@@ -1,8 +1,9 @@
-from typing import Annotated
+from typing import Annotated, Self
 
 from annotated_types import MinLen
 from django.urls import reverse
-from ninja import Field, FilterSchema, ModelSchema
+from ninja import Field, FilterSchema, ModelSchema, Schema
+from pydantic import model_validator
 
 from club.schemas import ClubSchema
 from core.schemas import GroupSchema, SimpleUserSchema
@@ -31,7 +32,32 @@ class SimplifiedCounterSchema(ModelSchema):
 class ProductTypeSchema(ModelSchema):
     class Meta:
         model = ProductType
+        fields = ["id", "name", "description", "comment", "icon", "order"]
+
+    url: str
+
+    @staticmethod
+    def resolve_url(obj: ProductType) -> str:
+        return reverse("counter:producttype_edit", kwargs={"type_id": obj.id})
+
+
+class SimpleProductTypeSchema(ModelSchema):
+    class Meta:
+        model = ProductType
         fields = ["id", "name"]
+
+
+class ReorderProductTypeSchema(Schema):
+    below: int | None = None
+    above: int | None = None
+
+    @model_validator(mode="after")
+    def validate_exclusive(self) -> Self:
+        if self.below is None and self.above is None:
+            raise ValueError("Either 'below' or 'above' must be set.")
+        if self.below is not None and self.above is not None:
+            raise ValueError("Only one of 'below' or 'above' must be set.")
+        return self
 
 
 class SimpleProductSchema(ModelSchema):
@@ -57,7 +83,7 @@ class ProductSchema(ModelSchema):
 
     buying_groups: list[GroupSchema]
     club: ClubSchema
-    product_type: ProductTypeSchema | None
+    product_type: SimpleProductTypeSchema | None
     url: str
 
     @staticmethod
