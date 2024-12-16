@@ -10,7 +10,7 @@ from django.utils.timezone import now
 from model_bakery import baker, seq
 from model_bakery.recipe import Recipe, foreign_key
 
-from club.models import Membership
+from club.models import Club, Membership
 from core.baker_recipes import (
     board_user,
     old_subscriber_user,
@@ -20,6 +20,7 @@ from core.baker_recipes import (
 from core.models import User
 from counter.models import Counter, Refilling, Selling
 from eboutic.models import Invoice, InvoiceItem
+from trombi.models import Trombi, TrombiUser
 
 
 class TestSearchUsers(TestCase):
@@ -199,6 +200,25 @@ class TestUserPreferences:
         return subscriber_user.make()
 
     @pytest.fixture
+    def other_subscriber(self) -> User:
+        return subscriber_user.make()
+
+    @pytest.fixture
+    def trombi_user(self) -> User:
+        user = subscriber_user.make()
+        club = baker.make(Club)
+        baker.make(
+            Membership,
+            club=club,
+            start_date=now() - timedelta(days=30),
+            role=settings.SITH_CLUB_ROLES_ID["Curious"],
+            user=user,
+        )
+        trombi = baker.make(Trombi, club=club)
+        baker.make(TrombiUser, user=user, trombi=trombi)
+        return user
+
+    @pytest.fixture
     def non_subscriber(self) -> User:
         return baker.make(User)
 
@@ -227,15 +247,27 @@ class TestUserPreferences:
             ("subscriber", None, 403),  # Anonymous user
             ("subscriber", "non_subscriber", 403),
             ("subscriber", "club_admin", 403),
+            ("subscriber", "other_subscriber", 403),
+            ("subscriber", "trombi_user", 403),
             ("subscriber", "subscriber", 200),
             ("subscriber", "board_member", 200),
             ("subscriber", "admin", 200),
-            ("non_subscriber", None, 403),
+            ("non_subscriber", None, 403),  # Anonymous user
             ("non_subscriber", "club_admin", 403),
             ("non_subscriber", "subscriber", 403),
+            ("non_subscriber", "other_subscriber", 403),
+            ("non_subscriber", "trombi_user", 403),
             ("non_subscriber", "non_subscriber", 200),
             ("non_subscriber", "board_member", 200),
             ("non_subscriber", "admin", 200),
+            ("trombi_user", None, 403),  # Anonymous user
+            ("trombi_user", "club_admin", 403),
+            ("trombi_user", "subscriber", 403),
+            ("trombi_user", "other_subscriber", 403),
+            ("trombi_user", "non_subscriber", 403),
+            ("trombi_user", "trombi_user", 200),
+            ("trombi_user", "board_member", 200),
+            ("trombi_user", "admin", 200),
         ],
     )
     @pytest.mark.django_db
