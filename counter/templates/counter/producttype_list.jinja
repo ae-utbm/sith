@@ -4,21 +4,49 @@
   {% trans %}Product type list{% endtrans %}
 {% endblock %}
 
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("counter/css/product_type.scss") }}">
+{% endblock %}
+
+{% block additional_js %}
+  <script type="module" src="{{ static("bundled/counter/product-type-index.ts") }}"></script>
+{% endblock %}
+
 {% block content %}
   <p><a href="{{ url('counter:new_producttype') }}">{% trans %}New product type{% endtrans %}</a></p>
   {% if producttype_list %}
-    <h3>{% trans %}Product type list{% endtrans %}</h3>
-    <ul>
-      {% for t in producttype_list  %}
-        <li><a href="{{ url('counter:producttype_edit', type_id=t.id) }}">{{ t }}</a></li>
-      {% endfor %}
-    </ul>
+    <div x-data="productTypesList">
+      <p
+        class="alert snackbar"
+        :class="alertMessage.success ? 'alert-green' : 'alert-red'"
+        x-show="alertMessage.open"
+        x-transition.duration.500ms
+        x-text="alertMessage.content"
+      ></p>
+      <h3>{% trans %}Product type list{% endtrans %}</h3>
+      <ul
+        x-sort="($item, $position) => reorder($item, $position)"
+        x-ref="productTypes"
+        class="product-type-list"
+        :aria-busy="loading"
+      >
+        {%- for t in producttype_list -%}
+          <li x-sort:item="{{ t.id }}">
+            <i class="fa fa-grip-vertical"></i>
+            <a href="{{ url('counter:producttype_edit', type_id=t.id) }}">{{ t }}</a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
   {% else %}
     {% trans %}There is no product types in this website.{% endtrans %}
   {% endif %}
 {% endblock %}
 
 
+{% block script %}
+
+{% endblock %}
 
 
 

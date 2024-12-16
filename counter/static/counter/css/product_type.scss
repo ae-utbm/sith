@@ -1,0 +1,15 @@
+.product-type-list {
+  li {
+    list-style: none;
+    margin-bottom: 10px;
+
+    i {
+      cursor: grab;
+      visibility: hidden;
+    }
+  }
+}
+
+body:not(.sorting) .product-type-list li:hover i {
+  visibility: visible;
+}
