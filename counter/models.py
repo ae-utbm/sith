@@ -652,13 +652,12 @@ class Counter(models.Model):
         )["total"]
 
     def customer_is_barman(self, customer: Customer | User) -> bool:
-        """Check if current counter is a `bar` and that the customer is on the barmen_list
+        """Check if this counter is a `bar` and if the customer is currently logged in.
+        This is useful to compute special prices."""
 
-        This is useful to compute special prices"""
-        if isinstance(customer, Customer):
-            customer: User = customer.user
-
-        return self.type == "BAR" and customer in self.barmen_list
+        # Customer and User are two different tables,
+        # but they share the same primary key
+        return self.type == "BAR" and any(b.pk == customer.pk for b in self.barmen_list)
 
 
 class RefillingQuerySet(models.QuerySet):

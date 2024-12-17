@@ -417,7 +417,7 @@ class RefillingCreateView(FormView):
     def get_template_data(
         cls, customer: Customer, *, form_instance: form_class | None = None
     ) -> FormFragmentTemplateData[form_class]:
-        return FormFragmentTemplateData[cls.form_class](
+        return FormFragmentTemplateData(
             form=form_instance if form_instance else cls.form_class(),
             template=cls.template_name,
             context={

@@ -73,7 +73,7 @@ class StudentCardFormView(FormView):
         cls, customer: Customer, *, form_instance: form_class | None = None
     ) -> FormFragmentTemplateData[form_class]:
         """Get necessary data to pre-render the fragment"""
-        return FormFragmentTemplateData[cls.form_class](
+        return FormFragmentTemplateData(
             form=form_instance if form_instance else cls.form_class(),
             template=cls.template_name,
             context={
