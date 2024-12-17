@@ -432,14 +432,6 @@ SITH_SUBSCRIPTION_LOCATIONS = [
 
 SITH_COUNTER_BARS = [(1, "MDE"), (2, "Foyer"), (35, "La Gommette")]
 
-SITH_COUNTER_OFFICES = {2: "PdF", 1: "AE"}
-
-SITH_COUNTER_PAYMENT_METHOD = [
-    ("CHECK", _("Check")),
-    ("CASH", _("Cash")),
-    ("CARD", _("Credit card")),
-]
-
 SITH_COUNTER_BANK = [
     ("OTHER", "Autre"),
     ("SOCIETE-GENERALE", "Société générale"),

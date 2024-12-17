@@ -111,6 +111,8 @@ class GetUserForm(forms.Form):
 
 
 class RefillForm(forms.ModelForm):
+    allowed_refilling_methods = ["CASH", "CARD"]
+
     error_css_class = "error"
     required_css_class = "required"
     amount = forms.FloatField(
@@ -120,6 +122,21 @@ class RefillForm(forms.ModelForm):
     class Meta:
         model = Refilling
         fields = ["amount", "payment_method", "bank"]
+        widgets = {"payment_method": forms.RadioSelect}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["payment_method"].choices = (
+            method
+            for method in self.fields["payment_method"].choices
+            if method[0] in self.allowed_refilling_methods
+        )
+        if self.fields["payment_method"].initial not in self.allowed_refilling_methods:
+            self.fields["payment_method"].initial = self.allowed_refilling_methods[0]
+
+        if "CHECK" not in self.allowed_refilling_methods:
+            del self.fields["bank"]
 
 
 class CounterEditForm(forms.ModelForm):

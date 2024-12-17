@@ -70,11 +70,11 @@ class StudentCardFormView(FormView):
 
     @classmethod
     def get_template_data(
-        cls, customer: Customer
-    ) -> FormFragmentTemplateData[StudentCardForm]:
+        cls, customer: Customer, *, form_instance: form_class | None = None
+    ) -> FormFragmentTemplateData[form_class]:
         """Get necessary data to pre-render the fragment"""
         return FormFragmentTemplateData(
-            form=cls.form_class(),
+            form=form_instance if form_instance else cls.form_class(),
             template=cls.template_name,
             context={
                 "action": reverse(
@@ -105,7 +105,7 @@ class StudentCardFormView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        data = self.get_template_data(self.customer)
+        data = self.get_template_data(self.customer, form_instance=context["form"])
         context.update(data.context)
         return context
 

@@ -42,7 +42,8 @@ from club.models import Club
 from core.fields import ResizedImageField
 from core.models import Group, Notification, User
 from core.utils import get_start_of_semester
-from sith.settings import SITH_COUNTER_OFFICES, SITH_MAIN_CLUB
+from counter.apps import PAYMENT_METHOD
+from sith.settings import SITH_MAIN_CLUB
 from subscription.models import Subscription
 
 
@@ -558,9 +559,6 @@ class Counter(models.Model):
         """Show if the counter authorize the refilling with physic money."""
         if self.type != "BAR":
             return False
-        if self.id in SITH_COUNTER_OFFICES:
-            # If the counter is either 'AE' or 'BdF', refills are authorized
-            return True
         # at least one of the barmen is in the AE board
         ae = Club.objects.get(unix_name=SITH_MAIN_CLUB["unix_name"])
         return any(ae.get_membership_for(barman) for barman in self.barmen_list)
@@ -650,6 +648,14 @@ class Counter(models.Model):
             )
         )["total"]
 
+    def customer_is_barman(self, customer: Customer | User) -> bool:
+        """Check if this counter is a `bar` and if the customer is currently logged in.
+        This is useful to compute special prices."""
+
+        # Customer and User are two different tables,
+        # but they share the same primary key
+        return self.type == "BAR" and any(b.pk == customer.pk for b in self.barmen_list)
+
 
 class RefillingQuerySet(models.QuerySet):
     def annotate_total(self) -> Self:
@@ -688,8 +694,8 @@ class Refilling(models.Model):
     payment_method = models.CharField(
         _("payment method"),
         max_length=255,
-        choices=settings.SITH_COUNTER_PAYMENT_METHOD,
-        default="CASH",
+        choices=PAYMENT_METHOD,
+        default="CARD",
     )
     bank = models.CharField(
         _("bank"), max_length=255, choices=settings.SITH_COUNTER_BANK, default="OTHER"

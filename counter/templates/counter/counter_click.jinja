@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block additional_js %}
-  <script src="{{ static('counter/js/counter_click.js') }}" defer></script>
+  <script type="module" src="{{ static('bundled/counter/counter-click-index.ts') }}"></script>
 {% endblock %}
 
 {% block info_boxes %}
@@ -28,16 +28,11 @@
       <h5>{% trans %}Customer{% endtrans %}</h5>
       {{ user_mini_profile(customer.user) }}
       {{ user_subscription(customer.user) }}
-      <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
-
-      {% if counter.type == 'BAR' %}
-        <h5>{% trans %}Student card{% endtrans %}</h3>
-        {{ student_card_fragment }}
-      {% endif %}
+      <p>{% trans %}Amount: {% endtrans %}<span x-text="customerBalance"></span> €</p>
     </div>
 
-    <div id="click_form">
-      <h5>{% trans %}Selling{% endtrans %}</h5>
+    <div id="click_form" style="width: 20%;">
+      <h5 id="selling-accordion">{% trans %}Selling{% endtrans %}</h5>
       <div>
         {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user_id) %}
 
@@ -105,17 +100,32 @@
           <input type="submit" value="{% trans %}Cancel{% endtrans %}"/>
         </form>
       </div>
-      {% if (counter.type == 'BAR' and barmens_can_refill) %}
+      {% if object.type == "BAR" %}
         <h5>{% trans %}Refilling{% endtrans %}</h5>
-        <div>
-          <form method="post"
-                action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
-            {% csrf_token %}
-            {{ refill_form.as_p() }}
-            <input type="hidden" name="action" value="refill">
-            <input type="submit" value="{% trans %}Go{% endtrans %}"/>
-          </form>
-        </div>
+        {% if refilling_fragment %}
+          <div
+            @htmx:after-request="onRefillingSuccess"
+          >
+            {{ refilling_fragment }}
+          </div>
+        {% else %}
+          <div>
+            <p class="alert alert-yellow">
+              {% trans trimmed %}
+                As a barman, you are not able to refill any account on your own.
+                An admin should be connected on this counter for that.
+                The customer can refill by using the eboutic.
+              {% endtrans %}
+            </p>
+          </div>
+        {% endif %}
+        {% if student_card_fragment %}
+          <h5>{% trans %}Student card{% endtrans %}</h3>
+          <div>
+            {{ student_card_fragment }}
+          </div>
+        {% endif %}
+
       {% endif %}
     </div>
 
@@ -155,9 +165,6 @@
 {% block script %}
   {{ super() }}
   <script>
-    const csrfToken = "{{ csrf_token }}";
-    const clickApiUrl = "{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}";
-    const sessionBasket = {{ request.session["basket"]|tojson }};
     const products = {
       {%- for p in products -%}
         {{ p.id }}: {
@@ -176,5 +183,14 @@
         },
       {%- endfor %}
     ];
+    window.addEventListener("DOMContentLoaded", () => {
+      loadCounter({
+        csrfToken: "{{ csrf_token }}",
+        clickApiUrl: "{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}",
+        sessionBasket: {{ request.session["basket"]|tojson }},
+        customerBalance: {{ customer.amount }},
+        customerId: {{ customer.pk }},
+      });
+    });
   </script>
 {% endblock script %}
