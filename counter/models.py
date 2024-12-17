@@ -43,7 +43,7 @@ from core.fields import ResizedImageField
 from core.models import Group, Notification, User
 from core.utils import get_start_of_semester
 from counter.apps import PAYMENT_METHOD
-from sith.settings import SITH_COUNTER_OFFICES, SITH_MAIN_CLUB
+from sith.settings import SITH_MAIN_CLUB
 from subscription.models import Subscription
 
 
@@ -559,9 +559,6 @@ class Counter(models.Model):
         """Show if the counter authorize the refilling with physic money."""
         if self.type != "BAR":
             return False
-        if self.id in SITH_COUNTER_OFFICES:
-            # If the counter is either 'AE' or 'BdF', refills are authorized
-            return True
         # at least one of the barmen is in the AE board
         ae = Club.objects.get(unix_name=SITH_MAIN_CLUB["unix_name"])
         return any(ae.get_membership_for(barman) for barman in self.barmen_list)

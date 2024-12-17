@@ -159,7 +159,7 @@ class TestCounter(TestCase):
             },
             HTTP_REFERER=counter_url,
         )
-        assert response.status_code == 302
+        assert response.status_code == 403  # Krophil is not board admin
 
     def test_annotate_has_barman_queryset(self):
         """Test if the custom queryset method `annotate_has_barman` works as intended."""
