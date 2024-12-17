@@ -215,17 +215,14 @@ class JournalTabsMixin(TabedViewMixin):
         return _("Journal")
 
     def get_list_of_tabs(self):
-        tab_list = []
-        tab_list.append(
+        return [
             {
                 "url": reverse(
                     "accounting:journal_details", kwargs={"j_id": self.object.id}
                 ),
                 "slug": "journal",
                 "name": _("Journal"),
-            }
-        )
-        tab_list.append(
+            },
             {
                 "url": reverse(
                     "accounting:journal_nature_statement",
@@ -233,9 +230,7 @@ class JournalTabsMixin(TabedViewMixin):
                 ),
                 "slug": "nature_statement",
                 "name": _("Statement by nature"),
-            }
-        )
-        tab_list.append(
+            },
             {
                 "url": reverse(
                     "accounting:journal_person_statement",
@@ -243,9 +238,7 @@ class JournalTabsMixin(TabedViewMixin):
                 ),
                 "slug": "person_statement",
                 "name": _("Statement by person"),
-            }
-        )
-        tab_list.append(
+            },
             {
                 "url": reverse(
                     "accounting:journal_accounting_statement",
@@ -253,9 +246,8 @@ class JournalTabsMixin(TabedViewMixin):
                 ),
                 "slug": "accounting_statement",
                 "name": _("Accounting statement"),
-            }
-        )
-        return tab_list
+            },
+        ]
 
 
 class JournalCreateView(CanCreateMixin, CreateView):

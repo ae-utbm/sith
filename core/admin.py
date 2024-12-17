@@ -15,6 +15,7 @@
 
 from django.contrib import admin
 from django.contrib.auth.models import Group as AuthGroup
+from django.contrib.auth.models import Permission
 
 from core.models import Group, OperationLog, Page, SithFile, User
 
@@ -23,9 +24,10 @@ admin.site.unregister(AuthGroup)
 
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
-    list_display = ("name", "description", "is_meta")
-    list_filter = ("is_meta",)
+    list_display = ("name", "description", "is_manually_manageable")
+    list_filter = ("is_manually_manageable",)
     search_fields = ("name",)
+    autocomplete_fields = ("permissions",)
 
 
 @admin.register(User)
@@ -37,8 +39,15 @@ class UserAdmin(admin.ModelAdmin):
         "profile_pict",
         "avatar_pict",
         "scrub_pict",
+        "user_permissions",
+        "groups",
     )
     search_fields = ["first_name", "last_name", "username"]
+
+
+@admin.register(Permission)
+class PermissionAdmin(admin.ModelAdmin):
+    search_fields = ("codename",)
 
 
 @admin.register(Page)

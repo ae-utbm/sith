@@ -216,7 +216,7 @@ class TestOperation(TestCase):
             self.journal.operations.filter(target_label="Le fantome du jour").exists()
         )
 
-    def test__operation_simple_accounting(self):
+    def test_operation_simple_accounting(self):
         sat = SimplifiedAccountingType.objects.all().first()
         response = self.client.post(
             reverse("accounting:op_new", args=[self.journal.id]),
@@ -237,15 +237,14 @@ class TestOperation(TestCase):
                 "done": False,
             },
         )
-        self.assertFalse(response.status_code == 403)
-        self.assertTrue(self.journal.operations.filter(amount=23).exists())
+        assert response.status_code != 403
+        assert self.journal.operations.filter(amount=23).exists()
         response_get = self.client.get(
             reverse("accounting:journal_details", args=[self.journal.id])
         )
-        self.assertTrue(
-            "<td>Le fantome de l&#39;aurore</td>" in str(response_get.content)
-        )
-        self.assertTrue(
+        assert "<td>Le fantome de l&#39;aurore</td>" in str(response_get.content)
+
+        assert (
             self.journal.operations.filter(amount=23)
             .values("accounting_type")
             .first()["accounting_type"]
