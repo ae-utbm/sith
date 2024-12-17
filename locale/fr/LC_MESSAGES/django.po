@@ -971,7 +971,7 @@ msgstr "Comptoir"
 msgid "Products"
 msgstr "Produits"
 
-#: club/forms.py:168 counter/views/mixins.py:99
+#: club/forms.py:168 counter/templates/counter/product_list.jinja:37
 msgid "Archived products"
 msgstr "Produits archivés"
 
@@ -1192,6 +1192,7 @@ msgid "Show"
 msgstr "Montrer"
 
 #: club/templates/club/club_sellings.jinja:38
+#: counter/templates/counter/product_list.jinja:59
 msgid "Download as cvs"
 msgstr "Télécharger en CSV"
 
@@ -2478,7 +2479,7 @@ msgstr "Photos"
 #: core/templates/core/base/navbar.jinja:22 counter/models.py:491
 #: counter/templates/counter/counter_list.jinja:11
 #: eboutic/templates/eboutic/eboutic_main.jinja:4
-#: eboutic/templates/eboutic/eboutic_main.jinja:22
+#: eboutic/templates/eboutic/eboutic_main.jinja:23
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:16
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja:4
 #: sith/settings.py:422 sith/settings.py:430
@@ -3021,7 +3022,7 @@ msgid "Eboutic invoices"
 msgstr "Facture eboutic"
 
 #: core/templates/core/user_account.jinja:54
-#: core/templates/core/user_tools.jinja:58 counter/views/mixins.py:119
+#: core/templates/core/user_tools.jinja:58 counter/views/mixins.py:114
 msgid "Etickets"
 msgstr "Etickets"
 
@@ -3372,12 +3373,12 @@ msgstr "Gestion des types de produit"
 
 #: core/templates/core/user_tools.jinja:56
 #: counter/templates/counter/cash_summary_list.jinja:23
-#: counter/views/mixins.py:109
+#: counter/views/mixins.py:104
 msgid "Cash register summaries"
 msgstr "Relevés de caisse"
 
 #: core/templates/core/user_tools.jinja:57
-#: counter/templates/counter/invoices_call.jinja:4 counter/views/mixins.py:114
+#: counter/templates/counter/invoices_call.jinja:4 counter/views/mixins.py:109
 msgid "Invoices call"
 msgstr "Appels à facture"
 
@@ -4150,22 +4151,34 @@ msgstr ""
 "votre cotisation. Si vous ne renouvelez pas votre cotisation, il n'y aura "
 "aucune conséquence autre que le retrait de l'argent de votre compte."
 
-#: counter/templates/counter/product_list.jinja:4
-#: counter/templates/counter/product_list.jinja:11
+#: counter/templates/counter/product_list.jinja:5
+#: counter/templates/counter/product_list.jinja:46
 msgid "Product list"
 msgstr "Liste des produits"
 
-#: counter/templates/counter/product_list.jinja:9
+#: counter/templates/counter/product_list.jinja:20
+msgid "Filter products"
+msgstr "Filtrer les produits"
+
+#: counter/templates/counter/product_list.jinja:22
+msgid "Product name"
+msgstr "Nom du produit"
+
+#: counter/templates/counter/product_list.jinja:33
+#, fuzzy
+#| msgid "Archived products"
+msgid "Active products"
+msgstr "Produits archivés"
+
+#: counter/templates/counter/product_list.jinja:41
+#, fuzzy
+#| msgid "products"
+msgid "All products"
+msgstr "produits"
+
+#: counter/templates/counter/product_list.jinja:51
 msgid "New product"
 msgstr "Nouveau produit"
-
-#: counter/templates/counter/product_list.jinja:13
-msgid "Uncategorized"
-msgstr "Sans catégorie"
-
-#: counter/templates/counter/product_list.jinja:20
-msgid "There is no products in this website."
-msgstr "Il n'y a pas de produits dans ce site web."
 
 #: counter/templates/counter/product_type_list.jinja:4
 #: counter/templates/counter/product_type_list.jinja:42
@@ -4327,7 +4340,7 @@ msgstr "Dernières opérations"
 msgid "Counter administration"
 msgstr "Administration des comptoirs"
 
-#: counter/views/mixins.py:104
+#: counter/views/mixins.py:99
 msgid "Product types"
 msgstr "Types de produit"
 
@@ -4373,26 +4386,26 @@ msgstr "id du type du produit"
 msgid "basket"
 msgstr "panier"
 
-#: eboutic/templates/eboutic/eboutic_main.jinja:39
+#: eboutic/templates/eboutic/eboutic_main.jinja:40
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:44
 msgid "Current account amount: "
 msgstr "Solde actuel : "
 
-#: eboutic/templates/eboutic/eboutic_main.jinja:58
+#: eboutic/templates/eboutic/eboutic_main.jinja:59
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:40
 msgid "Basket amount: "
 msgstr "Valeur du panier : "
 
-#: eboutic/templates/eboutic/eboutic_main.jinja:65
+#: eboutic/templates/eboutic/eboutic_main.jinja:66
 msgid "Clear"
 msgstr "Vider"
 
-#: eboutic/templates/eboutic/eboutic_main.jinja:71
+#: eboutic/templates/eboutic/eboutic_main.jinja:72
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:95
 msgid "Validate"
 msgstr "Valider"
 
-#: eboutic/templates/eboutic/eboutic_main.jinja:80
+#: eboutic/templates/eboutic/eboutic_main.jinja:81
 msgid ""
 "You have not filled in your date of birth. As a result, you may not have "
 "access to all the products in the online shop. To fill in your date of "
@@ -4403,11 +4416,11 @@ msgstr ""
 "boutique en ligne. Pour remplir votre date de naissance, vous pouvez aller "
 "sur"
 
-#: eboutic/templates/eboutic/eboutic_main.jinja:82
+#: eboutic/templates/eboutic/eboutic_main.jinja:83
 msgid "this page"
 msgstr "cette page"
 
-#: eboutic/templates/eboutic/eboutic_main.jinja:128
+#: eboutic/templates/eboutic/eboutic_main.jinja:132
 msgid "There are no items available for sale"
 msgstr "Aucun article n'est disponible à la vente"
 
