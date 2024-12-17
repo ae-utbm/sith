@@ -72,9 +72,7 @@ class TestCounter(TestCase):
             kwargs={"customer_id": self.richard.customer.pk},
         )
 
-        response = self.client.get(
-            response.get("location"),
-        )
+        response = self.client.get(counter_url)
         assert ">Richard Batsbak</" in str(response.content)
 
         self.client.post(

@@ -21,12 +21,11 @@ from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
-from core.api_permissions import CanAccessLookup, CanView, IsLoggedInCounter, IsRoot
-from counter.models import Counter, Customer, Product
+from core.api_permissions import CanAccessLookup, CanView, IsRoot
+from counter.models import Counter, Product
 from counter.schemas import (
     CounterFilterSchema,
     CounterSchema,
-    CustomerSchema,
     ProductSchema,
     SimplifiedCounterSchema,
 )
@@ -59,18 +58,6 @@ class CounterController(ControllerBase):
     @paginate(PageNumberPaginationExtra, page_size=50)
     def search_counter(self, filters: Query[CounterFilterSchema]):
         return filters.filter(Counter.objects.all())
-
-
-@api_controller("/customer")
-class CustomerController(ControllerBase):
-    @route.get(
-        "{customer_id}",
-        response=CustomerSchema,
-        permissions=[IsLoggedInCounter],
-        url_name="get_customer",
-    )
-    def get_customer(self, customer_id: int):
-        return self.get_object_or_exception(Customer, pk=customer_id)
 
 
 @api_controller("/product")

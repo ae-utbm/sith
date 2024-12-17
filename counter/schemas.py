@@ -4,7 +4,7 @@ from annotated_types import MinLen
 from ninja import Field, FilterSchema, ModelSchema
 
 from core.schemas import SimpleUserSchema
-from counter.models import Counter, Customer, Product
+from counter.models import Counter, Product
 
 
 class CounterSchema(ModelSchema):
@@ -14,12 +14,6 @@ class CounterSchema(ModelSchema):
     class Meta:
         model = Counter
         fields = ["id", "name", "type", "club", "products"]
-
-
-class CustomerSchema(ModelSchema):
-    class Meta:
-        model = Customer
-        fields = ["user", "account_id", "amount", "recorded_products"]
 
 
 class CounterFilterSchema(FilterSchema):
