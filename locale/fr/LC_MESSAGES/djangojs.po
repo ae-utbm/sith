@@ -123,8 +123,8 @@ msgid "captured.%s"
 msgstr "capture.%s"
 
 #: counter/static/bundled/counter/product-type-index.ts:36
-msgid "Products types successfully reordered"
-msgstr "Types de produits réordonnés."
+msgid "Products types reordered!"
+msgstr "Types de produits réordonnés !"
 
 #: counter/static/bundled/counter/product-type-index.ts:40
 #, javascript-format

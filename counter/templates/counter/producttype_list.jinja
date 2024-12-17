@@ -13,8 +13,24 @@
 {% endblock %}
 
 {% block content %}
-  <p><a href="{{ url('counter:new_producttype') }}">{% trans %}New product type{% endtrans %}</a></p>
+  <p>
+    <a href="{{ url('counter:new_producttype') }}" class="btn btn-blue">
+      {% trans %}New product type{% endtrans %}
+      <i class="fa fa-plus"></i>
+    </a>
+  </p>
   {% if producttype_list %}
+    <aside>
+      <p>
+        {% trans %}Product types are in the same order on this page and on the eboutic.{% endtrans %}
+      </p>
+      <p>
+        {% trans trimmed %}
+          You can reorder them here by drag-and-drop.
+          The changes will then be applied globally immediately.
+        {% endtrans %}
+      </p>
+    </aside>
     <div x-data="productTypesList">
       <p
         class="alert snackbar"
@@ -42,11 +58,3 @@
     {% trans %}There is no product types in this website.{% endtrans %}
   {% endif %}
 {% endblock %}
-
-
-{% block script %}
-
-{% endblock %}
-
-
-

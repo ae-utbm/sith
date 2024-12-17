@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-17 13:10+0100\n"
+"POT-Creation-Date: 2024-12-17 17:04+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4198,15 +4198,27 @@ msgid "There is no products in this website."
 msgstr "Il n'y a pas de produits dans ce site web."
 
 #: counter/templates/counter/producttype_list.jinja:4
-#: counter/templates/counter/producttype_list.jinja:26
+#: counter/templates/counter/producttype_list.jinja:42
 msgid "Product type list"
 msgstr "Liste des types de produit"
 
-#: counter/templates/counter/producttype_list.jinja:16
+#: counter/templates/counter/producttype_list.jinja:18
 msgid "New product type"
 msgstr "Nouveau type de produit"
 
-#: counter/templates/counter/producttype_list.jinja:42
+#: counter/templates/counter/producttype_list.jinja:25
+msgid "Product types are in the same order on this page and on the eboutic."
+msgstr "Les types de produit sont dans le même ordre sur cette page et sur l'eboutic."
+
+#: counter/templates/counter/producttype_list.jinja:28
+msgid ""
+"You can reorder them here by drag-and-drop. The changes will then be applied "
+"globally immediately."
+msgstr ""
+"Vous pouvez les réorganiser ici. Les changements seront alors immédiatement "
+"appliqués globalement."
+
+#: counter/templates/counter/producttype_list.jinja:58
 msgid "There is no product types in this website."
 msgstr "Il n'y a pas de types de produit dans ce site web."
 

@@ -87,5 +87,5 @@ def test_move_above_product_type(product_types: list[ProductType]):
 )
 def test_controller_permissions(client: Client, user_factory, status_code):
     client.force_login(user_factory())
-    response = client.get(reverse("api:fetch-product-types"))
+    response = client.get(reverse("api:fetch_product_types"))
     assert response.status_code == status_code

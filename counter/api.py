@@ -109,7 +109,7 @@ class ProductController(ControllerBase):
 
 @api_controller("/product-type", permissions=[IsCounterAdmin])
 class ProductTypeController(ControllerBase):
-    @route.get("", response=list[ProductTypeSchema], url_name="fetch-product-types")
+    @route.get("", response=list[ProductTypeSchema], url_name="fetch_product_types")
     def fetch_all(self):
         return ProductType.objects.order_by("order")
 
