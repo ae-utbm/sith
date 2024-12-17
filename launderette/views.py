@@ -145,10 +145,8 @@ class LaunderetteBookView(CanViewMixin, DetailView):
                         and self.check_slot("WASHING", h)
                         and self.check_slot("DRYING", h + timedelta(hours=1))
                     )
-                    or self.slot_type == "WASHING"
-                    and self.check_slot("WASHING", h)
-                    or self.slot_type == "DRYING"
-                    and self.check_slot("DRYING", h)
+                    or (self.slot_type == "WASHING" and self.check_slot("WASHING", h))
+                    or (self.slot_type == "DRYING" and self.check_slot("DRYING", h))
                 ):
                     free = True
                 if free and datetime.now().replace(tzinfo=tz.utc) < h:

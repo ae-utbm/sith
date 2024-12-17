@@ -67,17 +67,22 @@ class TestCounter(TestCase):
             {"code": self.richard.customer.account_id, "counter_token": counter_token},
         )
         counter_url = response.get("location")
-        response = self.client.get(response.get("location"))
+        refill_url = reverse(
+            "counter:refilling_create",
+            kwargs={"customer_id": self.richard.customer.pk},
+        )
+
+        response = self.client.get(counter_url)
         assert ">Richard Batsbak</" in str(response.content)
 
         self.client.post(
-            counter_url,
+            refill_url,
             {
-                "action": "refill",
                 "amount": "5",
                 "payment_method": "CASH",
                 "bank": "OTHER",
             },
+            HTTP_REFERER=counter_url,
         )
         self.client.post(counter_url, "action=code&code=BARB", content_type="text/xml")
         self.client.post(
@@ -110,15 +115,15 @@ class TestCounter(TestCase):
         )
 
         response = self.client.post(
-            counter_url,
+            refill_url,
             {
-                "action": "refill",
                 "amount": "5",
                 "payment_method": "CASH",
                 "bank": "OTHER",
             },
+            HTTP_REFERER=counter_url,
         )
-        assert response.status_code == 200
+        assert response.status_code == 302
 
         self.client.post(
             reverse("counter:login", kwargs={"counter_id": self.foyer.id}),
@@ -138,17 +143,23 @@ class TestCounter(TestCase):
             {"code": self.richard.customer.account_id, "counter_token": counter_token},
         )
         counter_url = response.get("location")
+        refill_url = reverse(
+            "counter:refilling_create",
+            kwargs={
+                "customer_id": self.richard.customer.pk,
+            },
+        )
 
         response = self.client.post(
-            counter_url,
+            refill_url,
             {
-                "action": "refill",
                 "amount": "5",
                 "payment_method": "CASH",
                 "bank": "OTHER",
             },
+            HTTP_REFERER=counter_url,
         )
-        assert response.status_code == 200
+        assert response.status_code == 403  # Krophil is not board admin
 
     def test_annotate_has_barman_queryset(self):
         """Test if the custom queryset method `annotate_has_barman` works as intended."""

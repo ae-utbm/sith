@@ -1,0 +1,15 @@
+<div id="student_card_form">
+  <form hx-post="{{ action }}" hx-swap="outerHTML" hx-target="#student_card_form">
+    {% csrf_token %}
+    <p>{% trans obj=object %}Are you sure you want to delete "{{ obj }}"?{% endtrans %}</p>
+    <input type="submit" value="{% trans %}Confirm{% endtrans %}" />
+    <input
+      hx-get="{{ action_cancel }}"
+      hx-swap="outerHTML"
+      hx-target="#student_card_form"
+      type="submit"
+      name="cancel"
+      value="{% trans %}Cancel{% endtrans %}"
+    />
+  </form>
+</div>

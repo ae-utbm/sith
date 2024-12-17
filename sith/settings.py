@@ -351,6 +351,9 @@ SITH_SEMESTER_START_SPRING = (2, 15)  # 15 February
 # Used to determine the valid promos
 SITH_SCHOOL_START_YEAR = 1999
 
+# id of the Root account
+SITH_ROOT_USER_ID = 0
+
 SITH_GROUP_ROOT_ID = 1
 SITH_GROUP_PUBLIC_ID = 2
 SITH_GROUP_SUBSCRIBERS_ID = 3
@@ -428,14 +431,6 @@ SITH_SUBSCRIPTION_LOCATIONS = [
 ]
 
 SITH_COUNTER_BARS = [(1, "MDE"), (2, "Foyer"), (35, "La Gommette")]
-
-SITH_COUNTER_OFFICES = {2: "PdF", 1: "AE"}
-
-SITH_COUNTER_PAYMENT_METHOD = [
-    ("CHECK", _("Check")),
-    ("CASH", _("Cash")),
-    ("CARD", _("Credit card")),
-]
 
 SITH_COUNTER_BANK = [
     ("OTHER", "Autre"),

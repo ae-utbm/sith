@@ -4,13 +4,9 @@
       {% trans user=subscription.member %}Subscription created for {{ user }}{% endtrans %}
     </h3>
     <p>
-      {% trans trimmed
-      user=subscription.member.get_short_name(),
-      type=subscription.subscription_type,
-      end=subscription.subscription_end
-      %}
-      {{ user }} received its new {{ type }} subscription.
-      It will be active until {{ end }} included.
+      {% trans trimmed user=subscription.member.get_short_name(), type=subscription.subscription_type, end=subscription.subscription_end %}
+        {{ user }} received its new {{ type }} subscription.
+        It will be active until {{ end }} included.
       {% endtrans %}
     </p>
   </div>

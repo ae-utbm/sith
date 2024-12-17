@@ -26,7 +26,8 @@ def test_sentry_debug_endpoint(
     expected_error: RaisesContext[ZeroDivisionError] | does_not_raise[None],
     expected_return_code: int | None,
 ):
-    with expected_error, override_settings(
-        SENTRY_DSN=sentry_dsn, SENTRY_ENV=sentry_env
+    with (
+        expected_error,
+        override_settings(SENTRY_DSN=sentry_dsn, SENTRY_ENV=sentry_env),
     ):
         assert client.get(reverse("sentry-debug")).status_code == expected_return_code

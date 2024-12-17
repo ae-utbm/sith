@@ -1,15 +1,28 @@
+import itertools
 import json
 import string
+from datetime import timedelta
 
 import pytest
+from django.conf import settings
+from django.contrib.auth.base_user import make_password
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils.timezone import now
 from model_bakery import baker
 
-from core.baker_recipes import subscriber_user
+from club.models import Membership
+from core.baker_recipes import board_user, subscriber_user
 from core.models import User
 from counter.baker_recipes import refill_recipe, sale_recipe
-from counter.models import BillingInfo, Counter, Customer, Refilling, Selling
+from counter.models import (
+    BillingInfo,
+    Counter,
+    Customer,
+    Refilling,
+    Selling,
+    StudentCard,
+)
 
 
 @pytest.mark.django_db
@@ -162,302 +175,221 @@ class TestStudentCard(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.krophil = User.objects.get(username="krophil")
-        cls.sli = User.objects.get(username="sli")
-        cls.skia = User.objects.get(username="skia")
-        cls.root = User.objects.get(username="root")
+        cls.customer = subscriber_user.make()
+        cls.barmen = subscriber_user.make(password=make_password("plop"))
+        cls.board_admin = board_user.make()
+        cls.club_admin = baker.make(User)
+        cls.root = baker.make(User, is_superuser=True)
+        cls.subscriber = subscriber_user.make()
 
-        cls.counter = Counter.objects.get(id=2)
+        cls.counter = baker.make(Counter, type="BAR")
+        cls.counter.sellers.add(cls.barmen)
 
-    def setUp(self):
-        # Auto login on counter
-        self.client.post(
-            reverse("counter:login", args=[self.counter.id]),
-            {"username": "krophil", "password": "plop"},
+        cls.club_counter = baker.make(Counter)
+        baker.make(
+            Membership,
+            start_date=now() - timedelta(days=30),
+            club=cls.club_counter.club,
+            role=settings.SITH_CLUB_ROLES_ID["Board member"],
+            user=cls.club_admin,
         )
 
+        cls.valid_card = baker.make(
+            StudentCard, customer=cls.customer.customer, uid="8A89B82018B0A0"
+        )
+
+    def login_in_counter(self):
+        self.client.post(
+            reverse("counter:login", args=[self.counter.id]),
+            {"username": self.barmen.username, "password": "plop"},
+        )
+
+    def invalid_uids(self) -> list[tuple[str, str]]:
+        """Return a list of invalid uids, with the associated error message"""
+        return [
+            ("8B90734A802A8", ""),  # too short
+            (
+                "8B90734A802A8FA",
+                "Assurez-vous que cette valeur comporte au plus 14 caractères (actuellement 15).",
+            ),  # too long
+            ("8b90734a802a9f", ""),  # has lowercases
+            (" " * 14, "Ce champ est obligatoire."),  # empty
+            (
+                self.customer.customer.student_card.uid,
+                "Un objet Carte étudiante avec ce champ Uid existe déjà.",
+            ),
+        ]
+
     def test_search_user_with_student_card(self):
+        self.login_in_counter()
         response = self.client.post(
             reverse("counter:details", args=[self.counter.id]),
-            {"code": "9A89B82018B0A0"},
+            {"code": self.valid_card.uid},
         )
 
         assert response.url == reverse(
             "counter:click",
-            kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
+            kwargs={"counter_id": self.counter.id, "user_id": self.customer.pk},
         )
 
     def test_add_student_card_from_counter(self):
-        # Test card with mixed letters and numbers
-        response = self.client.post(
-            reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
-            ),
-            {"student_card_uid": "8B90734A802A8F", "action": "add_student_card"},
-        )
-        self.assertContains(response, text="8B90734A802A8F")
-
-        # Test card with only numbers
-        response = self.client.post(
-            reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
-            ),
-            {"student_card_uid": "04786547890123", "action": "add_student_card"},
-        )
-        self.assertContains(response, text="04786547890123")
-
-        # Test card with only letters
-        response = self.client.post(
-            reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
-            ),
-            {"student_card_uid": "ABCAAAFAAFAAAB", "action": "add_student_card"},
-        )
-        self.assertContains(response, text="ABCAAAFAAFAAAB")
+        self.login_in_counter()
+        for uid in ["8B90734A802A8F", "ABCAAAFAAFAAAB", "15248196326518"]:
+            customer = subscriber_user.make().customer
+            response = self.client.post(
+                reverse(
+                    "counter:add_student_card", kwargs={"customer_id": customer.pk}
+                ),
+                {"uid": uid},
+                HTTP_REFERER=reverse(
+                    "counter:click",
+                    kwargs={"counter_id": self.counter.id, "user_id": customer.pk},
+                ),
+            )
+            assert response.status_code == 302
+            customer.refresh_from_db()
+            assert hasattr(customer, "student_card")
+            assert customer.student_card.uid == uid
 
     def test_add_student_card_from_counter_fail(self):
-        # UID too short
-        response = self.client.post(
-            reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
-            ),
-            {"student_card_uid": "8B90734A802A8", "action": "add_student_card"},
-        )
-        self.assertContains(
-            response, text="Ce n'est pas un UID de carte étudiante valide"
-        )
+        self.login_in_counter()
+        customer = subscriber_user.make().customer
+        for uid, error_msg in self.invalid_uids():
+            response = self.client.post(
+                reverse(
+                    "counter:add_student_card", kwargs={"customer_id": customer.pk}
+                ),
+                {"uid": uid},
+                HTTP_REFERER=reverse(
+                    "counter:click",
+                    kwargs={"counter_id": self.counter.id, "user_id": customer.pk},
+                ),
+            )
+            self.assertContains(response, text="Cet UID est invalide")
+            self.assertContains(response, text=error_msg)
+            customer.refresh_from_db()
+            assert not hasattr(customer, "student_card")
 
-        # UID too long
-        response = self.client.post(
-            reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
-            ),
-            {"student_card_uid": "8B90734A802A8FA", "action": "add_student_card"},
-        )
-        self.assertContains(
-            response, text="Ce n'est pas un UID de carte étudiante valide"
-        )
+    def test_add_student_card_from_counter_unauthorized(self):
+        def send_valid_request(client, counter_id):
+            return client.post(
+                reverse(
+                    "counter:add_student_card", kwargs={"customer_id": self.customer.pk}
+                ),
+                {"uid": "8B90734A802A8F"},
+                HTTP_REFERER=reverse(
+                    "counter:click",
+                    kwargs={"counter_id": counter_id, "user_id": self.customer.pk},
+                ),
+            )
 
-        # Test with already existing card
-        response = self.client.post(
-            reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
-            ),
-            {"student_card_uid": "9A89B82018B0A0", "action": "add_student_card"},
-        )
-        self.assertContains(
-            response, text="Ce n'est pas un UID de carte étudiante valide"
-        )
+        # Send to a counter where you aren't logged in
+        assert send_valid_request(self.client, self.counter.id).status_code == 403
 
-        # Test with lowercase
-        response = self.client.post(
-            reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
-            ),
-            {"student_card_uid": "8b90734a802a9f", "action": "add_student_card"},
-        )
-        self.assertContains(
-            response, text="Ce n'est pas un UID de carte étudiante valide"
-        )
+        self.login_in_counter()
+        barman = subscriber_user.make()
+        self.counter.sellers.add(barman)
+        # We want to test sending requests from another counter while
+        # we are currently registered to another counter
+        # so we connect to a counter and
+        # we create a new client, in order to check
+        # that using a client not logged to a counter
+        # where another client is logged still isn't authorized.
+        client = Client()
+        # Send to a counter where you aren't logged in
+        assert send_valid_request(client, self.counter.id).status_code == 403
 
-        # Test with white spaces
-        response = self.client.post(
-            reverse(
-                "counter:click",
-                kwargs={"counter_id": self.counter.id, "user_id": self.sli.id},
-            ),
-            {"student_card_uid": "              ", "action": "add_student_card"},
-        )
-        self.assertContains(
-            response, text="Ce n'est pas un UID de carte étudiante valide"
-        )
+        # Send to a non bar counter
+        client.force_login(self.club_admin)
+        assert send_valid_request(client, self.club_counter.id).status_code == 403
 
     def test_delete_student_card_with_owner(self):
-        self.client.force_login(self.sli)
+        self.client.force_login(self.customer)
         self.client.post(
             reverse(
                 "counter:delete_student_card",
-                kwargs={
-                    "customer_id": self.sli.customer.pk,
-                    "card_id": self.sli.customer.student_cards.first().id,
-                },
+                kwargs={"customer_id": self.customer.customer.pk},
             )
         )
-        assert not self.sli.customer.student_cards.exists()
+        self.customer.customer.refresh_from_db()
+        assert not hasattr(self.customer.customer, "student_card")
 
-    def test_delete_student_card_with_board_member(self):
-        self.client.force_login(self.skia)
-        self.client.post(
-            reverse(
-                "counter:delete_student_card",
-                kwargs={
-                    "customer_id": self.sli.customer.pk,
-                    "card_id": self.sli.customer.student_cards.first().id,
-                },
+    def test_delete_student_card_with_admin_user(self):
+        """Test that AE board members and root users can delete student cards"""
+        for user in self.board_admin, self.root:
+            self.client.force_login(user)
+            self.client.post(
+                reverse(
+                    "counter:delete_student_card",
+                    kwargs={"customer_id": self.customer.customer.pk},
+                )
             )
-        )
-        assert not self.sli.customer.student_cards.exists()
+            self.customer.customer.refresh_from_db()
+            assert not hasattr(self.customer.customer, "student_card")
 
-    def test_delete_student_card_with_root(self):
-        self.client.force_login(self.root)
+    def test_delete_student_card_from_counter(self):
+        self.login_in_counter()
         self.client.post(
             reverse(
                 "counter:delete_student_card",
+                kwargs={"customer_id": self.customer.customer.pk},
+            ),
+            http_referer=reverse(
+                "counter:click",
                 kwargs={
-                    "customer_id": self.sli.customer.pk,
-                    "card_id": self.sli.customer.student_cards.first().id,
+                    "counter_id": self.counter.id,
+                    "user_id": self.customer.customer.pk,
                 },
-            )
+            ),
         )
-        assert not self.sli.customer.student_cards.exists()
+        self.customer.customer.refresh_from_db()
+        assert not hasattr(self.customer.customer, "student_card")
 
     def test_delete_student_card_fail(self):
-        self.client.force_login(self.krophil)
+        """Test that non-admin users cannot delete student cards"""
+        self.client.force_login(self.subscriber)
         response = self.client.post(
             reverse(
                 "counter:delete_student_card",
-                kwargs={
-                    "customer_id": self.sli.customer.pk,
-                    "card_id": self.sli.customer.student_cards.first().id,
-                },
+                kwargs={"customer_id": self.customer.customer.pk},
             )
         )
         assert response.status_code == 403
-        assert self.sli.customer.student_cards.exists()
+        self.subscriber.customer.refresh_from_db()
+        assert not hasattr(self.subscriber.customer, "student_card")
 
     def test_add_student_card_from_user_preferences(self):
-        # Test with owner of the card
-        self.client.force_login(self.sli)
-        self.client.post(
-            reverse(
-                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
-            ),
-            {"uid": "8B90734A802A8F"},
-        )
+        users = [self.customer, self.board_admin, self.root]
+        uids = ["8B90734A802A8F", "ABCAAAFAAFAAAB", "15248196326518"]
+        for user, uid in itertools.product(users, uids):
+            self.customer.customer.student_card.delete()
+            self.client.force_login(user)
+            response = self.client.post(
+                reverse(
+                    "counter:add_student_card",
+                    kwargs={"customer_id": self.customer.customer.pk},
+                ),
+                {"uid": uid},
+            )
+            assert response.status_code == 302
+            response = self.client.get(response.url)
 
-        response = self.client.get(
-            reverse("core:user_prefs", kwargs={"user_id": self.sli.id})
-        )
-        self.assertContains(response, text="8B90734A802A8F")
-
-        # Test with board member
-        self.client.force_login(self.skia)
-        self.client.post(
-            reverse(
-                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
-            ),
-            {"uid": "8B90734A802A8A"},
-        )
-
-        response = self.client.get(
-            reverse("core:user_prefs", kwargs={"user_id": self.sli.id})
-        )
-        self.assertContains(response, text="8B90734A802A8A")
-
-        # Test card with only numbers
-        self.client.post(
-            reverse(
-                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
-            ),
-            {"uid": "04786547890123"},
-        )
-        response = self.client.get(
-            reverse("core:user_prefs", kwargs={"user_id": self.sli.id})
-        )
-        self.assertContains(response, text="04786547890123")
-
-        # Test card with only letters
-        self.client.post(
-            reverse(
-                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
-            ),
-            {"uid": "ABCAAAFAAFAAAB"},
-        )
-        response = self.client.get(
-            reverse("core:user_prefs", kwargs={"user_id": self.sli.id})
-        )
-        self.assertContains(response, text="ABCAAAFAAFAAAB")
-
-        # Test with root
-        self.client.force_login(self.root)
-        self.client.post(
-            reverse(
-                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
-            ),
-            {"uid": "8B90734A802A8B"},
-        )
-
-        response = self.client.get(
-            reverse("core:user_prefs", kwargs={"user_id": self.sli.id})
-        )
-        self.assertContains(response, text="8B90734A802A8B")
+            self.customer.customer.refresh_from_db()
+            assert self.customer.customer.student_card.uid == uid
+            self.assertContains(response, text="Carte enregistrée")
 
     def test_add_student_card_from_user_preferences_fail(self):
-        self.client.force_login(self.sli)
-        # UID too short
-        response = self.client.post(
-            reverse(
-                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
-            ),
-            {"uid": "8B90734A802A8"},
-        )
-
-        self.assertContains(response, text="Cet UID est invalide")
-
-        # UID too long
-        response = self.client.post(
-            reverse(
-                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
-            ),
-            {"uid": "8B90734A802A8FA"},
-        )
-        self.assertContains(response, text="Cet UID est invalide")
-
-        # Test with already existing card
-        response = self.client.post(
-            reverse(
-                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
-            ),
-            {"uid": "9A89B82018B0A0"},
-        )
-        self.assertContains(
-            response, text="Un objet Student card avec ce champ Uid existe déjà."
-        )
-
-        # Test with lowercase
-        response = self.client.post(
-            reverse(
-                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
-            ),
-            {"uid": "8b90734a802a9f"},
-        )
-        self.assertContains(response, text="Cet UID est invalide")
-
-        # Test with white spaces
-        response = self.client.post(
-            reverse(
-                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
-            ),
-            {"uid": " " * 14},
-        )
-        self.assertContains(response, text="Cet UID est invalide")
-
-        # Test with unauthorized user
-        self.client.force_login(self.krophil)
-        response = self.client.post(
-            reverse(
-                "counter:add_student_card", kwargs={"customer_id": self.sli.customer.pk}
-            ),
-            {"uid": "8B90734A802A8F"},
-        )
-        assert response.status_code == 403
+        customer = subscriber_user.make()
+        self.client.force_login(customer)
+        for uid, error_msg in self.invalid_uids():
+            url = reverse(
+                "counter:add_student_card", kwargs={"customer_id": customer.customer.pk}
+            )
+            response = self.client.post(url, {"uid": uid})
+            self.assertContains(response, text="Cet UID est invalide")
+            self.assertContains(response, text=error_msg)
+            customer.refresh_from_db()
+            assert not hasattr(customer.customer, "student_card")
 
 
 class TestCustomerAccountId(TestCase):

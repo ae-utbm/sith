@@ -42,7 +42,8 @@ from club.models import Club
 from core.fields import ResizedImageField
 from core.models import Group, Notification, User
 from core.utils import get_start_of_semester
-from sith.settings import SITH_COUNTER_OFFICES, SITH_MAIN_CLUB
+from counter.apps import PAYMENT_METHOD
+from sith.settings import SITH_MAIN_CLUB
 from subscription.models import Subscription
 
 
@@ -326,7 +327,7 @@ class Product(models.Model):
     """A product, with all its related information."""
 
     name = models.CharField(_("name"), max_length=64)
-    description = models.TextField(_("description"), blank=True)
+    description = models.TextField(_("description"), default="")
     product_type = models.ForeignKey(
         ProductType,
         related_name="products",
@@ -336,9 +337,15 @@ class Product(models.Model):
         on_delete=models.SET_NULL,
     )
     code = models.CharField(_("code"), max_length=16, blank=True)
-    purchase_price = CurrencyField(_("purchase price"))
+    purchase_price = CurrencyField(
+        _("purchase price"),
+        help_text=_("Initial cost of purchasing the product"),
+    )
     selling_price = CurrencyField(_("selling price"))
-    special_selling_price = CurrencyField(_("special selling price"))
+    special_selling_price = CurrencyField(
+        _("special selling price"),
+        help_text=_("Price for barmen during their permanence"),
+    )
     icon = ResizedImageField(
         height=70,
         force_format="WEBP",
@@ -352,14 +359,6 @@ class Product(models.Model):
     )
     limit_age = models.IntegerField(_("limit age"), default=0)
     tray = models.BooleanField(_("tray price"), default=False)
-    parent_product = models.ForeignKey(
-        "self",
-        related_name="children_products",
-        verbose_name=_("parent product"),
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-    )
     buying_groups = models.ManyToManyField(
         Group, related_name="products", verbose_name=_("buying groups"), blank=True
     )
@@ -369,7 +368,7 @@ class Product(models.Model):
         verbose_name = _("product")
 
     def __str__(self):
-        return "%s (%s)" % (self.name, self.code)
+        return f"{self.name} ({self.code})"
 
     def get_absolute_url(self):
         return reverse("counter:product_list")
@@ -560,9 +559,6 @@ class Counter(models.Model):
         """Show if the counter authorize the refilling with physic money."""
         if self.type != "BAR":
             return False
-        if self.id in SITH_COUNTER_OFFICES:
-            # If the counter is either 'AE' or 'BdF', refills are authorized
-            return True
         # at least one of the barmen is in the AE board
         ae = Club.objects.get(unix_name=SITH_MAIN_CLUB["unix_name"])
         return any(ae.get_membership_for(barman) for barman in self.barmen_list)
@@ -652,6 +648,14 @@ class Counter(models.Model):
             )
         )["total"]
 
+    def customer_is_barman(self, customer: Customer | User) -> bool:
+        """Check if this counter is a `bar` and if the customer is currently logged in.
+        This is useful to compute special prices."""
+
+        # Customer and User are two different tables,
+        # but they share the same primary key
+        return self.type == "BAR" and any(b.pk == customer.pk for b in self.barmen_list)
+
 
 class RefillingQuerySet(models.QuerySet):
     def annotate_total(self) -> Self:
@@ -690,8 +694,8 @@ class Refilling(models.Model):
     payment_method = models.CharField(
         _("payment method"),
         max_length=255,
-        choices=settings.SITH_COUNTER_PAYMENT_METHOD,
-        default="CASH",
+        choices=PAYMENT_METHOD,
+        default="CARD",
     )
     bank = models.CharField(
         _("bank"), max_length=255, choices=settings.SITH_COUNTER_BANK, default="OTHER"
@@ -1140,20 +1144,22 @@ class StudentCard(models.Model):
     uid = models.CharField(
         _("uid"), max_length=UID_SIZE, unique=True, validators=[MinLengthValidator(4)]
     )
-    customer = models.ForeignKey(
+    customer = models.OneToOneField(
         Customer,
-        related_name="student_cards",
-        verbose_name=_("student cards"),
-        null=False,
-        blank=False,
+        related_name="student_card",
+        verbose_name=_("student card"),
         on_delete=models.CASCADE,
     )
+
+    class Meta:
+        verbose_name = _("student card")
+        verbose_name_plural = _("student cards")
 
     def __str__(self):
         return self.uid
 
     @staticmethod
-    def is_valid(uid):
+    def is_valid(uid: str) -> bool:
         return (
             (uid.isupper() or uid.isnumeric())
             and len(uid) == StudentCard.UID_SIZE

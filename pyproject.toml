@@ -21,41 +21,38 @@ license = "GPL-3.0-only"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-Django = "^4.2.14"
+Django = "^4.2.17"
 django-ninja = "^1.3.0"
-django-ninja-extra = "^0.21.4"
-Pillow = "^10.4.0"
+django-ninja-extra = "^0.21.8"
+Pillow = "^11.0.0"
 mistune = "^3.0.2"
-django-jinja = "^2.11"
-cryptography = "^43.0.0"
+django-jinja = "^2.11.0"
+cryptography = "^44.0.0"
 django-phonenumber-field = "^8.0.0"
-phonenumbers = "^8.13"
-reportlab = "^4.2"
-django-haystack = "^3.2.1"
-xapian-haystack = "^3.0.1"
-libsass = "^0.23"
-django-ordered-model = "^3.7"
+phonenumbers = "^8.13.52"
+reportlab = "^4.2.5"
+django-haystack = "^3.3.0"
+xapian-haystack = "^3.1.0"
+libsass = "^0.23.0"
+django-ordered-model = "^3.7.4"
 django-simple-captcha = "^0.6.0"
-python-dateutil = "^2.8.2"
-sentry-sdk = "^2.16.0"
-Jinja2 = "^3.1"
+python-dateutil = "^2.9.0.post0"
+sentry-sdk = "^2.19.2"
+Jinja2 = "^3.1.4"
 django-countries = "^7.6.1"
-dict2xml = "^1.7.3"
+dict2xml = "^1.7.6"
 Sphinx = "^5" # Needed for building xapian
-tomli = "^2.0.1"
+tomli = "^2.2.1"
 django-honeypot = "^1.2.1"
-# When I introduced pydantic-extra-types, I needed *right now*
-# the PhoneNumberValidator class which was on the master branch but not released yet.
-# Once it's released, switch this to a regular version.
-pydantic-extra-types = { git = "https://github.com/pydantic/pydantic-extra-types.git", rev = "58db4b0" }
+pydantic-extra-types = "^2.10.1"
 
 [tool.poetry.group.prod.dependencies]
 # deps used in prod, but unnecessary for development
 
-# The C extra triggers compilation against sytem libs during install.
+# The C extra triggers compilation against system libs during install.
 # Removing it would switch psycopg to a slower full-python implementation
-psycopg = {extras = ["c"], version = "^3.2.1"}
-redis = {extras = ["hiredis"], version = "^5.0.8"}
+psycopg = {extras = ["c"], version = "^3.2.3"}
+redis = {extras = ["hiredis"], version = "^5.2.0"}
 
 [tool.poetry.group.prod]
 optional = true
@@ -63,28 +60,28 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 # deps used for development purposes, but unneeded in prod
 django-debug-toolbar = "^4.4.6"
-ipython = "^8.26.0"
+ipython = "^8.30.0"
 pre-commit = "^4.0.1"
-ruff = "^0.6.9" # Version used in pipeline is controlled by pre-commit hooks in .pre-commit.config.yaml
-djhtml = "^3.0.6"
-faker = "^30.3.0"
-rjsmin = "^1.2.2"
+ruff = "^0.8.3" # Version used in pipeline is controlled by pre-commit hooks in .pre-commit.config.yaml
+djhtml = "^3.0.7"
+faker = "^33.1.0"
+rjsmin = "^1.2.3"
 
 [tool.poetry.group.tests.dependencies]
 # deps used for testing purposes
 freezegun = "^1.5.1"  # used to test time-dependent code
-pytest = "^8.3.2"
-pytest-cov = "^5.0.0"
+pytest = "^8.3.4"
+pytest-cov = "^6.0.0"
 pytest-django = "^4.9.0"
 model-bakery = "^1.20.0"
 
 [tool.poetry.group.docs.dependencies]
 # deps used to work on the documentation
 mkdocs = "^1.6.1"
-mkdocs-material = "^9.5.40"
-mkdocstrings = "^0.26.2"
-mkdocstrings-python = "^1.12.0"
-mkdocs-include-markdown-plugin = "^6.2.2"
+mkdocs-material = "^9.5.47"
+mkdocstrings = "^0.27.0"
+mkdocstrings-python = "^1.12.2"
+mkdocs-include-markdown-plugin = "^7.1.2"
 
 [tool.poetry.group.docs]
 optional = true

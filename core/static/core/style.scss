@@ -42,6 +42,32 @@ body {
   }
 }
 
+[tooltip] {
+  position: relative;
+}
+
+[tooltip]::before {
+  @include shadow;
+  opacity: 0;
+  z-index: 1;
+  content: attr(tooltip);
+  background: hsl(219.6, 20.8%, 96%);
+  color: $black-color;
+  border: 0.5px solid hsl(0, 0%, 50%);
+  ;
+  border-radius: 5px;
+  padding: 5px;
+  top: 1em;
+  position: absolute;
+  margin-top: 5px;
+  white-space: nowrap;
+  transition: opacity 500ms ease-out;
+}
+
+[tooltip]:hover::before {
+  opacity: 1;
+}
+
 .ib {
   display: inline-block;
   padding: 1px;
@@ -79,8 +105,7 @@ body {
 }
 
 .shadow {
-  box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0,
-              rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
+  @include shadow;
 }
 
 .w_big {
@@ -308,6 +333,7 @@ body {
         font-size: 120%;
         background-color: unset;
         position: relative;
+
         &:after {
           content: '';
           position: absolute;
@@ -318,14 +344,17 @@ body {
           border-radius: 2px;
           transition: all 0.2s ease-in-out;
         }
+
         &:hover:after {
           border-bottom-color: darken($primary-neutral-light-color, 20%);
         }
+
         &.active:after {
           border-bottom-color: $primary-dark-color;
         }
       }
     }
+
     section {
       padding: 20px;
     }
