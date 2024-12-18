@@ -1,4 +1,5 @@
 import { exportToHtml } from "#core:utils/globals";
+import type TomSelect from "tom-select";
 
 interface CounterConfig {
   csrfToken: string;
@@ -20,6 +21,12 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
       basket: config.sessionBasket,
       errors: [],
       customerBalance: config.customerBalance,
+      codeField: undefined,
+
+      init() {
+        this.codeField = this.$refs.codeField;
+        this.codeField.widget.focus();
+      },
 
       sumBasket() {
         if (!this.basket || Object.keys(this.basket).length === 0) {
@@ -40,17 +47,19 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
           (event.detail.target.querySelector("#id_amount") as HTMLInputElement).value,
         );
         document.getElementById("selling-accordion").click();
+        this.codeField.widget.focus();
       },
 
       async handleCode(event: SubmitEvent) {
-        const code = (
-          $(event.target).find("#code_field").val() as string
-        ).toUpperCase();
-        if (["FIN", "ANN"].includes(code)) {
+        const widget: TomSelect = this.codeField.widget;
+        const code = (widget.getValue() as string).toUpperCase();
+        if (this.codeField.getOperationCodes().includes(code)) {
           $(event.target).submit();
         } else {
           await this.handleAction(event);
         }
+        widget.clear();
+        widget.focus();
       },
 
       async handleAction(event: SubmitEvent) {
@@ -68,54 +77,12 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
         const json = await response.json();
         this.basket = json.basket;
         this.errors = json.errors;
-        $("form.code_form #code_field").val("").focus();
       },
     }));
   });
 });
 
-interface Product {
-  value: string;
-  label: string;
-  tags: string;
-}
-declare global {
-  const productsAutocomplete: Product[];
-}
-
 $(() => {
-  /* Autocompletion in the code field */
-  // biome-ignore lint/suspicious/noExplicitAny: dealing with legacy jquery
-  const codeField: any = $("#code_field");
-
-  let quantity = "";
-  codeField.autocomplete({
-    // biome-ignore lint/suspicious/noExplicitAny: dealing with legacy jquery
-    select: (event: any, ui: any) => {
-      event.preventDefault();
-      codeField.val(quantity + ui.item.value);
-    },
-    // biome-ignore lint/suspicious/noExplicitAny: dealing with legacy jquery
-    focus: (event: any, ui: any) => {
-      event.preventDefault();
-      codeField.val(quantity + ui.item.value);
-    },
-    // biome-ignore lint/suspicious/noExplicitAny: dealing with legacy jquery
-    source: (request: any, response: any) => {
-      // biome-ignore lint/performance/useTopLevelRegex: performance impact is minimal
-      const res = /^(\d+x)?(.*)/i.exec(request.term);
-      quantity = res[1] || "";
-      const search = res[2];
-      // biome-ignore lint/suspicious/noExplicitAny: dealing with legacy jquery
-      const matcher = new RegExp(($ as any).ui.autocomplete.escapeRegex(search), "i");
-      response(
-        $.grep(productsAutocomplete, (value: Product) => {
-          return matcher.test(value.tags);
-        }),
-      );
-    },
-  });
-
   /* Accordion UI between basket and refills */
   // biome-ignore lint/suspicious/noExplicitAny: dealing with legacy jquery
   ($("#click_form") as any).accordion({
@@ -124,6 +91,4 @@ $(() => {
   });
   // biome-ignore lint/suspicious/noExplicitAny: dealing with legacy jquery
   ($("#products") as any).tabs();
-
-  codeField.focus();
 });
