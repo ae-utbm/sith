@@ -34,43 +34,90 @@
     {% csrf_token %}
     {{ form.non_field_errors() }}
     {{ form.author }}
-    <p>{{ form.type.errors }}<label for="{{ form.type.name }}">{{ form.type.label }}</label>
+    <p>
+      {{ form.type.errors }}
+      <label for="{{ form.type.name }}" class="required">{{ form.type.label }}</label>
       <ul>
         <li>{% trans %}Notice: Information, election result - no date{% endtrans %}</li>
         <li>{% trans %}Event: punctual event, associated with one date{% endtrans %}</li>
-        <li>{% trans %}Weekly: recurrent event, associated with many dates (specify the first one, and a deadline){% endtrans %}</li>
-        <li>{% trans %}Call: long time event, associated with a long date (election appliance, ...){% endtrans %}</li>
+        <li>
+          {% trans trimmed%}
+            Weekly: recurrent event, associated with many dates
+            (specify the first one, and a deadline)
+          {% endtrans %}
+        </li>
+        <li>
+          {% trans trimmed %}
+            Call: long time event, associated with a long date (like election appliance)
+          {% endtrans %}
+        </li>
       </ul>
-      {{ form.type }}</p>
-    <p class="date">{{ form.start_date.errors }}<label for="{{ form.start_date.name }}">{{ form.start_date.label }}</label> {{ form.start_date }}</p>
-    <p class="date">{{ form.end_date.errors }}<label for="{{ form.end_date.name }}">{{ form.end_date.label }}</label> {{ form.end_date }}</p>
-    <p class="until">{{ form.until.errors }}<label for="{{ form.until.name }}">{{ form.until.label }}</label> {{ form.until }}</p>
-    <p>{{ form.title.errors }}<label for="{{ form.title.name }}">{{ form.title.label }}</label> {{ form.title }}</p>
-    <p>{{ form.club.errors }}<label for="{{ form.club.name }}">{{ form.club.label }}</label> {{ form.club }}</p>
-    <p>{{ form.summary.errors }}<label for="{{ form.summary.name }}">{{ form.summary.label }}</label> {{ form.summary }}</p>
-    <p>{{ form.content.errors }}<label for="{{ form.content.name }}">{{ form.content.label }}</label> {{ form.content }}</p>
+      {{ form.type }}
+    </p>
+    <p class="date">
+      {{ form.start_date.errors }}
+      <label for="{{ form.start_date.name }}">{{ form.start_date.label }}</label>
+      {{ form.start_date }}
+    </p>
+    <p class="date">
+      {{ form.end_date.errors }}
+      <label for="{{ form.end_date.name }}">{{ form.end_date.label }}</label>
+      {{ form.end_date }}
+    </p>
+    <p class="until">
+      {{ form.until.errors }}
+      <label for="{{ form.until.name }}">{{ form.until.label }}</label>
+      {{ form.until }}
+    </p>
+    <p>
+      {{ form.title.errors }}
+      <label for="{{ form.title.name }}" class="required">{{ form.title.label }}</label>
+      {{ form.title }}
+    </p>
+    <p>
+      {{ form.club.errors }}
+      <label for="{{ form.club.name }}" class="required">{{ form.club.label }}</label>
+      <span class="helptext">{{ form.club.help_text }}</span>
+      {{ form.club }}
+    </p>
+    <p>
+      {{ form.summary.errors }}
+      <label for="{{ form.summary.name }}" class="required">{{ form.summary.label }}</label>
+      <span class="helptext">{{ form.summary.help_text }}</span>
+      {{ form.summary }}
+    </p>
+    <p>
+      {{ form.content.errors }}
+      <label for="{{ form.content.name }}">{{ form.content.label }}</label>
+      <span class="helptext">{{ form.content.help_text }}</span>
+      {{ form.content }}
+    </p>
     {% if user.is_com_admin %}
-      <p>{{ form.automoderation.errors }}<label for="{{ form.automoderation.name }}">{{ form.automoderation.label }}</label>
-        {{ form.automoderation }}</p>
+      <p>
+        {{ form.automoderation.errors }}
+        <label for="{{ form.automoderation.name }}">{{ form.automoderation.label }}</label>
+        {{ form.automoderation }}
+      </p>
     {% endif %}
-    <p><input type="submit" name="preview" value="{% trans %}Preview{% endtrans %}" /></p>
-    <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
+    <p><input type="submit" name="preview" value="{% trans %}Preview{% endtrans %}"/></p>
+    <p><input type="submit" value="{% trans %}Save{% endtrans %}"/></p>
   </form>
 {% endblock %}
 
 {% block script %}
   {{ super() }}
   <script>
-    $( function() {
-      var type = $('input[name=type]');
-      var dates = $('.date');
-      var until = $('.until');
-      function update_targets () {
-        type_checked = $('input[name=type]:checked');
-        if (type_checked.val() == "EVENT" || type_checked.val() == "CALL") {
+    $(function () {
+      let type = $('input[name=type]');
+      let dates = $('.date');
+      let until = $('.until');
+
+      function update_targets() {
+        const type_checked = $('input[name=type]:checked');
+        if (["CALL", "EVENT"].includes(type_checked.val())) {
           dates.show();
           until.hide();
-        } else if (type_checked.val() == "WEEKLY") {
+        } else if (type_checked.val() === "WEEKLY") {
           dates.show();
           until.show();
         } else {
@@ -78,9 +125,10 @@
           until.hide();
         }
       }
+
       update_targets();
       type.change(update_targets);
-    } );
+    });
   </script>
 {% endblock %}
 

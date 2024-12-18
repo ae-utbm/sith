@@ -223,15 +223,13 @@ class NewsForm(forms.ModelForm):
             ):
                 self.add_error(
                     "end_date",
-                    ValidationError(
-                        _("You crazy? You can not finish an event before starting it.")
-                    ),
+                    ValidationError(_("An event cannot end before its beginning.")),
                 )
             if self.cleaned_data["type"] == "WEEKLY" and not self.cleaned_data["until"]:
                 self.add_error("until", ValidationError(_("This field is required.")))
         return self.cleaned_data
 
-    def save(self):
+    def save(self, *args, **kwargs):
         ret = super().save()
         self.instance.dates.all().delete()
         if self.instance.type == "EVENT" or self.instance.type == "CALL":
