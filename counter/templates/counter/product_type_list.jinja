@@ -14,12 +14,12 @@
 
 {% block content %}
   <p>
-    <a href="{{ url('counter:new_producttype') }}" class="btn btn-blue">
+    <a href="{{ url('counter:new_product_type') }}" class="btn btn-blue">
       {% trans %}New product type{% endtrans %}
       <i class="fa fa-plus"></i>
     </a>
   </p>
-  {% if producttype_list %}
+  {% if product_types %}
     <aside>
       <p>
         {% trans %}Product types are in the same order on this page and on the eboutic.{% endtrans %}
@@ -46,15 +46,19 @@
         class="product-type-list"
         :aria-busy="loading"
       >
-        {%- for t in producttype_list -%}
-          <li x-sort:item="{{ t.id }}">
+        {%- for product_type in product_types -%}
+          <li x-sort:item="{{ product_type.id }}">
             <i class="fa fa-grip-vertical"></i>
-            <a href="{{ url('counter:producttype_edit', type_id=t.id) }}">{{ t }}</a>
+            <a href="{{ url('counter:product_type_edit', type_id=product_type.id) }}">
+              {{ product_type.name }}
+            </a>
           </li>
         {%- endfor -%}
       </ul>
     </div>
   {% else %}
-    {% trans %}There is no product types in this website.{% endtrans %}
+    <p>
+      {% trans %}There are no product types in this website.{% endtrans %}
+    </p>
   {% endif %}
 {% endblock %}

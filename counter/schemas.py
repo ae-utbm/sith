@@ -38,7 +38,7 @@ class ProductTypeSchema(ModelSchema):
 
     @staticmethod
     def resolve_url(obj: ProductType) -> str:
-        return reverse("counter:producttype_edit", kwargs={"type_id": obj.id})
+        return reverse("counter:product_type_edit", kwargs={"type_id": obj.id})
 
 
 class SimpleProductTypeSchema(ModelSchema):

@@ -101,8 +101,9 @@ class ProductTypeListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     """A list view for the admins."""
 
     model = ProductType
-    template_name = "counter/producttype_list.jinja"
+    template_name = "counter/product_type_list.jinja"
     current_tab = "product_types"
+    context_object_name = "product_types"
 
 
 class ProductTypeCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):

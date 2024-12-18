@@ -4197,20 +4197,20 @@ msgstr "Sans catégorie"
 msgid "There is no products in this website."
 msgstr "Il n'y a pas de produits dans ce site web."
 
-#: counter/templates/counter/producttype_list.jinja:4
-#: counter/templates/counter/producttype_list.jinja:42
+#: counter/templates/counter/product_type_list.jinja:4
+#: counter/templates/counter/product_type_list.jinja:42
 msgid "Product type list"
 msgstr "Liste des types de produit"
 
-#: counter/templates/counter/producttype_list.jinja:18
+#: counter/templates/counter/product_type_list.jinja:18
 msgid "New product type"
 msgstr "Nouveau type de produit"
 
-#: counter/templates/counter/producttype_list.jinja:25
+#: counter/templates/counter/product_type_list.jinja:25
 msgid "Product types are in the same order on this page and on the eboutic."
 msgstr "Les types de produit sont dans le même ordre sur cette page et sur l'eboutic."
 
-#: counter/templates/counter/producttype_list.jinja:28
+#: counter/templates/counter/product_type_list.jinja:28
 msgid ""
 "You can reorder them here by drag-and-drop. The changes will then be applied "
 "globally immediately."
@@ -4218,8 +4218,8 @@ msgstr ""
 "Vous pouvez les réorganiser ici. Les changements seront alors immédiatement "
 "appliqués globalement."
 
-#: counter/templates/counter/producttype_list.jinja:58
-msgid "There is no product types in this website."
+#: counter/templates/counter/product_type_list.jinja:58
+msgid "There are no product types in this website."
 msgstr "Il n'y a pas de types de produit dans ce site web."
 
 #: counter/templates/counter/refilling_list.jinja:15

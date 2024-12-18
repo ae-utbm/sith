@@ -315,7 +315,7 @@ class ProductType(OrderedModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("counter:producttype_list")
+        return reverse("counter:product_type_list")
 
     def is_owned_by(self, user):
         """Method to see if that object can be edited by the given user."""
