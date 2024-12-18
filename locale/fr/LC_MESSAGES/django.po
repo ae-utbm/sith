@@ -586,7 +586,7 @@ msgstr "Classeur : "
 #: accounting/templates/accounting/journal_statement_accounting.jinja:30
 #: core/templates/core/user_account.jinja:39
 #: core/templates/core/user_account_detail.jinja:9
-#: counter/templates/counter/counter_click.jinja:31
+#: counter/templates/counter/counter_click.jinja:37
 msgid "Amount: "
 msgstr "Montant : "
 
@@ -1217,7 +1217,7 @@ msgid "Barman"
 msgstr "Barman"
 
 #: club/templates/club/club_sellings.jinja:51
-#: counter/templates/counter/counter_click.jinja:28
+#: counter/templates/counter/counter_click.jinja:34
 #: counter/templates/counter/last_ops.jinja:22
 #: counter/templates/counter/last_ops.jinja:47
 #: counter/templates/counter/refilling_list.jinja:12
@@ -2562,7 +2562,7 @@ msgstr "Confirmation"
 
 #: core/templates/core/delete_confirm.jinja:20
 #: core/templates/core/file_delete_confirm.jinja:46
-#: counter/templates/counter/counter_click.jinja:100
+#: counter/templates/counter/counter_click.jinja:121
 #: counter/templates/counter/fragments/delete_student_card.jinja:12
 #: sas/templates/sas/ask_picture_removal.jinja:20
 msgid "Cancel"
@@ -3276,7 +3276,7 @@ msgid "Go to my Trombi tools"
 msgstr "Allez à mes outils de Trombi"
 
 #: core/templates/core/user_preferences.jinja:39
-#: counter/templates/counter/counter_click.jinja:123
+#: counter/templates/counter/counter_click.jinja:144
 msgid "Student card"
 msgstr "Carte étudiante"
 
@@ -3918,12 +3918,28 @@ msgstr "oui"
 msgid "There is no cash register summary in this website."
 msgstr "Il n'y a pas de relevé de caisse dans ce site web."
 
-#: counter/templates/counter/counter_click.jinja:35
+#: counter/templates/counter/counter_click.jinja:41
 #: launderette/templates/launderette/launderette_admin.jinja:8
 msgid "Selling"
 msgstr "Vente"
 
-#: counter/templates/counter/counter_click.jinja:46
+#: counter/templates/counter/counter_click.jinja:52
+msgid "Select a product..."
+msgstr "Sélectionnez un produit…"
+
+#: counter/templates/counter/counter_click.jinja:54
+msgid "Operations"
+msgstr "Opérations"
+
+#: counter/templates/counter/counter_click.jinja:55
+msgid "Confirm (FIN)"
+msgstr "Confirmer (FIN)"
+
+#: counter/templates/counter/counter_click.jinja:56
+msgid "Cancel (ANN)"
+msgstr "Annuler (ANN)"
+
+#: counter/templates/counter/counter_click.jinja:67
 #: counter/templates/counter/fragments/create_refill.jinja:8
 #: counter/templates/counter/fragments/create_student_card.jinja:10
 #: counter/templates/counter/invoices_call.jinja:16
@@ -3934,21 +3950,21 @@ msgstr "Vente"
 msgid "Go"
 msgstr "Valider"
 
-#: counter/templates/counter/counter_click.jinja:53
+#: counter/templates/counter/counter_click.jinja:74
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja:19
 msgid "Basket: "
 msgstr "Panier : "
 
-#: counter/templates/counter/counter_click.jinja:94
+#: counter/templates/counter/counter_click.jinja:115
 msgid "Finish"
 msgstr "Terminer"
 
-#: counter/templates/counter/counter_click.jinja:104
+#: counter/templates/counter/counter_click.jinja:125
 #: counter/templates/counter/refilling_list.jinja:9
 msgid "Refilling"
 msgstr "Rechargement"
 
-#: counter/templates/counter/counter_click.jinja:114
+#: counter/templates/counter/counter_click.jinja:135
 msgid ""
 "As a barman, you are not able to refill any account on your own. An admin "
 "should be connected on this counter for that. The customer can refill by "
