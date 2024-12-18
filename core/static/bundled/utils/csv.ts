@@ -19,6 +19,15 @@ function getNested<T extends object>(obj: T, key: NestedKeyOf<T>) {
   return res;
 }
 
+/**
+ * Convert the content the string to make sure it won't break
+ * the resulting csv.
+ * cf. https://en.wikipedia.org/wiki/Comma-separated_values#Basic_rules
+ */
+function sanitizeCell(content: string): string {
+  return `"${content.replace(/"/g, '""')}"`;
+}
+
 export const csv = {
   stringify: <T extends object>(objs: T[], options?: StringifyOptions<T>) => {
     const columns = options.columns;
@@ -26,10 +35,7 @@ export const csv = {
       .map((obj) => {
         return columns
           .map((col) => {
-            return (getNested(obj, col) ?? "")
-              .toString()
-              .replace(/,/g, ",")
-              .replace(/\n/g, " ");
+            return sanitizeCell((getNested(obj, col) ?? "").toString());
           })
           .join(",");
       })
@@ -37,7 +43,7 @@ export const csv = {
     if (!options.titleRow) {
       return content;
     }
-    const firstRow = options.titleRow.map((s) => s.replace(/,/g, ",")).join(",");
+    const firstRow = options.titleRow.map(sanitizeCell).join(",");
     return `${firstRow}\n${content}`;
   },
 };
