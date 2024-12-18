@@ -67,6 +67,8 @@ export class AutoCompleteSelectBase extends inheritHtmlElement("select") {
         remove_button: {
           title: gettext("Remove"),
         },
+        // biome-ignore lint/style/useNamingConvention: this is required by the api
+        restore_on_backspace: {},
       },
       persist: false,
       maxItems: this.node.multiple ? this.max : 1,

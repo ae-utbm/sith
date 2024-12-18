@@ -4,7 +4,7 @@ import type { TomOption } from "tom-select/dist/types/types";
 import type { escape_html } from "tom-select/dist/types/utils";
 import {
   type CounterSchema,
-  type ProductSchema,
+  type SimpleProductSchema,
   counterSearchCounter,
   productSearchProducts,
 } from "#openapi";
@@ -23,13 +23,13 @@ export class ProductAjaxSelect extends AjaxSelect {
     return [];
   }
 
-  protected renderOption(item: ProductSchema, sanitize: typeof escape_html) {
+  protected renderOption(item: SimpleProductSchema, sanitize: typeof escape_html) {
     return `<div class="select-item">
             <span class="select-item-text">${sanitize(item.code)} - ${sanitize(item.name)}</span>
           </div>`;
   }
 
-  protected renderItem(item: ProductSchema, sanitize: typeof escape_html) {
+  protected renderItem(item: SimpleProductSchema, sanitize: typeof escape_html) {
     return `<span>${sanitize(item.code)} - ${sanitize(item.name)}</span>`;
   }
 }

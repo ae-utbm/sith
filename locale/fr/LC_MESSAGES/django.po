@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-17 10:53+0100\n"
+"POT-Creation-Date: 2024-12-17 17:04+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -18,8 +18,8 @@ msgstr ""
 
 #: accounting/models.py:62 accounting/models.py:101 accounting/models.py:132
 #: accounting/models.py:190 club/models.py:55 com/models.py:274
-#: com/models.py:293 counter/models.py:298 counter/models.py:329
-#: counter/models.py:480 forum/models.py:60 launderette/models.py:29
+#: com/models.py:293 counter/models.py:299 counter/models.py:330
+#: counter/models.py:481 forum/models.py:60 launderette/models.py:29
 #: launderette/models.py:80 launderette/models.py:116
 msgid "name"
 msgstr "nom"
@@ -65,8 +65,8 @@ msgid "account number"
 msgstr "numéro de compte"
 
 #: accounting/models.py:107 accounting/models.py:136 club/models.py:345
-#: com/models.py:74 com/models.py:259 com/models.py:299 counter/models.py:358
-#: counter/models.py:482 trombi/models.py:209
+#: com/models.py:74 com/models.py:259 com/models.py:299 counter/models.py:359
+#: counter/models.py:483 trombi/models.py:209
 msgid "club"
 msgstr "club"
 
@@ -87,12 +87,12 @@ msgstr "Compte club"
 msgid "%(club_account)s on %(bank_account)s"
 msgstr "%(club_account)s sur %(bank_account)s"
 
-#: accounting/models.py:188 club/models.py:351 counter/models.py:965
+#: accounting/models.py:188 club/models.py:351 counter/models.py:966
 #: election/models.py:16 launderette/models.py:165
 msgid "start date"
 msgstr "date de début"
 
-#: accounting/models.py:189 club/models.py:352 counter/models.py:966
+#: accounting/models.py:189 club/models.py:352 counter/models.py:967
 #: election/models.py:17
 msgid "end date"
 msgstr "date de fin"
@@ -105,8 +105,8 @@ msgstr "est fermé"
 msgid "club account"
 msgstr "compte club"
 
-#: accounting/models.py:199 accounting/models.py:255 counter/models.py:92
-#: counter/models.py:683
+#: accounting/models.py:199 accounting/models.py:255 counter/models.py:93
+#: counter/models.py:684
 msgid "amount"
 msgstr "montant"
 
@@ -128,18 +128,18 @@ msgstr "classeur"
 
 #: accounting/models.py:256 core/models.py:956 core/models.py:1467
 #: core/models.py:1512 core/models.py:1541 core/models.py:1565
-#: counter/models.py:693 counter/models.py:797 counter/models.py:1001
+#: counter/models.py:694 counter/models.py:798 counter/models.py:1002
 #: eboutic/models.py:57 eboutic/models.py:193 forum/models.py:312
 #: forum/models.py:413
 msgid "date"
 msgstr "date"
 
-#: accounting/models.py:257 counter/models.py:300 counter/models.py:1002
+#: accounting/models.py:257 counter/models.py:302 counter/models.py:1003
 #: pedagogy/models.py:208
 msgid "comment"
 msgstr "commentaire"
 
-#: accounting/models.py:259 counter/models.py:695 counter/models.py:799
+#: accounting/models.py:259 counter/models.py:696 counter/models.py:800
 #: subscription/models.py:56
 msgid "payment method"
 msgstr "méthode de paiement"
@@ -166,7 +166,7 @@ msgstr "type comptable"
 
 #: accounting/models.py:294 accounting/models.py:429 accounting/models.py:460
 #: accounting/models.py:492 core/models.py:1540 core/models.py:1566
-#: counter/models.py:763
+#: counter/models.py:764
 msgid "label"
 msgstr "étiquette"
 
@@ -264,7 +264,7 @@ msgstr ""
 "Vous devez fournir soit un type comptable simplifié ou un type comptable "
 "standard"
 
-#: accounting/models.py:421 counter/models.py:339 pedagogy/models.py:41
+#: accounting/models.py:421 counter/models.py:340 pedagogy/models.py:41
 msgid "code"
 msgstr "code"
 
@@ -1041,7 +1041,7 @@ msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 msgid "A club with that unix_name already exists"
 msgstr "Un club avec ce nom UNIX existe déjà."
 
-#: club/models.py:337 counter/models.py:956 counter/models.py:992
+#: club/models.py:337 counter/models.py:957 counter/models.py:993
 #: eboutic/models.py:53 eboutic/models.py:189 election/models.py:183
 #: launderette/models.py:130 launderette/models.py:184 sas/models.py:273
 #: trombi/models.py:205
@@ -1053,8 +1053,8 @@ msgstr "nom d'utilisateur"
 msgid "role"
 msgstr "rôle"
 
-#: club/models.py:359 core/models.py:90 counter/models.py:299
-#: counter/models.py:330 election/models.py:13 election/models.py:115
+#: club/models.py:359 core/models.py:90 counter/models.py:300
+#: counter/models.py:331 election/models.py:13 election/models.py:115
 #: election/models.py:188 forum/models.py:61 forum/models.py:245
 msgid "description"
 msgstr "description"
@@ -2501,7 +2501,7 @@ msgstr "Forum"
 msgid "Gallery"
 msgstr "Photos"
 
-#: core/templates/core/base/navbar.jinja:22 counter/models.py:490
+#: core/templates/core/base/navbar.jinja:22 counter/models.py:491
 #: counter/templates/counter/counter_list.jinja:11
 #: eboutic/templates/eboutic/eboutic_main.jinja:4
 #: eboutic/templates/eboutic/eboutic_main.jinja:22
@@ -3607,13 +3607,13 @@ msgstr "Chèque"
 msgid "Cash"
 msgstr "Espèces"
 
-#: counter/apps.py:30 counter/models.py:801 sith/settings.py:415
+#: counter/apps.py:30 counter/models.py:802 sith/settings.py:415
 #: sith/settings.py:420
 msgid "Credit card"
 msgstr "Carte bancaire"
 
-#: counter/apps.py:36 counter/models.py:506 counter/models.py:962
-#: counter/models.py:998 launderette/models.py:32
+#: counter/apps.py:36 counter/models.py:507 counter/models.py:963
+#: counter/models.py:999 launderette/models.py:32
 msgid "counter"
 msgstr "comptoir"
 
@@ -3637,180 +3637,184 @@ msgstr "Vidange de votre compte AE"
 msgid "Ecocup regularization"
 msgstr "Régularization des ecocups"
 
-#: counter/models.py:91
+#: counter/models.py:92
 msgid "account id"
 msgstr "numéro de compte"
 
-#: counter/models.py:93
+#: counter/models.py:94
 msgid "recorded product"
 msgstr "produits consignés"
 
-#: counter/models.py:98
+#: counter/models.py:99
 msgid "customer"
 msgstr "client"
 
-#: counter/models.py:99
+#: counter/models.py:100
 msgid "customers"
 msgstr "clients"
 
-#: counter/models.py:111 counter/views/click.py:68
+#: counter/models.py:112 counter/views/click.py:68
 msgid "Not enough money"
 msgstr "Solde insuffisant"
 
-#: counter/models.py:197
+#: counter/models.py:198
 msgid "First name"
 msgstr "Prénom"
 
-#: counter/models.py:198
+#: counter/models.py:199
 msgid "Last name"
 msgstr "Nom de famille"
 
-#: counter/models.py:199
+#: counter/models.py:200
 msgid "Address 1"
 msgstr "Adresse 1"
 
-#: counter/models.py:200
+#: counter/models.py:201
 msgid "Address 2"
 msgstr "Adresse 2"
 
-#: counter/models.py:201
+#: counter/models.py:202
 msgid "Zip code"
 msgstr "Code postal"
 
-#: counter/models.py:202
+#: counter/models.py:203
 msgid "City"
 msgstr "Ville"
 
-#: counter/models.py:203
+#: counter/models.py:204
 msgid "Country"
 msgstr "Pays"
 
-#: counter/models.py:211
+#: counter/models.py:212
 msgid "Phone number"
 msgstr "Numéro de téléphone"
 
-#: counter/models.py:253
+#: counter/models.py:254
 msgid "When the mail warning that the account was about to be dumped was sent."
 msgstr "Quand le mail d'avertissement de la vidange du compte a été envoyé."
 
-#: counter/models.py:258
+#: counter/models.py:259
 msgid "Set this to True if the warning mail received an error"
 msgstr "Mettre à True si le mail a reçu une erreur"
 
-#: counter/models.py:265
+#: counter/models.py:266
 msgid "The operation that emptied the account."
 msgstr "L'opération qui a vidé le compte."
 
-#: counter/models.py:310 counter/models.py:334
+#: counter/models.py:304
+msgid "A text that will be shown on the eboutic."
+msgstr "Un texte qui sera affiché sur l'eboutic."
+
+#: counter/models.py:311 counter/models.py:335
 msgid "product type"
 msgstr "type du produit"
 
-#: counter/models.py:341
+#: counter/models.py:342
 msgid "purchase price"
 msgstr "prix d'achat"
 
-#: counter/models.py:342
+#: counter/models.py:343
 msgid "Initial cost of purchasing the product"
 msgstr "Coût initial d'achat du produit"
 
-#: counter/models.py:344
+#: counter/models.py:345
 msgid "selling price"
 msgstr "prix de vente"
 
-#: counter/models.py:346
+#: counter/models.py:347
 msgid "special selling price"
 msgstr "prix de vente spécial"
 
-#: counter/models.py:347
+#: counter/models.py:348
 msgid "Price for barmen during their permanence"
 msgstr "Prix pour les barmen durant leur permanence"
 
-#: counter/models.py:355
+#: counter/models.py:356
 msgid "icon"
 msgstr "icône"
 
-#: counter/models.py:360
+#: counter/models.py:361
 msgid "limit age"
 msgstr "âge limite"
 
-#: counter/models.py:361
+#: counter/models.py:362
 msgid "tray price"
 msgstr "prix plateau"
 
-#: counter/models.py:363
+#: counter/models.py:364
 msgid "buying groups"
 msgstr "groupe d'achat"
 
-#: counter/models.py:365 election/models.py:50
+#: counter/models.py:366 election/models.py:50
 msgid "archived"
 msgstr "archivé"
 
-#: counter/models.py:368 counter/models.py:1096
+#: counter/models.py:369 counter/models.py:1097
 msgid "product"
 msgstr "produit"
 
-#: counter/models.py:485
+#: counter/models.py:486
 msgid "products"
 msgstr "produits"
 
-#: counter/models.py:488
+#: counter/models.py:489
 msgid "counter type"
 msgstr "type de comptoir"
 
-#: counter/models.py:490
+#: counter/models.py:491
 msgid "Bar"
 msgstr "Bar"
 
-#: counter/models.py:490
+#: counter/models.py:491
 msgid "Office"
 msgstr "Bureau"
 
-#: counter/models.py:493
+#: counter/models.py:494
 msgid "sellers"
 msgstr "vendeurs"
 
-#: counter/models.py:501 launderette/models.py:178
+#: counter/models.py:502 launderette/models.py:178
 msgid "token"
 msgstr "jeton"
 
-#: counter/models.py:701
+#: counter/models.py:702
 msgid "bank"
 msgstr "banque"
 
-#: counter/models.py:703 counter/models.py:804
+#: counter/models.py:704 counter/models.py:805
 msgid "is validated"
 msgstr "est validé"
 
-#: counter/models.py:708
+#: counter/models.py:709
 msgid "refilling"
 msgstr "rechargement"
 
-#: counter/models.py:781 eboutic/models.py:249
+#: counter/models.py:782 eboutic/models.py:249
 msgid "unit price"
 msgstr "prix unitaire"
 
-#: counter/models.py:782 counter/models.py:1076 eboutic/models.py:250
+#: counter/models.py:783 counter/models.py:1077 eboutic/models.py:250
 msgid "quantity"
 msgstr "quantité"
 
-#: counter/models.py:801
+#: counter/models.py:802
 msgid "Sith account"
 msgstr "Compte utilisateur"
 
-#: counter/models.py:809
+#: counter/models.py:810
 msgid "selling"
 msgstr "vente"
 
-#: counter/models.py:913
+#: counter/models.py:914
 msgid "Unknown event"
 msgstr "Événement inconnu"
 
-#: counter/models.py:914
+#: counter/models.py:915
 #, python-format
 msgid "Eticket bought for the event %(event)s"
 msgstr "Eticket acheté pour l'événement %(event)s"
 
-#: counter/models.py:916 counter/models.py:929
+#: counter/models.py:917 counter/models.py:930
 #, python-format
 msgid ""
 "You bought an eticket for the event %(event)s.\n"
@@ -3822,67 +3826,67 @@ msgstr ""
 "Vous pouvez également retrouver tous vos e-tickets sur votre page de compte "
 "%(url)s."
 
-#: counter/models.py:967
+#: counter/models.py:968
 msgid "last activity date"
 msgstr "dernière activité"
 
-#: counter/models.py:970
+#: counter/models.py:971
 msgid "permanency"
 msgstr "permanence"
 
-#: counter/models.py:1003
+#: counter/models.py:1004
 msgid "emptied"
 msgstr "coffre vidée"
 
-#: counter/models.py:1006
+#: counter/models.py:1007
 msgid "cash register summary"
 msgstr "relevé de caisse"
 
-#: counter/models.py:1072
+#: counter/models.py:1073
 msgid "cash summary"
 msgstr "relevé"
 
-#: counter/models.py:1075
+#: counter/models.py:1076
 msgid "value"
 msgstr "valeur"
 
-#: counter/models.py:1078
+#: counter/models.py:1079
 msgid "check"
 msgstr "chèque"
 
-#: counter/models.py:1080
+#: counter/models.py:1081
 msgid "True if this is a bank check, else False"
 msgstr "Vrai si c'est un chèque, sinon Faux."
 
-#: counter/models.py:1084
+#: counter/models.py:1085
 msgid "cash register summary item"
 msgstr "élément de relevé de caisse"
 
-#: counter/models.py:1100
+#: counter/models.py:1101
 msgid "banner"
 msgstr "bannière"
 
-#: counter/models.py:1102
+#: counter/models.py:1103
 msgid "event date"
 msgstr "date de l'événement"
 
-#: counter/models.py:1104
+#: counter/models.py:1105
 msgid "event title"
 msgstr "titre de l'événement"
 
-#: counter/models.py:1106
+#: counter/models.py:1107
 msgid "secret"
 msgstr "secret"
 
-#: counter/models.py:1145
+#: counter/models.py:1146
 msgid "uid"
 msgstr "uid"
 
-#: counter/models.py:1150 counter/models.py:1155
+#: counter/models.py:1151 counter/models.py:1156
 msgid "student card"
 msgstr "carte étudiante"
 
-#: counter/models.py:1156
+#: counter/models.py:1157
 msgid "student cards"
 msgstr "cartes étudiantes"
 
@@ -4193,17 +4197,29 @@ msgstr "Sans catégorie"
 msgid "There is no products in this website."
 msgstr "Il n'y a pas de produits dans ce site web."
 
-#: counter/templates/counter/producttype_list.jinja:4
-#: counter/templates/counter/producttype_list.jinja:10
+#: counter/templates/counter/product_type_list.jinja:4
+#: counter/templates/counter/product_type_list.jinja:42
 msgid "Product type list"
 msgstr "Liste des types de produit"
 
-#: counter/templates/counter/producttype_list.jinja:8
+#: counter/templates/counter/product_type_list.jinja:18
 msgid "New product type"
 msgstr "Nouveau type de produit"
 
-#: counter/templates/counter/producttype_list.jinja:17
-msgid "There is no product types in this website."
+#: counter/templates/counter/product_type_list.jinja:25
+msgid "Product types are in the same order on this page and on the eboutic."
+msgstr "Les types de produit sont dans le même ordre sur cette page et sur l'eboutic."
+
+#: counter/templates/counter/product_type_list.jinja:28
+msgid ""
+"You can reorder them here by drag-and-drop. The changes will then be applied "
+"globally immediately."
+msgstr ""
+"Vous pouvez les réorganiser ici. Les changements seront alors immédiatement "
+"appliqués globalement."
+
+#: counter/templates/counter/product_type_list.jinja:58
+msgid "There are no product types in this website."
 msgstr "Il n'y a pas de types de produit dans ce site web."
 
 #: counter/templates/counter/refilling_list.jinja:15

@@ -1,0 +1,64 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+  {% trans %}Product type list{% endtrans %}
+{% endblock %}
+
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("counter/css/product_type.scss") }}">
+{% endblock %}
+
+{% block additional_js %}
+  <script type="module" src="{{ static("bundled/counter/product-type-index.ts") }}"></script>
+{% endblock %}
+
+{% block content %}
+  <p>
+    <a href="{{ url('counter:new_product_type') }}" class="btn btn-blue">
+      {% trans %}New product type{% endtrans %}
+      <i class="fa fa-plus"></i>
+    </a>
+  </p>
+  {% if product_types %}
+    <aside>
+      <p>
+        {% trans %}Product types are in the same order on this page and on the eboutic.{% endtrans %}
+      </p>
+      <p>
+        {% trans trimmed %}
+          You can reorder them here by drag-and-drop.
+          The changes will then be applied globally immediately.
+        {% endtrans %}
+      </p>
+    </aside>
+    <div x-data="productTypesList">
+      <p
+        class="alert snackbar"
+        :class="alertMessage.success ? 'alert-green' : 'alert-red'"
+        x-show="alertMessage.open"
+        x-transition.duration.500ms
+        x-text="alertMessage.content"
+      ></p>
+      <h3>{% trans %}Product type list{% endtrans %}</h3>
+      <ul
+        x-sort="($item, $position) => reorder($item, $position)"
+        x-ref="productTypes"
+        class="product-type-list"
+        :aria-busy="loading"
+      >
+        {%- for product_type in product_types -%}
+          <li x-sort:item="{{ product_type.id }}">
+            <i class="fa fa-grip-vertical"></i>
+            <a href="{{ url('counter:product_type_edit', type_id=product_type.id) }}">
+              {{ product_type.name }}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {% else %}
+    <p>
+      {% trans %}There are no product types in this website.{% endtrans %}
+    </p>
+  {% endif %}
+{% endblock %}

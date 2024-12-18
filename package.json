@@ -33,12 +33,13 @@
     "vite-plugin-static-copy": "^2.1.0"
   },
   "dependencies": {
+    "@alpinejs/sort": "^3.14.7",
     "@fortawesome/fontawesome-free": "^6.6.0",
     "@hey-api/client-fetch": "^0.4.0",
     "@sentry/browser": "^8.34.0",
     "@zip.js/zip.js": "^2.7.52",
     "3d-force-graph": "^1.73.4",
-    "alpinejs": "^3.14.1",
+    "alpinejs": "^3.14.7",
     "chart.js": "^4.4.4",
     "cytoscape": "^3.30.2",
     "cytoscape-cxtmenu": "^3.5.0",

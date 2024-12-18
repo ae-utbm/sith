@@ -129,7 +129,7 @@ class PermanencyAdmin(SearchModelAdmin):
 
 @admin.register(ProductType)
 class ProductTypeAdmin(admin.ModelAdmin):
-    list_display = ("name", "priority")
+    list_display = ("name", "order")
 
 
 @admin.register(CashRegisterSummary)

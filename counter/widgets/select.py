@@ -2,7 +2,7 @@ from pydantic import TypeAdapter
 
 from core.views.widgets.select import AutoCompleteSelect, AutoCompleteSelectMultiple
 from counter.models import Counter, Product
-from counter.schemas import ProductSchema, SimplifiedCounterSchema
+from counter.schemas import SimpleProductSchema, SimplifiedCounterSchema
 
 _js = ["bundled/counter/components/ajax-select-index.ts"]
 
@@ -24,12 +24,12 @@ class AutoCompleteSelectMultipleCounter(AutoCompleteSelectMultiple):
 class AutoCompleteSelectProduct(AutoCompleteSelect):
     component_name = "product-ajax-select"
     model = Product
-    adapter = TypeAdapter(list[ProductSchema])
+    adapter = TypeAdapter(list[SimpleProductSchema])
     js = _js
 
 
 class AutoCompleteSelectMultipleProduct(AutoCompleteSelectMultiple):
     component_name = "product-ajax-select"
     model = Product
-    adapter = TypeAdapter(list[ProductSchema])
+    adapter = TypeAdapter(list[SimpleProductSchema])
     js = _js

@@ -87,3 +87,21 @@ a:not(.button) {
     color: $primary-color;
   }
 }
+
+
+form {
+  .row {
+    label {
+      margin: unset;
+    }
+  }
+
+  fieldset {
+    margin-bottom: 1rem;
+  }
+
+  .helptext {
+    margin-top: .25rem;
+    font-size: 80%;
+  }
+}

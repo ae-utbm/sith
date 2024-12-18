@@ -88,7 +88,7 @@
         </div>
       {% endif %}
 
-      {% for priority_groups in products|groupby('priority')|reverse %}
+      {% for priority_groups in products|groupby('order') %}
         {% for category, items in priority_groups.list|groupby('category') %}
           {% if items|count > 0 %}
             <section>
