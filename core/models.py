@@ -530,10 +530,8 @@ class User(AbstractBaseUser):
 
     @cached_property
     def can_create_subscription(self) -> bool:
-        from club.models import Membership
-
-        return (
-            Membership.objects.board()
+        return self.is_root or (
+            self.memberships.board()
             .ongoing()
             .filter(club_id__in=settings.SITH_CAN_CREATE_SUBSCRIPTIONS)
             .exists()
