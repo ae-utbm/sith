@@ -1,3 +1,5 @@
+@import "core/static/core/colors";
+
 main {
   box-sizing: border-box;
   padding: 10px;
@@ -25,7 +27,7 @@ main {
     font-size: 1.2em;
     line-height: 1.2em;
     color: black;
-    background-color: #f2f2f2;
+    background-color: $primary-neutral-light-color;
     border-radius: 5px;
     font-weight: bold;
 
@@ -34,7 +36,7 @@ main {
     }
 
     &:disabled {
-      background-color: #f2f2f2;
+      background-color: $primary-neutral-light-color;
       color: #d4d4d4;
     }
   }

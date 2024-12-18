@@ -16,8 +16,6 @@
 from django.urls import path
 
 from counter.views.admin import (
-    ActiveProductListView,
-    ArchivedProductListView,
     CounterCreateView,
     CounterDeleteView,
     CounterEditPropView,
@@ -27,6 +25,7 @@ from counter.views.admin import (
     CounterStatView,
     ProductCreateView,
     ProductEditView,
+    ProductListView,
     ProductTypeCreateView,
     ProductTypeEditView,
     ProductTypeListView,
@@ -108,12 +107,7 @@ urlpatterns = [
         CashSummaryEditView.as_view(),
         name="cash_summary_edit",
     ),
-    path("admin/product/list/", ActiveProductListView.as_view(), name="product_list"),
-    path(
-        "admin/product/list_archived/",
-        ArchivedProductListView.as_view(),
-        name="product_list_archived",
-    ),
+    path("admin/product/", ProductListView.as_view(), name="product_list"),
     path("admin/product/create/", ProductCreateView.as_view(), name="new_product"),
     path(
         "admin/product/<int:product_id>/",
