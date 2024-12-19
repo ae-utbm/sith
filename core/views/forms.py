@@ -44,7 +44,7 @@ from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from PIL import Image
 
 from antispam.forms import AntiSpamEmailField
-from core.models import Gift, Page, SithFile, User
+from core.models import Gift, Page, RealGroup, SithFile, User
 from core.utils import resize_image
 from core.views.widgets.select import (
     AutoCompleteSelect,
@@ -285,15 +285,18 @@ class UserProfileForm(forms.ModelForm):
         self._post_clean()
 
 
-class UserPropForm(forms.ModelForm):
+class UserRealGroupForm(forms.ModelForm):
     error_css_class = "error"
     required_css_class = "required"
+
+    groups = forms.ModelChoiceField(
+        RealGroup.objects.all(),
+        widget=CheckboxSelectMultiple,
+    )
 
     class Meta:
         model = User
         fields = ["groups"]
-        help_texts = {"groups": "Which groups this user belongs to"}
-        widgets = {"groups": CheckboxSelectMultiple}
 
 
 class UserGodfathersForm(forms.Form):
