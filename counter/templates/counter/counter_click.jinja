@@ -5,8 +5,14 @@
   {{ counter }}
 {% endblock %}
 
+{% block additional_css %}
+  <link rel="stylesheet" type="text/css" href="{{ static('bundled/core/components/ajax-select-index.css') }}" defer></link>
+  <link rel="stylesheet" type="text/css" href="{{ static('core/components/ajax-select.scss') }}" defer></link>
+{% endblock %}
+
 {% block additional_js %}
   <script type="module" src="{{ static('bundled/counter/counter-click-index.ts') }}"></script>
+  <script type="module" src="{{ static('bundled/counter/components/counter-product-select-index.ts') }}"></script>
 {% endblock %}
 
 {% block info_boxes %}
@@ -40,9 +46,24 @@
         <form method="post" action=""
               class="code_form" @submit.prevent="handleCode">
           {% csrf_token %}
+
           <input type="hidden" name="action" value="code">
-          <label for="code_field"></label>
-          <input type="text" name="code" value="" class="focus" id="code_field"/>
+
+          <counter-product-select name="code" x-ref="codeField" autofocus required placeholder="{% trans %}Select a product...{% endtrans %}">
+            <option value=""></option>
+            <optgroup label="{% trans %}Operations{% endtrans %}">
+              <option value="FIN">{% trans %}Confirm (FIN){% endtrans %}</option>
+              <option value="ANN">{% trans %}Cancel (ANN){% endtrans %}</option>
+            </optgroup>
+            {% for category in categories.keys() %}
+              <optgroup label="{{ category }}">
+                {% for product in categories[category] %}
+                  <option value="{{ product.code }}">{{ product }}</option>
+                {% endfor %}
+              </optgroup>
+            {% endfor %}
+          </counter-product-select>
+
           <input type="submit" value="{% trans %}Go{% endtrans %}"/>
         </form>
 
@@ -174,15 +195,6 @@
         },
       {%- endfor -%}
     };
-    const productsAutocomplete = [
-      {% for p in products -%}
-        {
-          value: "{{ p.code }}",
-          label: "{{ p.name }}",
-          tags: "{{ p.code }} {{ p.name }}",
-        },
-      {%- endfor %}
-    ];
     window.addEventListener("DOMContentLoaded", () => {
       loadCounter({
         csrfToken: "{{ csrf_token }}",
