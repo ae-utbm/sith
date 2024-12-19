@@ -15,7 +15,8 @@
 {% endblock %}
 
 {% block additional_css %}
-  <link rel="stylesheet" href="{{ static('eboutic/css/eboutic.css') }}">
+  <link rel="stylesheet" href="{{ static("eboutic/css/eboutic.css") }}">
+  <link rel="stylesheet" href="{{ static("core/components/card.scss") }}">
 {% endblock %}
 
 {% block content %}
@@ -104,18 +105,21 @@
                 {% for p in items %}
                   <button
                     id="{{ p.id }}"
-                    class="product-button"
+                    class="card product-button clickable shadow"
                     :class="{selected: items.some((i) => i.id === {{ p.id }})}"
                     @click='addFromCatalog({{ p.id }}, {{ p.name|tojson }}, {{ p.selling_price }})'
                   >
                     {% if p.icon %}
-                      <img class="product-image" src="{{ p.icon.url }}"
-                           alt="image de {{ p.name }}">
+                      <img
+                        class="card-image"
+                        src="{{ p.icon.url }}"
+                        alt="image de {{ p.name }}"
+                      >
                     {% else %}
-                      <i class="fa-regular fa-image fa-2x product-image"></i>
+                      <i class="fa-regular fa-image fa-2x card-image"></i>
                     {% endif %}
-                    <div class="product-description">
-                      <h4>{{ p.name }}</h4>
+                    <div class="card-content">
+                      <h4 class="card-title">{{ p.name }}</h4>
                       <p>{{ p.selling_price }} €</p>
                     </div>
                   </button>

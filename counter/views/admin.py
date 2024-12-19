@@ -12,19 +12,16 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-import itertools
 from datetime import timedelta
-from operator import itemgetter
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.db.models import F
 from django.forms import CheckboxSelectMultiple
 from django.forms.models import modelform_factory
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from core.utils import get_semester_code, get_start_of_semester
@@ -125,40 +122,9 @@ class ProductTypeEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     current_tab = "products"
 
 
-class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
-    model = Product
-    queryset = Product.objects.values("id", "name", "code", "product_type__name")
-    template_name = "counter/product_list.jinja"
-    ordering = [
-        F("product_type__order").asc(nulls_last=True),
-        "product_type",
-        "name",
-    ]
-
-    def get_context_data(self, **kwargs):
-        res = super().get_context_data(**kwargs)
-        res["object_list"] = itertools.groupby(
-            res["object_list"], key=itemgetter("product_type__name")
-        )
-        return res
-
-
-class ArchivedProductListView(ProductListView):
-    """A list view for the admins."""
-
-    current_tab = "archive"
-
-    def get_queryset(self):
-        return super().get_queryset().filter(archived=True)
-
-
-class ActiveProductListView(ProductListView):
-    """A list view for the admins."""
-
+class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
     current_tab = "products"
-
-    def get_queryset(self):
-        return super().get_queryset().filter(archived=False)
+    template_name = "counter/product_list.jinja"
 
 
 class ProductCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
