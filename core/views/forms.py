@@ -167,9 +167,7 @@ class RegisteringForm(UserCreationForm):
     class Meta:
         model = User
         fields = ("first_name", "last_name", "email")
-        field_classes = {
-            "email": AntiSpamEmailField,
-        }
+        field_classes = {"email": AntiSpamEmailField}
 
 
 class UserProfileForm(forms.ModelForm):

@@ -261,19 +261,19 @@ class Command(BaseCommand):
         User.groups.through.objects.bulk_create(
             [
                 User.groups.through(
-                    realgroup_id=settings.SITH_GROUP_COUNTER_ADMIN_ID, user=counter
+                    group_id=settings.SITH_GROUP_COUNTER_ADMIN_ID, user=counter
                 ),
                 User.groups.through(
-                    realgroup_id=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID, user=comptable
+                    group_id=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID, user=comptable
                 ),
                 User.groups.through(
-                    realgroup_id=settings.SITH_GROUP_COM_ADMIN_ID, user=comunity
+                    group_id=settings.SITH_GROUP_COM_ADMIN_ID, user=comunity
                 ),
                 User.groups.through(
-                    realgroup_id=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID, user=tutu
+                    group_id=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID, user=tutu
                 ),
                 User.groups.through(
-                    realgroup_id=settings.SITH_GROUP_SAS_ADMIN_ID, user=skia
+                    group_id=settings.SITH_GROUP_SAS_ADMIN_ID, user=skia
                 ),
             ]
         )

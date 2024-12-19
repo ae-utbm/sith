@@ -31,14 +31,14 @@ from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import RegexValidator, validate_email
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.timezone import localdate
 from django.utils.translation import gettext_lazy as _
 
-from core.models import Group, MetaGroup, Notification, Page, RealGroup, SithFile, User
+from core.models import Group, MetaGroup, Notification, Page, SithFile, User
 
 # Create your models here.
 
@@ -438,19 +438,18 @@ class Mailing(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.is_moderated:
-            for user in (
-                RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID)
-                .first()
-                .users.all()
+            unread_notif_subquery = Notification.objects.filter(
+                user=OuterRef("pk"), type="MAILING_MODERATION", viewed=False
+            )
+            for user in User.objects.filter(
+                ~Exists(unread_notif_subquery),
+                groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID],
             ):
-                if not user.notifications.filter(
-                    type="MAILING_MODERATION", viewed=False
-                ).exists():
-                    Notification(
-                        user=user,
-                        url=reverse("com:mailing_admin"),
-                        type="MAILING_MODERATION",
-                    ).save(*args, **kwargs)
+                Notification(
+                    user=user,
+                    url=reverse("com:mailing_admin"),
+                    type="MAILING_MODERATION",
+                ).save(*args, **kwargs)
         super().save(*args, **kwargs)
 
     def clean(self):

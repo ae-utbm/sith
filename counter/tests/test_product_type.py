@@ -6,7 +6,7 @@ from model_bakery import baker, seq
 from ninja_extra.testing import TestClient
 
 from core.baker_recipes import board_user, subscriber_user
-from core.models import RealGroup, User
+from core.models import Group, User
 from counter.api import ProductTypeController
 from counter.models import ProductType
 
@@ -70,16 +70,14 @@ def test_move_above_product_type(product_types: list[ProductType]):
         (
             lambda: baker.make(
                 User,
-                groups=[RealGroup.objects.get(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)],
+                groups=[Group.objects.get(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)],
             ),
             200,
         ),
         (
             lambda: baker.make(
                 User,
-                groups=[
-                    RealGroup.objects.get(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-                ],
+                groups=[Group.objects.get(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)],
             ),
             200,
         ),

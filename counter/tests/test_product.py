@@ -13,7 +13,7 @@ from PIL import Image
 from pytest_django.asserts import assertNumQueries
 
 from core.baker_recipes import board_user, subscriber_user
-from core.models import RealGroup, User
+from core.models import Group, User
 from counter.models import Product, ProductType
 
 
@@ -51,16 +51,14 @@ def test_resize_product_icon(model):
         (
             lambda: baker.make(
                 User,
-                groups=[RealGroup.objects.get(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)],
+                groups=[Group.objects.get(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)],
             ),
             200,
         ),
         (
             lambda: baker.make(
                 User,
-                groups=[
-                    RealGroup.objects.get(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-                ],
+                groups=[Group.objects.get(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)],
             ),
             200,
         ),

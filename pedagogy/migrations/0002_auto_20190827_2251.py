@@ -25,26 +25,11 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
-from core.models import User
-
-
-def remove_multiples_comments_from_same_user(apps, schema_editor):
-    for user in User.objects.exclude(uv_comments=None).prefetch_related("uv_comments"):
-        for uv in user.uv_comments.values("uv").distinct():
-            last = (
-                user.uv_comments.filter(uv__id=uv["uv"])
-                .order_by("-publish_date")
-                .first()
-            )
-            user.uv_comments.filter(uv__id=uv["uv"]).exclude(pk=last.pk).delete()
-
 
 class Migration(migrations.Migration):
     dependencies = [("pedagogy", "0001_initial")]
 
-    operations = [
-        migrations.RunPython(
-            remove_multiples_comments_from_same_user,
-            reverse_code=migrations.RunPython.noop,
-        )
-    ]
+    # This migration contained just a RunPython operation
+    # Which has since been removed.
+    # The migration itself is kept in order not to break the migration tree
+    operations = []

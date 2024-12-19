@@ -14,7 +14,7 @@ from PIL import Image
 from pytest_django.asserts import assertNumQueries
 
 from core.baker_recipes import board_user, old_subscriber_user, subscriber_user
-from core.models import Group, RealGroup, SithFile, User
+from core.models import Group, SithFile, User
 from sas.models import Picture
 from sith import settings
 
@@ -26,12 +26,10 @@ class TestImageAccess:
         [
             lambda: baker.make(User, is_superuser=True),
             lambda: baker.make(
-                User,
-                groups=[RealGroup.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)],
+                User, groups=[Group.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
             ),
             lambda: baker.make(
-                User,
-                groups=[RealGroup.objects.get(pk=settings.SITH_GROUP_COM_ADMIN_ID)],
+                User, groups=[Group.objects.get(pk=settings.SITH_GROUP_COM_ADMIN_ID)]
             ),
         ],
     )
