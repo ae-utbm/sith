@@ -169,21 +169,36 @@
   {{ super() }}
   <script>
     const products = {
-      {%- for p in products -%}
-        {{ p.id }}: {
-          id: "{{ p.id }}",
-          name: "{{ p.name }}",
-          price: {{ p.price }},
-          hasTrayPrice: {{ p.tray | tojson }},
+      {%- for product in products -%}
+        {{ product.id }}: {
+          id: "{{ product.id }}",
+          name: "{{ product.name }}",
+          price: {{ product.price }},
+          hasTrayPrice: {{ product.tray | tojson }},
         },
       {%- endfor -%}
     };
+    const formInitial = [
+      {%- for f in form -%}
+        {%- if f.cleaned_data -%}
+          {
+            {%- if f.cleaned_data["id"] -%}
+              id: '{{ f.cleaned_data["id"] | tojson }}',
+            {%- endif -%}
+            {%- if f.cleaned_data["quantity"] -%}
+              quantity: {{ f.cleaned_data["quantity"] | tojson }},
+            {%- endif -%}
+          },
+        {%- endif -%}
+      {%- endfor -%}
+    ];
     window.addEventListener("DOMContentLoaded", () => {
       loadCounter({
         csrfToken: "{{ csrf_token }}",
         clickApiUrl: "{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}", customerBalance: {{ customer.amount }},
         products: products,
         customerId: {{ customer.pk }},
+        formInitial: formInitial,
       });
     });
   </script>
