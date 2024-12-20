@@ -15,6 +15,10 @@ export class CounterProductSelect extends AutoCompleteSelectBase {
     return ["FIN", "ANN"];
   }
 
+  public getSelectedProduct(): [number, string] {
+    return parseProduct(this.widget.getValue() as string);
+  }
+
   protected attachBehaviors(): void {
     this.allowMultipleProducts();
   }
