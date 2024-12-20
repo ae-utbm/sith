@@ -12,20 +12,26 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-import re
-from http import HTTPStatus
-from typing import TYPE_CHECKING
-from urllib.parse import parse_qs
+import math
 
 from django.core.exceptions import PermissionDenied
-from django.db import DataError, transaction
+from django.db import transaction
 from django.db.models import F
-from django.http import Http404, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.forms import (
+    BaseFormSet,
+    IntegerField,
+    ModelForm,
+    ValidationError,
+    formset_factory,
+)
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, resolve_url
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, FormView
+from django.views.generic import FormView
+from django.views.generic.detail import SingleObjectMixin
 
+from core.models import User
 from core.utils import FormFragmentTemplateData
 from core.views import CanViewMixin
 from counter.forms import RefillForm
@@ -34,11 +40,111 @@ from counter.utils import is_logged_in_counter
 from counter.views.mixins import CounterTabsMixin
 from counter.views.student_card import StudentCardFormView
 
-if TYPE_CHECKING:
-    from core.models import User
+
+def get_operator(counter: Counter, customer: Customer) -> User:
+    if counter.customer_is_barman(customer):
+        return customer.user
+    return counter.get_random_barman()
 
 
-class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
+class ProductForm(ModelForm):
+    quantity = IntegerField(min_value=1)
+
+    class Meta:
+        model = Product
+        fields = ["code"]
+
+    def __init__(
+        self,
+        *args,
+        customer: Customer | None = None,
+        counter: Counter | None = None,
+        **kwargs,
+    ):
+        self.customer = customer
+        self.counter = counter
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.customer is None or self.counter is None:
+            raise RuntimeError(
+                f"{self} has been initialized without customer or counter"
+            )
+
+        user = self.customer.user
+
+        # We store self.product so we can use it later on the formset validation
+        self.product = self.counter.products.filter(code=cleaned_data["code"]).first()
+        if self.product is None:
+            raise ValidationError(
+                _(
+                    "Product %(product)s doesn't exist or isn't available on this counter"
+                )
+                % {"product": cleaned_data["code"]}
+            )
+
+        # Test alcohoolic products
+        if self.product.limit_age >= 18:
+            if not user.date_of_birth:
+                raise ValidationError(_("Too young for that product"))
+            if user.is_banned_alcohol:
+                raise ValidationError(_("Not allowed for that product"))
+        if user.date_of_birth and self.customer.user.get_age() < self.product.limit_age:
+            raise ValidationError(_("Too young for that product"))
+
+        if user.is_banned_counter:
+            raise ValidationError(_("Not allowed for that product"))
+
+        # Compute prices
+        cleaned_data["bonus_quantity"] = 0
+        if self.product.tray:
+            cleaned_data["bonus_quantity"] = math.floor(
+                cleaned_data["quantity"] / Product.QUANTITY_FOR_TRAY_PRICE
+            )
+        cleaned_data["unit_price"] = self.product.get_actual_price(
+            self.counter, self.customer
+        )
+        cleaned_data["total_price"] = cleaned_data["unit_price"] * (
+            cleaned_data["quantity"] - cleaned_data["bonus_quantity"]
+        )
+
+        return cleaned_data
+
+
+class BaseBasketForm(BaseFormSet):
+    def clean(self):
+        super().clean()
+        if len(self) == 0:
+            return
+        self._check_recorded_products(self[0].customer)
+        self._check_enough_money(self[0].counter, self[0].customer)
+
+    def _check_enough_money(self, counter: Counter, customer: Customer):
+        self.total_price = sum([data["total_price"] for data in self.cleaned_data])
+        if self.total_price > customer.amount:
+            raise ValidationError(_("Not enough money"))
+
+    def _check_recorded_products(self, customer: Customer):
+        """Check for, among other things, ecocups and pitchers"""
+        self.total_recordings = 0
+        for form in self:
+            # form.product is stored by the clean step of each formset form
+            if form.product.is_record_product:
+                self.total_recordings -= form.cleaned_data["quantity"]
+            if form.product.is_unrecord_product:
+                self.total_recordings += form.cleaned_data["quantity"]
+
+        if not customer.can_record_more(self.total_recordings):
+            raise ValidationError(_("This user have reached his recording limit"))
+
+
+BasketForm = formset_factory(
+    ProductForm, formset=BaseBasketForm, absolute_max=None, min_num=1
+)
+
+
+class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
     """The click view
     This is a detail view not to have to worry about loading the counter
     Everything is made by hand in the post method.
@@ -46,37 +152,18 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
 
     model = Counter
     queryset = Counter.objects.annotate_is_open()
+    form_class = BasketForm
     template_name = "counter/counter_click.jinja"
     pk_url_kwarg = "counter_id"
     current_tab = "counter"
 
-    def render_to_response(self, *args, **kwargs):
-        if self.is_ajax(self.request):
-            response = {"errors": []}
-            status = HTTPStatus.OK
-
-            if self.request.session["too_young"]:
-                response["errors"].append(_("Too young for that product"))
-                status = HTTPStatus.UNAVAILABLE_FOR_LEGAL_REASONS
-            if self.request.session["not_allowed"]:
-                response["errors"].append(_("Not allowed for that product"))
-                status = HTTPStatus.FORBIDDEN
-            if self.request.session["no_age"]:
-                response["errors"].append(_("No date of birth provided"))
-                status = HTTPStatus.UNAVAILABLE_FOR_LEGAL_REASONS
-            if self.request.session["not_enough"]:
-                response["errors"].append(_("Not enough money"))
-                status = HTTPStatus.PAYMENT_REQUIRED
-
-            if len(response["errors"]) > 1:
-                status = HTTPStatus.BAD_REQUEST
-
-            response["basket"] = self.request.session["basket"]
-
-            return JsonResponse(response, status=status)
-
-        else:  # Standard HTML page
-            return super().render_to_response(*args, **kwargs)
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["form_kwargs"] = {
+            "customer": self.customer,
+            "counter": self.object,
+        }
+        return kwargs
 
     def dispatch(self, request, *args, **kwargs):
         self.customer = get_object_or_404(Customer, user__id=self.kwargs["user_id"])
@@ -90,301 +177,74 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             or request.session["counter_token"] != obj.token
             or len(obj.barmen_list) == 0
         ):
-            return redirect(obj)
+            return redirect(obj)  # Redirect to counter
         return super().dispatch(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
-        """Simple get view."""
-        if "basket" not in request.session:  # Init the basket session entry
-            request.session["basket"] = {}
-            request.session["basket_total"] = 0
-        request.session["not_enough"] = False  # Reset every variable
-        request.session["too_young"] = False
-        request.session["not_allowed"] = False
-        request.session["no_age"] = False
-        ret = super().get(request, *args, **kwargs)
-        if (self.object.type != "BAR" and not request.user.is_authenticated) or (
-            self.object.type == "BAR" and len(self.object.barmen_list) == 0
-        ):  # Check that at least one barman is logged in
-            ret = self.cancel(request)  # Otherwise, go to main view
+    def form_valid(self, formset):
+        ret = super().form_valid(formset)
+
+        if len(formset) == 0:
+            return ret
+
+        operator = get_operator(self.object, self.customer)
+        with transaction.atomic():
+            self.request.session["last_basket"] = []
+
+            for form in formset:
+                self.request.session["last_basket"].append(
+                    f"{form.cleaned_data['quantity']} x {form.product.name}"
+                )
+
+                Selling(
+                    label=form.product.name,
+                    product=form.product,
+                    club=form.product.club,
+                    counter=self.object,
+                    unit_price=form.cleaned_data["unit_price"],
+                    quantity=form.cleaned_data["quantity"]
+                    - form.cleaned_data["bonus_quantity"],
+                    seller=operator,
+                    customer=self.customer,
+                ).save()
+                if form.cleaned_data["bonus_quantity"] > 0:
+                    Selling(
+                        label=f"{form.product.name} (Plateau)",
+                        product=form.product,
+                        club=form.product.club,
+                        counter=self.object,
+                        unit_price=0,
+                        quantity=form.cleaned_data["bonus_quantity"],
+                        seller=operator,
+                        customer=self.customer,
+                    ).save()
+
+            self.customer.recorded_products -= formset.total_recordings
+            self.customer.save()
+
+        # Add some info for the main counter view to display
+        self.request.session["last_customer"] = self.customer.user.get_display_name()
+        self.request.session["last_total"] = f"{formset.total_price:0.2f}"
+        self.request.session["new_customer_amount"] = str(self.customer.amount)
+
         return ret
 
-    def post(self, request, *args, **kwargs):
-        """Handle the many possibilities of the post request."""
-        self.object = self.get_object()
-        if (self.object.type != "BAR" and not request.user.is_authenticated) or (
-            self.object.type == "BAR" and len(self.object.barmen_list) < 1
-        ):  # Check that at least one barman is logged in
-            return self.cancel(request)
-        if self.object.type == "BAR" and not (
-            "counter_token" in self.request.session
-            and self.request.session["counter_token"] == self.object.token
-        ):  # Also check the token to avoid the bar to be stolen
-            return HttpResponseRedirect(
-                reverse_lazy(
-                    "counter:details",
-                    args=self.args,
-                    kwargs={"counter_id": self.object.id},
-                )
-                + "?bad_location"
-            )
-        if "basket" not in request.session:
-            request.session["basket"] = {}
-            request.session["basket_total"] = 0
-        request.session["not_enough"] = False  # Reset every variable
-        request.session["too_young"] = False
-        request.session["not_allowed"] = False
-        request.session["no_age"] = False
-        if self.object.type != "BAR":
-            self.operator = request.user
-        elif self.object.customer_is_barman(self.customer):
-            self.operator = self.customer.user
-        else:
-            self.operator = self.object.get_random_barman()
-        action = self.request.POST.get("action", None)
-        if action is None:
-            action = parse_qs(request.body.decode()).get("action", [""])[0]
-        if action == "add_product":
-            self.add_product(request)
-        elif action == "del_product":
-            self.del_product(request)
-        elif action == "code":
-            return self.parse_code(request)
-        elif action == "cancel":
-            return self.cancel(request)
-        elif action == "finish":
-            return self.finish(request)
-        context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
+    def get_success_url(self):
+        return resolve_url(self.object)
 
     def get_product(self, pid):
         return Product.objects.filter(pk=int(pid)).first()
-
-    def get_price(self, pid):
-        p = self.get_product(pid)
-        if self.object.customer_is_barman(self.customer):
-            price = p.special_selling_price
-        else:
-            price = p.selling_price
-        return price
-
-    def sum_basket(self, request):
-        total = 0
-        for infos in request.session["basket"].values():
-            total += infos["price"] * infos["qty"]
-        return total / 100
-
-    def get_total_quantity_for_pid(self, request, pid):
-        pid = str(pid)
-        if pid not in request.session["basket"]:
-            return 0
-        return (
-            request.session["basket"][pid]["qty"]
-            + request.session["basket"][pid]["bonus_qty"]
-        )
-
-    def compute_record_product(self, request, product=None):
-        recorded = 0
-        basket = request.session["basket"]
-
-        if product:
-            if product.is_record_product:
-                recorded -= 1
-            elif product.is_unrecord_product:
-                recorded += 1
-
-        for p in basket:
-            bproduct = self.get_product(str(p))
-            if bproduct.is_record_product:
-                recorded -= basket[p]["qty"]
-            elif bproduct.is_unrecord_product:
-                recorded += basket[p]["qty"]
-        return recorded
-
-    def is_record_product_ok(self, request, product):
-        return self.customer.can_record_more(
-            self.compute_record_product(request, product)
-        )
-
-    @staticmethod
-    def is_ajax(request):
-        # when using the fetch API, the django request.POST dict is empty
-        # this is but a wretched contrivance which strive to replace
-        # the deprecated django is_ajax() method
-        # and which must be replaced as soon as possible
-        # by a proper separation between the api endpoints of the counter
-        return len(request.POST) == 0 and len(request.body) != 0
-
-    def add_product(self, request, q=1, p=None):
-        """Add a product to the basket
-        q is the quantity passed as integer
-        p is the product id, passed as an integer.
-        """
-        pid = p or parse_qs(request.body.decode())["product_id"][0]
-        pid = str(pid)
-        price = self.get_price(pid)
-        total = self.sum_basket(request)
-        product: Product = self.get_product(pid)
-        user: User = self.customer.user
-        buying_groups = list(product.buying_groups.values_list("pk", flat=True))
-        can_buy = len(buying_groups) == 0 or any(
-            user.is_in_group(pk=group_id) for group_id in buying_groups
-        )
-        if not can_buy:
-            request.session["not_allowed"] = True
-            return False
-        bq = 0  # Bonus quantity, for trays
-        if (
-            product.tray
-        ):  # Handle the tray to adjust the quantity q to add and the bonus quantity bq
-            total_qty_mod_6 = self.get_total_quantity_for_pid(request, pid) % 6
-            bq = int((total_qty_mod_6 + q) / 6)  # Integer division
-            q -= bq
-        if self.customer.amount < (
-            total + round(q * float(price), 2)
-        ):  # Check for enough money
-            request.session["not_enough"] = True
-            return False
-        if product.is_unrecord_product and not self.is_record_product_ok(
-            request, product
-        ):
-            request.session["not_allowed"] = True
-            return False
-        if product.limit_age >= 18 and not user.date_of_birth:
-            request.session["no_age"] = True
-            return False
-        if product.limit_age >= 18 and user.is_banned_alcohol:
-            request.session["not_allowed"] = True
-            return False
-        if user.is_banned_counter:
-            request.session["not_allowed"] = True
-            return False
-        if (
-            user.date_of_birth and self.customer.user.get_age() < product.limit_age
-        ):  # Check if affordable
-            request.session["too_young"] = True
-            return False
-        if pid in request.session["basket"]:  # Add if already in basket
-            request.session["basket"][pid]["qty"] += q
-            request.session["basket"][pid]["bonus_qty"] += bq
-        else:  # or create if not
-            request.session["basket"][pid] = {
-                "qty": q,
-                "price": int(price * 100),
-                "bonus_qty": bq,
-            }
-        request.session.modified = True
-        return True
-
-    def del_product(self, request):
-        """Delete a product from the basket."""
-        pid = parse_qs(request.body.decode())["product_id"][0]
-        product = self.get_product(pid)
-        if pid in request.session["basket"]:
-            if (
-                product.tray
-                and (self.get_total_quantity_for_pid(request, pid) % 6 == 0)
-                and request.session["basket"][pid]["bonus_qty"]
-            ):
-                request.session["basket"][pid]["bonus_qty"] -= 1
-            else:
-                request.session["basket"][pid]["qty"] -= 1
-            if request.session["basket"][pid]["qty"] <= 0:
-                del request.session["basket"][pid]
-        request.session.modified = True
-
-    def parse_code(self, request):
-        """Parse the string entered by the barman.
-
-        This can be of two forms :
-            - `<str>`, where the string is the code of the product
-            - `<int>X<str>`, where the integer is the quantity and str the code.
-        """
-        string = parse_qs(request.body.decode()).get("code", [""])[0].upper()
-        if string == "FIN":
-            return self.finish(request)
-        elif string == "ANN":
-            return self.cancel(request)
-        regex = re.compile(r"^((?P<nb>[0-9]+)X)?(?P<code>[A-Z0-9]+)$")
-        m = regex.match(string)
-        if m is not None:
-            nb = m.group("nb")
-            code = m.group("code")
-            nb = int(nb) if nb is not None else 1
-            p = self.object.products.filter(code=code).first()
-            if p is not None:
-                self.add_product(request, nb, p.id)
-        context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
-
-    def finish(self, request):
-        """Finish the click session, and validate the basket."""
-        with transaction.atomic():
-            request.session["last_basket"] = []
-            if self.sum_basket(request) > self.customer.amount:
-                raise DataError(_("You have not enough money to buy all the basket"))
-
-            for pid, infos in request.session["basket"].items():
-                # This duplicates code for DB optimization (prevent to load many times the same object)
-                p = Product.objects.filter(pk=pid).first()
-                if self.object.customer_is_barman(self.customer):
-                    uprice = p.special_selling_price
-                else:
-                    uprice = p.selling_price
-                request.session["last_basket"].append(
-                    "%d x %s" % (infos["qty"] + infos["bonus_qty"], p.name)
-                )
-                s = Selling(
-                    label=p.name,
-                    product=p,
-                    club=p.club,
-                    counter=self.object,
-                    unit_price=uprice,
-                    quantity=infos["qty"],
-                    seller=self.operator,
-                    customer=self.customer,
-                )
-                s.save()
-                if infos["bonus_qty"]:
-                    s = Selling(
-                        label=p.name + " (Plateau)",
-                        product=p,
-                        club=p.club,
-                        counter=self.object,
-                        unit_price=0,
-                        quantity=infos["bonus_qty"],
-                        seller=self.operator,
-                        customer=self.customer,
-                    )
-                    s.save()
-                self.customer.recorded_products -= self.compute_record_product(request)
-                self.customer.save()
-            request.session["last_customer"] = self.customer.user.get_display_name()
-            request.session["last_total"] = "%0.2f" % self.sum_basket(request)
-            request.session["new_customer_amount"] = str(self.customer.amount)
-            del request.session["basket"]
-            request.session.modified = True
-            kwargs = {"counter_id": self.object.id}
-            return HttpResponseRedirect(
-                reverse_lazy("counter:details", args=self.args, kwargs=kwargs)
-            )
-
-    def cancel(self, request):
-        """Cancel the click session."""
-        kwargs = {"counter_id": self.object.id}
-        request.session.pop("basket", None)
-        return HttpResponseRedirect(
-            reverse_lazy("counter:details", args=self.args, kwargs=kwargs)
-        )
 
     def get_context_data(self, **kwargs):
         """Add customer to the context."""
         kwargs = super().get_context_data(**kwargs)
         products = self.object.products.select_related("product_type")
+
+        # Optimisation to bulk edit prices instead of `calling get_actual_price` on everything
         if self.object.customer_is_barman(self.customer):
             products = products.annotate(price=F("special_selling_price"))
         else:
             products = products.annotate(price=F("selling_price"))
+
         kwargs["products"] = products
         kwargs["categories"] = {}
         for product in kwargs["products"]:
@@ -393,7 +253,6 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
                     product
                 )
         kwargs["customer"] = self.customer
-        kwargs["basket_total"] = self.sum_basket(self.request)
 
         if self.object.type == "BAR":
             kwargs["student_card_fragment"] = StudentCardFormView.get_template_data(
@@ -404,6 +263,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, DetailView):
             kwargs["refilling_fragment"] = RefillingCreateView.get_template_data(
                 self.customer
             ).render(self.request)
+
         return kwargs
 
 
@@ -442,10 +302,7 @@ class RefillingCreateView(FormView):
         if not self.counter.can_refill():
             raise PermissionDenied
 
-        if self.counter.customer_is_barman(self.customer):
-            self.operator = self.customer.user
-        else:
-            self.operator = self.counter.get_random_barman()
+        self.operator = get_operator(self.counter, self.customer)
 
         return super().dispatch(request, *args, **kwargs)
 
