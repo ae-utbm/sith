@@ -117,11 +117,15 @@ class BaseBasketForm(BaseFormSet):
         super().clean()
         if len(self) == 0:
             return
-        if len(self.errors) > 0:
-            return
 
+        self._check_forms_have_errors()
         self._check_recorded_products(self[0].customer)
         self._check_enough_money(self[0].counter, self[0].customer)
+
+    def _check_forms_have_errors(self):
+        for form in self:
+            if len(form.errors):
+                raise ValidationError(_("Submmited basket is invalid"))
 
     def _check_enough_money(self, counter: Counter, customer: Customer):
         self.total_price = sum([data["total_price"] for data in self.cleaned_data])

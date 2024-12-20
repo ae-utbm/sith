@@ -2,12 +2,19 @@ import { exportToHtml } from "#core:utils/globals";
 
 const quantityForTrayPrice = 6;
 
+interface InitialFormData {
+  /* Used to refill the form when the backend raises an error */
+  id?: string;
+  quantity?: number;
+}
+
 interface CounterConfig {
   csrfToken: string;
   clickApiUrl: string;
   customerBalance: number;
   customerId: number;
   products: Record<string, Product>;
+  formInitial: InitialFormData[];
 }
 
 interface Product {
@@ -48,8 +55,16 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
       codeField: undefined,
 
       init() {
+        // Fill the basket with the initial data
+        for (const entry of config.formInitial) {
+          if (entry.id !== undefined && entry.quantity !== undefined) {
+            this.addToBasket(entry.id, entry.quantity);
+          }
+        }
+
         this.codeField = this.$refs.codeField;
         this.codeField.widget.focus();
+
         // It's quite tricky to manually apply attributes to the management part
         // of a formset so we dynamically apply it here
         this.$refs.basketManagementForm
