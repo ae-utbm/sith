@@ -285,13 +285,14 @@ class UserProfileForm(forms.ModelForm):
         self._post_clean()
 
 
-class UserRealGroupForm(forms.ModelForm):
+class UserGroupsForm(forms.ModelForm):
     error_css_class = "error"
     required_css_class = "required"
 
-    groups = forms.ModelChoiceField(
-        RealGroup.objects.all(),
+    groups = forms.ModelMultipleChoiceField(
+        queryset=RealGroup.objects.all(),
         widget=CheckboxSelectMultiple,
+        label=_("Groups"),
     )
 
     class Meta:

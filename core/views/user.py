@@ -67,8 +67,8 @@ from core.views.forms import (
     LoginForm,
     RegisteringForm,
     UserGodfathersForm,
+    UserGroupsForm,
     UserProfileForm,
-    UserRealGroupForm,
 )
 from counter.models import Refilling, Selling
 from counter.views.student_card import StudentCardFormView
@@ -583,7 +583,7 @@ class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
     model = User
     pk_url_kwarg = "user_id"
     template_name = "core/user_group.jinja"
-    form_class = UserRealGroupForm
+    form_class = UserGroupsForm
     context_object_name = "profile"
     current_tab = "groups"
 
