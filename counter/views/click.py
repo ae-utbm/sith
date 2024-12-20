@@ -64,6 +64,9 @@ class ProductForm(Form):
 
     def clean(self):
         cleaned_data = super().clean()
+        if len(self.errors) > 0:
+            return
+
         if self.customer is None or self.counter is None:
             raise RuntimeError(
                 f"{self} has been initialized without customer or counter"
@@ -114,6 +117,9 @@ class BaseBasketForm(BaseFormSet):
         super().clean()
         if len(self) == 0:
             return
+        if len(self.errors) > 0:
+            return
+
         self._check_recorded_products(self[0].customer)
         self._check_enough_money(self[0].counter, self[0].customer)
 
