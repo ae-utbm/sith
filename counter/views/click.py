@@ -261,6 +261,11 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
                 )
         kwargs["customer"] = self.customer
 
+        # To get all forms errors to the javascript, we create a list of error list
+        kwargs["form_errors"] = []
+        for field_errors in kwargs["form"].errors:
+            kwargs["form_errors"].append(list(field_errors.values()))
+
         if self.object.type == "BAR":
             kwargs["student_card_fragment"] = StudentCardFormView.get_template_data(
                 self.customer
