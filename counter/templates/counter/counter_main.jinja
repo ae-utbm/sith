@@ -59,5 +59,26 @@
   {% endif %}
 {% endblock %}
 
+{% block script %}
+  {{ super() }}
+  <script type="text/javascript">
+    window.addEventListener("DOMContentLoaded", () => {
+      // The login form annoyingly takes priority over the code form 
+      // This is due to the loading time of the web component
+      // We can't rely on DOMContentLoaded to know if the component is there so we
+      // periodically run a script until the field is there
+      const autofocus = () => {
+        const field = document.querySelector("input[id='id_code']");
+        if (field === null){
+          setTimeout(autofocus, 0.5);
+          return;
+        }
+        field.focus();
+      }
+      autofocus()
+    })
+  </script>
+{% endblock %}
+
 
 
