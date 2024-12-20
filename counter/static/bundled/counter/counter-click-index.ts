@@ -10,12 +10,11 @@ interface InitialFormData {
 }
 
 interface CounterConfig {
-  csrfToken: string;
-  clickApiUrl: string;
   customerBalance: number;
   customerId: number;
   products: Record<string, Product>;
   formInitial: InitialFormData[];
+  cancelUrl: string;
 }
 
 interface Product {
@@ -132,11 +131,7 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
       },
 
       cancel() {
-        this.basket = new Object({});
-        // We need to wait for the templated form to be removed before sending
-        this.$nextTick(() => {
-          this.finish();
-        });
+        location.href = config.cancelUrl;
       },
 
       handleCode() {

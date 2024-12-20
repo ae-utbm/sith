@@ -260,6 +260,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
                     product
                 )
         kwargs["customer"] = self.customer
+        kwargs["cancel_url"] = self.get_success_url()
 
         # To get all forms errors to the javascript, we create a list of error list
         kwargs["form_errors"] = []

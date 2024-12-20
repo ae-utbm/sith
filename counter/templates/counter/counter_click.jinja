@@ -199,11 +199,10 @@
     ];
     window.addEventListener("DOMContentLoaded", () => {
       loadCounter({
-        csrfToken: "{{ csrf_token }}",
-        clickApiUrl: "{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}", customerBalance: {{ customer.amount }},
         products: products,
         customerId: {{ customer.pk }},
         formInitial: formInitial,
+        cancelUrl: "{{ cancel_url }}",
       });
     });
   </script>
