@@ -72,20 +72,24 @@
           <input type="submit" value="{% trans %}Go{% endtrans %}"/>
         </form>
 
-        <template x-for="error in errors">
-          <div class="alert alert-red" x-text="error">
+        {% for error in form.non_form_errors() %}
+          <div class="alert alert-red">
+            {{ error }}
           </div>
-        </template>
+        {% endfor %}
         <p>{% trans %}Basket: {% endtrans %}</p>
         <form method="post" action="" x-ref="basketForm">
           {% csrf_token %}
-          {{ form.errors }}
-          {{ form.non_form_errors() }}
           <div x-ref="basketManagementForm">
             {{ form.management_form }}
           </div>
           <template x-for="(item, index) in Object.values(basket)">
             <ul>
+              <template x-for="error in item.errors">
+                <div class="alert alert-red" x-text="error">
+                </div>
+              </template>
+
               <button @click.prevent="addToBasket(item.product.id, -1)">-</button>
               <span x-text="item.quantity"></span>
               <button @click.prevent="addToBasket(item.product.id, 1)">+</button>
@@ -188,6 +192,7 @@
             {%- if f.cleaned_data["quantity"] -%}
               quantity: {{ f.cleaned_data["quantity"] | tojson }},
             {%- endif -%}
+            errors: {{ form_errors[loop.index0] | tojson }},
           },
         {%- endif -%}
       {%- endfor -%}

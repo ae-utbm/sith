@@ -6,6 +6,7 @@ interface InitialFormData {
   /* Used to refill the form when the backend raises an error */
   id?: string;
   quantity?: number;
+  errors?: string[];
 }
 
 interface CounterConfig {
@@ -28,10 +29,12 @@ interface Product {
 class BasketItem {
   quantity: number;
   product: Product;
+  errors: string[];
 
   constructor(product: Product, quantity: number) {
     this.quantity = quantity;
     this.product = product;
+    this.errors = [];
   }
 
   getBonusQuantity(): number {
@@ -59,6 +62,7 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
         for (const entry of config.formInitial) {
           if (entry.id !== undefined && entry.quantity !== undefined) {
             this.addToBasket(entry.id, entry.quantity);
+            this.basket[entry.id].errors = entry.errors ?? [];
           }
         }
 
