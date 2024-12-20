@@ -19,8 +19,8 @@ from django.db import transaction
 from django.db.models import F
 from django.forms import (
     BaseFormSet,
+    Form,
     IntegerField,
-    ModelForm,
     ValidationError,
     formset_factory,
 )
@@ -47,12 +47,9 @@ def get_operator(counter: Counter, customer: Customer) -> User:
     return counter.get_random_barman()
 
 
-class ProductForm(ModelForm):
+class ProductForm(Form):
     quantity = IntegerField(min_value=1)
-
-    class Meta:
-        model = Product
-        fields = ["code"]
+    id = IntegerField(min_value=0)
 
     def __init__(
         self,
@@ -75,13 +72,13 @@ class ProductForm(ModelForm):
         user = self.customer.user
 
         # We store self.product so we can use it later on the formset validation
-        self.product = self.counter.products.filter(code=cleaned_data["code"]).first()
+        self.product = self.counter.products.filter(id=cleaned_data["id"]).first()
         if self.product is None:
             raise ValidationError(
                 _(
                     "Product %(product)s doesn't exist or isn't available on this counter"
                 )
-                % {"product": cleaned_data["code"]}
+                % {"product": cleaned_data["id"]}
             )
 
         # Test alcohoolic products

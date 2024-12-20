@@ -11,6 +11,7 @@ interface CounterConfig {
 }
 
 interface Product {
+  id: string;
   code: string;
   name: string;
   price: number;
@@ -56,18 +57,11 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
           .setAttribute(":value", "getBasketSize()");
       },
 
-      getItemIdFromCode(code: string): string {
-        return Object.keys(config.products).find(
-          (key) => config.products[key].code === code,
-        );
+      removeFromBasket(id: string) {
+        delete this.basket[id];
       },
 
-      removeFromBasket(code: string) {
-        delete this.basket[this.getItemIdFromCode(code)];
-      },
-
-      addToBasket(code: string, quantity: number): [boolean, string] {
-        const id = this.getItemIdFromCode(code);
+      addToBasket(id: string, quantity: number): [boolean, string] {
         const item: BasketItem =
           this.basket[id] || new BasketItem(config.products[id], 0);
 
@@ -126,7 +120,7 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
         });
       },
 
-      handleCode(event: SubmitEvent) {
+      handleCode() {
         const [quantity, code] = this.codeField.getSelectedProduct() as [
           number,
           string,

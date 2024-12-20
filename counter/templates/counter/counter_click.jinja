@@ -63,7 +63,7 @@
             {% for category in categories.keys() %}
               <optgroup label="{{ category }}">
                 {% for product in categories[category] %}
-                  <option value="{{ product.code }}">{{ product }}</option>
+                  <option value="{{ product.id }}">{{ product }}</option>
                 {% endfor %}
               </optgroup>
             {% endfor %}
@@ -86,17 +86,17 @@
           </div>
           <template x-for="(item, index) in Object.values(basket)">
             <ul>
-              <button @click.prevent="addToBasket(item.product.code, -1)">-</button>
+              <button @click.prevent="addToBasket(item.product.id, -1)">-</button>
               <span x-text="item.quantity"></span>
-              <button @click.prevent="addToBasket(item.product.code, 1)">+</button>
+              <button @click.prevent="addToBasket(item.product.id, 1)">+</button>
 
               <span x-text="item.product.name"></span> :
               <span x-text="item.sum().toLocaleString(undefined, { minimumFractionDigits: 2 })">€</span>
               <span x-cloak x-show="item.getBonusQuantity() > 0" x-text="`${item.getBonusQuantity()} x P`"></span>
-              <button @click.prevent="removeFromBasket(item.product.code)"><i class="fa fa-trash-can delete-action"></i></button>
+              <button @click.prevent="removeFromBasket(item.product.id)"><i class="fa fa-trash-can delete-action"></i></button>
 
               <input type="hidden" :value="item.quantity" :id="`id_form-${index}-quantity`" :name="`form-${index}-quantity`" required readonly>
-              <input type="hidden" :value="item.product.code" :id="`id_form-${index}-code`" :name="`form-${index}-code`" required readonly>
+              <input type="hidden" :value="item.product.id" :id="`id_form-${index}-id`" :name="`form-${index}-id`" required readonly>
             </ul>
           </template>
 
@@ -149,7 +149,7 @@
         <div id="cat_{{ category|slugify }}">
           <h5>{{ category }}</h5>
           {% for product in categories[category] -%}
-            <button @click="addToBasket('{{ product.code }}', 1)">
+            <button @click="addToBasket('{{ product.id }}', 1)">
               <strong>{{ product.name }}</strong>
               {% if product.icon %}
                 <img src="{{ product.icon.url }}" alt="image de {{ product.name }}"/>
@@ -171,7 +171,7 @@
     const products = {
       {%- for p in products -%}
         {{ p.id }}: {
-          code: "{{ p.code }}",
+          id: "{{ p.id }}",
           name: "{{ p.name }}",
           price: {{ p.price }},
           hasTrayPrice: {{ p.tray | tojson }},
