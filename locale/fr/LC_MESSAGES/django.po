@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-19 10:43+0100\n"
+"POT-Creation-Date: 2024-12-21 02:15+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -765,7 +765,7 @@ msgstr "Opération liée : "
 #: core/templates/core/create.jinja:12 core/templates/core/edit.jinja:7
 #: core/templates/core/edit.jinja:15 core/templates/core/edit.jinja:20
 #: core/templates/core/file_edit.jinja:8
-#: core/templates/core/macros_pages.jinja:25
+#: core/templates/core/macros_pages.jinja:26
 #: core/templates/core/page_prop.jinja:11
 #: core/templates/core/user_godfathers.jinja:61
 #: core/templates/core/user_godfathers_tree.jinja:85
@@ -971,7 +971,7 @@ msgstr "Comptoir"
 msgid "Products"
 msgstr "Produits"
 
-#: club/forms.py:168 counter/templates/counter/product_list.jinja:37
+#: club/forms.py:168 counter/templates/counter/product_list.jinja:43
 msgid "Archived products"
 msgstr "Produits archivés"
 
@@ -1146,7 +1146,7 @@ msgid "There are no members in this club."
 msgstr "Il n'y a pas de membres dans ce club."
 
 #: club/templates/club/club_members.jinja:80
-#: core/templates/core/file_detail.jinja:19 core/views/forms.py:305
+#: core/templates/core/file_detail.jinja:19 core/views/forms.py:309
 #: launderette/views.py:208 trombi/templates/trombi/detail.jinja:19
 msgid "Add"
 msgstr "Ajouter"
@@ -1192,7 +1192,7 @@ msgid "Show"
 msgstr "Montrer"
 
 #: club/templates/club/club_sellings.jinja:38
-#: counter/templates/counter/product_list.jinja:59
+#: counter/templates/counter/product_list.jinja:74
 msgid "Download as cvs"
 msgstr "Télécharger en CSV"
 
@@ -2038,8 +2038,8 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
-"Les groupes auxquels cet utilisateur appartient. Un utilisateur aura toutes les "
-"permissions de chacun de ses groupes."
+"Les groupes auxquels cet utilisateur appartient. Un utilisateur aura toutes "
+"les permissions de chacun de ses groupes."
 
 #: core/models.py:277
 msgid "profile"
@@ -2764,11 +2764,11 @@ msgstr "Tout désélectionner"
 msgid "You're seeing the history of page \"%(page_name)s\""
 msgstr "Vous consultez l'historique de la page \"%(page_name)s\""
 
-#: core/templates/core/macros_pages.jinja:8
+#: core/templates/core/macros_pages.jinja:10
 msgid "last"
 msgstr "actuel"
 
-#: core/templates/core/macros_pages.jinja:21
+#: core/templates/core/macros_pages.jinja:22
 msgid "Edit page"
 msgstr "Éditer la page"
 
@@ -3026,7 +3026,7 @@ msgstr "Facture eboutic"
 msgid "Etickets"
 msgstr "Etickets"
 
-#: core/templates/core/user_account.jinja:69 core/views/user.py:633
+#: core/templates/core/user_account.jinja:69 core/views/user.py:631
 msgid "User has no account"
 msgstr "L'utilisateur n'a pas de compte"
 
@@ -3326,7 +3326,8 @@ msgstr "Outils utilisateurs"
 msgid "Sith management"
 msgstr "Gestion de Sith"
 
-#: core/templates/core/user_tools.jinja:21 core/views/user.py:254
+#: core/templates/core/user_tools.jinja:21 core/views/forms.py:295
+#: core/views/user.py:254
 msgid "Groups"
 msgstr "Groupes"
 
@@ -3518,32 +3519,32 @@ msgstr "Blouse : montrez aux autres à quoi ressemble votre blouse !"
 msgid "Bad image format, only jpeg, png, webp and gif are accepted"
 msgstr "Mauvais format d'image, seuls les jpeg, png, webp et gif sont acceptés"
 
-#: core/views/forms.py:302
+#: core/views/forms.py:306
 msgid "Godfather / Godmother"
 msgstr "Parrain / Marraine"
 
-#: core/views/forms.py:303
+#: core/views/forms.py:307
 msgid "Godchild"
 msgstr "Fillot / Fillote"
 
-#: core/views/forms.py:308 counter/forms.py:78 trombi/views.py:151
+#: core/views/forms.py:312 counter/forms.py:78 trombi/views.py:151
 msgid "Select user"
 msgstr "Choisir un utilisateur"
 
-#: core/views/forms.py:322
+#: core/views/forms.py:326
 msgid "This user does not exist"
 msgstr "Cet utilisateur n'existe pas"
 
-#: core/views/forms.py:324
+#: core/views/forms.py:328
 msgid "You cannot be related to yourself"
 msgstr "Vous ne pouvez pas être relié à vous-même"
 
-#: core/views/forms.py:336
+#: core/views/forms.py:340
 #, python-format
 msgid "%s is already your godfather"
 msgstr "%s est déjà votre parrain/marraine"
 
-#: core/views/forms.py:342
+#: core/views/forms.py:346
 #, python-format
 msgid "%s is already your godchild"
 msgstr "%s est déjà votre fillot/fillote"
@@ -4152,31 +4153,35 @@ msgstr ""
 "aucune conséquence autre que le retrait de l'argent de votre compte."
 
 #: counter/templates/counter/product_list.jinja:5
-#: counter/templates/counter/product_list.jinja:46
+#: counter/templates/counter/product_list.jinja:62
 msgid "Product list"
 msgstr "Liste des produits"
 
-#: counter/templates/counter/product_list.jinja:20
+#: counter/templates/counter/product_list.jinja:22
 msgid "Filter products"
 msgstr "Filtrer les produits"
 
-#: counter/templates/counter/product_list.jinja:22
+#: counter/templates/counter/product_list.jinja:27
 msgid "Product name"
 msgstr "Nom du produit"
 
-#: counter/templates/counter/product_list.jinja:33
-#, fuzzy
-#| msgid "Archived products"
+#: counter/templates/counter/product_list.jinja:36
+msgid "Product state"
+msgstr "Etat du produit"
+
+#: counter/templates/counter/product_list.jinja:39
 msgid "Active products"
-msgstr "Produits archivés"
+msgstr "Produits actifs"
 
-#: counter/templates/counter/product_list.jinja:41
-#, fuzzy
-#| msgid "products"
+#: counter/templates/counter/product_list.jinja:47
 msgid "All products"
-msgstr "produits"
+msgstr "Tous les produits"
 
-#: counter/templates/counter/product_list.jinja:51
+#: counter/templates/counter/product_list.jinja:52
+msgid "Product type"
+msgstr "Type de produit"
+
+#: counter/templates/counter/product_list.jinja:66
 msgid "New product"
 msgstr "Nouveau produit"
 

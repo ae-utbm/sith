@@ -429,6 +429,16 @@ body {
   .row {
     display: flex;
     flex-wrap: wrap;
+
+    $col-gap: 1rem;
+    &.gap {
+      column-gap: var($col-gap);
+    }
+    @for $i from 2 through 5 {
+      &.gap-#{$i}x {
+        column-gap: $i * $col-gap;
+      }
+    }
   }
 
   /*---------------------------------NEWS--------------------------------*/

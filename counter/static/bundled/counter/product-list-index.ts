@@ -3,6 +3,7 @@ import { csv } from "#core:utils/csv";
 import { History, getCurrentUrlParams, updateQueryString } from "#core:utils/history";
 import type { NestedKeyOf } from "#core:utils/types";
 import { showSaveFilePicker } from "native-file-system-adapter";
+import type TomSelect from "tom-select";
 import {
   type ProductSchema,
   type ProductSearchProductsDetailedData,
@@ -58,6 +59,7 @@ document.addEventListener("alpine:init", () => {
 
     productStatus: "" as "active" | "archived" | "both",
     search: "",
+    productTypes: [] as string[],
     pageSize: defaultPageSize,
     page: defaultPage,
 
@@ -65,17 +67,22 @@ document.addEventListener("alpine:init", () => {
       const url = getCurrentUrlParams();
       this.search = url.get("search") || "";
       this.productStatus = url.get("productStatus") ?? "active";
+      const widget = this.$refs.productTypesInput.widget as TomSelect;
+      widget.on("change", (items: string[]) => {
+        this.productTypes = [...items];
+      });
+
       await this.load();
-      for (const param of ["search", "productStatus"]) {
+      const searchParams = ["search", "productStatus", "productTypes"];
+      for (const param of searchParams) {
         this.$watch(param, () => {
           this.page = defaultPage;
         });
       }
-      for (const param of ["search", "productStatus", "page"]) {
+      for (const param of [...searchParams, "page"]) {
         this.$watch(param, async (value: string) => {
           updateQueryString(param, value, History.Replace);
           this.nbPages = 0;
-          this.products = {};
           await this.load();
         });
       }
@@ -100,6 +107,8 @@ document.addEventListener("alpine:init", () => {
           search: search,
           // biome-ignore lint/style/useNamingConvention: api is in snake_case
           is_archived: isArchived,
+          // biome-ignore lint/style/useNamingConvention: api is in snake_case
+          product_type: this.productTypes,
         },
       };
     },
