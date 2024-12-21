@@ -327,6 +327,8 @@ class ProductType(OrderedModel):
 class Product(models.Model):
     """A product, with all its related information."""
 
+    QUANTITY_FOR_TRAY_PRICE = 6
+
     name = models.CharField(_("name"), max_length=64)
     description = models.TextField(_("description"), default="")
     product_type = models.ForeignKey(
@@ -425,6 +427,13 @@ class Product(models.Model):
     @property
     def profit(self):
         return self.selling_price - self.purchase_price
+
+    def get_actual_price(self, counter: Counter, customer: Customer):
+        """Return the price of the article taking into account if the customer has a special price
+        or not in the counter it's being purchased on"""
+        if counter.customer_is_barman(customer):
+            return self.special_selling_price
+        return self.selling_price
 
 
 class CounterQuerySet(models.QuerySet):

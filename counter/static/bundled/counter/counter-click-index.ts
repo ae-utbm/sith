@@ -1,42 +1,118 @@
 import { exportToHtml } from "#core:utils/globals";
-import type TomSelect from "tom-select";
+
+const quantityForTrayPrice = 6;
+
+interface InitialFormData {
+  /* Used to refill the form when the backend raises an error */
+  id?: string;
+  quantity?: number;
+  errors?: string[];
+}
 
 interface CounterConfig {
-  csrfToken: string;
-  clickApiUrl: string;
-  sessionBasket: Record<number, BasketItem>;
   customerBalance: number;
   customerId: number;
+  products: Record<string, Product>;
+  formInitial: InitialFormData[];
+  cancelUrl: string;
 }
-interface BasketItem {
-  // biome-ignore lint/style/useNamingConvention: talking with python
-  bonus_qty: number;
+
+interface Product {
+  id: string;
+  code: string;
+  name: string;
   price: number;
-  qty: number;
+  hasTrayPrice: boolean;
+}
+
+class BasketItem {
+  quantity: number;
+  product: Product;
+  errors: string[];
+
+  constructor(product: Product, quantity: number) {
+    this.quantity = quantity;
+    this.product = product;
+    this.errors = [];
+  }
+
+  getBonusQuantity(): number {
+    if (!this.product.hasTrayPrice) {
+      return 0;
+    }
+    return Math.floor(this.quantity / quantityForTrayPrice);
+  }
+
+  sum(): number {
+    return (this.quantity - this.getBonusQuantity()) * this.product.price;
+  }
 }
 
 exportToHtml("loadCounter", (config: CounterConfig) => {
   document.addEventListener("alpine:init", () => {
     Alpine.data("counter", () => ({
-      basket: config.sessionBasket,
+      basket: {} as Record<string, BasketItem>,
       errors: [],
       customerBalance: config.customerBalance,
       codeField: undefined,
 
       init() {
+        // Fill the basket with the initial data
+        for (const entry of config.formInitial) {
+          if (entry.id !== undefined && entry.quantity !== undefined) {
+            this.addToBasket(entry.id, entry.quantity);
+            this.basket[entry.id].errors = entry.errors ?? [];
+          }
+        }
+
         this.codeField = this.$refs.codeField;
         this.codeField.widget.focus();
+
+        // It's quite tricky to manually apply attributes to the management part
+        // of a formset so we dynamically apply it here
+        this.$refs.basketManagementForm
+          .querySelector("#id_form-TOTAL_FORMS")
+          .setAttribute(":value", "getBasketSize()");
+      },
+
+      removeFromBasket(id: string) {
+        delete this.basket[id];
+      },
+
+      addToBasket(id: string, quantity: number): [boolean, string] {
+        const item: BasketItem =
+          this.basket[id] || new BasketItem(config.products[id], 0);
+
+        const oldQty = item.quantity;
+        item.quantity += quantity;
+
+        if (item.quantity <= 0) {
+          delete this.basket[id];
+          return [true, ""];
+        }
+
+        if (item.sum() > this.customerBalance) {
+          item.quantity = oldQty;
+          return [false, gettext("Not enough money")];
+        }
+
+        this.basket[id] = item;
+        return [true, ""];
+      },
+
+      getBasketSize() {
+        return Object.keys(this.basket).length;
       },
 
       sumBasket() {
-        if (!this.basket || Object.keys(this.basket).length === 0) {
+        if (this.getBasketSize() === 0) {
           return 0;
         }
         const total = Object.values(this.basket).reduce(
-          (acc: number, cur: BasketItem) => acc + cur.qty * cur.price,
+          (acc: number, cur: BasketItem) => acc + cur.sum(),
           0,
         ) as number;
-        return total / 100;
+        return total;
       },
 
       onRefillingSuccess(event: CustomEvent) {
@@ -50,33 +126,32 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
         this.codeField.widget.focus();
       },
 
-      async handleCode(event: SubmitEvent) {
-        const widget: TomSelect = this.codeField.widget;
-        const code = (widget.getValue() as string).toUpperCase();
-        if (this.codeField.getOperationCodes().includes(code)) {
-          $(event.target).submit();
-        } else {
-          await this.handleAction(event);
-        }
-        widget.clear();
-        widget.focus();
+      finish() {
+        this.$refs.basketForm.submit();
       },
 
-      async handleAction(event: SubmitEvent) {
-        const payload = $(event.target).serialize();
-        const request = new Request(config.clickApiUrl, {
-          method: "POST",
-          body: payload,
-          headers: {
-            // biome-ignore lint/style/useNamingConvention: this goes into http headers
-            Accept: "application/json",
-            "X-CSRFToken": config.csrfToken,
-          },
-        });
-        const response = await fetch(request);
-        const json = await response.json();
-        this.basket = json.basket;
-        this.errors = json.errors;
+      cancel() {
+        location.href = config.cancelUrl;
+      },
+
+      handleCode() {
+        const [quantity, code] = this.codeField.getSelectedProduct() as [
+          number,
+          string,
+        ];
+
+        if (this.codeField.getOperationCodes().includes(code.toUpperCase())) {
+          if (code === "ANN") {
+            this.cancel();
+          }
+          if (code === "FIN") {
+            this.finish();
+          }
+        } else {
+          this.addToBasket(code, quantity);
+        }
+        this.codeField.widget.clear();
+        this.codeField.widget.focus();
       },
     }));
   });
