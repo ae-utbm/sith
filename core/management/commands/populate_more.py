@@ -173,7 +173,8 @@ class Command(BaseCommand):
                     club=club,
                 )
             )
-        Membership.objects.bulk_create(memberships)
+        memberships = Membership.objects.bulk_create(memberships)
+        Membership._add_club_groups(memberships)
 
     def create_uvs(self):
         root = User.objects.get(username="root")

@@ -46,7 +46,7 @@ from accounting.models import (
 )
 from club.models import Club, Membership
 from com.models import News, NewsDate, Sith, Weekmail
-from core.models import Group, Page, PageRev, RealGroup, SithFile, User
+from core.models import Group, Page, PageRev, SithFile, User
 from core.utils import resize_image
 from counter.models import Counter, Product, ProductType, StudentCard
 from election.models import Candidature, Election, ElectionList, Role
@@ -80,19 +80,21 @@ class Command(BaseCommand):
         Sith.objects.create(weekmail_destinations="etudiants@git.an personnel@git.an")
         Site.objects.create(domain=settings.SITH_URL, name=settings.SITH_NAME)
 
-        root_group = Group.objects.create(name="Root")
+        root_group = Group.objects.create(name="Root", is_manually_manageable=True)
         public_group = Group.objects.create(name="Public")
         subscribers = Group.objects.create(name="Subscribers")
         old_subscribers = Group.objects.create(name="Old subscribers")
-        Group.objects.create(name="Accounting admin")
-        Group.objects.create(name="Communication admin")
-        Group.objects.create(name="Counter admin")
-        Group.objects.create(name="Banned from buying alcohol")
-        Group.objects.create(name="Banned from counters")
-        Group.objects.create(name="Banned to subscribe")
-        Group.objects.create(name="SAS admin")
-        Group.objects.create(name="Forum admin")
-        Group.objects.create(name="Pedagogy admin")
+        Group.objects.create(name="Accounting admin", is_manually_manageable=True)
+        Group.objects.create(name="Communication admin", is_manually_manageable=True)
+        Group.objects.create(name="Counter admin", is_manually_manageable=True)
+        Group.objects.create(
+            name="Banned from buying alcohol", is_manually_manageable=True
+        )
+        Group.objects.create(name="Banned from counters", is_manually_manageable=True)
+        Group.objects.create(name="Banned to subscribe", is_manually_manageable=True)
+        Group.objects.create(name="SAS admin", is_manually_manageable=True)
+        Group.objects.create(name="Forum admin", is_manually_manageable=True)
+        Group.objects.create(name="Pedagogy admin", is_manually_manageable=True)
         self.reset_index("core", "auth")
 
         change_billing = Permission.objects.get(codename="change_billinginfo")
@@ -148,7 +150,9 @@ class Command(BaseCommand):
         Counter.objects.bulk_create(counters)
         bar_groups = []
         for bar_id, bar_name in settings.SITH_COUNTER_BARS:
-            group = RealGroup.objects.create(name=f"{bar_name} admin")
+            group = Group.objects.create(
+                name=f"{bar_name} admin", is_manually_manageable=True
+            )
             bar_groups.append(
                 Counter.edit_groups.through(counter_id=bar_id, group=group)
             )
@@ -381,46 +385,42 @@ Welcome to the wiki page!
             parent=main_club,
         )
 
-        Membership.objects.bulk_create(
-            [
-                Membership(user=skia, club=main_club, role=3),
-                Membership(
-                    user=comunity,
-                    club=bar_club,
-                    start_date=localdate(),
-                    role=settings.SITH_CLUB_ROLES_ID["Board member"],
-                ),
-                Membership(
-                    user=sli,
-                    club=troll,
-                    role=9,
-                    description="Padawan Troll",
-                    start_date=localdate() - timedelta(days=17),
-                ),
-                Membership(
-                    user=krophil,
-                    club=troll,
-                    role=10,
-                    description="Maitre Troll",
-                    start_date=localdate() - timedelta(days=200),
-                ),
-                Membership(
-                    user=skia,
-                    club=troll,
-                    role=2,
-                    description="Grand Ancien Troll",
-                    start_date=localdate() - timedelta(days=400),
-                    end_date=localdate() - timedelta(days=86),
-                ),
-                Membership(
-                    user=richard,
-                    club=troll,
-                    role=2,
-                    description="",
-                    start_date=localdate() - timedelta(days=200),
-                    end_date=localdate() - timedelta(days=100),
-                ),
-            ]
+        Membership.objects.create(user=skia, club=main_club, role=3)
+        Membership.objects.create(
+            user=comunity,
+            club=bar_club,
+            start_date=localdate(),
+            role=settings.SITH_CLUB_ROLES_ID["Board member"],
+        )
+        Membership.objects.create(
+            user=sli,
+            club=troll,
+            role=9,
+            description="Padawan Troll",
+            start_date=localdate() - timedelta(days=17),
+        )
+        Membership.objects.create(
+            user=krophil,
+            club=troll,
+            role=10,
+            description="Maitre Troll",
+            start_date=localdate() - timedelta(days=200),
+        )
+        Membership.objects.create(
+            user=skia,
+            club=troll,
+            role=2,
+            description="Grand Ancien Troll",
+            start_date=localdate() - timedelta(days=400),
+            end_date=localdate() - timedelta(days=86),
+        )
+        Membership.objects.create(
+            user=richard,
+            club=troll,
+            role=2,
+            description="",
+            start_date=localdate() - timedelta(days=200),
+            end_date=localdate() - timedelta(days=100),
         )
 
         p = ProductType.objects.create(name="Bières bouteilles")
@@ -607,7 +607,6 @@ Welcome to the wiki page!
         )
 
         # Create an election
-        ae_board_group = Group.objects.get(name=settings.SITH_MAIN_BOARD_GROUP)
         el = Election.objects.create(
             title="Élection 2017",
             description="La roue tourne",
@@ -617,7 +616,7 @@ Welcome to the wiki page!
             end_date="7942-06-12 10:28:45+01",
         )
         el.view_groups.add(public_group)
-        el.edit_groups.add(ae_board_group)
+        el.edit_groups.add(main_club.board_group)
         el.candidature_groups.add(subscribers)
         el.vote_groups.add(subscribers)
         liste = ElectionList.objects.create(title="Candidature Libre", election=el)
