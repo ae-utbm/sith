@@ -110,8 +110,10 @@
             <strong> €</strong>
           </p>
 
-          <input type="submit" @click.prevent="finish" value="{% trans %}Finish{% endtrans %}"/>
-          <input type="submit" @click.prevent="cancel" value="{% trans %}Cancel{% endtrans %}"/>
+          <div class="row">
+            <input class="btn btn-blue" type="submit" @click.prevent="finish" value="{% trans %}Finish{% endtrans %}"/>
+            <input class="btn btn-grey" type="submit" @click.prevent="cancel" value="{% trans %}Cancel{% endtrans %}"/>
+          </div>
         </form>
       </div>
       {% if object.type == "BAR" %}
@@ -199,6 +201,7 @@
     ];
     window.addEventListener("DOMContentLoaded", () => {
       loadCounter({
+        customerBalance: {{ customer.amount }},
         products: products,
         customerId: {{ customer.pk }},
         formInitial: formInitial,
