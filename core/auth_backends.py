@@ -2,8 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import Permission
+
+from core.models import Group
 
 if TYPE_CHECKING:
     from core.models import User
@@ -26,4 +29,9 @@ class SithModelBackend(ModelBackend):
     """
 
     def _get_group_permissions(self, user_obj: User):
-        return Permission.objects.filter(group__group__users=user_obj)
+        groups = user_obj.groups.all()
+        if user_obj.is_subscribed:
+            groups = groups.union(
+                Group.objects.get(pk=settings.SITH_GROUP_SUBSCRIBERS_ID)
+            )
+        return Permission.objects.filter(group__group__in=groups)
