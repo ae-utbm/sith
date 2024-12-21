@@ -8,6 +8,7 @@
 {% block additional_css %}
   <link rel="stylesheet" type="text/css" href="{{ static('bundled/core/components/ajax-select-index.css') }}" defer></link>
   <link rel="stylesheet" type="text/css" href="{{ static('core/components/ajax-select.scss') }}" defer></link>
+  <link rel="stylesheet" href="{{ static("core/components/card.scss") }}">
 {% endblock %}
 
 {% block additional_js %}
@@ -104,7 +105,7 @@
             </ul>
           </template>
 
-          <p>
+          <p class="margin-bottom">
             <strong>Total: </strong>
             <strong x-text="sumBasket().toLocaleString(undefined, { minimumFractionDigits: 2 })"></strong>
             <strong> €</strong>
@@ -153,18 +154,24 @@
       </ul>
       {% for category in categories.keys() -%}
         <div id="cat_{{ category|slugify }}">
-          <h5>{{ category }}</h5>
-          {% for product in categories[category] -%}
-            <button @click="addToBasket('{{ product.id }}', 1)">
-              <strong>{{ product.name }}</strong>
-              {% if product.icon %}
-                <img src="{{ product.icon.url }}" alt="image de {{ product.name }}"/>
-              {% else %}
-                <img src="{{ static('core/img/na.gif') }}" alt="image de {{ product.name }}"/>
-              {% endif %}
-              <span>{{ product.price }} €<br>{{ product.code }}</span>
-            </button>
-          {%- endfor %}
+          <h5 class="margin-bottom">{{ category }}</h5>
+          <div class="row gap-2x">
+            {% for product in categories[category] -%}
+              <button class="card shadow" @click="addToBasket('{{ product.id }}', 1)">
+                <strong class="card-title">{{ product.name }}</strong>
+                <img
+                  class="card-image"
+                  alt="image de {{ product.name }}"
+                  {% if product.icon %}
+                    src="{{ product.icon.url }}"
+                  {% else %}
+                    src="{{ static('core/img/na.gif') }}"
+                  {% endif %}
+                />
+                <span class="card-content">{{ product.price }} €<br>{{ product.code }}</span>
+              </button>
+            {%- endfor %}
+          </div>
         </div>
       {%- endfor %}
     </div>

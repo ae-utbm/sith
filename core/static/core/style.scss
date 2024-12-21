@@ -208,6 +208,7 @@ body {
   a.btn {
     display: inline-block;
   }
+
   .btn {
     font-size: 15px;
     font-weight: normal;
@@ -431,12 +432,17 @@ body {
     flex-wrap: wrap;
 
     $col-gap: 1rem;
+    $row-gap: 0.5rem;
+
     &.gap {
       column-gap: var($col-gap);
+      row-gap: var($row-gap);
     }
+
     @for $i from 2 through 5 {
       &.gap-#{$i}x {
         column-gap: $i * $col-gap;
+        row-gap: $i * $row-gap;
       }
     }
   }
