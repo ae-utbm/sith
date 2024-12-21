@@ -34,7 +34,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from club.models import Club
-from core.models import Notification, Preferences, RealGroup, User
+from core.models import Notification, Preferences, User
 
 
 class Sith(models.Model):
@@ -62,16 +62,31 @@ NEWS_TYPES = [
 
 
 class News(models.Model):
-    """The news class."""
+    """News about club events."""
 
     title = models.CharField(_("title"), max_length=64)
-    summary = models.TextField(_("summary"))
-    content = models.TextField(_("content"))
+    summary = models.TextField(
+        _("summary"),
+        help_text=_(
+            "A description of the event (what is the activity ? "
+            "is there an associated clic ? is there a inscription form ?)"
+        ),
+    )
+    content = models.TextField(
+        _("content"),
+        blank=True,
+        default="",
+        help_text=_("A more detailed and exhaustive description of the event."),
+    )
     type = models.CharField(
         _("type"), max_length=16, choices=NEWS_TYPES, default="EVENT"
     )
     club = models.ForeignKey(
-        Club, related_name="news", verbose_name=_("club"), on_delete=models.CASCADE
+        Club,
+        related_name="news",
+        verbose_name=_("club"),
+        on_delete=models.CASCADE,
+        help_text=_("The club which organizes the event."),
     )
     author = models.ForeignKey(
         User,
@@ -85,7 +100,7 @@ class News(models.Model):
         related_name="moderated_news",
         verbose_name=_("moderator"),
         null=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
     )
 
     def __str__(self):
@@ -93,17 +108,15 @@ class News(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        for u in (
-            RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID)
-            .first()
-            .users.all()
+        for user in User.objects.filter(
+            groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID]
         ):
-            Notification(
-                user=u,
+            Notification.objects.create(
+                user=user,
                 url=reverse("com:news_admin_list"),
                 type="NEWS_MODERATION",
                 param="1",
-            ).save()
+            )
 
     def get_absolute_url(self):
         return reverse("com:news_detail", kwargs={"news_id": self.id})
@@ -321,16 +334,14 @@ class Poster(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.is_moderated:
-            for u in (
-                RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID)
-                .first()
-                .users.all()
+            for user in User.objects.filter(
+                groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID]
             ):
-                Notification(
-                    user=u,
+                Notification.objects.create(
+                    user=user,
                     url=reverse("com:poster_moderate_list"),
                     type="POSTER_MODERATION",
-                ).save()
+                )
         return super().save(*args, **kwargs)
 
     def clean(self, *args, **kwargs):

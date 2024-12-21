@@ -28,7 +28,7 @@ from smtplib import SMTPRecipientsRefused
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import Max
+from django.db.models import Exists, Max, OuterRef
 from django.forms.models import modelform_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
@@ -42,7 +42,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from club.models import Club, Mailing
 from com.models import News, NewsDate, Poster, Screen, Sith, Weekmail, WeekmailArticle
-from core.models import Notification, RealGroup, User
+from core.models import Notification, User
 from core.views import (
     CanCreateMixin,
     CanEditMixin,
@@ -223,15 +223,13 @@ class NewsForm(forms.ModelForm):
             ):
                 self.add_error(
                     "end_date",
-                    ValidationError(
-                        _("You crazy? You can not finish an event before starting it.")
-                    ),
+                    ValidationError(_("An event cannot end before its beginning.")),
                 )
             if self.cleaned_data["type"] == "WEEKLY" and not self.cleaned_data["until"]:
                 self.add_error("until", ValidationError(_("This field is required.")))
         return self.cleaned_data
 
-    def save(self):
+    def save(self, *args, **kwargs):
         ret = super().save()
         self.instance.dates.all().delete()
         if self.instance.type == "EVENT" or self.instance.type == "CALL":
@@ -280,21 +278,18 @@ class NewsEditView(CanEditMixin, UpdateView):
         else:
             self.object.is_moderated = False
             self.object.save()
-            for u in (
-                RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID)
-                .first()
-                .users.all()
+            unread_notif_subquery = Notification.objects.filter(
+                user=OuterRef("pk"), type="NEWS_MODERATION", viewed=False
+            )
+            for user in User.objects.filter(
+                ~Exists(unread_notif_subquery),
+                groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID],
             ):
-                if not u.notifications.filter(
-                    type="NEWS_MODERATION", viewed=False
-                ).exists():
-                    Notification(
-                        user=u,
-                        url=reverse(
-                            "com:news_detail", kwargs={"news_id": self.object.id}
-                        ),
-                        type="NEWS_MODERATION",
-                    ).save()
+                Notification.objects.create(
+                    user=user,
+                    url=self.object.get_absolute_url(),
+                    type="NEWS_MODERATION",
+                )
         return super().form_valid(form)
 
 
@@ -325,19 +320,18 @@ class NewsCreateView(CanCreateMixin, CreateView):
             self.object.is_moderated = True
             self.object.save()
         else:
-            for u in (
-                RealGroup.objects.filter(id=settings.SITH_GROUP_COM_ADMIN_ID)
-                .first()
-                .users.all()
+            unread_notif_subquery = Notification.objects.filter(
+                user=OuterRef("pk"), type="NEWS_MODERATION", viewed=False
+            )
+            for user in User.objects.filter(
+                ~Exists(unread_notif_subquery),
+                groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID],
             ):
-                if not u.notifications.filter(
-                    type="NEWS_MODERATION", viewed=False
-                ).exists():
-                    Notification(
-                        user=u,
-                        url=reverse("com:news_admin_list"),
-                        type="NEWS_MODERATION",
-                    ).save()
+                Notification.objects.create(
+                    user=user,
+                    url=reverse("com:news_admin_list"),
+                    type="NEWS_MODERATION",
+                )
         return super().form_valid(form)
 
 

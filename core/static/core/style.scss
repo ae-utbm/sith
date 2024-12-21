@@ -314,6 +314,17 @@ body {
     }
   }
 
+  .snackbar {
+    width: 250px;
+    margin-left: -125px;
+    box-sizing: border-box;
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    top: 60px;
+    text-align: center;
+  }
+
   .tabs {
     border-radius: 5px;
 
@@ -1401,21 +1412,6 @@ footer {
   }
 }
 
-/*---------------------------------FORMS-------------------------------*/
-
-form {
-  margin: 0 auto;
-  margin-bottom: 10px;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-}
-
-.choose_file_widget {
-  display: none;
-}
 
 .ui-dialog .ui-dialog-buttonpane {
   bottom: 0;

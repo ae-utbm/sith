@@ -30,19 +30,13 @@ import string
 import unicodedata
 from datetime import timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, Self
+from typing import TYPE_CHECKING, Optional, Self
 
 from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser, UserManager
-from django.contrib.auth.models import (
-    AnonymousUser as AuthAnonymousUser,
-)
-from django.contrib.auth.models import (
-    Group as AuthGroup,
-)
-from django.contrib.auth.models import (
-    GroupManager as AuthGroupManager,
-)
+from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.auth.models import AnonymousUser as AuthAnonymousUser
+from django.contrib.auth.models import Group as AuthGroup
+from django.contrib.auth.models import GroupManager as AuthGroupManager
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core import validators
 from django.core.cache import cache
@@ -242,7 +236,7 @@ class CustomUserManager(UserManager.from_queryset(UserQuerySet)):
     pass
 
 
-class User(AbstractBaseUser):
+class User(AbstractUser):
     """Defines the base user class, useable in every app.
 
     This is almost the same as the auth module AbstractUser since it inherits from it,
@@ -253,51 +247,22 @@ class User(AbstractBaseUser):
     Required fields: email, first_name, last_name, date_of_birth
     """
 
-    username = models.CharField(
-        _("username"),
-        max_length=254,
-        unique=True,
-        help_text=_(
-            "Required. 254 characters or fewer. Letters, digits and ./+/-/_ only."
-        ),
-        validators=[
-            validators.RegexValidator(
-                r"^[\w.+-]+$",
-                _(
-                    "Enter a valid username. This value may contain only "
-                    "letters, numbers "
-                    "and ./+/-/_ characters."
-                ),
-            )
-        ],
-        error_messages={"unique": _("A user with that username already exists.")},
-    )
     first_name = models.CharField(_("first name"), max_length=64)
     last_name = models.CharField(_("last name"), max_length=64)
     email = models.EmailField(_("email address"), unique=True)
     date_of_birth = models.DateField(_("date of birth"), blank=True, null=True)
     nick_name = models.CharField(_("nick name"), max_length=64, null=True, blank=True)
-    is_staff = models.BooleanField(
-        _("staff status"),
-        default=False,
-        help_text=_("Designates whether the user can log into this admin site."),
-    )
-    is_active = models.BooleanField(
-        _("active"),
-        default=True,
-        help_text=_(
-            "Designates whether this user should be treated as active. "
-            "Unselect this instead of deleting accounts."
-        ),
-    )
-    date_joined = models.DateField(_("date joined"), auto_now_add=True)
     last_update = models.DateTimeField(_("last update"), auto_now=True)
-    is_superuser = models.BooleanField(
-        _("superuser"),
-        default=False,
-        help_text=_("Designates whether this user is a superuser. "),
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name=_("groups"),
+        help_text=_(
+            "The groups this user belongs to. A user will get all permissions "
+            "granted to each of their groups."
+        ),
+        related_name="users",
+        blank=True,
     )
-    groups = models.ManyToManyField(RealGroup, related_name="users", blank=True)
     home = models.OneToOneField(
         "SithFile",
         related_name="home_of",
@@ -401,8 +366,6 @@ class User(AbstractBaseUser):
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = "username"
-
     def __str__(self):
         return self.get_display_name()
 
@@ -422,22 +385,23 @@ class User(AbstractBaseUser):
             settings.BASE_DIR / f"core/static/core/img/promo_{self.promo}.png"
         ).exists()
 
-    def has_module_perms(self, package_name: str) -> bool:
-        return self.is_active
-
-    def has_perm(self, perm: str, obj: Any = None) -> bool:
-        return self.is_active and self.is_superuser
-
     @cached_property
     def was_subscribed(self) -> bool:
+        if "is_subscribed" in self.__dict__ and self.is_subscribed:
+            # if the user is currently subscribed, he is an old subscriber too
+            # if the property has already been cached, avoid another request
+            return True
         return self.subscriptions.exists()
 
     @cached_property
     def is_subscribed(self) -> bool:
-        s = self.subscriptions.filter(
+        if "was_subscribed" in self.__dict__ and not self.was_subscribed:
+            # if the user never subscribed, he cannot be a subscriber now.
+            # if the property has already been cached, avoid another request
+            return False
+        return self.subscriptions.filter(
             subscription_start__lte=timezone.now(), subscription_end__gte=timezone.now()
-        )
-        return s.exists()
+        ).exists()
 
     @cached_property
     def account_balance(self):
@@ -530,10 +494,8 @@ class User(AbstractBaseUser):
 
     @cached_property
     def can_create_subscription(self) -> bool:
-        from club.models import Membership
-
-        return (
-            Membership.objects.board()
+        return self.is_root or (
+            self.memberships.board()
             .ongoing()
             .filter(club_id__in=settings.SITH_CAN_CREATE_SUBSCRIPTIONS)
             .exists()
@@ -600,11 +562,6 @@ class User(AbstractBaseUser):
             "nick_name": self.nick_name,
             "date_of_birth": self.date_of_birth,
         }
-
-    def get_full_name(self):
-        """Returns the first_name plus the last_name, with a space in between."""
-        full_name = "%s %s" % (self.first_name, self.last_name)
-        return full_name.strip()
 
     def get_short_name(self):
         """Returns the short name for the user."""
@@ -984,13 +941,11 @@ class SithFile(models.Model):
         if copy_rights:
             self.copy_rights()
         if self.is_in_sas:
-            for u in (
-                RealGroup.objects.filter(id=settings.SITH_GROUP_SAS_ADMIN_ID)
-                .first()
-                .users.all()
+            for user in User.objects.filter(
+                groups__id__in=[settings.SITH_GROUP_SAS_ADMIN_ID]
             ):
                 Notification(
-                    user=u,
+                    user=user,
                     url=reverse("sas:moderation"),
                     type="SAS_MODERATION",
                     param="1",

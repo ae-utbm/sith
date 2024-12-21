@@ -118,7 +118,9 @@ class TestUserRegistration:
         response = client.post(reverse("core:register"), valid_payload)
 
         assert response.status_code == 200
-        error_html = "<li>Un objet User avec ce champ Adresse email existe déjà.</li>"
+        error_html = (
+            "<li>Un objet Utilisateur avec ce champ Adresse email existe déjà.</li>"
+        )
         assertInHTML(error_html, str(response.content.decode()))
 
     def test_register_fail_with_not_existing_email(

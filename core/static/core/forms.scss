@@ -87,3 +87,38 @@ a:not(.button) {
     color: $primary-color;
   }
 }
+
+form {
+  margin: 0 auto 10px;
+
+  .helptext {
+    margin-top: .25rem;
+    margin-bottom: .25rem;
+    font-size: 80%;
+  }
+
+  fieldset {
+    margin-bottom: 1rem;
+  }
+
+  .row {
+    label {
+      margin: unset;
+    }
+  }
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+
+    &.required:after {
+      margin-left: 4px;
+      content: "*";
+      color: red;
+    }
+  }
+
+  .choose_file_widget {
+    display: none;
+  }
+}

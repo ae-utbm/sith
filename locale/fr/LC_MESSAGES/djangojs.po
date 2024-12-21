@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-11-14 10:24+0100\n"
+"POT-Creation-Date: 2024-12-17 00:46+0100\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -17,119 +17,128 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
+#: core/static/bundled/core/components/ajax-select-base.ts:68
+msgid "Remove"
+msgstr "Retirer"
+
+#: core/static/bundled/core/components/ajax-select-base.ts:90
+msgid "You need to type %(number)s more characters"
+msgstr "Vous devez taper %(number)s caractères de plus"
+
+#: core/static/bundled/core/components/ajax-select-base.ts:94
+msgid "No results found"
+msgstr "Aucun résultat trouvé"
+
+#: core/static/bundled/core/components/easymde-index.ts:38
+msgid "Heading"
+msgstr "Titre"
+
+#: core/static/bundled/core/components/easymde-index.ts:44
+msgid "Italic"
+msgstr "Italique"
+
+#: core/static/bundled/core/components/easymde-index.ts:50
+msgid "Bold"
+msgstr "Gras"
+
+#: core/static/bundled/core/components/easymde-index.ts:56
+msgid "Strikethrough"
+msgstr "Barré"
+
+#: core/static/bundled/core/components/easymde-index.ts:65
+msgid "Underline"
+msgstr "Souligné"
+
+#: core/static/bundled/core/components/easymde-index.ts:74
+msgid "Superscript"
+msgstr "Exposant"
+
+#: core/static/bundled/core/components/easymde-index.ts:83
+msgid "Subscript"
+msgstr "Indice"
+
+#: core/static/bundled/core/components/easymde-index.ts:89
+msgid "Code"
+msgstr "Code"
+
+#: core/static/bundled/core/components/easymde-index.ts:96
+msgid "Quote"
+msgstr "Citation"
+
+#: core/static/bundled/core/components/easymde-index.ts:102
+msgid "Unordered list"
+msgstr "Liste non ordonnée"
+
+#: core/static/bundled/core/components/easymde-index.ts:108
+msgid "Ordered list"
+msgstr "Liste ordonnée"
+
+#: core/static/bundled/core/components/easymde-index.ts:115
+msgid "Insert link"
+msgstr "Insérer lien"
+
+#: core/static/bundled/core/components/easymde-index.ts:121
+msgid "Insert image"
+msgstr "Insérer image"
+
+#: core/static/bundled/core/components/easymde-index.ts:127
+msgid "Insert table"
+msgstr "Insérer tableau"
+
+#: core/static/bundled/core/components/easymde-index.ts:134
+msgid "Clean block"
+msgstr "Nettoyer bloc"
+
+#: core/static/bundled/core/components/easymde-index.ts:141
+msgid "Toggle preview"
+msgstr "Activer la prévisualisation"
+
+#: core/static/bundled/core/components/easymde-index.ts:147
+msgid "Toggle side by side"
+msgstr "Activer la vue côte à côte"
+
+#: core/static/bundled/core/components/easymde-index.ts:153
+msgid "Toggle fullscreen"
+msgstr "Activer le plein écran"
+
+#: core/static/bundled/core/components/easymde-index.ts:160
+msgid "Markdown guide"
+msgstr "Guide markdown"
+
+#: core/static/bundled/core/components/nfc-input-index.ts:26
+msgid "Unsupported NFC card"
+msgstr "Carte NFC non supportée"
+
+#: core/static/bundled/user/family-graph-index.js:233
+msgid "family_tree.%(extension)s"
+msgstr "arbre_genealogique.%(extension)s"
+
+#: core/static/bundled/user/pictures-index.js:76
+msgid "pictures.%(extension)s"
+msgstr "photos.%(extension)s"
+
 #: core/static/user/js/user_edit.js:91
 #, javascript-format
 msgid "captured.%s"
 msgstr "capture.%s"
 
-#: core/static/webpack/core/components/ajax-select-base.ts:68
-msgid "Remove"
-msgstr "Retirer"
+#: counter/static/bundled/counter/product-type-index.ts:36
+msgid "Products types reordered!"
+msgstr "Types de produits réordonnés !"
 
-#: core/static/webpack/core/components/ajax-select-base.ts:88
-msgid "You need to type %(number)s more characters"
-msgstr "Vous devez taper %(number)s caractères de plus"
-
-#: core/static/webpack/core/components/ajax-select-base.ts:92
-msgid "No results found"
-msgstr "Aucun résultat trouvé"
-
-#: core/static/webpack/core/components/easymde-index.ts:38
-msgid "Heading"
-msgstr "Titre"
-
-#: core/static/webpack/core/components/easymde-index.ts:44
-msgid "Italic"
-msgstr "Italique"
-
-#: core/static/webpack/core/components/easymde-index.ts:50
-msgid "Bold"
-msgstr "Gras"
-
-#: core/static/webpack/core/components/easymde-index.ts:56
-msgid "Strikethrough"
-msgstr "Barré"
-
-#: core/static/webpack/core/components/easymde-index.ts:65
-msgid "Underline"
-msgstr "Souligné"
-
-#: core/static/webpack/core/components/easymde-index.ts:74
-msgid "Superscript"
-msgstr "Exposant"
-
-#: core/static/webpack/core/components/easymde-index.ts:83
-msgid "Subscript"
-msgstr "Indice"
-
-#: core/static/webpack/core/components/easymde-index.ts:89
-msgid "Code"
-msgstr "Code"
-
-#: core/static/webpack/core/components/easymde-index.ts:96
-msgid "Quote"
-msgstr "Citation"
-
-#: core/static/webpack/core/components/easymde-index.ts:102
-msgid "Unordered list"
-msgstr "Liste non ordonnée"
-
-#: core/static/webpack/core/components/easymde-index.ts:108
-msgid "Ordered list"
-msgstr "Liste ordonnée"
-
-#: core/static/webpack/core/components/easymde-index.ts:115
-msgid "Insert link"
-msgstr "Insérer lien"
-
-#: core/static/webpack/core/components/easymde-index.ts:121
-msgid "Insert image"
-msgstr "Insérer image"
-
-#: core/static/webpack/core/components/easymde-index.ts:127
-msgid "Insert table"
-msgstr "Insérer tableau"
-
-#: core/static/webpack/core/components/easymde-index.ts:134
-msgid "Clean block"
-msgstr "Nettoyer bloc"
-
-#: core/static/webpack/core/components/easymde-index.ts:141
-msgid "Toggle preview"
-msgstr "Activer la prévisualisation"
-
-#: core/static/webpack/core/components/easymde-index.ts:147
-msgid "Toggle side by side"
-msgstr "Activer la vue côte à côte"
-
-#: core/static/webpack/core/components/easymde-index.ts:153
-msgid "Toggle fullscreen"
-msgstr "Activer le plein écran"
-
-#: core/static/webpack/core/components/easymde-index.ts:160
-msgid "Markdown guide"
-msgstr "Guide markdown"
-
-#: core/static/webpack/core/components/nfc-input-index.ts:24
-msgid "Unsupported NFC card"
-msgstr "Carte NFC non supportée"
-
-#: core/static/webpack/user/family-graph-index.js:233
-msgid "family_tree.%(extension)s"
-msgstr "arbre_genealogique.%(extension)s"
-
-#: core/static/webpack/user/pictures-index.js:76
-msgid "pictures.%(extension)s"
-msgstr "photos.%(extension)s"
+#: counter/static/bundled/counter/product-type-index.ts:40
+#, javascript-format
+msgid "Product type reorganisation failed with status code : %d"
+msgstr "La réorganisation des types de produit a échoué avec le code : %d"
 
 #: eboutic/static/eboutic/js/makecommand.js:56
 msgid "Incorrect value"
 msgstr "Valeur incorrecte"
 
-#: sas/static/webpack/sas/viewer-index.ts:271
+#: sas/static/bundled/sas/viewer-index.ts:271
 msgid "Couldn't moderate picture"
 msgstr "Il n'a pas été possible de modérer l'image"
 
-#: sas/static/webpack/sas/viewer-index.ts:284
+#: sas/static/bundled/sas/viewer-index.ts:284
 msgid "Couldn't delete picture"
 msgstr "Il n'a pas été possible de supprimer l'image"

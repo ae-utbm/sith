@@ -35,7 +35,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import DateField, QuerySet
 from django.db.models.functions import Trunc
-from django.forms import CheckboxSelectMultiple
 from django.forms.models import modelform_factory
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
@@ -68,6 +67,7 @@ from core.views.forms import (
     LoginForm,
     RegisteringForm,
     UserGodfathersForm,
+    UserGroupsForm,
     UserProfileForm,
 )
 from counter.models import Refilling, Selling
@@ -583,9 +583,7 @@ class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
     model = User
     pk_url_kwarg = "user_id"
     template_name = "core/user_group.jinja"
-    form_class = modelform_factory(
-        User, fields=["groups"], widgets={"groups": CheckboxSelectMultiple}
-    )
+    form_class = UserGroupsForm
     context_object_name = "profile"
     current_tab = "groups"
 

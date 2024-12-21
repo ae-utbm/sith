@@ -90,13 +90,20 @@ def test_form_new_user(settings: SettingsWrapper):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "user_factory", [lambda: baker.make(User, is_superuser=True), board_user.make]
+    ("user_factory", "status_code"),
+    [
+        (lambda: baker.make(User, is_superuser=True), 200),
+        (board_user.make, 200),
+        (subscriber_user.make, 403),
+    ],
 )
-def test_load_page(client: Client, user_factory: Callable[[], User]):
-    """Just check the page doesn't crash."""
+def test_page_access(
+    client: Client, user_factory: Callable[[], User], status_code: int
+):
+    """Check that only authorized users may access this page."""
     client.force_login(user_factory())
     res = client.get(reverse("subscription:subscription"))
-    assert res.status_code == 200
+    assert res.status_code == status_code
 
 
 @pytest.mark.django_db

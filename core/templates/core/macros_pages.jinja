@@ -3,17 +3,18 @@
 {% macro page_history(page) %}
   <p>{% trans page_name=page.name %}You're seeing the history of page "{{ page_name }}"{% endtrans %}</p>
   <ul>
-    {% for r in (page.revisions.all()|sort(attribute='date', reverse=True)) %}
-      {% if loop.index < 2 %}
-        <li><a href="{{ url('core:page', page_name=page.get_full_name()) }}">{% trans %}last{% endtrans %}</a> -
-          {{ user_profile_link(page.revisions.last().author) }} -
-          {{ page.revisions.last().date|localtime|date(DATETIME_FORMAT) }} {{ page.revisions.last().date|localtime|time(DATETIME_FORMAT) }}</a></li>
-      {% else %}
-        <li><a href="{{ url('core:page_rev', page_name=page.get_full_name(), rev=r['id']) }}">{{ r.revision }}</a> -
-          {{ user_profile_link(r.author) }} -
-          {{ r.date|localtime|date(DATETIME_FORMAT) }} {{ r.date|localtime|time(DATETIME_FORMAT) }}</a></li>
-      {% endif %}
-    {% endfor %}
+    {% set page_name = page.get_full_name() %}
+    {%- for rev in page.revisions.order_by("-date").select_related("author") -%}
+      <li>
+        {% if loop.first %}
+          <a href="{{ url('core:page', page_name=page_name) }}">{% trans %}last{% endtrans %}</a>
+        {% else %}
+          <a href="{{ url('core:page_rev', page_name=page_name, rev=rev.id) }}">{{ rev.revision }}</a>
+        {% endif %}
+        {{ user_profile_link(rev.author) }} -
+        {{ rev.date|localtime|date(DATETIME_FORMAT) }} {{ rev.date|localtime|time(DATETIME_FORMAT) }}
+      </li>
+    {%- endfor -%}
   </ul>
 {% endmacro %}
 
