@@ -19,6 +19,13 @@ body {
   --loading-stroke: 5px;
   --loading-duration: 1s;
   position: relative;
+
+  &.aria-busy-grow {
+    // Make sure the element take enough place to hold the loading wheel
+    min-height: calc((var(--loading-size)) * 1.5);
+    min-width: calc((var(--loading-size)) * 1.5);
+    overflow: hidden;
+  }
 }
 
 [aria-busy]:after {
@@ -198,6 +205,9 @@ body {
   margin: 20px auto 0;
 
   /*---------------------------------NAV---------------------------------*/
+  a.btn {
+    display: inline-block;
+  }
   .btn {
     font-size: 15px;
     font-weight: normal;
@@ -250,6 +260,13 @@ body {
     i {
       margin-right: 4px;
     }
+  }
+
+  /**
+  * A spacer below an element. Somewhat cleaner than putting <br/> everywhere.
+  */
+  .margin-bottom {
+    margin-bottom: 1.5rem;
   }
 
   /*--------------------------------CONTENT------------------------------*/
@@ -405,6 +422,21 @@ body {
           color: $white-color;
           border-radius: 6px;
         }
+      }
+    }
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+
+    $col-gap: 1rem;
+    &.gap {
+      column-gap: var($col-gap);
+    }
+    @for $i from 2 through 5 {
+      &.gap-#{$i}x {
+        column-gap: $i * $col-gap;
       }
     }
   }

@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-17 00:46+0100\n"
+"POT-Creation-Date: 2024-12-18 16:26+0100\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -122,11 +122,43 @@ msgstr "photos.%(extension)s"
 msgid "captured.%s"
 msgstr "capture.%s"
 
-#: counter/static/bundled/counter/product-type-index.ts:36
+#: counter/static/bundled/counter/product-list-index.ts:39
+msgid "name"
+msgstr "nom"
+
+#: counter/static/bundled/counter/product-list-index.ts:42
+msgid "product type"
+msgstr "type de produit"
+
+#: counter/static/bundled/counter/product-list-index.ts:44
+msgid "limit age"
+msgstr "limite d'âge"
+
+#: counter/static/bundled/counter/product-list-index.ts:45
+msgid "purchase price"
+msgstr "prix d'achat"
+
+#: counter/static/bundled/counter/product-list-index.ts:46
+msgid "selling price"
+msgstr "prix de vente"
+
+#: counter/static/bundled/counter/product-list-index.ts:47
+msgid "archived"
+msgstr "archivé"
+
+#: counter/static/bundled/counter/product-list-index.ts:116
+msgid "Uncategorized"
+msgstr "Sans catégorie"
+
+#: counter/static/bundled/counter/product-list-index.ts:134
+msgid "products.csv"
+msgstr "produits.csv"
+
+#: counter/static/bundled/counter/product-type-index.ts:46
 msgid "Products types reordered!"
 msgstr "Types de produits réordonnés !"
 
-#: counter/static/bundled/counter/product-type-index.ts:40
+#: counter/static/bundled/counter/product-type-index.ts:50
 #, javascript-format
 msgid "Product type reorganisation failed with status code : %d"
 msgstr "La réorganisation des types de produit a échoué avec le code : %d"

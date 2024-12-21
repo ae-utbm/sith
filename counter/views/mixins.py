@@ -94,11 +94,6 @@ class CounterAdminTabsMixin(TabedViewMixin):
             "name": _("Products"),
         },
         {
-            "url": reverse_lazy("counter:product_list_archived"),
-            "slug": "archive",
-            "name": _("Archived products"),
-        },
-        {
             "url": reverse_lazy("counter:product_type_list"),
             "slug": "product_types",
             "name": _("Product types"),
