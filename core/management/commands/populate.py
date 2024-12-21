@@ -23,7 +23,7 @@
 from datetime import date, timedelta
 from io import StringIO
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, NamedTuple
 
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -31,6 +31,7 @@ from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connection
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.timezone import localdate
 from PIL import Image
@@ -56,6 +57,18 @@ from sas.models import Album, PeoplePictureRelation, Picture
 from subscription.models import Subscription
 
 
+class PopulatedGroups(NamedTuple):
+    root: Group
+    public: Group
+    subscribers: Group
+    old_subscribers: Group
+    sas_admin: Group
+    com_admin: Group
+    counter_admin: Group
+    accounting_admin: Group
+    pedagogy_admin: Group
+
+
 class Command(BaseCommand):
     ROOT_PATH: ClassVar[Path] = Path(__file__).parent.parent.parent.parent
     SAS_FIXTURE_PATH: ClassVar[Path] = (
@@ -79,25 +92,7 @@ class Command(BaseCommand):
 
         Sith.objects.create(weekmail_destinations="etudiants@git.an personnel@git.an")
         Site.objects.create(domain=settings.SITH_URL, name=settings.SITH_NAME)
-
-        root_group = Group.objects.create(name="Root")
-        public_group = Group.objects.create(name="Public")
-        subscribers = Group.objects.create(name="Subscribers")
-        old_subscribers = Group.objects.create(name="Old subscribers")
-        Group.objects.create(name="Accounting admin")
-        Group.objects.create(name="Communication admin")
-        Group.objects.create(name="Counter admin")
-        Group.objects.create(name="Banned from buying alcohol")
-        Group.objects.create(name="Banned from counters")
-        Group.objects.create(name="Banned to subscribe")
-        Group.objects.create(name="SAS admin")
-        Group.objects.create(name="Forum admin")
-        Group.objects.create(name="Pedagogy admin")
-        self.reset_index("core", "auth")
-
-        change_billing = Permission.objects.get(codename="change_billinginfo")
-        add_billing = Permission.objects.get(codename="add_billinginfo")
-        root_group.permissions.add(change_billing, add_billing)
+        groups = self._create_groups()
 
         root = User.objects.create_superuser(
             id=0,
@@ -155,7 +150,7 @@ class Command(BaseCommand):
         Counter.edit_groups.through.objects.bulk_create(bar_groups)
         self.reset_index("counter")
 
-        subscribers.viewable_files.add(home_root, club_root)
+        groups.subscribers.viewable_files.add(home_root, club_root)
 
         Weekmail().save()
 
@@ -260,21 +255,11 @@ class Command(BaseCommand):
         )
         User.groups.through.objects.bulk_create(
             [
-                User.groups.through(
-                    group_id=settings.SITH_GROUP_COUNTER_ADMIN_ID, user=counter
-                ),
-                User.groups.through(
-                    group_id=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID, user=comptable
-                ),
-                User.groups.through(
-                    group_id=settings.SITH_GROUP_COM_ADMIN_ID, user=comunity
-                ),
-                User.groups.through(
-                    group_id=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID, user=tutu
-                ),
-                User.groups.through(
-                    group_id=settings.SITH_GROUP_SAS_ADMIN_ID, user=skia
-                ),
+                User.groups.through(group=groups.counter_admin, user=counter),
+                User.groups.through(group=groups.accounting_admin, user=comptable),
+                User.groups.through(group=groups.com_admin, user=comunity),
+                User.groups.through(group=groups.pedagogy_admin, user=tutu),
+                User.groups.through(group=groups.sas_admin, user=skia),
             ]
         )
         for user in richard, sli, krophil, skia:
@@ -335,7 +320,7 @@ Welcome to the wiki page!
             content="Fonctionnement de la laverie",
         )
 
-        public_group.viewable_page.set(
+        groups.public.viewable_page.set(
             [syntax_page, services_page, index_page, laundry_page]
         )
 
@@ -512,8 +497,10 @@ Welcome to the wiki page!
             club=main_club,
             limit_age=18,
         )
-        subscribers.products.add(cotis, cotis2, refill, barb, cble, cors, carolus)
-        old_subscribers.products.add(cotis, cotis2)
+        groups.subscribers.products.add(
+            cotis, cotis2, refill, barb, cble, cors, carolus
+        )
+        groups.old_subscribers.products.add(cotis, cotis2)
 
         mde = Counter.objects.get(name="MDE")
         mde.products.add(barb, cble, cons, dcons)
@@ -616,10 +603,10 @@ Welcome to the wiki page!
             start_date="1942-06-12 10:28:45+01",
             end_date="7942-06-12 10:28:45+01",
         )
-        el.view_groups.add(public_group)
+        el.view_groups.add(groups.public)
         el.edit_groups.add(ae_board_group)
-        el.candidature_groups.add(subscribers)
-        el.vote_groups.add(subscribers)
+        el.candidature_groups.add(groups.subscribers)
+        el.vote_groups.add(groups.subscribers)
         liste = ElectionList.objects.create(title="Candidature Libre", election=el)
         listeT = ElectionList.objects.create(title="Troll", election=el)
         pres = Role.objects.create(
@@ -898,3 +885,102 @@ Welcome to the wiki page!
             start=s.subscription_start,
         )
         s.save()
+
+    def _create_groups(self) -> PopulatedGroups:
+        perms = Permission.objects.all()
+
+        root_group = Group.objects.create(name="Root")
+        root_group.permissions.add(*list(perms.values_list("pk", flat=True)))
+        # public has no permission.
+        # Its purpose is not to link users to permissions,
+        # but to other objects (like products)
+        public_group = Group.objects.create(name="Public")
+
+        subscribers = Group.objects.create(name="Subscribers")
+        old_subscribers = Group.objects.create(name="Old subscribers")
+        old_subscribers.permissions.add(
+            *list(
+                perms.filter(
+                    codename__in=[
+                        "view_user",
+                        "view_picture",
+                        "view_album",
+                        "view_peoplepicturerelation",
+                        "add_peoplepicturerelation",
+                    ]
+                )
+            )
+        )
+        accounting_admin = Group.objects.create(name="Accounting admin")
+        accounting_admin.permissions.add(
+            *list(
+                perms.filter(
+                    Q(content_type__app_label="accounting")
+                    | Q(
+                        codename__in=[
+                            "view_customer",
+                            "view_product",
+                            "change_product",
+                            "add_product",
+                            "view_producttype",
+                            "change_producttype",
+                            "add_producttype",
+                            "delete_selling",
+                        ]
+                    )
+                ).values_list("pk", flat=True)
+            )
+        )
+        com_admin = Group.objects.create(name="Communication admin")
+        com_admin.permissions.add(
+            *list(
+                perms.filter(content_type__app_label="com").values_list("pk", flat=True)
+            )
+        )
+        counter_admin = Group.objects.create(name="Counter admin")
+        counter_admin.permissions.add(
+            *list(
+                perms.filter(
+                    Q(content_type__app_label__in=["counter", "launderette"])
+                    & ~Q(codename__in=["delete_product", "delete_producttype"])
+                )
+            )
+        )
+        Group.objects.create(name="Banned from buying alcohol")
+        Group.objects.create(name="Banned from counters")
+        Group.objects.create(name="Banned to subscribe")
+        sas_admin = Group.objects.create(name="SAS admin")
+        sas_admin.permissions.add(
+            *list(
+                perms.filter(content_type__app_label="sas").values_list("pk", flat=True)
+            )
+        )
+        forum_admin = Group.objects.create(name="Forum admin")
+        forum_admin.permissions.add(
+            *list(
+                perms.filter(content_type__app_label="forum").values_list(
+                    "pk", flat=True
+                )
+            )
+        )
+        pedagogy_admin = Group.objects.create(name="Pedagogy admin")
+        pedagogy_admin.permissions.add(
+            *list(
+                perms.filter(content_type__app_label="pedagogy").values_list(
+                    "pk", flat=True
+                )
+            )
+        )
+        self.reset_index("core", "auth")
+
+        return PopulatedGroups(
+            root=root_group,
+            public=public_group,
+            subscribers=subscribers,
+            old_subscribers=old_subscribers,
+            com_admin=com_admin,
+            counter_admin=counter_admin,
+            accounting_admin=accounting_admin,
+            sas_admin=sas_admin,
+            pedagogy_admin=pedagogy_admin,
+        )
