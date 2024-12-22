@@ -9,6 +9,11 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
       errors: [],
       customerBalance: config.customerBalance,
       codeField: undefined,
+      alertMessage: {
+        content: "",
+        show: false,
+        timeout: null,
+      },
 
       init() {
         // Fill the basket with the initial data
@@ -33,7 +38,7 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
         delete this.basket[id];
       },
 
-      addToBasket(id: string, quantity: number): [boolean, string] {
+      addToBasket(id: string, quantity: number): string {
         const item: BasketItem =
           this.basket[id] || new BasketItem(config.products[id], 0);
 
@@ -42,16 +47,20 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
 
         if (item.quantity <= 0) {
           delete this.basket[id];
-          return [true, ""];
-        }
-
-        if (item.sum() > this.customerBalance) {
-          item.quantity = oldQty;
-          return [false, gettext("Not enough money")];
+          return "";
         }
 
         this.basket[id] = item;
-        return [true, ""];
+
+        if (this.sumBasket() > this.customerBalance) {
+          item.quantity = oldQty;
+          if (item.quantity === 0) {
+            delete this.basket[id];
+          }
+          return gettext("Not enough money");
+        }
+
+        return "";
       },
 
       getBasketSize() {
@@ -69,6 +78,25 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
         return total;
       },
 
+      showAlertMessage(message: string) {
+        if (this.alertMessage.timeout !== null) {
+          clearTimeout(this.alertMessage.timeout);
+        }
+        this.alertMessage.content = message;
+        this.alertMessage.show = true;
+        this.alertMessage.timeout = setTimeout(() => {
+          this.alertMessage.show = false;
+          this.alertMessage.timeout = null;
+        }, 2000);
+      },
+
+      addToBasketWithMessage(id: string, quantity: number) {
+        const message = this.addToBasket(id, quantity);
+        if (message.length > 0) {
+          this.showAlertMessage(message);
+        }
+      },
+
       onRefillingSuccess(event: CustomEvent) {
         if (event.type !== "htmx:after-request" || event.detail.failed) {
           return;
@@ -81,9 +109,11 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
       },
 
       finish() {
-        if (this.getBasketSize() > 0) {
-          this.$refs.basketForm.submit();
+        if (this.getBasketSize() === 0) {
+          this.showAlertMessage(gettext("You can't send an empty basket."));
+          return;
         }
+        this.$refs.basketForm.submit();
       },
 
       cancel() {
@@ -104,7 +134,7 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
             this.finish();
           }
         } else {
-          this.addToBasket(code, quantity);
+          this.addToBasketWithMessage(code, quantity);
         }
         this.codeField.widget.clear();
         this.codeField.widget.focus();

@@ -31,6 +31,14 @@
       <p class="important">Javascript is required for the counter UI.</p>
     </noscript>
 
+    <p
+      x-cloak
+      class="alert alert-red snackbar"
+      x-show="alertMessage.show"
+      x-transition.duration.500ms
+      x-text="alertMessage.content"
+    ></p>
+
     <div id="user_info">
       <h5>{% trans %}Customer{% endtrans %}</h5>
       {{ user_mini_profile(customer.user) }}
@@ -92,9 +100,9 @@
                 </div>
               </template>
 
-              <button @click.prevent="addToBasket(item.product.id, -1)">-</button>
+              <button @click.prevent="addToBasketWithMessage(item.product.id, -1)">-</button>
               <span x-text="item.quantity"></span>
-              <button @click.prevent="addToBasket(item.product.id, 1)">+</button>
+              <button @click.prevent="addToBasketWithMessage(item.product.id, 1)">+</button>
 
               <span x-text="item.product.name"></span> :
               <span x-text="item.sum().toLocaleString(undefined, { minimumFractionDigits: 2 })">€</span>
@@ -163,7 +171,7 @@
             <h5 class="margin-bottom">{{ category }}</h5>
             <div class="row gap-2x">
               {% for product in categories[category] -%}
-                <button class="card shadow" @click="addToBasket('{{ product.id }}', 1)">
+                <button class="card shadow" @click="addToBasketWithMessage('{{ product.id }}', 1)">
                   <strong class="card-title">{{ product.name }}</strong>
                   <img
                     class="card-image"
