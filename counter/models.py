@@ -791,7 +791,8 @@ class SellingQuerySet(models.QuerySet):
 class Selling(models.Model):
     """Handle the sellings."""
 
-    label = models.CharField(_("label"), max_length=64)
+    # We make sure that sellings have a way begger label than any product name is allowed to
+    label = models.CharField(_("label"), max_length=128)
     product = models.ForeignKey(
         Product,
         related_name="sellings",

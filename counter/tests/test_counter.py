@@ -31,6 +31,7 @@ from model_bakery import baker
 from club.models import Club, Membership
 from core.baker_recipes import board_user, old_subscriber_user, subscriber_user
 from core.models import User
+from counter.baker_recipes import product_recipe
 from counter.models import (
     Counter,
     Customer,
@@ -216,26 +217,33 @@ class TestCounterClick(FullClickSetup, TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.beer = baker.make(
-            Product, limit_age=18, selling_price="1.5", special_selling_price="1"
+
+        cls.underage_customer = subscriber_user.make()
+
+        cls.set_age(cls.customer, 20)
+        cls.set_age(cls.barmen, 20)
+        cls.set_age(cls.club_admin, 20)
+        cls.set_age(cls.underage_customer, 17)
+
+        cls.beer = product_recipe.make(
+            limit_age=18, selling_price="1.5", special_selling_price="1"
         )
-        cls.beer_tape = baker.make(
-            Product,
+        cls.beer_tap = product_recipe.make(
             limit_age=18,
             tray=True,
             selling_price="1.5",
             special_selling_price="1",
         )
 
-        cls.snack = baker.make(
-            Product, limit_age=0, selling_price="1.5", special_selling_price="1"
+        cls.snack = product_recipe.make(
+            limit_age=0, selling_price="1.5", special_selling_price="1"
         )
-        cls.stamps = baker.make(
-            Product, limit_age=0, selling_price="1.5", special_selling_price="1"
+        cls.stamps = product_recipe.make(
+            limit_age=0, selling_price="1.5", special_selling_price="1"
         )
 
         cls.counter.products.add(cls.beer)
-        cls.counter.products.add(cls.beer_tape)
+        cls.counter.products.add(cls.beer_tap)
         cls.counter.products.add(cls.snack)
         cls.counter.save()
 
@@ -251,6 +259,11 @@ class TestCounterClick(FullClickSetup, TestCase):
             reverse("counter:login", args=[self.counter.id]),
             {"username": used_barman.username, "password": "plop"},
         )
+
+    @classmethod
+    def set_age(cls, user: User, age: int):
+        user.date_of_birth = localdate().replace(year=localdate().year - age)
+        user.save()
 
     def submit_basket(
         self,
@@ -305,6 +318,63 @@ class TestCounterClick(FullClickSetup, TestCase):
         )
 
         assert self.updated_amount(self.club_admin) == Decimal("8.5")
+
+    def test_click_bar_success(self):
+        self.refill_user(self.customer, 10)
+        self.login_in_bar(self.barmen)
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.beer.id, 2),
+                    BasketItem(self.snack.id, 1),
+                ],
+            ).status_code
+            == 302
+        )
+
+        assert self.updated_amount(self.customer) == Decimal("5.5")
+
+        # Test barmen special price
+
+        self.refill_user(self.barmen, 10)
+
+        assert (
+            self.submit_basket(self.barmen, [BasketItem(self.beer.id, 1)])
+        ).status_code == 302
+
+        assert self.updated_amount(self.barmen) == Decimal("9")
+
+    def test_click_tray_price(self):
+        self.refill_user(self.customer, 20)
+        self.login_in_bar(self.barmen)
+
+        # Not applying tray price
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.beer_tap.id, 2),
+                ],
+            ).status_code
+            == 302
+        )
+
+        assert self.updated_amount(self.customer) == Decimal("17")
+
+        # Applying tray price
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.beer_tap.id, 7),
+                ],
+            ).status_code
+            == 302
+        )
+
+        assert self.updated_amount(self.customer) == Decimal("8")
 
     def test_annotate_has_barman_queryset(self):
         """Test if the custom queryset method `annotate_has_barman` works as intended."""
