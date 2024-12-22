@@ -29,9 +29,14 @@ class SithModelBackend(ModelBackend):
     """
 
     def _get_group_permissions(self, user_obj: User):
-        groups = user_obj.groups.all()
+        # union of querysets doesn't work if the queryset is ordered.
+        # The empty `order_by` here are actually there to *remove*
+        # any default ordering defined in managers or model Meta
+        groups = user_obj.groups.order_by()
         if user_obj.is_subscribed:
             groups = groups.union(
-                Group.objects.get(pk=settings.SITH_GROUP_SUBSCRIBERS_ID)
+                Group.objects.filter(pk=settings.SITH_GROUP_SUBSCRIBERS_ID).order_by()
             )
-        return Permission.objects.filter(group__group__in=groups)
+        return Permission.objects.filter(
+            group__group__in=groups.values_list("pk", flat=True)
+        )
