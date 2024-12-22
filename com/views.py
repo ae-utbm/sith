@@ -21,7 +21,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-
+import itertools
 from datetime import timedelta
 from smtplib import SMTPRecipientsRefused
 
@@ -374,13 +374,14 @@ class NewsListView(CanViewMixin, ListView):
         kwargs = super().get_context_data(**kwargs)
         kwargs["NewsDate"] = NewsDate
         kwargs["timedelta"] = timedelta
-        kwargs["birthdays"] = (
+        kwargs["birthdays"] = itertools.groupby(
             User.objects.filter(
                 date_of_birth__month=localdate().month,
                 date_of_birth__day=localdate().day,
             )
             .filter(role__in=["STUDENT", "FORMER STUDENT"])
-            .order_by("-date_of_birth")
+            .order_by("-date_of_birth"),
+            key=lambda u: u.date_of_birth.year,
         )
         return kwargs
 
