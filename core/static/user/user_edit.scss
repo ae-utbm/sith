@@ -1,23 +1,6 @@
-
 @media (max-width: 750px) {
   .title {
     text-align: center;
-  }
-}
-
-.field-error {
-  height: auto !important;
-
-  > ul {
-    list-style-type: none;
-    margin: 0;
-    color: indianred;
-
-    > li {
-      text-align: left !important;
-      line-height: normal;
-      margin-top: 5px;
-    }
   }
 }
 
@@ -87,11 +70,7 @@
         max-height: 100%;
       }
 
-      > i {
-        font-size: 32px;
-      }
-
-      >p {
+      > p {
         text-align: left !important;
         width: 100% !important;
       }
@@ -107,16 +86,6 @@
       > div {
         max-width: 100%;
 
-        > input {
-          font-weight: normal;
-          cursor: pointer;
-          text-align: left !important;
-        }
-
-        > button {
-          min-width: 30%;
-        }
-
         @media (min-width: 750px) {
           height: auto;
           align-items: center;
@@ -124,8 +93,8 @@
           overflow: hidden;
 
           > input {
-            width: 70%;
             font-size: .6em;
+
             &::file-selector-button {
               height: 30px;
             }
@@ -167,7 +136,7 @@
       max-width: 100%;
     }
 
-    >* {
+    > * {
       width: 100%;
       max-width: 300px;
 
@@ -181,45 +150,22 @@
     }
 
     &-content {
-
-      >* {
+      > * {
         box-sizing: border-box;
         text-align: left !important;
-        line-height: 40px;
-        max-width: 100%;
-        width: 100%;
-        height: 40px;
         margin: 0;
 
-        >* {
+        > * {
           text-align: left !important;
         }
       }
+    }
 
-
-      >textarea {
-        height: 120px;
-        min-height: 40px;
-        min-width: 300px;
-        max-width: 300px;
-        line-height: initial;
-
-        @media (max-width: 750px) {
-          max-width: 100%;
-        }
-      }
-
-      >input[type="file"] {
-        font-size: small;
-        line-height: 30px;
-      }
-
-      >input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-        margin: 0;
-        float: left;
-      }
+    textarea {
+      height: 7rem;
+    }
+    .final-actions {
+      text-align: center;
     }
   }
 }
