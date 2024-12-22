@@ -428,13 +428,6 @@ class Product(models.Model):
     def profit(self):
         return self.selling_price - self.purchase_price
 
-    def get_actual_price(self, counter: Counter, customer: Customer):
-        """Return the price of the article taking into account if the customer has a special price
-        or not in the counter it's being purchased on"""
-        if counter.customer_is_barman(customer):
-            return self.special_selling_price
-        return self.selling_price
-
 
 class CounterQuerySet(models.QuerySet):
     def annotate_has_barman(self, user: User) -> Self:

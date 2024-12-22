@@ -53,13 +53,15 @@ class ProductForm(Form):
 
     def __init__(
         self,
+        customer: Customer,
+        counter: Counter,
+        allowed_products: list[Product],
         *args,
-        customer: Customer | None = None,
-        counter: Counter | None = None,
         **kwargs,
     ):
-        self.customer = customer
-        self.counter = counter
+        self.customer = customer  # Used by formset
+        self.counter = counter  # Used by formset
+        self.allowed_products = allowed_products
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -67,34 +69,19 @@ class ProductForm(Form):
         if len(self.errors) > 0:
             return
 
-        if self.customer is None or self.counter is None:
-            raise RuntimeError(
-                f"{self} has been initialized without customer or counter"
-            )
-
-        user = self.customer.user
-
         # We store self.product so we can use it later on the formset validation
-        self.product = self.counter.products.filter(id=cleaned_data["id"]).first()
+        self.product = next(
+            (
+                product
+                for product in self.allowed_products
+                if product.id == cleaned_data["id"]
+            ),
+            None,
+        )
         if self.product is None:
             raise ValidationError(
-                _(
-                    "Product %(product)s doesn't exist or isn't available on this counter"
-                )
-                % {"product": cleaned_data["id"]}
+                _("The selected product isn't available for this user")
             )
-
-        # Test alcohoolic products
-        if self.product.limit_age >= 18:
-            if not user.date_of_birth:
-                raise ValidationError(_("Too young for that product"))
-            if user.is_banned_alcohol:
-                raise ValidationError(_("Not allowed for that product"))
-        if user.date_of_birth and self.customer.user.get_age() < self.product.limit_age:
-            raise ValidationError(_("Too young for that product"))
-
-        if user.is_banned_counter:
-            raise ValidationError(_("Not allowed for that product"))
 
         # Compute prices
         cleaned_data["bonus_quantity"] = 0
@@ -102,10 +89,7 @@ class ProductForm(Form):
             cleaned_data["bonus_quantity"] = math.floor(
                 cleaned_data["quantity"] / Product.QUANTITY_FOR_TRAY_PRICE
             )
-        cleaned_data["unit_price"] = self.product.get_actual_price(
-            self.counter, self.customer
-        )
-        cleaned_data["total_price"] = cleaned_data["unit_price"] * (
+        cleaned_data["total_price"] = self.product.price * (
             cleaned_data["quantity"] - cleaned_data["bonus_quantity"]
         )
 
@@ -164,27 +148,62 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
     pk_url_kwarg = "counter_id"
     current_tab = "counter"
 
+    def get_products(self) -> list[Product]:
+        """Get all allowed products for the current customer on the current counter"""
+
+        if hasattr(self, "_products"):
+            return self._products
+
+        products = self.object.products.select_related("product_type").prefetch_related(
+            "buying_groups"
+        )
+
+        # Only include allowed products
+        if not self.customer.user.date_of_birth or self.customer.user.is_banned_alcohol:
+            products = products.filter(limit_age__lt=18)
+        else:
+            products = products.filter(limit_age__lte=self.customer.user.get_age())
+
+        # Compute special price for customer if he is a barmen on that bar
+        if self.object.customer_is_barman(self.customer):
+            products = products.annotate(price=F("special_selling_price"))
+        else:
+            products = products.annotate(price=F("selling_price"))
+
+        self._products = [
+            product
+            for product in products.all()
+            if product.can_be_sold_to(self.customer.user)
+        ]
+
+        return self._products
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["form_kwargs"] = {
             "customer": self.customer,
             "counter": self.object,
+            "allowed_products": self.get_products(),
         }
         return kwargs
 
     def dispatch(self, request, *args, **kwargs):
         self.customer = get_object_or_404(Customer, user__id=self.kwargs["user_id"])
         obj: Counter = self.get_object()
-        if not self.customer.can_buy:
-            raise Http404
+
+        if not self.customer.can_buy or self.customer.user.is_banned_counter:
+            return redirect(obj)  # Redirect to counter
+
         if obj.type != "BAR" and not request.user.is_authenticated:
             raise PermissionDenied
+
         if obj.type == "BAR" and (
             "counter_token" not in request.session
             or request.session["counter_token"] != obj.token
             or len(obj.barmen_list) == 0
         ):
             return redirect(obj)  # Redirect to counter
+
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, formset):
@@ -207,7 +226,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
                     product=form.product,
                     club=form.product.club,
                     counter=self.object,
-                    unit_price=form.cleaned_data["unit_price"],
+                    unit_price=form.product.price,
                     quantity=form.cleaned_data["quantity"]
                     - form.cleaned_data["bonus_quantity"],
                     seller=operator,
@@ -238,21 +257,10 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
     def get_success_url(self):
         return resolve_url(self.object)
 
-    def get_product(self, pid):
-        return Product.objects.filter(pk=int(pid)).first()
-
     def get_context_data(self, **kwargs):
         """Add customer to the context."""
         kwargs = super().get_context_data(**kwargs)
-        products = self.object.products.select_related("product_type")
-
-        # Optimisation to bulk edit prices instead of `calling get_actual_price` on everything
-        if self.object.customer_is_barman(self.customer):
-            products = products.annotate(price=F("special_selling_price"))
-        else:
-            products = products.annotate(price=F("selling_price"))
-
-        kwargs["products"] = products
+        kwargs["products"] = self.get_products()
         kwargs["categories"] = {}
         for product in kwargs["products"]:
             if product.product_type:
