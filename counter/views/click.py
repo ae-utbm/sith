@@ -29,6 +29,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django.views.generic.detail import SingleObjectMixin
+from ninja.main import HttpRequest
 
 from core.models import User
 from core.utils import FormFragmentTemplateData
@@ -40,7 +41,9 @@ from counter.views.mixins import CounterTabsMixin
 from counter.views.student_card import StudentCardFormView
 
 
-def get_operator(counter: Counter, customer: Customer) -> User:
+def get_operator(request: HttpRequest, counter: Counter, customer: Customer) -> User:
+    if counter.type != "BAR":
+        return request.user
     if counter.customer_is_barman(customer):
         return customer.user
     return counter.get_random_barman()
@@ -181,7 +184,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
         if len(formset) == 0:
             return ret
 
-        operator = get_operator(self.object, self.customer)
+        operator = get_operator(self.request, self.object, self.customer)
         with transaction.atomic():
             self.request.session["last_basket"] = []
 
@@ -291,7 +294,7 @@ class RefillingCreateView(FormView):
         if not self.counter.can_refill():
             raise PermissionDenied
 
-        self.operator = get_operator(self.counter, self.customer)
+        self.operator = get_operator(request, self.counter, self.customer)
 
         return super().dispatch(request, *args, **kwargs)
 

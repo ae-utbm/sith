@@ -148,33 +148,39 @@
     </div>
 
     <div id="products">
-      <ul>
-        {% for category in categories.keys() -%}
-          <li><a href="#cat_{{ category|slugify }}">{{ category }}</a></li>
-        {%- endfor %}
-      </ul>
-      {% for category in categories.keys() -%}
-        <div id="cat_{{ category|slugify }}">
-          <h5 class="margin-bottom">{{ category }}</h5>
-          <div class="row gap-2x">
-            {% for product in categories[category] -%}
-              <button class="card shadow" @click="addToBasket('{{ product.id }}', 1)">
-                <strong class="card-title">{{ product.name }}</strong>
-                <img
-                  class="card-image"
-                  alt="image de {{ product.name }}"
-                  {% if product.icon %}
-                    src="{{ product.icon.url }}"
-                  {% else %}
-                    src="{{ static('core/img/na.gif') }}"
-                  {% endif %}
-                />
-                <span class="card-content">{{ product.price }} €<br>{{ product.code }}</span>
-              </button>
-            {%- endfor %}
-          </div>
+      {% if not products %}
+        <div class="alert alert-red">
+          {% trans %}No products available on this counter for this user{% endtrans %}
         </div>
-      {%- endfor %}
+      {% else %}
+        <ul>
+          {% for category in categories.keys() -%}
+            <li><a href="#cat_{{ category|slugify }}">{{ category }}</a></li>
+          {%- endfor %}
+        </ul>
+        {% for category in categories.keys() -%}
+          <div id="cat_{{ category|slugify }}">
+            <h5 class="margin-bottom">{{ category }}</h5>
+            <div class="row gap-2x">
+              {% for product in categories[category] -%}
+                <button class="card shadow" @click="addToBasket('{{ product.id }}', 1)">
+                  <strong class="card-title">{{ product.name }}</strong>
+                  <img
+                    class="card-image"
+                    alt="image de {{ product.name }}"
+                    {% if product.icon %}
+                      src="{{ product.icon.url }}"
+                    {% else %}
+                      src="{{ static('core/img/na.gif') }}"
+                    {% endif %}
+                  />
+                  <span class="card-content">{{ product.price }} €<br>{{ product.code }}</span>
+                </button>
+              {%- endfor %}
+            </div>
+          </div>
+        {%- endfor %}
+      {% endif %}
     </div>
   </div>
 {% endblock content %}
