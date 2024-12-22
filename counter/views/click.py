@@ -55,7 +55,7 @@ class ProductForm(Form):
         self,
         customer: Customer,
         counter: Counter,
-        allowed_products: list[Product],
+        allowed_products: dict[int, Product],
         *args,
         **kwargs,
     ):
@@ -64,24 +64,23 @@ class ProductForm(Form):
         self.allowed_products = allowed_products
         super().__init__(*args, **kwargs)
 
-    def clean(self):
-        cleaned_data = super().clean()
-        if len(self.errors) > 0:
-            return
+    def clean_id(self):
+        data = self.cleaned_data["id"]
 
         # We store self.product so we can use it later on the formset validation
-        self.product = next(
-            (
-                product
-                for product in self.allowed_products
-                if product.id == cleaned_data["id"]
-            ),
-            None,
-        )
+        # And also in the global clean
+        self.product = self.allowed_products.get(data, None)
         if self.product is None:
             raise ValidationError(
                 _("The selected product isn't available for this user")
             )
+
+        return data
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if len(self.errors) > 0:
+            return
 
         # Compute prices
         cleaned_data["bonus_quantity"] = 0
@@ -183,7 +182,9 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
         kwargs["form_kwargs"] = {
             "customer": self.customer,
             "counter": self.object,
-            "allowed_products": self.get_products(),
+            "allowed_products": {
+                product.id: product for product in self.get_products()
+            },
         }
         return kwargs
 
