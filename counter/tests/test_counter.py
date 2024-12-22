@@ -14,19 +14,22 @@
 #
 import re
 from datetime import timedelta
+from decimal import Decimal
 
 import pytest
 from django.conf import settings
+from django.contrib.auth.models import make_password
 from django.core.cache import cache
-from django.test import TestCase
+from django.http import HttpResponse
+from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.timezone import now
+from django.utils.timezone import localdate, now
 from freezegun import freeze_time
 from model_bakery import baker
 
 from club.models import Club, Membership
-from core.baker_recipes import subscriber_user
+from core.baker_recipes import board_user, old_subscriber_user, subscriber_user
 from core.models import User
 from counter.models import (
     Counter,
@@ -35,6 +38,156 @@ from counter.models import (
     Product,
     Selling,
 )
+
+
+class TestRefilling(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.customer = subscriber_user.make()
+        cls.barmen = subscriber_user.make(password=make_password("plop"))
+        cls.board_admin = board_user.make(password=make_password("plop"))
+        cls.club_admin = baker.make(User)
+        cls.root = baker.make(User, is_superuser=True)
+        cls.subscriber = subscriber_user.make()
+
+        cls.counter = baker.make(Counter, type="BAR")
+        cls.counter.sellers.add(cls.barmen)
+        cls.counter.sellers.add(cls.board_admin)
+
+        cls.customer_old_can_buy = subscriber_user.make()
+        sub = cls.customer_old_can_buy.subscriptions.first()
+        sub.subscription_end = localdate() - timedelta(days=89)
+        sub.save()
+
+        cls.customer_old_can_not_buy = old_subscriber_user.make()
+        cls.customer_can_not_buy = baker.make(User)
+
+        cls.club_counter = baker.make(Counter)
+        baker.make(
+            Membership,
+            start_date=now() - timedelta(days=30),
+            club=cls.club_counter.club,
+            role=settings.SITH_CLUB_ROLES_ID["Board member"],
+            user=cls.club_admin,
+        )
+
+    def login_in_bar(self, barmen: User | None = None):
+        used_barman = barmen if barmen is not None else self.board_admin
+        self.client.post(
+            reverse("counter:login", args=[self.counter.id]),
+            {"username": used_barman.username, "password": "plop"},
+        )
+
+    def updated_amount(self, user: User) -> Decimal:
+        user.customer.refresh_from_db()
+        return user.customer.amount
+
+    def refill_user(
+        self,
+        user: User | Customer,
+        counter: Counter,
+        amount: int,
+        client: Client | None = None,
+    ) -> HttpResponse:
+        used_client = client if client is not None else self.client
+        return used_client.post(
+            reverse(
+                "counter:refilling_create",
+                kwargs={"customer_id": user.pk},
+            ),
+            {
+                "amount": str(amount),
+                "payment_method": "CASH",
+                "bank": "OTHER",
+            },
+            HTTP_REFERER=reverse(
+                "counter:click",
+                kwargs={"counter_id": counter.id, "user_id": user.pk},
+            ),
+        )
+
+    def test_refilling_office_fail(self):
+        self.client.force_login(self.club_admin)
+        assert self.refill_user(self.customer, self.club_counter, 10).status_code == 403
+
+        self.client.force_login(self.root)
+        assert self.refill_user(self.customer, self.club_counter, 10).status_code == 403
+
+        self.client.force_login(self.subscriber)
+        assert self.refill_user(self.customer, self.club_counter, 10).status_code == 403
+
+        assert self.updated_amount(self.customer) == 0
+
+    def test_refilling_no_refer_fail(self):
+        def refill():
+            return self.client.post(
+                reverse(
+                    "counter:refilling_create",
+                    kwargs={"customer_id": self.customer.pk},
+                ),
+                {
+                    "amount": "10",
+                    "payment_method": "CASH",
+                    "bank": "OTHER",
+                },
+            )
+
+        self.client.force_login(self.club_admin)
+        assert refill()
+
+        self.client.force_login(self.root)
+        assert refill()
+
+        self.client.force_login(self.subscriber)
+        assert refill()
+
+        assert self.updated_amount(self.customer) == 0
+
+    def test_refilling_not_connected_fail(self):
+        assert self.refill_user(self.customer, self.counter, 10).status_code == 403
+        assert self.updated_amount(self.customer) == 0
+
+    def test_refilling_counter_open_but_not_connected_fail(self):
+        self.login_in_bar()
+        client = Client()
+        assert (
+            self.refill_user(self.customer, self.counter, 10, client=client).status_code
+            == 403
+        )
+        assert self.updated_amount(self.customer) == 0
+
+    def test_refilling_counter_no_board_member(self):
+        self.login_in_bar(barmen=self.barmen)
+        assert self.refill_user(self.customer, self.counter, 10).status_code == 403
+        assert self.updated_amount(self.customer) == 0
+
+    def test_refilling_user_can_not_buy(self):
+        self.login_in_bar(barmen=self.barmen)
+
+        assert (
+            self.refill_user(self.customer_can_not_buy, self.counter, 10).status_code
+            == 404
+        )
+        assert (
+            self.refill_user(
+                self.customer_old_can_not_buy, self.counter, 10
+            ).status_code
+            == 403
+        )
+
+    def test_refilling_counter_success(self):
+        self.login_in_bar()
+
+        assert self.refill_user(self.customer, self.counter, 30).status_code == 302
+        assert self.updated_amount(self.customer) == 30
+        assert self.refill_user(self.customer, self.counter, 10.1).status_code == 302
+        assert self.updated_amount(self.customer) == Decimal("40.1")
+
+        assert (
+            self.refill_user(self.customer_old_can_buy, self.counter, 1).status_code
+            == 302
+        )
+        assert self.updated_amount(self.customer_old_can_buy) == 1
 
 
 class TestCounter(TestCase):
