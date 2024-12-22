@@ -21,7 +21,7 @@ import string
 from datetime import date, datetime, timedelta
 from datetime import timezone as tz
 from decimal import Decimal
-from typing import Self, Tuple
+from typing import Self
 
 from dict2xml import dict2xml
 from django.conf import settings
@@ -138,7 +138,7 @@ class Customer(models.Model):
         return (date.today() - subscription.subscription_end) < timedelta(days=90)
 
     @classmethod
-    def get_or_create(cls, user: User) -> Tuple[Customer, bool]:
+    def get_or_create(cls, user: User) -> tuple[Customer, bool]:
         """Work in pretty much the same way as the usual get_or_create method,
         but with the default field replaced by some under the hood.
 

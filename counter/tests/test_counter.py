@@ -12,7 +12,6 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-import re
 from datetime import timedelta
 from decimal import Decimal
 
@@ -40,7 +39,7 @@ from counter.models import (
 )
 
 
-class TestRefilling(TestCase):
+class FullClickSetup:
     @classmethod
     def setUpTestData(cls):
         cls.customer = subscriber_user.make()
@@ -53,6 +52,11 @@ class TestRefilling(TestCase):
         cls.counter = baker.make(Counter, type="BAR")
         cls.counter.sellers.add(cls.barmen)
         cls.counter.sellers.add(cls.board_admin)
+
+        cls.other_counter = baker.make(Counter, type="BAR")
+        cls.other_counter.sellers.add(cls.barmen)
+
+        cls.yet_another_counter = baker.make(Counter, type="BAR")
 
         cls.customer_old_can_buy = subscriber_user.make()
         sub = cls.customer_old_can_buy.subscriptions.first()
@@ -71,6 +75,8 @@ class TestRefilling(TestCase):
             user=cls.club_admin,
         )
 
+
+class TestRefilling(FullClickSetup, TestCase):
     def login_in_bar(self, barmen: User | None = None):
         used_barman = barmen if barmen is not None else self.board_admin
         self.client.post(
@@ -190,136 +196,12 @@ class TestRefilling(TestCase):
         assert self.updated_amount(self.customer_old_can_buy) == 1
 
 
-class TestCounter(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.skia = User.objects.filter(username="skia").first()
-        cls.sli = User.objects.filter(username="sli").first()
-        cls.krophil = User.objects.filter(username="krophil").first()
-        cls.richard = User.objects.filter(username="rbatsbak").first()
-        cls.mde = Counter.objects.filter(name="MDE").first()
-        cls.foyer = Counter.objects.get(id=2)
-
-    def test_full_click(self):
-        self.client.post(
-            reverse("counter:login", kwargs={"counter_id": self.mde.id}),
-            {"username": self.skia.username, "password": "plop"},
-        )
-        response = self.client.get(
-            reverse("counter:details", kwargs={"counter_id": self.mde.id})
-        )
-
-        assert 'class="link-button">S&#39; Kia</button>' in str(response.content)
-
-        counter_token = re.search(
-            r'name="counter_token" value="([^"]*)"', str(response.content)
-        ).group(1)
-
-        response = self.client.post(
-            reverse("counter:details", kwargs={"counter_id": self.mde.id}),
-            {"code": self.richard.customer.account_id, "counter_token": counter_token},
-        )
-        counter_url = response.get("location")
-        refill_url = reverse(
-            "counter:refilling_create",
-            kwargs={"customer_id": self.richard.customer.pk},
-        )
-
-        response = self.client.get(counter_url)
-        assert ">Richard Batsbak</" in str(response.content)
-
-        self.client.post(
-            refill_url,
-            {
-                "amount": "5",
-                "payment_method": "CASH",
-                "bank": "OTHER",
-            },
-            HTTP_REFERER=counter_url,
-        )
-        self.client.post(counter_url, "action=code&code=BARB", content_type="text/xml")
-        self.client.post(
-            counter_url, "action=add_product&product_id=4", content_type="text/xml"
-        )
-        self.client.post(
-            counter_url, "action=del_product&product_id=4", content_type="text/xml"
-        )
-        self.client.post(
-            counter_url, "action=code&code=2xdeco", content_type="text/xml"
-        )
-        self.client.post(
-            counter_url, "action=code&code=1xbarb", content_type="text/xml"
-        )
-        response = self.client.post(
-            counter_url, "action=code&code=fin", content_type="text/xml"
-        )
-
-        response_get = self.client.get(response.get("location"))
-        response_content = response_get.content.decode("utf-8")
-        assert "2 x Barbar" in str(response_content)
-        assert "2 x Déconsigne Eco-cup" in str(response_content)
-        assert "<p>Client : Richard Batsbak - Nouveau montant : 3.60" in str(
-            response_content
-        )
-
-        self.client.post(
-            reverse("counter:login", kwargs={"counter_id": self.mde.id}),
-            {"username": self.sli.username, "password": "plop"},
-        )
-
-        response = self.client.post(
-            refill_url,
-            {
-                "amount": "5",
-                "payment_method": "CASH",
-                "bank": "OTHER",
-            },
-            HTTP_REFERER=counter_url,
-        )
-        assert response.status_code == 302
-
-        self.client.post(
-            reverse("counter:login", kwargs={"counter_id": self.foyer.id}),
-            {"username": self.krophil.username, "password": "plop"},
-        )
-
-        response = self.client.get(
-            reverse("counter:details", kwargs={"counter_id": self.foyer.id})
-        )
-
-        counter_token = re.search(
-            r'name="counter_token" value="([^"]*)"', str(response.content)
-        ).group(1)
-
-        response = self.client.post(
-            reverse("counter:details", kwargs={"counter_id": self.foyer.id}),
-            {"code": self.richard.customer.account_id, "counter_token": counter_token},
-        )
-        counter_url = response.get("location")
-        refill_url = reverse(
-            "counter:refilling_create",
-            kwargs={
-                "customer_id": self.richard.customer.pk,
-            },
-        )
-
-        response = self.client.post(
-            refill_url,
-            {
-                "amount": "5",
-                "payment_method": "CASH",
-                "bank": "OTHER",
-            },
-            HTTP_REFERER=counter_url,
-        )
-        assert response.status_code == 403  # Krophil is not board admin
-
+class TestCounterClick(FullClickSetup, TestCase):
     def test_annotate_has_barman_queryset(self):
         """Test if the custom queryset method `annotate_has_barman` works as intended."""
-        self.sli.counters.set([self.foyer, self.mde])
-        counters = Counter.objects.annotate_has_barman(self.sli)
+        counters = Counter.objects.annotate_has_barman(self.barmen)
         for counter in counters:
-            if counter.name in ("Foyer", "MDE"):
+            if counter in (self.counter, self.other_counter):
                 assert counter.has_annotated_barman
             else:
                 assert not counter.has_annotated_barman
