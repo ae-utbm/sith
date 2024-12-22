@@ -1,10 +1,8 @@
 import { exportToHtml } from "#core:utils/globals";
 
-const quantityForTrayPrice = 6;
-
 interface InitialFormData {
   /* Used to refill the form when the backend raises an error */
-  id?: string;
+  id?: Pick<Product, "id">;
   quantity?: number;
   errors?: string[];
 }
@@ -23,11 +21,13 @@ interface Product {
   name: string;
   price: number;
   hasTrayPrice: boolean;
+  quantityForTrayPrice: number;
 }
 
 class BasketItem {
   quantity: number;
   product: Product;
+  quantityForTrayPrice: number;
   errors: string[];
 
   constructor(product: Product, quantity: number) {
@@ -40,7 +40,7 @@ class BasketItem {
     if (!this.product.hasTrayPrice) {
       return 0;
     }
-    return Math.floor(this.quantity / quantityForTrayPrice);
+    return Math.floor(this.quantity / this.product.quantityForTrayPrice);
   }
 
   sum(): number {
@@ -127,7 +127,9 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
       },
 
       finish() {
-        this.$refs.basketForm.submit();
+        if (this.getBasketSize() > 0) {
+          this.$refs.basketForm.submit();
+        }
       },
 
       cancel() {

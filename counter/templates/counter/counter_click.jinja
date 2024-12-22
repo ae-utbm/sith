@@ -79,11 +79,12 @@
           </div>
         {% endfor %}
         <p>{% trans %}Basket: {% endtrans %}</p>
-        <form method="post" action="" x-ref="basketForm">
+        <form x-cloak method="post" action="" x-ref="basketForm">
           {% csrf_token %}
           <div x-ref="basketManagementForm">
             {{ form.management_form }}
           </div>
+          <ul x-show="getBasketSize() === 0">{% trans %}This basket is empty{% endtrans %}</ul>
           <template x-for="(item, index) in Object.values(basket)">
             <ul>
               <template x-for="error in item.errors">
@@ -97,7 +98,7 @@
 
               <span x-text="item.product.name"></span> :
               <span x-text="item.sum().toLocaleString(undefined, { minimumFractionDigits: 2 })">€</span>
-              <span x-cloak x-show="item.getBonusQuantity() > 0" x-text="`${item.getBonusQuantity()} x P`"></span>
+              <span x-show="item.getBonusQuantity() > 0" x-text="`${item.getBonusQuantity()} x P`"></span>
               <button @click.prevent="removeFromBasket(item.product.id)"><i class="fa fa-trash-can delete-action"></i></button>
 
               <input type="hidden" :value="item.quantity" :id="`id_form-${index}-quantity`" :name="`form-${index}-quantity`" required readonly>
@@ -112,7 +113,7 @@
           </p>
 
           <div class="row">
-            <input class="btn btn-blue" type="submit" @click.prevent="finish" value="{% trans %}Finish{% endtrans %}"/>
+            <input class="btn btn-blue" type="submit" @click.prevent="finish" :disabled="getBasketSize() == 0" value="{% trans %}Finish{% endtrans %}"/>
             <input class="btn btn-grey" type="submit" @click.prevent="cancel" value="{% trans %}Cancel{% endtrans %}"/>
           </div>
         </form>
@@ -188,6 +189,7 @@
           name: "{{ product.name }}",
           price: {{ product.price }},
           hasTrayPrice: {{ product.tray | tojson }},
+          quantityForTrayPrice: {{ product.QUANTITY_FOR_TRAY_PRICE }},
         },
       {%- endfor -%}
     };

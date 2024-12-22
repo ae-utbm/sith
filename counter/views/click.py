@@ -106,9 +106,8 @@ class BaseBasketForm(BaseFormSet):
         self._check_enough_money(self[0].counter, self[0].customer)
 
     def _check_forms_have_errors(self):
-        for form in self:
-            if len(form.errors):
-                raise ValidationError(_("Submmited basket is invalid"))
+        if any(len(form.errors) > 0 for form in self):
+            raise ValidationError(_("Submmited basket is invalid"))
 
     def _check_enough_money(self, counter: Counter, customer: Customer):
         self.total_price = sum([data["total_price"] for data in self.cleaned_data])
@@ -272,10 +271,9 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
         kwargs["cancel_url"] = self.get_success_url()
 
         # To get all forms errors to the javascript, we create a list of error list
-        kwargs["form_errors"] = []
-        for field_errors in kwargs["form"].errors:
-            kwargs["form_errors"].append(list(field_errors.values()))
-
+        kwargs["form_errors"] = [
+            list(field_error.values()) for field_error in kwargs["form"].errors
+        ]
         if self.object.type == "BAR":
             kwargs["student_card_fragment"] = StudentCardFormView.get_template_data(
                 self.customer
