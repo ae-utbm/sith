@@ -15,7 +15,8 @@
     "paths": {
       "#openapi": ["./staticfiles/generated/openapi/index.ts"],
       "#core:*": ["./core/static/bundled/*"],
-      "#pedagogy:*": ["./pedagogy/static/bundled/*"]
+      "#pedagogy:*": ["./pedagogy/static/bundled/*"],
+      "#counter:*": ["./counter/static/bundled/*"]
     }
   }
 }

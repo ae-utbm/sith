@@ -1,52 +1,6 @@
 import { exportToHtml } from "#core:utils/globals";
-
-interface InitialFormData {
-  /* Used to refill the form when the backend raises an error */
-  id?: Pick<Product, "id">;
-  quantity?: number;
-  errors?: string[];
-}
-
-interface CounterConfig {
-  customerBalance: number;
-  customerId: number;
-  products: Record<string, Product>;
-  formInitial: InitialFormData[];
-  cancelUrl: string;
-}
-
-interface Product {
-  id: string;
-  code: string;
-  name: string;
-  price: number;
-  hasTrayPrice: boolean;
-  quantityForTrayPrice: number;
-}
-
-class BasketItem {
-  quantity: number;
-  product: Product;
-  quantityForTrayPrice: number;
-  errors: string[];
-
-  constructor(product: Product, quantity: number) {
-    this.quantity = quantity;
-    this.product = product;
-    this.errors = [];
-  }
-
-  getBonusQuantity(): number {
-    if (!this.product.hasTrayPrice) {
-      return 0;
-    }
-    return Math.floor(this.quantity / this.product.quantityForTrayPrice);
-  }
-
-  sum(): number {
-    return (this.quantity - this.getBonusQuantity()) * this.product.price;
-  }
-}
+import { BasketItem } from "#counter:counter/basket";
+import type { CounterConfig } from "#counter:counter/types";
 
 exportToHtml("loadCounter", (config: CounterConfig) => {
   document.addEventListener("alpine:init", () => {
