@@ -12,6 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from dataclasses import asdict, dataclass
 from datetime import timedelta
 from decimal import Decimal
 
@@ -35,6 +36,7 @@ from counter.models import (
     Customer,
     Permanency,
     Product,
+    Refilling,
     Selling,
 )
 
@@ -45,7 +47,7 @@ class FullClickSetup:
         cls.customer = subscriber_user.make()
         cls.barmen = subscriber_user.make(password=make_password("plop"))
         cls.board_admin = board_user.make(password=make_password("plop"))
-        cls.club_admin = baker.make(User)
+        cls.club_admin = subscriber_user.make()
         cls.root = baker.make(User, is_superuser=True)
         cls.subscriber = subscriber_user.make()
 
@@ -75,6 +77,11 @@ class FullClickSetup:
             user=cls.club_admin,
         )
 
+    def updated_amount(self, user: User) -> Decimal:
+        user.refresh_from_db()
+        user.customer.refresh_from_db()
+        return user.customer.amount
+
 
 class TestRefilling(FullClickSetup, TestCase):
     def login_in_bar(self, barmen: User | None = None):
@@ -83,10 +90,6 @@ class TestRefilling(FullClickSetup, TestCase):
             reverse("counter:login", args=[self.counter.id]),
             {"username": used_barman.username, "password": "plop"},
         )
-
-    def updated_amount(self, user: User) -> Decimal:
-        user.customer.refresh_from_db()
-        return user.customer.amount
 
     def refill_user(
         self,
@@ -196,7 +199,113 @@ class TestRefilling(FullClickSetup, TestCase):
         assert self.updated_amount(self.customer_old_can_buy) == 1
 
 
+@dataclass
+class BasketItem:
+    id: int | None = None
+    quantity: int | None = None
+
+    def to_form(self, index: int) -> dict[str, str]:
+        return {
+            f"form-{index}-{key}": str(value)
+            for key, value in asdict(self).items()
+            if value is not None
+        }
+
+
 class TestCounterClick(FullClickSetup, TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.beer = baker.make(
+            Product, limit_age=18, selling_price="1.5", special_selling_price="1"
+        )
+        cls.beer_tape = baker.make(
+            Product,
+            limit_age=18,
+            tray=True,
+            selling_price="1.5",
+            special_selling_price="1",
+        )
+
+        cls.snack = baker.make(
+            Product, limit_age=0, selling_price="1.5", special_selling_price="1"
+        )
+        cls.stamps = baker.make(
+            Product, limit_age=0, selling_price="1.5", special_selling_price="1"
+        )
+
+        cls.counter.products.add(cls.beer)
+        cls.counter.products.add(cls.beer_tape)
+        cls.counter.products.add(cls.snack)
+        cls.counter.save()
+
+        cls.other_counter.products.add(cls.snack)
+        cls.other_counter.save()
+
+        cls.club_counter.products.add(cls.stamps)
+        cls.club_counter.save()
+
+    def login_in_bar(self, barmen: User | None = None):
+        used_barman = barmen if barmen is not None else self.barmen
+        self.client.post(
+            reverse("counter:login", args=[self.counter.id]),
+            {"username": used_barman.username, "password": "plop"},
+        )
+
+    def submit_basket(
+        self,
+        user: User,
+        basket: list[BasketItem],
+        counter: Counter | None = None,
+        client: Client | None = None,
+    ) -> HttpResponse:
+        used_counter = counter if counter is not None else self.counter
+        used_client = client if client is not None else self.client
+        data = {
+            "form-TOTAL_FORMS": str(len(basket)),
+            "form-INITIAL_FORMS": "0",
+        }
+        for index, item in enumerate(basket):
+            data.update(item.to_form(index))
+        return used_client.post(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": used_counter.id, "user_id": user.id},
+            ),
+            data,
+        )
+
+    def refill_user(self, user: User, amount: Decimal | int):
+        baker.make(Refilling, amount=amount, customer=user.customer, is_validated=False)
+
+    def test_click_office_success(self):
+        self.refill_user(self.customer, 10)
+        self.client.force_login(self.club_admin)
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [BasketItem(self.stamps.id, 5)],
+                counter=self.club_counter,
+            ).status_code
+            == 302
+        )
+        assert self.updated_amount(self.customer) == Decimal("2.5")
+
+        # Test no special price on office counter
+        self.refill_user(self.club_admin, 10)
+
+        assert (
+            self.submit_basket(
+                self.club_admin,
+                [BasketItem(self.stamps.id, 1)],
+                counter=self.club_counter,
+            ).status_code
+            == 302
+        )
+
+        assert self.updated_amount(self.club_admin) == Decimal("8.5")
+
     def test_annotate_has_barman_queryset(self):
         """Test if the custom queryset method `annotate_has_barman` works as intended."""
         counters = Counter.objects.annotate_has_barman(self.barmen)
