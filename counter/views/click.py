@@ -16,7 +16,6 @@ import math
 
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import F
 from django.forms import (
     BaseFormSet,
     Form,
@@ -146,44 +145,12 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
     pk_url_kwarg = "counter_id"
     current_tab = "counter"
 
-    def get_products(self) -> list[Product]:
-        """Get all allowed products for the current customer on the current counter"""
-
-        if hasattr(self, "_products"):
-            return self._products
-
-        products = self.object.products.select_related("product_type").prefetch_related(
-            "buying_groups"
-        )
-
-        # Only include allowed products
-        if not self.customer.user.date_of_birth or self.customer.user.is_banned_alcohol:
-            products = products.filter(limit_age__lt=18)
-        else:
-            products = products.filter(limit_age__lte=self.customer.user.get_age())
-
-        # Compute special price for customer if he is a barmen on that bar
-        if self.object.customer_is_barman(self.customer):
-            products = products.annotate(price=F("special_selling_price"))
-        else:
-            products = products.annotate(price=F("selling_price"))
-
-        self._products = [
-            product
-            for product in products.all()
-            if product.can_be_sold_to(self.customer.user)
-        ]
-
-        return self._products
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["form_kwargs"] = {
             "customer": self.customer,
             "counter": self.object,
-            "allowed_products": {
-                product.id: product for product in self.get_products()
-            },
+            "allowed_products": {product.id: product for product in self.products},
         }
         return kwargs
 
@@ -203,6 +170,8 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
             or len(obj.barmen_list) == 0
         ):
             return redirect(obj)  # Redirect to counter
+
+        self.products = obj.get_products_for(self.customer)
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -260,7 +229,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
     def get_context_data(self, **kwargs):
         """Add customer to the context."""
         kwargs = super().get_context_data(**kwargs)
-        kwargs["products"] = self.get_products()
+        kwargs["products"] = self.products
         kwargs["categories"] = {}
         for product in kwargs["products"]:
             if product.product_type:
