@@ -337,11 +337,30 @@ body {
     margin-left: -125px;
     box-sizing: border-box;
     position: fixed;
-    z-index: 1;
+    z-index: 10;
+    /* to get on top of tomselect */
     left: 50%;
     top: 60px;
     text-align: center;
   }
+
+  .popup {
+    z-index: 10;
+    /* to get on top of tomselect */
+    display: inline-block;
+    text-align: center;
+    overflow: auto;
+    margin: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    height: 20vh;
+    width: 20vw;
+    align-content: center;
+  }
+
 
   .tabs {
     border-radius: 5px;
