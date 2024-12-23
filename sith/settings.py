@@ -88,6 +88,8 @@ INSTALLED_APPS = (
     "django_jinja",
     "ninja_extra",
     "haystack",
+    "django_celery_results",
+    "django_celery_beat",
     "captcha",
     "core",
     "club",
@@ -271,13 +273,13 @@ PHONENUMBER_DEFAULT_REGION = "FR"
 
 # Medias
 MEDIA_URL = "/data/"
-MEDIA_ROOT = env.path("MEDIA_ROOT", default="data")
+MEDIA_ROOT = env.path("MEDIA_ROOT", default=BASE_DIR / "data")
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = env.path("STATIC_ROOT", default="static")
+STATIC_ROOT = env.path("STATIC_ROOT", default=BASE_DIR / "static")
 
 # Static files finders which allow to see static folder in all apps
 STATICFILES_FINDERS = [
@@ -318,6 +320,14 @@ EMAIL_BACKEND = env.str(
 )
 EMAIL_HOST = env.str("EMAIL_HOST", default="localhost")
 EMAIL_PORT = env.int("EMAIL_PORT", default=25)
+
+# Celery
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CElERY_BROKER_URL = env.str("CELERY_BROKER_URL", default="redis://localhost:6379/1")
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 # Below this line, only Sith-specific variables are defined
 

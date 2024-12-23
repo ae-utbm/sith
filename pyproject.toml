@@ -46,6 +46,9 @@ dependencies = [
     "ical<9.0.0,>=8.3.0",
     "redis[hiredis]<6.0.0,>=5.2.0",
     "environs[django]<15.0.0,>=14.1.0",
+    "celery[redis]<6.0.0,>=5.4.0",
+    "django-celery-results<3.0.0,>=2.5.1",
+    "django-celery-beat<3.0.0,>=2.7.0",
 ]
 
 [project.urls]
