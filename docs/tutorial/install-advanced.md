@@ -279,6 +279,20 @@ Toutes les requêtes vers des fichiers statiques et les medias publiques
 seront servies directement par nginx.
 Toutes les autres requêtes seront transmises au serveur django.
 
+## Celery
+
+Celery ne tourne pas dans django.
+C'est une application à part, avec ses propres processus,
+qui tourne de manière indépendante et qui ne communique
+que par messages avec l'instance de django.
+
+Pour faire tourner Celery, faites la commande suivante dans 
+un terminal à part :
+
+```bash
+poetry run celery -A sith worker --beat -l INFO 
+```
+
 
 ## Mettre à jour la base de données antispam
 
