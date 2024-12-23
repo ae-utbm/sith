@@ -21,6 +21,7 @@ from django.conf import settings
 from django.contrib.auth.models import make_password
 from django.core.cache import cache
 from django.http import HttpResponse
+from django.shortcuts import resolve_url
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -30,7 +31,7 @@ from model_bakery import baker
 
 from club.models import Club, Membership
 from core.baker_recipes import board_user, old_subscriber_user, subscriber_user
-from core.models import User
+from core.models import Group, User
 from counter.baker_recipes import product_recipe
 from counter.models import (
     Counter,
@@ -219,11 +220,21 @@ class TestCounterClick(FullClickSetup, TestCase):
         super().setUpTestData()
 
         cls.underage_customer = subscriber_user.make()
+        cls.banned_counter_customer = subscriber_user.make()
+        cls.banned_alcohol_customer = subscriber_user.make()
 
         cls.set_age(cls.customer, 20)
         cls.set_age(cls.barmen, 20)
         cls.set_age(cls.club_admin, 20)
+        cls.set_age(cls.banned_alcohol_customer, 20)
         cls.set_age(cls.underage_customer, 17)
+
+        cls.banned_alcohol_customer.groups.add(
+            Group.objects.get(pk=settings.SITH_GROUP_BANNED_ALCOHOL_ID)
+        )
+        cls.banned_counter_customer.groups.add(
+            Group.objects.get(pk=settings.SITH_GROUP_BANNED_COUNTER_ID)
+        )
 
         cls.beer = product_recipe.make(
             limit_age=18, selling_price="1.5", special_selling_price="1"
@@ -375,6 +386,69 @@ class TestCounterClick(FullClickSetup, TestCase):
         )
 
         assert self.updated_amount(self.customer) == Decimal("8")
+
+    def test_click_alcool_unauthorized(self):
+        self.login_in_bar()
+
+        for user in [self.underage_customer, self.banned_alcohol_customer]:
+            self.refill_user(user, 10)
+
+            # Buy product without age limit
+            assert (
+                self.submit_basket(
+                    user,
+                    [
+                        BasketItem(self.snack.id, 2),
+                    ],
+                ).status_code
+                == 302
+            )
+
+            assert self.updated_amount(user) == Decimal("7")
+
+            # Buy product without age limit
+            assert (
+                self.submit_basket(
+                    user,
+                    [
+                        BasketItem(self.beer.id, 2),
+                    ],
+                ).status_code
+                == 200
+            )
+
+            assert self.updated_amount(user) == Decimal("7")
+
+    def test_click_unauthorized_customer(self):
+        self.login_in_bar()
+
+        for user in [
+            self.banned_counter_customer,
+            self.customer_old_can_not_buy,
+        ]:
+            self.refill_user(user, 10)
+            resp = self.submit_basket(
+                user,
+                [
+                    BasketItem(self.snack.id, 2),
+                ],
+            )
+            assert resp.status_code == 302
+            assert resp.url == resolve_url(self.counter)
+
+            assert self.updated_amount(self.banned_counter_customer) == Decimal("10")
+
+    def test_click_user_without_customer(self):
+        self.login_in_bar()
+        assert (
+            self.submit_basket(
+                self.customer_can_not_buy,
+                [
+                    BasketItem(self.snack.id, 2),
+                ],
+            ).status_code
+            == 404
+        )
 
     def test_annotate_has_barman_queryset(self):
         """Test if the custom queryset method `annotate_has_barman` works as intended."""
