@@ -148,6 +148,9 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
     pk_url_kwarg = "counter_id"
     current_tab = "counter"
 
+    def get_queryset(self):
+        return super().get_queryset().exclude(type="EBOUTIC")
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["form_kwargs"] = {

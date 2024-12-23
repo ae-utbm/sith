@@ -70,7 +70,7 @@ class FullClickSetup:
         cls.customer_old_can_not_buy = old_subscriber_user.make()
         cls.customer_can_not_buy = baker.make(User)
 
-        cls.club_counter = baker.make(Counter)
+        cls.club_counter = baker.make(Counter, type="OFFICE")
         baker.make(
             Membership,
             start_date=now() - timedelta(days=30),
@@ -301,6 +301,18 @@ class TestCounterClick(FullClickSetup, TestCase):
 
     def refill_user(self, user: User, amount: Decimal | int):
         baker.make(Refilling, amount=amount, customer=user.customer, is_validated=False)
+
+    def test_click_eboutic_failure(self):
+        eboutic = baker.make(Counter, type="EBOUTIC")
+        self.client.force_login(self.club_admin)
+        assert (
+            self.submit_basket(
+                self.customer,
+                [BasketItem(self.stamps.id, 5)],
+                counter=eboutic,
+            ).status_code
+            == 404
+        )
 
     def test_click_office_success(self):
         self.refill_user(self.customer, 10)
