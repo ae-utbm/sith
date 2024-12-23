@@ -5,6 +5,7 @@ from typing import Iterator
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib.auth.hashers import make_password
 from django.core.management.base import BaseCommand
 from django.db.models import Count, Exists, Min, OuterRef, Subquery
 from django.utils.timezone import localdate, make_aware, now
@@ -38,23 +39,7 @@ class Command(BaseCommand):
             raise Exception("Never call this command in prod. Never.")
 
         self.stdout.write("Creating users...")
-        users = [
-            User(
-                username=self.faker.user_name(),
-                first_name=self.faker.first_name(),
-                last_name=self.faker.last_name(),
-                date_of_birth=self.faker.date_of_birth(minimum_age=15, maximum_age=25),
-                email=self.faker.email(),
-                phone=self.faker.phone_number(),
-                address=self.faker.address(),
-            )
-            for _ in range(600)
-        ]
-        # there may a duplicate or two
-        # Not a problem, we will just have 599 users instead of 600
-        User.objects.bulk_create(users, ignore_conflicts=True)
-        users = list(User.objects.order_by("-id")[: len(users)])
-
+        users = self.create_users()
         subscribers = random.sample(users, k=int(0.8 * len(users)))
         self.stdout.write("Creating subscriptions...")
         self.create_subscriptions(subscribers)
@@ -101,6 +86,29 @@ class Command(BaseCommand):
         self.create_forums()
 
         self.stdout.write("Done")
+
+    def create_users(self) -> list[User]:
+        password = make_password("plop")
+        users = [
+            User(
+                username=self.faker.user_name(),
+                first_name=self.faker.first_name(),
+                last_name=self.faker.last_name(),
+                date_of_birth=self.faker.date_of_birth(minimum_age=15, maximum_age=25),
+                email=self.faker.email(),
+                phone=self.faker.phone_number(),
+                address=self.faker.address(),
+                password=password,
+            )
+            for _ in range(600)
+        ]
+        # there may a duplicate or two
+        # Not a problem, we will just have 599 users instead of 600
+        users = User.objects.bulk_create(users, ignore_conflicts=True)
+        users = list(User.objects.order_by("-id")[: len(users)])
+        public_group = Group.objects.get(pk=settings.SITH_GROUP_PUBLIC_ID)
+        public_group.users.add(*users)
+        return users
 
     def create_subscriptions(self, users: list[User]):
         def prepare_subscription(_user: User, start_date: date) -> Subscription:

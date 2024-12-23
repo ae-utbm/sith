@@ -320,12 +320,16 @@ class User(AbstractUser):
         return self.get_display_name()
 
     def save(self, *args, **kwargs):
+        adding = self._state.adding
         with transaction.atomic():
-            if self.id:
+            if not adding:
                 old = User.objects.filter(id=self.id).first()
                 if old and old.username != self.username:
                     self._change_username(self.username)
             super().save(*args, **kwargs)
+            if adding:
+                # All users are in the public group.
+                self.groups.add(settings.SITH_GROUP_PUBLIC_ID)
 
     def get_absolute_url(self) -> str:
         return reverse("core:user_profile", kwargs={"user_id": self.pk})
@@ -380,8 +384,6 @@ class User(AbstractUser):
             raise ValueError("You must either provide the id or the name of the group")
         if group is None:
             return False
-        if group.id == settings.SITH_GROUP_PUBLIC_ID:
-            return True
         if group.id == settings.SITH_GROUP_SUBSCRIBERS_ID:
             return self.is_subscribed
         if group.id == settings.SITH_GROUP_ROOT_ID:
