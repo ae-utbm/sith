@@ -30,7 +30,7 @@ from freezegun import freeze_time
 from model_bakery import baker
 
 from club.models import Club, Membership
-from core.baker_recipes import board_user, subscriber_user
+from core.baker_recipes import board_user, subscriber_user, very_old_subscriber_user
 from core.models import Group, User
 from counter.baker_recipes import product_recipe
 from counter.models import (
@@ -43,7 +43,7 @@ from counter.models import (
 )
 
 
-class FullClickSetup:
+class TestFullClickBase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.customer = subscriber_user.make()
@@ -54,8 +54,7 @@ class FullClickSetup:
         cls.subscriber = subscriber_user.make()
 
         cls.counter = baker.make(Counter, type="BAR")
-        cls.counter.sellers.add(cls.barmen)
-        cls.counter.sellers.add(cls.board_admin)
+        cls.counter.sellers.add(cls.barmen, cls.board_admin)
 
         cls.other_counter = baker.make(Counter, type="BAR")
         cls.other_counter.sellers.add(cls.barmen)
@@ -67,10 +66,7 @@ class FullClickSetup:
         sub.subscription_end = localdate() - timedelta(days=89)
         sub.save()
 
-        cls.customer_old_can_not_buy = subscriber_user.make()
-        sub = cls.customer_old_can_not_buy.subscriptions.first()
-        sub.subscription_end = localdate() - timedelta(days=90)
-        sub.save()
+        cls.customer_old_can_not_buy = very_old_subscriber_user.make()
 
         cls.customer_can_not_buy = baker.make(User)
 
@@ -89,7 +85,7 @@ class FullClickSetup:
         return user.customer.amount
 
 
-class TestRefilling(FullClickSetup, TestCase):
+class TestRefilling(TestFullClickBase):
     def login_in_bar(self, barmen: User | None = None):
         used_barman = barmen if barmen is not None else self.board_admin
         self.client.post(
@@ -218,7 +214,7 @@ class BasketItem:
         }
 
 
-class TestCounterClick(FullClickSetup, TestCase):
+class TestCounterClick(TestFullClickBase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -257,16 +253,11 @@ class TestCounterClick(FullClickSetup, TestCase):
             limit_age=0, selling_price="1.5", special_selling_price="1"
         )
 
-        cls.counter.products.add(cls.beer)
-        cls.counter.products.add(cls.beer_tap)
-        cls.counter.products.add(cls.snack)
-        cls.counter.save()
+        cls.counter.products.add(cls.beer, cls.beer_tap, cls.snack)
 
         cls.other_counter.products.add(cls.snack)
-        cls.other_counter.save()
 
         cls.club_counter.products.add(cls.stamps)
-        cls.club_counter.save()
 
     def login_in_bar(self, barmen: User | None = None):
         used_barman = barmen if barmen is not None else self.barmen

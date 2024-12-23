@@ -1,3 +1,5 @@
+type ErrorMessage = string;
+
 export interface InitialFormData {
   /* Used to refill the form when the backend raises an error */
   id?: keyof Record<string, Product>;

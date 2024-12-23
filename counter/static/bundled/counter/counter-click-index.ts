@@ -1,6 +1,6 @@
 import { exportToHtml } from "#core:utils/globals";
 import { BasketItem } from "#counter:counter/basket";
-import type { CounterConfig } from "#counter:counter/types";
+import type { CounterConfig, ErrorMessage } from "#counter:counter/types";
 
 exportToHtml("loadCounter", (config: CounterConfig) => {
   document.addEventListener("alpine:init", () => {
@@ -38,7 +38,7 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
         delete this.basket[id];
       },
 
-      addToBasket(id: string, quantity: number): string {
+      addToBasket(id: string, quantity: number): ErrorMessage {
         const item: BasketItem =
           this.basket[id] || new BasketItem(config.products[id], 0);
 
