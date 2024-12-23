@@ -1254,6 +1254,16 @@ u,
   flex-wrap: wrap;
   flex-direction: row-reverse;
 
+  .quantity {
+    display: inline-block;
+    min-width: 1.2em;
+    text-align: center;
+  }
+
+  .remove-item {
+    float: right;
+  }
+
   #products {
     flex-basis: 100%;
     margin: 0.2em;

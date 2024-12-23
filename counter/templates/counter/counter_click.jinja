@@ -56,12 +56,8 @@
       <div>
         {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user_id) %}
 
-                {# Formulaire pour rechercher un produit en tapant son code dans une barre de recherche #}
         <form method="post" action=""
               class="code_form" @submit.prevent="handleCode">
-          {% csrf_token %}
-
-          <input type="hidden" name="action" value="code">
 
           <counter-product-select name="code" x-ref="codeField" autofocus required placeholder="{% trans %}Select a product...{% endtrans %}">
             <option value=""></option>
@@ -87,7 +83,9 @@
           </div>
         {% endfor %}
         <p>{% trans %}Basket: {% endtrans %}</p>
+
         <form x-cloak method="post" action="" x-ref="basketForm">
+
           {% csrf_token %}
           <div x-ref="basketManagementForm">
             {{ form.management_form }}
@@ -101,13 +99,14 @@
               </template>
 
               <button @click.prevent="addToBasketWithMessage(item.product.id, -1)">-</button>
-              <span x-text="item.quantity"></span>
+              <span class="quantity" x-text="item.quantity"></span>
               <button @click.prevent="addToBasketWithMessage(item.product.id, 1)">+</button>
 
               <span x-text="item.product.name"></span> :
               <span x-text="item.sum().toLocaleString(undefined, { minimumFractionDigits: 2 })">€</span>
               <span x-show="item.getBonusQuantity() > 0" x-text="`${item.getBonusQuantity()} x P`"></span>
-              <button @click.prevent="removeFromBasket(item.product.id)"><i class="fa fa-trash-can delete-action"></i></button>
+
+              <button class="remove-item" @click.prevent="removeFromBasket(item.product.id)"><i class="fa fa-trash-can delete-action"></i></button>
 
               <input type="hidden" :value="item.quantity" :id="`id_form-${index}-quantity`" :name="`form-${index}-quantity`" required readonly>
               <input type="hidden" :value="item.product.id" :id="`id_form-${index}-id`" :name="`form-${index}-id`" required readonly>
