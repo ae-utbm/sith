@@ -149,7 +149,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
     current_tab = "counter"
 
     def get_queryset(self):
-        return super().get_queryset().exclude(type="EBOUTIC")
+        return super().get_queryset().exclude(type="EBOUTIC").annotate_is_open()
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -167,13 +167,13 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
         if not self.customer.can_buy or self.customer.user.is_banned_counter:
             return redirect(obj)  # Redirect to counter
 
-        if obj.type != "BAR" and not request.user.is_authenticated:
+        if obj.type == "OFFICE" and not obj.club.has_rights_in_club(request.user):
             raise PermissionDenied
 
         if obj.type == "BAR" and (
-            "counter_token" not in request.session
+            not obj.is_open
+            or "counter_token" not in request.session
             or request.session["counter_token"] != obj.token
-            or len(obj.barmen_list) == 0
         ):
             return redirect(obj)  # Redirect to counter
 

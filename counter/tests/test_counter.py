@@ -30,7 +30,7 @@ from freezegun import freeze_time
 from model_bakery import baker
 
 from club.models import Club, Membership
-from core.baker_recipes import board_user, old_subscriber_user, subscriber_user
+from core.baker_recipes import board_user, subscriber_user
 from core.models import Group, User
 from counter.baker_recipes import product_recipe
 from counter.models import (
@@ -67,7 +67,11 @@ class FullClickSetup:
         sub.subscription_end = localdate() - timedelta(days=89)
         sub.save()
 
-        cls.customer_old_can_not_buy = old_subscriber_user.make()
+        cls.customer_old_can_not_buy = subscriber_user.make()
+        sub = cls.customer_old_can_not_buy.subscriptions.first()
+        sub.subscription_end = localdate() - timedelta(days=90)
+        sub.save()
+
         cls.customer_can_not_buy = baker.make(User)
 
         cls.club_counter = baker.make(Counter, type="OFFICE")
@@ -448,7 +452,7 @@ class TestCounterClick(FullClickSetup, TestCase):
             assert resp.status_code == 302
             assert resp.url == resolve_url(self.counter)
 
-            assert self.updated_amount(self.banned_counter_customer) == Decimal("10")
+            assert self.updated_amount(user) == Decimal("10")
 
     def test_click_user_without_customer(self):
         self.login_in_bar()
@@ -461,6 +465,81 @@ class TestCounterClick(FullClickSetup, TestCase):
             ).status_code
             == 404
         )
+
+    def test_click_allowed_old_subscriber(self):
+        self.login_in_bar()
+        self.refill_user(self.customer_old_can_buy, 10)
+        assert (
+            self.submit_basket(
+                self.customer_old_can_buy,
+                [
+                    BasketItem(self.snack.id, 2),
+                ],
+            ).status_code
+            == 302
+        )
+
+        assert self.updated_amount(self.customer_old_can_buy) == Decimal("7")
+
+    def test_click_wrong_counter(self):
+        self.login_in_bar()
+        self.refill_user(self.customer, 10)
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.snack.id, 2),
+                ],
+                counter=self.other_counter,
+            ).status_code
+            == 302  # Redirect to counter main
+        )
+
+        # We want to test sending requests from another counter while
+        # we are currently registered to another counter
+        # so we connect to a counter and
+        # we create a new client, in order to check
+        # that using a client not logged to a counter
+        # where another client is logged still isn't authorized.
+        client = Client()
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.snack.id, 2),
+                ],
+                counter=self.counter,
+                client=client,
+            ).status_code
+            == 302  # Redirect to counter main
+        )
+
+        assert self.updated_amount(self.customer) == Decimal("10")
+
+    def test_click_not_connected(self):
+        self.refill_user(self.customer, 10)
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.snack.id, 2),
+                ],
+            ).status_code
+            == 302  # Redirect to counter main
+        )
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.snack.id, 2),
+                ],
+                counter=self.club_counter,
+            ).status_code
+            == 403
+        )
+
+        assert self.updated_amount(self.customer) == Decimal("10")
 
     def test_annotate_has_barman_queryset(self):
         """Test if the custom queryset method `annotate_has_barman` works as intended."""

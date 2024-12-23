@@ -527,7 +527,7 @@ class Counter(models.Model):
         if user.is_anonymous:
             return False
         mem = self.club.get_membership_for(user)
-        if mem and mem.role >= 7:
+        if mem and mem.role >= settings.SITH_CLUB_ROLES_ID["Treasurer"]:
             return True
         return user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
