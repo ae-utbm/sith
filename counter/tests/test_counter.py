@@ -187,7 +187,7 @@ class TestRefilling(FullClickSetup, TestCase):
             self.refill_user(
                 self.customer_old_can_not_buy, self.counter, 10
             ).status_code
-            == 403
+            == 404
         )
 
     def test_refilling_counter_success(self):
@@ -868,4 +868,4 @@ class TestClubCounterClickAccess(TestCase):
         self.counter.sellers.add(self.user)
         self.client.force_login(self.user)
         res = self.client.get(self.click_url)
-        assert res.status_code == 200
+        assert res.status_code == 403

@@ -167,7 +167,10 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
         if not self.customer.can_buy or self.customer.user.is_banned_counter:
             return redirect(obj)  # Redirect to counter
 
-        if obj.type == "OFFICE" and not obj.club.has_rights_in_club(request.user):
+        if obj.type == "OFFICE" and (
+            obj.sellers.filter(pk=request.user.pk).exists()
+            or not obj.club.has_rights_in_club(request.user)
+        ):
             raise PermissionDenied
 
         if obj.type == "BAR" and (
