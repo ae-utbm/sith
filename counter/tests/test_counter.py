@@ -541,6 +541,59 @@ class TestCounterClick(FullClickSetup, TestCase):
 
         assert self.updated_amount(self.customer) == Decimal("10")
 
+    def test_click_product_not_in_counter(self):
+        self.refill_user(self.customer, 10)
+        self.login_in_bar()
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.stamps.id, 2),
+                ],
+            ).status_code
+            == 200
+        )
+        assert self.updated_amount(self.customer) == Decimal("10")
+
+    def test_click_product_invalid(self):
+        self.refill_user(self.customer, 10)
+        self.login_in_bar()
+
+        for item in [
+            BasketItem("-1", 2),
+            BasketItem(self.beer.id, -1),
+            BasketItem(None, 1),
+            BasketItem(self.beer.id, None),
+            BasketItem(None, None),
+        ]:
+            assert (
+                self.submit_basket(
+                    self.customer,
+                    [item],
+                ).status_code
+                == 200
+            )
+
+            assert self.updated_amount(self.customer) == Decimal("10")
+
+    def test_click_not_enough_money(self):
+        self.refill_user(self.customer, 10)
+        self.login_in_bar()
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.beer_tap.id, 5),
+                    BasketItem(self.beer.id, 10),
+                ],
+            ).status_code
+            == 200
+        )
+
+        assert self.updated_amount(self.customer) == Decimal("10")
+
     def test_annotate_has_barman_queryset(self):
         """Test if the custom queryset method `annotate_has_barman` works as intended."""
         counters = Counter.objects.annotate_has_barman(self.barmen)
