@@ -81,7 +81,7 @@ def sentry_debug(request):
     The error will be displayed on Sentry
     inside the "development" environment
 
-    NOTE : you need to specify the SENTRY_DSN setting in settings_custom.py
+    NOTE : you need to specify the SENTRY_DSN setting in .env
     """
     if settings.SENTRY_ENV != "development" or not settings.SENTRY_DSN:
         raise Http404

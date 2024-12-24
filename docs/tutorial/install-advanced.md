@@ -47,19 +47,19 @@ Commencez par installer les dépendances système :
     === "Debian/Ubuntu"
 
         ```bash
-        sudo apt install postgresql redis libq-dev nginx
+        sudo apt install postgresql libq-dev nginx
         ```
 
     === "Arch Linux"
     
         ```bash
-        sudo pacman -S postgresql redis nginx
+        sudo pacman -S postgresql nginx
         ```
 
 === "macOS"
 
     ```bash
-    brew install postgresql redis lipbq nginx
+    brew install postgresql lipbq nginx
     export PATH="/usr/local/opt/libpq/bin:$PATH"
     source ~/.zshrc
     ```
@@ -76,34 +76,6 @@ uv sync --group prod
     (notamment psycopg-c).
     C'est parce que ces dépendances compilent certains modules
     à l'installation.
-
-## Configurer Redis
-
-Redis est utilisé comme cache.
-Assurez-vous qu'il tourne :
-
-```bash
-sudo systemctl redis status
-```
-
-Et s'il ne tourne pas, démarrez-le :
-
-```bash
-sudo systemctl start redis
-sudo systemctl enable redis  # si vous voulez que redis démarre automatiquement au boot
-```
-
-Puis ajoutez le code suivant à la fin de votre fichier
-`settings_custom.py` :
-
-```python
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379",
-    }
-}
-```
 
 ## Configurer PostgreSQL
 
@@ -139,26 +111,19 @@ en étant connecté en tant que postgres :
 psql -d sith -c "GRANT ALL PRIVILEGES ON SCHEMA public to sith";
 ```
 
-Puis ajoutez le code suivant à la fin de votre
-`settings_custom.py` :
+Puis modifiez votre `.env`.
+Dedans, décommentez l'url de la base de données
+de postgres et commentez l'url de sqlite :
 
-```python
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "sith",
-        "USER": "sith",
-        "PASSWORD": "password",
-        "HOST": "localhost",
-        "PORT": "",  # laissez ce champ vide pour que le choix du port soit automatique
-    }
-}
+```dotenv
+#DATABASE_URL=sqlite:///db.sqlite3
+DATABASE_URL=postgres://sith:password@localhost:5432/sith
 ```
 
 Enfin, créez vos données :
 
 ```bash
-uv run ./manage.py populate
+uv run ./manage.py setup
 ```
 
 !!! note
@@ -247,7 +212,7 @@ Puis lancez ou relancez nginx :
 sudo systemctl restart nginx
 ```
 
-Dans votre `settings_custom.py`, remplacez `DEBUG=True` par `DEBUG=False`.
+Dans votre `.env`, remplacez `DEBUG=true` par `DEBUG=false`.
 
 Enfin, démarrez le serveur Django :
 
