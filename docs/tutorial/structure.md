@@ -72,12 +72,14 @@ sith/
 ├── .gitattributes
 ├── .gitignore
 ├── .mailmap
-├── manage.py (26)
-├── mkdocs.yml (27)
+├── .env (26)
+├── .env.example (27)
+├── manage.py (28)
+├── mkdocs.yml (29)
 ├── uv.lock
-├── pyproject.toml (28)
-├── .venv/ (29)
-├── .python-version (30)
+├── pyproject.toml (30)
+├── .venv/ (31)
+├── .python-version (32)
 └── README.md
 ```
 </div>
@@ -121,15 +123,19 @@ sith/
     de manière transparente pour l'utilisateur. 
 24. Fichier de configuration de coverage. 
 25. Fichier de configuration de direnv. 
-26. Fichier généré automatiquement par Django. C'est lui
+26. Contient les variables d'environnement, qui sont susceptibles
+    de varier d'une machine à l'autre.
+27. Contient des valeurs par défaut pour le `.env`
+    pouvant convenir à un environnment de développement local
+28. Fichier généré automatiquement par Django. C'est lui
     qui permet d'appeler des commandes de gestion du projet
     avec la syntaxe `python ./manage.py <nom de la commande>`
-27. Le fichier de configuration de la documentation,
+29. Le fichier de configuration de la documentation,
     avec ses plugins et sa table des matières. 
-28. Le fichier où sont déclarés les dépendances et la configuration
+30. Le fichier où sont déclarés les dépendances et la configuration
     de certaines d'entre elles.
-29. Dossier d'environnement virtuel généré par uv
-30. Fichier qui contrôle quel version de python utiliser pour le projet
+31. Dossier d'environnement virtuel généré par uv
+32. Fichier qui contrôle quelle version de python utiliser pour le projet
     
 
 ## L'application principale
@@ -144,10 +150,9 @@ Il est organisé comme suit :
 ```
 sith/
 ├── settings.py (1)
-├── settings_custom.py (2)
-├── toolbar_debug.py (3)
-├── urls.py (4)
-└── wsgi.py (5)
+├── toolbar_debug.py (2)
+├── urls.py (3)
+└── wsgi.py (4)
 ```
 </div>
 
@@ -155,13 +160,10 @@ sith/
    Ce fichier contient les paramètres de configuration du projet.
    Par exemple, il contient la liste des applications
    installées dans le projet.
-2. Configuration maison pour votre environnement.
-   Toute variable que vous définissez dans ce fichier sera prioritaire
-   sur la configuration donnée dans `settings.py`.
-3. Configuration de la barre de debug.
+2. Configuration de la barre de debug.
    C'est inutilisé en prod, mais c'est très pratique en développement.
-4. Fichier de configuration des urls du projet.
-5. Fichier de configuration pour le serveur WSGI.
+3. Fichier de configuration des urls du projet.
+4. Fichier de configuration pour le serveur WSGI.
    WSGI est un protocole de communication entre le serveur
    et les applications.
    Ce fichier ne vous servira sans doute pas sur un environnement

@@ -34,7 +34,6 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
 import binascii
-import logging
 import os
 import sys
 from datetime import timedelta
@@ -43,24 +42,31 @@ from pathlib import Path
 import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django.utils.translation import gettext_lazy as _
+from environs import Env
 from sentry_sdk.integrations.django import DjangoIntegration
 
 from .honeypot import custom_honeypot_error
 
-BASE_DIR = Path(__file__).parent.parent.resolve()
+env = Env()
+env.read_env()
 
-os.environ["HTTPS"] = "off"
+BASE_DIR = Path(__file__).parent.parent.resolve()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "(4sjxvhz@m5$0a$j0_pqicnc$s!vbve)z+&++m%g%bjhlz4+g2"
+SECRET_KEY = env.str("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = env.bool("DEBUG", default=False)
 TESTING = "pytest" in sys.modules
 INTERNAL_IPS = ["127.0.0.1"]
+
+# force csrf tokens and cookies to be secure when in https
+CSRF_COOKIE_SECURE = env.bool("HTTPS", default=True)
+SESSION_COOKIE_SECURE = env.bool("HTTPS", default=True)
+X_FRAME_OPTIONS = "SAMEORIGIN"
 
 ALLOWED_HOSTS = ["*"]
 
@@ -208,11 +214,11 @@ WSGI_APPLICATION = "sith.wsgi.application"
 # Database
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    },
+    "default": env.dj_db_url("DATABASE_URL", conn_max_age=None, conn_health_checks=True)
 }
+
+if "CACHE_URL" in os.environ:
+    CACHES = {"default": env.dj_cache_url("CACHE_URL")}
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
@@ -265,13 +271,13 @@ PHONENUMBER_DEFAULT_REGION = "FR"
 
 # Medias
 MEDIA_URL = "/data/"
-MEDIA_ROOT = BASE_DIR / "data"
+MEDIA_ROOT = env.path("MEDIA_ROOT", default=BASE_DIR / "data")
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT = env.path("STATIC_ROOT", default=BASE_DIR / "static")
 
 # Static files finders which allow to see static folder in all apps
 STATICFILES_FINDERS = [
@@ -295,24 +301,28 @@ AUTHENTICATION_BACKENDS = ["core.auth.backends.SithModelBackend"]
 LOGIN_URL = "/login/"
 LOGOUT_URL = "/logout/"
 LOGIN_REDIRECT_URL = "/"
-DEFAULT_FROM_EMAIL = "bibou@git.an"
-SITH_COM_EMAIL = "bibou_com@git.an"
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", default="bibou@git.an")
+SITH_COM_EMAIL = env.str("SITH_COM_EMAIL", default="bibou_com@git.an")
 
 # Those values are to be changed in production to be more effective
-HONEYPOT_FIELD_NAME = "body2"
-HONEYPOT_VALUE = "content"
+HONEYPOT_FIELD_NAME = env.str("HONEYPOT_FIELD_NAME", default="body2")
+HONEYPOT_VALUE = env.str("HONEYPOT_VALUE", default="content")
 HONEYPOT_RESPONDER = custom_honeypot_error  # Make honeypot errors less suspicious
-HONEYPOT_FIELD_NAME_FORUM = "message2"  # Only used on forum
+HONEYPOT_FIELD_NAME_FORUM = env.str(
+    "HONEYPOT_FIELD_NAME_FORUM", default="message2"
+)  # Only used on forum
 
 # Email
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-EMAIL_HOST = "localhost"
-EMAIL_PORT = 25
+EMAIL_BACKEND = env.str(
+    "EMAIL_BACKEND", default="django.core.mail.backends.dummy.EmailBackend"
+)
+EMAIL_HOST = env.str("EMAIL_HOST", default="localhost")
+EMAIL_PORT = env.int("EMAIL_PORT", default=25)
 
 # Below this line, only Sith-specific variables are defined
 
-SITH_URL = "my.url.git.an"
-SITH_NAME = "Sith website"
+SITH_URL = env.str("SITH_URL", default="127.0.0.1:8000")
+SITH_NAME = env.str("SITH_NAME", default="AE UTBM")
 SITH_TWITTER = "@ae_utbm"
 
 # Enable experimental features
@@ -321,7 +331,7 @@ SITH_ENABLE_GALAXY = False
 
 # AE configuration
 # TODO: keep only that first setting, with the ID, and do the same for the other clubs
-SITH_MAIN_CLUB_ID = 1
+SITH_MAIN_CLUB_ID = env.int("SITH_MAIN_CLUB_ID", default=1)
 SITH_MAIN_CLUB = {
     "name": "AE",
     "unix_name": "ae",
@@ -356,26 +366,28 @@ SITH_SCHOOL_START_YEAR = 1999
 # id of the Root account
 SITH_ROOT_USER_ID = 0
 
-SITH_GROUP_ROOT_ID = 1
-SITH_GROUP_PUBLIC_ID = 2
-SITH_GROUP_SUBSCRIBERS_ID = 3
-SITH_GROUP_OLD_SUBSCRIBERS_ID = 4
-SITH_GROUP_ACCOUNTING_ADMIN_ID = 5
-SITH_GROUP_COM_ADMIN_ID = 6
-SITH_GROUP_COUNTER_ADMIN_ID = 7
-SITH_GROUP_SAS_ADMIN_ID = 8
-SITH_GROUP_FORUM_ADMIN_ID = 9
-SITH_GROUP_PEDAGOGY_ADMIN_ID = 10
+SITH_GROUP_ROOT_ID = env.int("SITH_GROUP_ROOT_ID", default=1)
+SITH_GROUP_PUBLIC_ID = env.int("SITH_GROUP_PUBLIC_ID", default=2)
+SITH_GROUP_SUBSCRIBERS_ID = env.int("SITH_GROUP_SUBSCRIBERS_ID", default=3)
+SITH_GROUP_OLD_SUBSCRIBERS_ID = env.int("SITH_GROUP_OLD_SUBSCRIBERS_ID", default=4)
+SITH_GROUP_ACCOUNTING_ADMIN_ID = env.int("SITH_GROUP_ACCOUNTING_ADMIN_ID", default=5)
+SITH_GROUP_COM_ADMIN_ID = env.int("SITH_GROUP_COM_ADMIN_ID", default=6)
+SITH_GROUP_COUNTER_ADMIN_ID = env.int("SITH_GROUP_COUNTER_ADMIN_ID", default=7)
+SITH_GROUP_SAS_ADMIN_ID = env.int("SITH_GROUP_SAS_ADMIN_ID", default=8)
+SITH_GROUP_FORUM_ADMIN_ID = env.int("SITH_GROUP_FORUM_ADMIN_ID", default=9)
+SITH_GROUP_PEDAGOGY_ADMIN_ID = env.int("SITH_GROUP_PEDAGOGY_ADMIN_ID", default=10)
 
-SITH_GROUP_BANNED_ALCOHOL_ID = 11
-SITH_GROUP_BANNED_COUNTER_ID = 12
-SITH_GROUP_BANNED_SUBSCRIPTION_ID = 13
+SITH_GROUP_BANNED_ALCOHOL_ID = env.int("SITH_GROUP_BANNED_ALCOHOL_ID", default=11)
+SITH_GROUP_BANNED_COUNTER_ID = env.int("SITH_GROUP_BANNED_COUNTER_ID", default=12)
+SITH_GROUP_BANNED_SUBSCRIPTION_ID = env.int(
+    "SITH_GROUP_BANNED_SUBSCRIPTION_ID", default=13
+)
 
-SITH_CLUB_REFOUND_ID = 89
-SITH_COUNTER_REFOUND_ID = 38
-SITH_PRODUCT_REFOUND_ID = 5
+SITH_CLUB_REFOUND_ID = env.int("SITH_CLUB_REFOUND_ID", default=89)
+SITH_COUNTER_REFOUND_ID = env.int("SITH_COUNTER_REFOUND_ID", default=38)
+SITH_PRODUCT_REFOUND_ID = env.int("SITH_PRODUCT_REFOUND_ID", default=5)
 
-SITH_COUNTER_ACCOUNT_DUMP_ID = 39
+SITH_COUNTER_ACCOUNT_DUMP_ID = env.int("SITH_COUNTER_ACCOUNT_DUMP_ID", default=39)
 
 # Pages
 SITH_CORE_PAGE_SYNTAX = "Aide_sur_la_syntaxe"
@@ -385,7 +397,7 @@ SITH_CORE_PAGE_SYNTAX = "Aide_sur_la_syntaxe"
 SITH_FORUM_PAGE_LENGTH = 30
 
 # SAS variables
-SITH_SAS_ROOT_DIR_ID = 4
+SITH_SAS_ROOT_DIR_ID = env.int("SITH_SAS_ROOT_DIR_ID", default=4)
 SITH_SAS_IMAGES_PER_PAGE = 60
 
 SITH_BOARD_SUFFIX = "-bureau"
@@ -492,9 +504,9 @@ SITH_LOG_OPERATION_TYPE = [
 
 SITH_PEDAGOGY_UTBM_API = "https://extranet1.utbm.fr/gpedago/api/guide"
 
-SITH_ECOCUP_CONS = 1152
+SITH_ECOCUP_CONS = env.int("SITH_ECOCUP_CONS", default=1151)
 
-SITH_ECOCUP_DECO = 1151
+SITH_ECOCUP_DECO = env.int("SITH_ECOCUP_DECO", default=1152)
 
 # The limit is the maximum difference between cons and deco possible for a customer
 SITH_ECOCUP_LIMIT = 3
@@ -509,13 +521,19 @@ SITH_ACCOUNT_DUMP_DELTA = timedelta(days=30)
 
 # Defines which product type is the refilling type,
 # and thus increases the account amount
-SITH_COUNTER_PRODUCTTYPE_REFILLING = 3
+SITH_COUNTER_PRODUCTTYPE_REFILLING = env.int(
+    "SITH_COUNTER_PRODUCTTYPE_REFILLING", default=3
+)
 
 # Defines which product is the one year subscription
 # and which one is the six month subscription
-SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER = 1
-SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS = 2
-SITH_PRODUCTTYPE_SUBSCRIPTION = 2
+SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER = env.int(
+    "SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER", default=1
+)
+SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS = env.int(
+    "SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS", default=2
+)
+SITH_PRODUCTTYPE_SUBSCRIPTION = env.int("SITH_PRODUCTTYPE_SUBSCRIPTION", default=2)
 
 # Number of weeks before the end of a subscription when the subscriber can resubscribe
 SITH_SUBSCRIPTION_END = 10
@@ -624,21 +642,29 @@ SITH_BARMAN_TIMEOUT = 30
 SITH_LAST_OPERATIONS_LIMIT = 10
 
 # ET variables
-SITH_EBOUTIC_CB_ENABLED = True
-SITH_EBOUTIC_ET_URL = (
-    "https://preprod-tpeweb.e-transactions.fr/cgi/MYchoix_pagepaiement.cgi"
+SITH_EBOUTIC_CB_ENABLED = env.bool("SITH_EBOUTIC_CB_ENABLED", default=True)
+SITH_EBOUTIC_ET_URL = env.str(
+    "SITH_EBOUTIC_ET_URL",
+    default="https://preprod-tpeweb.e-transactions.fr/cgi/MYchoix_pagepaiement.cgi",
 )
-SITH_EBOUTIC_PBX_SITE = "1999888"
-SITH_EBOUTIC_PBX_RANG = "32"
-SITH_EBOUTIC_PBX_IDENTIFIANT = "2"
+SITH_EBOUTIC_PBX_SITE = env.str("SITH_EBOUTIC_PBX_SITE", default="1999888")
+SITH_EBOUTIC_PBX_RANG = env.str("SITH_EBOUTIC_PBX_RANG", default="32")
+SITH_EBOUTIC_PBX_IDENTIFIANT = env.str("SITH_EBOUTIC_PBX_IDENTIFIANT", default="2")
 SITH_EBOUTIC_HMAC_KEY = binascii.unhexlify(
-    "0123456789ABCDEF0123456789ABCDEF"
-    "0123456789ABCDEF0123456789ABCDEF"
-    "0123456789ABCDEF0123456789ABCDEF"
-    "0123456789ABCDEF0123456789ABCDEF"
+    env.str(
+        "SITH_EBOUTIC_HMAC_KEY",
+        default=(
+            "0123456789ABCDEF0123456789ABCDEF"
+            "0123456789ABCDEF0123456789ABCDEF"
+            "0123456789ABCDEF0123456789ABCDEF"
+            "0123456789ABCDEF0123456789ABCDEF"
+        ),
+    )
 )
 SITH_EBOUTIC_PUB_KEY = ""
-with open(os.path.join(os.path.dirname(__file__), "et_keys/pubkey.pem")) as f:
+with open(
+    env.path("SITH_EBOUTIC_PUB_KEY_PATH", default=BASE_DIR / "sith/et_keys/pubkey.pem")
+) as f:
     SITH_EBOUTIC_PUB_KEY = f.read()
 
 # Launderette variables
@@ -680,23 +706,16 @@ SITH_QUICK_NOTIF = {
 # Mailing related settings
 
 SITH_MAILING_DOMAIN = "utbm.fr"
-SITH_MAILING_FETCH_KEY = "IloveMails"
+SITH_MAILING_FETCH_KEY = env.str("SITH_MAILING_FETCH_KEY", default="ILoveMails")
 
 SITH_GIFT_LIST = [("AE Tee-shirt", _("AE tee-shirt"))]
 
-SENTRY_DSN = ""
-SENTRY_ENV = "production"
+SENTRY_DSN = env.str("SENRY_DSN", default=None)
+SENTRY_ENV = env.str("SENTRY_ENV", default="production")
 
 TOXIC_DOMAINS_PROVIDERS = [
     "https://www.stopforumspam.com/downloads/toxic_domains_whole.txt",
 ]
-
-try:
-    from .settings_custom import *  # noqa F403 (this star-import is actually useful)
-
-    logging.getLogger("django").info("Custom settings imported")
-except ImportError:
-    logging.getLogger("django").warning("Custom settings failed")
 
 if DEBUG:
     INSTALLED_APPS += ("debug_toolbar",)
