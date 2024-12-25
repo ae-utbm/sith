@@ -344,24 +344,6 @@ body {
     text-align: center;
   }
 
-  .popup {
-    z-index: 10;
-    /* to get on top of tomselect */
-    display: inline-block;
-    text-align: center;
-    overflow: auto;
-    margin: auto;
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    height: 20vh;
-    width: 20vw;
-    align-content: center;
-  }
-
-
   .tabs {
     border-radius: 5px;
 
@@ -1283,6 +1265,18 @@ u,
     float: right;
   }
 
+  .basket-error-container {
+    position: relative;
+    display: block
+  }
+
+  .basket-error {
+    z-index: 10; // to get on top of tomselect
+    text-align: center;
+    position: absolute;
+  }
+
+
   #products {
     flex-basis: 100%;
     margin: 0.2em;
@@ -1292,6 +1286,7 @@ u,
   #click_form {
     flex: auto;
     margin: 0.2em;
+    width: 20%;
   }
 
   #user_info {

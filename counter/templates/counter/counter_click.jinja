@@ -31,14 +31,6 @@
       <p class="important">Javascript is required for the counter UI.</p>
     </noscript>
 
-    <p
-      x-cloak
-      class="alert alert-red popup"
-      x-show="alertMessage.show"
-      x-transition.duration.500ms
-      x-text="alertMessage.content"
-    ></p>
-
     <div id="user_info">
       <h5>{% trans %}Customer{% endtrans %}</h5>
       {{ user_mini_profile(customer.user) }}
@@ -51,7 +43,7 @@
       </p>
     </div>
 
-    <div id="click_form" style="width: 20%;">
+    <div id="click_form">
       <h5 id="selling-accordion">{% trans %}Selling{% endtrans %}</h5>
       <div>
         {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user_id) %}
@@ -85,6 +77,16 @@
         <p>{% trans %}Basket: {% endtrans %}</p>
 
         <form x-cloak method="post" action="" x-ref="basketForm">
+
+          <div class="basket-error-container">
+            <div
+              x-cloak
+              class="alert alert-red basket-error"
+              x-show="alertMessage.show"
+              x-transition.duration.500ms
+              x-text="alertMessage.content"
+            ></div>
+          </div>
 
           {% csrf_token %}
           <div x-ref="basketManagementForm">
