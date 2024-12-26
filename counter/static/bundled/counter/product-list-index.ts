@@ -108,7 +108,7 @@ document.addEventListener("alpine:init", () => {
           // biome-ignore lint/style/useNamingConvention: api is in snake_case
           is_archived: isArchived,
           // biome-ignore lint/style/useNamingConvention: api is in snake_case
-          product_type: this.productTypes,
+          product_type: [...this.productTypes],
         },
       };
     },
