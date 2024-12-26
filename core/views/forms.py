@@ -293,6 +293,7 @@ class UserGroupsForm(forms.ModelForm):
         queryset=RealGroup.objects.all(),
         widget=CheckboxSelectMultiple,
         label=_("Groups"),
+        required=False,
     )
 
     class Meta:
