@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block additional_css %}
+  <link rel="stylesheet" type="text/css" href="{{ static('counter/css/counter-click.scss') }}" defer></link>
   <link rel="stylesheet" type="text/css" href="{{ static('bundled/core/components/ajax-select-index.css') }}" defer></link>
   <link rel="stylesheet" type="text/css" href="{{ static('core/components/ajax-select.scss') }}" defer></link>
   <link rel="stylesheet" href="{{ static("core/components/card.scss") }}">
@@ -24,7 +25,7 @@
 {% endblock %}
 
 {% block content %}
-  <h4 id="click_interface">{{ counter }}</h4>
+  <h4>{{ counter }}</h4>
 
   <div id="bar-ui" x-data="counter">
     <noscript>
@@ -43,7 +44,7 @@
       </p>
     </div>
 
-    <div id="click_form">
+    <div id="click-form">
       <h5 id="selling-accordion">{% trans %}Selling{% endtrans %}</h5>
       <div>
         {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user_id) %}
@@ -92,28 +93,47 @@
           <div x-ref="basketManagementForm">
             {{ form.management_form }}
           </div>
-          <ul x-show="getBasketSize() === 0">{% trans %}This basket is empty{% endtrans %}</ul>
-          <template x-for="(item, index) in Object.values(basket)">
-            <ul>
-              <template x-for="error in item.errors">
-                <div class="alert alert-red" x-text="error">
-                </div>
-              </template>
+          <ul>
+            <li x-show="getBasketSize() === 0">{% trans %}This basket is empty{% endtrans %}</li>
+            <template x-for="(item, index) in Object.values(basket)">
+              <li>
+                <template x-for="error in item.errors">
+                  <div class="alert alert-red" x-text="error">
+                  </div>
+                </template>
 
-              <button @click.prevent="addToBasketWithMessage(item.product.id, -1)">-</button>
-              <span class="quantity" x-text="item.quantity"></span>
-              <button @click.prevent="addToBasketWithMessage(item.product.id, 1)">+</button>
+                <button @click.prevent="addToBasketWithMessage(item.product.id, -1)">-</button>
+                <span class="quantity" x-text="item.quantity"></span>
+                <button @click.prevent="addToBasketWithMessage(item.product.id, 1)">+</button>
 
-              <span x-text="item.product.name"></span> :
-              <span x-text="item.sum().toLocaleString(undefined, { minimumFractionDigits: 2 })">€</span>
-              <span x-show="item.getBonusQuantity() > 0" x-text="`${item.getBonusQuantity()} x P`"></span>
+                <span x-text="item.product.name"></span> :
+                <span x-text="item.sum().toLocaleString(undefined, { minimumFractionDigits: 2 })">€</span>
+                <span x-show="item.getBonusQuantity() > 0" x-text="`${item.getBonusQuantity()} x P`"></span>
 
-              <button class="remove-item" @click.prevent="removeFromBasket(item.product.id)"><i class="fa fa-trash-can delete-action"></i></button>
+                <button
+                  class="remove-item"
+                  @click.prevent="removeFromBasket(item.product.id)"
+                ><i class="fa fa-trash-can delete-action"></i></button>
 
-              <input type="hidden" :value="item.quantity" :id="`id_form-${index}-quantity`" :name="`form-${index}-quantity`" required readonly>
-              <input type="hidden" :value="item.product.id" :id="`id_form-${index}-id`" :name="`form-${index}-id`" required readonly>
-            </ul>
-          </template>
+                <input
+                  type="hidden"
+                  :value="item.quantity"
+                  :id="`id_form-${index}-quantity`"
+                  :name="`form-${index}-quantity`"
+                  required
+                  readonly
+                >
+                <input
+                  type="hidden"
+                  :value="item.product.id"
+                  :id="`id_form-${index}-id`"
+                  :name="`form-${index}-id`"
+                  required
+                  readonly
+                >
+              </li>
+            </template>
+          </ul>
 
           <p class="margin-bottom">
             <strong>Total: </strong>
@@ -122,8 +142,18 @@
           </p>
 
           <div class="row">
-            <input class="btn btn-blue" type="submit" @click.prevent="finish" :disabled="getBasketSize() == 0" value="{% trans %}Finish{% endtrans %}"/>
-            <input class="btn btn-grey" type="submit" @click.prevent="cancel" value="{% trans %}Cancel{% endtrans %}"/>
+            <input
+              class="btn btn-blue"
+              type="submit"
+              @click.prevent="finish"
+              :disabled="getBasketSize() === 0"
+              value="{% trans %}Finish{% endtrans %}"
+            />
+            <input
+              class="btn btn-grey"
+              type="submit" @click.prevent="cancel"
+              value="{% trans %}Cancel{% endtrans %}"
+            />
           </div>
         </form>
       </div>

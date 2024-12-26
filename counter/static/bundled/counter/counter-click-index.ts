@@ -146,7 +146,7 @@ exportToHtml("loadCounter", (config: CounterConfig) => {
 $(() => {
   /* Accordion UI between basket and refills */
   // biome-ignore lint/suspicious/noExplicitAny: dealing with legacy jquery
-  ($("#click_form") as any).accordion({
+  ($("#click-form") as any).accordion({
     heightStyle: "content",
     activate: () => $(".focus").focus(),
   });
