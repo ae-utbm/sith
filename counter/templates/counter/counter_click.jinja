@@ -5,8 +5,16 @@
   {{ counter }}
 {% endblock %}
 
+{% block additional_css %}
+  <link rel="stylesheet" type="text/css" href="{{ static('counter/css/counter-click.scss') }}" defer></link>
+  <link rel="stylesheet" type="text/css" href="{{ static('bundled/core/components/ajax-select-index.css') }}" defer></link>
+  <link rel="stylesheet" type="text/css" href="{{ static('core/components/ajax-select.scss') }}" defer></link>
+  <link rel="stylesheet" href="{{ static("core/components/card.scss") }}">
+{% endblock %}
+
 {% block additional_js %}
   <script type="module" src="{{ static('bundled/counter/counter-click-index.ts') }}"></script>
+  <script type="module" src="{{ static('bundled/counter/components/counter-product-select-index.ts') }}"></script>
 {% endblock %}
 
 {% block info_boxes %}
@@ -17,7 +25,7 @@
 {% endblock %}
 
 {% block content %}
-  <h4 id="click_interface">{{ counter }}</h4>
+  <h4>{{ counter }}</h4>
 
   <div id="bar-ui" x-data="counter">
     <noscript>
@@ -28,76 +36,125 @@
       <h5>{% trans %}Customer{% endtrans %}</h5>
       {{ user_mini_profile(customer.user) }}
       {{ user_subscription(customer.user) }}
-      <p>{% trans %}Amount: {% endtrans %}<span x-text="customerBalance"></span> €</p>
+      <p>{% trans %}Amount: {% endtrans %}<span x-text="customerBalance"></span> €
+        <span x-cloak x-show="getBasketSize() > 0">
+          <i class="fa-solid fa-arrow-right"></i>
+          <span x-text="(customerBalance - sumBasket()).toLocaleString(undefined, { minimumFractionDigits: 2 })"></span> €
+        </span>
+      </p>
     </div>
 
-    <div id="click_form" style="width: 20%;">
+    <div id="click-form">
       <h5 id="selling-accordion">{% trans %}Selling{% endtrans %}</h5>
       <div>
         {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user_id) %}
 
-                {# Formulaire pour rechercher un produit en tapant son code dans une barre de recherche #}
         <form method="post" action=""
               class="code_form" @submit.prevent="handleCode">
-          {% csrf_token %}
-          <input type="hidden" name="action" value="code">
-          <label for="code_field"></label>
-          <input type="text" name="code" value="" class="focus" id="code_field"/>
+
+          <counter-product-select name="code" x-ref="codeField" autofocus required placeholder="{% trans %}Select a product...{% endtrans %}">
+            <option value=""></option>
+            <optgroup label="{% trans %}Operations{% endtrans %}">
+              <option value="FIN">{% trans %}Confirm (FIN){% endtrans %}</option>
+              <option value="ANN">{% trans %}Cancel (ANN){% endtrans %}</option>
+            </optgroup>
+            {% for category in categories.keys() %}
+              <optgroup label="{{ category }}">
+                {% for product in categories[category] %}
+                  <option value="{{ product.id }}">{{ product }}</option>
+                {% endfor %}
+              </optgroup>
+            {% endfor %}
+          </counter-product-select>
+
           <input type="submit" value="{% trans %}Go{% endtrans %}"/>
         </form>
 
-        <template x-for="error in errors">
-          <div class="alert alert-red" x-text="error">
+        {% for error in form.non_form_errors() %}
+          <div class="alert alert-red">
+            {{ error }}
           </div>
-        </template>
+        {% endfor %}
         <p>{% trans %}Basket: {% endtrans %}</p>
 
-        <ul>
-          <template x-for="[id, item] in Object.entries(basket)" :key="id">
-            <div>
-              <form method="post" action="" class="inline del_product_form"
-                    @submit.prevent="handleAction">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="del_product">
-                <input type="hidden" name="product_id" :value="id">
-                <input type="submit" value="-"/>
-              </form>
+        <form x-cloak method="post" action="" x-ref="basketForm">
 
-              <span x-text="item['qty'] + item['bonus_qty']"></span>
+          <div class="basket-error-container">
+            <div
+              x-cloak
+              class="alert alert-red basket-error"
+              x-show="alertMessage.show"
+              x-transition.duration.500ms
+              x-text="alertMessage.content"
+            ></div>
+          </div>
 
-              <form method="post" action="" class="inline add_product_form"
-                    @submit.prevent="handleAction">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="add_product">
-                <input type="hidden" name="product_id" :value="id">
-                <input type="submit" value="+">
-              </form>
-
-              <span x-text="products[id].name"></span> :
-              <span x-text="(item['qty'] * item['price'] / 100)
-                            .toLocaleString(undefined, { minimumFractionDigits: 2 })">
-              </span> €
-              <template x-if="item['bonus_qty'] > 0">P</template>
-            </div>
-          </template>
-        </ul>
-        <p>
-          <strong>Total: </strong>
-          <strong x-text="sumBasket().toLocaleString(undefined, { minimumFractionDigits: 2 })"></strong>
-          <strong> €</strong>
-        </p>
-
-        <form method="post"
-              action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
           {% csrf_token %}
-          <input type="hidden" name="action" value="finish">
-          <input type="submit" value="{% trans %}Finish{% endtrans %}"/>
-        </form>
-        <form method="post"
-              action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}">
-          {% csrf_token %}
-          <input type="hidden" name="action" value="cancel">
-          <input type="submit" value="{% trans %}Cancel{% endtrans %}"/>
+          <div x-ref="basketManagementForm">
+            {{ form.management_form }}
+          </div>
+          <ul>
+            <li x-show="getBasketSize() === 0">{% trans %}This basket is empty{% endtrans %}</li>
+            <template x-for="(item, index) in Object.values(basket)">
+              <li>
+                <template x-for="error in item.errors">
+                  <div class="alert alert-red" x-text="error">
+                  </div>
+                </template>
+
+                <button @click.prevent="addToBasketWithMessage(item.product.id, -1)">-</button>
+                <span class="quantity" x-text="item.quantity"></span>
+                <button @click.prevent="addToBasketWithMessage(item.product.id, 1)">+</button>
+
+                <span x-text="item.product.name"></span> :
+                <span x-text="item.sum().toLocaleString(undefined, { minimumFractionDigits: 2 })">€</span>
+                <span x-show="item.getBonusQuantity() > 0" x-text="`${item.getBonusQuantity()} x P`"></span>
+
+                <button
+                  class="remove-item"
+                  @click.prevent="removeFromBasket(item.product.id)"
+                ><i class="fa fa-trash-can delete-action"></i></button>
+
+                <input
+                  type="hidden"
+                  :value="item.quantity"
+                  :id="`id_form-${index}-quantity`"
+                  :name="`form-${index}-quantity`"
+                  required
+                  readonly
+                >
+                <input
+                  type="hidden"
+                  :value="item.product.id"
+                  :id="`id_form-${index}-id`"
+                  :name="`form-${index}-id`"
+                  required
+                  readonly
+                >
+              </li>
+            </template>
+          </ul>
+
+          <p class="margin-bottom">
+            <strong>Total: </strong>
+            <strong x-text="sumBasket().toLocaleString(undefined, { minimumFractionDigits: 2 })"></strong>
+            <strong> €</strong>
+          </p>
+
+          <div class="row">
+            <input
+              class="btn btn-blue"
+              type="submit"
+              @click.prevent="finish"
+              :disabled="getBasketSize() === 0"
+              value="{% trans %}Finish{% endtrans %}"
+            />
+            <input
+              class="btn btn-grey"
+              type="submit" @click.prevent="cancel"
+              value="{% trans %}Cancel{% endtrans %}"
+            />
+          </div>
         </form>
       </div>
       {% if object.type == "BAR" %}
@@ -130,34 +187,41 @@
     </div>
 
     <div id="products">
-      <ul>
-        {% for category in categories.keys() -%}
-          <li><a href="#cat_{{ category|slugify }}">{{ category }}</a></li>
-        {%- endfor %}
-      </ul>
-      {% for category in categories.keys() -%}
-        <div id="cat_{{ category|slugify }}">
-          <h5>{{ category }}</h5>
-          {% for p in categories[category] -%}
-            <form method="post"
-                  action="{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}"
-                  class="form_button add_product_form" @submit.prevent="handleAction">
-              {% csrf_token %}
-              <input type="hidden" name="action" value="add_product">
-              <input type="hidden" name="product_id" value="{{ p.id }}">
-              <button type="submit">
-                <strong>{{ p.name }}</strong>
-                {% if p.icon %}
-                  <img src="{{ p.icon.url }}" alt="image de {{ p.name }}"/>
-                {% else %}
-                  <img src="{{ static('core/img/na.gif') }}" alt="image de {{ p.name }}"/>
-                {% endif %}
-                <span>{{ p.price }} €<br>{{ p.code }}</span>
-              </button>
-            </form>
-          {%- endfor %}
+      {% if not products %}
+        <div class="alert alert-red">
+          {% trans %}No products available on this counter for this user{% endtrans %}
         </div>
-      {%- endfor %}
+      {% else %}
+        <ul>
+          {% for category in categories.keys() -%}
+            <li><a href="#cat_{{ category|slugify }}">{{ category }}</a></li>
+          {%- endfor %}
+        </ul>
+        {% for category in categories.keys() -%}
+          <div id="cat_{{ category|slugify }}">
+            <h5 class="margin-bottom">{{ category }}</h5>
+            <div class="row gap-2x">
+              {% for product in categories[category] -%}
+                <button class="card shadow" @click="addToBasketWithMessage('{{ product.id }}', 1)">
+                  <img
+                    class="card-image"
+                    alt="image de {{ product.name }}"
+                    {% if product.icon %}
+                      src="{{ product.icon.url }}"
+                    {% else %}
+                      src="{{ static('core/img/na.gif') }}"
+                    {% endif %}
+                  />
+                  <span class="card-content">
+                    <strong class="card-title">{{ product.name }}</strong>
+                    <p>{{ product.price }} €<br>{{ product.code }}</p>
+                  </span>
+                </button>
+              {%- endfor %}
+            </div>
+          </div>
+        {%- endfor %}
+      {% endif %}
     </div>
   </div>
 {% endblock content %}
@@ -166,30 +230,38 @@
   {{ super() }}
   <script>
     const products = {
-      {%- for p in products -%}
-        {{ p.id }}: {
-          code: "{{ p.code }}",
-          name: "{{ p.name }}",
-          price: {{ p.price }},
+      {%- for product in products -%}
+        {{ product.id }}: {
+          id: "{{ product.id }}",
+          name: "{{ product.name }}",
+          price: {{ product.price }},
+          hasTrayPrice: {{ product.tray | tojson }},
+          quantityForTrayPrice: {{ product.QUANTITY_FOR_TRAY_PRICE }},
         },
       {%- endfor -%}
     };
-    const productsAutocomplete = [
-      {% for p in products -%}
-        {
-          value: "{{ p.code }}",
-          label: "{{ p.name }}",
-          tags: "{{ p.code }} {{ p.name }}",
-        },
-      {%- endfor %}
+    const formInitial = [
+      {%- for f in form -%}
+        {%- if f.cleaned_data -%}
+          {
+            {%- if f.cleaned_data["id"] -%}
+              id: '{{ f.cleaned_data["id"] | tojson }}',
+            {%- endif -%}
+            {%- if f.cleaned_data["quantity"] -%}
+              quantity: {{ f.cleaned_data["quantity"] | tojson }},
+            {%- endif -%}
+            errors: {{ form_errors[loop.index0] | tojson }},
+          },
+        {%- endif -%}
+      {%- endfor -%}
     ];
     window.addEventListener("DOMContentLoaded", () => {
       loadCounter({
-        csrfToken: "{{ csrf_token }}",
-        clickApiUrl: "{{ url('counter:click', counter_id=counter.id, user_id=customer.user.id) }}",
-        sessionBasket: {{ request.session["basket"]|tojson }},
         customerBalance: {{ customer.amount }},
+        products: products,
         customerId: {{ customer.pk }},
+        formInitial: formInitial,
+        cancelUrl: "{{ cancel_url }}",
       });
     });
   </script>

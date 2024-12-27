@@ -1,3 +1,5 @@
+@import "core/static/core/colors";
+
 $padding: 1.5rem;
 $padding_smaller: .5rem;
 $gap: .25rem;
@@ -50,8 +52,7 @@ $min_col_width: 100px;
         position: relative;
         min-width: $min_col_width;
 
-        >a{
-          margin-left: $padding;
+        >a {
           width: 20px;
           height: 20px;
           text-align: center;
@@ -269,12 +270,12 @@ $min_col_width: 100px;
   border: none;
   color: black;
   text-decoration: none;
-  background-color: #f2f2f2;
+  background-color: $primary-neutral-light-color;
   padding: 0.4em;
   margin: 0.1em;
   font-size: 1.18em;
   border-radius: 5px;
-  box-shadow: #dfdfdf 0px 0px 1px;
+  box-shadow: #dfdfdf 0 0 1px;
   cursor: pointer;
 
   &:hover {

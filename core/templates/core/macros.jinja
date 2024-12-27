@@ -60,7 +60,7 @@
         {% endif %}
         {% if user.date_of_birth %}
           <div class="user_mini_profile_dob">
-            {{ user.date_of_birth|date("d/m/Y") }} ({{ user.get_age() }})
+            {{ user.date_of_birth|date("d/m/Y") }} ({{ user.age }})
           </div>
         {% endif %}
       </div>
@@ -140,7 +140,7 @@
         nb_page (str): call to a javascript function or variable returning
             the maximum number of pages to paginate
     #}
-  <nav class="pagination" x-show="{{ nb_pages }} > 1">
+  <nav class="pagination" x-show="{{ nb_pages }} > 1" x-cloak>
       {# Adding the prevent here is important, because otherwise,
       clicking on the pagination buttons could submit the picture management form
       and reload the page #}

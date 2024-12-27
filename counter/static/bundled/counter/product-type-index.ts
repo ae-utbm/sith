@@ -43,7 +43,7 @@ document.addEventListener("alpine:init", () => {
     openAlertMessage(response: Response) {
       if (response.ok) {
         this.alertMessage.success = true;
-        this.alertMessage.content = gettext("Products types successfully reordered");
+        this.alertMessage.content = gettext("Products types reordered!");
       } else {
         this.alertMessage.success = false;
         this.alertMessage.content = interpolate(

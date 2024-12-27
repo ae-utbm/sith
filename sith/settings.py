@@ -290,6 +290,7 @@ STORAGES = {
 # Auth configuration
 AUTH_USER_MODEL = "core.User"
 AUTH_ANONYMOUS_MODEL = "core.models.AnonymousUser"
+AUTHENTICATION_BACKENDS = ["core.auth_backends.SithModelBackend"]
 LOGIN_URL = "/login"
 LOGOUT_URL = "/logout"
 LOGIN_REDIRECT_URL = "/"

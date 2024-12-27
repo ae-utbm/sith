@@ -1,26 +1,103 @@
 {% extends "core/base.jinja" %}
+{% from "core/macros.jinja" import paginate_alpine %}
 
 {% block title %}
   {% trans %}Product list{% endtrans %}
 {% endblock %}
 
-{% block content %}
-  {% if current_tab == "products" %}
-    <p><a href="{{ url('counter:new_product') }}">{% trans %}New product{% endtrans %}</a></p>
-  {% endif %}
-  <h3>{% trans %}Product list{% endtrans %}</h3>
-  {%- for product_type, products in object_list -%}
-    <h4>{{ product_type or _("Uncategorized") }}</h4>
-    <ul>
-      {%- for product in products -%}
-        <li><a href="{{ url('counter:product_edit', product_id=product.id) }}">{{ product.name }} ({{ product.code }})</a></li>
-      {%- endfor -%}
-    </ul>
-  {%- else -%}
-    {% trans %}There is no products in this website.{% endtrans %}
-  {%- endfor -%}
+{% block additional_js %}
+  <script type="module" src="{{ static("bundled/counter/components/ajax-select-index.ts") }}"></script>
+  <script type="module" src="{{ static("bundled/counter/product-list-index.ts") }}"></script>
 {% endblock %}
 
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("core/components/card.scss") }}">
+  <link rel="stylesheet" href="{{ static("counter/css/admin.scss") }}">
+  <link rel="stylesheet" href="{{ static("bundled/core/components/ajax-select-index.css") }}">
+  <link rel="stylesheet" href="{{ static("core/components/ajax-select.scss") }}">
+{% endblock %}
 
+{% block content %}
+  <main x-data="productList">
+    <h4 class="margin-bottom">{% trans %}Filter products{% endtrans %}</h4>
+    <form id="search-form" class="margin-bottom">
+      <div class="row gap-4x">
 
+        <fieldset>
+          <label for="search-input">{% trans %}Product name{% endtrans %}</label>
+          <input
+            id="search-input"
+            type="text"
+            name="search"
+            x-model.debounce.500ms="search"
+          />
+        </fieldset>
+        <fieldset class="grow">
+          <legend>{% trans %}Product state{% endtrans %}</legend>
+          <div class="row">
+            <input type="radio" id="filter-active-products" x-model="productStatus" value="active">
+            <label for="filter-active-products">{% trans %}Active products{% endtrans %}</label>
+          </div>
+          <div class="row">
+            <input type="radio" id="filter-inactive-products" x-model="productStatus" value="archived">
+            <label for="filter-inactive-products">{% trans %}Archived products{% endtrans %}</label>
+          </div>
+          <div class="row">
+            <input type="radio" id="filter-all-products" x-model="productStatus" value="both">
+            <label for="filter-all-products">{% trans %}All products{% endtrans %}</label>
+          </div>
+        </fieldset>
+      </div>
+      <fieldset>
+        <label for="type-search-input">{% trans %}Product type{% endtrans %}</label>
+        <product-type-ajax-select
+          id="type-search-input"
+          name="product-type"
+          x-ref="productTypesInput"
+          multiple
+        >
+        </product-type-ajax-select>
+      </fieldset>
+    </form>
+    <h3 class="margin-bottom">{% trans %}Product list{% endtrans %}</h3>
 
+    <div class="row margin-bottom">
+      <a href="{{ url('counter:new_product') }}" class="btn btn-blue">
+        {% trans %}New product{% endtrans %} <i class="fa fa-plus"></i>
+      </a>
+      <button
+        class="btn btn-blue"
+        @click="downloadCsv()"
+        :disabled="csvLoading"
+        :aria-busy="csvLoading"
+      >
+        {% trans %}Download as cvs{% endtrans %} <i class="fa fa-file-arrow-down"></i>
+      </button>
+    </div>
+
+    <div class="aria-busy-grow" :aria-busy="loading">
+      <template x-for="[category, cat_products] of Object.entries(products)" :key="category">
+        <section>
+          <h4 x-text="category" class="margin-bottom"></h4>
+          <div class="product-group">
+            <template x-for="p in cat_products" :key="p.id">
+              <a class="card card-row shadow clickable" :href="p.url">
+                <template x-if="p.icon">
+                  <img class="card-image" :src="p.icon" :alt="`icon ${p.name}`">
+                </template>
+                <template x-if="!p.icon">
+                  <i class="fa-regular fa-image fa-2x card-image"></i>
+                </template>
+                <span class="card-content">
+                  <strong class="card-title" x-text="`${p.name} (${p.code})`"></strong>
+                  <p x-text="`${p.selling_price} €`"></p>
+                </span>
+              </a>
+            </template>
+          </div>
+        </section>
+      </template>
+      {{ paginate_alpine("page", "nbPages") }}
+    </div>
+  </main>
+{% endblock %}

@@ -136,25 +136,22 @@ type="EVENT").order_by('dates__start_date') %}
   <div id="birthdays">
     <div id="birthdays_title">{% trans %}Birthdays{% endtrans %}</div>
     <div id="birthdays_content">
-      {% if user.is_subscribed %}
-                    {# Cache request for 1 hour #}
-        {% cache 3600 "birthdays" %}
-          <ul class="birthdays_year">
-            {% for d in birthdays.dates('date_of_birth', 'year', 'DESC') %}
-              <li>
-                {% trans age=timezone.now().year - d.year %}{{ age }} year old{% endtrans %}
-                <ul>
-                  {% for u in birthdays.filter(date_of_birth__year=d.year) %}
-                    <li><a href="{{ u.get_absolute_url() }}">{{ u.get_short_name() }}</a></li>
-                  {% endfor %}
-                </ul>
-              </li>
-            {% endfor %}
-          </ul>
-        {% endcache %}
-      {% else %}
+      {%- if user.is_subscribed -%}
+        <ul class="birthdays_year">
+          {%- for year, users in birthdays -%}
+            <li>
+              {% trans age=timezone.now().year - year %}{{ age }} year old{% endtrans %}
+              <ul>
+                {%- for u in users -%}
+                  <li><a href="{{ u.get_absolute_url() }}">{{ u.get_short_name() }}</a></li>
+                {%- endfor -%}
+              </ul>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- else -%}
         <p>{% trans %}You need an up to date subscription to access this content{% endtrans %}</p>
-      {% endif %}
+      {%- endif -%}
     </div>
   </div>
 </div>

@@ -47,6 +47,8 @@ class BillingInfoForm(forms.ModelForm):
 class StudentCardForm(forms.ModelForm):
     """Form for adding student cards"""
 
+    error_css_class = "error"
+
     class Meta:
         model = StudentCard
         fields = ["uid"]
@@ -87,7 +89,7 @@ class GetUserForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        cus = None
+        customer = None
         if cleaned_data["code"] != "":
             if len(cleaned_data["code"]) == StudentCard.UID_SIZE:
                 card = (
@@ -96,17 +98,18 @@ class GetUserForm(forms.Form):
                     .first()
                 )
                 if card is not None:
-                    cus = card.customer
-            if cus is None:
-                cus = Customer.objects.filter(
+                    customer = card.customer
+            if customer is None:
+                customer = Customer.objects.filter(
                     account_id__iexact=cleaned_data["code"]
                 ).first()
-        elif cleaned_data["id"] is not None:
-            cus = Customer.objects.filter(user=cleaned_data["id"]).first()
-        if cus is None or not cus.can_buy:
+        elif cleaned_data["id"]:
+            customer = Customer.objects.filter(user=cleaned_data["id"]).first()
+
+        if customer is None or not customer.can_buy:
             raise forms.ValidationError(_("User not found"))
-        cleaned_data["user_id"] = cus.user.id
-        cleaned_data["user"] = cus.user
+        cleaned_data["user_id"] = customer.user.id
+        cleaned_data["user"] = customer.user
         return cleaned_data
 
 

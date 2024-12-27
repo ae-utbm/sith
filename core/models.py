@@ -578,14 +578,6 @@ class User(AbstractUser):
             return "%s (%s)" % (self.get_full_name(), self.nick_name)
         return self.get_full_name()
 
-    def get_age(self):
-        """Returns the age."""
-        today = timezone.now()
-        born = self.date_of_birth
-        return (
-            today.year - born.year - ((today.month, today.day) < (born.month, born.day))
-        )
-
     def get_family(
         self,
         godfathers_depth: NonNegativeInt = 4,

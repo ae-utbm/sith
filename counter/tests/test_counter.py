@@ -12,161 +12,584 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-import re
+from dataclasses import asdict, dataclass
 from datetime import timedelta
+from decimal import Decimal
 
 import pytest
 from django.conf import settings
+from django.contrib.auth.models import make_password
 from django.core.cache import cache
-from django.test import TestCase
+from django.http import HttpResponse
+from django.shortcuts import resolve_url
+from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.timezone import now
+from django.utils.timezone import localdate, now
 from freezegun import freeze_time
 from model_bakery import baker
 
 from club.models import Club, Membership
-from core.baker_recipes import subscriber_user
-from core.models import User
+from core.baker_recipes import board_user, subscriber_user, very_old_subscriber_user
+from core.models import Group, User
+from counter.baker_recipes import product_recipe
 from counter.models import (
     Counter,
     Customer,
     Permanency,
     Product,
+    Refilling,
     Selling,
 )
 
 
-class TestCounter(TestCase):
+class TestFullClickBase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.skia = User.objects.filter(username="skia").first()
-        cls.sli = User.objects.filter(username="sli").first()
-        cls.krophil = User.objects.filter(username="krophil").first()
-        cls.richard = User.objects.filter(username="rbatsbak").first()
-        cls.mde = Counter.objects.filter(name="MDE").first()
-        cls.foyer = Counter.objects.get(id=2)
+        cls.customer = subscriber_user.make()
+        cls.barmen = subscriber_user.make(password=make_password("plop"))
+        cls.board_admin = board_user.make(password=make_password("plop"))
+        cls.club_admin = subscriber_user.make()
+        cls.root = baker.make(User, is_superuser=True)
+        cls.subscriber = subscriber_user.make()
 
-    def test_full_click(self):
+        cls.counter = baker.make(Counter, type="BAR")
+        cls.counter.sellers.add(cls.barmen, cls.board_admin)
+
+        cls.other_counter = baker.make(Counter, type="BAR")
+        cls.other_counter.sellers.add(cls.barmen)
+
+        cls.yet_another_counter = baker.make(Counter, type="BAR")
+
+        cls.customer_old_can_buy = subscriber_user.make()
+        sub = cls.customer_old_can_buy.subscriptions.first()
+        sub.subscription_end = localdate() - timedelta(days=89)
+        sub.save()
+
+        cls.customer_old_can_not_buy = very_old_subscriber_user.make()
+
+        cls.customer_can_not_buy = baker.make(User)
+
+        cls.club_counter = baker.make(Counter, type="OFFICE")
+        baker.make(
+            Membership,
+            start_date=now() - timedelta(days=30),
+            club=cls.club_counter.club,
+            role=settings.SITH_CLUB_ROLES_ID["Board member"],
+            user=cls.club_admin,
+        )
+
+    def updated_amount(self, user: User) -> Decimal:
+        user.refresh_from_db()
+        user.customer.refresh_from_db()
+        return user.customer.amount
+
+
+class TestRefilling(TestFullClickBase):
+    def login_in_bar(self, barmen: User | None = None):
+        used_barman = barmen if barmen is not None else self.board_admin
         self.client.post(
-            reverse("counter:login", kwargs={"counter_id": self.mde.id}),
-            {"username": self.skia.username, "password": "plop"},
-        )
-        response = self.client.get(
-            reverse("counter:details", kwargs={"counter_id": self.mde.id})
+            reverse("counter:login", args=[self.counter.id]),
+            {"username": used_barman.username, "password": "plop"},
         )
 
-        assert 'class="link-button">S&#39; Kia</button>' in str(response.content)
-
-        counter_token = re.search(
-            r'name="counter_token" value="([^"]*)"', str(response.content)
-        ).group(1)
-
-        response = self.client.post(
-            reverse("counter:details", kwargs={"counter_id": self.mde.id}),
-            {"code": self.richard.customer.account_id, "counter_token": counter_token},
-        )
-        counter_url = response.get("location")
-        refill_url = reverse(
-            "counter:refilling_create",
-            kwargs={"customer_id": self.richard.customer.pk},
-        )
-
-        response = self.client.get(counter_url)
-        assert ">Richard Batsbak</" in str(response.content)
-
-        self.client.post(
-            refill_url,
+    def refill_user(
+        self,
+        user: User | Customer,
+        counter: Counter,
+        amount: int,
+        client: Client | None = None,
+    ) -> HttpResponse:
+        used_client = client if client is not None else self.client
+        return used_client.post(
+            reverse(
+                "counter:refilling_create",
+                kwargs={"customer_id": user.pk},
+            ),
             {
-                "amount": "5",
+                "amount": str(amount),
                 "payment_method": "CASH",
                 "bank": "OTHER",
             },
-            HTTP_REFERER=counter_url,
+            HTTP_REFERER=reverse(
+                "counter:click",
+                kwargs={"counter_id": counter.id, "user_id": user.pk},
+            ),
         )
-        self.client.post(counter_url, "action=code&code=BARB", content_type="text/xml")
+
+    def test_refilling_office_fail(self):
+        self.client.force_login(self.club_admin)
+        assert self.refill_user(self.customer, self.club_counter, 10).status_code == 403
+
+        self.client.force_login(self.root)
+        assert self.refill_user(self.customer, self.club_counter, 10).status_code == 403
+
+        self.client.force_login(self.subscriber)
+        assert self.refill_user(self.customer, self.club_counter, 10).status_code == 403
+
+        assert self.updated_amount(self.customer) == 0
+
+    def test_refilling_no_refer_fail(self):
+        def refill():
+            return self.client.post(
+                reverse(
+                    "counter:refilling_create",
+                    kwargs={"customer_id": self.customer.pk},
+                ),
+                {
+                    "amount": "10",
+                    "payment_method": "CASH",
+                    "bank": "OTHER",
+                },
+            )
+
+        self.client.force_login(self.club_admin)
+        assert refill()
+
+        self.client.force_login(self.root)
+        assert refill()
+
+        self.client.force_login(self.subscriber)
+        assert refill()
+
+        assert self.updated_amount(self.customer) == 0
+
+    def test_refilling_not_connected_fail(self):
+        assert self.refill_user(self.customer, self.counter, 10).status_code == 403
+        assert self.updated_amount(self.customer) == 0
+
+    def test_refilling_counter_open_but_not_connected_fail(self):
+        self.login_in_bar()
+        client = Client()
+        assert (
+            self.refill_user(self.customer, self.counter, 10, client=client).status_code
+            == 403
+        )
+        assert self.updated_amount(self.customer) == 0
+
+    def test_refilling_counter_no_board_member(self):
+        self.login_in_bar(barmen=self.barmen)
+        assert self.refill_user(self.customer, self.counter, 10).status_code == 403
+        assert self.updated_amount(self.customer) == 0
+
+    def test_refilling_user_can_not_buy(self):
+        self.login_in_bar(barmen=self.barmen)
+
+        assert (
+            self.refill_user(self.customer_can_not_buy, self.counter, 10).status_code
+            == 404
+        )
+        assert (
+            self.refill_user(
+                self.customer_old_can_not_buy, self.counter, 10
+            ).status_code
+            == 404
+        )
+
+    def test_refilling_counter_success(self):
+        self.login_in_bar()
+
+        assert self.refill_user(self.customer, self.counter, 30).status_code == 302
+        assert self.updated_amount(self.customer) == 30
+        assert self.refill_user(self.customer, self.counter, 10.1).status_code == 302
+        assert self.updated_amount(self.customer) == Decimal("40.1")
+
+        assert (
+            self.refill_user(self.customer_old_can_buy, self.counter, 1).status_code
+            == 302
+        )
+        assert self.updated_amount(self.customer_old_can_buy) == 1
+
+
+@dataclass
+class BasketItem:
+    id: int | None = None
+    quantity: int | None = None
+
+    def to_form(self, index: int) -> dict[str, str]:
+        return {
+            f"form-{index}-{key}": str(value)
+            for key, value in asdict(self).items()
+            if value is not None
+        }
+
+
+class TestCounterClick(TestFullClickBase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        cls.underage_customer = subscriber_user.make()
+        cls.banned_counter_customer = subscriber_user.make()
+        cls.banned_alcohol_customer = subscriber_user.make()
+
+        cls.set_age(cls.customer, 20)
+        cls.set_age(cls.barmen, 20)
+        cls.set_age(cls.club_admin, 20)
+        cls.set_age(cls.banned_alcohol_customer, 20)
+        cls.set_age(cls.underage_customer, 17)
+
+        cls.banned_alcohol_customer.groups.add(
+            Group.objects.get(pk=settings.SITH_GROUP_BANNED_ALCOHOL_ID)
+        )
+        cls.banned_counter_customer.groups.add(
+            Group.objects.get(pk=settings.SITH_GROUP_BANNED_COUNTER_ID)
+        )
+
+        cls.beer = product_recipe.make(
+            limit_age=18, selling_price="1.5", special_selling_price="1"
+        )
+        cls.beer_tap = product_recipe.make(
+            limit_age=18,
+            tray=True,
+            selling_price="1.5",
+            special_selling_price="1",
+        )
+
+        cls.snack = product_recipe.make(
+            limit_age=0, selling_price="1.5", special_selling_price="1"
+        )
+        cls.stamps = product_recipe.make(
+            limit_age=0, selling_price="1.5", special_selling_price="1"
+        )
+
+        cls.counter.products.add(cls.beer, cls.beer_tap, cls.snack)
+
+        cls.other_counter.products.add(cls.snack)
+
+        cls.club_counter.products.add(cls.stamps)
+
+    def login_in_bar(self, barmen: User | None = None):
+        used_barman = barmen if barmen is not None else self.barmen
         self.client.post(
-            counter_url, "action=add_product&product_id=4", content_type="text/xml"
-        )
-        self.client.post(
-            counter_url, "action=del_product&product_id=4", content_type="text/xml"
-        )
-        self.client.post(
-            counter_url, "action=code&code=2xdeco", content_type="text/xml"
-        )
-        self.client.post(
-            counter_url, "action=code&code=1xbarb", content_type="text/xml"
-        )
-        response = self.client.post(
-            counter_url, "action=code&code=fin", content_type="text/xml"
+            reverse("counter:login", args=[self.counter.id]),
+            {"username": used_barman.username, "password": "plop"},
         )
 
-        response_get = self.client.get(response.get("location"))
-        response_content = response_get.content.decode("utf-8")
-        assert "2 x Barbar" in str(response_content)
-        assert "2 x Déconsigne Eco-cup" in str(response_content)
-        assert "<p>Client : Richard Batsbak - Nouveau montant : 3.60" in str(
-            response_content
+    @classmethod
+    def set_age(cls, user: User, age: int):
+        user.date_of_birth = localdate().replace(year=localdate().year - age)
+        user.save()
+
+    def submit_basket(
+        self,
+        user: User,
+        basket: list[BasketItem],
+        counter: Counter | None = None,
+        client: Client | None = None,
+    ) -> HttpResponse:
+        used_counter = counter if counter is not None else self.counter
+        used_client = client if client is not None else self.client
+        data = {
+            "form-TOTAL_FORMS": str(len(basket)),
+            "form-INITIAL_FORMS": "0",
+        }
+        for index, item in enumerate(basket):
+            data.update(item.to_form(index))
+        return used_client.post(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": used_counter.id, "user_id": user.id},
+            ),
+            data,
         )
 
-        self.client.post(
-            reverse("counter:login", kwargs={"counter_id": self.mde.id}),
-            {"username": self.sli.username, "password": "plop"},
+    def refill_user(self, user: User, amount: Decimal | int):
+        baker.make(Refilling, amount=amount, customer=user.customer, is_validated=False)
+
+    def test_click_eboutic_failure(self):
+        eboutic = baker.make(Counter, type="EBOUTIC")
+        self.client.force_login(self.club_admin)
+        assert (
+            self.submit_basket(
+                self.customer,
+                [BasketItem(self.stamps.id, 5)],
+                counter=eboutic,
+            ).status_code
+            == 404
         )
 
-        response = self.client.post(
-            refill_url,
-            {
-                "amount": "5",
-                "payment_method": "CASH",
-                "bank": "OTHER",
-            },
-            HTTP_REFERER=counter_url,
-        )
-        assert response.status_code == 302
+    def test_click_office_success(self):
+        self.refill_user(self.customer, 10)
+        self.client.force_login(self.club_admin)
 
-        self.client.post(
-            reverse("counter:login", kwargs={"counter_id": self.foyer.id}),
-            {"username": self.krophil.username, "password": "plop"},
+        assert (
+            self.submit_basket(
+                self.customer,
+                [BasketItem(self.stamps.id, 5)],
+                counter=self.club_counter,
+            ).status_code
+            == 302
         )
+        assert self.updated_amount(self.customer) == Decimal("2.5")
 
-        response = self.client.get(
-            reverse("counter:details", kwargs={"counter_id": self.foyer.id})
-        )
+        # Test no special price on office counter
+        self.refill_user(self.club_admin, 10)
 
-        counter_token = re.search(
-            r'name="counter_token" value="([^"]*)"', str(response.content)
-        ).group(1)
-
-        response = self.client.post(
-            reverse("counter:details", kwargs={"counter_id": self.foyer.id}),
-            {"code": self.richard.customer.account_id, "counter_token": counter_token},
-        )
-        counter_url = response.get("location")
-        refill_url = reverse(
-            "counter:refilling_create",
-            kwargs={
-                "customer_id": self.richard.customer.pk,
-            },
+        assert (
+            self.submit_basket(
+                self.club_admin,
+                [BasketItem(self.stamps.id, 1)],
+                counter=self.club_counter,
+            ).status_code
+            == 302
         )
 
-        response = self.client.post(
-            refill_url,
-            {
-                "amount": "5",
-                "payment_method": "CASH",
-                "bank": "OTHER",
-            },
-            HTTP_REFERER=counter_url,
+        assert self.updated_amount(self.club_admin) == Decimal("8.5")
+
+    def test_click_bar_success(self):
+        self.refill_user(self.customer, 10)
+        self.login_in_bar(self.barmen)
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.beer.id, 2),
+                    BasketItem(self.snack.id, 1),
+                ],
+            ).status_code
+            == 302
         )
-        assert response.status_code == 403  # Krophil is not board admin
+
+        assert self.updated_amount(self.customer) == Decimal("5.5")
+
+        # Test barmen special price
+
+        self.refill_user(self.barmen, 10)
+
+        assert (
+            self.submit_basket(self.barmen, [BasketItem(self.beer.id, 1)])
+        ).status_code == 302
+
+        assert self.updated_amount(self.barmen) == Decimal("9")
+
+    def test_click_tray_price(self):
+        self.refill_user(self.customer, 20)
+        self.login_in_bar(self.barmen)
+
+        # Not applying tray price
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.beer_tap.id, 2),
+                ],
+            ).status_code
+            == 302
+        )
+
+        assert self.updated_amount(self.customer) == Decimal("17")
+
+        # Applying tray price
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.beer_tap.id, 7),
+                ],
+            ).status_code
+            == 302
+        )
+
+        assert self.updated_amount(self.customer) == Decimal("8")
+
+    def test_click_alcool_unauthorized(self):
+        self.login_in_bar()
+
+        for user in [self.underage_customer, self.banned_alcohol_customer]:
+            self.refill_user(user, 10)
+
+            # Buy product without age limit
+            assert (
+                self.submit_basket(
+                    user,
+                    [
+                        BasketItem(self.snack.id, 2),
+                    ],
+                ).status_code
+                == 302
+            )
+
+            assert self.updated_amount(user) == Decimal("7")
+
+            # Buy product without age limit
+            assert (
+                self.submit_basket(
+                    user,
+                    [
+                        BasketItem(self.beer.id, 2),
+                    ],
+                ).status_code
+                == 200
+            )
+
+            assert self.updated_amount(user) == Decimal("7")
+
+    def test_click_unauthorized_customer(self):
+        self.login_in_bar()
+
+        for user in [
+            self.banned_counter_customer,
+            self.customer_old_can_not_buy,
+        ]:
+            self.refill_user(user, 10)
+            resp = self.submit_basket(
+                user,
+                [
+                    BasketItem(self.snack.id, 2),
+                ],
+            )
+            assert resp.status_code == 302
+            assert resp.url == resolve_url(self.counter)
+
+            assert self.updated_amount(user) == Decimal("10")
+
+    def test_click_user_without_customer(self):
+        self.login_in_bar()
+        assert (
+            self.submit_basket(
+                self.customer_can_not_buy,
+                [
+                    BasketItem(self.snack.id, 2),
+                ],
+            ).status_code
+            == 404
+        )
+
+    def test_click_allowed_old_subscriber(self):
+        self.login_in_bar()
+        self.refill_user(self.customer_old_can_buy, 10)
+        assert (
+            self.submit_basket(
+                self.customer_old_can_buy,
+                [
+                    BasketItem(self.snack.id, 2),
+                ],
+            ).status_code
+            == 302
+        )
+
+        assert self.updated_amount(self.customer_old_can_buy) == Decimal("7")
+
+    def test_click_wrong_counter(self):
+        self.login_in_bar()
+        self.refill_user(self.customer, 10)
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.snack.id, 2),
+                ],
+                counter=self.other_counter,
+            ).status_code
+            == 302  # Redirect to counter main
+        )
+
+        # We want to test sending requests from another counter while
+        # we are currently registered to another counter
+        # so we connect to a counter and
+        # we create a new client, in order to check
+        # that using a client not logged to a counter
+        # where another client is logged still isn't authorized.
+        client = Client()
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.snack.id, 2),
+                ],
+                counter=self.counter,
+                client=client,
+            ).status_code
+            == 302  # Redirect to counter main
+        )
+
+        assert self.updated_amount(self.customer) == Decimal("10")
+
+    def test_click_not_connected(self):
+        self.refill_user(self.customer, 10)
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.snack.id, 2),
+                ],
+            ).status_code
+            == 302  # Redirect to counter main
+        )
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.snack.id, 2),
+                ],
+                counter=self.club_counter,
+            ).status_code
+            == 403
+        )
+
+        assert self.updated_amount(self.customer) == Decimal("10")
+
+    def test_click_product_not_in_counter(self):
+        self.refill_user(self.customer, 10)
+        self.login_in_bar()
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.stamps.id, 2),
+                ],
+            ).status_code
+            == 200
+        )
+        assert self.updated_amount(self.customer) == Decimal("10")
+
+    def test_click_product_invalid(self):
+        self.refill_user(self.customer, 10)
+        self.login_in_bar()
+
+        for item in [
+            BasketItem("-1", 2),
+            BasketItem(self.beer.id, -1),
+            BasketItem(None, 1),
+            BasketItem(self.beer.id, None),
+            BasketItem(None, None),
+        ]:
+            assert (
+                self.submit_basket(
+                    self.customer,
+                    [item],
+                ).status_code
+                == 200
+            )
+
+            assert self.updated_amount(self.customer) == Decimal("10")
+
+    def test_click_not_enough_money(self):
+        self.refill_user(self.customer, 10)
+        self.login_in_bar()
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.beer_tap.id, 5),
+                    BasketItem(self.beer.id, 10),
+                ],
+            ).status_code
+            == 200
+        )
+
+        assert self.updated_amount(self.customer) == Decimal("10")
 
     def test_annotate_has_barman_queryset(self):
         """Test if the custom queryset method `annotate_has_barman` works as intended."""
-        self.sli.counters.set([self.foyer, self.mde])
-        counters = Counter.objects.annotate_has_barman(self.sli)
+        counters = Counter.objects.annotate_has_barman(self.barmen)
         for counter in counters:
-            if counter.name in ("Foyer", "MDE"):
+            if counter in (self.counter, self.other_counter):
                 assert counter.has_annotated_barman
             else:
                 assert not counter.has_annotated_barman
@@ -436,4 +859,4 @@ class TestClubCounterClickAccess(TestCase):
         self.counter.sellers.add(self.user)
         self.client.force_login(self.user)
         res = self.client.get(self.click_url)
-        assert res.status_code == 200
+        assert res.status_code == 403

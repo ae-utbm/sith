@@ -43,6 +43,9 @@ class CounterMain(
     )
     current_tab = "counter"
 
+    def get_queryset(self):
+        return super().get_queryset().exclude(type="EBOUTIC")
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         if self.object.type == "BAR" and not (

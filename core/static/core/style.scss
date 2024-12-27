@@ -19,6 +19,13 @@ body {
   --loading-stroke: 5px;
   --loading-duration: 1s;
   position: relative;
+
+  &.aria-busy-grow {
+    // Make sure the element take enough place to hold the loading wheel
+    min-height: calc((var(--loading-size)) * 1.5);
+    min-width: calc((var(--loading-size)) * 1.5);
+    overflow: hidden;
+  }
 }
 
 [aria-busy]:after {
@@ -198,6 +205,10 @@ body {
   margin: 20px auto 0;
 
   /*---------------------------------NAV---------------------------------*/
+  a.btn {
+    display: inline-block;
+  }
+
   .btn {
     font-size: 15px;
     font-weight: normal;
@@ -250,6 +261,13 @@ body {
     i {
       margin-right: 4px;
     }
+  }
+
+  /**
+  * A spacer below an element. Somewhat cleaner than putting <br/> everywhere.
+  */
+  .margin-bottom {
+    margin-bottom: 1.5rem;
   }
 
   /*--------------------------------CONTENT------------------------------*/
@@ -319,7 +337,8 @@ body {
     margin-left: -125px;
     box-sizing: border-box;
     position: fixed;
-    z-index: 1;
+    z-index: 10;
+    /* to get on top of tomselect */
     left: 50%;
     top: 60px;
     text-align: center;
@@ -406,6 +425,31 @@ body {
           border-radius: 6px;
         }
       }
+    }
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+
+    $col-gap: 1rem;
+    $row-gap: 0.5rem;
+
+    &.gap {
+      column-gap: var($col-gap);
+      row-gap: var($row-gap);
+    }
+
+    @for $i from 2 through 5 {
+      &.gap-#{$i}x {
+        column-gap: $i * $col-gap;
+        row-gap: $i * $row-gap;
+      }
+    }
+
+    // Make an element of the row take as much space as needed
+    .grow {
+      flex: 1;
     }
   }
 
@@ -1210,40 +1254,6 @@ u,
   text-decoration: underline;
 }
 
-#bar-ui {
-  padding: 0.4em;
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row-reverse;
-
-  #products {
-    flex-basis: 100%;
-    margin: 0.2em;
-    overflow: auto;
-  }
-
-  #click_form {
-    flex: auto;
-    margin: 0.2em;
-  }
-
-  #user_info {
-    flex: auto;
-    padding: 0.5em;
-    margin: 0.2em;
-    height: 100%;
-    background: $secondary-neutral-light-color;
-
-    img {
-      max-width: 70%;
-    }
-
-    input {
-      background: white;
-    }
-  }
-}
-
 /*-----------------------------USER PROFILE----------------------------*/
 
 .user_mini_profile {
@@ -1417,16 +1427,6 @@ footer {
   bottom: 0;
   position: absolute;
   width: 97%;
-}
-
-#user_edit {
-  * {
-    text-align: center;
-  }
-
-  img {
-    width: 100px;
-  }
 }
 
 #cash_summary_form label,

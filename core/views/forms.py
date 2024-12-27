@@ -173,6 +173,9 @@ class RegisteringForm(UserCreationForm):
 class UserProfileForm(forms.ModelForm):
     """Form handling the user profile, managing the files"""
 
+    required_css_class = "required"
+    error_css_class = "error"
+
     class Meta:
         model = User
         fields = [
@@ -293,6 +296,7 @@ class UserGroupsForm(forms.ModelForm):
         queryset=RealGroup.objects.all(),
         widget=CheckboxSelectMultiple,
         label=_("Groups"),
+        required=False,
     )
 
     class Meta:

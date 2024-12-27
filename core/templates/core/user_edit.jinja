@@ -63,9 +63,7 @@
             {%- trans -%}Delete{%- endtrans -%}
           </button>
         </div>
-        <p>
-          {{ form[field_name].label }}
-        </p>
+        {{ form[field_name].label_tag() }}
         {{ form[field_name].errors }}
       {%- else -%}
         <em>{% trans %}To edit your profile picture, ask a member of the AE{% endtrans %}</em>
@@ -118,68 +116,68 @@
     {# All fields #}
     <div class="profile-fields">
       {%- for field in form -%}
-        {%-
-        if field.name in ["quote","profile_pict","avatar_pict","scrub_pict","is_subscriber_viewable","forum_signature"]
-        -%}
-        {%- continue -%}
-      {%- endif -%}
+        {%- if field.name in ["quote","profile_pict","avatar_pict","scrub_pict","is_subscriber_viewable","forum_signature"] -%}
+          {%- continue -%}
+        {%- endif -%}
 
-      <div class="profile-field">
-        <div class="profile-field-label">{{ field.label }}</div>
-        <div class="profile-field-content">
-          {{ field }}
-          {%- if field.errors -%}
-            <div class="field-error">{{ field.errors }}</div>
-          {%- endif -%}
+        <div class="profile-field">
+          <div class="profile-field-label">{{ field.label }}</div>
+          <div class="profile-field-content">
+            {{ field }}
+            {%- if field.errors -%}
+              <div class="field-error">{{ field.errors }}</div>
+            {%- endif -%}
+          </div>
         </div>
-      </div>
-{%- endfor -%}
-</div>
+      {%- endfor -%}
+    </div>
 
     {# Textareas #}
-<div class="profile-fields">
-  {%- for field in [form.quote, form.forum_signature] -%}
-    <div class="profile-field">
-      <div class="profile-field-label">{{ field.label }}</div>
-      <div class="profile-field-content">
-        {{ field }}
-        {%- if field.errors -%}
-          <div class="field-error">{{ field.errors }}</div>
-        {%- endif -%}
-      </div>
+    <div class="profile-fields">
+      {%- for field in [form.quote, form.forum_signature] -%}
+        <div class="profile-field">
+          <div class="profile-field-label">{{ field.label }}</div>
+          <div class="profile-field-content">
+            {{ field }}
+            {%- if field.errors -%}
+              <div class="field-error">{{ field.errors }}</div>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
     </div>
-  {%- endfor -%}
-</div>
 
     {# Checkboxes #}
-<div class="profile-visible">
-  {{ form.is_subscriber_viewable }}
-  {{ form.is_subscriber_viewable.label }}
-</div>
+    <div class="profile-visible">
+      {{ form.is_subscriber_viewable }}
+      {{ form.is_subscriber_viewable.label }}
+    </div>
+    <div class="final-actions">
 
-{%- if form.instance == user -%}
+      {%- if form.instance == user -%}
+        <p>
+          <a href="{{ url('core:password_change') }}">{%- trans -%}Change my password{%- endtrans -%}</a>
+        </p>
+      {%- elif user.is_root -%}
+        <p>
+          <a href="{{ url('core:password_root_change', user_id=form.instance.id) }}">
+            {%- trans -%}Change user password{%- endtrans -%}
+          </a>
+        </p>
+      {%- endif -%}
+
+      <p>
+        <input type="submit" value="{%- trans -%}Update{%- endtrans -%}" />
+      </p>
+    </div>
+  </form>
+
   <p>
-    <a href="{{ url('core:password_change') }}">{%- trans -%}Change my password{%- endtrans -%}</a>
+    <em>{%- trans -%}Username: {%- endtrans -%}&nbsp;{{ form.instance.username }}</em>
+    <br />
+    {%- if form.instance.customer -%}
+      <em>{%- trans -%}Account number: {%- endtrans -%}&nbsp;{{ form.instance.customer.account_id }}</em>
+    {%- endif -%}
   </p>
-{%- elif user.is_root -%}
-  <p>
-    <a href="{{ url('core:password_root_change', user_id=form.instance.id) }}">
-      {%- trans -%}Change user password{%- endtrans -%}
-    </a>
-  </p>
-{%- endif -%}
-
-<p>
-  <input type="submit" value="{%- trans -%}Update{%- endtrans -%}" />
-</p>
-</form>
-
-<p>
-  <em>{%- trans -%}Username: {%- endtrans -%}&nbsp;{{ form.instance.username }}</em>
-  <br />
-  {%- if form.instance.customer -%}
-    <em>{%- trans -%}Account number: {%- endtrans -%}&nbsp;{{ form.instance.customer.account_id }}</em>
-  {%- endif -%}
-</p>
 
 {%- endblock -%}

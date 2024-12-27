@@ -33,8 +33,8 @@ $hovered-red-text-color: #ff4d4d;
     flex-direction: row;
     gap: 10px;
 
-    >a {
-      color: $text-color;
+    > a {
+      color: $text-color!important;
     }
 
     &:hover>a {
@@ -395,9 +395,9 @@ $hovered-red-text-color: #ff4d4d;
         }
 
         >input[type=text] {
-          box-sizing: border-box;
-          max-width: 100%;
           width: 100%;
+          min-width: unset;
+          border: unset;
           height: 35px;
           border-radius: 5px;
           font-size: .9em;
