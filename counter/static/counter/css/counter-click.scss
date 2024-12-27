@@ -1,0 +1,62 @@
+@import "core/static/core/colors";
+
+.quantity {
+  display: inline-block;
+  min-width: 1.2em;
+  text-align: center;
+}
+
+.remove-item {
+  float: right;
+}
+
+.basket-error-container {
+  position: relative;
+  display: block
+}
+
+.basket-error {
+  z-index: 10; // to get on top of tomselect
+  text-align: center;
+  position: absolute;
+}
+
+
+#bar-ui {
+  padding: 0.4em;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row-reverse;
+}
+
+#products {
+  flex-basis: 100%;
+  margin: 0.2em;
+  overflow: auto;
+}
+
+#click-form {
+  flex: auto;
+  margin: 0.2em;
+  width: 20%;
+
+  ul {
+    list-style-type: none;
+  }
+}
+
+#user_info {
+  flex: auto;
+  padding: 0.5em;
+  margin: 0.2em;
+  height: 100%;
+  background: $secondary-neutral-light-color;
+
+  img {
+    max-width: 70%;
+  }
+
+  input {
+    background: white;
+  }
+}

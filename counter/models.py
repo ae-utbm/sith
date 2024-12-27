@@ -21,7 +21,7 @@ import string
 from datetime import date, datetime, timedelta
 from datetime import timezone as tz
 from decimal import Decimal
-from typing import Self, Tuple
+from typing import Self
 
 from dict2xml import dict2xml
 from django.conf import settings
@@ -138,7 +138,7 @@ class Customer(models.Model):
         return (date.today() - subscription.subscription_end) < timedelta(days=90)
 
     @classmethod
-    def get_or_create(cls, user: User) -> Tuple[Customer, bool]:
+    def get_or_create(cls, user: User) -> tuple[Customer, bool]:
         """Work in pretty much the same way as the usual get_or_create method,
         but with the default field replaced by some under the hood.
 
@@ -326,6 +326,8 @@ class ProductType(OrderedModel):
 
 class Product(models.Model):
     """A product, with all its related information."""
+
+    QUANTITY_FOR_TRAY_PRICE = 6
 
     name = models.CharField(_("name"), max_length=64)
     description = models.TextField(_("description"), default="")
@@ -525,7 +527,7 @@ class Counter(models.Model):
         if user.is_anonymous:
             return False
         mem = self.club.get_membership_for(user)
-        if mem and mem.role >= 7:
+        if mem and mem.role >= settings.SITH_CLUB_ROLES_ID["Treasurer"]:
             return True
         return user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
@@ -657,6 +659,34 @@ class Counter(models.Model):
         # but they share the same primary key
         return self.type == "BAR" and any(b.pk == customer.pk for b in self.barmen_list)
 
+    def get_products_for(self, customer: Customer) -> list[Product]:
+        """
+        Get all allowed products for the provided customer on this counter
+        Prices will be annotated
+        """
+
+        products = self.products.select_related("product_type").prefetch_related(
+            "buying_groups"
+        )
+
+        # Only include age appropriate products
+        age = customer.user.age
+        if customer.user.is_banned_alcohol:
+            age = min(age, 17)
+        products = products.filter(limit_age__lte=age)
+
+        # Compute special price for customer if he is a barmen on that bar
+        if self.customer_is_barman(customer):
+            products = products.annotate(price=F("special_selling_price"))
+        else:
+            products = products.annotate(price=F("selling_price"))
+
+        return [
+            product
+            for product in products.all()
+            if product.can_be_sold_to(customer.user)
+        ]
+
 
 class RefillingQuerySet(models.QuerySet):
     def annotate_total(self) -> Self:
@@ -761,7 +791,8 @@ class SellingQuerySet(models.QuerySet):
 class Selling(models.Model):
     """Handle the sellings."""
 
-    label = models.CharField(_("label"), max_length=64)
+    # We make sure that sellings have a way begger label than any product name is allowed to
+    label = models.CharField(_("label"), max_length=128)
     product = models.ForeignKey(
         Product,
         related_name="sellings",
