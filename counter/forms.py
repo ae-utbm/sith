@@ -47,6 +47,8 @@ class BillingInfoForm(forms.ModelForm):
 class StudentCardForm(forms.ModelForm):
     """Form for adding student cards"""
 
+    error_css_class = "error"
+
     class Meta:
         model = StudentCard
         fields = ["uid"]

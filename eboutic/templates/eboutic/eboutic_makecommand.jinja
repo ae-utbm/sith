@@ -77,8 +77,7 @@
             >
               {% csrf_token %}
               {{ billing_form }}
-              <br>
-              <br>
+              <br />
               <div
                 x-show="[BillingInfoReqState.SUCCESS, BillingInfoReqState.FAILURE].includes(reqState)"
                 class="alert"

@@ -446,6 +446,11 @@ body {
         row-gap: $i * $row-gap;
       }
     }
+
+    // Make an element of the row take as much space as needed
+    .grow {
+      flex: 1;
+    }
   }
 
   /*---------------------------------NEWS--------------------------------*/
@@ -1422,16 +1427,6 @@ footer {
   bottom: 0;
   position: absolute;
   width: 97%;
-}
-
-#user_edit {
-  * {
-    text-align: center;
-  }
-
-  img {
-    width: 100px;
-  }
 }
 
 #cash_summary_form label,

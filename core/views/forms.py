@@ -173,6 +173,9 @@ class RegisteringForm(UserCreationForm):
 class UserProfileForm(forms.ModelForm):
     """Form handling the user profile, managing the files"""
 
+    required_css_class = "required"
+    error_css_class = "error"
+
     class Meta:
         model = User
         fields = [
