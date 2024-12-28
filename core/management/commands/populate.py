@@ -738,7 +738,7 @@ Welcome to the wiki page!
             NewsDate(
                 news=n,
                 start_date=friday + timedelta(hours=24 * 7 + 1),
-                end_date=self.now + timedelta(hours=24 * 7 + 9),
+                end_date=friday + timedelta(hours=24 * 7 + 9),
             )
         )
         # Weekly
@@ -765,7 +765,7 @@ Welcome to the wiki page!
         )
         NewsDate.objects.bulk_create(news_dates)
 
-        # Create som data for pedagogy
+        # Create some data for pedagogy
 
         UV(
             code="PA00",

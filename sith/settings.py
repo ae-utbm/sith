@@ -163,6 +163,7 @@ TEMPLATES = [
                 "ProductType": "counter.models.ProductType",
                 "timezone": "django.utils.timezone",
                 "get_sith": "com.views.sith",
+                "get_language": "django.utils.translation.get_language",
             },
             "bytecode_cache": {
                 "name": "default",

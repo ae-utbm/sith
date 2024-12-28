@@ -5,6 +5,15 @@
   {% trans %}News{% endtrans %}
 {% endblock %}
 
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static('com/css/news-list.scss') }}">
+  <link rel="stylesheet" href="{{ static('com/components/ics-calendar.scss') }}">
+{% endblock %}
+
+{% block additional_js %}
+  <script type="module" src={{ static("bundled/com/components/ics-calendar-index.ts") }}></script>
+{% endblock %}
+
 {% block content %}
   {% if user.is_com_admin %}
     <div id="news_admin">
@@ -98,16 +107,6 @@ type="EVENT").order_by('dates__start_date') %}
   {% endfor %}
 {% endif %}
 
-<h3>{% trans %}All coming events{% endtrans %}</h3>
-<iframe
-  src="https://embed.styledcalendar.com/#2mF2is8CEXhr4ADcX6qN"
-  title="Styled Calendar"
-  class="styled-calendar-container"
-  style="width: 100%; border: none; height: 1060px"
-  data-cy="calendar-embed-iframe">
-</iframe>
-</div>
-
 <div id="right_column" class="news_column">
   <div id="agenda">
     <div id="agenda_title">{% trans %}Agenda{% endtrans %}</div>
@@ -154,7 +153,13 @@ type="EVENT").order_by('dates__start_date') %}
       {%- endif -%}
     </div>
   </div>
+
+  <h3>{% trans %}All coming events{% endtrans %}</h3>
+
+  <ics-calendar locale="{{ get_language() }}"></ics-calendar>
+
 </div>
+
 
 </div>
 {% endblock %}

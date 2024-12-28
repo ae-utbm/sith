@@ -1,0 +1,60 @@
+@import "core/static/core/colors";
+
+
+:root {
+  --fc-button-border-color: #fff;
+  --fc-button-hover-border-color: #fff;
+  --fc-button-active-border-color: #fff;
+  --fc-button-text-color: #fff;
+  --fc-button-bg-color: #1a78b3;
+  --fc-button-active-bg-color: #15608F;
+  --fc-button-hover-bg-color: #15608F;
+  --fc-today-bg-color: rgba(26, 120, 179, 0.1);
+  --fc-border-color: #DDDDDD;
+  --sc-main-background-color: #f9fafb;
+  --sc-main-padding: 5px;
+  --sc-main-border: 0px solid #DDDDDD;
+  --sc-main-border-radius: 0px;
+  --sc-body-font-family: Roboto;
+  --sc-title-font-family: Roboto;
+  --sc-body-font-size: 16px;
+  --sc-title-font-size: 28px;
+  --sc-body-font-weight: 400;
+  --sc-title-font-weight: 500;
+  --sc-title-font-color: #111111;
+  --sc-base-body-font-color: #222222;
+  --sc-title-font-style: normal;
+  --sc-body-font-style: normal;
+  --sc-event-dot-color: #1a78b3;
+  --sc-button-border: 1px solid #ffffff;
+  --sc-button-border-radius: 4px;
+  --sc-button-icons-size: 22px;
+  --sc-grid-event-white-space: nowrap;
+  --sc-block-event-background-color-hovered: rgb(245, 245, 245);
+  --sc-block-event-border: 1px solid rgba(255, 255, 255, 0);
+  --sc-block-event-border-radius: 2.5px;
+  --sc-dot-event-background-color: rgba(255, 255, 255, 0);
+  --sc-dot-event-background-color-hovered: rgb(245, 245, 245);
+  --sc-dot-event-text-color: #222222;
+  --sc-dot-event-border: 1px solid rgba(255, 255, 255, 0);
+  --sc-dot-event-border-radius: 2.5px;
+  --sc-grid-day-header-background-color: rgba(255, 255, 255, 0);
+  --sc-list-day-header-background-color: rgba(208, 208, 208, 0.3);
+  --sc-inner-calendar-background-color: rgba(255, 255, 255, 0);
+  --sc-past-day-background-color: rgba(255, 255, 255, 0);
+  --sc-future-day-background-color: rgba(255, 255, 255, 0);
+  --sc-disabled-day-background-color: rgba(208, 208, 208, 0.3);
+  --sc-event-overlay-background-color: #FFFFFF;
+  --sc-event-overlay-padding: 20px;
+  --sc-event-overlay-border: 1px solid #EEEEEE;
+  --sc-event-overlay-border-radius: 4px;
+  --sc-event-overlay-primary-icon-color: #1a78b3;
+  --sc-event-overlay-secondary-icon-color: #000000;
+  --sc-event-overlay-box-shadow: 0px 6px 20px 4px rgb(0 0 0 / 16%);
+  --sc-event-overlay-max-width: 600px;
+}
+
+ics-calendar {
+  border: none;
+  box-shadow: none;
+}
