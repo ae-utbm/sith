@@ -64,16 +64,20 @@ class PageView(CanViewMixin, DetailView):
 class PageHistView(CanViewMixin, DetailView):
     model = Page
     template_name = "core/page_hist.jinja"
+    slug_field = "_full_name"
+    slug_url_kwarg = "page_name"
+    _cached_object: Page | None = None
 
     def dispatch(self, request, *args, **kwargs):
-        res = super().dispatch(request, *args, **kwargs)
-        if self.object.need_club_redirection:
-            return redirect("club:club_hist", club_id=self.object.club.id)
-        return res
+        page = self.get_object()
+        if page.need_club_redirection:
+            return redirect("club:club_hist", club_id=page.club.id)
+        return super().dispatch(request, *args, **kwargs)
 
-    def get_object(self):
-        self.page = Page.get_page_by_full_name(self.kwargs["page_name"])
-        return self.page
+    def get_object(self, *args, **kwargs):
+        if not self._cached_object:
+            self._cached_object = super().get_object()
+        return self._cached_object
 
 
 class PageRevView(CanViewMixin, DetailView):
