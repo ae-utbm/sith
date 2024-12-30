@@ -92,20 +92,12 @@
   </div>
 {% endif %}
 
-{% set coming_soon = object_list.filter(dates__start_date__gte=timezone.now()+timedelta(days=5),
-type="EVENT").order_by('dates__start_date') %}
-{% if coming_soon %}
-  <h3>{% trans %}Coming soon... don't miss!{% endtrans %}</h3>
-  {% for news in coming_soon %}
-    <section class="news_coming_soon">
-      <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a>
-      <span class="news_date">{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
-        {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }} -
-        {{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
-        {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
-    </section>
-  {% endfor %}
-{% endif %}
+
+<h3>{% trans %}All coming events{% endtrans %}</h3>
+<ics-calendar locale="{{ get_language() }}"></ics-calendar>
+
+
+</div>
 
 <div id="right_column" class="news_column">
   <div id="agenda">
@@ -153,10 +145,6 @@ type="EVENT").order_by('dates__start_date') %}
       {%- endif -%}
     </div>
   </div>
-
-  <h3>{% trans %}All coming events{% endtrans %}</h3>
-
-  <ics-calendar locale="{{ get_language() }}"></ics-calendar>
 
 </div>
 
