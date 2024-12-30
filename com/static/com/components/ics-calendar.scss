@@ -44,12 +44,12 @@
   --sc-past-day-background-color: rgba(255, 255, 255, 0);
   --sc-future-day-background-color: rgba(255, 255, 255, 0);
   --sc-disabled-day-background-color: rgba(208, 208, 208, 0.3);
-  --sc-event-overlay-background-color: #FFFFFF;
+  --sc-event-overlay-background-color: white;
   --sc-event-overlay-padding: 20px;
   --sc-event-overlay-border: 1px solid #EEEEEE;
   --sc-event-overlay-border-radius: 4px;
   --sc-event-overlay-primary-icon-color: #1a78b3;
-  --sc-event-overlay-secondary-icon-color: #000000;
+  --sc-event-overlay-secondary-icon-color: black;
   --sc-event-overlay-box-shadow: 0px 6px 20px 4px rgb(0 0 0 / 16%);
   --sc-event-overlay-max-width: 600px;
 }
@@ -57,4 +57,39 @@
 ics-calendar {
   border: none;
   box-shadow: none;
+
+  a.fc-col-header-cell-cushion,
+  a.fc-col-header-cell-cushion:hover {
+    color: black;
+  }
+
+  a.fc-daygrid-day-number,
+  a.fc-daygrid-day-number:hover {
+    color: rgb(34, 34, 34);
+  }
+
+  td {
+    overflow: visible; // Show events on multiple days
+  }
+
+	//Reset from style.scss
+  table {
+    box-shadow: none;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    margin: 0px;
+  }
+
+	// Reset from style.scss
+  thead {
+    background-color: white;
+    color: black;
+  }
+
+	// Reset from style.scss
+  tbody>tr {
+    &:nth-child(even):not(.highlight) {
+      background: white;
+    }
+  }
 }
