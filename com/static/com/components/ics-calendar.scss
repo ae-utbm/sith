@@ -39,6 +39,7 @@ ics-calendar {
       border-radius: var(--event-details-border-radius);
       background-color: var(--event-details-background-color);
       box-shadow: var(--event-details-box-shadow);
+      gap: 20px;
     }
 
     .event-detail-row-icon {

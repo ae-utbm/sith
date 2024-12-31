@@ -61,18 +61,24 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       oldPopup.remove();
     }
 
-    const makePopupTitle = (event: EventImpl) => {
+    const makePopupInfo = (info: HTMLElement, iconClass: string) => {
       const row = document.createElement("div");
       const icon = document.createElement("i");
-      const infoRow = document.createElement("div");
-      const title = document.createElement("h4");
-      const time = document.createElement("span");
+
       row.setAttribute("class", "event-details-row");
 
-      icon.setAttribute(
-        "class",
-        "fa-solid fa-calendar-days fa-xl event-detail-row-icon",
-      );
+      icon.setAttribute("class", `event-detail-row-icon fa-xl ${iconClass}`);
+
+      row.appendChild(icon);
+      row.appendChild(info);
+
+      return row;
+    };
+
+    const makePopupTitle = (event: EventImpl) => {
+      const row = document.createElement("div");
+      const title = document.createElement("h4");
+      const time = document.createElement("span");
 
       title.setAttribute("class", "event-details-row-content");
       title.textContent = event.title;
@@ -80,13 +86,33 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       time.setAttribute("class", "event-details-row-content");
       time.textContent = `${this.formatDate(event.start)} - ${this.formatDate(event.end)}`;
 
-      infoRow.appendChild(title);
-      infoRow.appendChild(time);
+      row.appendChild(title);
+      row.appendChild(time);
+      return makePopupInfo(
+        row,
+        "fa-solid fa-calendar-days fa-xl event-detail-row-icon",
+      );
+    };
 
-      row.appendChild(icon);
-      row.appendChild(infoRow);
+    const makePopupLocation = (event: EventImpl) => {
+      if (event.extendedProps.location === null) {
+        return null;
+      }
+      const info = document.createElement("div");
+      info.innerText = event.extendedProps.location;
 
-      return row;
+      return makePopupInfo(info, "fa-solid fa-location-dot");
+    };
+
+    const makePopupUrl = (event: EventImpl) => {
+      if (event.url === "") {
+        return null;
+      }
+      const url = document.createElement("a");
+      url.href = event.url;
+      url.textContent = gettext("More info");
+
+      return makePopupInfo(url, "fa-solid fa-link");
     };
 
     // Create new popup
@@ -97,6 +123,16 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     popupContainer.setAttribute("class", "event-details-container");
 
     popupContainer.appendChild(makePopupTitle(event.event));
+
+    const location = makePopupLocation(event.event);
+    if (location !== null) {
+      popupContainer.appendChild(location);
+    }
+
+    const url = makePopupUrl(event.event);
+    if (url !== null) {
+      popupContainer.appendChild(url);
+    }
 
     popup.appendChild(popupContainer);
 
@@ -143,6 +179,8 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       eventClick: (event) => {
         // Avoid our popup to be deleted because we clicked outside of it
         event.jsEvent.stopPropagation();
+        // Don't auto-follow events URLs
+        event.jsEvent.preventDefault();
         this.createEventDetailPopup(event);
       },
     });

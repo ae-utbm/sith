@@ -3,6 +3,7 @@ from datetime import timedelta
 import urllib3
 from django.core.cache import cache
 from django.http import HttpResponse
+from django.urls import reverse
 from django.utils import timezone
 from ics import Calendar, Event
 from ninja_extra import ControllerBase, api_controller, route
@@ -38,12 +39,14 @@ class CalendarController(ControllerBase):
         calendar = Calendar()
         for news_date in NewsDate.objects.filter(
             news__is_moderated=True,
-            start_date__lte=timezone.now() + timedelta(days=30),
+            end_date__gte=timezone.now()
+            - (timedelta(days=30) * 60),  # Roughly get the last 6 months
         ).prefetch_related("news"):
             event = Event(
                 name=news_date.news.title,
                 begin=news_date.start_date,
                 end=news_date.end_date,
+                url=reverse("com:news_detail", kwargs={"news_id": news_date.news.id}),
             )
             calendar.events.add(event)
 
