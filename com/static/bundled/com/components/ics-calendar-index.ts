@@ -1,6 +1,7 @@
 import { makeUrl } from "#core:utils/api";
 import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
 import { Calendar, type EventClickArg } from "@fullcalendar/core";
+import type { EventImpl } from "@fullcalendar/core/internal";
 import enLocale from "@fullcalendar/core/locales/en-gb";
 import frLocale from "@fullcalendar/core/locales/fr";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -60,37 +61,42 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       oldPopup.remove();
     }
 
+    const makePopupTitle = (event: EventImpl) => {
+      const row = document.createElement("div");
+      const icon = document.createElement("i");
+      const infoRow = document.createElement("div");
+      const title = document.createElement("h4");
+      const time = document.createElement("span");
+      row.setAttribute("class", "event-details-row");
+
+      icon.setAttribute(
+        "class",
+        "fa-solid fa-calendar-days fa-xl event-detail-row-icon",
+      );
+
+      title.setAttribute("class", "event-details-row-content");
+      title.textContent = event.title;
+
+      time.setAttribute("class", "event-details-row-content");
+      time.textContent = `${this.formatDate(event.start)} - ${this.formatDate(event.end)}`;
+
+      infoRow.appendChild(title);
+      infoRow.appendChild(time);
+
+      row.appendChild(icon);
+      row.appendChild(infoRow);
+
+      return row;
+    };
+
     // Create new popup
     const popup = document.createElement("div");
     const popupContainer = document.createElement("div");
-    const popupFirstRow = document.createElement("div");
-    const popupTitleTimeIcon = document.createElement("i");
-    const popupTitleTime = document.createElement("div");
-    const popupTitle = document.createElement("h4");
-    const popupTime = document.createElement("span");
 
     popup.setAttribute("id", "event-details");
     popupContainer.setAttribute("class", "event-details-container");
-    popupFirstRow.setAttribute("class", "event-details-row");
 
-    popupTitleTimeIcon.setAttribute(
-      "class",
-      "fa-solid fa-calendar-days fa-xl event-detail-row-icon",
-    );
-
-    popupTitle.setAttribute("class", "event-details-row-content");
-    popupTitle.textContent = event.event.title;
-
-    popupTime.setAttribute("class", "event-details-row-content");
-    popupTime.textContent = `${this.formatDate(event.event.start)} - ${this.formatDate(event.event.end)}`;
-
-    popupTitleTime.appendChild(popupTitle);
-    popupTitleTime.appendChild(popupTime);
-
-    popupFirstRow.appendChild(popupTitleTimeIcon);
-    popupFirstRow.appendChild(popupTitleTime);
-
-    popupContainer.appendChild(popupFirstRow);
+    popupContainer.appendChild(makePopupTitle(event.event));
 
     popup.appendChild(popupContainer);
 
