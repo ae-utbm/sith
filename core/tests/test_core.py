@@ -358,9 +358,6 @@ class TestUserIsInGroup(TestCase):
         cls.accounting_admin = Group.objects.get(name="Accounting admin")
         cls.com_admin = Group.objects.get(name="Communication admin")
         cls.counter_admin = Group.objects.get(name="Counter admin")
-        cls.banned_alcohol = Group.objects.get(name="Banned from buying alcohol")
-        cls.banned_counters = Group.objects.get(name="Banned from counters")
-        cls.banned_subscription = Group.objects.get(name="Banned to subscribe")
         cls.sas_admin = Group.objects.get(name="SAS admin")
         cls.club = baker.make(Club)
         cls.main_club = Club.objects.get(id=1)
@@ -373,7 +370,6 @@ class TestUserIsInGroup(TestCase):
         self.assert_in_public_group(user)
         for group in (
             self.root_group,
-            self.banned_counters,
             self.accounting_admin,
             self.sas_admin,
             self.subscribers,

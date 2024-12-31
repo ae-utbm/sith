@@ -48,7 +48,7 @@ from accounting.models import (
 from club.models import Club, Membership
 from com.calendar import IcsCalendar
 from com.models import News, NewsDate, Sith, Weekmail
-from core.models import Group, Page, PageRev, SithFile, User
+from core.models import BanGroup, Group, Page, PageRev, SithFile, User
 from core.utils import resize_image
 from counter.models import Counter, Product, ProductType, StudentCard
 from election.models import Candidature, Election, ElectionList, Role
@@ -94,6 +94,7 @@ class Command(BaseCommand):
         Sith.objects.create(weekmail_destinations="etudiants@git.an personnel@git.an")
         Site.objects.create(domain=settings.SITH_URL, name=settings.SITH_NAME)
         groups = self._create_groups()
+        self._create_ban_groups()
 
         root = User.objects.create_superuser(
             id=0,
@@ -951,11 +952,6 @@ Welcome to the wiki page!
                 )
             )
         )
-        Group.objects.create(
-            name="Banned from buying alcohol", is_manually_manageable=True
-        )
-        Group.objects.create(name="Banned from counters", is_manually_manageable=True)
-        Group.objects.create(name="Banned to subscribe", is_manually_manageable=True)
         sas_admin = Group.objects.create(name="SAS admin", is_manually_manageable=True)
         sas_admin.permissions.add(
             *list(
@@ -995,3 +991,8 @@ Welcome to the wiki page!
             sas_admin=sas_admin,
             pedagogy_admin=pedagogy_admin,
         )
+
+    def _create_ban_groups(self):
+        BanGroup.objects.create(name="Banned from buying alcohol", description="")
+        BanGroup.objects.create(name="Banned from counters", description="")
+        BanGroup.objects.create(name="Banned to subscribe", description="")
