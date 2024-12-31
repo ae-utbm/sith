@@ -41,13 +41,22 @@ ics-calendar {
       box-shadow: var(--event-details-box-shadow);
     }
 
+    .event-detail-row-icon {
+      margin-left: 10px;
+      margin-right: 20px;
+      align-content: center;
+      align-self: center;
+    }
+
     .event-details-row {
       display: flex;
-      flex-direction: row;
       align-items: start;
     }
 
-    .event-details-title {
+    .event-details-row-content {
+      display: flex;
+      align-items: start;
+      flex-direction: row;
       background-color: var(--event-details-background-color);
       margin-top: 0px;
       margin-bottom: 4px;

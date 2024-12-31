@@ -64,7 +64,6 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     const popup = document.createElement("div");
     const popupContainer = document.createElement("div");
     const popupFirstRow = document.createElement("div");
-    const popupSecondRow = document.createElement("div");
     const popupTitleTimeIcon = document.createElement("i");
     const popupTitleTime = document.createElement("div");
     const popupTitle = document.createElement("h4");
@@ -73,24 +72,25 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     popup.setAttribute("id", "event-details");
     popupContainer.setAttribute("class", "event-details-container");
     popupFirstRow.setAttribute("class", "event-details-row");
-    popupSecondRow.setAttribute("class", "event-details-row");
 
-    popupTitleTimeIcon.setAttribute("class", "fa-solid fa-calendar-days fa-xl");
+    popupTitleTimeIcon.setAttribute(
+      "class",
+      "fa-solid fa-calendar-days fa-xl event-detail-row-icon",
+    );
 
-    popupTitle.setAttribute("class", "event-details-title");
+    popupTitle.setAttribute("class", "event-details-row-content");
     popupTitle.textContent = event.event.title;
 
-    popupTime.setAttribute("class", "event-details-time");
+    popupTime.setAttribute("class", "event-details-row-content");
     popupTime.textContent = `${this.formatDate(event.event.start)} - ${this.formatDate(event.event.end)}`;
 
     popupTitleTime.appendChild(popupTitle);
     popupTitleTime.appendChild(popupTime);
 
     popupFirstRow.appendChild(popupTitleTimeIcon);
-    popupSecondRow.appendChild(popupTitleTime);
+    popupFirstRow.appendChild(popupTitleTime);
 
     popupContainer.appendChild(popupFirstRow);
-    popupContainer.appendChild(popupSecondRow);
 
     popup.appendChild(popupContainer);
 
