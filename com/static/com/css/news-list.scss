@@ -8,37 +8,33 @@
     flex-direction: column;
   }
 
-  .news_column {
-    display: inline-block;
-    margin: 0;
-    vertical-align: top;
-  }
-
   #news_admin {
     margin-bottom: 1em;
   }
 
   #right_column {
     flex: 20%;
-    float: right;
-    margin: 0.2em;
+    margin: 3.2px;
+
+    display: inline-block;
+    vertical-align: top;
   }
 
   #left_column {
     flex: 79%;
     margin: 0.2em;
+  }
 
-    h3 {
-      background: $second-color;
-      box-shadow: $shadow-color 1px 1px 1px;
-      padding: 0.4em;
-      margin: 0 0 0.5em 0;
-      text-transform: uppercase;
-      font-size: 1.1em;
+  h3 {
+    background: $second-color;
+    box-shadow: $shadow-color 1px 1px 1px;
+    padding: 0.4em;
+    margin: 0 0 0.5em 0;
+    text-transform: uppercase;
+    font-size: 1.1em;
 
-      &:not(:first-of-type) {
-        margin: 2em 0 1em 0;
-      }
+    &:not(:first-of-type) {
+      margin: 2em 0 1em 0;
     }
   }
 
@@ -50,8 +46,8 @@
     }
   }
 
-	/* AGENDA/BIRTHDAYS */
-  #agenda,
+  /* LINKS/BIRTHDAYS */
+  #links,
   #birthdays {
     display: block;
     width: 100%;
@@ -59,9 +55,7 @@
     font-size: 70%;
     margin-bottom: 1em;
 
-    #agenda_title,
-    #birthdays_title {
-      margin: 0;
+    h3 {
       border-radius: 5px 5px 0 0;
       box-shadow: $shadow-color 1px 1px 1px;
       padding: 0.5em;
@@ -72,34 +66,27 @@
       background: $second-color;
     }
 
-    #agenda_content {
+    #links_content {
       overflow: auto;
       box-shadow: $shadow-color 1px 1px 1px;
       height: 20em;
-    }
 
-    #agenda_content,
-    #birthdays_content {
-      .agenda_item {
-        padding: 0.5em;
-        margin-bottom: 0.5em;
-
-        &:nth-of-type(even) {
-          background: $secondary-neutral-light-color;
-        }
-
-        .agenda_time {
-          font-size: 90%;
-          color: grey;
-        }
-
-        .agenda_item_content {
-          p {
-            margin-top: 0.2em;
-          }
-        }
+      h4 {
+        margin-left: 5px;
       }
 
+      li {
+        margin: 10px;
+      }
+
+      i {
+        width: 20px;
+        margin: 5px;
+      }
+    }
+
+
+    #birthdays_content {
       ul.birthdays_year {
         margin: 0;
         list-style-type: none;
@@ -124,9 +111,9 @@
     }
   }
 
-	/* END AGENDA/BIRTHDAYS */
+  /* END AGENDA/BIRTHDAYS */
 
-	/* EVENTS TODAY AND NEXT FEW DAYS */
+  /* EVENTS TODAY AND NEXT FEW DAYS */
   .news_events_group {
     box-shadow: $shadow-color 1px 1px 1px;
     margin-left: 1em;
@@ -222,9 +209,9 @@
     }
   }
 
-	/* END EVENTS TODAY AND NEXT FEW DAYS */
+  /* END EVENTS TODAY AND NEXT FEW DAYS */
 
-	/* COMING SOON */
+  /* COMING SOON */
   .news_coming_soon {
     display: list-item;
     list-style-type: square;
@@ -242,9 +229,9 @@
     }
   }
 
-	/* END COMING SOON */
+  /* END COMING SOON */
 
-	/* NOTICES */
+  /* NOTICES */
   .news_notice {
     margin: 0 0 1em 1em;
     padding: 0.4em;
@@ -262,9 +249,9 @@
     }
   }
 
-	/* END NOTICES */
+  /* END NOTICES */
 
-	/* CALLS */
+  /* CALLS */
   .news_call {
     margin: 0 0 1em 1em;
     padding: 0.4em;
@@ -286,7 +273,7 @@
     }
   }
 
-	/* END CALLS */
+  /* END CALLS */
 
   .news_empty {
     margin-left: 1em;

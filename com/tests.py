@@ -97,9 +97,7 @@ class TestCom(TestCase):
         response = self.client.get(reverse("core:index"))
         self.assertContains(
             response,
-            text=html.escape(
-                _("You need an up to date subscription to access this content")
-            ),
+            text=html.escape(_("You need to subscribe to access this content")),
         )
 
     def test_birthday_subscibed_user(self):
@@ -107,9 +105,16 @@ class TestCom(TestCase):
 
         self.assertNotContains(
             response,
-            text=html.escape(
-                _("You need an up to date subscription to access this content")
-            ),
+            text=html.escape(_("You need to subscribe to access this content")),
+        )
+
+    def test_birthday_old_subscibed_user(self):
+        self.client.force_login(User.objects.get(username="old_subscriber"))
+        response = self.client.get(reverse("core:index"))
+
+        self.assertNotContains(
+            response,
+            text=html.escape(_("You need to subscribe to access this content")),
         )
 
 
