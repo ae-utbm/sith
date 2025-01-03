@@ -23,20 +23,19 @@
 #
 import logging
 
-from django import forms
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.timezone import localdate
-from django.utils.translation import gettext as _
-from django.views.generic import ListView
-from django.views.generic.edit import FormView
+from django.views.generic import DeleteView, ListView
+from django.views.generic.edit import CreateView, FormView
 
-from core.models import OperationLog, SithFile, User
+from core.models import OperationLog, SithFile, User, UserBan
 from core.views import CanEditPropMixin
-from core.views.widgets.select import AutoCompleteSelectUser
 from counter.models import Customer
 from forum.models import ForumMessageMeta
+from rootplace.forms import BanForm, MergeForm, SelectUserForm
 
 
 def __merge_subscriptions(u1: User, u2: User):
@@ -155,33 +154,6 @@ def delete_all_forum_user_messages(
         ForumMessageMeta(message=message, user=moderator, action="DELETE").save()
 
 
-class MergeForm(forms.Form):
-    user1 = forms.ModelChoiceField(
-        label=_("User that will be kept"),
-        help_text=None,
-        required=True,
-        widget=AutoCompleteSelectUser,
-        queryset=User.objects.all(),
-    )
-    user2 = forms.ModelChoiceField(
-        label=_("User that will be deleted"),
-        help_text=None,
-        required=True,
-        widget=AutoCompleteSelectUser,
-        queryset=User.objects.all(),
-    )
-
-
-class SelectUserForm(forms.Form):
-    user = forms.ModelChoiceField(
-        label=_("User to be selected"),
-        help_text=None,
-        required=True,
-        widget=AutoCompleteSelectUser,
-        queryset=User.objects.all(),
-    )
-
-
 class MergeUsersView(FormView):
     template_name = "rootplace/merge.jinja"
     form_class = MergeForm
@@ -233,3 +205,39 @@ class OperationLogListView(ListView, CanEditPropMixin):
     template_name = "rootplace/logs.jinja"
     ordering = ["-date"]
     paginate_by = 100
+
+
+class BanView(PermissionRequiredMixin, ListView):
+    """[UserBan][core.models.UserBan] management view.
+
+    Displays :
+
+    - the list of active bans with their main information,
+      with a link to [BanDeleteView][rootplace.views.BanDeleteView] for each one
+    - a link which redirects to [BanCreateView][rootplace.views.BanCreateView]
+    """
+
+    permission_required = "core.view_userban"
+    template_name = "rootplace/userban.jinja"
+    queryset = UserBan.objects.select_related("user", "user__profile_pict", "ban_group")
+    ordering = "created_at"
+    context_object_name = "user_bans"
+
+
+class BanCreateView(PermissionRequiredMixin, CreateView):
+    """[UserBan][core.models.UserBan] creation view."""
+
+    permission_required = "core.add_userban"
+    form_class = BanForm
+    template_name = "core/create.jinja"
+    success_url = reverse_lazy("rootplace:ban_list")
+
+
+class BanDeleteView(PermissionRequiredMixin, DeleteView):
+    """[UserBan][core.models.UserBan] deletion view."""
+
+    permission_required = "core.delete_userban"
+    pk_url_kwarg = "ban_id"
+    model = UserBan
+    template_name = "core/delete_confirm.jinja"
+    success_url = reverse_lazy("rootplace:ban_list")

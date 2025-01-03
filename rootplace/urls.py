@@ -25,6 +25,9 @@
 from django.urls import path
 
 from rootplace.views import (
+    BanCreateView,
+    BanDeleteView,
+    BanView,
     DeleteAllForumUserMessagesView,
     MergeUsersView,
     OperationLogListView,
@@ -38,4 +41,7 @@ urlpatterns = [
         name="delete_forum_messages",
     ),
     path("logs/", OperationLogListView.as_view(), name="operation_logs"),
+    path("ban/", BanView.as_view(), name="ban_list"),
+    path("ban/new", BanCreateView.as_view(), name="ban_create"),
+    path("ban/<int:ban_id>/remove/", BanDeleteView.as_view(), name="ban_remove"),
 ]
