@@ -68,16 +68,35 @@
         margin-left: 5px;
       }
 
-      li {
-        margin: 10px;
+      ul {
+        list-style: none;
+        margin-left: 0;
+
+        li {
+          margin: 10px;
+
+          .fa-facebook {
+            color: $faceblue;
+          }
+
+          .fa-discord {
+            color: $discordblurple;
+          }
+
+          .fa-square-instagram::before {
+            background: $instagradient;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+          }
+
+          i {
+            width: 25px;
+            text-align: center;
+          }
+        }
       }
 
-      i {
-        width: 20px;
-        margin: 5px;
-      }
     }
-
 
     #birthdays_content {
       ul.birthdays_year {
