@@ -17,11 +17,16 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
 
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import final
+
+import urllib3
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
@@ -35,6 +40,39 @@ from django.utils.translation import gettext_lazy as _
 
 from club.models import Club
 from core.models import Notification, Preferences, User
+
+
+@final
+class IcsCalendar:
+    _CACHE_FOLDER: Path = settings.MEDIA_ROOT / "com" / "calendars"
+    _EXTERNAL_CALENDAR = _CACHE_FOLDER / "external.ics"
+
+    @classmethod
+    def get_external(cls, expiration: timedelta = timedelta(hours=1)) -> Path | None:
+        if (
+            cls._EXTERNAL_CALENDAR.exists()
+            and timezone.make_aware(
+                datetime.fromtimestamp(cls._EXTERNAL_CALENDAR.stat().st_mtime)
+            )
+            + expiration
+            > timezone.now()
+        ):
+            return cls._EXTERNAL_CALENDAR
+        return cls.make_external()
+
+    @classmethod
+    def make_external(cls) -> Path | None:
+        calendar = urllib3.request(
+            "GET",
+            "https://calendar.google.com/calendar/ical/ae.utbm%40gmail.com/public/basic.ics",
+        )
+        if calendar.status != 200:
+            return None
+
+        cls._CACHE_FOLDER.mkdir(parents=True, exist_ok=True)
+        with open(cls._EXTERNAL_CALENDAR, "wb") as f:
+            _ = f.write(calendar.data)
+        return cls._EXTERNAL_CALENDAR
 
 
 class Sith(models.Model):

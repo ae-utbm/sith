@@ -1,15 +1,14 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from pathlib import Path
 
-import urllib3
 from django.conf import settings
-from django.http import HttpResponse
+from django.http import Http404
 from django.urls import reverse
 from django.utils import timezone
 from ics import Calendar, Event
 from ninja_extra import ControllerBase, api_controller, route
 
-from com.models import NewsDate
+from com.models import IcsCalendar, NewsDate
 from core.views.files import send_raw_file
 
 
@@ -19,28 +18,18 @@ class CalendarController(ControllerBase):
 
     @route.get("/external.ics")
     def calendar_external(self):
-        file = self.CACHE_FOLDER / "external.ics"
-        # Return cached file if updated less than an our ago
-        if (
-            file.exists()
-            and timezone.make_aware(datetime.fromtimestamp(file.stat().st_mtime))
-            + timedelta(hours=1)
-            > timezone.now()
-        ):
-            return send_raw_file(file)
+        """Return the ICS file of the AE Google Calendar
 
-        calendar = urllib3.request(
-            "GET",
-            "https://calendar.google.com/calendar/ical/ae.utbm%40gmail.com/public/basic.ics",
-        )
-        if calendar.status != 200:
-            return HttpResponse(status=calendar.status)
+        Because of Google's cors rules, we can't "just" do a request to google ics
+        from the frontend. Google is blocking CORS request in it's responses headers.
+        The only way to do it from the frontend is to use Google Calendar API with an API key
+        This is not especially desirable as your API key is going to be provided to the frontend.
 
-        self.CACHE_FOLDER.mkdir(parents=True, exist_ok=True)
-        with open(file, "wb") as f:
-            _ = f.write(calendar.data)
-
-        return send_raw_file(file)
+        This is why we have this backend based solution.
+        """
+        if (calendar := IcsCalendar.get_external()) is not None:
+            return send_raw_file(calendar)
+        raise Http404
 
     @route.get("/internal.ics")
     def calendar_internal(self):
