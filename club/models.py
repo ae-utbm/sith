@@ -79,19 +79,6 @@ class Club(models.Model):
         _("short description"), max_length=1000, default="", blank=True, null=True
     )
     address = models.CharField(_("address"), max_length=254)
-
-    owner_group = models.ForeignKey(
-        Group,
-        related_name="owned_club",
-        default=get_default_owner_group,
-        on_delete=models.CASCADE,
-    )
-    edit_groups = models.ManyToManyField(
-        Group, related_name="editable_club", blank=True
-    )
-    view_groups = models.ManyToManyField(
-        Group, related_name="viewable_club", blank=True
-    )
     home = models.OneToOneField(
         SithFile,
         related_name="home_of_club",
@@ -104,10 +91,10 @@ class Club(models.Model):
         Page, related_name="club", blank=True, null=True, on_delete=models.CASCADE
     )
     members_group = models.OneToOneField(
-        Group, related_name="club", on_delete=models.CASCADE
+        Group, related_name="club", on_delete=models.PROTECT
     )
     board_group = models.OneToOneField(
-        Group, related_name="club_board", on_delete=models.CASCADE
+        Group, related_name="club_board", on_delete=models.PROTECT
     )
 
     class Meta:
@@ -131,12 +118,7 @@ class Club(models.Model):
             )
         super().save(*args, **kwargs)
         if creation:
-            subscribers = Group.objects.filter(
-                name=settings.SITH_MAIN_MEMBERS_GROUP
-            ).first()
             self.make_home()
-            self.home.edit_groups.add(self.board_group)
-            self.home.view_groups.add(self.members_group, subscribers)
         self.make_page()
         cache.set(f"sith_club_{self.unix_name}", self)
 
@@ -209,6 +191,8 @@ class Club(models.Model):
         for membership in self.members.ongoing().select_related("user"):
             cache.delete(f"membership_{self.id}_{membership.user.id}")
         cache.delete(f"sith_club_{self.unix_name}")
+        self.board_group.delete()
+        self.members_group.delete()
         return super().delete(*args, **kwargs)
 
     def get_display_name(self) -> str:
@@ -218,7 +202,7 @@ class Club(models.Model):
         """Method to see if that object can be super edited by the given user."""
         if user.is_anonymous:
             return False
-        return user.is_board_member
+        return user.is_root or user.is_board_member
 
     def get_full_logo_url(self) -> str:
         return f"https://{settings.SITH_URL}{self.logo.url}"
@@ -251,8 +235,7 @@ class Club(models.Model):
         return membership
 
     def has_rights_in_club(self, user: User) -> bool:
-        m = self.get_membership_for(user)
-        return m is not None and m.role > settings.SITH_MAXIMUM_FREE_ROLE
+        return user.is_in_group(pk=self.board_group_id)
 
 
 class MembershipQuerySet(models.QuerySet):

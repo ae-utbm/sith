@@ -25,9 +25,6 @@ class ClubAdmin(admin.ModelAdmin):
         "parent",
         "board_group",
         "members_group",
-        "view_groups",
-        "edit_groups",
-        "owner_group",
         "home",
         "page",
     )

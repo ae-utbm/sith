@@ -64,13 +64,25 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RemoveField(
+            model_name="club",
+            name="edit_groups",
+        ),
+        migrations.RemoveField(
+            model_name="club",
+            name="owner_group",
+        ),
+        migrations.RemoveField(
+            model_name="club",
+            name="view_groups",
+        ),
         migrations.AddField(
             model_name="club",
             name="board_group",
             field=models.OneToOneField(
                 blank=True,
                 null=True,
-                on_delete=django.db.models.deletion.CASCADE,
+                on_delete=django.db.models.deletion.PROTECT,
                 related_name="club_board",
                 to="core.group",
             ),
@@ -81,7 +93,7 @@ class Migration(migrations.Migration):
             field=models.OneToOneField(
                 blank=True,
                 null=True,
-                on_delete=django.db.models.deletion.CASCADE,
+                on_delete=django.db.models.deletion.PROTECT,
                 related_name="club",
                 to="core.group",
             ),
