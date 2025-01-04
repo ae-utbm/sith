@@ -20,6 +20,14 @@ from club.models import Club, Membership
 @admin.register(Club)
 class ClubAdmin(admin.ModelAdmin):
     list_display = ("name", "unix_name", "parent", "is_active")
+    search_fields = ("name", "unix_name")
+    autocomplete_fields = (
+        "parent",
+        "board_group",
+        "members_group",
+        "home",
+        "page",
+    )
 
 
 @admin.register(Membership)

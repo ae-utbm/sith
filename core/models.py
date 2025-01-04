@@ -36,7 +36,6 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.auth.models import AnonymousUser as AuthAnonymousUser
 from django.contrib.auth.models import Group as AuthGroup
-from django.contrib.auth.models import GroupManager as AuthGroupManager
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core import validators
 from django.core.cache import cache
@@ -58,33 +57,16 @@ if TYPE_CHECKING:
     from club.models import Club
 
 
-class RealGroupManager(AuthGroupManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(is_meta=False)
-
-
-class MetaGroupManager(AuthGroupManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(is_meta=True)
-
-
 class Group(AuthGroup):
-    """Implement both RealGroups and Meta groups.
+    """Wrapper around django.auth.Group"""
 
-    Groups are sorted by their is_meta property
-    """
-
-    #: If False, this is a RealGroup
-    is_meta = models.BooleanField(
-        _("meta group status"),
+    is_manually_manageable = models.BooleanField(
+        _("Is manually manageable"),
         default=False,
-        help_text=_("Whether a group is a meta group or not"),
+        help_text=_("If False, this shouldn't be shown on group management pages"),
     )
     #: Description of the group
     description = models.CharField(_("description"), max_length=60)
-
-    class Meta:
-        ordering = ["name"]
 
     def get_absolute_url(self) -> str:
         return reverse("core:group_list")
@@ -98,65 +80,6 @@ class Group(AuthGroup):
         super().delete(*args, **kwargs)
         cache.delete(f"sith_group_{self.id}")
         cache.delete(f"sith_group_{self.name.replace(' ', '_')}")
-
-
-class MetaGroup(Group):
-    """MetaGroups are dynamically created groups.
-
-    Generally used with clubs where creating a club creates two groups:
-
-    * club-SITH_BOARD_SUFFIX
-    * club-SITH_MEMBER_SUFFIX
-    """
-
-    #: Assign a manager in a way that MetaGroup.objects only return groups with is_meta=False
-    objects = MetaGroupManager()
-
-    class Meta:
-        proxy = True
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.is_meta = True
-
-    @cached_property
-    def associated_club(self) -> Club | None:
-        """Return the group associated with this meta group.
-
-        The result of this function is cached
-
-
-        Returns:
-            The associated club if it exists, else None
-        """
-        from club.models import Club
-
-        if self.name.endswith(settings.SITH_BOARD_SUFFIX):
-            # replace this with str.removesuffix as soon as Python
-            # is upgraded to 3.10
-            club_name = self.name[: -len(settings.SITH_BOARD_SUFFIX)]
-        elif self.name.endswith(settings.SITH_MEMBER_SUFFIX):
-            club_name = self.name[: -len(settings.SITH_MEMBER_SUFFIX)]
-        else:
-            return None
-        club = cache.get(f"sith_club_{club_name}")
-        if club is None:
-            club = Club.objects.filter(unix_name=club_name).first()
-            cache.set(f"sith_club_{club_name}", club)
-        return club
-
-
-class RealGroup(Group):
-    """RealGroups are created by the developer.
-
-    Most of the time they match a number in settings to be easily used for permissions.
-    """
-
-    #: Assign a manager in a way that MetaGroup.objects only return groups with is_meta=True
-    objects = RealGroupManager()
-
-    class Meta:
-        proxy = True
 
 
 def validate_promo(value: int) -> None:
@@ -204,8 +127,8 @@ def get_group(*, pk: int | None = None, name: str | None = None) -> Group | None
     else:
         group = Group.objects.filter(name=name).first()
     if group is not None:
-        cache.set(f"sith_group_{group.id}", group)
-        cache.set(f"sith_group_{group.name.replace(' ', '_')}", group)
+        name = group.name.replace(" ", "_")
+        cache.set_many({f"sith_group_{group.id}": group, f"sith_group_{name}": group})
     else:
         cache.set(f"sith_group_{pk_or_name}", "not_found")
     return group
@@ -438,18 +361,6 @@ class User(AbstractUser):
             return self.was_subscribed
         if group.id == settings.SITH_GROUP_ROOT_ID:
             return self.is_root
-        if group.is_meta:
-            # check if this group is associated with a club
-            group.__class__ = MetaGroup
-            club = group.associated_club
-            if club is None:
-                return False
-            membership = club.get_membership_for(self)
-            if membership is None:
-                return False
-            if group.name.endswith(settings.SITH_MEMBER_SUFFIX):
-                return True
-            return membership.role > settings.SITH_MAXIMUM_FREE_ROLE
         return group in self.cached_groups
 
     @property
@@ -474,12 +385,11 @@ class User(AbstractUser):
         return any(g.id == root_id for g in self.cached_groups)
 
     @cached_property
-    def is_board_member(self):
-        main_club = settings.SITH_MAIN_CLUB["unix_name"]
-        return self.is_in_group(name=main_club + settings.SITH_BOARD_SUFFIX)
+    def is_board_member(self) -> bool:
+        return self.groups.filter(club_board=settings.SITH_MAIN_CLUB_ID).exists()
 
     @cached_property
-    def can_read_subscription_history(self):
+    def can_read_subscription_history(self) -> bool:
         if self.is_root or self.is_board_member:
             return True
 
@@ -943,7 +853,7 @@ class SithFile(models.Model):
                     param="1",
                 ).save()
 
-    def is_owned_by(self, user):
+    def is_owned_by(self, user: User) -> bool:
         if user.is_anonymous:
             return False
         if user.is_root:
@@ -958,7 +868,7 @@ class SithFile(models.Model):
             return True
         return user.id == self.owner_id
 
-    def can_be_viewed_by(self, user):
+    def can_be_viewed_by(self, user: User) -> bool:
         if hasattr(self, "profile_of"):
             return user.can_view(self.profile_of)
         if hasattr(self, "avatar_of"):

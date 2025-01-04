@@ -21,6 +21,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.timezone import localdate, localtime, now
 from django.utils.translation import gettext as _
+from model_bakery import baker
 
 from club.forms import MailingForm
 from club.models import Club, Mailing, Membership
@@ -164,6 +165,27 @@ class TestMembershipQuerySet(TestClub):
         assert new_mem != "not_member"
         assert new_mem.role == 5
 
+    def test_update_change_club_groups(self):
+        """Test that `update` set the user groups accordingly."""
+        user = baker.make(User)
+        membership = baker.make(Membership, end_date=None, user=user, role=5)
+        members_group = membership.club.members_group
+        board_group = membership.club.board_group
+        assert user.groups.contains(members_group)
+        assert user.groups.contains(board_group)
+
+        user.memberships.update(role=1)  # from board to simple member
+        assert user.groups.contains(members_group)
+        assert not user.groups.contains(board_group)
+
+        user.memberships.update(role=5)  # from member to board
+        assert user.groups.contains(members_group)
+        assert user.groups.contains(board_group)
+
+        user.memberships.update(end_date=localdate())  # end the membership
+        assert not user.groups.contains(members_group)
+        assert not user.groups.contains(board_group)
+
     def test_delete_invalidate_cache(self):
         """Test that the `delete` queryset properly invalidate cache."""
         mem_skia = self.skia.memberships.get(club=self.club)
@@ -182,6 +204,19 @@ class TestMembershipQuerySet(TestClub):
             )
             assert cached_mem == "not_member"
 
+    def test_delete_remove_from_groups(self):
+        """Test that `delete` removes from club groups"""
+        user = baker.make(User)
+        memberships = baker.make(Membership, role=iter([1, 5]), user=user, _quantity=2)
+        club_groups = {
+            memberships[0].club.members_group,
+            memberships[1].club.members_group,
+            memberships[1].club.board_group,
+        }
+        assert set(user.groups.all()) == club_groups
+        user.memberships.all().delete()
+        assert user.groups.all().count() == 0
+
 
 class TestClubModel(TestClub):
     def assert_membership_started_today(self, user: User, role: int):
@@ -192,10 +227,8 @@ class TestClubModel(TestClub):
         assert membership.end_date is None
         assert membership.role == role
         assert membership.club.get_membership_for(user) == membership
-        member_group = self.club.unix_name + settings.SITH_MEMBER_SUFFIX
-        board_group = self.club.unix_name + settings.SITH_BOARD_SUFFIX
-        assert user.is_in_group(name=member_group)
-        assert user.is_in_group(name=board_group)
+        assert user.is_in_group(pk=self.club.members_group_id)
+        assert user.is_in_group(pk=self.club.board_group_id)
 
     def assert_membership_ended_today(self, user: User):
         """Assert that the given user have a membership which ended today."""
@@ -474,37 +507,35 @@ class TestClubModel(TestClub):
         assert self.club.members.count() == nb_memberships
         assert membership == new_mem
 
-    def test_delete_remove_from_meta_group(self):
-        """Test that when a club is deleted, all its members are removed from the
-        associated metagroup.
-        """
-        memberships = self.club.members.select_related("user")
-        users = [membership.user for membership in memberships]
-        meta_group = self.club.unix_name + settings.SITH_MEMBER_SUFFIX
+    def test_remove_from_club_group(self):
+        """Test that when a membership ends, the user is removed from club groups."""
+        user = baker.make(User)
+        baker.make(Membership, user=user, club=self.club, end_date=None, role=3)
+        assert user.groups.contains(self.club.members_group)
+        assert user.groups.contains(self.club.board_group)
+        user.memberships.update(end_date=localdate())
+        assert not user.groups.contains(self.club.members_group)
+        assert not user.groups.contains(self.club.board_group)
 
-        self.club.delete()
-        for user in users:
-            assert not user.is_in_group(name=meta_group)
+    def test_add_to_club_group(self):
+        """Test that when a membership begins, the user is added to the club group."""
+        assert not self.subscriber.groups.contains(self.club.members_group)
+        assert not self.subscriber.groups.contains(self.club.board_group)
+        baker.make(Membership, club=self.club, user=self.subscriber, role=3)
+        assert self.subscriber.groups.contains(self.club.members_group)
+        assert self.subscriber.groups.contains(self.club.board_group)
 
-    def test_add_to_meta_group(self):
-        """Test that when a membership begins, the user is added to the meta group."""
-        group_members = self.club.unix_name + settings.SITH_MEMBER_SUFFIX
-        board_members = self.club.unix_name + settings.SITH_BOARD_SUFFIX
-        assert not self.subscriber.is_in_group(name=group_members)
-        assert not self.subscriber.is_in_group(name=board_members)
-        Membership.objects.create(club=self.club, user=self.subscriber, role=3)
-        assert self.subscriber.is_in_group(name=group_members)
-        assert self.subscriber.is_in_group(name=board_members)
-
-    def test_remove_from_meta_group(self):
-        """Test that when a membership ends, the user is removed from meta group."""
-        group_members = self.club.unix_name + settings.SITH_MEMBER_SUFFIX
-        board_members = self.club.unix_name + settings.SITH_BOARD_SUFFIX
-        assert self.comptable.is_in_group(name=group_members)
-        assert self.comptable.is_in_group(name=board_members)
-        self.comptable.memberships.update(end_date=localtime(now()))
-        assert not self.comptable.is_in_group(name=group_members)
-        assert not self.comptable.is_in_group(name=board_members)
+    def test_change_position_in_club(self):
+        """Test that when moving from board to members, club group change"""
+        membership = baker.make(
+            Membership, club=self.club, user=self.subscriber, role=3
+        )
+        assert self.subscriber.groups.contains(self.club.members_group)
+        assert self.subscriber.groups.contains(self.club.board_group)
+        membership.role = 1
+        membership.save()
+        assert self.subscriber.groups.contains(self.club.members_group)
+        assert not self.subscriber.groups.contains(self.club.board_group)
 
     def test_club_owner(self):
         """Test that a club is owned only by board members of the main club."""
@@ -516,6 +547,26 @@ class TestClubModel(TestClub):
         self.sli.memberships.all().delete()
         Membership(club=self.ae, user=self.sli, role=3).save()
         assert self.club.is_owned_by(self.sli)
+
+    def test_change_club_name(self):
+        """Test that changing the club name doesn't break things."""
+        members_group = self.club.members_group
+        board_group = self.club.board_group
+        initial_members = set(members_group.users.values_list("id", flat=True))
+        initial_board = set(board_group.users.values_list("id", flat=True))
+        self.club.name = "something else"
+        self.club.save()
+        self.club.refresh_from_db()
+
+        # The names should have changed, but not the ids nor the group members
+        assert self.club.members_group.name == "something else - Membres"
+        assert self.club.board_group.name == "something else - Bureau"
+        assert self.club.members_group.id == members_group.id
+        assert self.club.board_group.id == board_group.id
+        new_members = set(self.club.members_group.users.values_list("id", flat=True))
+        new_board = set(self.club.board_group.users.values_list("id", flat=True))
+        assert new_members == initial_members
+        assert new_board == initial_board
 
 
 class TestMailingForm(TestCase):

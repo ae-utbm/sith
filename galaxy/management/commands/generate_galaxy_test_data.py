@@ -118,18 +118,26 @@ class Command(BaseCommand):
             self.make_important_citizen(u)
 
     def make_clubs(self):
-        """Create all the clubs (:class:`club.models.Club`).
+        """Create all the clubs [club.models.Club][].
 
         After creation, the clubs are stored in `self.clubs` for fast access later.
-        Don't create the meta groups (:class:`core.models.MetaGroup`)
-        nor the pages of the clubs (:class:`core.models.Page`).
+        Don't create the pages of the clubs ([core.models.Page][]).
         """
-        self.clubs = []
-        for i in range(self.NB_CLUBS):
-            self.clubs.append(Club(unix_name=f"galaxy-club-{i}", name=f"club-{i}"))
-        # We don't need to create corresponding groups here, as the Galaxy doesn't care about them
-        Club.objects.bulk_create(self.clubs)
-        self.clubs = list(Club.objects.filter(unix_name__startswith="galaxy-").all())
+        # dummy groups.
+        # the galaxy doesn't care about the club groups,
+        # but it's necessary to add them nonetheless in order
+        # not to break the integrity constraints
+        self.clubs = Club.objects.bulk_create(
+            [
+                Club(
+                    unix_name=f"galaxy-club-{i}",
+                    name=f"club-{i}",
+                    board_group=Group.objects.create(name=f"board {i}"),
+                    members_group=Group.objects.create(name=f"members {i}"),
+                )
+                for i in range(self.NB_CLUBS)
+            ]
+        )
 
     def make_users(self):
         """Create all the users and store them in `self.users` for fast access later.

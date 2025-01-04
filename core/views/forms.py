@@ -32,19 +32,14 @@ from django.contrib.staticfiles.management.commands.collectstatic import (
 )
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.forms import (
-    CheckboxSelectMultiple,
-    DateInput,
-    DateTimeInput,
-    TextInput,
-)
+from django.forms import CheckboxSelectMultiple, DateInput, DateTimeInput, TextInput
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from PIL import Image
 
 from antispam.forms import AntiSpamEmailField
-from core.models import Gift, Page, RealGroup, SithFile, User
+from core.models import Gift, Group, Page, SithFile, User
 from core.utils import resize_image
 from core.views.widgets.select import (
     AutoCompleteSelect,
@@ -293,7 +288,7 @@ class UserGroupsForm(forms.ModelForm):
     required_css_class = "required"
 
     groups = forms.ModelMultipleChoiceField(
-        queryset=RealGroup.objects.all(),
+        queryset=Group.objects.filter(is_manually_manageable=True),
         widget=CheckboxSelectMultiple,
         label=_("Groups"),
         required=False,
