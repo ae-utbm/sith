@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-23 02:38+0100\n"
+"POT-Creation-Date: 2025-01-04 22:00+0100\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -17,168 +17,168 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: core/static/bundled/core/components/ajax-select-base.ts:68
+#: core/static/bundled/core/components/ajax-select-base.ts
 msgid "Remove"
 msgstr "Retirer"
 
-#: core/static/bundled/core/components/ajax-select-base.ts:90
+#: core/static/bundled/core/components/ajax-select-base.ts
 msgid "You need to type %(number)s more characters"
 msgstr "Vous devez taper %(number)s caractères de plus"
 
-#: core/static/bundled/core/components/ajax-select-base.ts:94
+#: core/static/bundled/core/components/ajax-select-base.ts
 msgid "No results found"
 msgstr "Aucun résultat trouvé"
 
-#: core/static/bundled/core/components/easymde-index.ts:38
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Heading"
 msgstr "Titre"
 
-#: core/static/bundled/core/components/easymde-index.ts:44
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Italic"
 msgstr "Italique"
 
-#: core/static/bundled/core/components/easymde-index.ts:50
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Bold"
 msgstr "Gras"
 
-#: core/static/bundled/core/components/easymde-index.ts:56
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Strikethrough"
 msgstr "Barré"
 
-#: core/static/bundled/core/components/easymde-index.ts:65
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Underline"
 msgstr "Souligné"
 
-#: core/static/bundled/core/components/easymde-index.ts:74
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Superscript"
 msgstr "Exposant"
 
-#: core/static/bundled/core/components/easymde-index.ts:83
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Subscript"
 msgstr "Indice"
 
-#: core/static/bundled/core/components/easymde-index.ts:89
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Code"
 msgstr "Code"
 
-#: core/static/bundled/core/components/easymde-index.ts:96
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Quote"
 msgstr "Citation"
 
-#: core/static/bundled/core/components/easymde-index.ts:102
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Unordered list"
 msgstr "Liste non ordonnée"
 
-#: core/static/bundled/core/components/easymde-index.ts:108
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Ordered list"
 msgstr "Liste ordonnée"
 
-#: core/static/bundled/core/components/easymde-index.ts:115
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Insert link"
 msgstr "Insérer lien"
 
-#: core/static/bundled/core/components/easymde-index.ts:121
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Insert image"
 msgstr "Insérer image"
 
-#: core/static/bundled/core/components/easymde-index.ts:127
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Insert table"
 msgstr "Insérer tableau"
 
-#: core/static/bundled/core/components/easymde-index.ts:134
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Clean block"
 msgstr "Nettoyer bloc"
 
-#: core/static/bundled/core/components/easymde-index.ts:141
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Toggle preview"
 msgstr "Activer la prévisualisation"
 
-#: core/static/bundled/core/components/easymde-index.ts:147
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Toggle side by side"
 msgstr "Activer la vue côte à côte"
 
-#: core/static/bundled/core/components/easymde-index.ts:153
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Toggle fullscreen"
 msgstr "Activer le plein écran"
 
-#: core/static/bundled/core/components/easymde-index.ts:160
+#: core/static/bundled/core/components/easymde-index.ts
 msgid "Markdown guide"
 msgstr "Guide markdown"
 
-#: core/static/bundled/core/components/nfc-input-index.ts:26
+#: core/static/bundled/core/components/nfc-input-index.ts
 msgid "Unsupported NFC card"
 msgstr "Carte NFC non supportée"
 
-#: core/static/bundled/user/family-graph-index.js:233
+#: core/static/bundled/user/family-graph-index.js
 msgid "family_tree.%(extension)s"
 msgstr "arbre_genealogique.%(extension)s"
 
-#: core/static/bundled/user/pictures-index.js:76
+#: core/static/bundled/user/pictures-index.js
 msgid "pictures.%(extension)s"
 msgstr "photos.%(extension)s"
 
-#: core/static/user/js/user_edit.js:91
+#: core/static/user/js/user_edit.js
 #, javascript-format
 msgid "captured.%s"
 msgstr "capture.%s"
 
-#: counter/static/bundled/counter/counter-click-index.ts:60
+#: counter/static/bundled/counter/counter-click-index.ts
 msgid "Not enough money"
 msgstr "Pas assez d'argent"
 
-#: counter/static/bundled/counter/counter-click-index.ts:113
+#: counter/static/bundled/counter/counter-click-index.ts
 msgid "You can't send an empty basket."
 msgstr "Vous ne pouvez pas envoyer un panier vide."
 
-#: counter/static/bundled/counter/product-list-index.ts:40
+#: counter/static/bundled/counter/product-list-index.ts
 msgid "name"
 msgstr "nom"
 
-#: counter/static/bundled/counter/product-list-index.ts:43
+#: counter/static/bundled/counter/product-list-index.ts
 msgid "product type"
 msgstr "type de produit"
 
-#: counter/static/bundled/counter/product-list-index.ts:45
+#: counter/static/bundled/counter/product-list-index.ts
 msgid "limit age"
 msgstr "limite d'âge"
 
-#: counter/static/bundled/counter/product-list-index.ts:46
+#: counter/static/bundled/counter/product-list-index.ts
 msgid "purchase price"
 msgstr "prix d'achat"
 
-#: counter/static/bundled/counter/product-list-index.ts:47
+#: counter/static/bundled/counter/product-list-index.ts
 msgid "selling price"
 msgstr "prix de vente"
 
-#: counter/static/bundled/counter/product-list-index.ts:48
+#: counter/static/bundled/counter/product-list-index.ts
 msgid "archived"
 msgstr "archivé"
 
-#: counter/static/bundled/counter/product-list-index.ts:125
+#: counter/static/bundled/counter/product-list-index.ts
 msgid "Uncategorized"
 msgstr "Sans catégorie"
 
-#: counter/static/bundled/counter/product-list-index.ts:143
+#: counter/static/bundled/counter/product-list-index.ts
 msgid "products.csv"
 msgstr "produits.csv"
 
-#: counter/static/bundled/counter/product-type-index.ts:46
+#: counter/static/bundled/counter/product-type-index.ts
 msgid "Products types reordered!"
 msgstr "Types de produits réordonnés !"
 
-#: counter/static/bundled/counter/product-type-index.ts:50
+#: counter/static/bundled/counter/product-type-index.ts
 #, javascript-format
 msgid "Product type reorganisation failed with status code : %d"
 msgstr "La réorganisation des types de produit a échoué avec le code : %d"
 
-#: eboutic/static/eboutic/js/makecommand.js:56
+#: eboutic/static/eboutic/js/makecommand.js
 msgid "Incorrect value"
 msgstr "Valeur incorrecte"
 
-#: sas/static/bundled/sas/viewer-index.ts:271
+#: sas/static/bundled/sas/viewer-index.ts
 msgid "Couldn't moderate picture"
 msgstr "Il n'a pas été possible de modérer l'image"
 
-#: sas/static/bundled/sas/viewer-index.ts:284
+#: sas/static/bundled/sas/viewer-index.ts
 msgid "Couldn't delete picture"
 msgstr "Il n'a pas été possible de supprimer l'image"
