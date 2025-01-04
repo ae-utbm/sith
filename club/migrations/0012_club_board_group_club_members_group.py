@@ -101,29 +101,4 @@ class Migration(migrations.Migration):
         migrations.RunPython(
             migrate_meta_groups, reverse_code=migrations.RunPython.noop, elidable=True
         ),
-        migrations.AlterField(
-            model_name="club",
-            name="board_group",
-            field=models.OneToOneField(
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="club_board",
-                to="core.group",
-            ),
-        ),
-        migrations.AlterField(
-            model_name="club",
-            name="members_group",
-            field=models.OneToOneField(
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="club",
-                to="core.group",
-            ),
-        ),
-        migrations.AddConstraint(
-            model_name="membership",
-            constraint=models.CheckConstraint(
-                check=models.Q(("end_date__gte", models.F("start_date"))),
-                name="end_after_start",
-            ),
-        ),
     ]
