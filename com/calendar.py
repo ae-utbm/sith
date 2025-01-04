@@ -3,10 +3,13 @@ from pathlib import Path
 from typing import final
 
 import urllib3
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
-from ics import Calendar, Event
+from ical.calendar import Calendar
+from ical.calendar_stream import IcsCalendarStream
+from ical.event import Event
 
 from com.models import NewsDate
 
@@ -56,19 +59,18 @@ class IcsCalendar:
         calendar = Calendar()
         for news_date in NewsDate.objects.filter(
             news__is_moderated=True,
-            end_date__gte=timezone.now()
-            - (timedelta(days=30) * 60),  # Roughly get the last 6 months
+            end_date__gte=timezone.now() - (relativedelta(months=6)),
         ).prefetch_related("news"):
             event = Event(
-                name=news_date.news.title,
-                begin=news_date.start_date,
+                summary=news_date.news.title,
+                start=news_date.start_date,
                 end=news_date.end_date,
                 url=reverse("com:news_detail", kwargs={"news_id": news_date.news.id}),
             )
-            calendar.events.add(event)
+            calendar.events.append(event)
 
         # Create a file so we can offload the download to the reverse proxy if available
         cls._CACHE_FOLDER.mkdir(parents=True, exist_ok=True)
         with open(cls._INTERNAL_CALENDAR, "wb") as f:
-            _ = f.write(calendar.serialize().encode("utf-8"))
+            _ = f.write(IcsCalendarStream.calendar_to_ics(calendar).encode("utf-8"))
         return cls._INTERNAL_CALENDAR
