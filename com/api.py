@@ -4,7 +4,7 @@ from django.conf import settings
 from django.http import Http404
 from ninja_extra import ControllerBase, api_controller, route
 
-from com.models import IcsCalendar
+from com.calendar import IcsCalendar
 from core.views.files import send_raw_file
 
 
@@ -16,7 +16,7 @@ class CalendarController(ControllerBase):
     def calendar_external(self):
         """Return the ICS file of the AE Google Calendar
 
-        Because of Google's cors rules, we can't "just" do a request to google ics
+        Because of Google's cors rules, we can't just do a request to google ics
         from the frontend. Google is blocking CORS request in it's responses headers.
         The only way to do it from the frontend is to use Google Calendar API with an API key
         This is not especially desirable as your API key is going to be provided to the frontend.

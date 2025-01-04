@@ -46,7 +46,8 @@ from accounting.models import (
     SimplifiedAccountingType,
 )
 from club.models import Club, Membership
-from com.models import IcsCalendar, News, NewsDate, Sith, Weekmail
+from com.calendar import IcsCalendar
+from com.models import News, NewsDate, Sith, Weekmail
 from core.models import Group, Page, PageRev, SithFile, User
 from core.utils import resize_image
 from counter.models import Counter, Product, ProductType, StudentCard
