@@ -548,6 +548,26 @@ class TestClubModel(TestClub):
         Membership(club=self.ae, user=self.sli, role=3).save()
         assert self.club.is_owned_by(self.sli)
 
+    def test_change_club_name(self):
+        """Test that changing the club name doesn't break things."""
+        members_group = self.club.members_group
+        board_group = self.club.board_group
+        initial_members = set(members_group.users.values_list("id", flat=True))
+        initial_board = set(board_group.users.values_list("id", flat=True))
+        self.club.name = "something else"
+        self.club.save()
+        self.club.refresh_from_db()
+
+        # The names should have changed, but not the ids nor the group members
+        assert self.club.members_group.name == "something else - Membres"
+        assert self.club.board_group.name == "something else - Bureau"
+        assert self.club.members_group.id == members_group.id
+        assert self.club.board_group.id == board_group.id
+        new_members = set(self.club.members_group.users.values_list("id", flat=True))
+        new_board = set(self.club.board_group.users.values_list("id", flat=True))
+        assert new_members == initial_members
+        assert new_board == initial_board
+
 
 class TestMailingForm(TestCase):
     """Perform validation tests for MailingForm."""

@@ -106,9 +106,16 @@ class Club(models.Model):
     @transaction.atomic()
     def save(self, *args, **kwargs):
         creation = self._state.adding
-        if not creation and Club.objects.get(id=self.id).unix_name != self.unix_name:
-            self.home.name = self.unix_name
-            self.home.save()
+        if not creation:
+            db_club = Club.objects.get(id=self.id)
+            if self.unix_name != db_club.unix_name:
+                self.home.name = self.unix_name
+                self.home.save()
+            if self.name != db_club.name:
+                self.board_group.name = f"{self.name} - Bureau"
+                self.board_group.save()
+                self.members_group.name = f"{self.name} - Membres"
+                self.members_group.save()
         if creation:
             self.board_group = Group.objects.create(
                 name=f"{self.name} - Bureau", is_manually_manageable=False
