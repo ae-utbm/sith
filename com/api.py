@@ -12,7 +12,7 @@ from core.views.files import send_raw_file
 class CalendarController(ControllerBase):
     CACHE_FOLDER: Path = settings.MEDIA_ROOT / "com" / "calendars"
 
-    @route.get("/external.ics")
+    @route.get("/external.ics", url_name="calendar_external")
     def calendar_external(self):
         """Return the ICS file of the AE Google Calendar
 
@@ -27,6 +27,6 @@ class CalendarController(ControllerBase):
             return send_raw_file(calendar)
         raise Http404
 
-    @route.get("/internal.ics")
+    @route.get("/internal.ics", url_name="calendar_internal")
     def calendar_internal(self):
         return send_raw_file(IcsCalendar.get_internal())
