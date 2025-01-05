@@ -46,6 +46,7 @@ from accounting.models import (
     SimplifiedAccountingType,
 )
 from club.models import Club, Membership
+from com.calendar import IcsCalendar
 from com.models import News, NewsDate, Sith, Weekmail
 from core.models import Group, Page, PageRev, SithFile, User
 from core.utils import resize_image
@@ -738,7 +739,7 @@ Welcome to the wiki page!
             NewsDate(
                 news=n,
                 start_date=friday + timedelta(hours=24 * 7 + 1),
-                end_date=self.now + timedelta(hours=24 * 7 + 9),
+                end_date=friday + timedelta(hours=24 * 7 + 9),
             )
         )
         # Weekly
@@ -764,8 +765,9 @@ Welcome to the wiki page!
             ]
         )
         NewsDate.objects.bulk_create(news_dates)
+        IcsCalendar.make_internal()  # Force refresh of the calendar after a bulk_create
 
-        # Create som data for pedagogy
+        # Create some data for pedagogy
 
         UV(
             code="PA00",

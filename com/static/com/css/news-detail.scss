@@ -1,0 +1,66 @@
+@import "core/static/core/colors";
+
+#news_details {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 0.4em;
+  width: 80%;
+  background: $white-color;
+
+  h4 {
+    margin-top: 1em;
+    text-transform: uppercase;
+  }
+
+  .club_logo {
+    display: inline-block;
+    text-align: center;
+    width: 19%;
+    float: left;
+    min-width: 15em;
+    margin: 0;
+
+    img {
+      max-height: 15em;
+      max-width: 12em;
+      display: block;
+      margin: 0 auto;
+      margin-bottom: 10px;
+    }
+  }
+
+  .share_button {
+    border: none;
+    color: white;
+    padding: 0.5em 1em;
+    text-align: center;
+    text-decoration: none;
+    font-size: 1.2em;
+    border-radius: 2px;
+    float: right;
+    display: block;
+    margin-left: 0.3em;
+
+    &:hover {
+      color: lightgrey;
+    }
+  }
+
+  .facebook {
+    background: $faceblue;
+  }
+
+  .twitter {
+    background: $twitblue;
+  }
+
+  .news_meta {
+    margin-top: 10em;
+    font-size: small;
+  }
+}
+
+.helptext {
+  margin-top: 10px;
+  display: block;
+}

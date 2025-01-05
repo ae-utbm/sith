@@ -1,0 +1,101 @@
+@import "core/static/core/colors";
+
+
+:root {
+  --fc-button-border-color: #fff;
+  --fc-button-hover-border-color: #fff;
+  --fc-button-active-border-color: #fff;
+  --fc-button-text-color: #fff;
+  --fc-button-bg-color: #1a78b3;
+  --fc-button-active-bg-color: #15608F;
+  --fc-button-hover-bg-color: #15608F;
+  --fc-today-bg-color: rgba(26, 120, 179, 0.1);
+  --fc-border-color: #DDDDDD;
+  --event-details-background-color: white;
+  --event-details-padding: 20px;
+  --event-details-border: 1px solid #EEEEEE;
+  --event-details-border-radius: 4px;
+  --event-details-box-shadow: 0px 6px 20px 4px rgb(0 0 0 / 16%);
+  --event-details-max-width: 600px;
+}
+
+ics-calendar {
+  border: none;
+  box-shadow: none;
+
+  #event-details {
+    z-index: 10;
+    max-width: 1151px;
+    position: absolute;
+
+    .event-details-container {
+      display: flex;
+      color: black;
+      flex-direction: column;
+      min-width: 200px;
+      max-width: var(--event-details-max-width);
+      padding: var(--event-details-padding);
+      border: var(--event-details-border);
+      border-radius: var(--event-details-border-radius);
+      background-color: var(--event-details-background-color);
+      box-shadow: var(--event-details-box-shadow);
+      gap: 20px;
+    }
+
+    .event-detail-row-icon {
+      margin-left: 10px;
+      margin-right: 20px;
+      align-content: center;
+      align-self: center;
+    }
+
+    .event-details-row {
+      display: flex;
+      align-items: start;
+    }
+
+    .event-details-row-content {
+      display: flex;
+      align-items: start;
+      flex-direction: row;
+      background-color: var(--event-details-background-color);
+      margin-top: 0px;
+      margin-bottom: 4px;
+    }
+  }
+
+  a.fc-col-header-cell-cushion,
+  a.fc-col-header-cell-cushion:hover {
+    color: black;
+  }
+
+  a.fc-daygrid-day-number,
+  a.fc-daygrid-day-number:hover {
+    color: rgb(34, 34, 34);
+  }
+
+  td {
+    overflow-x: visible; // Show events on multiple days
+  }
+
+	//Reset from style.scss
+  table {
+    box-shadow: none;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    margin: 0px;
+  }
+
+	// Reset from style.scss
+  thead {
+    background-color: white;
+    color: black;
+  }
+
+	// Reset from style.scss
+  tbody>tr {
+    &:nth-child(even):not(.highlight) {
+      background: white;
+    }
+  }
+}

@@ -11,6 +11,11 @@
   {{ gen_news_metatags(news) }}
 {% endblock %}
 
+
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static('com/css/news-detail.scss') }}">
+{% endblock %}
+
 {% block content %}
   <p><a href="{{ url('com:news_list') }}">{% trans %}Back to news{% endtrans %}</a></p>
   <section id="news_details">

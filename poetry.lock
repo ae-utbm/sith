@@ -932,6 +932,23 @@ files = [
 ]
 
 [[package]]
+name = "ical"
+version = "8.3.0"
+description = "Python iCalendar implementation (rfc 2445)"
+optional = false
+python-versions = ">=3.10"
+files = [
+    {file = "ical-8.3.0-py3-none-any.whl", hash = "sha256:606f2f561bd8b75cb726710dddbb20f3f84dfa1d6323550947dba97359423850"},
+    {file = "ical-8.3.0.tar.gz", hash = "sha256:e277cc518cbb0132e6827c318c8ec3b379b125ebf0a2a44337f08795d5530937"},
+]
+
+[package.dependencies]
+pydantic = ">=1.9.1"
+pyparsing = ">=3.0.9"
+python-dateutil = ">=2.8.2"
+tzdata = ">=2023.3"
+
+[[package]]
 name = "identify"
 version = "2.6.3"
 description = "File identification library for Python"
@@ -1884,6 +1901,20 @@ pyyaml = "*"
 extra = ["pygments (>=2.12)"]
 
 [[package]]
+name = "pyparsing"
+version = "3.2.1"
+description = "pyparsing module - Classes and methods to define and execute parsing grammars"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "pyparsing-3.2.1-py3-none-any.whl", hash = "sha256:506ff4f4386c4cec0590ec19e6302d3aedb992fdc02c761e90416f158dacf8e1"},
+    {file = "pyparsing-3.2.1.tar.gz", hash = "sha256:61980854fd66de3a90028d679a954d5f2623e83144b5afe5ee86f43d762e5f0a"},
+]
+
+[package.extras]
+diagrams = ["jinja2", "railroad-diagrams"]
+
+[[package]]
 name = "pytest"
 version = "8.3.4"
 description = "pytest: simple powerful testing with Python"
@@ -2724,4 +2755,4 @@ filelock = ">=3.4"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "5836c1a8ad42645d7d045194c8c371754b19957ebdcd2aaa902a2fb3dc97cc53"
+content-hash = "7f348f74a05c27e29aaaf25a5584bba9b416f42c3f370db234dd69e5e10dc8df"

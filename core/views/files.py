@@ -13,6 +13,7 @@
 #
 #
 import mimetypes
+from pathlib import Path
 from urllib.parse import quote, urljoin
 
 # This file contains all the views that concern the page model
@@ -48,6 +49,41 @@ from core.views.widgets.select import (
 from counter.utils import is_logged_in_counter
 
 
+def send_raw_file(path: Path) -> HttpResponse:
+    """Send a file located in the MEDIA_ROOT
+
+    This handles all the logic of using production reverse proxy or debug server.
+
+    THIS DOESN'T CHECK ANY PERMISSIONS !
+    """
+    if not path.is_relative_to(settings.MEDIA_ROOT):
+        raise Http404
+
+    if not path.is_file() or not path.exists():
+        raise Http404
+
+    response = HttpResponse(
+        headers={"Content-Disposition": f'inline; filename="{quote(path.name)}"'}
+    )
+    if not settings.DEBUG:
+        # When receiving a response with the Accel-Redirect header,
+        # the reverse proxy will automatically handle the file sending.
+        # This is really hard to test (thus isn't tested)
+        # so please do not mess with this.
+        response["Content-Type"] = ""  # automatically set by nginx
+        response["X-Accel-Redirect"] = quote(
+            urljoin(settings.MEDIA_URL, str(path.relative_to(settings.MEDIA_ROOT)))
+        )
+        return response
+
+    with open(path, "rb") as filename:
+        response.content = FileWrapper(filename)
+        response["Content-Type"] = mimetypes.guess_type(path)[0]
+        response["Last-Modified"] = http_date(path.stat().st_mtime)
+        response["Content-Length"] = path.stat().st_size
+        return response
+
+
 def send_file(
     request: HttpRequest,
     file_id: int,
@@ -66,28 +102,7 @@ def send_file(
         raise PermissionDenied
     name = getattr(f, file_attr).name
 
-    response = HttpResponse(
-        headers={"Content-Disposition": f'inline; filename="{quote(name)}"'}
-    )
-    if not settings.DEBUG:
-        # When receiving a response with the Accel-Redirect header,
-        # the reverse proxy will automatically handle the file sending.
-        # This is really hard to test (thus isn't tested)
-        # so please do not mess with this.
-        response["Content-Type"] = ""  # automatically set by nginx
-        response["X-Accel-Redirect"] = quote(urljoin(settings.MEDIA_URL, name))
-        return response
-
-    filepath = settings.MEDIA_ROOT / name
-    # check if file exists on disk
-    if not filepath.exists():
-        raise Http404
-    with open(filepath, "rb") as filename:
-        response.content = FileWrapper(filename)
-        response["Content-Type"] = mimetypes.guess_type(filepath)[0]
-        response["Last-Modified"] = http_date(f.date.timestamp())
-        response["Content-Length"] = filepath.stat().st_size
-        return response
+    return send_raw_file(settings.MEDIA_ROOT / name)
 
 
 class MultipleFileInput(forms.ClearableFileInput):

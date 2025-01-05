@@ -45,6 +45,7 @@ Sphinx = "^5" # Needed for building xapian
 tomli = "^2.2.1"
 django-honeypot = "^1.2.1"
 pydantic-extra-types = "^2.10.1"
+ical = "^8.3.0"
 
 [tool.poetry.group.prod.dependencies]
 # deps used in prod, but unnecessary for development

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-04 21:59+0100\n"
+"POT-Creation-Date: 2025-01-04 23:05+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -356,9 +356,8 @@ msgstr "Nouveau compte club"
 #: com/templates/com/news_admin_list.jinja com/templates/com/poster_list.jinja
 #: com/templates/com/screen_list.jinja com/templates/com/weekmail.jinja
 #: core/templates/core/file.jinja core/templates/core/group_list.jinja
-#: core/templates/core/page.jinja core/templates/core/poster_list.jinja
-#: core/templates/core/user_tools.jinja core/views/user.py
-#: counter/templates/counter/cash_summary_list.jinja
+#: core/templates/core/page.jinja core/templates/core/user_tools.jinja
+#: core/views/user.py counter/templates/counter/cash_summary_list.jinja
 #: counter/templates/counter/counter_list.jinja
 #: election/templates/election/election_detail.jinja
 #: forum/templates/forum/macros.jinja
@@ -1140,7 +1139,7 @@ msgid "New Trombi"
 msgstr "Nouveau Trombi"
 
 #: club/templates/club/club_tools.jinja com/templates/com/poster_list.jinja
-#: core/templates/core/poster_list.jinja core/templates/core/user_tools.jinja
+#: core/templates/core/user_tools.jinja
 msgid "Posters"
 msgstr "Affiches"
 
@@ -1559,16 +1558,45 @@ msgid "Nothing to come..."
 msgstr "Rien à venir..."
 
 #: com/templates/com/news_list.jinja
-msgid "Coming soon... don't miss!"
-msgstr "Prochainement... à ne pas rater!"
-
-#: com/templates/com/news_list.jinja
 msgid "All coming events"
 msgstr "Tous les événements à venir"
 
 #: com/templates/com/news_list.jinja
-msgid "Agenda"
-msgstr "Agenda"
+msgid "Links"
+msgstr "Liens"
+
+#: com/templates/com/news_list.jinja
+msgid "Our services"
+msgstr "Nos services"
+
+#: com/templates/com/news_list.jinja pedagogy/templates/pedagogy/guide.jinja
+msgid "UV Guide"
+msgstr "Guide des UVs"
+
+#: com/templates/com/news_list.jinja core/templates/core/base/navbar.jinja
+msgid "Matmatronch"
+msgstr "Matmatronch"
+
+#: com/templates/com/news_list.jinja core/templates/core/base/navbar.jinja
+#: core/templates/core/user_tools.jinja
+msgid "Elections"
+msgstr "Élections"
+
+#: com/templates/com/news_list.jinja
+msgid "Social media"
+msgstr "Réseaux sociaux"
+
+#: com/templates/com/news_list.jinja
+msgid "Discord"
+msgstr "Discord"
+
+#: com/templates/com/news_list.jinja
+msgid "Facebook"
+msgstr "Facebook"
+
+#: com/templates/com/news_list.jinja
+msgid "Instagram"
+msgstr "Instagram"
 
 #: com/templates/com/news_list.jinja
 msgid "Birthdays"
@@ -1580,11 +1608,10 @@ msgid "%(age)s year old"
 msgstr "%(age)s ans"
 
 #: com/templates/com/news_list.jinja com/tests.py
-msgid "You need an up to date subscription to access this content"
-msgstr "Votre cotisation doit être à jour pour accéder à cette section"
+msgid "You need to subscribe to access this content"
+msgstr "Vous devez cotiser pour accéder à ce contenu"
 
 #: com/templates/com/poster_edit.jinja com/templates/com/poster_list.jinja
-#: core/templates/core/poster_list.jinja
 msgid "Poster"
 msgstr "Affiche"
 
@@ -1598,15 +1625,15 @@ msgid "Posters - edit"
 msgstr "Affiche - modifier"
 
 #: com/templates/com/poster_list.jinja com/templates/com/screen_list.jinja
-#: core/templates/core/poster_list.jinja sas/templates/sas/main.jinja
+#: sas/templates/sas/main.jinja
 msgid "Create"
 msgstr "Créer"
 
-#: com/templates/com/poster_list.jinja core/templates/core/poster_list.jinja
+#: com/templates/com/poster_list.jinja
 msgid "Moderation"
 msgstr "Modération"
 
-#: com/templates/com/poster_list.jinja core/templates/core/poster_list.jinja
+#: com/templates/com/poster_list.jinja
 msgid "No posters"
 msgstr "Aucune affiche"
 
@@ -2233,10 +2260,6 @@ msgstr "Les clubs de L'AE"
 msgid "Others UTBM's Associations"
 msgstr "Les autres associations de l'UTBM"
 
-#: core/templates/core/base/navbar.jinja core/templates/core/user_tools.jinja
-msgid "Elections"
-msgstr "Élections"
-
 #: core/templates/core/base/navbar.jinja
 msgid "Big event"
 msgstr "Grandes Activités"
@@ -2263,10 +2286,6 @@ msgstr "Eboutic"
 #: core/templates/core/base/navbar.jinja
 msgid "Services"
 msgstr "Services"
-
-#: core/templates/core/base/navbar.jinja
-msgid "Matmatronch"
-msgstr "Matmatronch"
 
 #: core/templates/core/base/navbar.jinja launderette/models.py
 #: launderette/templates/launderette/launderette_book.jinja
@@ -4858,10 +4877,6 @@ msgstr "signalant"
 #: pedagogy/models.py
 msgid "reason"
 msgstr "raison"
-
-#: pedagogy/templates/pedagogy/guide.jinja
-msgid "UV Guide"
-msgstr "Guide des UVs"
 
 #: pedagogy/templates/pedagogy/guide.jinja
 #, python-format
