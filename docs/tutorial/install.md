@@ -81,7 +81,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
                  libffi-dev python-dev-is-python3 pkg-config \
                  gettext git pipx
 
-        pipx install poetry
+        pipx install poetry==1.8.5
         ```
 
     === "Arch Linux"
@@ -101,7 +101,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
     
     ```bash    
     brew install git python pipx npm
-    pipx install poetry
+    pipx install poetry==1.8.5
     
     # Pour bien configurer gettext
     brew link gettext # (suivez bien les instructions supplémentaires affichées)
