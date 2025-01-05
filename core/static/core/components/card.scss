@@ -29,7 +29,7 @@
   align-items: center;
   gap: 20px;
 
-  &:hover {
+  &.clickable:hover {
     background-color: darken($primary-neutral-light-color, 5%);
   }
 

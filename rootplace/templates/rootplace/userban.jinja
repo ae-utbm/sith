@@ -1,0 +1,62 @@
+{% extends "core/base.jinja" %}
+
+
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("core/components/card.scss") }}">
+{% endblock %}
+
+
+{% block content %}
+  {% if user.has_perm("core:add_userban") %}
+    <a href="{{ url("rootplace:ban_create") }}" class="btn btn-red margin-bottom">
+      <i class="fa fa-person-circle-xmark"></i>
+      {% trans %}Ban a user{% endtrans %}
+    </a>
+  {% endif %}
+  {% for user_ban in user_bans %}
+    <div class="card card-row margin-bottom">
+      <img
+        class="card-image"
+        alt="profil de {{ user_ban.user.get_short_name() }}"
+        {%- if user_ban.user.profile_pict -%}
+          src="{{ user_ban.user.profile_pict.get_download_url() }}"
+        {%- else -%}
+          src="{{ static("core/img/unknown.jpg") }}"
+        {%- endif -%}
+      />
+      <div class="card-content">
+        <strong>
+          <a href="{{ user_ban.user.get_absolute_url() }}">
+            {{ user_ban.user.get_full_name() }}
+          </a>
+        </strong>
+        <em>{{ user_ban.ban_group.name }}</em>
+        <p>{% trans %}Since{% endtrans %} : {{ user_ban.created_at|date }}</p>
+        <p>
+          {% trans %}Until{% endtrans %} :
+          {% if user_ban.expires_at %}
+            {{ user_ban.expires_at|date }} {{ user_ban.expires_at|time }}
+          {% else %}
+            {% trans %}not specified{% endtrans %}
+          {% endif %}
+        </p>
+        <details>
+          <summary class="clickable">{% trans %}Reason{% endtrans %}</summary>
+          <p>{{ user_ban.reason }}</p>
+        </details>
+        {% if user.has_perm("core:delete_userban") %}
+          <span>
+            <a
+              href="{{ url("rootplace:ban_remove", ban_id=user_ban.id) }}"
+              class="btn btn-blue"
+            >
+              {% trans %}Remove ban{% endtrans %}
+            </a>
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  {% else %}
+    <p>{% trans %}No active ban.{% endtrans %}</p>
+  {% endfor %}
+{% endblock %}

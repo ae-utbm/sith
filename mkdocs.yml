@@ -127,6 +127,7 @@ nav:
       - reference/pedagogy/schemas.md
     - rootplace:
       - reference/rootplace/models.md
+      - reference/rootplace/forms.md
       - reference/rootplace/views.md
     - sas:
       - reference/sas/models.md

@@ -21,6 +21,7 @@
 #
 #
 import re
+from datetime import date, datetime
 from io import BytesIO
 
 from captcha.fields import CaptchaField
@@ -32,7 +33,14 @@ from django.contrib.staticfiles.management.commands.collectstatic import (
 )
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.forms import CheckboxSelectMultiple, DateInput, DateTimeInput, TextInput
+from django.forms import (
+    CheckboxSelectMultiple,
+    DateInput,
+    DateTimeInput,
+    TextInput,
+    Widget,
+)
+from django.utils.timezone import now
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
@@ -123,6 +131,23 @@ class SelectUser(TextInput):
             + "</span>"
         )
         return output
+
+
+# Fields
+
+
+def validate_future_timestamp(value: date | datetime):
+    if value <= now():
+        raise ValueError(_("Ensure this timestamp is set in the future"))
+
+
+class FutureDateTimeField(forms.DateTimeField):
+    """A datetime field that accepts only future timestamps."""
+
+    default_validators = [validate_future_timestamp]
+
+    def widget_attrs(self, widget: Widget) -> dict[str, str]:
+        return {"min": widget.format_value(now())}
 
 
 # Forms

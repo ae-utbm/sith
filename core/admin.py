@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group as AuthGroup
 from django.contrib.auth.models import Permission
 
-from core.models import Group, OperationLog, Page, SithFile, User
+from core.models import BanGroup, Group, OperationLog, Page, SithFile, User, UserBan
 
 admin.site.unregister(AuthGroup)
 
@@ -28,6 +28,19 @@ class GroupAdmin(admin.ModelAdmin):
     list_filter = ("is_manually_manageable",)
     search_fields = ("name",)
     autocomplete_fields = ("permissions",)
+
+
+@admin.register(BanGroup)
+class BanGroupAdmin(admin.ModelAdmin):
+    list_display = ("name", "description")
+    search_fields = ("name",)
+    autocomplete_fields = ("permissions",)
+
+
+class UserBanInline(admin.TabularInline):
+    model = UserBan
+    extra = 0
+    autocomplete_fields = ("ban_group",)
 
 
 @admin.register(User)
@@ -42,7 +55,14 @@ class UserAdmin(admin.ModelAdmin):
         "user_permissions",
         "groups",
     )
+    inlines = (UserBanInline,)
     search_fields = ["first_name", "last_name", "username"]
+
+
+@admin.register(UserBan)
+class UserBanAdmin(admin.ModelAdmin):
+    list_display = ("user", "ban_group", "created_at", "expires_at")
+    autocomplete_fields = ("user", "ban_group")
 
 
 @admin.register(Permission)

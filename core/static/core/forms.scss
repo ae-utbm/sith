@@ -199,14 +199,6 @@ form {
     }
   }
 
-  // ------------- LEGEND
-
-  legend {
-    font-weight: var(--nf-label-font-weight);
-    display: block;
-    margin-bottom: calc(var(--nf-input-size) / 5);
-  }
-
   .form-group,
   > p,
   > div {

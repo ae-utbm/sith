@@ -42,7 +42,7 @@ from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.mail import send_mail
 from django.db import models, transaction
-from django.db.models import Exists, OuterRef, Q
+from django.db.models import Exists, F, OuterRef, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -65,8 +65,7 @@ class Group(AuthGroup):
         default=False,
         help_text=_("If False, this shouldn't be shown on group management pages"),
     )
-    #: Description of the group
-    description = models.CharField(_("description"), max_length=60)
+    description = models.TextField(_("description"))
 
     def get_absolute_url(self) -> str:
         return reverse("core:group_list")
@@ -134,6 +133,28 @@ def get_group(*, pk: int | None = None, name: str | None = None) -> Group | None
     return group
 
 
+class BanGroup(AuthGroup):
+    """An anti-group, that removes permissions instead of giving them.
+
+    Users are linked to BanGroups through UserBan objects.
+
+    Example:
+        ```python
+        user = User.objects.get(username="...")
+        ban_group = BanGroup.objects.first()
+        UserBan.objects.create(user=user, ban_group=ban_group, reason="...")
+
+        assert user.ban_groups.contains(ban_group)
+        ```
+    """
+
+    description = models.TextField(_("description"))
+
+    class Meta:
+        verbose_name = _("ban group")
+        verbose_name_plural = _("ban groups")
+
+
 class UserQuerySet(models.QuerySet):
     def filter_inactive(self) -> Self:
         from counter.models import Refilling, Selling
@@ -184,7 +205,13 @@ class User(AbstractUser):
             "granted to each of their groups."
         ),
         related_name="users",
-        blank=True,
+    )
+    ban_groups = models.ManyToManyField(
+        BanGroup,
+        verbose_name=_("ban groups"),
+        through="UserBan",
+        help_text=_("The bans this user has received."),
+        related_name="users",
     )
     home = models.OneToOneField(
         "SithFile",
@@ -424,12 +451,12 @@ class User(AbstractUser):
         )
 
     @cached_property
-    def is_banned_alcohol(self):
-        return self.is_in_group(pk=settings.SITH_GROUP_BANNED_ALCOHOL_ID)
+    def is_banned_alcohol(self) -> bool:
+        return self.ban_groups.filter(id=settings.SITH_GROUP_BANNED_ALCOHOL_ID).exists()
 
     @cached_property
-    def is_banned_counter(self):
-        return self.is_in_group(pk=settings.SITH_GROUP_BANNED_COUNTER_ID)
+    def is_banned_counter(self) -> bool:
+        return self.ban_groups.filter(id=settings.SITH_GROUP_BANNED_COUNTER_ID).exists()
 
     @cached_property
     def age(self) -> int:
@@ -729,6 +756,52 @@ class AnonymousUser(AuthAnonymousUser):
 
     def get_display_name(self):
         return _("Visitor")
+
+
+class UserBan(models.Model):
+    """A ban of a user.
+
+    A user can be banned for a specific reason, for a specific duration.
+    The expiration date is indicative, and the ban should be removed manually.
+    """
+
+    ban_group = models.ForeignKey(
+        BanGroup,
+        verbose_name=_("ban type"),
+        related_name="user_bans",
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(
+        User, verbose_name=_("user"), related_name="bans", on_delete=models.CASCADE
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    expires_at = models.DateTimeField(
+        _("expires at"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "When the ban should be removed. "
+            "Currently, there is no automatic removal, so this is purely indicative. "
+            "Automatic ban removal may be implemented later on."
+        ),
+    )
+    reason = models.TextField(_("reason"))
+
+    class Meta:
+        verbose_name = _("user ban")
+        verbose_name_plural = _("user bans")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["ban_group", "user"], name="unique_ban_type_per_user"
+            ),
+            models.CheckConstraint(
+                check=Q(expires_at__gte=F("created_at")),
+                name="user_ban_end_after_start",
+            ),
+        ]
+
+    def __str__(self):
+        return f"Ban of user {self.user.id}"
 
 
 class Preferences(models.Model):
