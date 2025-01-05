@@ -921,8 +921,8 @@ msgstr "home"
 msgid "You can not make loops in clubs"
 msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 
-#: club/models.py counter/models.py eboutic/models.py election/models.py
-#: launderette/models.py sas/models.py trombi/models.py
+#: club/models.py core/models.py counter/models.py eboutic/models.py
+#: election/models.py launderette/models.py sas/models.py trombi/models.py
 msgid "user"
 msgstr "utilisateur"
 
@@ -1009,6 +1009,7 @@ msgstr "Description"
 
 #: club/templates/club/club_members.jinja core/templates/core/user_clubs.jinja
 #: launderette/templates/launderette/launderette_admin.jinja
+#: rootplace/templates/rootplace/userban.jinja
 msgid "Since"
 msgstr "Depuis"
 
@@ -1787,7 +1788,7 @@ msgstr "Message d'alerte"
 msgid "Screens list"
 msgstr "Liste d'écrans"
 
-#: com/views.py
+#: com/views.py rootplace/templates/rootplace/userban.jinja
 msgid "Until"
 msgstr "Jusqu'à"
 
@@ -1833,6 +1834,14 @@ msgid "%(value)s is not a valid promo (between 0 and %(end)s)"
 msgstr "%(value)s n'est pas une promo valide (doit être entre 0 et %(end)s)"
 
 #: core/models.py
+msgid "ban group"
+msgstr "groupe de ban"
+
+#: core/models.py
+msgid "ban groups"
+msgstr "groupes de ban"
+
+#: core/models.py
 msgid "first name"
 msgstr "Prénom"
 
@@ -1867,6 +1876,10 @@ msgid ""
 msgstr ""
 "Les groupes auxquels cet utilisateur appartient. Un utilisateur aura toutes "
 "les permissions de chacun de ses groupes."
+
+#: core/models.py
+msgid "The bans this user has received."
+msgstr "Les bans que cet utilisateur a reçus."
 
 #: core/models.py
 msgid "profile"
@@ -2018,6 +2031,42 @@ msgstr "Profil"
 #: core/models.py
 msgid "Visitor"
 msgstr "Visiteur"
+
+#: core/models.py
+msgid "ban type"
+msgstr "type de ban"
+
+#: core/models.py
+msgid "created at"
+msgstr "créé le"
+
+#: core/models.py
+msgid "expires at"
+msgstr "expire le"
+
+#: core/models.py
+msgid ""
+"When the ban should be removed. Currently, there is no automatic removal, so "
+"this is purely indicative. Automatic ban removal may be implemented later on."
+msgstr ""
+"Quand le ban devrait être retiré. Actuellement, il n'y a pas de retrait automatique, "
+"donc ceci est purement indicatif. Le retrait automatique pourra être implémenté plus tard."
+
+#: core/models.py pedagogy/models.py
+msgid "reason"
+msgstr "raison"
+
+#: core/models.py
+#, fuzzy
+#| msgid "user"
+msgid "user ban"
+msgstr "utilisateur"
+
+#: core/models.py
+#, fuzzy
+#| msgid "user"
+msgid "user bans"
+msgstr "utilisateur"
 
 #: core/models.py
 msgid "receive the Weekmail"
@@ -3118,6 +3167,10 @@ msgid "Delete user's forum messages"
 msgstr "Supprimer les messages forum d'un utilisateur"
 
 #: core/templates/core/user_tools.jinja
+msgid "Bans"
+msgstr "Bans"
+
+#: core/templates/core/user_tools.jinja
 msgid "Subscriptions"
 msgstr "Cotisations"
 
@@ -3259,6 +3312,10 @@ msgstr "Choisir un fichier"
 #: core/views/forms.py
 msgid "Choose user"
 msgstr "Choisir un utilisateur"
+
+#: core/views/forms.py
+msgid "Ensure this timestamp is set in the future"
+msgstr "Assurez-vous que cet horodatage est dans le futur"
 
 #: core/views/forms.py
 msgid "Username, email, or account number"
@@ -4882,10 +4939,6 @@ msgstr "signaler"
 msgid "reporter"
 msgstr "signalant"
 
-#: pedagogy/models.py
-msgid "reason"
-msgstr "raison"
-
 #: pedagogy/templates/pedagogy/guide.jinja
 #, python-format
 msgid "%(display_name)s"
@@ -4917,7 +4970,8 @@ msgstr "non noté"
 msgid "UV comment moderation"
 msgstr "Modération des commentaires d'UV"
 
-#: pedagogy/templates/pedagogy/moderation.jinja sas/models.py
+#: pedagogy/templates/pedagogy/moderation.jinja
+#: rootplace/templates/rootplace/userban.jinja sas/models.py
 msgid "Reason"
 msgstr "Raison"
 
@@ -5038,6 +5092,18 @@ msgstr "Autocomplétion réussite"
 msgid "An error occurred: "
 msgstr "Une erreur est survenue : "
 
+#: rootplace/forms.py
+msgid "User that will be kept"
+msgstr "Utilisateur qui sera conservé"
+
+#: rootplace/forms.py
+msgid "User that will be deleted"
+msgstr "Utilisateur qui sera supprimé"
+
+#: rootplace/forms.py
+msgid "User to be selected"
+msgstr "Utilisateur à sélectionner"
+
 #: rootplace/templates/rootplace/delete_user_messages.jinja
 msgid "Delete all forum messages from an user"
 msgstr "Supprimer tous les messages forum d'un utilisateur"
@@ -5067,17 +5133,21 @@ msgstr "Fusionner deux utilisateurs"
 msgid "Merge"
 msgstr "Fusion"
 
-#: rootplace/views.py
-msgid "User that will be kept"
-msgstr "Utilisateur qui sera conservé"
+#: rootplace/templates/rootplace/userban.jinja
+msgid "Ban a user"
+msgstr "Bannir un utilisateur"
 
-#: rootplace/views.py
-msgid "User that will be deleted"
-msgstr "Utilisateur qui sera supprimé"
+#: rootplace/templates/rootplace/userban.jinja
+msgid "not specified"
+msgstr "non spécifié"
 
-#: rootplace/views.py
-msgid "User to be selected"
-msgstr "Utilisateur à sélectionner"
+#: rootplace/templates/rootplace/userban.jinja
+msgid "Remove ban"
+msgstr "Retirer le ban"
+
+#: rootplace/templates/rootplace/userban.jinja
+msgid "No active ban."
+msgstr "Pas de ban actif"
 
 #: sas/forms.py
 msgid "Add a new album"
