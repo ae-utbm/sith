@@ -77,17 +77,14 @@ export class IcsCalendar extends inheritHtmlElement("div") {
 
     const makePopupTitle = (event: EventImpl) => {
       const row = document.createElement("div");
-      const title = document.createElement("h4");
-      const time = document.createElement("span");
-
-      title.setAttribute("class", "event-details-row-content");
-      title.textContent = event.title;
-
-      time.setAttribute("class", "event-details-row-content");
-      time.textContent = `${this.formatDate(event.start)} - ${this.formatDate(event.end)}`;
-
-      row.appendChild(title);
-      row.appendChild(time);
+      row.innerHTML = `
+        <h4 class="event-details-row-content">
+          ${event.title}
+        </h4>
+        <span class="event-details-row-content">
+          ${this.formatDate(event.start)} - ${this.formatDate(event.end)}
+        </span>
+      `;
       return makePopupInfo(
         row,
         "fa-solid fa-calendar-days fa-xl event-detail-row-icon",
