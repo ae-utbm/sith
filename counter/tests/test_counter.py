@@ -31,7 +31,7 @@ from model_bakery import baker
 
 from club.models import Club, Membership
 from core.baker_recipes import board_user, subscriber_user, very_old_subscriber_user
-from core.models import Group, User
+from core.models import BanGroup, User
 from counter.baker_recipes import product_recipe
 from counter.models import (
     Counter,
@@ -229,11 +229,11 @@ class TestCounterClick(TestFullClickBase):
         cls.set_age(cls.banned_alcohol_customer, 20)
         cls.set_age(cls.underage_customer, 17)
 
-        cls.banned_alcohol_customer.groups.add(
-            Group.objects.get(pk=settings.SITH_GROUP_BANNED_ALCOHOL_ID)
+        cls.banned_alcohol_customer.ban_groups.add(
+            BanGroup.objects.get(pk=settings.SITH_GROUP_BANNED_ALCOHOL_ID)
         )
-        cls.banned_counter_customer.groups.add(
-            Group.objects.get(pk=settings.SITH_GROUP_BANNED_COUNTER_ID)
+        cls.banned_counter_customer.ban_groups.add(
+            BanGroup.objects.get(pk=settings.SITH_GROUP_BANNED_COUNTER_ID)
         )
 
         cls.beer = product_recipe.make(

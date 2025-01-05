@@ -23,7 +23,7 @@
 #
 from __future__ import annotations
 
-from typing import Self
+from typing import Iterable, Self
 
 from django.conf import settings
 from django.core import validators
@@ -31,14 +31,14 @@ from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import RegexValidator, validate_email
 from django.db import models, transaction
-from django.db.models import Exists, OuterRef, Q
+from django.db.models import Exists, F, OuterRef, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.timezone import localdate
 from django.utils.translation import gettext_lazy as _
 
-from core.models import Group, MetaGroup, Notification, Page, SithFile, User
+from core.models import Group, Notification, Page, SithFile, User
 
 # Create your models here.
 
@@ -79,19 +79,6 @@ class Club(models.Model):
         _("short description"), max_length=1000, default="", blank=True, null=True
     )
     address = models.CharField(_("address"), max_length=254)
-
-    owner_group = models.ForeignKey(
-        Group,
-        related_name="owned_club",
-        default=get_default_owner_group,
-        on_delete=models.CASCADE,
-    )
-    edit_groups = models.ManyToManyField(
-        Group, related_name="editable_club", blank=True
-    )
-    view_groups = models.ManyToManyField(
-        Group, related_name="viewable_club", blank=True
-    )
     home = models.OneToOneField(
         SithFile,
         related_name="home_of_club",
@@ -103,6 +90,12 @@ class Club(models.Model):
     page = models.OneToOneField(
         Page, related_name="club", blank=True, null=True, on_delete=models.CASCADE
     )
+    members_group = models.OneToOneField(
+        Group, related_name="club", on_delete=models.PROTECT
+    )
+    board_group = models.OneToOneField(
+        Group, related_name="club_board", on_delete=models.PROTECT
+    )
 
     class Meta:
         ordering = ["name", "unix_name"]
@@ -112,23 +105,27 @@ class Club(models.Model):
 
     @transaction.atomic()
     def save(self, *args, **kwargs):
-        old = Club.objects.filter(id=self.id).first()
-        creation = old is None
-        if not creation and old.unix_name != self.unix_name:
-            self._change_unixname(self.unix_name)
+        creation = self._state.adding
+        if not creation:
+            db_club = Club.objects.get(id=self.id)
+            if self.unix_name != db_club.unix_name:
+                self.home.name = self.unix_name
+                self.home.save()
+            if self.name != db_club.name:
+                self.board_group.name = f"{self.name} - Bureau"
+                self.board_group.save()
+                self.members_group.name = f"{self.name} - Membres"
+                self.members_group.save()
+        if creation:
+            self.board_group = Group.objects.create(
+                name=f"{self.name} - Bureau", is_manually_manageable=False
+            )
+            self.members_group = Group.objects.create(
+                name=f"{self.name} - Membres", is_manually_manageable=False
+            )
         super().save(*args, **kwargs)
         if creation:
-            board = MetaGroup(name=self.unix_name + settings.SITH_BOARD_SUFFIX)
-            board.save()
-            member = MetaGroup(name=self.unix_name + settings.SITH_MEMBER_SUFFIX)
-            member.save()
-            subscribers = Group.objects.filter(
-                name=settings.SITH_MAIN_MEMBERS_GROUP
-            ).first()
             self.make_home()
-            self.home.edit_groups.set([board])
-            self.home.view_groups.set([member, subscribers])
-            self.home.save()
         self.make_page()
         cache.set(f"sith_club_{self.unix_name}", self)
 
@@ -136,7 +133,8 @@ class Club(models.Model):
         return reverse("club:club_view", kwargs={"club_id": self.id})
 
     @cached_property
-    def president(self):
+    def president(self) -> Membership | None:
+        """Fetch the membership of the current president of this club."""
         return self.members.filter(
             role=settings.SITH_CLUB_ROLES_ID["President"], end_date=None
         ).first()
@@ -154,36 +152,18 @@ class Club(models.Model):
     def clean(self):
         self.check_loop()
 
-    def _change_unixname(self, old_name, new_name):
-        c = Club.objects.filter(unix_name=new_name).first()
-        if c is None:
-            # Update all the groups names
-            Group.objects.filter(name=old_name).update(name=new_name)
-            Group.objects.filter(name=old_name + settings.SITH_BOARD_SUFFIX).update(
-                name=new_name + settings.SITH_BOARD_SUFFIX
-            )
-            Group.objects.filter(name=old_name + settings.SITH_MEMBER_SUFFIX).update(
-                name=new_name + settings.SITH_MEMBER_SUFFIX
-            )
+    def make_home(self) -> None:
+        if self.home:
+            return
+        home_root = SithFile.objects.filter(parent=None, name="clubs").first()
+        root = User.objects.filter(username="root").first()
+        if home_root and root:
+            home = SithFile(parent=home_root, name=self.unix_name, owner=root)
+            home.save()
+            self.home = home
+            self.save()
 
-            if self.home:
-                self.home.name = new_name
-                self.home.save()
-
-        else:
-            raise ValidationError(_("A club with that unix_name already exists"))
-
-    def make_home(self):
-        if not self.home:
-            home_root = SithFile.objects.filter(parent=None, name="clubs").first()
-            root = User.objects.filter(username="root").first()
-            if home_root and root:
-                home = SithFile(parent=home_root, name=self.unix_name, owner=root)
-                home.save()
-                self.home = home
-                self.save()
-
-    def make_page(self):
+    def make_page(self) -> None:
         root = User.objects.filter(username="root").first()
         if not self.page:
             club_root = Page.objects.filter(name=settings.SITH_CLUB_ROOT_PAGE).first()
@@ -213,35 +193,34 @@ class Club(models.Model):
             self.page.parent = self.parent.page
             self.page.save(force_lock=True)
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs) -> tuple[int, dict[str, int]]:
         # Invalidate the cache of this club and of its memberships
         for membership in self.members.ongoing().select_related("user"):
             cache.delete(f"membership_{self.id}_{membership.user.id}")
         cache.delete(f"sith_club_{self.unix_name}")
-        super().delete(*args, **kwargs)
+        self.board_group.delete()
+        self.members_group.delete()
+        return super().delete(*args, **kwargs)
 
-    def get_display_name(self):
+    def get_display_name(self) -> str:
         return self.name
 
-    def is_owned_by(self, user):
+    def is_owned_by(self, user: User) -> bool:
         """Method to see if that object can be super edited by the given user."""
         if user.is_anonymous:
             return False
-        return user.is_board_member
+        return user.is_root or user.is_board_member
 
-    def get_full_logo_url(self):
-        return "https://%s%s" % (settings.SITH_URL, self.logo.url)
+    def get_full_logo_url(self) -> str:
+        return f"https://{settings.SITH_URL}{self.logo.url}"
 
-    def can_be_edited_by(self, user):
+    def can_be_edited_by(self, user: User) -> bool:
         """Method to see if that object can be edited by the given user."""
         return self.has_rights_in_club(user)
 
-    def can_be_viewed_by(self, user):
+    def can_be_viewed_by(self, user: User) -> bool:
         """Method to see if that object can be seen by the given user."""
-        sub = User.objects.filter(pk=user.pk).first()
-        if sub is None:
-            return False
-        return sub.was_subscribed
+        return user.was_subscribed
 
     def get_membership_for(self, user: User) -> Membership | None:
         """Return the current membership the given user.
@@ -262,9 +241,8 @@ class Club(models.Model):
                 cache.set(f"membership_{self.id}_{user.id}", membership)
         return membership
 
-    def has_rights_in_club(self, user):
-        m = self.get_membership_for(user)
-        return m is not None and m.role > settings.SITH_MAXIMUM_FREE_ROLE
+    def has_rights_in_club(self, user: User) -> bool:
+        return user.is_in_group(pk=self.board_group_id)
 
 
 class MembershipQuerySet(models.QuerySet):
@@ -283,42 +261,65 @@ class MembershipQuerySet(models.QuerySet):
         """
         return self.filter(role__gt=settings.SITH_MAXIMUM_FREE_ROLE)
 
-    def update(self, **kwargs):
-        """Refresh the cache for the elements of the queryset.
+    def update(self, **kwargs) -> int:
+        """Refresh the cache and edit group ownership.
 
-        Besides that, does the same job as a regular update method.
+        Update the cache, when necessary, remove
+        users from club groups they are no more in
+        and add them in the club groups they should be in.
 
-        Be aware that this adds a db query to retrieve the updated objects
+        Be aware that this adds three db queries :
+        one to retrieve the updated memberships,
+        one to perform group removal and one to perform
+        group attribution.
         """
         nb_rows = super().update(**kwargs)
-        if nb_rows > 0:
-            # if at least a row was affected, refresh the cache
-            for membership in self.all():
-                if membership.end_date is not None:
-                    cache.set(
-                        f"membership_{membership.club_id}_{membership.user_id}",
-                        "not_member",
-                    )
-                else:
-                    cache.set(
-                        f"membership_{membership.club_id}_{membership.user_id}",
-                        membership,
-                    )
+        if nb_rows == 0:
+            # if no row was affected, no need to refresh the cache
+            return 0
 
-    def delete(self):
+        cache_memberships = {}
+        memberships = set(self.select_related("club"))
+        # delete all User-Group relations and recreate the necessary ones
+        # It's more concise to write and more reliable
+        Membership._remove_club_groups(memberships)
+        Membership._add_club_groups(memberships)
+        for member in memberships:
+            cache_key = f"membership_{member.club_id}_{member.user_id}"
+            if member.end_date is None:
+                cache_memberships[cache_key] = member
+            else:
+                cache_memberships[cache_key] = "not_member"
+        cache.set_many(cache_memberships)
+        return nb_rows
+
+    def delete(self) -> tuple[int, dict[str, int]]:
         """Work just like the default Django's delete() method,
         but add a cache invalidation for the elements of the queryset
-        before the deletion.
+        before the deletion,
+        and a removal of the user from the club groups.
 
-        Be aware that this adds a db query to retrieve the deleted element.
-        As this first query take place before the deletion operation,
-        it will be performed even if the deletion fails.
+        Be aware that this adds some db queries :
+
+        - 1 to retrieve the deleted elements in order to perform
+          post-delete operations.
+          As we can't know if a delete will affect rows or not,
+          this query will always happen
+        - 1 query to remove the users from the club groups.
+          If the delete operation affected no row,
+          this query won't happen.
         """
-        ids = list(self.values_list("club_id", "user_id"))
-        nb_rows, _ = super().delete()
+        memberships = set(self.all())
+        nb_rows, rows_counts = super().delete()
         if nb_rows > 0:
-            for club_id, user_id in ids:
-                cache.set(f"membership_{club_id}_{user_id}", "not_member")
+            Membership._remove_club_groups(memberships)
+            cache.set_many(
+                {
+                    f"membership_{m.club_id}_{m.user_id}": "not_member"
+                    for m in memberships
+                }
+            )
+        return nb_rows, rows_counts
 
 
 class Membership(models.Model):
@@ -361,6 +362,13 @@ class Membership(models.Model):
 
     objects = MembershipQuerySet.as_manager()
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=Q(end_date__gte=F("start_date")), name="end_after_start"
+            ),
+        ]
+
     def __str__(self):
         return (
             f"{self.club.name} - {self.user.username} "
@@ -370,7 +378,14 @@ class Membership(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+        # a save may either be an update or a creation
+        # and may result in either an ongoing or an ended membership.
+        # It could also be a retrogradation from the board to being a simple member.
+        # To avoid problems, the user is removed from the club groups beforehand ;
+        # he will be added back if necessary
+        self._remove_club_groups([self])
         if self.end_date is None:
+            self._add_club_groups([self])
             cache.set(f"membership_{self.club_id}_{self.user_id}", self)
         else:
             cache.set(f"membership_{self.club_id}_{self.user_id}", "not_member")
@@ -378,11 +393,11 @@ class Membership(models.Model):
     def get_absolute_url(self):
         return reverse("club:club_members", kwargs={"club_id": self.club_id})
 
-    def is_owned_by(self, user):
+    def is_owned_by(self, user: User) -> bool:
         """Method to see if that object can be super edited by the given user."""
         if user.is_anonymous:
             return False
-        return user.is_board_member
+        return user.is_root or user.is_board_member
 
     def can_be_edited_by(self, user: User) -> bool:
         """Check if that object can be edited by the given user."""
@@ -392,8 +407,90 @@ class Membership(models.Model):
         return membership is not None and membership.role >= self.role
 
     def delete(self, *args, **kwargs):
+        self._remove_club_groups([self])
         super().delete(*args, **kwargs)
         cache.delete(f"membership_{self.club_id}_{self.user_id}")
+
+    @staticmethod
+    def _remove_club_groups(
+        memberships: Iterable[Membership],
+    ) -> tuple[int, dict[str, int]]:
+        """Remove users of those memberships from the club groups.
+
+        For example, if a user is in the Troll club board,
+        he is in the board group and the members group of the Troll.
+        After calling this function, he will be in neither.
+
+        Returns:
+            The result of the deletion queryset.
+
+        Warnings:
+            If this function isn't used in combination
+            with an actual deletion of the memberships,
+            it will result in an inconsistent state,
+            where users will be in the clubs, without
+            having the associated rights.
+        """
+        clubs = {m.club_id for m in memberships}
+        users = {m.user_id for m in memberships}
+        groups = Group.objects.filter(Q(club__in=clubs) | Q(club_board__in=clubs))
+        return User.groups.through.objects.filter(
+            Q(group__in=groups) & Q(user__in=users)
+        ).delete()
+
+    @staticmethod
+    def _add_club_groups(
+        memberships: Iterable[Membership],
+    ) -> list[User.groups.through]:
+        """Add users of those memberships to the club groups.
+
+        For example, if a user just joined the Troll club board,
+        he will be added in both the members group and the board group
+        of the club.
+
+        Returns:
+            The created User-Group relations.
+
+        Warnings:
+            If this function isn't used in combination
+            with an actual update/creation of the memberships,
+            it will result in an inconsistent state,
+            where users will have the rights associated to the
+            club, without actually being part of it.
+        """
+        # only active membership (i.e. `end_date=None`)
+        # grant the attribution of club groups.
+        memberships = [m for m in memberships if m.end_date is None]
+        if not memberships:
+            return []
+
+        if sum(1 for m in memberships if not hasattr(m, "club")) > 1:
+            # if more than one membership hasn't its `club` attribute set
+            # it's less expensive to reload the whole query with
+            # a select_related than perform a distinct query
+            # to fetch each club.
+            ids = {m.id for m in memberships}
+            memberships = list(
+                Membership.objects.filter(id__in=ids).select_related("club")
+            )
+        club_groups = []
+        for membership in memberships:
+            club_groups.append(
+                User.groups.through(
+                    user_id=membership.user_id,
+                    group_id=membership.club.members_group_id,
+                )
+            )
+            if membership.role > settings.SITH_MAXIMUM_FREE_ROLE:
+                club_groups.append(
+                    User.groups.through(
+                        user_id=membership.user_id,
+                        group_id=membership.club.board_group_id,
+                    )
+                )
+        return User.groups.through.objects.bulk_create(
+            club_groups, ignore_conflicts=True
+        )
 
 
 class Mailing(models.Model):

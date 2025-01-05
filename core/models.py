@@ -36,14 +36,13 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.auth.models import AnonymousUser as AuthAnonymousUser
 from django.contrib.auth.models import Group as AuthGroup
-from django.contrib.auth.models import GroupManager as AuthGroupManager
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core import validators
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.mail import send_mail
 from django.db import models, transaction
-from django.db.models import Exists, OuterRef, Q
+from django.db.models import Exists, F, OuterRef, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -58,33 +57,15 @@ if TYPE_CHECKING:
     from club.models import Club
 
 
-class RealGroupManager(AuthGroupManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(is_meta=False)
-
-
-class MetaGroupManager(AuthGroupManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(is_meta=True)
-
-
 class Group(AuthGroup):
-    """Implement both RealGroups and Meta groups.
+    """Wrapper around django.auth.Group"""
 
-    Groups are sorted by their is_meta property
-    """
-
-    #: If False, this is a RealGroup
-    is_meta = models.BooleanField(
-        _("meta group status"),
+    is_manually_manageable = models.BooleanField(
+        _("Is manually manageable"),
         default=False,
-        help_text=_("Whether a group is a meta group or not"),
+        help_text=_("If False, this shouldn't be shown on group management pages"),
     )
-    #: Description of the group
-    description = models.CharField(_("description"), max_length=60)
-
-    class Meta:
-        ordering = ["name"]
+    description = models.TextField(_("description"))
 
     def get_absolute_url(self) -> str:
         return reverse("core:group_list")
@@ -98,65 +79,6 @@ class Group(AuthGroup):
         super().delete(*args, **kwargs)
         cache.delete(f"sith_group_{self.id}")
         cache.delete(f"sith_group_{self.name.replace(' ', '_')}")
-
-
-class MetaGroup(Group):
-    """MetaGroups are dynamically created groups.
-
-    Generally used with clubs where creating a club creates two groups:
-
-    * club-SITH_BOARD_SUFFIX
-    * club-SITH_MEMBER_SUFFIX
-    """
-
-    #: Assign a manager in a way that MetaGroup.objects only return groups with is_meta=False
-    objects = MetaGroupManager()
-
-    class Meta:
-        proxy = True
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.is_meta = True
-
-    @cached_property
-    def associated_club(self) -> Club | None:
-        """Return the group associated with this meta group.
-
-        The result of this function is cached
-
-
-        Returns:
-            The associated club if it exists, else None
-        """
-        from club.models import Club
-
-        if self.name.endswith(settings.SITH_BOARD_SUFFIX):
-            # replace this with str.removesuffix as soon as Python
-            # is upgraded to 3.10
-            club_name = self.name[: -len(settings.SITH_BOARD_SUFFIX)]
-        elif self.name.endswith(settings.SITH_MEMBER_SUFFIX):
-            club_name = self.name[: -len(settings.SITH_MEMBER_SUFFIX)]
-        else:
-            return None
-        club = cache.get(f"sith_club_{club_name}")
-        if club is None:
-            club = Club.objects.filter(unix_name=club_name).first()
-            cache.set(f"sith_club_{club_name}", club)
-        return club
-
-
-class RealGroup(Group):
-    """RealGroups are created by the developer.
-
-    Most of the time they match a number in settings to be easily used for permissions.
-    """
-
-    #: Assign a manager in a way that MetaGroup.objects only return groups with is_meta=True
-    objects = RealGroupManager()
-
-    class Meta:
-        proxy = True
 
 
 def validate_promo(value: int) -> None:
@@ -204,11 +126,33 @@ def get_group(*, pk: int | None = None, name: str | None = None) -> Group | None
     else:
         group = Group.objects.filter(name=name).first()
     if group is not None:
-        cache.set(f"sith_group_{group.id}", group)
-        cache.set(f"sith_group_{group.name.replace(' ', '_')}", group)
+        name = group.name.replace(" ", "_")
+        cache.set_many({f"sith_group_{group.id}": group, f"sith_group_{name}": group})
     else:
         cache.set(f"sith_group_{pk_or_name}", "not_found")
     return group
+
+
+class BanGroup(AuthGroup):
+    """An anti-group, that removes permissions instead of giving them.
+
+    Users are linked to BanGroups through UserBan objects.
+
+    Example:
+        ```python
+        user = User.objects.get(username="...")
+        ban_group = BanGroup.objects.first()
+        UserBan.objects.create(user=user, ban_group=ban_group, reason="...")
+
+        assert user.ban_groups.contains(ban_group)
+        ```
+    """
+
+    description = models.TextField(_("description"))
+
+    class Meta:
+        verbose_name = _("ban group")
+        verbose_name_plural = _("ban groups")
 
 
 class UserQuerySet(models.QuerySet):
@@ -261,7 +205,13 @@ class User(AbstractUser):
             "granted to each of their groups."
         ),
         related_name="users",
-        blank=True,
+    )
+    ban_groups = models.ManyToManyField(
+        BanGroup,
+        verbose_name=_("ban groups"),
+        through="UserBan",
+        help_text=_("The bans this user has received."),
+        related_name="users",
     )
     home = models.OneToOneField(
         "SithFile",
@@ -438,18 +388,6 @@ class User(AbstractUser):
             return self.was_subscribed
         if group.id == settings.SITH_GROUP_ROOT_ID:
             return self.is_root
-        if group.is_meta:
-            # check if this group is associated with a club
-            group.__class__ = MetaGroup
-            club = group.associated_club
-            if club is None:
-                return False
-            membership = club.get_membership_for(self)
-            if membership is None:
-                return False
-            if group.name.endswith(settings.SITH_MEMBER_SUFFIX):
-                return True
-            return membership.role > settings.SITH_MAXIMUM_FREE_ROLE
         return group in self.cached_groups
 
     @property
@@ -474,12 +412,11 @@ class User(AbstractUser):
         return any(g.id == root_id for g in self.cached_groups)
 
     @cached_property
-    def is_board_member(self):
-        main_club = settings.SITH_MAIN_CLUB["unix_name"]
-        return self.is_in_group(name=main_club + settings.SITH_BOARD_SUFFIX)
+    def is_board_member(self) -> bool:
+        return self.groups.filter(club_board=settings.SITH_MAIN_CLUB_ID).exists()
 
     @cached_property
-    def can_read_subscription_history(self):
+    def can_read_subscription_history(self) -> bool:
         if self.is_root or self.is_board_member:
             return True
 
@@ -514,12 +451,12 @@ class User(AbstractUser):
         )
 
     @cached_property
-    def is_banned_alcohol(self):
-        return self.is_in_group(pk=settings.SITH_GROUP_BANNED_ALCOHOL_ID)
+    def is_banned_alcohol(self) -> bool:
+        return self.ban_groups.filter(id=settings.SITH_GROUP_BANNED_ALCOHOL_ID).exists()
 
     @cached_property
-    def is_banned_counter(self):
-        return self.is_in_group(pk=settings.SITH_GROUP_BANNED_COUNTER_ID)
+    def is_banned_counter(self) -> bool:
+        return self.ban_groups.filter(id=settings.SITH_GROUP_BANNED_COUNTER_ID).exists()
 
     @cached_property
     def age(self) -> int:
@@ -821,6 +758,52 @@ class AnonymousUser(AuthAnonymousUser):
         return _("Visitor")
 
 
+class UserBan(models.Model):
+    """A ban of a user.
+
+    A user can be banned for a specific reason, for a specific duration.
+    The expiration date is indicative, and the ban should be removed manually.
+    """
+
+    ban_group = models.ForeignKey(
+        BanGroup,
+        verbose_name=_("ban type"),
+        related_name="user_bans",
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(
+        User, verbose_name=_("user"), related_name="bans", on_delete=models.CASCADE
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    expires_at = models.DateTimeField(
+        _("expires at"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "When the ban should be removed. "
+            "Currently, there is no automatic removal, so this is purely indicative. "
+            "Automatic ban removal may be implemented later on."
+        ),
+    )
+    reason = models.TextField(_("reason"))
+
+    class Meta:
+        verbose_name = _("user ban")
+        verbose_name_plural = _("user bans")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["ban_group", "user"], name="unique_ban_type_per_user"
+            ),
+            models.CheckConstraint(
+                check=Q(expires_at__gte=F("created_at")),
+                name="user_ban_end_after_start",
+            ),
+        ]
+
+    def __str__(self):
+        return f"Ban of user {self.user.id}"
+
+
 class Preferences(models.Model):
     user = models.OneToOneField(
         User, related_name="_preferences", on_delete=models.CASCADE
@@ -943,7 +926,7 @@ class SithFile(models.Model):
                     param="1",
                 ).save()
 
-    def is_owned_by(self, user):
+    def is_owned_by(self, user: User) -> bool:
         if user.is_anonymous:
             return False
         if user.is_root:
@@ -958,7 +941,7 @@ class SithFile(models.Model):
             return True
         return user.id == self.owner_id
 
-    def can_be_viewed_by(self, user):
+    def can_be_viewed_by(self, user: User) -> bool:
         if hasattr(self, "profile_of"):
             return user.can_view(self.profile_of)
         if hasattr(self, "avatar_of"):

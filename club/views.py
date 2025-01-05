@@ -71,14 +71,13 @@ class ClubTabsMixin(TabedViewMixin):
         return self.object.get_display_name()
 
     def get_list_of_tabs(self):
-        tab_list = []
-        tab_list.append(
+        tab_list = [
             {
                 "url": reverse("club:club_view", kwargs={"club_id": self.object.id}),
                 "slug": "infos",
                 "name": _("Infos"),
             }
-        )
+        ]
         if self.request.user.can_view(self.object):
             tab_list.append(
                 {

@@ -21,6 +21,7 @@
 #
 #
 import re
+from datetime import date, datetime
 from io import BytesIO
 
 from captcha.fields import CaptchaField
@@ -37,14 +38,16 @@ from django.forms import (
     DateInput,
     DateTimeInput,
     TextInput,
+    Widget,
 )
+from django.utils.timezone import now
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from PIL import Image
 
 from antispam.forms import AntiSpamEmailField
-from core.models import Gift, Page, RealGroup, SithFile, User
+from core.models import Gift, Group, Page, SithFile, User
 from core.utils import resize_image
 from core.views.widgets.select import (
     AutoCompleteSelect,
@@ -128,6 +131,23 @@ class SelectUser(TextInput):
             + "</span>"
         )
         return output
+
+
+# Fields
+
+
+def validate_future_timestamp(value: date | datetime):
+    if value <= now():
+        raise ValueError(_("Ensure this timestamp is set in the future"))
+
+
+class FutureDateTimeField(forms.DateTimeField):
+    """A datetime field that accepts only future timestamps."""
+
+    default_validators = [validate_future_timestamp]
+
+    def widget_attrs(self, widget: Widget) -> dict[str, str]:
+        return {"min": widget.format_value(now())}
 
 
 # Forms
@@ -293,7 +313,7 @@ class UserGroupsForm(forms.ModelForm):
     required_css_class = "required"
 
     groups = forms.ModelMultipleChoiceField(
-        queryset=RealGroup.objects.all(),
+        queryset=Group.objects.filter(is_manually_manageable=True),
         widget=CheckboxSelectMultiple,
         label=_("Groups"),
         required=False,

@@ -1,0 +1,230 @@
+#poster_list,
+#screen_list,
+#poster_edit,
+#screen_edit {
+  position: relative;
+
+  #title {
+    position: relative;
+    padding: 10px;
+    margin: 10px;
+    border-bottom: 2px solid black;
+
+    h3 {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #links {
+      position: absolute;
+      display: flex;
+      bottom: 5px;
+
+      &.left {
+        left: 0;
+      }
+
+      &.right {
+        right: 0;
+      }
+
+      .link {
+        padding: 5px;
+        padding-left: 20px;
+        padding-right: 20px;
+        margin-left: 5px;
+        border-radius: 20px;
+        background-color: hsl(40, 100%, 50%);
+        color: black;
+
+        &:hover {
+          color: black;
+          background-color: hsl(40, 58%, 50%);
+        }
+
+        &.delete {
+          background-color: hsl(0, 100%, 40%);
+        }
+      }
+    }
+  }
+
+  #posters,
+  #screens {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+
+    #no-posters,
+    #no-screens {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .poster,
+    .screen {
+      min-width: 10%;
+      max-width: 20%;
+      display: flex;
+      flex-direction: column;
+      margin: 10px;
+      border: 2px solid darkgrey;
+      border-radius: 4px;
+      padding: 10px;
+      background-color: lightgrey;
+
+      * {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .name {
+        padding-bottom: 5px;
+        margin-bottom: 5px;
+        border-bottom: 1px solid whitesmoke;
+      }
+
+      .image {
+        flex-grow: 1;
+        position: relative;
+        padding-bottom: 5px;
+        margin-bottom: 5px;
+        border-bottom: 1px solid whitesmoke;
+
+        img {
+          max-height: 20vw;
+          max-width: 100%;
+        }
+
+        &:hover {
+          &::before {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            content: "Click to expand";
+            color: white;
+            background-color: rgba(black, 0.5);
+          }
+        }
+      }
+
+      .dates {
+        padding-bottom: 5px;
+        margin-bottom: 5px;
+        border-bottom: 1px solid whitesmoke;
+
+        * {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-wrap: wrap;
+          margin-left: 5px;
+          margin-right: 5px;
+        }
+
+        .begin,
+        .end {
+          width: 48%;
+        }
+
+        .begin {
+          border-right: 1px solid whitesmoke;
+          padding-right: 2%;
+        }
+      }
+
+      .edit,
+      .moderate,
+      .slideshow {
+        padding: 5px;
+        border-radius: 20px;
+        background-color: hsl(40, 100%, 50%);
+        color: black;
+
+        &:hover {
+          color: black;
+          background-color: hsl(40, 58%, 50%);
+        }
+
+        &:nth-child(2n) {
+          margin-top: 5px;
+          margin-bottom: 5px;
+        }
+      }
+
+      .tooltip {
+        visibility: hidden;
+        width: 120px;
+        background-color: hsl(210, 20%, 98%);
+        color: hsl(0, 0%, 0%);
+        text-align: center;
+        padding: 5px 0;
+        border-radius: 6px;
+        position: absolute;
+        z-index: 10;
+
+        ul {
+          margin-left: 0;
+          display: inline-block;
+
+          li {
+            display: list-item;
+            list-style-type: none;
+          }
+        }
+      }
+
+      &.not_moderated {
+        border: 1px solid red;
+      }
+
+      &:hover .tooltip {
+        visibility: visible;
+      }
+    }
+  }
+
+  #view {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    visibility: hidden;
+    background-color: rgba(10, 10, 10, 0.9);
+    overflow: hidden;
+
+    &.active {
+      visibility: visible;
+    }
+
+    #placeholder {
+      width: 80vw;
+      height: 80vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      top: 0;
+      left: 0;
+
+      img {
+        max-width: 100%;
+        max-height: 100%;
+      }
+    }
+  }
+}

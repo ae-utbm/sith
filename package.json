@@ -19,7 +19,8 @@
     "#openapi": "./staticfiles/generated/openapi/index.ts",
     "#core:*": "./core/static/bundled/*",
     "#pedagogy:*": "./pedagogy/static/bundled/*",
-    "#counter:*": "./counter/static/bundled/*"
+    "#counter:*": "./counter/static/bundled/*",
+    "#com:*": "./com/static/bundled/*"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -36,6 +37,10 @@
   "dependencies": {
     "@alpinejs/sort": "^3.14.7",
     "@fortawesome/fontawesome-free": "^6.6.0",
+    "@fullcalendar/core": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/icalendar": "^6.1.15",
+    "@fullcalendar/list": "^6.1.15",
     "@hey-api/client-fetch": "^0.4.0",
     "@sentry/browser": "^8.34.0",
     "@zip.js/zip.js": "^2.7.52",

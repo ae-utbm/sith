@@ -11,8 +11,6 @@ class TestElection(TestCase):
     def setUpTestData(cls):
         cls.election = Election.objects.first()
         cls.public_group = Group.objects.get(id=settings.SITH_GROUP_PUBLIC_ID)
-        cls.subscriber_group = Group.objects.get(name=settings.SITH_MAIN_MEMBERS_GROUP)
-        cls.ae_board_group = Group.objects.get(name=settings.SITH_MAIN_BOARD_GROUP)
         cls.sli = User.objects.get(username="sli")
         cls.subscriber = User.objects.get(username="subscriber")
         cls.public = User.objects.get(username="public")

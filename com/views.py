@@ -685,8 +685,12 @@ class PosterEditBaseView(UpdateView):
 
     def get_initial(self):
         return {
-            "date_begin": self.object.date_begin.strftime("%Y-%m-%d %H:%M:%S"),
-            "date_end": self.object.date_end.strftime("%Y-%m-%d %H:%M:%S"),
+            "date_begin": self.object.date_begin.strftime("%Y-%m-%d %H:%M:%S")
+            if self.object.date_begin
+            else None,
+            "date_end": self.object.date_end.strftime("%Y-%m-%d %H:%M:%S")
+            if self.object.date_end
+            else None,
         }
 
     def dispatch(self, request, *args, **kwargs):

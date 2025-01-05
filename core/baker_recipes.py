@@ -7,7 +7,7 @@ from model_bakery import seq
 from model_bakery.recipe import Recipe, related
 
 from club.models import Membership
-from core.models import User
+from core.models import Group, User
 from subscription.models import Subscription
 
 active_subscription = Recipe(
@@ -60,5 +60,6 @@ board_user = Recipe(
     first_name="AE",
     last_name=seq("member "),
     memberships=related(ae_board_membership),
+    groups=lambda: [Group.objects.get(club_board=settings.SITH_MAIN_CLUB_ID)],
 )
 """A user which is in the board of the AE."""

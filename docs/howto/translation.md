@@ -38,10 +38,20 @@ l'éditer et enfin le compiler au format binaire pour qu'il soit lu par le serve
 
 ```bash
 # Pour le backend
-./manage.py makemessages --locale=fr -e py,jinja --ignore=node_modules 
+./manage.py makemessages \
+  --locale=fr \
+  -e py,jinja \
+  --ignore=node_modules \
+  --add-location=file 
 
 # Pour le frontend
-./manage.py makemessages --locale=fr -d djangojs -e js,ts --ignore=node_modules --ignore=staticfiles/generated
+./manage.py makemessages \
+  --locale=fr \
+  -d djangojs \
+  -e js,ts \
+  --ignore=node_modules \
+  --ignore=staticfiles/generated \
+  --add-location=file
 ```
 
 ## Éditer le fichier django.po

@@ -5,6 +5,15 @@
   {% trans %}News{% endtrans %}
 {% endblock %}
 
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static('com/css/news-list.scss') }}">
+  <link rel="stylesheet" href="{{ static('com/components/ics-calendar.scss') }}">
+{% endblock %}
+
+{% block additional_js %}
+  <script type="module" src={{ static("bundled/com/components/ics-calendar-index.ts") }}></script>
+{% endblock %}
+
 {% block content %}
   {% if user.is_com_admin %}
     <div id="news_admin">
@@ -83,60 +92,58 @@
   </div>
 {% endif %}
 
-{% set coming_soon = object_list.filter(dates__start_date__gte=timezone.now()+timedelta(days=5),
-type="EVENT").order_by('dates__start_date') %}
-{% if coming_soon %}
-  <h3>{% trans %}Coming soon... don't miss!{% endtrans %}</h3>
-  {% for news in coming_soon %}
-    <section class="news_coming_soon">
-      <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a>
-      <span class="news_date">{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
-        {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }} -
-        {{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
-        {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
-    </section>
-  {% endfor %}
-{% endif %}
 
 <h3>{% trans %}All coming events{% endtrans %}</h3>
-<iframe
-  src="https://embed.styledcalendar.com/#2mF2is8CEXhr4ADcX6qN"
-  title="Styled Calendar"
-  class="styled-calendar-container"
-  style="width: 100%; border: none; height: 1060px"
-  data-cy="calendar-embed-iframe">
-</iframe>
+<ics-calendar locale="{{ get_language() }}"></ics-calendar>
+
+
 </div>
 
-<div id="right_column" class="news_column">
-  <div id="agenda">
-    <div id="agenda_title">{% trans %}Agenda{% endtrans %}</div>
-    <div id="agenda_content">
-      {% for d in NewsDate.objects.filter(end_date__gte=timezone.now(),
-      news__is_moderated=True, news__type__in=["WEEKLY",
-      "EVENT"]).order_by('start_date', 'end_date') %}
-      <div class="agenda_item">
-        <div class="agenda_date">
-          <strong>{{ d.start_date|localtime|date('D d M Y') }}</strong>
-        </div>
-        <div class="agenda_time">
-          <span>{{ d.start_date|localtime|time(DATETIME_FORMAT) }}</span> -
-          <span>{{ d.end_date|localtime|time(DATETIME_FORMAT) }}</span>
-        </div>
-        <div>
-          <strong><a href="{{ url('com:news_detail', news_id=d.news.id) }}">{{ d.news.title }}</a></strong>
-          <a href="{{ d.news.club.get_absolute_url() }}">{{ d.news.club }}</a>
-        </div>
-        <div class="agenda_item_content">{{ d.news.summary|markdown }}</div>
-      </div>
-      {% endfor %}
+<div id="right_column">
+  <div id="links">
+    <h3>{% trans %}Links{% endtrans %}</h3>
+    <div id="links_content">
+      <h4>{% trans %}Our services{% endtrans %}</h4>
+      <ul>
+        <li>
+          <i class="fa-solid fa-graduation-cap fa-xl"></i>
+          <a href="{{ url("pedagogy:guide") }}">{% trans %}UV Guide{% endtrans %}</a>
+        </li>
+        <li>
+          <i class="fa-solid fa-magnifying-glass fa-xl"></i>
+          <a href="{{ url("matmat:search_clear") }}">{% trans %}Matmatronch{% endtrans %}</a>
+        </li>
+        <li>
+          <i class="fa-solid fa-check-to-slot fa-xl"></i>
+          <a href="{{ url("election:list") }}">{% trans %}Elections{% endtrans %}</a>
+        </li>
+      </ul>
+      <br>
+      <h4>{% trans %}Social media{% endtrans %}</h4>
+      <ul>
+        <li>
+          <i class="fa-brands fa-discord fa-xl"></i>
+          <a rel="nofollow" target="#" href="https://discord.gg/QvTm3XJrHR">{% trans %}Discord AE{% endtrans %}</a>
+          {% if user.was_subscribed %}
+            - <a rel="nofollow" target="#" href="https://discord.gg/XK9WfPsUFm">{% trans %}Dev Team{% endtrans %}</a>
+          {% endif %}
+        </li>
+        <li>
+          <i class="fa-brands fa-facebook fa-xl"></i>
+          <a rel="nofollow" target="#" href="https://www.facebook.com/@AEUTBM/">{% trans %}Facebook{% endtrans %}</a>
+        </li>
+        <li>
+          <i class="fa-brands fa-square-instagram fa-xl"></i>
+          <a rel="nofollow" target="#" href="https://www.instagram.com/ae_utbm">{% trans %}Instagram{% endtrans %}</a>
+        </li>
+      </ul>
     </div>
   </div>
 
   <div id="birthdays">
-    <div id="birthdays_title">{% trans %}Birthdays{% endtrans %}</div>
+    <h3>{% trans %}Birthdays{% endtrans %}</h3>
     <div id="birthdays_content">
-      {%- if user.is_subscribed -%}
+      {%- if user.was_subscribed -%}
         <ul class="birthdays_year">
           {%- for year, users in birthdays -%}
             <li>
@@ -150,14 +157,13 @@ type="EVENT").order_by('dates__start_date') %}
           {%- endfor -%}
         </ul>
       {%- else -%}
-        <p>{% trans %}You need an up to date subscription to access this content{% endtrans %}</p>
+        <p>{% trans %}You need to subscribe to access this content{% endtrans %}</p>
       {%- endif -%}
     </div>
   </div>
+
 </div>
+
 
 </div>
 {% endblock %}
-
-
-

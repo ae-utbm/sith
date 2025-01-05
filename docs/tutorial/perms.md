@@ -4,7 +4,7 @@
 Le fonctionnement de l'AE ne permet pas d'utiliser le système de permissions
 intégré à Django tel quel. Lors de la conception du Sith, ce qui paraissait le
 plus simple à l'époque était de concevoir un système maison afin de se calquer
-sur ce que faisais l'ancien site.
+sur ce que faisait l'ancien site.
 
 ### Protéger un modèle
 

@@ -10,6 +10,10 @@
   {% trans %}Poster{% endtrans %}
 {% endblock %}
 
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static('com/css/posters.scss') }}">
+{% endblock %}
+
 {% block content %}
   <div id="poster_list">
 

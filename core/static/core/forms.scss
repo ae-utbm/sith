@@ -145,6 +145,7 @@ form {
     margin-top: .25rem;
     margin-bottom: .25rem;
     font-size: 80%;
+    display: block;
   }
 
   fieldset {
@@ -196,14 +197,6 @@ form {
     &:last-child {
       margin-bottom: 0;
     }
-  }
-
-  // ------------- LEGEND
-
-  legend {
-    font-weight: var(--nf-label-font-weight);
-    display: block;
-    margin-bottom: calc(var(--nf-input-size) / 5);
   }
 
   .form-group,
