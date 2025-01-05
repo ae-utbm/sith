@@ -61,7 +61,7 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 # deps used for development purposes, but unneeded in prod
 django-debug-toolbar = "^4.4.6"
-ipython = "^8.30.0"
+ipython = "^8.31.0"
 pre-commit = "^4.0.1"
 ruff = "^0.8.3" # Version used in pipeline is controlled by pre-commit hooks in .pre-commit.config.yaml
 djhtml = "^3.0.7"
