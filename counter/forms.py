@@ -154,6 +154,9 @@ class CounterEditForm(forms.ModelForm):
 
 
 class ProductEditForm(forms.ModelForm):
+    error_css_class = "error"
+    required_css_class = "required"
+
     class Meta:
         model = Product
         fields = [
@@ -171,6 +174,12 @@ class ProductEditForm(forms.ModelForm):
             "tray",
             "archived",
         ]
+        help_texts = {
+            "description": _(
+                "Describe the product. If it's an event's click, "
+                "give some insights about it, like the date (including the year)."
+            )
+        }
         widgets = {
             "product_type": AutoCompleteSelect,
             "buying_groups": AutoCompleteSelectMultipleGroup,
