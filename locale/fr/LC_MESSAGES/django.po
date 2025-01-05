@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-04 23:05+0100\n"
+"POT-Creation-Date: 2025-01-05 15:28+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1607,7 +1607,7 @@ msgstr "Anniversaires"
 msgid "%(age)s year old"
 msgstr "%(age)s ans"
 
-#: com/templates/com/news_list.jinja com/tests.py
+#: com/templates/com/news_list.jinja com/tests/test_views.py
 msgid "You need to subscribe to access this content"
 msgstr "Vous devez cotiser pour accéder à ce contenu"
 
@@ -3363,6 +3363,14 @@ msgstr "Cet UID est invalide"
 #: counter/forms.py
 msgid "User not found"
 msgstr "Utilisateur non trouvé"
+
+#: counter/forms.py
+msgid ""
+"Describe the product. If it's an event's click, give some insights about it, "
+"like the date (including the year)."
+msgstr ""
+"Décrivez le produit. Si c'est un click pour un évènement, donnez quelques détails "
+"dessus, comme la date (en incluant l'année)."
 
 #: counter/management/commands/dump_accounts.py
 msgid "Your AE account has been emptied"
