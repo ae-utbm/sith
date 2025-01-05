@@ -106,3 +106,17 @@ class TestExternalCalendar:
             assert f.read() == external_response.value
 
         assert mock_request.call_count == 2
+
+
+@pytest.mark.django_db
+class TestInternalCalendar:
+    @pytest.fixture(autouse=True)
+    def clear_cache(self):
+        IcsCalendar._INTERNAL_CALENDAR.unlink(missing_ok=True)
+
+    def test_fetch_success(self, client: Client):
+        response = client.get(reverse("api:calendar_internal"))
+        assert response.status_code == 200
+        out_file = accel_redirect_to_file(response)
+        assert out_file is not None
+        assert out_file.exists()
