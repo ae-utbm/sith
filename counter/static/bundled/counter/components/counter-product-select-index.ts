@@ -3,6 +3,7 @@ import { registerComponent } from "#core:utils/web-components";
 import type { RecursivePartial, TomSettings } from "tom-select/dist/types/types";
 
 const productParsingRegex = /^(\d+x)?(.*)/i;
+const codeParsingRegex = / \((\w+)\)$/;
 
 function parseProduct(query: string): [number, string] {
   const parsed = productParsingRegex.exec(query);
@@ -21,6 +22,18 @@ export class CounterProductSelect extends AutoCompleteSelectBase {
 
   protected attachBehaviors(): void {
     this.allowMultipleProducts();
+    this.parseCodes();
+  }
+
+  private parseCodes(): void {
+    // We guess the code from the product name so we can prioritize search on it
+    // If no code is found, we just ignore it and everything still is fine
+    for (const option of Object.values(this.widget.options)) {
+      const match = codeParsingRegex.exec(option.text);
+      if (match !== null) {
+        option.code = match[1];
+      }
+    }
   }
 
   private allowMultipleProducts(): void {
@@ -60,6 +73,10 @@ export class CounterProductSelect extends AutoCompleteSelectBase {
   }
   protected tomSelectSettings(): RecursivePartial<TomSettings> {
     /* We disable the dropdown on focus because we're going to always autofocus the widget */
-    return { ...super.tomSelectSettings(), openOnFocus: false };
+    return {
+      ...super.tomSelectSettings(),
+      openOnFocus: false,
+      searchField: ["code", "text"],
+    };
   }
 }
