@@ -37,7 +37,7 @@ jobs:
 
           git fetch
           git reset --hard origin/master
-          uv sync --only-group prod
+          uv sync --group prod
           npm install
           uv run ./manage.py install_xapian
           uv run ./manage.py migrate
