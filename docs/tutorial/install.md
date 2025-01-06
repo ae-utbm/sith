@@ -64,10 +64,10 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
         Installez les dépendances :
         
         ```bash
-        sudo apt install uv build-essential libssl-dev \
+        sudo apt install curl build-essential libssl-dev \
         libjpeg-dev zlib1g-dev npm libffi-dev pkg-config \
         gettext git
-
+        curl -LsSf https://astral.sh/uv/install.sh | sh
         ```
 
     === "Arch Linux"
