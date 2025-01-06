@@ -21,9 +21,21 @@ runs:
       with:
         python-version-file: ".python-version"
 
+    - name: Restore cached virtualenv
+      uses: actions/cache/restore@v4
+      with:
+        key: venv-${{ runner.os }}-${{ hashFiles('.python-version') }}-${{ hashFiles('pyproject.toml') }}-${{ env.CACHE_SUFFIX }}
+        path: .venv
+
     - name: Install dependencies
       run: uv run ./manage.py install_xapian
       shell: bash
+
+    - name: Save cached virtualenv
+      uses: actions/cache/save@v4
+      with:
+        key: venv-${{ runner.os }}-${{ hashFiles('.python-version') }}-${{ hashFiles('pyproject.toml') }}-${{ env.CACHE_SUFFIX }}
+        path: .venv
 
     - name: Compile gettext messages
       run: uv run ./manage.py compilemessages

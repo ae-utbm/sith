@@ -29,6 +29,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - uses: ./.github/actions/setup_project
+        env:
+          # To avoid race conditions on environment cache
+          CACHE_SUFFIX: ${{ matrix.pytest-mark }}
       - name: Run tests
         run: uv run coverage run -m pytest -m "${{ matrix.pytest-mark }}"
       - name: Generate coverage report
