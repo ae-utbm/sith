@@ -29,14 +29,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - uses: ./.github/actions/setup_project
-      - uses: ./.github/actions/setup_xapian
-      - uses: ./.github/actions/compile_messages
       - name: Run tests
-        run: poetry run coverage run -m pytest -m "${{ matrix.pytest-mark }}"
+        run: uv run coverage run -m pytest -m "${{ matrix.pytest-mark }}"
       - name: Generate coverage report
         run: |
-          poetry run coverage report
-          poetry run coverage html
+          uv run coverage report
+          uv run coverage html
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
         with:

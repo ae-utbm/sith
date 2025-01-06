@@ -8,7 +8,7 @@ pyrightconfig.json
 dist/
 .vscode/
 .idea/
-env/
+.venv/
 doc/html
 data/
 galaxy/test_galaxy_state.json

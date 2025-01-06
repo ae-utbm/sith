@@ -127,7 +127,7 @@ class Command(BaseCommand):
 
         # dumps and sales are linked to the same customers
         # and or both ordered with the same key, so zipping them is valid
-        for dump, sale in zip(pending_dumps, sales):
+        for dump, sale in zip(pending_dumps, sales, strict=False):
             dump.dump_operation = sale
         AccountDump.objects.bulk_update(pending_dumps, ["dump_operation"])
 

@@ -106,7 +106,7 @@ class Basket(models.Model):
         products = Product.objects.filter(id__in=ids).order_by("id")
         # items and products are sorted in the same order
         sales = []
-        for item, product in zip(items, products):
+        for item, product in zip(items, products, strict=False):
             sales.append(
                 Selling(
                     label=product.name,

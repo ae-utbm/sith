@@ -726,7 +726,7 @@ class TestCounterStats(TestCase):
                 "nickname": user.nick_name,
                 "perm_sum": perm_time,
             }
-            for user, perm_time in zip(users, perm_times)
+            for user, perm_time in zip(users, perm_times, strict=False)
         ]
 
     def test_top_customer(self):
@@ -741,7 +741,7 @@ class TestCounterStats(TestCase):
                 "nickname": user.nick_name,
                 "selling_sum": sale_amount,
             }
-            for user, sale_amount in zip(users, sale_amounts)
+            for user, sale_amount in zip(users, sale_amounts, strict=False)
         ]
 
 

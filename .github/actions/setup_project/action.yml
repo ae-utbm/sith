@@ -9,43 +9,22 @@ runs:
         packages: gettext
         version: 1.0  # increment to reset cache
 
-    - name: Set up python
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        version: "0.5.14"
+        enable-cache: true
+        cache-dependency-glob: "uv.lock"
+
+    - name: "Set up Python"
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12"
-
-    - name: Load cached Poetry installation
-      id: cached-poetry
-      uses: actions/cache@v3
-      with:
-        path: ~/.local
-        key: poetry-3  # increment to reset cache
-
-    - name: Install Poetry
-      if: steps.cached-poetry.outputs.cache-hit != 'true'
-      shell: bash
-      run: curl -sSL https://install.python-poetry.org | python3 - --version 1.8.5
-
-    - name: Check pyproject.toml syntax
-      shell: bash
-      run: poetry check
-
-    - name: Load cached dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pypoetry
-        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-poetry-
+        python-version-file: ".python-version"
 
     - name: Install dependencies
-      run: poetry install --with docs,tests
-      shell: bash
-
-    - name: Install xapian
-      run: poetry run ./manage.py install_xapian
+      run: uv run ./manage.py install_xapian
       shell: bash
 
     - name: Compile gettext messages
-      run: poetry run ./manage.py compilemessages
+      run: uv run ./manage.py compilemessages
       shell: bash

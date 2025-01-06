@@ -52,11 +52,11 @@ Pour gérer ça plus simplement,
 nous utilisons le logiciel python [pre-commit](https://pre-commit.com/)
 qui permet de contrôller leur installation via un fichier yaml.
 
-Le logiciel est installé par défaut par poetry. 
+Le logiciel est installé par défaut par uv. 
 Il suffit ensuite de lancer :
 
 ```bash
-pre-commit install
+uv run pre-commit install
 ```
 Une fois que vous avez fait cette commande, pre-commit
 tournera automatiquement chaque fois que vous ferez
@@ -65,7 +65,7 @@ un nouveau commit.
 Il est également possible d'appeler soi-même les pre-commits :
 
 ```bash
-pre-commit run --all-files
+uv run pre-commit run --all-files
 ```
 
 
@@ -80,8 +80,8 @@ pre-commit run --all-files
 Pour utiliser Ruff, placez-vous à la racine du projet et lancez la commande suivante :
 
 ```bash
-ruff format  # pour formatter le code
-ruff check  # pour linter le code
+uv run ruff format  # pour formatter le code
+uv run ruff check  # pour linter le code
 ```
 
 Ruff va alors faire son travail sur l'ensemble du projet puis vous dire
