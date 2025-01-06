@@ -174,11 +174,10 @@ class NewsEditView(CanEditMixin, UpdateView):
             self.object.is_moderated = False
             self.object.save()
             unread_notif_subquery = Notification.objects.filter(
-                user=OuterRef("pk"), type="NEWS_MODERATION", viewed=False
+                user=OuterRef("pk"), viewed=False
             )
-            for user in User.objects.filter(
-                ~Exists(unread_notif_subquery),
-                groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID],
+            for user in User.objects.with_perm("com.moderate_news").filter(
+                ~Exists(unread_notif_subquery)
             ):
                 Notification.objects.create(
                     user=user,
@@ -216,11 +215,10 @@ class NewsCreateView(CanCreateMixin, CreateView):
             self.object.save()
         else:
             unread_notif_subquery = Notification.objects.filter(
-                user=OuterRef("pk"), type="NEWS_MODERATION", viewed=False
+                user=OuterRef("pk"), viewed=False
             )
-            for user in User.objects.filter(
-                ~Exists(unread_notif_subquery),
-                groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID],
+            for user in User.objects.with_perm("com.moderate_news").filter(
+                ~Exists(unread_notif_subquery)
             ):
                 Notification.objects.create(
                     user=user,
