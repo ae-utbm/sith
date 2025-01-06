@@ -41,6 +41,7 @@ l'éditer et enfin le compiler au format binaire pour qu'il soit lu par le serve
 ./manage.py makemessages \
   --locale=fr \
   -e py,jinja \
+  --ignore=.venv \
   --ignore=node_modules \
   --add-location=file 
 
@@ -49,6 +50,7 @@ l'éditer et enfin le compiler au format binaire pour qu'il soit lu par le serve
   --locale=fr \
   -d djangojs \
   -e js,ts \
+  --ignore=.venv \
   --ignore=node_modules \
   --ignore=staticfiles/generated \
   --add-location=file

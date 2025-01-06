@@ -72,19 +72,20 @@ sith/
 ├── .gitattributes
 ├── .gitignore
 ├── .mailmap
-├── .env.exemple
 ├── manage.py (26)
 ├── mkdocs.yml (27)
-├── poetry.lock
+├── uv.lock
 ├── pyproject.toml (28)
+├── .venv/ (29)
+├── .python-version (30)
 └── README.md
 ```
 </div>
 
 1. Dossier contenant certaines actions réutilisables
    dans des workflows Github. Par exemple, l'action
-   `setup-project` installe poetry puis appelle
-   la commande `poetry install`.
+   `setup-project` installe uv puis appelle
+   configure l'environnement de développement
 2. Dossier contenant les fichiers de configuration
    des workflows Github. 
    Par exemple, le workflow `docs.yml` compile
@@ -127,6 +128,8 @@ sith/
     avec ses plugins et sa table des matières. 
 28. Le fichier où sont déclarés les dépendances et la configuration
     de certaines d'entre elles.
+29. Dossier d'environnement virtuel généré par uv
+30. Fichier qui contrôle quel version de python utiliser pour le projet
     
 
 ## L'application principale

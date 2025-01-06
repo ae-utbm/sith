@@ -64,10 +64,10 @@ Commencez par installer les dépendances système :
     source ~/.zshrc
     ```
 
-Puis, installez les dépendances poetry nécessaires en prod :
+Puis, installez les dépendances nécessaires en prod :
 
 ```bash
-poetry install --with prod
+uv sync --group prod
 ```
 
 !!! info
@@ -158,7 +158,7 @@ DATABASES = {
 Enfin, créez vos données :
 
 ```bash
-poetry run ./manage.py populate
+uv run ./manage.py populate
 ```
 
 !!! note
@@ -253,7 +253,7 @@ Enfin, démarrez le serveur Django :
 
 ```bash
 cd /repertoire/du/projet
-poetry run ./manage.py runserver 8001
+uv run ./manage.py runserver 8001
 ```
 
 Et c'est bon, votre reverse-proxy est prêt à tourner devant votre serveur.

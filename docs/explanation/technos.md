@@ -311,16 +311,16 @@ pour savoir tout ce qui ne fonctionne pas,
 et surtout pour récolter toutes les informations
 nécessaires à la réparation des bugs.
 
-### Poetry
+### UV
 
-[Utiliser Poetry](https://python-poetry.org/docs/basic-usage/)
+[UV](https://docs.astral.sh/uv/)
 
-Poetry est un utilitaire qui permet de créer et gérer 
+UV est un utilitaire qui permet de créer et gérer 
 des environnements Python de manière simple et intuitive.
 Il permet également de gérer et mettre à jour
 le fichier de dépendances.
 
-L'avantage d'utiliser poetry 
+L'avantage d'utiliser uv 
 (et les environnements virtuels en général) 
 est de pouvoir gérer plusieurs projets différents 
 en parallèle puisqu'il permet d'avoir sur sa
@@ -329,7 +329,7 @@ donc plusieurs versions d'une même dépendance
 dans plusieurs projets différents sans impacter 
 le système sur lequel le tout est installé.
 
-Poetry possède également l'avantage par rapport à un simple venv
+UV possède également l'avantage par rapport à un simple venv
 que les versions exactes de toutes les dépendances,
 y compris celles utilisées par d'autres dépendances,
 sont consignées dans un fichier `.lock`.
@@ -338,9 +338,14 @@ configurés avec le même fichier lock utiliseront
 exactement les mêmes versions des mêmes dépendances,
 y compris si celles-ci ne sont pas indiquées explicitement.
 
-Les dépendances utilisées par poetry sont déclarées
+UV se charge même de télécharger la bonne version de Python
+automatiquement !
+
+Les dépendances utilisées par uv sont déclarées
 dans le fichier `pyproject.toml`,
 situé à la racine du projet.
+
+Aussi, uv est rapide, genre TRÈS TRÈS rapide ⚡️
 
 ### Ruff
 
