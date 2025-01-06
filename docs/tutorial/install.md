@@ -109,8 +109,9 @@ git clone https://github.com/ae-utbm/sith.git
 cd sith
 
 # Création de l'environnement et installation des dépendances
+uv sync
 npm install # Dépendances frontend
-uv run ./manage.py install_xapian # Dépendances backend
+uv run ./manage.py install_xapian
 ```
 
 !!!note

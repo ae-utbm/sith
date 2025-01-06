@@ -28,6 +28,10 @@ runs:
         path: .venv
 
     - name: Install dependencies
+      run: uv sync
+      shell: bash
+
+    - name: Install Xapian
       run: uv run ./manage.py install_xapian
       shell: bash
 
