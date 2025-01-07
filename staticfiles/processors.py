@@ -1,6 +1,7 @@
 import json
 import logging
 import subprocess
+import platform
 from dataclasses import dataclass
 from hashlib import sha1
 from itertools import chain
@@ -94,7 +95,7 @@ class JSBundler:
     @staticmethod
     def compile():
         """Bundle js files with the javascript bundler for production."""
-        process = subprocess.Popen(["npm", "run", "compile"])
+        process = subprocess.Popen(["npm", "run", "compile"], shell=platform.system() == "Windows")
         process.wait()
         if process.returncode:
             raise RuntimeError(f"Bundler failed with returncode {process.returncode}")
@@ -103,7 +104,7 @@ class JSBundler:
     def runserver() -> subprocess.Popen:
         """Bundle js files automatically in background when called in debug mode."""
         logging.getLogger("django").info("Running javascript bundling server")
-        return subprocess.Popen(["npm", "run", "serve"])
+        return subprocess.Popen(["npm", "run", "serve"], shell=platform.system() == "Windows")
 
     @staticmethod
     def get_manifest() -> JSBundlerManifest:
@@ -197,4 +198,4 @@ class OpenApi:
         with open(out, "w") as f:
             _ = f.write(schema)
 
-        subprocess.run(["npx", "openapi-ts"], check=True)
+        subprocess.run(["npx", "openapi-ts"], check=True, shell=platform.system() == "Windows")

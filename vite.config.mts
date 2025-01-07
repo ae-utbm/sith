@@ -1,5 +1,5 @@
 // biome-ignore lint/correctness/noNodejsModules: this is backend side
-import { parse, resolve } from "node:path";
+import { parse, resolve, sep } from "node:path";
 import inject from "@rollup/plugin-inject";
 import { glob } from "glob";
 import { type AliasOptions, type UserConfig, defineConfig } from "vite";
@@ -31,7 +31,7 @@ function getAliases(): AliasOptions {
 function getRelativeAssetPath(path: string): string {
   let relativePath: string[] = [];
   const fullPath = parse(path);
-  for (const dir of fullPath.dir.split("/").reverse()) {
+  for (const dir of fullPath.dir.split(sep).reverse()) {
     if (dir === "bundled") {
       break;
     }
@@ -40,7 +40,7 @@ function getRelativeAssetPath(path: string): string {
   // We collected folders in reverse order, we put them back in the original order
   relativePath = relativePath.reverse();
   relativePath.push(fullPath.name);
-  return relativePath.join("/");
+  return relativePath.join(sep);
 }
 
 // biome-ignore lint/style/noDefaultExport: this is recommended by documentation

@@ -113,6 +113,10 @@ class XapianInstaller:
         self._core = f"xapian-core-{self._version}"
         self._bindings = f"xapian-bindings-{self._version}"
 
+    @property
+    def _is_windows(self) -> bool:
+        return platform.system() == "Windows"
+
     def _util_download(self, url: str, dest: Path, sha1_hash: str) -> None:
         resp = urllib3.request("GET", url)
         if resp.status != 200:
@@ -137,32 +141,7 @@ class XapianInstaller:
 
     def _prepare_dest_folder(self):
         shutil.rmtree(self._dest_dir, ignore_errors=True)
-        self._dest_dir.mkdir(parents=True)
-
-    def _setup_windows(self):
-        if "64bit" not in platform.architecture():
-            raise OSError("Only windows 64bit is supported")
-
-        extractor = self._dest_dir / ""
-        installer = self._dest_dir / "w64devkit-x64-2.0.0.exe"
-
-        self._util_download(
-            "https://github.com/ip7z/7zip/releases/download/24.08/7zr.exe",
-            extractor,
-            "d99de792fd08db53bb552cd28f0080137274f897",
-        )
-
-        self._util_download(
-            "https://github.com/skeeto/w64devkit/releases/download/v2.0.0/w64devkit-x64-2.0.0.exe",
-            installer,
-            "b5190c3ca9b06abe2b5cf329d99255a0be3a61ee",
-        )
-
-        subprocess.run(
-            [str(extractor), "x", str(installer), f"-o{self._dest_dir}"], check=False
-        ).check_returncode()
-
-        sys.path.insert(0, str(self._dest_dir / "w64devkit" / "bin"))
+        self._dest_dir.mkdir(parents=True, exist_ok=True)
 
     def _download(self):
         self._stdout.write("Downloading source…")
@@ -190,11 +169,24 @@ class XapianInstaller:
 
     def _install(self):
         self._stdout.write("Installing Xapian-core…")
+        def configure() -> list[str]:
+            if self._is_windows:
+                return ["sh", "configure"]
+            return ["./configure"]
+        def enable_static() -> list[str]:
+            if self._is_windows:
+                return ["--enable-shared", "--disable-static"]
+            return []
+
+        # Make sure that xapian finds the correct executable
+        os.environ["PYTHON3"] = str(Path(sys.executable).as_posix())
+        
         subprocess.run(
-            ["./configure", "--prefix", str(self._virtual_env)],
+            [*configure(), "--prefix", str(self._virtual_env.as_posix()), *enable_static(),],
             env=dict(os.environ),
             cwd=self._dest_dir / self._core,
             check=False,
+            shell=self._is_windows,
         ).check_returncode()
         subprocess.run(
             [
@@ -205,26 +197,32 @@ class XapianInstaller:
             env=dict(os.environ),
             cwd=self._dest_dir / self._core,
             check=False,
+            shell=self._is_windows,
         ).check_returncode()
         subprocess.run(
             ["make", "install"],
             env=dict(os.environ),
             cwd=self._dest_dir / self._core,
             check=False,
+            shell=self._is_windows,
+
         ).check_returncode()
+        
 
         self._stdout.write("Installing Xapian-bindings")
         subprocess.run(
             [
-                "./configure",
+                *configure(),
                 "--prefix",
-                str(self._virtual_env),
+                str(self._virtual_env.as_posix()),
                 "--with-python3",
-                f"XAPIAN_CONFIG={self._virtual_env / 'bin'/'xapian-config'}",
+                f"XAPIAN_CONFIG={(self._virtual_env / 'bin'/'xapian-config').as_posix()}",
+                *enable_static(),
             ],
             env=dict(os.environ),
             cwd=self._dest_dir / self._bindings,
             check=False,
+            shell=self._is_windows,
         ).check_returncode()
         subprocess.run(
             [
@@ -235,12 +233,14 @@ class XapianInstaller:
             env=dict(os.environ),
             cwd=self._dest_dir / self._bindings,
             check=False,
+            shell=self._is_windows,
         ).check_returncode()
         subprocess.run(
             ["make", "install"],
             env=dict(os.environ),
             cwd=self._dest_dir / self._bindings,
             check=False,
+            shell=self._is_windows,
         ).check_returncode()
 
     def _post_clean(self):
@@ -248,14 +248,12 @@ class XapianInstaller:
 
     def _test(self):
         subprocess.run(
-            [sys.executable, "-c", "import xapian"], check=False
+            [sys.executable, "-c", "import xapian"], check=False, shell=self._is_windows,
         ).check_returncode()
 
     def run(self):
         self._setup_env()
         self._prepare_dest_folder()
-        if platform.system() == "Windows":
-            self._setup_windows()
         self._download()
         self._install()
         self._post_clean()
