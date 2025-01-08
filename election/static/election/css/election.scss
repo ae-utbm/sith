@@ -15,8 +15,8 @@ $min_col_width: 100px;
   flex-direction: row;
   gap: $gap;
 
-  > input,
-  > label {
+  >input,
+  >label {
     margin: 0;
   }
 
@@ -25,12 +25,12 @@ $min_col_width: 100px;
   }
 }
 
-.election_vote {
-  overflow-x: scroll !important;
+#page #content {
+  overflow-x: clip;
 }
 
 .election_table {
-  width: 100%;
+  width: inherit;
 
   >.lists {
     display: flex;
@@ -93,16 +93,24 @@ $min_col_width: 100px;
         align-items: center;
         justify-content: space-between;
         margin: 0;
+        row-gap: 10px;
         padding: $padding;
         width: 100%;
 
 
         >.role_text {
+          display: flex;
+          flex-direction: column;
+
           >h4 {
             margin: 0;
           }
+
           >p {
+            flex-grow: 1;
             margin-top: .5em;
+            text-wrap: auto;
+            text-align: left;
           }
         }
 
@@ -112,9 +120,9 @@ $min_col_width: 100px;
           align-items: center;
           gap: $gap;
 
-          > button,
-          > button > i,
-          > a {
+          >button,
+          >button>i,
+          >a {
             width: 20px;
             height: 20px;
             background-color: #e9e9e9;
@@ -127,23 +135,23 @@ $min_col_width: 100px;
             justify-content: center;
 
             &:hover,
-            &:hover > i {
+            &:hover>i {
               background-color: #fff;
             }
           }
 
-          > button {
+          >button {
             width: 30px;
             height: 30px;
           }
 
-          > button[disabled] {
+          >button[disabled] {
             background-color: #eee;
             cursor: not-allowed;
 
             >i,
             &:hover,
-            &:hover > i {
+            &:hover>i {
               background-color: #eee;
             }
           }
@@ -178,12 +186,12 @@ $min_col_width: 100px;
             width: 100%;
             gap: $gap;
 
-            >input[type="radio"]:checked + label,
-            >input[type="checkbox"]:checked + label {
+            >input[type="radio"]:checked+label,
+            >input[type="checkbox"]:checked+label {
               background-color: lightgray;
               border-radius: 10px;
 
-              >figure>.edit_btns>a:hover{
+              >figure>.edit_btns>a:hover {
                 background-color: #fff;
               }
             }
@@ -215,7 +223,9 @@ $min_col_width: 100px;
                   margin: 0;
                   text-align: center;
                 }
+
                 .candidate_program {
+                  text-wrap: auto;
                   margin: 5px 0;
                 }
               }
@@ -228,7 +238,7 @@ $min_col_width: 100px;
                 right: $gap;
                 gap: $gap;
 
-                > a {
+                >a {
                   width: 20px;
                   height: 20px;
                   background-color: #e9e9e9;
@@ -253,40 +263,44 @@ $min_col_width: 100px;
   }
 }
 
-.election_details {
-  margin: .5em 0;
-}
+#content {
 
-.buttons {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: $gap;
-}
-
-.button {
-  border: none;
-  color: black;
-  text-decoration: none;
-  background-color: $primary-neutral-light-color;
-  padding: 0.4em;
-  margin: 0.1em;
-  font-size: 1.18em;
-  border-radius: 5px;
-  box-shadow: #dfdfdf 0 0 1px;
-  cursor: pointer;
-
-  &:hover {
-    color: black;
-    background: #d4d4d4;
+  .election_details {
+    margin: .5em 0;
   }
 
-  &_send {
-    background-color: #59aee2;
+  .buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: $gap;
+  }
+
+  .button {
+    border: none;
+    color: black;
+    text-decoration: none;
+    background-color: $primary-neutral-light-color;
+    padding: 0.4em;
+    margin: 0.1em;
+    font-size: 1.18em;
+    border-radius: 5px;
+    box-shadow: #dfdfdf 0 0 1px;
+    cursor: pointer;
+
     &:hover {
-      background-color: rgb(130, 186, 235);
+      color: black;
+      background: #d4d4d4;
+    }
+
+    &_send {
+      background-color: #59aee2;
+
+      &:hover {
+        background-color: rgb(130, 186, 235);
+      }
     }
   }
 }

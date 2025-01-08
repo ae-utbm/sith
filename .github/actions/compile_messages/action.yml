@@ -1,8 +1,0 @@
-name: "Compile messages"
-description: "Compile the gettext translation messages"
-runs:
-  using: composite
-  steps:
-      - name: Setup project
-        run: poetry run ./manage.py compilemessages
-        shell: bash

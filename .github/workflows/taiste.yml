@@ -36,11 +36,11 @@ jobs:
 
           git fetch
           git reset --hard origin/taiste
-          poetry install --with prod --without docs,tests
+          uv sync --group prod
           npm install
-          poetry run ./manage.py install_xapian
-          poetry run ./manage.py migrate
-          poetry run ./manage.py collectstatic --clear --noinput
-          poetry run ./manage.py compilemessages
+          uv run ./manage.py install_xapian
+          uv run ./manage.py migrate
+          uv run ./manage.py collectstatic --clear --noinput
+          uv run ./manage.py compilemessages
 
           sudo systemctl restart uwsgi

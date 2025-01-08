@@ -4,12 +4,11 @@
   {{ object.title }}
 {% endblock %}
 
-{% block head %}
-  {{ super() -}}
-  <link rel="stylesheet" href="{{ static('election/css/election.scss') }}">
-{%- endblock %}
-
 {% block additional_css %}
+  <link rel="stylesheet" href="{{ static('election/css/election.scss') }}">
+{% endblock %}
+
+{% block additional_js %}
   <script src="{{ static('bundled/vendored/jquery.shorten.min.js') }}"></script>
 {% endblock %}
 
@@ -47,7 +46,6 @@
       {% csrf_token %}
       <table class="election_table">
         {%- set election_lists = election.election_lists.all() -%}
-        <caption></caption>
         <thead class="lists">
           <tr>
             <th class="column" style="width: {{ 100 / (election_lists.count() + 1) }}%">{% trans %}Blank vote{% endtrans %}</th>
@@ -204,7 +202,7 @@
     $('.role_description').shorten({
       moreText: "{% trans %}Show more{% endtrans %}",
       lessText: "{% trans %}Show less{% endtrans %}",
-      showChars: 50
+      showChars: 300
     });
     $('.candidate_program').shorten({
       moreText: "{% trans %}Show more{% endtrans %}",

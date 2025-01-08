@@ -2,11 +2,10 @@
 
 Certaines dépendances sont nécessaires niveau système :
 
-- poetry
+- uv
 - libssl
 - libjpeg
 - zlib1g-dev
-- python
 - gettext
 
 ### Installer WSL
@@ -62,26 +61,13 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
         sudo apt upgrade
         ```
 
-        Puis, si ce n'est pas déjà fait, installez Python :    
-        ```bash
-        sudo apt install python3
-        # on sait jamais
-        sudo apt install python-is-python3
-        ```
-        Si vous utilisez Ubuntu 22.04 ou Ubuntu 24.04,
-        votre version de Python devrait être compatible
-        par défaut avec celle du projet.
-        Si ce n'est pas le cas, nous vous conseillons
-        d'utiliser [pyenv](https://github.com/pyenv/pyenv)
-
-        Puis installez les autres dépendances :
+        Installez les dépendances :
         
         ```bash
-        sudo apt install build-essential libssl-dev libjpeg-dev zlib1g-dev python-dev npm \
-                 libffi-dev python-dev-is-python3 pkg-config \
-                 gettext git pipx
-
-        pipx install poetry==1.8.5
+        sudo apt install curl build-essential libssl-dev \
+        libjpeg-dev zlib1g-dev npm libffi-dev pkg-config \
+        gettext git
+        curl -LsSf https://astral.sh/uv/install.sh | sh
         ```
 
     === "Arch Linux"
@@ -89,9 +75,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
         ```bash
         sudo pacman -Syu  # on s'assure que les dépôts et le système sont à jour
 
-        sudo pacman -S python
-        
-        sudo pacman -S gcc git gettext pkgconf python-poetry npm
+        sudo pacman -S uv gcc git gettext pkgconf npm
         ```
 
 === "macOS"
@@ -100,8 +84,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
     Il est également nécessaire d'avoir installé xcode
     
     ```bash    
-    brew install git python pipx npm
-    pipx install poetry==1.8.5
+    brew install git uv npm
     
     # Pour bien configurer gettext
     brew link gettext # (suivez bien les instructions supplémentaires affichées)
@@ -111,6 +94,10 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
     
         Si vous rencontrez des erreurs lors de votre configuration, n'hésitez pas à vérifier l'état de votre installation homebrew avec :code:`brew doctor`
 
+!!!note
+
+    Python ne fait pas parti des dépendances puisqu'il est automatiquement
+    installé par uv.
 
 ## Finaliser l'installation
 
@@ -122,9 +109,9 @@ git clone https://github.com/ae-utbm/sith.git
 cd sith
 
 # Création de l'environnement et installation des dépendances
-poetry install # Dépendances backend
-npm install    # Dépendances frontend
-poetry run ./manage.py install_xapian
+uv sync
+npm install # Dépendances frontend
+uv run ./manage.py install_xapian
 ```
 
 !!!note
@@ -149,19 +136,16 @@ echo 'SITH_URL = "localhost:8000"' >> sith/settings_custom.py
 Enfin, nous pouvons lancer les commandes suivantes :
 
 ```bash
-# Activation de l'environnement virtuel
-poetry shell
-
 # Prépare la base de données
-python ./manage.py setup
+uv run ./manage.py setup
 
 # Installe les traductions
-python ./manage.py compilemessages
+uv run ./manage.py compilemessages
 ```
 
 !!!note
 
-    Pour éviter d'avoir à utiliser la commande `poetry shell`
+    Pour éviter d'avoir à utiliser la commande `uv run`
     systématiquement, il est possible de consulter [direnv](../howto/direnv.md).
 
 ## Démarrer le serveur de développement
@@ -172,7 +156,7 @@ et se placer à la racine du projet.
 Il suffit ensuite d'utiliser cette commande :
 
 ```bash
-python manage.py runserver
+uv run ./manage.py runserver
 ```
 
 !!!note
@@ -198,14 +182,8 @@ Cette commande génère la documentation à
 chacune de ses modifications,
 inutile de relancer le serveur à chaque fois.
 
-!!!note
-
-    Les dépendances pour la documentation sont optionnelles.
-    Avant de commencer à travailler sur la doc, il faut donc les installer
-    avec la commande `poetry install --with docs`
-
 ```bash
-mkdocs serve
+uv run mkdocs serve
 ```
 
 ## Lancer les tests
@@ -215,13 +193,13 @@ la commande suivante :
 
 ```bash
 # Lancer tous les tests
-pytest
+uv run pytest
 
 # Lancer les tests de l'application core
-pytest core
+uv run pytest core
 
 # Lancer les tests de la classe UserRegistrationTest de core
-pytest core/tests/tests_core.py::TestUserRegistration
+uv run pytest core/tests/tests_core.py::TestUserRegistration
 ```
 
 !!!note
@@ -231,10 +209,10 @@ pytest core/tests/tests_core.py::TestUserRegistration
     vous pouvez exécutez pytest ainsi :
 
     ```bash
-    pytest -m "not slow"
+    uv run pytest -m "not slow"
 
     # vous pouvez toujours faire comme au-dessus
-    pytest core -m "not slow"
+    uv run pytest core -m "not slow"
     ```
 
     A l'inverse, vous pouvez ne faire tourner que les tests

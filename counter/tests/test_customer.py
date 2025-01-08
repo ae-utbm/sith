@@ -462,6 +462,6 @@ def test_update_balance():
     # put everything at zero to be sure the amounts were wrong beforehand
     customers_qs.update(amount=0)
     customers_qs.update_amount()
-    for customer, amount in zip(customers, [40, 10, 20, 40, 0]):
+    for customer, amount in zip(customers, [40, 10, 20, 40, 0], strict=False):
         customer.refresh_from_db()
         assert customer.amount == amount
