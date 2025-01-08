@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-05 16:39+0100\n"
+"POT-Creation-Date: 2025-01-08 12:23+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -934,6 +934,12 @@ msgstr "rôle"
 #: forum/models.py
 msgid "description"
 msgstr "description"
+
+#: club/models.py
+#, fuzzy
+#| msgid "Board member"
+msgid "past member"
+msgstr "Membre du bureau"
 
 #: club/models.py
 msgid "Email address"
@@ -3328,8 +3334,8 @@ msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
 #: core/views/forms.py
 msgid ""
-"Profile: you need to be visible on the picture, in order to be recognized (e."
-"g. by the barmen)"
+"Profile: you need to be visible on the picture, in order to be recognized "
+"(e.g. by the barmen)"
 msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
@@ -3935,8 +3941,8 @@ msgstr ""
 #: counter/templates/counter/mails/account_dump.jinja
 msgid "If you think this was a mistake, please mail us at ae@utbm.fr."
 msgstr ""
-"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à ae@utbm."
-"fr."
+"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à "
+"ae@utbm.fr."
 
 #: counter/templates/counter/mails/account_dump.jinja
 msgid ""
@@ -4455,14 +4461,6 @@ msgstr "Ajouter un nouveau rôle"
 #: election/templates/election/election_detail.jinja
 msgid "Submit the vote !"
 msgstr "Envoyer le vote !"
-
-#: election/templates/election/election_detail.jinja
-msgid "Show more"
-msgstr "Montrer plus"
-
-#: election/templates/election/election_detail.jinja
-msgid "Show less"
-msgstr "Montrer moins"
 
 #: election/templates/election/election_list.jinja
 msgid "Election list"
