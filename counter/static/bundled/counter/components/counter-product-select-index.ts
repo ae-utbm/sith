@@ -76,7 +76,15 @@ export class CounterProductSelect extends AutoCompleteSelectBase {
     return {
       ...super.tomSelectSettings(),
       openOnFocus: false,
-      searchField: ["code", "text"],
+      // We make searching on exact code matching a higher priority
+      // We need to manually set weights or it results on an inconsistent
+      // behavior between production and development environment
+      searchField: [
+        // @ts-ignore documentation says it's fine, specified type is wrong
+        { field: "code", weight: 2 },
+        // @ts-ignore documentation says it's fine, specified type is wrong
+        { field: "text", weight: 0.5 },
+      ],
     };
   }
 }
