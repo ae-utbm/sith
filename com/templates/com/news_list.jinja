@@ -15,37 +15,21 @@
 {% endblock %}
 
 {% block content %}
-  {% if user.is_com_admin %}
-    <div id="news_admin">
-      <a class="button" href="{{ url('com:news_admin_list') }}">{% trans %}Administrate news{% endtrans %}</a>
-    </div>
-    <br>
-  {% endif  %}
 
   <div id="news">
     <div id="left_column" class="news_column">
-      {% for news in object_list.filter(type="NOTICE") %}
-        <section class="news_notice">
-          <h4><a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>
-          <div class="news_content">{{ news.summary|markdown }}</div>
-        </section>
-      {% endfor %}
-
-      {% for news in object_list.filter(dates__start_date__lte=timezone.now(), dates__end_date__gte=timezone.now(), type="CALL") %}
-        <section class="news_call">
-          <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>
-          <div class="news_date">
-            <span>{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
-              {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
-            <span>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
-              {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
-          </div>
-          <div class="news_content">{{ news.summary|markdown }}</div>
-        </section>
-      {% endfor %}
-
-      {% set events_dates = NewsDate.objects.filter(end_date__gte=timezone.now(), start_date__lte=timezone.now()+timedelta(days=5), news__type="EVENT", news__is_moderated=True).datetimes('start_date', 'day') %}
+      {% set events_dates = NewsDate.objects.filter(end_date__gte=timezone.now(), start_date__lte=timezone.now()+timedelta(days=5), news__is_moderated=True).datetimes('start_date', 'day') %}
       <h3>{% trans %}Events today and the next few days{% endtrans %}</h3>
+      {% if user.is_authenticated and (user.is_com_admin or user.memberships.board().ongoing().exists()) %}
+        <a class="btn btn-blue margin-bottom" href="{{ url("com:news_new") }}">
+          <i class="fa fa-plus"></i>
+          {% trans %}Create news{% endtrans %}
+        </a>
+      {% endif %}
+      {% if user.is_com_admin %}
+        <a class="btn btn-blue" href="{{ url('com:news_admin_list') }}">{% trans %}Administrate news{% endtrans %}</a>
+        <br>
+      {% endif  %}
       {% if events_dates %}
         {% for d in events_dates %}
           <div class="news_events_group">
@@ -57,113 +41,104 @@
               </div>
             </div>
             <div class="news_events_group_items">
-              {% for news in object_list.filter(dates__start_date__gte=d,
-              dates__start_date__lte=d+timedelta(days=1),
-              type="EVENT").exclude(dates__end_date__lt=timezone.now())
-              .order_by('dates__start_date') %}
-              <section class="news_event">
-                <div class="club_logo">
-                  {% if news.club.logo %}
-                    <img src="{{ news.club.logo.url }}" alt="{{ news.club }}" />
-                  {% else %}
-                    <img src="{{ static("com/img/news.png") }}" alt="{{ news.club }}" />
-                  {% endif %}
-                </div>
-                <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>
-                <div><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></div>
-                <div class="news_date">
-                  <span>{{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
-                  <span>{{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
-                </div>
-                <div class="news_content">{{ news.summary|markdown }}
-                  <div class="button_bar">
-                    {{ fb_quick(news) }}
-                    {{ tweet_quick(news) }}
+              {% for news in object_list.filter(dates__start_date__gte=d,dates__start_date__lte=d+timedelta(days=1)).exclude(dates__end_date__lt=timezone.now()).order_by('dates__start_date') %}
+                <section class="news_event">
+                  <div class="club_logo">
+                    {% if news.club.logo %}
+                      <img src="{{ news.club.logo.url }}" alt="{{ news.club }}" />
+                    {% else %}
+                      <img src="{{ static("com/img/news.png") }}" alt="{{ news.club }}" />
+                    {% endif %}
                   </div>
-                </div>
-              </section>
+                  <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>
+                  <div><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></div>
+                  <div class="news_date">
+                    <span>{{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
+                    <span>{{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
+                  </div>
+                  <div class="news_content">{{ news.summary|markdown }}
+                    <div class="button_bar">
+                      {{ fb_quick(news) }}
+                      {{ tweet_quick(news) }}
+                    </div>
+                  </div>
+                </section>
+              {% endfor %}
+            </div>
+          </div>
         {% endfor %}
+      {% else %}
+        <div class="news_empty">
+          <em>{% trans %}Nothing to come...{% endtrans %}</em>
         </div>
-        </div>
-      {% endfor %}
-{% else %}
-  <div class="news_empty">
-    <em>{% trans %}Nothing to come...{% endtrans %}</em>
-  </div>
-{% endif %}
+      {% endif %}
 
-
-<h3>{% trans %}All coming events{% endtrans %}</h3>
-<ics-calendar locale="{{ get_language() }}"></ics-calendar>
-
-
-</div>
-
-<div id="right_column">
-  <div id="links">
-    <h3>{% trans %}Links{% endtrans %}</h3>
-    <div id="links_content">
-      <h4>{% trans %}Our services{% endtrans %}</h4>
-      <ul>
-        <li>
-          <i class="fa-solid fa-graduation-cap fa-xl"></i>
-          <a href="{{ url("pedagogy:guide") }}">{% trans %}UV Guide{% endtrans %}</a>
-        </li>
-        <li>
-          <i class="fa-solid fa-magnifying-glass fa-xl"></i>
-          <a href="{{ url("matmat:search_clear") }}">{% trans %}Matmatronch{% endtrans %}</a>
-        </li>
-        <li>
-          <i class="fa-solid fa-check-to-slot fa-xl"></i>
-          <a href="{{ url("election:list") }}">{% trans %}Elections{% endtrans %}</a>
-        </li>
-      </ul>
-      <br>
-      <h4>{% trans %}Social media{% endtrans %}</h4>
-      <ul>
-        <li>
-          <i class="fa-brands fa-discord fa-xl"></i>
-          <a rel="nofollow" target="#" href="https://discord.gg/QvTm3XJrHR">{% trans %}Discord AE{% endtrans %}</a>
-          {% if user.was_subscribed %}
-            - <a rel="nofollow" target="#" href="https://discord.gg/u6EuMfyGaJ">{% trans %}Dev Team{% endtrans %}</a>
-          {% endif %}
-        </li>
-        <li>
-          <i class="fa-brands fa-facebook fa-xl"></i>
-          <a rel="nofollow" target="#" href="https://www.facebook.com/@AEUTBM/">{% trans %}Facebook{% endtrans %}</a>
-        </li>
-        <li>
-          <i class="fa-brands fa-square-instagram fa-xl"></i>
-          <a rel="nofollow" target="#" href="https://www.instagram.com/ae_utbm">{% trans %}Instagram{% endtrans %}</a>
-        </li>
-      </ul>
+      <h3>{% trans %}All coming events{% endtrans %}</h3>
+      <ics-calendar locale="{{ get_language() }}"></ics-calendar>
     </div>
-  </div>
 
-  <div id="birthdays">
-    <h3>{% trans %}Birthdays{% endtrans %}</h3>
-    <div id="birthdays_content">
-      {%- if user.was_subscribed -%}
-        <ul class="birthdays_year">
-          {%- for year, users in birthdays -%}
+    <div id="right_column">
+      <div id="links">
+        <h3>{% trans %}Links{% endtrans %}</h3>
+        <div id="links_content">
+          <h4>{% trans %}Our services{% endtrans %}</h4>
+          <ul>
             <li>
-              {% trans age=timezone.now().year - year %}{{ age }} year old{% endtrans %}
-              <ul>
-                {%- for u in users -%}
-                  <li><a href="{{ u.get_absolute_url() }}">{{ u.get_short_name() }}</a></li>
-                {%- endfor -%}
-              </ul>
+              <i class="fa-solid fa-graduation-cap fa-xl"></i>
+              <a href="{{ url("pedagogy:guide") }}">{% trans %}UV Guide{% endtrans %}</a>
             </li>
-          {%- endfor -%}
-        </ul>
-      {%- else -%}
-        <p>{% trans %}You need to subscribe to access this content{% endtrans %}</p>
-      {%- endif -%}
+            <li>
+              <i class="fa-solid fa-magnifying-glass fa-xl"></i>
+              <a href="{{ url("matmat:search_clear") }}">{% trans %}Matmatronch{% endtrans %}</a>
+            </li>
+            <li>
+              <i class="fa-solid fa-check-to-slot fa-xl"></i>
+              <a href="{{ url("election:list") }}">{% trans %}Elections{% endtrans %}</a>
+            </li>
+          </ul>
+          <br>
+          <h4>{% trans %}Social media{% endtrans %}</h4>
+          <ul>
+            <li>
+              <i class="fa-brands fa-discord fa-xl"></i>
+              <a rel="nofollow" target="#" href="https://discord.gg/QvTm3XJrHR">{% trans %}Discord AE{% endtrans %}</a>
+              {% if user.was_subscribed %}
+                - <a rel="nofollow" target="#" href="https://discord.gg/u6EuMfyGaJ">{% trans %}Dev Team{% endtrans %}</a>
+              {% endif %}
+            </li>
+            <li>
+              <i class="fa-brands fa-facebook fa-xl"></i>
+              <a rel="nofollow" target="#" href="https://www.facebook.com/@AEUTBM/">{% trans %}Facebook{% endtrans %}</a>
+            </li>
+            <li>
+              <i class="fa-brands fa-square-instagram fa-xl"></i>
+              <a rel="nofollow" target="#" href="https://www.instagram.com/ae_utbm">{% trans %}Instagram{% endtrans %}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div id="birthdays">
+        <h3>{% trans %}Birthdays{% endtrans %}</h3>
+        <div id="birthdays_content">
+          {%- if user.was_subscribed -%}
+            <ul class="birthdays_year">
+              {%- for year, users in birthdays -%}
+                <li>
+                  {% trans age=timezone.now().year - year %}{{ age }} year old{% endtrans %}
+                  <ul>
+                    {%- for u in users -%}
+                      <li><a href="{{ u.get_absolute_url() }}">{{ u.get_short_name() }}</a></li>
+                    {%- endfor -%}
+                  </ul>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- else -%}
+            <p>{% trans %}You need to subscribe to access this content{% endtrans %}</p>
+          {%- endif -%}
+        </div>
+      </div>
     </div>
   </div>
-
-</div>
-
-
-</div>
 {% endblock %}

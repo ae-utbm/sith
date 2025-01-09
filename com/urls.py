@@ -25,9 +25,9 @@ from com.views import (
     NewsCreateView,
     NewsDeleteView,
     NewsDetailView,
-    NewsEditView,
     NewsListView,
     NewsModerateView,
+    NewsUpdateView,
     PosterCreateView,
     PosterDeleteView,
     PosterEditView,
@@ -75,11 +75,11 @@ urlpatterns = [
     path("news/", NewsListView.as_view(), name="news_list"),
     path("news/admin/", NewsAdminListView.as_view(), name="news_admin_list"),
     path("news/create/", NewsCreateView.as_view(), name="news_new"),
+    path("news/<int:news_id>/edit/", NewsUpdateView.as_view(), name="news_edit"),
     path("news/<int:news_id>/delete/", NewsDeleteView.as_view(), name="news_delete"),
     path(
         "news/<int:news_id>/moderate/", NewsModerateView.as_view(), name="news_moderate"
     ),
-    path("news/<int:news_id>/edit/", NewsEditView.as_view(), name="news_edit"),
     path("news/<int:news_id>/", NewsDetailView.as_view(), name="news_detail"),
     path("mailings/", MailingListAdminView.as_view(), name="mailing_admin"),
     path(

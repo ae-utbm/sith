@@ -58,6 +58,11 @@ class NewsQuerySet(models.QuerySet):
     def moderated(self):
         return self.filter(is_moderated=True)
 
+    def viewable_by(self, user: User):
+        if user.has_perm("com.view_unmoderated_news"):
+            return self
+        return self.moderated()
+
 
 class News(models.Model):
     """News about club events."""
@@ -132,11 +137,13 @@ class News(models.Model):
             return False
         return user.is_com_admin or user == self.author
 
-    def can_be_edited_by(self, user):
-        return user.is_com_admin
+    def can_be_edited_by(self, user: User):
+        return user.is_authenticated and (
+            self.author_id == user.id or user.has_perm("com.change_news")
+        )
 
     def can_be_viewed_by(self, user):
-        return self.is_moderated or user.is_com_admin
+        return self.is_moderated or user.has_perm("com.view_unmoderated_news")
 
 
 def news_notification_callback(notif):
