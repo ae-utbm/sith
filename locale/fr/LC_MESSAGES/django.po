@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-10 00:25+0100\n"
+"POT-Creation-Date: 2025-01-10 14:52+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1273,7 +1273,9 @@ msgstr "Événement Hebdomadaire"
 
 #: com/forms.py
 msgid "Weekly events will occur each week for a specified timespan."
-msgstr "Les événements hebdomadaires se répéteront chaque semaine pendant une durée déterminée"
+msgstr ""
+"Les événements hebdomadaires se répéteront chaque semaine pendant une durée "
+"déterminée"
 
 #: com/forms.py
 #, python-format
@@ -1290,7 +1292,8 @@ msgstr "Occurences"
 
 #: com/forms.py
 msgid "How much times should the event occur (including the first one)"
-msgstr "Combien de fois l'événement doit-il se répéter (en incluant la première fois)"
+msgstr ""
+"Combien de fois l'événement doit-il se répéter (en incluant la première fois)"
 
 #: com/forms.py
 msgid "Automoderation"
@@ -1400,10 +1403,6 @@ msgstr "fichier"
 #: com/models.py
 msgid "display time"
 msgstr "temps d'affichage"
-
-#: com/models.py
-msgid "Can moderate poster"
-msgstr "Peut modérer les posters"
 
 #: com/models.py
 msgid "Begin date should be before end date"

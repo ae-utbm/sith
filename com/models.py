@@ -344,7 +344,7 @@ class Poster(models.Model):
     )
 
     class Meta:
-        permissions = [("moderate_poster", _("Can moderate poster"))]
+        permissions = [("moderate_poster", "Can moderate poster")]
 
     def __str__(self):
         return self.name
