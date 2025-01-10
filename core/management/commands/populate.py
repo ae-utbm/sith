@@ -460,6 +460,7 @@ Welcome to the wiki page!
             limit_age=18,
         )
         cons = Product.objects.create(
+            id=settings.SITH_ECOCUP_CONS,
             name="Consigne Eco-cup",
             code="CONS",
             product_type=verre,
@@ -469,6 +470,7 @@ Welcome to the wiki page!
             club=main_club,
         )
         dcons = Product.objects.create(
+            id=settings.SITH_ECOCUP_DECO,
             name="Déconsigne Eco-cup",
             code="DECO",
             product_type=verre,

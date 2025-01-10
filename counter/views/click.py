@@ -194,7 +194,11 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
         with transaction.atomic():
             self.request.session["last_basket"] = []
 
-            for form in formset:
+            # We sort items from cheap to expensive
+            # This is important because some items have a negative price
+            # Negative priced items gives money to the customer and should
+            # be processed first so that we don't throw a not enough money error
+            for form in sorted(formset, key=lambda form: form.product.price):
                 self.request.session["last_basket"].append(
                     f"{form.cleaned_data['quantity']} x {form.product.name}"
                 )
