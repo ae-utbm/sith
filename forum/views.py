@@ -43,7 +43,7 @@ from haystack.query import RelatedSearchQuerySet
 from honeypot.decorators import check_honeypot
 
 from club.widgets.select import AutoCompleteSelectClub
-from core.views import (
+from core.auth.mixins import (
     CanCreateMixin,
     CanEditMixin,
     CanEditPropMixin,

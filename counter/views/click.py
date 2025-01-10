@@ -31,9 +31,9 @@ from django.views.generic import FormView
 from django.views.generic.detail import SingleObjectMixin
 from ninja.main import HttpRequest
 
+from core.auth.mixins import CanViewMixin
 from core.models import User
 from core.utils import FormFragmentTemplateData
-from core.views import CanViewMixin
 from counter.forms import RefillForm
 from counter.models import Counter, Customer, Product, Selling
 from counter.utils import is_logged_in_counter

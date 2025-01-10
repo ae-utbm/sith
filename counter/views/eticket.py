@@ -18,7 +18,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 
-from core.views import CanViewMixin
+from core.auth.mixins import CanViewMixin
 from counter.forms import EticketForm
 from counter.models import Eticket, Selling
 from counter.views.mixins import CounterAdminMixin, CounterAdminTabsMixin

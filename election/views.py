@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
-from core.views import CanCreateMixin, CanEditMixin, CanViewMixin
+from core.auth.mixins import CanCreateMixin, CanEditMixin, CanViewMixin
 from core.views.forms import SelectDateTime
 from core.views.widgets.markdown import MarkdownInput
 from core.views.widgets.select import (

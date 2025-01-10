@@ -154,13 +154,12 @@ TEMPLATES = [
                 "format_timedelta": "core.templatetags.renderer.format_timedelta",
             },
             "globals": {
-                "can_edit_prop": "core.views.can_edit_prop",
-                "can_edit": "core.views.can_edit",
-                "can_view": "core.views.can_view",
+                "can_edit_prop": "core.auth.mixins.can_edit_prop",
+                "can_edit": "core.auth.mixins.can_edit",
+                "can_view": "core.auth.mixins.can_view",
                 "settings": "sith.settings",
                 "Launderette": "launderette.models.Launderette",
                 "Counter": "counter.models.Counter",
-                "ProductType": "counter.models.ProductType",
                 "timezone": "django.utils.timezone",
                 "get_sith": "com.views.sith",
                 "get_language": "django.utils.translation.get_language",
@@ -291,7 +290,7 @@ STORAGES = {
 # Auth configuration
 AUTH_USER_MODEL = "core.User"
 AUTH_ANONYMOUS_MODEL = "core.models.AnonymousUser"
-AUTHENTICATION_BACKENDS = ["core.auth_backends.SithModelBackend"]
+AUTHENTICATION_BACKENDS = ["core.auth.backends.SithModelBackend"]
 LOGIN_URL = "/login"
 LOGOUT_URL = "/logout"
 LOGIN_REDIRECT_URL = "/"

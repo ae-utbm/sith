@@ -42,8 +42,13 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from club.models import Club, Mailing
 from com.models import News, NewsDate, Poster, Screen, Sith, Weekmail, WeekmailArticle
+from core.auth.mixins import (
+    CanCreateMixin,
+    CanEditMixin,
+    CanEditPropMixin,
+    CanViewMixin,
+)
 from core.models import Notification, User
-from core.views import CanCreateMixin, CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.views.forms import SelectDateTime
 from core.views.mixins import QuickNotifMixin, TabedViewMixin
 from core.views.widgets.markdown import MarkdownInput

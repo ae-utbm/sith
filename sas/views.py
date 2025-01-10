@@ -23,8 +23,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, TemplateView
 from django.views.generic.edit import FormMixin, FormView, UpdateView
 
+from core.auth.mixins import CanEditMixin, CanViewMixin
 from core.models import SithFile, User
-from core.views import CanEditMixin, CanViewMixin
 from core.views.files import FileView, send_file
 from sas.forms import (
     AlbumEditForm,

@@ -21,8 +21,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
+from core.auth.mixins import CanCreateMixin, CanEditMixin
 from core.models import Group, User
-from core.views import CanCreateMixin, CanEditMixin, DetailFormView
+from core.views import DetailFormView
 from core.views.widgets.select import AutoCompleteSelectMultipleUser
 
 # Forms

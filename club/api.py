@@ -7,7 +7,7 @@ from ninja_extra.schemas import PaginatedResponseSchema
 
 from club.models import Club
 from club.schemas import ClubSchema
-from core.api_permissions import CanAccessLookup
+from core.auth.api_permissions import CanAccessLookup
 
 
 @api_controller("/club")
