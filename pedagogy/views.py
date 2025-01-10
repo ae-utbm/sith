@@ -39,7 +39,6 @@ from core.models import Notification, User
 from core.views import (
     CanCreateMixin,
     CanEditPropMixin,
-    CanViewMixin,
     DetailFormView,
     FormerSubscriberMixin,
 )
