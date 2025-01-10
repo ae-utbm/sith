@@ -236,6 +236,10 @@ class TestCounterClick(TestFullClickBase):
             BanGroup.objects.get(pk=settings.SITH_GROUP_BANNED_COUNTER_ID)
         )
 
+        cls.gift = product_recipe.make(
+            selling_price="-1.5",
+            special_selling_price="-1.5",
+        )
         cls.beer = product_recipe.make(
             limit_age=18, selling_price="1.5", special_selling_price="1"
         )
@@ -253,7 +257,12 @@ class TestCounterClick(TestFullClickBase):
             limit_age=0, selling_price="1.5", special_selling_price="1"
         )
 
-        cls.counter.products.add(cls.beer, cls.beer_tap, cls.snack)
+        cls.cons = Product.objects.get(id=settings.SITH_ECOCUP_CONS)
+        cls.dcons = Product.objects.get(id=settings.SITH_ECOCUP_DECO)
+
+        cls.counter.products.add(
+            cls.gift, cls.beer, cls.beer_tap, cls.snack, cls.cons, cls.dcons
+        )
 
         cls.other_counter.products.add(cls.snack)
 
@@ -593,6 +602,84 @@ class TestCounterClick(TestFullClickBase):
                 assert counter.has_annotated_barman
             else:
                 assert not counter.has_annotated_barman
+
+    def test_selling_ordering(self):
+        # Cheaper items should be processed with a higher priority
+        self.login_in_bar(self.barmen)
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.beer.id, 1),
+                    BasketItem(self.gift.id, 1),
+                ],
+            ).status_code
+            == 302
+        )
+
+        assert self.updated_amount(self.customer) == 0
+
+    def test_recordings(self):
+        self.refill_user(self.customer, self.cons.selling_price * 3)
+        self.login_in_bar(self.barmen)
+        assert (
+            self.submit_basket(
+                self.customer,
+                [BasketItem(self.cons.id, 3)],
+            ).status_code
+            == 302
+        )
+        assert self.updated_amount(self.customer) == 0
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [BasketItem(self.dcons.id, 3)],
+            ).status_code
+            == 302
+        )
+
+        assert self.updated_amount(self.customer) == self.dcons.selling_price * -3
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [BasketItem(self.dcons.id, settings.SITH_ECOCUP_LIMIT)],
+            ).status_code
+            == 302
+        )
+
+        assert self.updated_amount(self.customer) == self.dcons.selling_price * (
+            -3 - settings.SITH_ECOCUP_LIMIT
+        )
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [BasketItem(self.dcons.id, 1)],
+            ).status_code
+            == 200
+        )
+
+        assert self.updated_amount(self.customer) == self.dcons.selling_price * (
+            -3 - settings.SITH_ECOCUP_LIMIT
+        )
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [
+                    BasketItem(self.cons.id, 1),
+                    BasketItem(self.dcons.id, 1),
+                ],
+            ).status_code
+            == 302
+        )
+
+        assert self.updated_amount(self.customer) == self.dcons.selling_price * (
+            -3 - settings.SITH_ECOCUP_LIMIT
+        )
 
 
 class TestCounterStats(TestCase):
