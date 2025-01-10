@@ -225,18 +225,6 @@ class CanViewMixin(GenericContentPermissionMixinBuilder):
     permission_function = can_view
 
 
-class UserIsRootMixin(GenericContentPermissionMixinBuilder):
-    """Allow only root admins.
-
-    Raises:
-        PermissionDenied: if the user isn't root
-    """
-
-    @staticmethod
-    def permission_function(obj: Any, user: User):
-        return user.is_root
-
-
 class FormerSubscriberMixin(AccessMixin):
     """Check if the user was at least an old subscriber.
 
