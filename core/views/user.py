@@ -54,8 +54,8 @@ from django.views.generic.dates import MonthMixin, YearMixin
 from django.views.generic.edit import FormView, UpdateView
 from honeypot.decorators import check_honeypot
 
+from core.auth.mixins import CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.models import Gift, Preferences, User
-from core.views import CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.views.forms import (
     GiftForm,
     LoginForm,

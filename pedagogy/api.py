@@ -7,7 +7,7 @@ from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import NotFound
 from ninja_extra.pagination import PageNumberPaginationExtra, PaginatedResponseSchema
 
-from core.api_permissions import IsInGroup, IsRoot, IsSubscriber
+from core.auth.api_permissions import IsInGroup, IsRoot, IsSubscriber
 from pedagogy.models import UV
 from pedagogy.schemas import SimpleUvSchema, UvFilterSchema, UvSchema
 from pedagogy.utbm_api import find_uv

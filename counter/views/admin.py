@@ -24,8 +24,8 @@ from django.utils import timezone
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
+from core.auth.mixins import CanEditMixin, CanViewMixin
 from core.utils import get_semester_code, get_start_of_semester
-from core.views import CanEditMixin, CanViewMixin
 from counter.forms import CounterEditForm, ProductEditForm
 from counter.models import Counter, Product, ProductType, Refilling, Selling
 from counter.utils import is_logged_in_counter

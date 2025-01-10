@@ -33,13 +33,13 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import DeleteView, FormMixin, UpdateView
 
-from core.models import Notification, SithFile, User
-from core.views import (
+from core.auth.mixins import (
     CanEditMixin,
     CanEditPropMixin,
     CanViewMixin,
     can_view,
 )
+from core.models import Notification, SithFile, User
 from core.views.mixins import AllowFragment
 from core.views.widgets.select import (
     AutoCompleteSelectMultipleGroup,

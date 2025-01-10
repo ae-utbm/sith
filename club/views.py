@@ -50,15 +50,14 @@ from com.views import (
     PosterEditBaseView,
     PosterListBaseView,
 )
-from core.models import PageRev
-from core.views import (
+from core.auth.mixins import (
     CanCreateMixin,
     CanEditMixin,
     CanEditPropMixin,
     CanViewMixin,
-    DetailFormView,
-    PageEditViewBase,
 )
+from core.models import PageRev
+from core.views import DetailFormView, PageEditViewBase
 from core.views.mixins import TabedViewMixin
 from counter.models import Selling
 

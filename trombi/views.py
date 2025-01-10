@@ -38,8 +38,13 @@ from django.views.generic import DetailView, RedirectView, TemplateView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from club.models import Club
+from core.auth.mixins import (
+    CanCreateMixin,
+    CanEditMixin,
+    CanEditPropMixin,
+    CanViewMixin,
+)
 from core.models import User
-from core.views import CanCreateMixin, CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.views.forms import SelectDate
 from core.views.mixins import QuickNotifMixin, TabedViewMixin
 from core.views.widgets.select import AutoCompleteSelectUser

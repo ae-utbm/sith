@@ -35,13 +35,14 @@ from django.views.generic import (
     UpdateView,
 )
 
-from core.models import Notification, User
-from core.views import (
+from core.auth.mixins import (
     CanCreateMixin,
     CanEditPropMixin,
-    DetailFormView,
+    CanViewMixin,
     FormerSubscriberMixin,
 )
+from core.models import Notification, User
+from core.views import DetailFormView
 from pedagogy.forms import (
     UVCommentForm,
     UVCommentModerationForm,
@@ -49,8 +50,6 @@ from pedagogy.forms import (
     UVForm,
 )
 from pedagogy.models import UV, UVComment, UVCommentReport
-
-# Acutal views
 
 
 class UVDetailFormView(CanViewMixin, DetailFormView):

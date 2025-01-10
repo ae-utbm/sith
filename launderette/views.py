@@ -28,8 +28,13 @@ from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import BaseFormView, CreateView, DeleteView, UpdateView
 
 from club.models import Club
+from core.auth.mixins import (
+    CanCreateMixin,
+    CanEditMixin,
+    CanEditPropMixin,
+    CanViewMixin,
+)
 from core.models import Page, User
-from core.views import CanCreateMixin, CanEditMixin, CanEditPropMixin, CanViewMixin
 from counter.forms import GetUserForm
 from counter.models import Counter, Customer, Selling
 from launderette.models import Launderette, Machine, Slot, Token

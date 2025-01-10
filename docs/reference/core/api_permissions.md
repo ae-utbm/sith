@@ -1,1 +1,1 @@
-::: core.api_permissions
+::: core.auth.api_permissions

@@ -44,8 +44,8 @@ from club.models import Club, Mailing
 from com.calendar import IcsCalendar
 from com.forms import NewsDateForm, NewsForm, PosterForm
 from com.models import News, NewsDate, Poster, Screen, Sith, Weekmail, WeekmailArticle
+from core.auth.mixins import CanEditPropMixin, CanViewMixin
 from core.models import User
-from core.views import CanEditPropMixin, CanViewMixin, QuickNotifMixin, TabedViewMixin
 from core.views.mixins import QuickNotifMixin, TabedViewMixin
 from core.views.widgets.markdown import MarkdownInput
 

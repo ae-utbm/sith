@@ -12,7 +12,7 @@ from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 from pydantic import NonNegativeInt
 
-from core.api_permissions import CanAccessLookup, CanView, IsInGroup, IsRoot
+from core.auth.api_permissions import CanAccessLookup, CanView, IsInGroup, IsRoot
 from core.models import Notification, User
 from sas.models import Album, PeoplePictureRelation, Picture
 from sas.schemas import (
