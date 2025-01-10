@@ -936,10 +936,8 @@ msgid "description"
 msgstr "description"
 
 #: club/models.py
-#, fuzzy
-#| msgid "Board member"
 msgid "past member"
-msgstr "Membre du bureau"
+msgstr "ancien membre"
 
 #: club/models.py
 msgid "Email address"
@@ -2068,16 +2066,12 @@ msgid "reason"
 msgstr "raison"
 
 #: core/models.py
-#, fuzzy
-#| msgid "user"
 msgid "user ban"
-msgstr "utilisateur"
+msgstr "utilisateur banni"
 
 #: core/models.py
-#, fuzzy
-#| msgid "user"
 msgid "user bans"
-msgstr "utilisateur"
+msgstr "utilisateurs bannis"
 
 #: core/models.py
 msgid "receive the Weekmail"
