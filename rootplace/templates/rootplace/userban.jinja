@@ -7,7 +7,7 @@
 
 
 {% block content %}
-  {% if user.has_perm("core:add_userban") %}
+  {% if user.has_perm("core.add_userban") %}
     <a href="{{ url("rootplace:ban_create") }}" class="btn btn-red margin-bottom">
       <i class="fa fa-person-circle-xmark"></i>
       {% trans %}Ban a user{% endtrans %}
@@ -44,7 +44,7 @@
           <summary class="clickable">{% trans %}Reason{% endtrans %}</summary>
           <p>{{ user_ban.reason }}</p>
         </details>
-        {% if user.has_perm("core:delete_userban") %}
+        {% if user.has_perm("core.delete_userban") %}
           <span>
             <a
               href="{{ url("rootplace:ban_remove", ban_id=user_ban.id) }}"
