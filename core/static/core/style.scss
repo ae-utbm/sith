@@ -131,6 +131,10 @@ body {
   display: none !important;
 }
 
+[show-more]:not([show-more-loaded]) {
+  display: none !important;
+}
+
 /*--------------------------------HEADER-------------------------------*/
 
 #popupheader {

@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-04 23:07+0100\n"
+"POT-Creation-Date: 2025-01-08 12:23+0100\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -112,6 +112,14 @@ msgstr "Guide markdown"
 #: core/static/bundled/core/components/nfc-input-index.ts
 msgid "Unsupported NFC card"
 msgstr "Carte NFC non supportée"
+
+#: core/static/bundled/core/read-more-index.ts
+msgid "Show less"
+msgstr "Montrer moins"
+
+#: core/static/bundled/core/read-more-index.ts
+msgid "Show more"
+msgstr "Montrer plus"
 
 #: core/static/bundled/user/family-graph-index.js
 msgid "family_tree.%(extension)s"
