@@ -45,14 +45,9 @@ from accounting.widgets.select import (
 from club.models import Club
 from club.widgets.select import AutoCompleteSelectClub
 from core.models import User
-from core.views import (
-    CanCreateMixin,
-    CanEditMixin,
-    CanEditPropMixin,
-    CanViewMixin,
-    TabedViewMixin,
-)
+from core.views import CanCreateMixin, CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.views.forms import SelectDate, SelectFile
+from core.views.mixins import TabedViewMixin
 from core.views.widgets.select import AutoCompleteSelectUser
 from counter.models import Counter, Product, Selling
 

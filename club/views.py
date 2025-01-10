@@ -58,8 +58,8 @@ from core.views import (
     CanViewMixin,
     DetailFormView,
     PageEditViewBase,
-    TabedViewMixin,
 )
+from core.views.mixins import TabedViewMixin
 from counter.models import Selling
 
 
