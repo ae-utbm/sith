@@ -21,7 +21,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-
+from typing import Self
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -55,13 +55,20 @@ class Sith(models.Model):
 
 
 class NewsQuerySet(models.QuerySet):
-    def moderated(self):
+    def moderated(self) -> Self:
         return self.filter(is_moderated=True)
 
-    def viewable_by(self, user: User):
+    def viewable_by(self, user: User) -> Self:
+        """Filter news that the given user can view.
+
+        If the user has the `com.view_unmoderated_news` permission,
+        all news are viewable.
+        Else the viewable news are those that are either moderated
+        or authored by the user.
+        """
         if user.has_perm("com.view_unmoderated_news"):
             return self
-        return self.moderated()
+        return self.filter(Q(is_moderated=True) | Q(author_id=user.id))
 
 
 class News(models.Model):
