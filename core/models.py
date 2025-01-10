@@ -29,6 +29,7 @@ import os
 import string
 import unicodedata
 from datetime import timedelta
+from io import BytesIO
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional, Self
 
@@ -50,6 +51,7 @@ from django.utils.html import escape
 from django.utils.timezone import localdate, now
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
+from PIL import Image
 
 if TYPE_CHECKING:
     from pydantic import NonNegativeInt
@@ -988,17 +990,11 @@ class SithFile(models.Model):
         if self.is_folder:
             if self.file:
                 try:
-                    import imghdr
-
-                    if imghdr.what(None, self.file.read()) not in [
-                        "gif",
-                        "png",
-                        "jpeg",
-                    ]:
-                        self.file.delete()
-                        self.file = None
-                except:  # noqa E722 I don't know the exception that can be raised
-                    self.file = None
+                    Image.open(BytesIO(self.file.read()))
+                except Image.UnidentifiedImageError as e:
+                    raise ValidationError(
+                        _("This is not a valid folder thumbnail")
+                    ) from e
             self.mime_type = "inode/directory"
         if self.is_file and (self.file is None or self.file == ""):
             raise ValidationError(_("You must provide a file"))
