@@ -154,7 +154,7 @@ Voici un exemple d'utilisation en reprenant l'objet Article crée précédemment
 ```python
 from django.views.generic import CreateView, ListView
 
-from core.views import CanViewMixin, CanCreateMixin
+from core.auth.mixins import CanViewMixin, CanCreateMixin
 
 from com.models import WeekmailArticle
 
@@ -172,14 +172,14 @@ class ArticlesCreateView(CanCreateMixin, CreateView):
 
 Les mixins suivants sont implémentés :
 
-- [CanCreateMixin][core.views.CanCreateMixin] : l'utilisateur peut-il créer l'objet ?
-- [CanEditPropMixin][core.views.CanEditPropMixin] : l'utilisateur peut-il éditer les propriétés de l'objet ?
-- [CanEditMixin][core.views.CanEditMixin] : L'utilisateur peut-il éditer l'objet ?
-- [CanViewMixin][core.views.CanViewMixin] : L'utilisateur peut-il voir l'objet ?
-- [UserIsRootMixin][core.views.UserIsRootMixin] : L'utilisateur a-t-il les droit root ?
-- [FormerSubscriberMixin][core.views.FormerSubscriberMixin] : L'utilisateur a-t-il déjà été cotisant ?
-- [UserIsLoggedMixin][core.views.UserIsLoggedMixin] : L'utilisateur est-il connecté ?
-  (à éviter ; préférez `LoginRequiredMixin`, fourni par Django)
+- [CanCreateMixin][core.auth.mixins.CanCreateMixin] : l'utilisateur peut-il créer l'objet ?
+- [CanEditPropMixin][core.auth.mixins.CanEditPropMixin] : l'utilisateur peut-il éditer les propriétés de l'objet ?
+- [CanEditMixin][core.auth.mixins.CanEditMixin] : L'utilisateur peut-il éditer l'objet ?
+- [CanViewMixin][core.auth.mixins.CanViewMixin] : L'utilisateur peut-il voir l'objet ?
+- [FormerSubscriberMixin][core.auth.mixins.FormerSubscriberMixin] : L'utilisateur a-t-il déjà été cotisant ?
+- [PermissionOrAuthorRequiredMixin][core.auth.mixins.PermissionOrAuthorRequiredMixin] :
+  L'utilisateur a-t-il la permission requise, ou bien est-il l'auteur de l'objet
+  auquel on veut accéder ?
 
 !!!danger "Performance"
 
