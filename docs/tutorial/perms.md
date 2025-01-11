@@ -178,6 +178,9 @@ Les mixins suivants sont implémentés :
 - [CanViewMixin][core.auth.mixins.CanViewMixin] : L'utilisateur peut-il voir l'objet ?
 - [UserIsRootMixin][core.auth.mixins.UserIsRootMixin] : L'utilisateur a-t-il les droit root ?
 - [FormerSubscriberMixin][core.auth.mixins.FormerSubscriberMixin] : L'utilisateur a-t-il déjà été cotisant ?
+- [PermissionOrAuthorRequiredMixin][core.auth.mixins.PermissionOrAuthorRequiredMixin] :
+  L'utilisateur a-t-il la permission requise, ou bien est-il l'auteur de l'objet
+  auquel on veut accéder ?
 
 !!!danger "Performance"
 

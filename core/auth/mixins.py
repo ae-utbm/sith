@@ -23,10 +23,11 @@
 #
 
 import types
-from typing import Any
+from typing import Any, LiteralString
 
-from django.contrib.auth.mixins import AccessMixin
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.mixins import AccessMixin, PermissionRequiredMixin
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.db.models import Model
 from django.views.generic.base import View
 
 from core.models import User
@@ -210,3 +211,36 @@ class SubscriberMixin(AccessMixin):
         if not request.user.is_subscribed:
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
+
+
+class PermissionOrAuthorRequiredMixin(PermissionRequiredMixin):
+    """Require that the user has the required perm or is the object author.
+
+    Example:
+        In the following code, a user will be able
+        to edit news if he has the `com.change_news` permission
+        or if he tries to edit his own news :
+
+        ```python
+        class NewsEditView(PermissionOrAuthorRequiredMixin, DetailView):
+            model = News
+            author_field = "author"
+            permission_required = "com.change_news"
+        ```
+    """
+    author_field: LiteralString = "author"
+
+    def has_permission(self):
+        if not hasattr(self, "get_object"):
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} is missing the "
+                "get_object attribute. "
+                f"Define {self.__class__.__name__}.get_object, "
+                "or inherit from a class that implement it (like DetailView)"
+            )
+        if super().has_permission():
+            return True
+        obj: Model = self.get_object()
+        author = getattr(obj, self.author_field, None)
+        return author == self.request.user
+
