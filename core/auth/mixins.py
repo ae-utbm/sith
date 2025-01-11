@@ -23,13 +23,16 @@
 #
 
 import types
-from typing import Any
+from typing import TYPE_CHECKING, Any, LiteralString
 
-from django.contrib.auth.mixins import AccessMixin
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.mixins import AccessMixin, PermissionRequiredMixin
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.views.generic.base import View
 
 from core.models import User
+
+if TYPE_CHECKING:
+    from django.db.models import Model
 
 
 def can_edit_prop(obj: Any, user: User) -> bool:
@@ -210,3 +213,62 @@ class SubscriberMixin(AccessMixin):
         if not request.user.is_subscribed:
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
+
+
+class PermissionOrAuthorRequiredMixin(PermissionRequiredMixin):
+    """Require that the user has the required perm or is the object author.
+
+    This mixin can be used in combination with `DetailView`,
+    or another base class that implements the `get_object` method.
+
+    Example:
+        In the following code, a user will be able
+        to edit news if he has the `com.change_news` permission
+        or if he tries to edit his own news :
+
+        ```python
+        class NewsEditView(PermissionOrAuthorRequiredMixin, DetailView):
+            model = News
+            author_field = "author"
+            permission_required = "com.change_news"
+        ```
+
+        This is more or less equivalent to :
+
+        ```python
+        class NewsEditView(PermissionOrAuthorRequiredMixin, DetailView):
+            model = News
+
+            def dispatch(self, request, *args, **kwargs):
+                self.object = self.get_object()
+                if not (
+                    user.has_perm("com.change_news")
+                    or self.object.author == request.user
+                ):
+                    raise PermissionDenied
+                return super().dispatch(request, *args, **kwargs)
+        ```
+    """
+
+    author_field: LiteralString = "author"
+
+    def has_permission(self):
+        if not hasattr(self, "get_object"):
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} is missing the "
+                "get_object attribute. "
+                f"Define {self.__class__.__name__}.get_object, "
+                "or inherit from a class that implement it (like DetailView)"
+            )
+        if super().has_permission():
+            return True
+        if self.request.user.is_anonymous:
+            return False
+        obj: Model = self.get_object()
+        if not self.author_field.endswith("_id"):
+            # getting the related model could trigger a db query
+            # so we will rather get the foreign value than
+            # the object itself.
+            self.author_field += "_id"
+        author_id = getattr(obj, self.author_field, None)
+        return author_id == self.request.user.id

@@ -44,7 +44,11 @@ from club.models import Club, Mailing
 from com.calendar import IcsCalendar
 from com.forms import NewsDateForm, NewsForm, PosterForm
 from com.models import News, NewsDate, Poster, Screen, Sith, Weekmail, WeekmailArticle
-from core.auth.mixins import CanEditPropMixin, CanViewMixin
+from core.auth.mixins import (
+    CanEditPropMixin,
+    CanViewMixin,
+    PermissionOrAuthorRequiredMixin,
+)
 from core.models import User
 from core.views.mixins import QuickNotifMixin, TabedViewMixin
 from core.views.widgets.markdown import MarkdownInput
@@ -162,24 +166,19 @@ class NewsCreateView(PermissionRequiredMixin, CreateView):
         return init
 
 
-class NewsUpdateView(UpdateView):
+class NewsUpdateView(PermissionOrAuthorRequiredMixin, UpdateView):
     model = News
     form_class = NewsForm
     template_name = "com/news_edit.jinja"
     pk_url_kwarg = "news_id"
-
-    def dispatch(self, request, *args, **kwargs):
-        if (
-            not request.user.has_perm("com.edit_news")
-            and self.get_object().author != request.user
-        ):
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
+    permission_required = "com.edit_news"
 
     def form_valid(self, form):
         self.object = form.save()
         IcsCalendar.make_internal()
-        return super().form_valid(form)
+        # Don't call `super().form_valid()`,
+        # because it would trigger a second call to `form.save()`
+        return HttpResponseRedirect(self.get_success_url())
 
     def get_date_form_kwargs(self) -> dict[str, Any]:
         """Get initial data for NewsDateForm"""
@@ -202,7 +201,7 @@ class NewsUpdateView(UpdateView):
         }
 
 
-class NewsDeleteView(PermissionRequiredMixin, DeleteView):
+class NewsDeleteView(PermissionOrAuthorRequiredMixin, DeleteView):
     model = News
     pk_url_kwarg = "news_id"
     template_name = "core/delete_confirm.jinja"
