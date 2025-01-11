@@ -9,6 +9,7 @@ from django.utils.timezone import now
 from model_bakery import baker, seq
 from model_bakery.recipe import Recipe, foreign_key
 
+from com.models import News
 from core.baker_recipes import (
     old_subscriber_user,
     subscriber_user,
@@ -22,6 +23,8 @@ from eboutic.models import Invoice, InvoiceItem
 class TestSearchUsers(TestCase):
     @classmethod
     def setUpTestData(cls):
+        # News.author has on_delete=PROTECT, so news must be deleted beforehand
+        News.objects.all().delete()
         User.objects.all().delete()
         user_recipe = Recipe(
             User,

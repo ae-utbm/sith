@@ -11,77 +11,12 @@
   <p><a href="{{ url('com:news_new') }}">{% trans %}Create news{% endtrans %}</a></p>
 
   <hr />
-  <h4>{% trans %}Notices{% endtrans %}</h4>
-  {% set notices = object_list.filter(type="NOTICE").distinct().order_by('id') %}
-  <h5>{% trans %}Displayed notices{% endtrans %}</h5>
-  <table>
-    <thead>
-      <tr>
-        <td>{% trans %}Type{% endtrans %}</td>
-        <td>{% trans %}Title{% endtrans %}</td>
-        <td>{% trans %}Summary{% endtrans %}</td>
-        <td>{% trans %}Club{% endtrans %}</td>
-        <td>{% trans %}Author{% endtrans %}</td>
-        <td>{% trans %}Moderator{% endtrans %}</td>
-        <td>{% trans %}Actions{% endtrans %}</td>
-      </tr>
-    </thead>
-    <tbody>
-      {% for news in notices.filter(is_moderated=True) %}
-        <tr>
-          <td>{{ news.get_type_display() }}</td>
-          <td>{{ news.title }}</td>
-          <td>{{ news.summary|markdown }}</td>
-          <td><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></td>
-          <td>{{ user_profile_link(news.author) }}</td>
-          <td>{{ user_profile_link(news.moderator) }}</td>
-          <td><a href="{{ url('com:news_detail', news_id=news.id) }}">{% trans %}View{% endtrans %}</a>
-            <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit{% endtrans %}</a>
-            <a href="{{ url('com:news_moderate', news_id=news.id) }}?remove">{% trans %}Remove{% endtrans %}</a>
-            <a href="{{ url('com:news_delete', news_id=news.id) }}">{% trans %}Delete{% endtrans %}</a>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <h5>{% trans %}Notices to moderate{% endtrans %}</h5>
-  <table>
-    <thead>
-      <tr>
-        <td>{% trans %}Type{% endtrans %}</td>
-        <td>{% trans %}Title{% endtrans %}</td>
-        <td>{% trans %}Summary{% endtrans %}</td>
-        <td>{% trans %}Club{% endtrans %}</td>
-        <td>{% trans %}Author{% endtrans %}</td>
-        <td>{% trans %}Actions{% endtrans %}</td>
-      </tr>
-    </thead>
-    <tbody>
-      {% for news in notices.filter(is_moderated=False) %}
-        <tr>
-          <td>{{ news.get_type_display() }}</td>
-          <td>{{ news.title }}</td>
-          <td>{{ news.summary|markdown }}</td>
-          <td><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></td>
-          <td>{{ user_profile_link(news.author) }}</td>
-          <td><a href="{{ url('com:news_detail', news_id=news.id) }}">{% trans %}View{% endtrans %}</a>
-            <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit{% endtrans %}</a>
-            <a href="{{ url('com:news_moderate', news_id=news.id) }}">{% trans %}Moderate{% endtrans %}</a>
-            <a href="{{ url('com:news_delete', news_id=news.id) }}">{% trans %}Delete{% endtrans %}</a>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  <hr />
   <h4>{% trans %}Weeklies{% endtrans %}</h4>
-  {% set weeklies = object_list.filter(type="WEEKLY", dates__end_date__gte=timezone.now()).distinct().order_by('id') %}
+  {% set weeklies = object_list.filter(dates__end_date__gte=timezone.now()).distinct().order_by('id') %}
   <h5>{% trans %}Displayed weeklies{% endtrans %}</h5>
   <table>
     <thead>
       <tr>
-        <td>{% trans %}Type{% endtrans %}</td>
         <td>{% trans %}Title{% endtrans %}</td>
         <td>{% trans %}Summary{% endtrans %}</td>
         <td>{% trans %}Club{% endtrans %}</td>
@@ -94,7 +29,6 @@
     <tbody>
       {% for news in weeklies.filter(is_moderated=True) %}
         <tr>
-          <td>{{ news.get_type_display() }}</td>
           <td>{{ news.title }}</td>
           <td>{{ news.summary|markdown }}</td>
           <td><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></td>
@@ -124,7 +58,6 @@
   <table>
     <thead>
       <tr>
-        <td>{% trans %}Type{% endtrans %}</td>
         <td>{% trans %}Title{% endtrans %}</td>
         <td>{% trans %}Summary{% endtrans %}</td>
         <td>{% trans %}Club{% endtrans %}</td>
@@ -136,7 +69,6 @@
     <tbody>
       {% for news in weeklies.filter(is_moderated=False) %}
         <tr>
-          <td>{{ news.get_type_display() }}</td>
           <td>{{ news.title }}</td>
           <td>{{ news.summary|markdown }}</td>
           <td><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></td>
@@ -161,91 +93,13 @@
       {% endfor %}
     </tbody>
   </table>
-
-  <hr />
-  <h4>{% trans %}Calls{% endtrans %}</h4>
-  {% set calls = object_list.filter(type="CALL", dates__end_date__gte=timezone.now()).distinct().order_by('id') %}
-  <h5>{% trans %}Displayed calls{% endtrans %}</h5>
-  <table>
-    <thead>
-      <tr>
-        <td>{% trans %}Type{% endtrans %}</td>
-        <td>{% trans %}Title{% endtrans %}</td>
-        <td>{% trans %}Summary{% endtrans %}</td>
-        <td>{% trans %}Club{% endtrans %}</td>
-        <td>{% trans %}Author{% endtrans %}</td>
-        <td>{% trans %}Moderator{% endtrans %}</td>
-        <td>{% trans %}Start{% endtrans %}</td>
-        <td>{% trans %}End{% endtrans %}</td>
-        <td>{% trans %}Actions{% endtrans %}</td>
-      </tr>
-    </thead>
-    <tbody>
-      {% for news in calls.filter(is_moderated=True) %}
-        <tr>
-          <td>{{ news.get_type_display() }}</td>
-          <td>{{ news.title }}</td>
-          <td>{{ news.summary|markdown }}</td>
-          <td><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></td>
-          <td>{{ user_profile_link(news.author) }}</td>
-          <td>{{ user_profile_link(news.moderator) }}</td>
-          <td>{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
-            {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</td>
-          <td>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
-            {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</td>
-          <td><a href="{{ url('com:news_detail', news_id=news.id) }}">{% trans %}View{% endtrans %}</a>
-            <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit{% endtrans %}</a>
-            <a href="{{ url('com:news_moderate', news_id=news.id) }}?remove">{% trans %}Remove{% endtrans %}</a>
-            <a href="{{ url('com:news_delete', news_id=news.id) }}">{% trans %}Delete{% endtrans %}</a>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  <h5>{% trans %}Calls to moderate{% endtrans %}</h5>
-  <table>
-    <thead>
-      <tr>
-        <td>{% trans %}Type{% endtrans %}</td>
-        <td>{% trans %}Title{% endtrans %}</td>
-        <td>{% trans %}Summary{% endtrans %}</td>
-        <td>{% trans %}Club{% endtrans %}</td>
-        <td>{% trans %}Author{% endtrans %}</td>
-        <td>{% trans %}Start{% endtrans %}</td>
-        <td>{% trans %}End{% endtrans %}</td>
-        <td>{% trans %}Actions{% endtrans %}</td>
-      </tr>
-    </thead>
-    <tbody>
-      {% for news in calls.filter(is_moderated=False) %}
-        <tr>
-          <td>{{ news.get_type_display() }}</td>
-          <td>{{ news.title }}</td>
-          <td>{{ news.summary|markdown }}</td>
-          <td><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></td>
-          <td>{{ user_profile_link(news.author) }}</td>
-          <td>{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
-            {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</td>
-          <td>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
-            {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</td>
-          <td><a href="{{ url('com:news_detail', news_id=news.id) }}">{% trans %}View{% endtrans %}</a>
-            <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit{% endtrans %}</a>
-            <a href="{{ url('com:news_moderate', news_id=news.id) }}">{% trans %}Moderate{% endtrans %}</a>
-            <a href="{{ url('com:news_delete', news_id=news.id) }}">{% trans %}Delete{% endtrans %}</a>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
   <hr />
   <h4>{% trans %}Events{% endtrans %}</h4>
-  {% set events = object_list.filter(type="EVENT", dates__end_date__gte=timezone.now()).distinct().order_by('id') %}
+  {% set events = object_list.filter(dates__end_date__gte=timezone.now()).order_by('id') %}
   <h5>{% trans %}Displayed events{% endtrans %}</h5>
   <table>
     <thead>
       <tr>
-        <td>{% trans %}Type{% endtrans %}</td>
         <td>{% trans %}Title{% endtrans %}</td>
         <td>{% trans %}Summary{% endtrans %}</td>
         <td>{% trans %}Club{% endtrans %}</td>
@@ -259,16 +113,15 @@
     <tbody>
       {% for news in events.filter(is_moderated=True) %}
         <tr>
-          <td>{{ news.get_type_display() }}</td>
           <td>{{ news.title }}</td>
           <td>{{ news.summary|markdown }}</td>
           <td><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></td>
           <td>{{ user_profile_link(news.author) }}</td>
           <td>{{ user_profile_link(news.moderator) }}</td>
-          <td>{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
-            {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</td>
-          <td>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
-            {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</td>
+          <td>{{ news.dates.all()[0].start_date|localtime|date(DATETIME_FORMAT) }}
+            {{ news.dates.all()[0].start_date|localtime|time(DATETIME_FORMAT) }}</td>
+          <td>{{ news.dates.all()[0].end_date|localtime|date(DATETIME_FORMAT) }}
+            {{ news.dates.all()[0].end_date|localtime|time(DATETIME_FORMAT) }}</td>
           <td><a href="{{ url('com:news_detail', news_id=news.id) }}">{% trans %}View{% endtrans %}</a>
             <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit{% endtrans %}</a>
             <a href="{{ url('com:news_moderate', news_id=news.id) }}?remove">{% trans %}Remove{% endtrans %}</a>
@@ -282,7 +135,6 @@
   <table>
     <thead>
       <tr>
-        <td>{% trans %}Type{% endtrans %}</td>
         <td>{% trans %}Title{% endtrans %}</td>
         <td>{% trans %}Summary{% endtrans %}</td>
         <td>{% trans %}Club{% endtrans %}</td>
@@ -295,15 +147,14 @@
     <tbody>
       {% for news in events.filter(is_moderated=False) %}
         <tr>
-          <td>{{ news.get_type_display() }}</td>
           <td>{{ news.title }}</td>
           <td>{{ news.summary|markdown }}</td>
           <td><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></td>
           <td>{{ user_profile_link(news.author) }}</td>
-          <td>{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
-            {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</td>
-          <td>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
-            {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</td>
+          <td>{{ news.dates.all()[0].start_date|localtime|date(DATETIME_FORMAT) }}
+            {{ news.dates.all()[0].start_date|localtime|time(DATETIME_FORMAT) }}</td>
+          <td>{{ news.dates.all()[0].end_date|localtime|date(DATETIME_FORMAT) }}
+            {{ news.dates.all()[0].end_date|localtime|time(DATETIME_FORMAT) }}</td>
           <td><a href="{{ url('com:news_detail', news_id=news.id) }}">{% trans %}View{% endtrans %}</a>
             <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit{% endtrans %}</a>
             <a href="{{ url('com:news_moderate', news_id=news.id) }}">{% trans %}Moderate{% endtrans %}</a>

@@ -665,7 +665,9 @@ form {
     }
 
     &:checked {
-      background: var(--nf-input-focus-border-color) none initial;
+      background: none;
+      background-position: 0 0;
+      background-color: var(--nf-input-focus-border-color);
 
       &::after {
         transform: translateY(-50%) translateX(

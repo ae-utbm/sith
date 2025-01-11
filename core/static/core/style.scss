@@ -436,8 +436,8 @@ body {
     $row-gap: 0.5rem;
 
     &.gap {
-      column-gap: var($col-gap);
-      row-gap: var($row-gap);
+      column-gap: $col-gap;
+      row-gap: $row-gap;
     }
 
     @for $i from 2 through 5 {

@@ -25,10 +25,10 @@
     </div>
     <h4>{{ news.title }}</h4>
     <p class="date">
-      <span>{{ news.dates.first().start_date|localtime|date(DATETIME_FORMAT) }}
-        {{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
-      <span>{{ news.dates.first().end_date|localtime|date(DATETIME_FORMAT) }}
-        {{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
+      <span>{{ date.start_date|localtime|date(DATETIME_FORMAT) }}
+        {{ date.start_date|localtime|time(DATETIME_FORMAT) }}</span> -
+      <span>{{ date.end_date|localtime|date(DATETIME_FORMAT) }}
+        {{ date.end_date|localtime|time(DATETIME_FORMAT) }}</span>
     </p>
     <div class="news_content">
       <div><em>{{ news.summary|markdown }}</em></div>

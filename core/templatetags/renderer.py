@@ -26,6 +26,7 @@ import datetime
 
 import phonenumbers
 from django import template
+from django.forms import BoundField
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe
 from django.utils.translation import ngettext
@@ -80,3 +81,43 @@ def format_timedelta(value: datetime.timedelta) -> str:
     return ngettext(
         "%(nb_days)d day, %(remainder)s", "%(nb_days)d days, %(remainder)s", days
     ) % {"nb_days": days, "remainder": str(remainder)}
+
+
+@register.filter(name="add_attr")
+def add_attr(field: BoundField, attr: str):
+    """Add attributes to a form field directly in the template.
+
+    Attributes are `key=value` pairs, separated by commas.
+
+    Example:
+        ```jinja
+        <form x-data="{alpineField: null}">
+            {{ form.field|add_attr("x-model=alpineField") }}
+        </form>
+        ```
+
+        will render :
+        ```html
+        <form x-data="{alpineField: null}">
+            <input type="..." x-model="alpineField">
+        </form>
+        ```
+
+    Notes:
+        Doing this gives the same result as setting the attribute
+        directly in the python code.
+        However, sometimes there are attributes that are tightly
+        coupled to the frontend logic (like Alpine variables)
+        and that shouldn't be declared outside of it.
+    """
+    attrs = {}
+    definition = attr.split(",")
+
+    for d in definition:
+        if "=" not in d:
+            attrs["class"] = d
+        else:
+            key, val = d.split("=")
+            attrs[key] = val
+
+    return field.as_widget(attrs=attrs)

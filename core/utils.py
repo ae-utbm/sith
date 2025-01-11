@@ -14,7 +14,7 @@
 #
 
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 
 # Image utils
 from io import BytesIO
@@ -75,6 +75,22 @@ def get_start_of_semester(today: date | None = None) -> date:
         return spring
     # between 01/01 and 15/02 -> autumn semester of the previous year
     return autumn.replace(year=autumn.year - 1)
+
+
+def get_end_of_semester(today: date | None = None):
+    """Return the date of the end of the semester of the given date.
+    If no date is given, return the end date of the current semester.
+    """
+    # the algorithm is simple, albeit somewhat imprecise :
+    # 1. get the start of the next semester
+    # 2. Remove a month and a half for the autumn semester (summer holidays)
+    #    and 28 days for spring semester (february holidays)
+    if today is None:
+        today = localdate()
+    semester_start = get_start_of_semester(today + timedelta(days=365 // 2))
+    if semester_start.month == settings.SITH_SEMESTER_START_AUTUMN[0]:
+        return semester_start - timedelta(days=45)
+    return semester_start - timedelta(days=28)
 
 
 def get_semester_code(d: date | None = None) -> str:

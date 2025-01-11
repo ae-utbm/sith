@@ -21,13 +21,13 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-
+from typing import Self
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.db import models, transaction
-from django.db.models import Q
+from django.db.models import F, Q
 from django.shortcuts import render
 from django.templatetags.static import static
 from django.urls import reverse
@@ -54,12 +54,21 @@ class Sith(models.Model):
         return user.is_com_admin
 
 
-NEWS_TYPES = [
-    ("NOTICE", _("Notice")),
-    ("EVENT", _("Event")),
-    ("WEEKLY", _("Weekly")),
-    ("CALL", _("Call")),
-]
+class NewsQuerySet(models.QuerySet):
+    def moderated(self) -> Self:
+        return self.filter(is_moderated=True)
+
+    def viewable_by(self, user: User) -> Self:
+        """Filter news that the given user can view.
+
+        If the user has the `com.view_unmoderated_news` permission,
+        all news are viewable.
+        Else the viewable news are those that are either moderated
+        or authored by the user.
+        """
+        if user.has_perm("com.view_unmoderated_news"):
+            return self
+        return self.filter(Q(is_moderated=True) | Q(author_id=user.id))
 
 
 class News(models.Model):
@@ -79,9 +88,6 @@ class News(models.Model):
         default="",
         help_text=_("A more detailed and exhaustive description of the event."),
     )
-    type = models.CharField(
-        _("type"), max_length=16, choices=NEWS_TYPES, default="EVENT"
-    )
     club = models.ForeignKey(
         Club,
         related_name="news",
@@ -93,7 +99,7 @@ class News(models.Model):
         User,
         related_name="owned_news",
         verbose_name=_("author"),
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
     is_moderated = models.BooleanField(_("is moderated"), default=False)
     moderator = models.ForeignKey(
@@ -104,19 +110,27 @@ class News(models.Model):
         on_delete=models.SET_NULL,
     )
 
+    objects = NewsQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("news")
+        permissions = [
+            ("moderate_news", "Can moderate news"),
+            ("view_unmoderated_news", "Can view non-moderated news"),
+        ]
+
     def __str__(self):
-        return "%s: %s" % (self.type, self.title)
+        return self.title
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+        if self.is_moderated:
+            return
         for user in User.objects.filter(
             groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID]
         ):
             Notification.objects.create(
-                user=user,
-                url=reverse("com:news_admin_list"),
-                type="NEWS_MODERATION",
-                param="1",
+                user=user, url=reverse("com:news_admin_list"), type="NEWS_MODERATION"
             )
 
     def get_absolute_url(self):
@@ -130,35 +144,31 @@ class News(models.Model):
             return False
         return user.is_com_admin or user == self.author
 
-    def can_be_edited_by(self, user):
-        return user.is_com_admin
+    def can_be_edited_by(self, user: User):
+        return user.is_authenticated and (
+            self.author_id == user.id or user.has_perm("com.change_news")
+        )
 
     def can_be_viewed_by(self, user):
-        return self.is_moderated or user.is_com_admin
+        return self.is_moderated or user.has_perm("com.view_unmoderated_news")
 
 
 def news_notification_callback(notif):
-    count = (
-        News.objects.filter(
-            Q(dates__start_date__gt=timezone.now(), is_moderated=False)
-            | Q(type="NOTICE", is_moderated=False)
-        )
-        .distinct()
-        .count()
-    )
+    count = News.objects.filter(
+        dates__start_date__gt=timezone.now(), is_moderated=False
+    ).count()
     if count:
         notif.viewed = False
-        notif.param = "%s" % count
+        notif.param = str(count)
         notif.date = timezone.now()
     else:
         notif.viewed = True
 
 
 class NewsDate(models.Model):
-    """A date class, useful for weekly events, or for events that just have no date.
+    """A date associated with news.
 
-    This class allows more flexibilty managing the dates related to a news, particularly when this news is weekly, since
-    we don't have to make copies
+    A [News][] can have multiple dates, for example if it is a recurring event.
     """
 
     news = models.ForeignKey(
@@ -167,11 +177,21 @@ class NewsDate(models.Model):
         verbose_name=_("news_date"),
         on_delete=models.CASCADE,
     )
-    start_date = models.DateTimeField(_("start_date"), null=True, blank=True)
-    end_date = models.DateTimeField(_("end_date"), null=True, blank=True)
+    start_date = models.DateTimeField(_("start_date"))
+    end_date = models.DateTimeField(_("end_date"))
+
+    class Meta:
+        verbose_name = _("news date")
+        verbose_name_plural = _("news dates")
+        constraints = [
+            models.CheckConstraint(
+                check=Q(end_date__gte=F("start_date")),
+                name="news_date_end_date_after_start_date",
+            )
+        ]
 
     def __str__(self):
-        return "%s: %s - %s" % (self.news.title, self.start_date, self.end_date)
+        return f"{self.news.title}: {self.start_date} - {self.end_date}"
 
 
 class Weekmail(models.Model):
@@ -329,6 +349,9 @@ class Poster(models.Model):
         blank=True,
         on_delete=models.CASCADE,
     )
+
+    class Meta:
+        permissions = [("moderate_poster", "Can moderate poster")]
 
     def __str__(self):
         return self.name
