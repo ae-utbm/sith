@@ -16,6 +16,7 @@
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
+from django.db import connection
 
 
 class Command(BaseCommand):
@@ -29,7 +30,7 @@ class Command(BaseCommand):
         if not data_dir.is_dir():
             data_dir.mkdir()
         db_path = settings.BASE_DIR / "db.sqlite3"
-        if db_path.exists():
+        if db_path.exists() or connection.vendor != "sqlite":
             call_command("flush", "--noinput")
             self.stdout.write("Existing database reset")
         call_command("migrate")
