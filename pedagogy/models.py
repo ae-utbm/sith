@@ -145,14 +145,6 @@ class UV(models.Model):
     def get_absolute_url(self):
         return reverse("pedagogy:uv_detail", kwargs={"uv_id": self.id})
 
-    def is_owned_by(self, user):
-        """Can be created by superuser, root or pedagogy admin user."""
-        return user.is_in_group(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
-
-    def can_be_viewed_by(self, user):
-        """Only visible by subscribers."""
-        return user.is_subscribed
-
     def __grade_average_generic(self, field):
         comments = self.comments.filter(**{field + "__gte": 0})
         if not comments.exists():
@@ -251,10 +243,6 @@ class UVComment(models.Model):
             self.publish_date = timezone.now()
         super().save(*args, **kwargs)
 
-    def is_owned_by(self, user):
-        """Is owned by a pedagogy admin, a superuser or the author himself."""
-        return self.author == user or user.is_owner(self.uv)
-
     @cached_property
     def is_reported(self):
         """Return True if someone reported this UV."""
@@ -323,7 +311,3 @@ class UVCommentReport(models.Model):
     @cached_property
     def uv(self):
         return self.comment.uv
-
-    def is_owned_by(self, user):
-        """Can be created by a pedagogy admin, a superuser or a subscriber."""
-        return user.is_subscribed or user.is_owner(self.comment.uv)

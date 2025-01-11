@@ -23,14 +23,16 @@
 #
 
 import types
-from typing import Any, LiteralString
+from typing import TYPE_CHECKING, Any, LiteralString
 
 from django.contrib.auth.mixins import AccessMixin, PermissionRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.db.models import Model
 from django.views.generic.base import View
 
 from core.models import User
+
+if TYPE_CHECKING:
+    from django.db.models import Model
 
 
 def can_edit_prop(obj: Any, user: User) -> bool:
@@ -228,6 +230,7 @@ class PermissionOrAuthorRequiredMixin(PermissionRequiredMixin):
             permission_required = "com.change_news"
         ```
     """
+
     author_field: LiteralString = "author"
 
     def has_permission(self):
@@ -243,4 +246,3 @@ class PermissionOrAuthorRequiredMixin(PermissionRequiredMixin):
         obj: Model = self.get_object()
         author = getattr(obj, self.author_field, None)
         return author == self.request.user
-

@@ -897,6 +897,17 @@ Welcome to the wiki page!
         public_group = Group.objects.create(name="Public")
 
         subscribers = Group.objects.create(name="Subscribers")
+        subscribers.permissions.add(
+            *list(
+                perms.filter(
+                    codename__in=[
+                        "view_uvcomment",
+                        "add_uvcomment",
+                        "add_uvcommentreport",
+                    ]
+                )
+            )
+        )
         old_subscribers = Group.objects.create(name="Old subscribers")
         old_subscribers.permissions.add(
             *list(
@@ -907,6 +918,7 @@ Welcome to the wiki page!
                         "view_album",
                         "view_peoplepicturerelation",
                         "add_peoplepicturerelation",
+                        "view_uv",
                     ]
                 )
             )

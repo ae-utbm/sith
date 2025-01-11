@@ -22,8 +22,7 @@
 #
 
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Exists, OuterRef
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -35,12 +34,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from core.auth.mixins import (
-    CanCreateMixin,
-    CanEditPropMixin,
-    CanViewMixin,
-    FormerSubscriberMixin,
-)
+from core.auth.mixins import PermissionOrAuthorRequiredMixin
 from core.models import Notification, User
 from core.views import DetailFormView
 from pedagogy.forms import (
@@ -52,7 +46,7 @@ from pedagogy.forms import (
 from pedagogy.models import UV, UVComment, UVCommentReport
 
 
-class UVDetailFormView(CanViewMixin, DetailFormView):
+class UVDetailFormView(PermissionRequiredMixin, DetailFormView):
     """Display every comment of an UV and detailed infos about it.
 
     Allow to comment the UV.
@@ -62,6 +56,7 @@ class UVDetailFormView(CanViewMixin, DetailFormView):
     pk_url_kwarg = "uv_id"
     template_name = "pedagogy/uv_detail.jinja"
     form_class = UVCommentForm
+    permission_required = "pedagogy.view_uv"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -75,73 +70,57 @@ class UVDetailFormView(CanViewMixin, DetailFormView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy(
-            "pedagogy:uv_detail", kwargs={"uv_id": self.get_object().id}
-        )
-
-    def get_context_data(self, **kwargs):
-        user = self.request.user
-        return super().get_context_data(**kwargs) | {
-            "can_create_uv": (
-                user.is_root
-                or user.is_in_group(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
-            )
-        }
+        return reverse_lazy("pedagogy:uv_detail", kwargs={"uv_id": self.object.id})
 
 
-class UVCommentUpdateView(CanEditPropMixin, UpdateView):
+class UVCommentUpdateView(PermissionOrAuthorRequiredMixin, UpdateView):
     """Allow edit of a given comment."""
 
     model = UVComment
     form_class = UVCommentForm
     pk_url_kwarg = "comment_id"
     template_name = "core/edit.jinja"
+    permission_required = "pedagogy.change_uvcomment"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         obj = self.get_object()
-        kwargs["author_id"] = obj.author.id
-        kwargs["uv_id"] = obj.uv.id
+        kwargs["author_id"] = obj.author_id
+        kwargs["uv_id"] = obj.uv_id
         kwargs["is_creation"] = False
 
         return kwargs
 
     def get_success_url(self):
-        return reverse_lazy("pedagogy:uv_detail", kwargs={"uv_id": self.object.uv.id})
+        return reverse_lazy("pedagogy:uv_detail", kwargs={"uv_id": self.object.uv_id})
 
 
-class UVCommentDeleteView(CanEditPropMixin, DeleteView):
+class UVCommentDeleteView(PermissionOrAuthorRequiredMixin, DeleteView):
     """Allow delete of a given comment."""
 
     model = UVComment
     pk_url_kwarg = "comment_id"
     template_name = "core/delete_confirm.jinja"
+    permission_required = "pedagogy.delete_uvcomment"
 
     def get_success_url(self):
-        return reverse_lazy("pedagogy:uv_detail", kwargs={"uv_id": self.object.uv.id})
+        return reverse_lazy("pedagogy:uv_detail", kwargs={"uv_id": self.object.uv_id})
 
 
-class UVGuideView(LoginRequiredMixin, FormerSubscriberMixin, TemplateView):
+class UVGuideView(PermissionRequiredMixin, TemplateView):
     """UV guide main page."""
 
     template_name = "pedagogy/guide.jinja"
-
-    def get_context_data(self, **kwargs):
-        user = self.request.user
-        return super().get_context_data(**kwargs) | {
-            "can_create_uv": (
-                user.is_root
-                or user.is_in_group(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
-            )
-        }
+    permission_required = "pedagogy.view_uv"
 
 
-class UVCommentReportCreateView(CanCreateMixin, CreateView):
+class UVCommentReportCreateView(PermissionRequiredMixin, CreateView):
     """Create a new report for an inapropriate comment."""
 
     model = UVCommentReport
     form_class = UVCommentReportForm
     template_name = "core/edit.jinja"
+    permission_required = "pedagogy.add_uvcommentreport"
 
     def dispatch(self, request, *args, **kwargs):
         self.uv_comment = get_object_or_404(UVComment, pk=kwargs["comment_id"])
@@ -177,16 +156,16 @@ class UVCommentReportCreateView(CanCreateMixin, CreateView):
         )
 
 
-class UVModerationFormView(FormView):
+class UVModerationFormView(PermissionRequiredMixin, FormView):
     """Moderation interface (Privileged)."""
 
     form_class = UVCommentModerationForm
     template_name = "pedagogy/moderation.jinja"
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_owner(UV()):
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
+    success_url = reverse_lazy("pedagogy:moderation")
+    permission_required = [
+        "pedagogy.delete_uvcommentreport",
+        "pedagogy.delete_uvcomment",
+    ]
 
     def form_valid(self, form):
         form_clean = form.clean()
@@ -198,50 +177,42 @@ class UVModerationFormView(FormView):
             UVCommentReport.objects.filter(id__in={d.id for d in denied}).delete()
         return super().form_valid(form)
 
-    def get_success_url(self):
-        return reverse_lazy("pedagogy:moderation")
 
-
-class UVCreateView(CanCreateMixin, CreateView):
+class UVCreateView(PermissionRequiredMixin, CreateView):
     """Add a new UV (Privileged)."""
 
     model = UV
     form_class = UVForm
     template_name = "pedagogy/uv_edit.jinja"
+    permission_required = "pedagogy.add_uv"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["author_id"] = self.request.user.id
         return kwargs
 
-    def get_success_url(self):
-        return reverse_lazy("pedagogy:uv_detail", kwargs={"uv_id": self.object.id})
 
-
-class UVDeleteView(CanEditPropMixin, DeleteView):
+class UVDeleteView(PermissionRequiredMixin, DeleteView):
     """Allow to delete an UV (Privileged)."""
 
     model = UV
     pk_url_kwarg = "uv_id"
     template_name = "core/delete_confirm.jinja"
+    permission_required = "pedagogy.delete_uv"
+    success_url = reverse_lazy("pedagogy:guide")
 
-    def get_success_url(self):
-        return reverse_lazy("pedagogy:guide")
 
-
-class UVUpdateView(CanEditPropMixin, UpdateView):
+class UVUpdateView(PermissionRequiredMixin, UpdateView):
     """Allow to edit an UV (Privilegied)."""
 
     model = UV
     form_class = UVForm
     pk_url_kwarg = "uv_id"
     template_name = "pedagogy/uv_edit.jinja"
+    permission_required = "pedagogy.change_uv"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         obj = self.get_object()
-        kwargs["author_id"] = obj.author.id
+        kwargs["author_id"] = obj.author_id
         return kwargs
-
-    def get_success_url(self):
-        return reverse_lazy("pedagogy:uv_detail", kwargs={"uv_id": self.object.id})
