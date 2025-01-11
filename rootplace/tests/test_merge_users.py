@@ -14,6 +14,7 @@
 #
 from datetime import timedelta
 
+from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.timezone import localtime, now
@@ -71,10 +72,12 @@ class TestMergeUser(TestCase):
         assert self.to_keep.nick_name == "B'ian"
         assert self.to_keep.address == "Jerusalem"
         assert self.to_keep.parent_address == "Rome"
-        assert self.to_keep.groups.count() == 3
-        groups = sorted(self.to_keep.groups.all(), key=lambda i: i.id)
-        expected = sorted([subscribers, mde_admin, sas_admin], key=lambda i: i.id)
-        assert groups == expected
+        assert set(self.to_keep.groups.values_list("id", flat=True)) == {
+            settings.SITH_GROUP_PUBLIC_ID,
+            subscribers.id,
+            mde_admin.id,
+            sas_admin.id,
+        }
 
     def test_both_subscribers_and_with_account(self):
         Customer(user=self.to_keep, account_id="11000l", amount=0).save()

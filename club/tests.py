@@ -213,9 +213,9 @@ class TestMembershipQuerySet(TestClub):
             memberships[1].club.members_group,
             memberships[1].club.board_group,
         }
-        assert set(user.groups.all()) == club_groups
+        assert set(user.groups.all()).issuperset(club_groups)
         user.memberships.all().delete()
-        assert user.groups.all().count() == 0
+        assert set(user.groups.all()).isdisjoint(club_groups)
 
 
 class TestClubModel(TestClub):

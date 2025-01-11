@@ -187,3 +187,11 @@ def test_generate_username(first_name: str, last_name: str, expected: str):
     new_user = User(first_name=first_name, last_name=last_name, email="a@example.com")
     new_user.generate_username()
     assert new_user.username == expected
+
+
+@pytest.mark.django_db
+def test_user_added_to_public_group():
+    """Test that newly created users are added to the public group"""
+    user = baker.make(User)
+    assert user.groups.filter(pk=settings.SITH_GROUP_PUBLIC_ID).exists()
+    assert user.is_in_group(pk=settings.SITH_GROUP_PUBLIC_ID)
