@@ -208,13 +208,6 @@ class FormerSubscriberMixin(AccessMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
-class SubscriberMixin(AccessMixin):
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_subscribed:
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
-
-
 class PermissionOrAuthorRequiredMixin(PermissionRequiredMixin):
     """Require that the user has the required perm or is the object author.
 
