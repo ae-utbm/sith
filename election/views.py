@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 from django import forms
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models.query import QuerySet
@@ -300,7 +301,7 @@ class VoteFormView(CanCreateMixin, FormView):
 # Create views
 
 
-class CandidatureCreateView(CanCreateMixin, CreateView):
+class CandidatureCreateView(LoginRequiredMixin, CreateView):
     """View dedicated to a cundidature creation."""
 
     form_class = CandidateForm
@@ -326,12 +327,13 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
     def form_valid(self, form):
         """Verify that the selected user is in candidate group."""
         obj = form.instance
-        obj.election = Election.objects.get(id=self.election.id)
-        obj.user = obj.user if hasattr(obj, "user") else self.request.user
+        obj.election = self.election
+        if not hasattr(obj, "user"):
+            obj.user = self.request.user
         if (obj.election.can_candidate(obj.user)) and (
             obj.user == self.request.user or self.can_edit
         ):
-            return super(CreateView, self).form_valid(form)
+            return super().form_valid(form)
         raise PermissionDenied
 
     def get_context_data(self, **kwargs):
@@ -343,22 +345,14 @@ class CandidatureCreateView(CanCreateMixin, CreateView):
         return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
 
 
-class ElectionCreateView(CanCreateMixin, CreateView):
+class ElectionCreateView(PermissionRequiredMixin, CreateView):
     model = Election
     form_class = ElectionForm
     template_name = "core/create.jinja"
-
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_subscribed:
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        """Allow every user that had passed the dispatch to create an election."""
-        return super(CreateView, self).form_valid(form)
+    permission_required = "election.add_election"
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy("election:detail", kwargs={"election_id": self.object.id})
+        return reverse("election:detail", kwargs={"election_id": self.object.id})
 
 
 class RoleCreateView(CanCreateMixin, CreateView):

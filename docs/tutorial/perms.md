@@ -173,13 +173,37 @@ class ArticlesCreateView(CanCreateMixin, CreateView):
 Les mixins suivants sont implémentés :
 
 - [CanCreateMixin][core.auth.mixins.CanCreateMixin] : l'utilisateur peut-il créer l'objet ?
+  Ce mixin existe, mais est déprécié et ne doit plus être utilisé !
 - [CanEditPropMixin][core.auth.mixins.CanEditPropMixin] : l'utilisateur peut-il éditer les propriétés de l'objet ?
 - [CanEditMixin][core.auth.mixins.CanEditMixin] : L'utilisateur peut-il éditer l'objet ?
 - [CanViewMixin][core.auth.mixins.CanViewMixin] : L'utilisateur peut-il voir l'objet ?
 - [FormerSubscriberMixin][core.auth.mixins.FormerSubscriberMixin] : L'utilisateur a-t-il déjà été cotisant ?
-- [PermissionOrAuthorRequiredMixin][core.auth.mixins.PermissionOrAuthorRequiredMixin] :
-  L'utilisateur a-t-il la permission requise, ou bien est-il l'auteur de l'objet
-  auquel on veut accéder ?
+
+!!!danger "CanCreateMixin"
+
+    L'usage de `CanCreateMixin` est dangereux et ne doit en aucun cas être
+    étendu.
+    La façon dont ce mixin marche est qu'il valide le formulaire
+    de création et crée l'objet sans le persister en base de données, puis
+    vérifie les droits sur cet objet non-persisté.
+    Le danger de ce système vient de multiples raisons :
+      - Les vérifications se faisant sur un objet non persisté,
+        l'utilisation de mécanismes nécessitant une persistance préalable
+        peut mener à des comportements indésirés, voire à des erreurs.
+      - Les développeurs de django ayant tendance à restreindre progressivement
+        les actions qui peuvent être faites sur des objets non-persistés,
+        les mises-à-jour de django deviennent plus compliquées.
+      - La vérification des droits ne se fait que dans les requêtes POST,
+        à la toute fin de la requête.
+        Tout ce qui arrive avant n'est absolument pas protégé.
+        Toute opération (même les suppressions et les créations) qui ont
+        lieu avant la persistance de l'objet seront appliquées,
+        même sans permission.
+      - Si un développeur du site fait l'erreur de surcharger
+        la méthode `form_valid` (ce qui est plutôt courant,
+        lorsqu'on veut accomplir certaines actions 
+        quand un formulaire est valide), on peut se retrouver
+        dans une situation où l'objet est persisté sans aucune protection.
 
 !!!danger "Performance"
 

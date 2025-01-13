@@ -473,13 +473,14 @@ class ClubEditPropView(ClubTabsMixin, CanEditPropMixin, UpdateView):
     current_tab = "props"
 
 
-class ClubCreateView(CanCreateMixin, CreateView):
+class ClubCreateView(PermissionRequiredMixin, CreateView):
     """Create a club (for the Sith admin)."""
 
     model = Club
     pk_url_kwarg = "club_id"
     fields = ["name", "unix_name", "parent"]
     template_name = "core/edit.jinja"
+    permission_required = "club.add_club"
 
 
 class MembershipSetOldView(CanEditMixin, DetailView):

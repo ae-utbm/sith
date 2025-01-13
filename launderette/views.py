@@ -19,6 +19,7 @@ from datetime import timezone as tz
 
 from django import forms
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db import transaction
 from django.template import defaultfilters
 from django.urls import reverse_lazy
@@ -28,12 +29,7 @@ from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import BaseFormView, CreateView, DeleteView, UpdateView
 
 from club.models import Club
-from core.auth.mixins import (
-    CanCreateMixin,
-    CanEditMixin,
-    CanEditPropMixin,
-    CanViewMixin,
-)
+from core.auth.mixins import CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.models import Page, User
 from counter.forms import GetUserForm
 from counter.models import Counter, Customer, Selling
@@ -191,12 +187,13 @@ class LaunderetteEditView(CanEditPropMixin, UpdateView):
     template_name = "core/edit.jinja"
 
 
-class LaunderetteCreateView(CanCreateMixin, CreateView):
+class LaunderetteCreateView(PermissionRequiredMixin, CreateView):
     """Create a new launderette."""
 
     model = Launderette
     fields = ["name"]
     template_name = "core/create.jinja"
+    permission_required = "launderette.add_launderette"
 
     def form_valid(self, form):
         club = Club.objects.filter(
@@ -497,12 +494,13 @@ class MachineDeleteView(CanEditPropMixin, DeleteView):
     success_url = reverse_lazy("launderette:launderette_list")
 
 
-class MachineCreateView(CanCreateMixin, CreateView):
+class MachineCreateView(PermissionRequiredMixin, CreateView):
     """Create a new machine."""
 
     model = Machine
     fields = ["name", "launderette", "type"]
     template_name = "core/create.jinja"
+    permission_required = "launderette.add_machine"
 
     def get_initial(self):
         ret = super().get_initial()

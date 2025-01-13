@@ -23,6 +23,7 @@
 #
 
 import types
+import warnings
 from typing import TYPE_CHECKING, Any, LiteralString
 
 from django.contrib.auth.mixins import AccessMixin, PermissionRequiredMixin
@@ -147,6 +148,24 @@ class CanCreateMixin(View):
             If the user has not the necessary permission
             to create the object of the view.
     """
+
+    def __init_subclass__(cls, **kwargs):
+        warnings.warn(
+            f"{cls.__name__} is deprecated and should be replaced "
+            "by other permission verification mecanism.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init_subclass__(**kwargs)
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            f"{self.__class__.__name__} is deprecated and should be replaced "
+            "by other permission verification mecanism.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     def dispatch(self, request, *arg, **kwargs):
         res = super().dispatch(request, *arg, **kwargs)

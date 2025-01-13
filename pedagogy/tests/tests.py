@@ -26,6 +26,7 @@ from django.conf import settings
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from pytest_django.asserts import assertRedirects
 
 from core.models import Notification, User
 from pedagogy.models import UV, UVComment, UVCommentReport
@@ -106,7 +107,7 @@ class TestUVCreation(TestCase):
     def test_create_uv_unauthorized_fail(self):
         # Test with anonymous user
         response = self.client.post(self.create_uv_url, create_uv_template(0))
-        assert response.status_code == 403
+        assertRedirects(response, reverse("core:login") + f"?next={self.create_uv_url}")
 
         # Test with subscribed user
         self.client.force_login(self.sli)
@@ -815,11 +816,11 @@ class TestUVCommentReportCreate(TestCase):
         self.create_report_test("guy", success=False)
 
     def test_create_report_anonymous_fail(self):
+        url = reverse("pedagogy:comment_report", kwargs={"comment_id": self.comment.id})
         response = self.client.post(
-            reverse("pedagogy:comment_report", kwargs={"comment_id": self.comment.id}),
-            {"comment": self.comment.id, "reporter": 0, "reason": "C'est moche"},
+            url, {"comment": self.comment.id, "reporter": 0, "reason": "C'est moche"}
         )
-        assert response.status_code == 403
+        assertRedirects(response, reverse("core:login") + f"?next={url}")
         assert not UVCommentReport.objects.all().exists()
 
     def test_notifications(self):
