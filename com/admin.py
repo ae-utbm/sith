@@ -13,16 +13,24 @@
 #
 #
 from django.contrib import admin
+from django.contrib.admin import TabularInline
 from haystack.admin import SearchModelAdmin
 
-from com.models import News, Poster, Screen, Sith, Weekmail
+from com.models import News, NewsDate, Poster, Screen, Sith, Weekmail
+
+
+class NewsDateInline(TabularInline):
+    model = NewsDate
+    extra = 0
 
 
 @admin.register(News)
 class NewsAdmin(SearchModelAdmin):
-    list_display = ("title", "type", "club", "author")
+    list_display = ("title", "club", "author")
     search_fields = ("title", "summary", "content")
     autocomplete_fields = ("author", "moderator")
+
+    inlines = [NewsDateInline]
 
 
 @admin.register(Poster)

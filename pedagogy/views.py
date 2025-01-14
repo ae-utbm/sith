@@ -22,7 +22,7 @@
 #
 
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef
 from django.shortcuts import get_object_or_404
@@ -35,14 +35,9 @@ from django.views.generic import (
     UpdateView,
 )
 
+from core.auth.mixins import CanEditPropMixin, CanViewMixin, FormerSubscriberMixin
 from core.models import Notification, User
-from core.views import (
-    CanCreateMixin,
-    CanEditPropMixin,
-    CanViewMixin,
-    DetailFormView,
-    FormerSubscriberMixin,
-)
+from core.views import DetailFormView
 from pedagogy.forms import (
     UVCommentForm,
     UVCommentModerationForm,
@@ -50,8 +45,6 @@ from pedagogy.forms import (
     UVForm,
 )
 from pedagogy.models import UV, UVComment, UVCommentReport
-
-# Acutal views
 
 
 class UVDetailFormView(CanViewMixin, DetailFormView):
@@ -138,12 +131,13 @@ class UVGuideView(LoginRequiredMixin, FormerSubscriberMixin, TemplateView):
         }
 
 
-class UVCommentReportCreateView(CanCreateMixin, CreateView):
+class UVCommentReportCreateView(PermissionRequiredMixin, CreateView):
     """Create a new report for an inapropriate comment."""
 
     model = UVCommentReport
     form_class = UVCommentReportForm
     template_name = "core/edit.jinja"
+    permission_required = "pedagogy.add_uvcommentreport"
 
     def dispatch(self, request, *args, **kwargs):
         self.uv_comment = get_object_or_404(UVComment, pk=kwargs["comment_id"])
@@ -204,12 +198,13 @@ class UVModerationFormView(FormView):
         return reverse_lazy("pedagogy:moderation")
 
 
-class UVCreateView(CanCreateMixin, CreateView):
+class UVCreateView(PermissionRequiredMixin, CreateView):
     """Add a new UV (Privileged)."""
 
     model = UV
     form_class = UVForm
     template_name = "pedagogy/uv_edit.jinja"
+    permission_required = "pedagogy.add_uv"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

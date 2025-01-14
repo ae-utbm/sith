@@ -4,12 +4,12 @@
   {{ object.title }}
 {% endblock %}
 
-{% block additional_css %}
-  <link rel="stylesheet" href="{{ static('election/css/election.scss') }}">
+{% block additional_js %}
+  <script type="module" src="{{ static('bundled/core/read-more-index.ts') }}"></script>
 {% endblock %}
 
-{% block additional_js %}
-  <script src="{{ static('bundled/vendored/jquery.shorten.min.js') }}"></script>
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static('election/css/election.scss') }}">
 {% endblock %}
 
 {% block content %}
@@ -68,7 +68,7 @@
               <td class="role_title">
                 <div class="role_text">
                   <h4>{{ role.title }}</h4>
-                  <p class="role_description">{{ role.description }}</p>
+                  <p class="role_description" show-more="300">{{ role.description }}</p>
                   {%- if role.max_choice > 1 and not election.has_voted(user) and election.can_vote(user) %}
                     <strong>{% trans %}You may choose up to{% endtrans %} {{ role.max_choice }} {% trans %}people.{% endtrans %}</strong>
                   {%- endif %}
@@ -139,7 +139,9 @@
                           <figcaption class="candidate__details">
                             <h5>{{ candidature.user.first_name }} <em>{{candidature.user.nick_name or ''}} </em>{{ candidature.user.last_name }}</h5>
                             {%- if not election.is_vote_finished %}
-                              <q class="candidate_program">{{ candidature.program | markdown or '' }}</q>
+                              <q class="candidate_program" show-more="200">
+                                {{ candidature.program|markdown or '' }}
+                              </q>
                             {%- endif %}
                           </figcaption>
                           {%- if user.can_edit(candidature) -%}
@@ -198,18 +200,6 @@
 
 {% block script %}
   {{ super() }}
-  <script type="text/javascript">
-    $('.role_description').shorten({
-      moreText: "{% trans %}Show more{% endtrans %}",
-      lessText: "{% trans %}Show less{% endtrans %}",
-      showChars: 300
-    });
-    $('.candidate_program').shorten({
-      moreText: "{% trans %}Show more{% endtrans %}",
-      lessText: "{% trans %}Show less{% endtrans %}",
-      showChars: 200
-    });
-  </script>
   <script type="text/javascript">
     document.querySelectorAll('.role__multiple-choices').forEach(setupRestrictions);
 

@@ -11,10 +11,7 @@ from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
 from club.models import Mailing
-from core.api_permissions import (
-    CanAccessLookup,
-    CanView,
-)
+from core.auth.api_permissions import CanAccessLookup, CanView
 from core.models import Group, SithFile, User
 from core.schemas import (
     FamilyGodfatherSchema,

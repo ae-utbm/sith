@@ -1,11 +1,27 @@
+.ts-wrapper.multi .ts-control {
+  min-width: calc(100% - 0.2rem);
+}
+
 /* This also requires ajax-select-index.css */
 .ts-dropdown {
+  width: calc(100% - 0.2rem);
+  left: 0.1rem;
+  top: calc(100% - 0.2rem - var(--nf-input-border-bottom-width));
+  border: var(--nf-input-border-color) var(--nf-input-border-width) solid;
+  border-top: none;
+  border-bottom-width: var(--nf-input-border-bottom-width);
+
+  .option.active {
+    background-color: #e5eafa;
+    color: inherit;
+  }
 
   .select-item {
     display: flex;
     flex-direction: row;
     gap: 10px;
     align-items: center;
+    overflow: hidden;
 
     img {
       height: 40px;
@@ -16,19 +32,44 @@
   }
 }
 
-.ts-wrapper {
-  margin: 5px;
+.ts-wrapper.single {
+  > .ts-control {
+    box-shadow: none;
+    max-width: 300px;
+    background-color: var(--nf-input-background-color);
+
+    &::after {
+      content: none;
+    }
+  }
+
+  > .ts-dropdown {
+    max-width: 300px;
+  }
 }
 
-.ts-wrapper.single {
-  width: 263px; // same length as regular text inputs
+.ts-wrapper input[type="text"] {
+  border: none;
+  border-radius: 0;
+}
+
+.ts-wrapper.multi, .ts-wrapper.single {
+  .ts-control:has(input:focus) {
+    outline: none;
+    border-color: var(--nf-input-focus-border-color);
+    box-shadow: none;
+  }
 }
 
 .ts-wrapper.plugin-remove_button:not(.rtl) .item .remove {
   border-left: 1px solid #aaa;
 }
 
-.ts-wrapper.multi .ts-control {
+.ts-wrapper.multi.has-items .ts-control {
+  padding: calc(var(--nf-input-size) * 0.65);
+  display: flex;
+  gap: calc(var(--nf-input-size) / 3);
+
   [data-value],
   [data-value].active {
     background-image: none;
@@ -37,19 +78,17 @@
     border: 1px solid #aaa;
     border-radius: 4px;
     display: inline-block;
-    margin-left: 5px;
-    margin-top: 5px;
-    margin-bottom: 5px;
     padding-right: 10px;
     padding-left: 10px;
     text-shadow: none;
     box-shadow: none;
+
+    .remove {
+      vertical-align: baseline;
+    }
   }
 }
 
-.ts-dropdown {
-  .option.active {
-    background-color: #e5eafa;
-    color: inherit;
-  }
+.ts-wrapper.focus .ts-control {
+  box-shadow: none;
 }

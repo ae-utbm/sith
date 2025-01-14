@@ -48,7 +48,8 @@
 
   input,
   textarea[type="text"],
-  [type="number"] {
+  [type="number"],
+  .ts-control {
     border: none;
     text-decoration: none;
     background-color: $background-button-color;
@@ -69,7 +70,7 @@
     font-family: sans-serif;
   }
 
-  select {
+  select, .ts-control {
     border: none;
     text-decoration: none;
     font-size: 1.2em;
@@ -177,7 +178,7 @@ form {
   }
 
   // wrap texts
-  label, legend, ul.errorlist>li, .helptext {
+  label, legend, ul.errorlist > li, .helptext {
     text-wrap: wrap;
   }
 
@@ -218,23 +219,25 @@ form {
     }
   }
 
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"],
-  input[type="url"],
-  input[type="password"],
-  input[type="number"],
-  input[type="date"],
-  input[type="week"],
-  input[type="time"],
-  input[type="month"],
-  input[type="search"],
-  textarea,
-  select {
-    min-width: 300px;
+  :not(.ts-control) > {
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="url"],
+    input[type="password"],
+    input[type="number"],
+    input[type="date"],
+    input[type="week"],
+    input[type="time"],
+    input[type="search"],
+    textarea,
+    input[type="month"],
+    select {
+      min-width: 300px;
 
-    &.grow {
-      width: 95%;
+      &.grow {
+        width: 95%;
+      }
     }
   }
 
@@ -253,7 +256,8 @@ form {
   input[type="month"],
   input[type="search"],
   textarea,
-  select {
+  select,
+  .ts-control {
     background: var(--nf-input-background-color);
     font-size: var(--nf-input-font-size);
     border-color: var(--nf-input-border-color);
@@ -661,7 +665,9 @@ form {
     }
 
     &:checked {
-      background: var(--nf-input-focus-border-color) none initial;
+      background: none;
+      background-position: 0 0;
+      background-color: var(--nf-input-focus-border-color);
 
       &::after {
         transform: translateY(-50%) translateX(
@@ -713,7 +719,11 @@ form {
 
   // ---------------- SELECT
 
-  select {
+  select,
+  .ts-wrapper.multi .ts-control,
+  .ts-wrapper.single .ts-control,
+  .ts-wrapper.single.input-active .ts-control {
+    background-color: var(--nf-input-background-color);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280'  stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-chevron-down'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
     background-position: right calc(var(--nf-input-size) * 0.75) bottom 50%;
     background-repeat: no-repeat;

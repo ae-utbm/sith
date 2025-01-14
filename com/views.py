@@ -24,11 +24,12 @@
 import itertools
 from datetime import timedelta
 from smtplib import SMTPRecipientsRefused
+from typing import Any
 
-from django import forms
 from django.conf import settings
+from django.contrib.auth.mixins import AccessMixin, PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import Exists, Max, OuterRef
+from django.db.models import Max
 from django.forms.models import modelform_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
@@ -37,21 +38,19 @@ from django.utils import timezone
 from django.utils.timezone import localdate
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, View
-from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from club.models import Club, Mailing
+from com.calendar import IcsCalendar
+from com.forms import NewsDateForm, NewsForm, PosterForm
 from com.models import News, NewsDate, Poster, Screen, Sith, Weekmail, WeekmailArticle
-from core.models import Notification, User
-from core.views import (
-    CanCreateMixin,
-    CanEditMixin,
+from core.auth.mixins import (
     CanEditPropMixin,
     CanViewMixin,
-    QuickNotifMixin,
-    TabedViewMixin,
+    PermissionOrAuthorRequiredMixin,
 )
-from core.views.forms import SelectDateTime
+from core.models import User
+from core.views.mixins import QuickNotifMixin, TabedViewMixin
 from core.views.widgets.markdown import MarkdownInput
 
 # Sith object
@@ -59,92 +58,47 @@ from core.views.widgets.markdown import MarkdownInput
 sith = Sith.objects.first
 
 
-class PosterForm(forms.ModelForm):
-    class Meta:
-        model = Poster
-        fields = [
-            "name",
-            "file",
-            "club",
-            "screens",
-            "date_begin",
-            "date_end",
-            "display_time",
-        ]
-        widgets = {"screens": forms.CheckboxSelectMultiple}
-        help_texts = {"file": _("Format: 16:9 | Resolution: 1920x1080")}
-
-    date_begin = forms.DateTimeField(
-        label=_("Start date"),
-        widget=SelectDateTime,
-        required=True,
-        initial=timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
-    )
-    date_end = forms.DateTimeField(
-        label=_("End date"), widget=SelectDateTime, required=False
-    )
-
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop("user", None)
-        super().__init__(*args, **kwargs)
-        if self.user and not self.user.is_com_admin:
-            self.fields["club"].queryset = Club.objects.filter(
-                id__in=self.user.clubs_with_rights
-            )
-            self.fields.pop("display_time")
-
-
 class ComTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
         return _("Communication administration")
 
     def get_list_of_tabs(self):
-        tab_list = []
-        tab_list.append(
-            {"url": reverse("com:weekmail"), "slug": "weekmail", "name": _("Weekmail")}
-        )
-        tab_list.append(
+        return [
+            {"url": reverse("com:weekmail"), "slug": "weekmail", "name": _("Weekmail")},
             {
                 "url": reverse("com:weekmail_destinations"),
                 "slug": "weekmail_destinations",
                 "name": _("Weekmail destinations"),
-            }
-        )
-        tab_list.append(
-            {"url": reverse("com:info_edit"), "slug": "info", "name": _("Info message")}
-        )
-        tab_list.append(
+            },
+            {
+                "url": reverse("com:info_edit"),
+                "slug": "info",
+                "name": _("Info message"),
+            },
             {
                 "url": reverse("com:alert_edit"),
                 "slug": "alert",
                 "name": _("Alert message"),
-            }
-        )
-        tab_list.append(
+            },
             {
                 "url": reverse("com:mailing_admin"),
                 "slug": "mailings",
                 "name": _("Mailing lists administration"),
-            }
-        )
-        tab_list.append(
+            },
             {
                 "url": reverse("com:poster_list"),
                 "slug": "posters",
                 "name": _("Posters list"),
-            }
-        )
-        tab_list.append(
+            },
             {
                 "url": reverse("com:screen_list"),
                 "slug": "screens",
                 "name": _("Screens list"),
-            }
-        )
-        return tab_list
+            },
+        ]
 
 
-class IsComAdminMixin(View):
+class IsComAdminMixin(AccessMixin):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_com_admin:
             raise PermissionDenied
@@ -184,167 +138,79 @@ class WeekmailDestinationEditView(ComEditView):
 # News
 
 
-class NewsForm(forms.ModelForm):
-    class Meta:
-        model = News
-        fields = ["type", "title", "club", "summary", "content", "author"]
-        widgets = {
-            "author": forms.HiddenInput,
-            "type": forms.RadioSelect,
-            "summary": MarkdownInput,
-            "content": MarkdownInput,
+class NewsCreateView(PermissionRequiredMixin, CreateView):
+    """View to either create or update News."""
+
+    model = News
+    form_class = NewsForm
+    template_name = "com/news_edit.jinja"
+    permission_required = "com.add_news"
+
+    def get_date_form_kwargs(self) -> dict[str, Any]:
+        """Get initial data for NewsDateForm"""
+        if self.request.method == "POST":
+            return {"data": self.request.POST}
+        return {}
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {
+            "author": self.request.user,
+            "date_form": NewsDateForm(**self.get_date_form_kwargs()),
         }
 
-    start_date = forms.DateTimeField(
-        label=_("Start date"), widget=SelectDateTime, required=False
-    )
-    end_date = forms.DateTimeField(
-        label=_("End date"), widget=SelectDateTime, required=False
-    )
-    until = forms.DateTimeField(label=_("Until"), widget=SelectDateTime, required=False)
-
-    automoderation = forms.BooleanField(label=_("Automoderation"), required=False)
-
-    def clean(self):
-        self.cleaned_data = super().clean()
-        if self.cleaned_data["type"] != "NOTICE":
-            if not self.cleaned_data["start_date"]:
-                self.add_error(
-                    "start_date", ValidationError(_("This field is required."))
-                )
-            if not self.cleaned_data["end_date"]:
-                self.add_error(
-                    "end_date", ValidationError(_("This field is required."))
-                )
-            if (
-                not self.has_error("start_date")
-                and not self.has_error("end_date")
-                and self.cleaned_data["start_date"] > self.cleaned_data["end_date"]
-            ):
-                self.add_error(
-                    "end_date",
-                    ValidationError(_("An event cannot end before its beginning.")),
-                )
-            if self.cleaned_data["type"] == "WEEKLY" and not self.cleaned_data["until"]:
-                self.add_error("until", ValidationError(_("This field is required.")))
-        return self.cleaned_data
-
-    def save(self, *args, **kwargs):
-        ret = super().save()
-        self.instance.dates.all().delete()
-        if self.instance.type == "EVENT" or self.instance.type == "CALL":
-            NewsDate(
-                start_date=self.cleaned_data["start_date"],
-                end_date=self.cleaned_data["end_date"],
-                news=self.instance,
-            ).save()
-        elif self.instance.type == "WEEKLY":
-            start_date = self.cleaned_data["start_date"]
-            end_date = self.cleaned_data["end_date"]
-            while start_date <= self.cleaned_data["until"]:
-                NewsDate(
-                    start_date=start_date, end_date=end_date, news=self.instance
-                ).save()
-                start_date += timedelta(days=7)
-                end_date += timedelta(days=7)
-        return ret
+    def get_initial(self):
+        init = super().get_initial()
+        # if the id of a club is provided, select it by default
+        if club_id := self.request.GET.get("club"):
+            init["club"] = Club.objects.filter(id=club_id).first()
+        return init
 
 
-class NewsEditView(CanEditMixin, UpdateView):
+class NewsUpdateView(PermissionOrAuthorRequiredMixin, UpdateView):
     model = News
     form_class = NewsForm
     template_name = "com/news_edit.jinja"
     pk_url_kwarg = "news_id"
-
-    def get_initial(self):
-        news_date: NewsDate = self.object.dates.order_by("id").first()
-        if news_date is None:
-            return {"start_date": None, "end_date": None}
-        return {"start_date": news_date.start_date, "end_date": news_date.end_date}
-
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid() and "preview" not in request.POST:
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+    permission_required = "com.edit_news"
 
     def form_valid(self, form):
-        self.object = form.save()
-        if form.cleaned_data["automoderation"] and self.request.user.is_com_admin:
-            self.object.moderator = self.request.user
-            self.object.is_moderated = True
-            self.object.save()
-        else:
-            self.object.is_moderated = False
-            self.object.save()
-            unread_notif_subquery = Notification.objects.filter(
-                user=OuterRef("pk"), type="NEWS_MODERATION", viewed=False
-            )
-            for user in User.objects.filter(
-                ~Exists(unread_notif_subquery),
-                groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID],
-            ):
-                Notification.objects.create(
-                    user=user,
-                    url=self.object.get_absolute_url(),
-                    type="NEWS_MODERATION",
-                )
-        return super().form_valid(form)
+        response = super().form_valid(form)  # Does the saving part
+        IcsCalendar.make_internal()
+        return response
+
+    def get_date_form_kwargs(self) -> dict[str, Any]:
+        """Get initial data for NewsDateForm"""
+        response = {}
+        if self.request.method == "POST":
+            response["data"] = self.request.POST
+        dates = list(self.object.dates.order_by("id"))
+        if len(dates) == 0:
+            return {}
+        response["instance"] = dates[0]
+        occurrences = NewsDateForm.get_occurrences(len(dates))
+        if occurrences is not None:
+            response["initial"] = {"is_weekly": True, "occurrences": occurrences}
+        return response
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {
+            "author": self.request.user,
+            "date_form": NewsDateForm(**self.get_date_form_kwargs()),
+        }
 
 
-class NewsCreateView(CanCreateMixin, CreateView):
-    model = News
-    form_class = NewsForm
-    template_name = "com/news_edit.jinja"
-
-    def get_initial(self):
-        init = {"author": self.request.user}
-        if "club" not in self.request.GET:
-            return init
-        init["club"] = Club.objects.filter(id=self.request.GET["club"]).first()
-        return init
-
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid() and "preview" not in request.POST:
-            return self.form_valid(form)
-        else:
-            self.object = form.instance
-            return self.form_invalid(form)
-
-    def form_valid(self, form):
-        self.object = form.save()
-        if form.cleaned_data["automoderation"] and self.request.user.is_com_admin:
-            self.object.moderator = self.request.user
-            self.object.is_moderated = True
-            self.object.save()
-        else:
-            unread_notif_subquery = Notification.objects.filter(
-                user=OuterRef("pk"), type="NEWS_MODERATION", viewed=False
-            )
-            for user in User.objects.filter(
-                ~Exists(unread_notif_subquery),
-                groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID],
-            ):
-                Notification.objects.create(
-                    user=user,
-                    url=reverse("com:news_admin_list"),
-                    type="NEWS_MODERATION",
-                )
-        return super().form_valid(form)
-
-
-class NewsDeleteView(CanEditMixin, DeleteView):
+class NewsDeleteView(PermissionOrAuthorRequiredMixin, DeleteView):
     model = News
     pk_url_kwarg = "news_id"
     template_name = "core/delete_confirm.jinja"
     success_url = reverse_lazy("com:news_admin_list")
+    permission_required = "com.delete_news"
 
 
-class NewsModerateView(CanEditMixin, SingleObjectMixin):
+class NewsModerateView(PermissionRequiredMixin, DetailView):
     model = News
     pk_url_kwarg = "news_id"
+    permission_required = "com.moderate_news"
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -359,16 +225,22 @@ class NewsModerateView(CanEditMixin, SingleObjectMixin):
         return redirect("com:news_admin_list")
 
 
-class NewsAdminListView(CanEditMixin, ListView):
+class NewsAdminListView(PermissionRequiredMixin, ListView):
     model = News
     template_name = "com/news_admin_list.jinja"
-    queryset = News.objects.all()
+    queryset = News.objects.select_related(
+        "club", "author", "moderator"
+    ).prefetch_related("dates")
+    permission_required = ["com.moderate_news", "com.delete_news"]
 
 
-class NewsListView(CanViewMixin, ListView):
+class NewsListView(ListView):
     model = News
     template_name = "com/news_list.jinja"
     queryset = News.objects.filter(is_moderated=True)
+
+    def get_queryset(self):
+        return super().get_queryset().viewable_by(self.request.user)
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
@@ -390,6 +262,10 @@ class NewsDetailView(CanViewMixin, DetailView):
     model = News
     template_name = "com/news_detail.jinja"
     pk_url_kwarg = "news_id"
+    queryset = News.objects.select_related("club", "author", "moderator")
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"date": self.object.dates.first()}
 
 
 # Weekmail

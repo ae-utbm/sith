@@ -157,7 +157,9 @@ il est automatiquement ajouté au groupe des membres
 du club.
 Lorsqu'il quitte le club, il est retiré du groupe.
 
-## Les principaux groupes utilisés
+## Les groupes utilisés
+
+### Groupes principaux
 
 Les groupes les plus notables gérables par les administrateurs du site sont :
 
@@ -168,15 +170,61 @@ Les groupes les plus notables gérables par les administrateurs du site sont :
 - `SAS admin` : les administrateurs du SAS
 - `Forum admin` : les administrateurs du forum
 - `Pedagogy admin` : les administrateurs de la pédagogie (guide des UVs)
-- `Banned from buying alcohol` : les utilisateurs interdits de vente d'alcool (non mineurs)
-- `Banned from counters` : les utilisateurs interdits d'utilisation des comptoirs
-- `Banned to subscribe` : les utilisateurs interdits de cotisation
-
 
 En plus de ces groupes, on peut noter :
 
-- `Public` : tous les utilisateurs du site
-- `Subscribers` : tous les cotisants du site
-- `Old subscribers` : tous les anciens cotisants
+- `Public` : tous les utilisateurs du site.
+  Un utilisateur est automatiquement ajouté à ce group
+  lors de la création de son compte.
+- `Subscribers` : tous les cotisants du site.
+  Les utilisateurs ne sont pas réellement ajoutés ce groupe ;
+  cependant, les utilisateurs cotisants sont implicitement
+  considérés comme membres du groupe lors de l'appel
+  à la méthode `User.has_perm`.
+- `Old subscribers` : tous les anciens cotisants.
+  Un utilisateur est automatiquement ajouté à ce groupe 
+  lors de sa première cotisation
 
+!!!note "Utilisation du groupe Public"
 
+    Le groupe Public est un groupe particulier.
+    Tout le monde faisant partie de ce groupe
+    (même les utilisateurs non-connectés en sont implicitement 
+    considérés comme membres),
+    il ne doit pas être utilisé pour résoudre les
+    permissions d'une vue.
+
+    En revanche, il est utile pour attribuer une ressource
+    à tout le monde.
+    Par exemple, un produit avec le groupe de vente Public
+    est considéré comme achetable par tous utilisateurs.
+    S'il n'avait eu aucun group de vente, il n'aurait
+    été accessible à personne.
+
+### Groupes de club
+
+Chaque club est associé à deux groupes :
+le groupe des membres et le groupe du bureau.
+
+Lorsqu'un utilisateur rejoint un club, il est automatiquement
+ajouté au groupe des membres.
+S'il rejoint le club en tant que membre du bureau,
+il est également ajouté au groupe du bureau.
+
+Lorsqu'un utilisateur quitte le club, il est automatiquement
+retiré des groupes liés au club.
+S'il quitte le bureau, mais reste dans le club, 
+il est retiré du groupe du bureau, mais reste dans le groupe des membres.
+
+### Groupes de ban
+
+Les groupes de ban sont une catégorie de groupes à part,
+qui ne sont pas stockés dans la même table 
+et qui ne sont pas gérés sur la même interface
+que les autres groupes.
+
+Les groupes de ban existants sont les suivants :
+
+- `Banned from buying alcohol` : les utilisateurs interdits de vente d'alcool (non mineurs)
+- `Banned from counters` : les utilisateurs interdits d'utilisation des comptoirs
+- `Banned to subscribe` : les utilisateurs interdits de cotisation

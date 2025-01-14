@@ -327,12 +327,9 @@ http://git.an
 class TestUserTools:
     def test_anonymous_user_unauthorized(self, client):
         """An anonymous user shouldn't have access to the tools page."""
-        response = client.get(reverse("core:user_tools"))
-        assertRedirects(
-            response,
-            expected_url="/login?next=%2Fuser%2Ftools%2F",
-            target_status_code=301,
-        )
+        url = reverse("core:user_tools")
+        response = client.get(url)
+        assertRedirects(response, expected_url=reverse("core:login") + f"?next={url}")
 
     @pytest.mark.parametrize("username", ["guy", "root", "skia", "comunity"])
     def test_page_is_working(self, client, username):

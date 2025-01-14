@@ -12,6 +12,9 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from datetime import timedelta
+from unittest.mock import patch
+
 import pytest
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -20,9 +23,12 @@ from django.urls import reverse
 from django.utils import html
 from django.utils.timezone import localtime, now
 from django.utils.translation import gettext as _
+from model_bakery import baker
+from pytest_django.asserts import assertRedirects
 
 from club.models import Club, Membership
-from com.models import News, Poster, Sith, Weekmail, WeekmailArticle
+from com.models import News, NewsDate, Poster, Sith, Weekmail, WeekmailArticle
+from core.baker_recipes import subscriber_user
 from core.models import AnonymousUser, Group, User
 
 
@@ -137,15 +143,8 @@ class TestNews(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.com_admin = User.objects.get(username="comunity")
-        new = News.objects.create(
-            title="dummy new",
-            summary="This is a dummy new",
-            content="Look at that beautiful dummy new",
-            author=User.objects.get(username="subscriber"),
-            club=Club.objects.first(),
-        )
-        cls.new = new
-        cls.author = new.author
+        cls.new = baker.make(News)
+        cls.author = cls.new.author
         cls.sli = User.objects.get(username="sli")
         cls.anonymous = AnonymousUser()
 
@@ -160,13 +159,13 @@ class TestNews(TestCase):
 
     def test_news_viewer(self):
         """Test that moderated news can be viewed by anyone
-        and not moderated news only by com admins.
+        and not moderated news only by com admins and by their author.
         """
-        # by default a news isn't moderated
+        # by default news aren't moderated
         assert self.new.can_be_viewed_by(self.com_admin)
+        assert self.new.can_be_viewed_by(self.author)
         assert not self.new.can_be_viewed_by(self.sli)
         assert not self.new.can_be_viewed_by(self.anonymous)
-        assert not self.new.can_be_viewed_by(self.author)
 
         self.new.is_moderated = True
         self.new.save()
@@ -176,11 +175,11 @@ class TestNews(TestCase):
         assert self.new.can_be_viewed_by(self.author)
 
     def test_news_editor(self):
-        """Test that only com admins can edit news."""
+        """Test that only com admins and the original author can edit news."""
         assert self.new.can_be_edited_by(self.com_admin)
+        assert self.new.can_be_edited_by(self.author)
         assert not self.new.can_be_edited_by(self.sli)
         assert not self.new.can_be_edited_by(self.anonymous)
-        assert not self.new.can_be_edited_by(self.author)
 
 
 class TestWeekmailArticle(TestCase):
@@ -230,3 +229,93 @@ class TestPoster(TestCase):
 
         assert not self.poster.is_owned_by(self.susbcriber)
         assert self.poster.is_owned_by(self.sli)
+
+
+class TestNewsCreation(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.club = baker.make(Club)
+        cls.user = subscriber_user.make()
+        baker.make(Membership, user=cls.user, club=cls.club, role=5)
+
+    def setUp(self):
+        self.client.force_login(self.user)
+        self.start = now() + timedelta(days=1)
+        self.end = self.start + timedelta(hours=5)
+        self.valid_payload = {
+            "title": "Test news",
+            "summary": "This is a test news",
+            "content": "This is a test news",
+            "club": self.club.pk,
+            "is_weekly": False,
+            "start_date": self.start,
+            "end_date": self.end,
+        }
+
+    def test_create_news(self):
+        response = self.client.post(reverse("com:news_new"), self.valid_payload)
+        created = News.objects.order_by("id").last()
+        assertRedirects(response, created.get_absolute_url())
+        assert created.title == "Test news"
+        assert not created.is_moderated
+        dates = list(created.dates.values("start_date", "end_date"))
+        assert dates == [{"start_date": self.start, "end_date": self.end}]
+
+    def test_create_news_multiple_dates(self):
+        self.valid_payload["is_weekly"] = True
+        self.valid_payload["occurrences"] = 2
+        response = self.client.post(reverse("com:news_new"), self.valid_payload)
+        created = News.objects.order_by("id").last()
+
+        assertRedirects(response, created.get_absolute_url())
+        dates = list(
+            created.dates.values("start_date", "end_date").order_by("start_date")
+        )
+        assert dates == [
+            {"start_date": self.start, "end_date": self.end},
+            {
+                "start_date": self.start + timedelta(days=7),
+                "end_date": self.end + timedelta(days=7),
+            },
+        ]
+
+    def test_edit_news(self):
+        news = baker.make(News, author=self.user, is_moderated=True)
+        baker.make(
+            NewsDate,
+            news=news,
+            start_date=self.start + timedelta(hours=1),
+            end_date=self.end + timedelta(hours=1),
+            _quantity=2,
+        )
+
+        response = self.client.post(
+            reverse("com:news_edit", kwargs={"news_id": news.id}), self.valid_payload
+        )
+        created = News.objects.order_by("id").last()
+        assertRedirects(response, created.get_absolute_url())
+        assert created.title == "Test news"
+        assert not created.is_moderated
+        dates = list(created.dates.values("start_date", "end_date"))
+        assert dates == [{"start_date": self.start, "end_date": self.end}]
+
+    def test_ics_updated(self):
+        """Test that the internal ICS is updated when news are created"""
+
+        # we will just test that the ICS is modified.
+        # Checking that the ICS is *well* modified is up to the ICS tests
+        with patch("com.calendar.IcsCalendar.make_internal") as mocked:
+            self.client.post(reverse("com:news_new"), self.valid_payload)
+            mocked.assert_called()
+
+        # The ICS file should also change after an update
+        self.valid_payload["is_weekly"] = True
+        self.valid_payload["occurrences"] = 2
+        last_news = News.objects.order_by("id").last()
+
+        with patch("com.calendar.IcsCalendar.make_internal") as mocked:
+            self.client.post(
+                reverse("com:news_edit", kwargs={"news_id": last_news.id}),
+                self.valid_payload,
+            )
+            mocked.assert_called()

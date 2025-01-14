@@ -29,6 +29,7 @@ import os
 import string
 import unicodedata
 from datetime import timedelta
+from io import BytesIO
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional, Self
 
@@ -50,6 +51,7 @@ from django.utils.html import escape
 from django.utils.timezone import localdate, now
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
+from PIL import Image
 
 if TYPE_CHECKING:
     from pydantic import NonNegativeInt
@@ -320,12 +322,16 @@ class User(AbstractUser):
         return self.get_display_name()
 
     def save(self, *args, **kwargs):
+        adding = self._state.adding
         with transaction.atomic():
-            if self.id:
+            if not adding:
                 old = User.objects.filter(id=self.id).first()
                 if old and old.username != self.username:
                     self._change_username(self.username)
             super().save(*args, **kwargs)
+            if adding:
+                # All users are in the public group.
+                self.groups.add(settings.SITH_GROUP_PUBLIC_ID)
 
     def get_absolute_url(self) -> str:
         return reverse("core:user_profile", kwargs={"user_id": self.pk})
@@ -380,12 +386,8 @@ class User(AbstractUser):
             raise ValueError("You must either provide the id or the name of the group")
         if group is None:
             return False
-        if group.id == settings.SITH_GROUP_PUBLIC_ID:
-            return True
         if group.id == settings.SITH_GROUP_SUBSCRIBERS_ID:
             return self.is_subscribed
-        if group.id == settings.SITH_GROUP_OLD_SUBSCRIBERS_ID:
-            return self.was_subscribed
         if group.id == settings.SITH_GROUP_ROOT_ID:
             return self.is_root
         return group in self.cached_groups
@@ -988,17 +990,11 @@ class SithFile(models.Model):
         if self.is_folder:
             if self.file:
                 try:
-                    import imghdr
-
-                    if imghdr.what(None, self.file.read()) not in [
-                        "gif",
-                        "png",
-                        "jpeg",
-                    ]:
-                        self.file.delete()
-                        self.file = None
-                except:  # noqa E722 I don't know the exception that can be raised
-                    self.file = None
+                    Image.open(BytesIO(self.file.read()))
+                except Image.UnidentifiedImageError as e:
+                    raise ValidationError(
+                        _("This is not a valid folder thumbnail")
+                    ) from e
             self.mime_type = "inode/directory"
         if self.is_file and (self.file is None or self.file == ""):
             raise ValidationError(_("You must provide a file"))

@@ -31,9 +31,9 @@ from django.views.generic import FormView
 from django.views.generic.detail import SingleObjectMixin
 from ninja.main import HttpRequest
 
+from core.auth.mixins import CanViewMixin
 from core.models import User
 from core.utils import FormFragmentTemplateData
-from core.views import CanViewMixin
 from counter.forms import RefillForm
 from counter.models import Counter, Customer, Product, Selling
 from counter.utils import is_logged_in_counter
@@ -194,7 +194,11 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
         with transaction.atomic():
             self.request.session["last_basket"] = []
 
-            for form in formset:
+            # We sort items from cheap to expensive
+            # This is important because some items have a negative price
+            # Negative priced items gives money to the customer and should
+            # be processed first so that we don't throw a not enough money error
+            for form in sorted(formset, key=lambda form: form.product.price):
                 self.request.session["last_basket"].append(
                     f"{form.cleaned_data['quantity']} x {form.product.name}"
                 )

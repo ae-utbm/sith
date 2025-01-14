@@ -460,6 +460,7 @@ Welcome to the wiki page!
             limit_age=18,
         )
         cons = Product.objects.create(
+            id=settings.SITH_ECOCUP_CONS,
             name="Consigne Eco-cup",
             code="CONS",
             product_type=verre,
@@ -469,6 +470,7 @@ Welcome to the wiki page!
             club=main_club,
         )
         dcons = Product.objects.create(
+            id=settings.SITH_ECOCUP_DECO,
             name="Déconsigne Eco-cup",
             code="DECO",
             product_type=verre,
@@ -676,7 +678,6 @@ Welcome to the wiki page!
             title="Apero barman",
             summary="Viens boire un coup avec les barmans",
             content="Glou glou glou glou glou glou glou",
-            type="EVENT",
             club=bar_club,
             author=subscriber,
             is_moderated=True,
@@ -696,7 +697,6 @@ Welcome to the wiki page!
                 "Viens donc t'enjailler avec les autres barmans aux "
                 "frais du BdF! \\o/"
             ),
-            type="EVENT",
             club=bar_club,
             author=subscriber,
             is_moderated=True,
@@ -713,7 +713,6 @@ Welcome to the wiki page!
             title="Repas fromager",
             summary="Wien manger du l'bon fromeug'",
             content="Fô viendre mangey d'la bonne fondue!",
-            type="EVENT",
             club=bar_club,
             author=subscriber,
             is_moderated=True,
@@ -730,7 +729,6 @@ Welcome to the wiki page!
             title="SdF",
             summary="Enjoy la fin des finaux!",
             content="Viens faire la fête avec tout plein de gens!",
-            type="EVENT",
             club=bar_club,
             author=subscriber,
             is_moderated=True,
@@ -749,7 +747,6 @@ Welcome to the wiki page!
             summary="Viens jouer!",
             content="Rejoins la fine équipe du Troll Penché et viens "
             "t'amuser le Vendredi soir!",
-            type="WEEKLY",
             club=troll,
             author=subscriber,
             is_moderated=True,
@@ -897,6 +894,9 @@ Welcome to the wiki page!
         public_group = Group.objects.create(name="Public")
 
         subscribers = Group.objects.create(name="Subscribers")
+        subscribers.permissions.add(
+            *list(perms.filter(codename__in=["add_news", "add_uvcommentreport"]))
+        )
         old_subscribers = Group.objects.create(name="Old subscribers")
         old_subscribers.permissions.add(
             *list(

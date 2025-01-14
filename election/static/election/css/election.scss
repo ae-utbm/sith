@@ -26,7 +26,7 @@ $min_col_width: 100px;
 }
 
 #page #content {
-  overflow-x: clip;
+  overflow-x: scroll;
 }
 
 .election_table {
@@ -106,11 +106,17 @@ $min_col_width: 100px;
             margin: 0;
           }
 
-          >p {
+          .role_description {
             flex-grow: 1;
             margin-top: .5em;
             text-wrap: auto;
             text-align: left;
+
+            // Show more/less element
+            a {
+              text-align: center;
+              display: block;
+            }
           }
         }
 

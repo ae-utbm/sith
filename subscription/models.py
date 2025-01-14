@@ -76,8 +76,11 @@ class Subscription(models.Model):
         super().save()
         from counter.models import Customer
 
-        _, created = Customer.get_or_create(self.member)
-        if created:
+        _, account_created = Customer.get_or_create(self.member)
+        if account_created:
+            # Someone who subscribed once will be considered forever
+            # as an old subscriber.
+            self.member.groups.add(settings.SITH_GROUP_OLD_SUBSCRIBERS_ID)
             form = PasswordResetForm({"email": self.member.email})
             if form.is_valid():
                 form.save(

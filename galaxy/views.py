@@ -27,12 +27,9 @@ from django.http import Http404, JsonResponse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, View
 
+from core.auth.mixins import CanViewMixin, FormerSubscriberMixin
 from core.models import User
-from core.views import (
-    CanViewMixin,
-    FormerSubscriberMixin,
-    UserTabsMixin,
-)
+from core.views import UserTabsMixin
 from galaxy.models import Galaxy, GalaxyLane
 
 

@@ -152,15 +152,15 @@ TEMPLATES = [
                 "phonenumber": "core.templatetags.renderer.phonenumber",
                 "truncate_time": "core.templatetags.renderer.truncate_time",
                 "format_timedelta": "core.templatetags.renderer.format_timedelta",
+                "add_attr": "core.templatetags.renderer.add_attr",
             },
             "globals": {
-                "can_edit_prop": "core.views.can_edit_prop",
-                "can_edit": "core.views.can_edit",
-                "can_view": "core.views.can_view",
+                "can_edit_prop": "core.auth.mixins.can_edit_prop",
+                "can_edit": "core.auth.mixins.can_edit",
+                "can_view": "core.auth.mixins.can_view",
                 "settings": "sith.settings",
                 "Launderette": "launderette.models.Launderette",
                 "Counter": "counter.models.Counter",
-                "ProductType": "counter.models.ProductType",
                 "timezone": "django.utils.timezone",
                 "get_sith": "com.views.sith",
                 "get_language": "django.utils.translation.get_language",
@@ -291,9 +291,9 @@ STORAGES = {
 # Auth configuration
 AUTH_USER_MODEL = "core.User"
 AUTH_ANONYMOUS_MODEL = "core.models.AnonymousUser"
-AUTHENTICATION_BACKENDS = ["core.auth_backends.SithModelBackend"]
-LOGIN_URL = "/login"
-LOGOUT_URL = "/logout"
+AUTHENTICATION_BACKENDS = ["core.auth.backends.SithModelBackend"]
+LOGIN_URL = "/login/"
+LOGOUT_URL = "/logout/"
 LOGIN_REDIRECT_URL = "/"
 DEFAULT_FROM_EMAIL = "bibou@git.an"
 SITH_COM_EMAIL = "bibou_com@git.an"

@@ -21,8 +21,8 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.generic.edit import DeleteView, FormView
 
+from core.auth.mixins import can_edit
 from core.utils import FormFragmentTemplateData
-from core.views import can_edit
 from counter.forms import StudentCardForm
 from counter.models import Customer, StudentCard
 from counter.utils import is_logged_in_counter

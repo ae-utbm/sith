@@ -7,7 +7,7 @@ from ninja_extra.schemas import PaginatedResponseSchema
 
 from accounting.models import ClubAccount, Company
 from accounting.schemas import ClubAccountSchema, CompanySchema
-from core.api_permissions import CanAccessLookup
+from core.auth.api_permissions import CanAccessLookup
 
 
 @api_controller("/lookup", permissions=[CanAccessLookup])

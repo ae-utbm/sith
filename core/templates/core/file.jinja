@@ -57,13 +57,4 @@
     {% endblock %}
   {% endif %}
 
-  {% block script %}
-    {{ super() }}
-    {% if popup %}
-      <script>
-        parent.$(".choose_file_widget").css("height", "75%");
-      </script>
-    {% endif %}
-  {% endblock %}
-
 {% endblock %}

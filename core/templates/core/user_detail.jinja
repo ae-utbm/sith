@@ -244,27 +244,30 @@
 {% block script %}
   {{ super() }}
   <script>
-    $(function () {
-      var keys = [];
-      var pattern = "71,85,89,71,85,89";
-      $(document).keydown(function (e) {
-        keys.push(e.keyCode);
-        if (keys.toString() == pattern) {
-          keys = [];
-          $("#big_picture img").attr("src", "{{ static('core/img/yug.jpg') }}");
-        }
-        if (keys.length == 6) {
-          keys.shift();
-        }
-      });
-    });
-    $(function () {
-      $("#small_pictures img").click(function () {
-        $("#big_picture img").attr("src", $(this)[0].src);
-        $("#big_picture img").attr("alt", $(this)[0].alt);
-        $("#big_picture img").attr("title", $(this)[0].title);
+    // Image selection
+    for (const img of document.querySelectorAll("#small_pictures img")){
+      img.addEventListener("click", (e) => {
+        const displayed = document.querySelector("#big_picture img");
+        displayed.src = e.target.src;
+        displayed.alt = e.target.alt;
+        displayed.title = e.target.title;
       })
+    }
+
+    let keys = [];
+    const pattern = "71,85,89,71,85,89";
+
+    document.addEventListener("keydown", (e) => {
+      keys.push(e.keyCode);
+      if (keys.toString() === pattern) {
+        keys = [];
+        document.querySelector("#big_picture img").src = "{{ static('core/img/yug.jpg') }}";
+      }
+      if (keys.length === 6) {
+        keys.shift();
+      }
     });
+
     $(function () {
       $("#drop_gifts").accordion({
         heightStyle: "content",

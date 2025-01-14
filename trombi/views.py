@@ -38,16 +38,15 @@ from django.views.generic import DetailView, RedirectView, TemplateView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from club.models import Club
-from core.models import User
-from core.views import (
+from core.auth.mixins import (
     CanCreateMixin,
     CanEditMixin,
     CanEditPropMixin,
     CanViewMixin,
-    QuickNotifMixin,
-    TabedViewMixin,
 )
+from core.models import User
 from core.views.forms import SelectDate
+from core.views.mixins import QuickNotifMixin, TabedViewMixin
 from core.views.widgets.select import AutoCompleteSelectUser
 from trombi.models import Trombi, TrombiClubMembership, TrombiComment, TrombiUser
 

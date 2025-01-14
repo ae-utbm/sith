@@ -30,7 +30,7 @@
           {% if m.can_be_edited_by(user) %}
             <td><a href="{{ url('club:membership_set_old', membership_id=m.id) }}">{% trans %}Mark as old{% endtrans %}</a></td>
           {% endif %}
-          {% if user.is_root %}
+          {% if user.has_perm("club.delete_membership") %}
             <td><a href="{{ url('club:membership_delete', membership_id=m.id) }}">{% trans %}Delete{% endtrans %}</a></td>
           {% endif %}
         </tr>
@@ -59,7 +59,7 @@
           <td>{{ m.description }}</td>
           <td>{{ m.start_date }}</td>
           <td>{{ m.end_date }}</td>
-          {% if user.is_root %}
+          {% if user.has_perm("club.delete_membership") %}
             <td><a href="{{ url('club:membership_delete', membership_id=m.id) }}">{% trans %}Delete{% endtrans %}</a></td>
           {% endif %}
         </tr>

@@ -3,7 +3,8 @@
 Some permissions are global (like `IsInGroup` or `IsRoot`),
 and some others are per-object (like `CanView` or `CanEdit`).
 
-Examples:
+Example:
+    ```python
     # restrict all the routes of this controller
     # to subscribed users
     @api_controller("/foo", permissions=[IsSubscriber])
@@ -33,6 +34,7 @@ Examples:
         ]
         def bar_delete(self, bar_id: int):
             # ...
+    ```
 """
 
 from typing import Any

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-05 16:39+0100\n"
+"POT-Creation-Date: 2025-01-10 14:52+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -841,7 +841,7 @@ msgstr "vous devez spécifier au moins un utilisateur ou une adresse email"
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/forms.py com/views.py counter/forms.py election/views.py
+#: club/forms.py com/forms.py counter/forms.py election/views.py
 #: subscription/forms.py
 msgid "End date"
 msgstr "Date de fin"
@@ -934,6 +934,10 @@ msgstr "rôle"
 #: forum/models.py
 msgid "description"
 msgstr "description"
+
+#: club/models.py
+msgid "past member"
+msgstr "ancien membre"
 
 #: club/models.py
 msgid "Email address"
@@ -1255,6 +1259,46 @@ msgstr "Liste d'affiches"
 msgid "Props"
 msgstr "Propriétés"
 
+#: com/forms.py
+msgid "Format: 16:9 | Resolution: 1920x1080"
+msgstr "Format : 16:9 | Résolution : 1920x1080"
+
+#: com/forms.py election/views.py subscription/forms.py
+msgid "Start date"
+msgstr "Date de début"
+
+#: com/forms.py
+msgid "Weekly event"
+msgstr "Événement Hebdomadaire"
+
+#: com/forms.py
+msgid "Weekly events will occur each week for a specified timespan."
+msgstr ""
+"Les événements hebdomadaires se répéteront chaque semaine pendant une durée "
+"déterminée"
+
+#: com/forms.py
+#, python-format
+msgid "%d times"
+msgstr "%d fois"
+
+#: com/forms.py
+msgid "Until the end of the semester"
+msgstr "Jusqu'à la fin du semestre"
+
+#: com/forms.py
+msgid "Occurrences"
+msgstr "Occurences"
+
+#: com/forms.py
+msgid "How much times should the event occur (including the first one)"
+msgstr ""
+"Combien de fois l'événement doit-il se répéter (en incluant la première fois)"
+
+#: com/forms.py
+msgid "Automoderation"
+msgstr "Automodération"
+
 #: com/models.py
 msgid "alert message"
 msgstr "message d'alerte"
@@ -1266,22 +1310,6 @@ msgstr "message d'info"
 #: com/models.py
 msgid "weekmail destinations"
 msgstr "destinataires du weekmail"
-
-#: com/models.py
-msgid "Notice"
-msgstr "Information"
-
-#: com/models.py
-msgid "Event"
-msgstr "Événement"
-
-#: com/models.py
-msgid "Weekly"
-msgstr "Hebdomadaire"
-
-#: com/models.py
-msgid "Call"
-msgstr "Appel"
 
 #: com/models.py core/templates/core/macros.jinja election/models.py
 #: forum/models.py pedagogy/models.py
@@ -1308,10 +1336,6 @@ msgstr "contenu"
 msgid "A more detailed and exhaustive description of the event."
 msgstr "Une description plus détaillée et exhaustive de l'évènement."
 
-#: com/models.py core/models.py launderette/models.py
-msgid "type"
-msgstr "type"
-
 #: com/models.py
 msgid "The club which organizes the event."
 msgstr "Le club qui organise l'évènement."
@@ -1319,6 +1343,10 @@ msgstr "Le club qui organise l'évènement."
 #: com/models.py pedagogy/models.py trombi/models.py
 msgid "author"
 msgstr "auteur"
+
+#: com/models.py
+msgid "news"
+msgstr "nouvelle"
 
 #: com/models.py
 msgid "news_date"
@@ -1331,6 +1359,14 @@ msgstr "date de début"
 #: com/models.py
 msgid "end_date"
 msgstr "date de fin"
+
+#: com/models.py
+msgid "news date"
+msgstr "date de la nouvelle"
+
+#: com/models.py
+msgid "news dates"
+msgstr "dates de la nouvelle"
 
 #: com/models.py
 msgid "intro"
@@ -1416,23 +1452,17 @@ msgid "News"
 msgstr "Nouvelles"
 
 #: com/templates/com/news_admin_list.jinja com/templates/com/news_edit.jinja
-#: core/templates/core/user_tools.jinja
+#: com/templates/com/news_list.jinja core/templates/core/user_tools.jinja
 msgid "Create news"
-msgstr "Créer nouvelle"
+msgstr "Créer une nouvelle"
 
 #: com/templates/com/news_admin_list.jinja
-msgid "Notices"
-msgstr "Information"
+msgid "Weeklies"
+msgstr "Événements hebdomadaires"
 
 #: com/templates/com/news_admin_list.jinja
-msgid "Displayed notices"
-msgstr "Informations affichées"
-
-#: com/templates/com/news_admin_list.jinja
-#: launderette/templates/launderette/launderette_admin.jinja
-#: launderette/views.py
-msgid "Type"
-msgstr "Type"
+msgid "Displayed weeklies"
+msgstr "Événements hebdomadaires affichées"
 
 #: com/templates/com/news_admin_list.jinja com/templates/com/weekmail.jinja
 #: forum/templates/forum/forum.jinja forum/templates/forum/main.jinja
@@ -1454,18 +1484,6 @@ msgid "Moderator"
 msgstr "Modérateur"
 
 #: com/templates/com/news_admin_list.jinja
-msgid "Notices to moderate"
-msgstr "Informations à modérer"
-
-#: com/templates/com/news_admin_list.jinja
-msgid "Weeklies"
-msgstr "Nouvelles hebdomadaires"
-
-#: com/templates/com/news_admin_list.jinja
-msgid "Displayed weeklies"
-msgstr "Nouvelles hebdomadaires affichées"
-
-#: com/templates/com/news_admin_list.jinja
 #: trombi/templates/trombi/edit_profile.jinja
 msgid "Dates"
 msgstr "Dates"
@@ -1473,18 +1491,6 @@ msgstr "Dates"
 #: com/templates/com/news_admin_list.jinja
 msgid "Weeklies to moderate"
 msgstr "Nouvelles hebdomadaires à modérer"
-
-#: com/templates/com/news_admin_list.jinja
-msgid "Calls"
-msgstr "Appels"
-
-#: com/templates/com/news_admin_list.jinja
-msgid "Displayed calls"
-msgstr "Appels affichés"
-
-#: com/templates/com/news_admin_list.jinja
-msgid "Calls to moderate"
-msgstr "Appels à modérer"
 
 #: com/templates/com/news_admin_list.jinja
 #: core/templates/core/base/navbar.jinja
@@ -1503,7 +1509,7 @@ msgstr "Événements à modérer"
 msgid "Back to news"
 msgstr "Retour aux nouvelles"
 
-#: com/templates/com/news_detail.jinja com/templates/com/news_edit.jinja
+#: com/templates/com/news_detail.jinja
 msgid "Author: "
 msgstr "Auteur : "
 
@@ -1519,40 +1525,13 @@ msgstr "Éditer (sera soumise de nouveau à la modération)"
 msgid "Edit news"
 msgstr "Éditer la nouvelle"
 
-#: com/templates/com/news_edit.jinja
-msgid "Notice: Information, election result - no date"
-msgstr "Information, résultat d'élection - sans date"
-
-#: com/templates/com/news_edit.jinja
-msgid "Event: punctual event, associated with one date"
-msgstr "Événement : événement ponctuel associé à une date"
-
-#: com/templates/com/news_edit.jinja
-msgid ""
-"Weekly: recurrent event, associated with many dates (specify the first one, "
-"and a deadline)"
-msgstr ""
-"Hebdomadaire : événement récurrent, associé à plusieurs dates (spécifier la "
-"première, ainsi que la date de fin)"
-
-#: com/templates/com/news_edit.jinja
-msgid ""
-"Call: long time event, associated with a long date (like election appliance)"
-msgstr ""
-"Appel : événement de longue durée, associé à une longue date (comme des "
-"candidatures à une élection)"
-
-#: com/templates/com/news_edit.jinja com/templates/com/weekmail.jinja
-msgid "Preview"
-msgstr "Prévisualiser"
+#: com/templates/com/news_list.jinja
+msgid "Events today and the next few days"
+msgstr "Événements aujourd'hui et dans les prochains jours"
 
 #: com/templates/com/news_list.jinja
 msgid "Administrate news"
 msgstr "Administrer les news"
-
-#: com/templates/com/news_list.jinja
-msgid "Events today and the next few days"
-msgstr "Événements aujourd'hui et dans les prochains jours"
 
 #: com/templates/com/news_list.jinja
 msgid "Nothing to come..."
@@ -1675,6 +1654,10 @@ msgstr "Diaporama"
 msgid "Weekmail"
 msgstr "Weekmail"
 
+#: com/templates/com/weekmail.jinja
+msgid "Preview"
+msgstr "Prévisualiser"
+
 #: com/templates/com/weekmail.jinja com/templates/com/weekmail_preview.jinja
 msgid "Send"
 msgstr "Envoyer"
@@ -1765,14 +1748,6 @@ msgid "Final word"
 msgstr "Le mot de la fin"
 
 #: com/views.py
-msgid "Format: 16:9 | Resolution: 1920x1080"
-msgstr "Format : 16:9 | Résolution : 1920x1080"
-
-#: com/views.py election/views.py subscription/forms.py
-msgid "Start date"
-msgstr "Date de début"
-
-#: com/views.py
 msgid "Communication administration"
 msgstr "Administration de la communication"
 
@@ -1791,22 +1766,6 @@ msgstr "Message d'alerte"
 #: com/views.py
 msgid "Screens list"
 msgstr "Liste d'écrans"
-
-#: com/views.py rootplace/templates/rootplace/userban.jinja
-msgid "Until"
-msgstr "Jusqu'à"
-
-#: com/views.py
-msgid "Automoderation"
-msgstr "Automodération"
-
-#: com/views.py
-msgid "This field is required."
-msgstr "Ce champ est obligatoire."
-
-#: com/views.py
-msgid "An event cannot end before its beginning."
-msgstr "Un évènement ne peut pas se finir avant d'avoir commencé."
 
 #: com/views.py
 msgid "Delete and save to regenerate"
@@ -2062,16 +2021,12 @@ msgid "reason"
 msgstr "raison"
 
 #: core/models.py
-#, fuzzy
-#| msgid "user"
 msgid "user ban"
-msgstr "utilisateur"
+msgstr "utilisateur banni"
 
 #: core/models.py
-#, fuzzy
-#| msgid "user"
 msgid "user bans"
-msgstr "utilisateur"
+msgstr "utilisateurs bannis"
 
 #: core/models.py
 msgid "receive the Weekmail"
@@ -2156,6 +2111,10 @@ msgid "Duplicate file"
 msgstr "Un fichier de ce nom existe déjà"
 
 #: core/models.py
+msgid "This is not a valid folder thumbnail"
+msgstr "Ceci n'est pas une miniature de dossier valide"
+
+#: core/models.py
 msgid "You must provide a file"
 msgstr "Vous devez fournir un fichier"
 
@@ -2214,6 +2173,10 @@ msgstr "url"
 #: core/models.py
 msgid "param"
 msgstr "param"
+
+#: core/models.py launderette/models.py
+msgid "type"
+msgstr "type"
 
 #: core/models.py
 msgid "viewed"
@@ -3328,8 +3291,8 @@ msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
 #: core/views/forms.py
 msgid ""
-"Profile: you need to be visible on the picture, in order to be recognized (e."
-"g. by the barmen)"
+"Profile: you need to be visible on the picture, in order to be recognized "
+"(e.g. by the barmen)"
 msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
@@ -3935,8 +3898,8 @@ msgstr ""
 #: counter/templates/counter/mails/account_dump.jinja
 msgid "If you think this was a mistake, please mail us at ae@utbm.fr."
 msgstr ""
-"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à ae@utbm."
-"fr."
+"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à "
+"ae@utbm.fr."
 
 #: counter/templates/counter/mails/account_dump.jinja
 msgid ""
@@ -4456,14 +4419,6 @@ msgstr "Ajouter un nouveau rôle"
 msgid "Submit the vote !"
 msgstr "Envoyer le vote !"
 
-#: election/templates/election/election_detail.jinja
-msgid "Show more"
-msgstr "Montrer plus"
-
-#: election/templates/election/election_detail.jinja
-msgid "Show less"
-msgstr "Montrer moins"
-
 #: election/templates/election/election_list.jinja
 msgid "Election list"
 msgstr "Liste des élections"
@@ -4741,6 +4696,11 @@ msgstr "Machines"
 #: launderette/templates/launderette/launderette_admin.jinja
 msgid "New machine"
 msgstr "Nouvelle machine"
+
+#: launderette/templates/launderette/launderette_admin.jinja
+#: launderette/views.py
+msgid "Type"
+msgstr "Type"
 
 #: launderette/templates/launderette/launderette_book.jinja
 msgid "Choose"
@@ -5141,6 +5101,10 @@ msgstr "Fusion"
 #: rootplace/templates/rootplace/userban.jinja
 msgid "Ban a user"
 msgstr "Bannir un utilisateur"
+
+#: rootplace/templates/rootplace/userban.jinja
+msgid "Until"
+msgstr "Jusqu'à"
 
 #: rootplace/templates/rootplace/userban.jinja
 msgid "not specified"
