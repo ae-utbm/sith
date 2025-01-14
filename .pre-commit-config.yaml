@@ -12,7 +12,7 @@ repos:
     rev: "v0.1.0"  # Use the sha / tag you want to point at
     hooks:
       - id: biome-check
-        additional_dependencies: ["@biomejs/biome@1.9.3"]
+        additional_dependencies: ["@biomejs/biome@1.9.4"]
   - repo: https://github.com/rtts/djhtml
     rev: 3.0.7
     hooks:
