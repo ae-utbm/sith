@@ -21,6 +21,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+from __future__ import annotations
 
 import types
 import warnings
@@ -30,10 +31,10 @@ from django.contrib.auth.mixins import AccessMixin, PermissionRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.views.generic.base import View
 
-from core.models import User
-
 if TYPE_CHECKING:
     from django.db.models import Model
+
+    from core.models import User
 
 
 def can_edit_prop(obj: Any, user: User) -> bool:
@@ -46,7 +47,7 @@ def can_edit_prop(obj: Any, user: User) -> bool:
     Returns:
         True if user is authorized to edit object properties else False
 
-    Examples:
+    Example:
         ```python
         if not can_edit_prop(self.object ,request.user):
             raise PermissionDenied
@@ -65,7 +66,7 @@ def can_edit(obj: Any, user: User) -> bool:
     Returns:
         True if user is authorized to edit object else False
 
-    Examples:
+    Example:
         ```python
         if not can_edit(self.object, request.user):
             raise PermissionDenied
@@ -86,7 +87,7 @@ def can_view(obj: Any, user: User) -> bool:
     Returns:
         True if user is authorized to see object else False
 
-    Examples:
+    Example:
         ```python
         if not can_view(self.object ,request.user):
             raise PermissionDenied

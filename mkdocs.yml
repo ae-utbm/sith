@@ -98,7 +98,7 @@ nav:
       - Champs de modèle: reference/core/model_fields.md
       - reference/core/views.md
       - reference/core/schemas.md
-      - reference/core/api_permissions.md
+      - reference/core/auth.md
     - counter:
       - reference/counter/models.md
       - reference/counter/views.md

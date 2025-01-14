@@ -412,9 +412,9 @@ reposent les vérifications de permission.
 Elles sont disponibles dans le contexte par défaut du 
 moteur de template et peuvent être utilisées à tout moment.
 
-- [can_edit_prop(obj, user)][core.views.can_edit_prop] : équivalent de `obj.is_owned_by(user)`
-- [can_edit(obj, user)][core.views.can_edit] : équivalent de `obj.can_be_edited_by(user)`
-- [can_view(obj, user)][core.views.can_view] : équivalent de `obj.can_be_viewed_by(user)`
+- [can_edit_prop(obj, user)][core.auth.mixins.can_edit_prop] : équivalent de `obj.is_owned_by(user)`
+- [can_edit(obj, user)][core.auth.mixins.can_edit] : équivalent de `obj.can_be_edited_by(user)`
+- [can_view(obj, user)][core.auth.mixins.can_view] : équivalent de `obj.can_be_viewed_by(user)`
 
 Voici un exemple d'utilisation dans un template :
 
@@ -483,23 +483,24 @@ Les mixins suivants sont implémentés :
     de création et crée l'objet sans le persister en base de données, puis
     vérifie les droits sur cet objet non-persisté.
     Le danger de ce système vient de multiples raisons :
-      - Les vérifications se faisant sur un objet non persisté,
-        l'utilisation de mécanismes nécessitant une persistance préalable
-        peut mener à des comportements indésirés, voire à des erreurs.
-      - Les développeurs de django ayant tendance à restreindre progressivement
-        les actions qui peuvent être faites sur des objets non-persistés,
-        les mises-à-jour de django deviennent plus compliquées.
-      - La vérification des droits ne se fait que dans les requêtes POST,
-        à la toute fin de la requête.
-        Tout ce qui arrive avant n'est absolument pas protégé.
-        Toute opération (même les suppressions et les créations) qui ont
-        lieu avant la persistance de l'objet seront appliquées,
-        même sans permission.
-      - Si un développeur du site fait l'erreur de surcharger
-        la méthode `form_valid` (ce qui est plutôt courant,
-        lorsqu'on veut accomplir certaines actions 
-        quand un formulaire est valide), on peut se retrouver
-        dans une situation où l'objet est persisté sans aucune protection.
+
+    - Les vérifications se faisant sur un objet non persisté,
+      l'utilisation de mécanismes nécessitant une persistance préalable
+      peut mener à des comportements indésirés, voire à des erreurs.
+    - Les développeurs de django ayant tendance à restreindre progressivement
+      les actions qui peuvent être faites sur des objets non-persistés,
+      les mises-à-jour de django deviennent plus compliquées.
+    - La vérification des droits ne se fait que dans les requêtes POST,
+      à la toute fin de la requête.
+      Tout ce qui arrive avant n'est absolument pas protégé.
+      Toute opération (même les suppressions et les créations) qui ont
+      lieu avant la persistance de l'objet seront appliquées,
+      même sans permission.
+    - Si un développeur du site fait l'erreur de surcharger
+      la méthode `form_valid` (ce qui est plutôt courant,
+      lorsqu'on veut accomplir certaines actions 
+      quand un formulaire est valide), on peut se retrouver
+      dans une situation où l'objet est persisté sans aucune protection.
 
 !!!danger "Performance"
 
