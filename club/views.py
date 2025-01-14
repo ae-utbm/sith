@@ -25,6 +25,7 @@
 import csv
 
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
 from django.db.models import Sum
@@ -49,17 +50,15 @@ from com.views import (
     PosterEditBaseView,
     PosterListBaseView,
 )
-from core.models import PageRev
-from core.views import (
+from core.auth.mixins import (
     CanCreateMixin,
     CanEditMixin,
     CanEditPropMixin,
     CanViewMixin,
-    DetailFormView,
-    PageEditViewBase,
-    TabedViewMixin,
-    UserIsRootMixin,
 )
+from core.models import PageRev
+from core.views import DetailFormView, PageEditViewBase
+from core.views.mixins import TabedViewMixin
 from counter.models import Selling
 
 
@@ -474,13 +473,14 @@ class ClubEditPropView(ClubTabsMixin, CanEditPropMixin, UpdateView):
     current_tab = "props"
 
 
-class ClubCreateView(CanCreateMixin, CreateView):
+class ClubCreateView(PermissionRequiredMixin, CreateView):
     """Create a club (for the Sith admin)."""
 
     model = Club
     pk_url_kwarg = "club_id"
     fields = ["name", "unix_name", "parent"]
     template_name = "core/edit.jinja"
+    permission_required = "club.add_club"
 
 
 class MembershipSetOldView(CanEditMixin, DetailView):
@@ -512,12 +512,13 @@ class MembershipSetOldView(CanEditMixin, DetailView):
         )
 
 
-class MembershipDeleteView(UserIsRootMixin, DeleteView):
+class MembershipDeleteView(PermissionRequiredMixin, DeleteView):
     """Delete a membership (for admins only)."""
 
     model = Membership
     pk_url_kwarg = "membership_id"
     template_name = "core/delete_confirm.jinja"
+    permission_required = "club.delete_membership"
 
     def get_success_url(self):
         return reverse_lazy("core:user_clubs", kwargs={"user_id": self.object.user.id})

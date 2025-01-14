@@ -20,7 +20,7 @@ from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
-from core.api_permissions import CanAccessLookup, CanView, IsInGroup, IsRoot
+from core.auth.api_permissions import CanAccessLookup, CanView, IsInGroup, IsRoot
 from counter.models import Counter, Product, ProductType
 from counter.schemas import (
     CounterFilterSchema,

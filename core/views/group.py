@@ -16,13 +16,15 @@
 """Views to manage Groups."""
 
 from django import forms
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
+from core.auth.mixins import CanEditMixin
 from core.models import Group, User
-from core.views import CanCreateMixin, CanEditMixin, DetailFormView
+from core.views import DetailFormView
 from core.views.widgets.select import AutoCompleteSelectMultipleUser
 
 # Forms
@@ -73,13 +75,14 @@ class GroupEditView(CanEditMixin, UpdateView):
     fields = ["name", "description"]
 
 
-class GroupCreateView(CanCreateMixin, CreateView):
+class GroupCreateView(PermissionRequiredMixin, CreateView):
     """Add a new Group."""
 
     model = Group
     queryset = Group.objects.filter(is_manually_manageable=True)
     template_name = "core/create.jinja"
     fields = ["name", "description"]
+    permission_required = "core.add_group"
 
 
 class GroupTemplateView(CanEditMixin, DetailFormView):

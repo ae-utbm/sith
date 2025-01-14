@@ -68,7 +68,10 @@ class NewsQuerySet(models.QuerySet):
         """
         if user.has_perm("com.view_unmoderated_news"):
             return self
-        return self.filter(Q(is_moderated=True) | Q(author_id=user.id))
+        q_filter = Q(is_moderated=True)
+        if user.is_authenticated:
+            q_filter |= Q(author_id=user.id)
+        return self.filter(q_filter)
 
 
 class News(models.Model):
@@ -149,8 +152,12 @@ class News(models.Model):
             self.author_id == user.id or user.has_perm("com.change_news")
         )
 
-    def can_be_viewed_by(self, user):
-        return self.is_moderated or user.has_perm("com.view_unmoderated_news")
+    def can_be_viewed_by(self, user: User):
+        return (
+            self.is_moderated
+            or user.has_perm("com.view_unmoderated_news")
+            or (user.is_authenticated and self.author_id == user.id)
+        )
 
 
 def news_notification_callback(notif):

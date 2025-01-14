@@ -894,7 +894,9 @@ Welcome to the wiki page!
         public_group = Group.objects.create(name="Public")
 
         subscribers = Group.objects.create(name="Subscribers")
-        subscribers.permissions.add(*list(perms.filter(codename__in=["add_news"])))
+        subscribers.permissions.add(
+            *list(perms.filter(codename__in=["add_news", "add_uvcommentreport"]))
+        )
         old_subscribers = Group.objects.create(name="Old subscribers")
         old_subscribers.permissions.add(
             *list(

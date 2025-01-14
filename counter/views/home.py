@@ -22,7 +22,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView
 from django.views.generic.edit import FormMixin, ProcessFormView
 
-from core.views import CanViewMixin
+from core.auth.mixins import CanViewMixin
 from core.views.forms import LoginForm
 from counter.forms import GetUserForm
 from counter.models import Counter

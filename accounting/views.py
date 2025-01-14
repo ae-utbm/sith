@@ -17,6 +17,7 @@ import collections
 
 from django import forms
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.db.models import Sum
@@ -44,15 +45,15 @@ from accounting.widgets.select import (
 )
 from club.models import Club
 from club.widgets.select import AutoCompleteSelectClub
-from core.models import User
-from core.views import (
+from core.auth.mixins import (
     CanCreateMixin,
     CanEditMixin,
     CanEditPropMixin,
     CanViewMixin,
-    TabedViewMixin,
 )
+from core.models import User
 from core.views.forms import SelectDate, SelectFile
+from core.views.mixins import TabedViewMixin
 from core.views.widgets.select import AutoCompleteSelectUser
 from counter.models import Counter, Product, Selling
 
@@ -86,12 +87,13 @@ class SimplifiedAccountingTypeEditView(CanViewMixin, UpdateView):
     template_name = "core/edit.jinja"
 
 
-class SimplifiedAccountingTypeCreateView(CanCreateMixin, CreateView):
+class SimplifiedAccountingTypeCreateView(PermissionRequiredMixin, CreateView):
     """Create an accounting type (for the admins)."""
 
     model = SimplifiedAccountingType
     fields = ["label", "accounting_type"]
     template_name = "core/create.jinja"
+    permission_required = "accounting.add_simplifiedaccountingtype"
 
 
 # Accounting types
@@ -113,12 +115,13 @@ class AccountingTypeEditView(CanViewMixin, UpdateView):
     template_name = "core/edit.jinja"
 
 
-class AccountingTypeCreateView(CanCreateMixin, CreateView):
+class AccountingTypeCreateView(PermissionRequiredMixin, CreateView):
     """Create an accounting type (for the admins)."""
 
     model = AccountingType
     fields = ["code", "label", "movement_type"]
     template_name = "core/create.jinja"
+    permission_required = "accounting.add_accountingtype"
 
 
 # BankAccount views

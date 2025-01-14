@@ -21,8 +21,13 @@ from django.urls import reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
+from core.auth.mixins import (
+    CanCreateMixin,
+    CanEditMixin,
+    CanEditPropMixin,
+    CanViewMixin,
+)
 from core.models import LockError, Page, PageRev
-from core.views import CanCreateMixin, CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.views.forms import PageForm, PagePropForm
 from core.views.widgets.markdown import MarkdownInput
 

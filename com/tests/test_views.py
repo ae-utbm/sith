@@ -159,13 +159,13 @@ class TestNews(TestCase):
 
     def test_news_viewer(self):
         """Test that moderated news can be viewed by anyone
-        and not moderated news only by com admins.
+        and not moderated news only by com admins and by their author.
         """
-        # by default a news isn't moderated
+        # by default news aren't moderated
         assert self.new.can_be_viewed_by(self.com_admin)
+        assert self.new.can_be_viewed_by(self.author)
         assert not self.new.can_be_viewed_by(self.sli)
         assert not self.new.can_be_viewed_by(self.anonymous)
-        assert not self.new.can_be_viewed_by(self.author)
 
         self.new.is_moderated = True
         self.new.save()

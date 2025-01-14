@@ -19,7 +19,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
-from core.views import TabedViewMixin
+from core.views.mixins import TabedViewMixin
 
 
 class CounterAdminMixin(View):

@@ -54,14 +54,8 @@ from django.views.generic.dates import MonthMixin, YearMixin
 from django.views.generic.edit import FormView, UpdateView
 from honeypot.decorators import check_honeypot
 
+from core.auth.mixins import CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.models import Gift, Preferences, User
-from core.views import (
-    CanEditMixin,
-    CanEditPropMixin,
-    CanViewMixin,
-    QuickNotifMixin,
-    TabedViewMixin,
-)
 from core.views.forms import (
     GiftForm,
     LoginForm,
@@ -70,6 +64,7 @@ from core.views.forms import (
     UserGroupsForm,
     UserProfileForm,
 )
+from core.views.mixins import QuickNotifMixin, TabedViewMixin
 from counter.models import Refilling, Selling
 from counter.views.student_card import StudentCardFormView
 from eboutic.models import Invoice

@@ -32,8 +32,9 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormView
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
+from core.auth.mixins import FormerSubscriberMixin
 from core.models import User
-from core.views import FormerSubscriberMixin, search_user
+from core.views import search_user
 from core.views.forms import SelectDate
 
 # Enum to select search type

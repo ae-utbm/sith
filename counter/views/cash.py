@@ -23,7 +23,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import UpdateView
 
-from core.views import CanViewMixin
+from core.auth.mixins import CanViewMixin
 from counter.forms import CashSummaryFormBase
 from counter.models import (
     CashRegisterSummary,
