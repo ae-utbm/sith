@@ -2111,6 +2111,10 @@ msgid "Duplicate file"
 msgstr "Un fichier de ce nom existe déjà"
 
 #: core/models.py
+msgid "This is not a valid folder thumbnail"
+msgstr "Ceci n'est pas une miniature de dossier valide"
+
+#: core/models.py
 msgid "You must provide a file"
 msgstr "Vous devez fournir un fichier"
 
