@@ -25,12 +25,12 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.4",
-    "@biomejs/biome": "1.9.3",
-    "@hey-api/openapi-ts": "^0.53.8",
+    "@biomejs/biome": "1.9.4",
+    "@hey-api/openapi-ts": "^0.61.3",
     "@rollup/plugin-inject": "^5.0.5",
     "@types/alpinejs": "^3.13.10",
     "@types/jquery": "^3.5.31",
-    "vite": "^5.4.11",
+    "vite": "^6.0.7",
     "vite-bundle-visualizer": "^1.2.1",
     "vite-plugin-static-copy": "^2.1.0"
   },
@@ -42,7 +42,7 @@
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/icalendar": "^6.1.15",
     "@fullcalendar/list": "^6.1.15",
-    "@hey-api/client-fetch": "^0.4.0",
+    "@hey-api/client-fetch": "^0.6.0",
     "@sentry/browser": "^8.34.0",
     "@zip.js/zip.js": "^2.7.52",
     "3d-force-graph": "^1.73.4",
@@ -58,7 +58,7 @@
     "jquery": "^3.7.1",
     "jquery-ui": "^1.14.0",
     "native-file-system-adapter": "^3.0.1",
-    "three": "^0.169.0",
+    "three": "^0.172.0",
     "three-spritetext": "^1.9.0",
     "tom-select": "^2.3.1"
   }
