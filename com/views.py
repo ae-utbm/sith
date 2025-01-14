@@ -174,11 +174,9 @@ class NewsUpdateView(PermissionOrAuthorRequiredMixin, UpdateView):
     permission_required = "com.edit_news"
 
     def form_valid(self, form):
-        self.object = form.save()
+        response = super().form_valid(form)  # Does the saving part
         IcsCalendar.make_internal()
-        # Don't call `super().form_valid()`,
-        # because it would trigger a second call to `form.save()`
-        return HttpResponseRedirect(self.get_success_url())
+        return response
 
     def get_date_form_kwargs(self) -> dict[str, Any]:
         """Get initial data for NewsDateForm"""

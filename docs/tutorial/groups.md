@@ -185,6 +185,22 @@ En plus de ces groupes, on peut noter :
   Un utilisateur est automatiquement ajouté à ce groupe 
   lors de sa première cotisation
 
+!!!note "Utilisation du groupe Public"
+
+    Le groupe Public est un groupe particulier.
+    Tout le monde faisant partie de ce groupe
+    (même les utilisateurs non-connectés en sont implicitement 
+    considérés comme membres),
+    il ne doit pas être utilisé pour résoudre les
+    permissions d'une vue.
+
+    En revanche, il est utile pour attribuer une ressource
+    à tout le monde.
+    Par exemple, un produit avec le groupe de vente Public
+    est considéré comme achetable par tous utilisateurs.
+    S'il n'avait eu aucun group de vente, il n'aurait
+    été accessible à personne.
+
 ### Groupes de club
 
 Chaque club est associé à deux groupes :
