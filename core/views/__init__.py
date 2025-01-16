@@ -28,8 +28,7 @@ from django.http import (
     HttpResponseServerError,
 )
 from django.shortcuts import render
-from django.utils.functional import cached_property
-from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.detail import BaseDetailView
 from django.views.generic.edit import FormView
 from sentry_sdk import last_event_id
 
@@ -54,17 +53,12 @@ def internal_servor_error(request):
     return HttpResponseServerError(render(request, "core/500.jinja"))
 
 
-class DetailFormView(SingleObjectMixin, FormView):
+class DetailFormView(FormView, BaseDetailView):
     """Class that allow both a detail view and a form view."""
 
-    def get_object(self):
-        """Get current group from id in url."""
-        return self.cached_object
-
-    @cached_property
-    def cached_object(self):
-        """Optimisation on group retrieval."""
-        return super().get_object()
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().post(request, *args, **kwargs)
 
 
 # F403: those star-imports would be hellish to refactor

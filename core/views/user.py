@@ -66,7 +66,6 @@ from core.views.forms import (
 )
 from core.views.mixins import QuickNotifMixin, TabedViewMixin
 from counter.models import Refilling, Selling
-from counter.views.student_card import StudentCardFormView
 from eboutic.models import Invoice
 from subscription.models import Subscription
 from trombi.views import UserTrombiForm
@@ -566,6 +565,8 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
         if not hasattr(self.object, "trombi_user"):
             kwargs["trombi_form"] = UserTrombiForm()
         if hasattr(self.object, "customer"):
+            from counter.views.student_card import StudentCardFormView
+
             kwargs["student_card_fragment"] = StudentCardFormView.get_template_data(
                 self.object.customer
             ).render(self.request)

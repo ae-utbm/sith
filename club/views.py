@@ -256,7 +256,7 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["request_user"] = self.request.user
-        kwargs["club"] = self.get_object()
+        kwargs["club"] = self.object
         kwargs["club_members"] = self.members
         return kwargs
 
@@ -273,9 +273,9 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
         users = data.pop("users", [])
         users_old = data.pop("users_old", [])
         for user in users:
-            Membership(club=self.get_object(), user=user, **data).save()
+            Membership(club=self.object, user=user, **data).save()
         for user in users_old:
-            membership = self.get_object().get_membership_for(user)
+            membership = self.object.get_membership_for(user)
             membership.end_date = timezone.now()
             membership.save()
         return resp
@@ -285,9 +285,7 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            "club:club_members", kwargs={"club_id": self.get_object().id}
-        )
+        return reverse_lazy("club:club_members", kwargs={"club_id": self.object.id})
 
 
 class ClubOldMembersView(ClubTabsMixin, CanViewMixin, DetailView):

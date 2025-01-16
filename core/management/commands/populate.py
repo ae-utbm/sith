@@ -895,13 +895,16 @@ Welcome to the wiki page!
 
         subscribers = Group.objects.create(name="Subscribers")
         subscribers.permissions.add(
-            *list(perms.filter(codename__in=["add_news", "add_uvcommentreport"]))
+            *list(perms.filter(codename__in=["add_news", "add_uvcomment"]))
         )
         old_subscribers = Group.objects.create(name="Old subscribers")
         old_subscribers.permissions.add(
             *list(
                 perms.filter(
                     codename__in=[
+                        "view_uv",
+                        "view_uvcomment",
+                        "add_uvcommentreport",
                         "view_user",
                         "view_picture",
                         "view_album",
@@ -973,9 +976,9 @@ Welcome to the wiki page!
         )
         pedagogy_admin.permissions.add(
             *list(
-                perms.filter(content_type__app_label="pedagogy").values_list(
-                    "pk", flat=True
-                )
+                perms.filter(content_type__app_label="pedagogy")
+                .exclude(codename__in=["change_uvcomment"])
+                .values_list("pk", flat=True)
             )
         )
         self.reset_index("core", "auth")
