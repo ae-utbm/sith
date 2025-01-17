@@ -1,13 +1,13 @@
+import operator
 from typing import Annotated
 
 from annotated_types import Ge
-from django.conf import settings
 from ninja import Query
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import NotFound
 from ninja_extra.pagination import PageNumberPaginationExtra, PaginatedResponseSchema
 
-from core.auth.api_permissions import IsInGroup, IsRoot, IsSubscriber
+from core.auth.api_permissions import HasPerm
 from pedagogy.models import UV
 from pedagogy.schemas import SimpleUvSchema, UvFilterSchema, UvSchema
 from pedagogy.utbm_api import find_uv
@@ -17,7 +17,11 @@ from pedagogy.utbm_api import find_uv
 class UvController(ControllerBase):
     @route.get(
         "/{year}/{code}",
-        permissions=[IsRoot | IsInGroup(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)],
+        permissions=[
+            # this route will almost always be called in the context
+            # of a UV creation/edition
+            HasPerm(["pedagogy.add_uv", "pedagogy.change_uv"], op=operator.or_)
+        ],
         url_name="fetch_uv_from_utbm",
         response=UvSchema,
     )
@@ -34,8 +38,8 @@ class UvController(ControllerBase):
         "",
         response=PaginatedResponseSchema[SimpleUvSchema],
         url_name="fetch_uvs",
-        permissions=[IsSubscriber | IsInGroup(settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)],
+        permissions=[HasPerm("pedagogy.view_uv")],
     )
     @paginate(PageNumberPaginationExtra, page_size=100)
     def fetch_uv_list(self, search: Query[UvFilterSchema]):
-        return search.filter(UV.objects.all())
+        return search.filter(UV.objects.values())
