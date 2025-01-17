@@ -152,6 +152,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
 
   async connectedCallback() {
     super.connectedCallback();
+    const cacheInvalidate = `?invalidate=${Date.now()}`;
     this.calendar = new Calendar(this.node, {
       plugins: [dayGridPlugin, iCalendarPlugin, listPlugin],
       locales: [frLocale, enLocale],
@@ -161,11 +162,11 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       headerToolbar: this.currentToolbar(),
       eventSources: [
         {
-          url: await makeUrl(calendarCalendarInternal),
+          url: `${await makeUrl(calendarCalendarInternal)}${cacheInvalidate}`,
           format: "ics",
         },
         {
-          url: await makeUrl(calendarCalendarExternal),
+          url: `${await makeUrl(calendarCalendarExternal)}${cacheInvalidate}`,
           format: "ics",
         },
       ],
