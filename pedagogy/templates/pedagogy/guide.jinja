@@ -19,7 +19,7 @@
 {% endblock head %}
 
 {% block content %}
-  {% if can_create_uv %}
+  {% if user.has_perm("pedagogy.add_uv") %}
     <div class="action-bar">
       <p>
         <a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a>
@@ -94,8 +94,10 @@
           <td>{% trans %}Credit type{% endtrans %}</td>
           <td><i class="fa fa-leaf"></i></td>
           <td><i class="fa-regular fa-sun"></i></td>
-          {% if can_create_uv %}
+          {%- if user.has_perm("pedagogy.change_uv") -%}
             <td>{% trans %}Edit{% endtrans %}</td>
+          {%- endif -%}
+          {%- if user.has_perm("pedagogy.delete_uv") -%}
             <td>{% trans %}Delete{% endtrans %}</td>
           {% endif %}
         </tr>
@@ -109,8 +111,10 @@
             <td x-text="uv.credit_type"></td>
             <td><i :class="uv.semester.includes('AUTUMN') && 'fa fa-leaf'"></i></td>
             <td><i :class="uv.semester.includes('SPRING') && 'fa-regular fa-sun'"></i></td>
-            {% if can_create_uv -%}
+            {%- if user.has_perm("pedagogy.change_uv") -%}
               <td><a :href="`/pedagogy/uv/${uv.id}/edit`">{% trans %}Edit{% endtrans %}</a></td>
+            {%- endif -%}
+            {%- if user.has_perm("pedagogy.delete_uv") -%}
               <td><a :href="`/pedagogy/uv/${uv.id}/delete`">{% trans %}Delete{% endtrans %}</a></td>
             {%- endif -%}
           </tr>

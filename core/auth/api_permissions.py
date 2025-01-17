@@ -37,8 +37,11 @@ Example:
     ```
 """
 
+import operator
+from functools import reduce
 from typing import Any
 
+from django.contrib.auth.models import Permission
 from django.http import HttpRequest
 from ninja_extra import ControllerBase
 from ninja_extra.permissions import BasePermission
@@ -54,6 +57,46 @@ class IsInGroup(BasePermission):
 
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
         return request.user.is_in_group(pk=self._group_pk)
+
+
+class HasPerm(BasePermission):
+    """Check that the user has the required perm.
+
+    If multiple perms are given, a comparer function can also be passed,
+    in order to change the way perms are checked.
+
+    Example:
+        ```python
+        # this route will require both permissions
+        @route.put("/foo", permissions=[HasPerm(["foo.change_foo", "foo.add_foo"])]
+        def foo(self): ...
+
+        # This route will require at least one of the perm,
+        # but it's not mandatory to have all of them
+        @route.put(
+            "/bar",
+            permissions=[HasPerm(["foo.change_bar", "foo.add_bar"], op=operator.or_)],
+        )
+        def bar(self): ...
+    """
+
+    def __init__(
+        self, perms: str | Permission | list[str | Permission], op=operator.and_
+    ):
+        """
+        Args:
+            perms: a permission or a list of permissions the user must have
+            op: An operator to combine multiple permissions (in most cases,
+                it will be either `operator.and_` or `operator.or_`)
+        """
+        super().__init__()
+        if not isinstance(perms, (list, tuple, set)):
+            perms = [perms]
+        self._operator = op
+        self._perms = perms
+
+    def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
+        return reduce(self._operator, (request.user.has_perm(p) for p in self._perms))
 
 
 class IsRoot(BasePermission):
