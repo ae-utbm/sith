@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-10 14:52+0100\n"
+"POT-Creation-Date: 2025-01-19 18:12+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1447,7 +1447,7 @@ msgid "News admin"
 msgstr "Administration des nouvelles"
 
 #: com/templates/com/news_admin_list.jinja com/templates/com/news_detail.jinja
-#: com/templates/com/news_list.jinja
+#: com/templates/com/news_list.jinja com/views.py
 msgid "News"
 msgstr "Nouvelles"
 
@@ -1524,6 +1524,10 @@ msgstr "Éditer (sera soumise de nouveau à la modération)"
 #: com/templates/com/news_edit.jinja
 msgid "Edit news"
 msgstr "Éditer la nouvelle"
+
+#: com/templates/com/news_list.jinja
+msgid "News feed"
+msgstr "Flux d'actualités"
 
 #: com/templates/com/news_list.jinja
 msgid "Events today and the next few days"
@@ -1766,6 +1770,10 @@ msgstr "Message d'alerte"
 #: com/views.py
 msgid "Screens list"
 msgstr "Liste d'écrans"
+
+#: com/views.py
+msgid "All incoming events"
+msgstr "Tous les événements à venir"
 
 #: com/views.py
 msgid "Delete and save to regenerate"

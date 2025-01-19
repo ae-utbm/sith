@@ -27,7 +27,7 @@ from typing import ClassVar, NamedTuple
 
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.contrib.sites.models import Site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connection
@@ -92,7 +92,12 @@ class Command(BaseCommand):
             raise Exception("Never call this command in prod. Never.")
 
         Sith.objects.create(weekmail_destinations="etudiants@git.an personnel@git.an")
-        Site.objects.create(domain=settings.SITH_URL, name=settings.SITH_NAME)
+
+        site = get_current_site(None)
+        site.domain = settings.SITH_URL
+        site.name = settings.SITH_NAME
+        site.save()
+
         groups = self._create_groups()
         self._create_ban_groups()
 

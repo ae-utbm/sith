@@ -319,3 +319,11 @@ class TestNewsCreation(TestCase):
                 self.valid_payload,
             )
             mocked.assert_called()
+
+
+@pytest.mark.django_db
+def test_feed(client):
+    """Smoke test that checks that the atom feed is working"""
+    resp = client.get(reverse("com:news_feed"))
+    assert resp.status_code == 200
+    assert resp.headers["Content-Type"] == "application/rss+xml; charset=utf-8"
