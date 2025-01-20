@@ -1,7 +1,6 @@
 """Set of functions to interact with the UTBM UV api."""
 
-import urllib
-
+import requests
 from django.conf import settings
 
 from pedagogy.schemas import ShortUvList, UtbmFullUvSchema, UtbmShortUvSchema, UvSchema
@@ -12,8 +11,8 @@ def find_uv(lang, year, code) -> UvSchema | None:
     # query the UV list
     base_url = settings.SITH_PEDAGOGY_UTBM_API
     uvs_url = f"{base_url}/uvs/{lang}/{year}"
-    response = urllib.request.urlopen(uvs_url)
-    uvs: list[UtbmShortUvSchema] = ShortUvList.validate_json(response.read())
+    response = requests.get(uvs_url)
+    uvs: list[UtbmShortUvSchema] = ShortUvList.validate_json(response.content)
 
     short_uv = next((uv for uv in uvs if uv.code == code), None)
     if short_uv is None:
@@ -21,12 +20,12 @@ def find_uv(lang, year, code) -> UvSchema | None:
 
     # get detailed information about the UV
     uv_url = f"{base_url}/uv/{lang}/{year}/{code}/{short_uv.code_formation}"
-    response = urllib.request.urlopen(uv_url)
-    full_uv = UtbmFullUvSchema.model_validate_json(response.read())
-    return _make_clean_uv(short_uv, full_uv)
+    response = requests.get(uv_url)
+    full_uv = UtbmFullUvSchema.model_validate_json(response.content)
+    return make_clean_uv(short_uv, full_uv)
 
 
-def _make_clean_uv(short_uv: UtbmShortUvSchema, full_uv: UtbmFullUvSchema) -> UvSchema:
+def make_clean_uv(short_uv: UtbmShortUvSchema, full_uv: UtbmFullUvSchema) -> UvSchema:
     """Cleans the data up so that it corresponds to our data representation.
 
     Some of the needed information are in the short uv schema, some

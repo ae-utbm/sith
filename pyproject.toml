@@ -44,6 +44,7 @@ dependencies = [
     "django-honeypot<2.0.0,>=1.2.1",
     "pydantic-extra-types<3.0.0,>=2.10.1",
     "ical<9.0.0,>=8.3.0",
+    "requests>=2.32.3",
 ]
 
 [project.urls]
