@@ -37,9 +37,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.utils.timezone import localdate
+from django.utils.timezone import localdate, now
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, ListView, View
+from django.views.generic import DetailView, ListView, TemplateView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from club.models import Club, Mailing
@@ -236,28 +236,37 @@ class NewsAdminListView(PermissionRequiredMixin, ListView):
     permission_required = ["com.moderate_news", "com.delete_news"]
 
 
-class NewsListView(ListView):
-    model = News
+class NewsListView(TemplateView):
     template_name = "com/news_list.jinja"
-    queryset = News.objects.filter(is_moderated=True)
 
-    def get_queryset(self):
-        return super().get_queryset().viewable_by(self.request.user)
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["NewsDate"] = NewsDate
-        kwargs["timedelta"] = timedelta
-        kwargs["birthdays"] = itertools.groupby(
+    def get_birthdays(self):
+        if not self.request.user.has_perm("core.view_user"):
+            return []
+        return itertools.groupby(
             User.objects.filter(
                 date_of_birth__month=localdate().month,
                 date_of_birth__day=localdate().day,
+                is_subscriber_viewable=True,
             )
             .filter(role__in=["STUDENT", "FORMER STUDENT"])
             .order_by("-date_of_birth"),
             key=lambda u: u.date_of_birth.year,
         )
-        return kwargs
+
+    def get_news_dates(self):
+        return itertools.groupby(
+            NewsDate.objects.viewable_by(self.request.user)
+            .filter(end_date__gt=now(), start_date__lt=now() + timedelta(days=6))
+            .order_by("start_date")
+            .select_related("news", "news__club"),
+            key=lambda d: d.start_date.date(),
+        )
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "news_dates": self.get_news_dates(),
+            "birthdays": self.get_birthdays(),
+        }
 
 
 class NewsDetailView(CanViewMixin, DetailView):
