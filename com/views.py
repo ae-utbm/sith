@@ -26,8 +26,10 @@ from datetime import timedelta
 from smtplib import SMTPRecipientsRefused
 from typing import Any
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.mixins import AccessMixin, PermissionRequiredMixin
+from django.contrib.syndication.views import Feed
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Max
 from django.forms.models import modelform_factory
@@ -266,6 +268,34 @@ class NewsDetailView(CanViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {"date": self.object.dates.first()}
+
+
+class NewsFeed(Feed):
+    title = _("News")
+    link = reverse_lazy("com:news_list")
+    description = _("All incoming events")
+
+    def items(self):
+        return (
+            NewsDate.objects.filter(
+                news__is_moderated=True,
+                end_date__gte=timezone.now() - (relativedelta(months=6)),
+            )
+            .select_related("news", "news__author")
+            .order_by("-start_date")
+        )
+
+    def item_title(self, item: NewsDate):
+        return item.news.title
+
+    def item_description(self, item: NewsDate):
+        return item.news.summary
+
+    def item_link(self, item: NewsDate):
+        return item.news.get_absolute_url()
+
+    def item_author_name(self, item: NewsDate):
+        return item.news.author.get_display_name()
 
 
 # Weekmail

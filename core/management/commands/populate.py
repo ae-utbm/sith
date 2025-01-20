@@ -92,7 +92,12 @@ class Command(BaseCommand):
             raise Exception("Never call this command in prod. Never.")
 
         Sith.objects.create(weekmail_destinations="etudiants@git.an personnel@git.an")
-        Site.objects.create(domain=settings.SITH_URL, name=settings.SITH_NAME)
+
+        site = Site.objects.get_current()
+        site.domain = settings.SITH_URL
+        site.name = settings.SITH_NAME
+        site.save()
+
         groups = self._create_groups()
         self._create_ban_groups()
 

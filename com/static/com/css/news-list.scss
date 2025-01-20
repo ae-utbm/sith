@@ -36,6 +36,11 @@
     &:not(:first-of-type) {
       margin: 2em 0 1em 0;
     }
+
+    .feed {
+      float: right;
+      color: #f26522;
+    }
   }
 
   @media screen and (max-width: $small-devices) {
