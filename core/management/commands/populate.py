@@ -27,7 +27,7 @@ from typing import ClassVar, NamedTuple
 
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connection
@@ -93,7 +93,7 @@ class Command(BaseCommand):
 
         Sith.objects.create(weekmail_destinations="etudiants@git.an personnel@git.an")
 
-        site = get_current_site(None)
+        site = Site.objects.get_current()
         site.domain = settings.SITH_URL
         site.name = settings.SITH_NAME
         site.save()

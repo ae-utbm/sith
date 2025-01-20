@@ -281,7 +281,7 @@ class NewsFeed(Feed):
                 news__is_moderated=True,
                 end_date__gte=timezone.now() - (relativedelta(months=6)),
             )
-            .prefetch_related("news")
+            .select_related("news", "news__author")
             .order_by("-start_date")
         )
 

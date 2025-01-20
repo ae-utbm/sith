@@ -17,6 +17,7 @@ from unittest.mock import patch
 
 import pytest
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
@@ -24,7 +25,7 @@ from django.utils import html
 from django.utils.timezone import localtime, now
 from django.utils.translation import gettext as _
 from model_bakery import baker
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertNumQueries, assertRedirects
 
 from club.models import Club, Membership
 from com.models import News, NewsDate, Poster, Sith, Weekmail, WeekmailArticle
@@ -324,6 +325,10 @@ class TestNewsCreation(TestCase):
 @pytest.mark.django_db
 def test_feed(client):
     """Smoke test that checks that the atom feed is working"""
-    resp = client.get(reverse("com:news_feed"))
-    assert resp.status_code == 200
-    assert resp.headers["Content-Type"] == "application/rss+xml; charset=utf-8"
+    Site.objects.clear_cache()
+    with assertNumQueries(2):
+        # get sith domain with Site api: 1 request
+        # get all news and related info: 1 request
+        resp = client.get(reverse("com:news_feed"))
+        assert resp.status_code == 200
+        assert resp.headers["Content-Type"] == "application/rss+xml; charset=utf-8"
