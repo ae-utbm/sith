@@ -310,7 +310,7 @@ msgstr "Compte en banque : "
 #: accounting/templates/accounting/club_account_details.jinja
 #: accounting/templates/accounting/label_list.jinja
 #: club/templates/club/club_sellings.jinja club/templates/club/mailing.jinja
-#: com/templates/com/mailing_admin.jinja
+#: com/templates/com/macros.jinja com/templates/com/mailing_admin.jinja
 #: com/templates/com/news_admin_list.jinja com/templates/com/poster_edit.jinja
 #: com/templates/com/screen_edit.jinja com/templates/com/weekmail.jinja
 #: core/templates/core/file_detail.jinja
@@ -936,10 +936,6 @@ msgid "description"
 msgstr "description"
 
 #: club/models.py
-msgid "past member"
-msgstr "ancien membre"
-
-#: club/models.py
 msgid "Email address"
 msgstr "Adresse email"
 
@@ -1408,18 +1404,44 @@ msgstr "temps d'affichage"
 msgid "Begin date should be before end date"
 msgstr "La date de début doit être avant celle de fin"
 
-#: com/templates/com/mailing_admin.jinja com/views.py
-#: core/templates/core/user_tools.jinja
-msgid "Mailing lists administration"
-msgstr "Administration des mailing listes"
+#: com/templates/com/macros.jinja
+msgid "Waiting moderation"
+msgstr "En attente de modération"
 
-#: com/templates/com/mailing_admin.jinja
+#: com/templates/com/macros.jinja
+msgid ""
+"This news isn't moderated and is visible only by its author and the "
+"communication admins."
+msgstr ""
+"Cette nouvelle n'est pas modérée et n'est visible que par son auteur et les "
+"admins communication."
+
+#: com/templates/com/macros.jinja
+msgid "It will stay hidden for other users until it has been moderated."
+msgstr ""
+"Elle sera cachée pour les autres utilisateurs tant qu'elle ne sera pas "
+"modérée."
+
+#: com/templates/com/macros.jinja com/templates/com/mailing_admin.jinja
 #: com/templates/com/news_admin_list.jinja com/templates/com/news_detail.jinja
 #: core/templates/core/file_detail.jinja
 #: core/templates/core/file_moderation.jinja sas/templates/sas/moderation.jinja
 #: sas/templates/sas/picture.jinja
 msgid "Moderate"
 msgstr "Modérer"
+
+#: com/templates/com/macros.jinja
+msgid "News moderated"
+msgstr "Nouvelle modérée"
+
+#: com/templates/com/macros.jinja
+msgid "News deleted"
+msgstr "Nouvelle supprimée"
+
+#: com/templates/com/mailing_admin.jinja com/views.py
+#: core/templates/core/user_tools.jinja
+msgid "Mailing lists administration"
+msgstr "Administration des mailing listes"
 
 #: com/templates/com/mailing_admin.jinja
 #, python-format
@@ -1579,14 +1601,6 @@ msgid "Dev Team"
 msgstr "Pôle Informatique"
 
 #: com/templates/com/news_list.jinja
-msgid "Facebook"
-msgstr "Facebook"
-
-#: com/templates/com/news_list.jinja
-msgid "Instagram"
-msgstr "Instagram"
-
-#: com/templates/com/news_list.jinja
 msgid "Birthdays"
 msgstr "Anniversaires"
 
@@ -1598,6 +1612,10 @@ msgstr "%(age)s ans"
 #: com/templates/com/news_list.jinja com/tests/test_views.py
 msgid "You need to subscribe to access this content"
 msgstr "Vous devez cotiser pour accéder à ce contenu"
+
+#: com/templates/com/news_list.jinja
+msgid "You cannot access this content"
+msgstr "Vous n'avez pas accès à ce contenu"
 
 #: com/templates/com/poster_edit.jinja com/templates/com/poster_list.jinja
 msgid "Poster"
@@ -3308,8 +3326,8 @@ msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
 #: core/views/forms.py
 msgid ""
-"Profile: you need to be visible on the picture, in order to be recognized "
-"(e.g. by the barmen)"
+"Profile: you need to be visible on the picture, in order to be recognized (e."
+"g. by the barmen)"
 msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
@@ -3919,8 +3937,8 @@ msgstr ""
 #: counter/templates/counter/mails/account_dump.jinja
 msgid "If you think this was a mistake, please mail us at ae@utbm.fr."
 msgstr ""
-"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à "
-"ae@utbm.fr."
+"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à ae@utbm."
+"fr."
 
 #: counter/templates/counter/mails/account_dump.jinja
 msgid ""

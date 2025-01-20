@@ -1,0 +1,73 @@
+{% macro news_moderation_alert(news, user, alpineState = None) %}
+    {# An alert to display on top of non moderated news,
+    with actions to either moderate or delete them.
+
+    The current state of the alert is accessible through
+    the given `alpineState` variable.
+    This state is a `AlertState`, as defined in `moderation-alert-index.ts`
+
+    Example :
+    ```jinja
+    <div x-data="{state: AlertState.PENDING}">
+      {{ news_moderation_alert(news, user, "state") }}
+    </div>
+    ```
+
+    Args:
+        news: The `News` object to which this alert is related
+        user: The request.user
+        alpineState: An alpine variable name
+
+    Warning:
+        If you use this macro, you must also include `moderation-alert-index.ts`
+        in your template.
+    #}
+  <div
+    x-data="moderationAlert({{ news.id }})"
+    {% if alpineState %}
+      x-modelable="{{ alpineState }}"
+      x-model="state"
+    {% endif %}
+  >
+    <template x-if="state === AlertState.PENDING">
+      <div class="alert alert-yellow">
+        <div class="alert-main">
+          <strong>{% trans %}Waiting moderation{% endtrans %}</strong>
+          <p>
+            {% trans trimmed %}
+              This news isn't moderated and is visible
+              only by its author and the communication admins.
+            {% endtrans %}
+          </p>
+          <p>
+            {% trans trimmed %}
+              It will stay hidden for other users until it has been moderated.
+            {% endtrans %}
+          </p>
+        </div>
+        {% if user.has_perm("com.moderate_news") %}
+          <span class="alert-aside" :aria-busy="loading">
+            <button class="btn btn-green" @click="moderateNews()" :disabled="loading">
+              <i class="fa fa-check"></i> {% trans %}Moderate{% endtrans %}
+            </button>
+        {% endif %}
+        {% if user.has_perm("com.delete_news") %}
+          <button class="btn btn-red" @click="deleteNews()" :disabled="loading">
+            <i class="fa fa-trash-can"></i> {% trans %}Delete{% endtrans %}
+          </button>
+          </span>
+        {% endif %}
+      </div>
+    </template>
+    <template x-if="state === AlertState.MODERATED">
+      <div class="alert alert-green">
+        {% trans %}News moderated{% endtrans %}
+      </div>
+    </template>
+    <template x-if="state === AlertState.DELETED">
+      <div class="alert alert-red">
+        {% trans %}News deleted{% endtrans %}
+      </div>
+    </template>
+  </div>
+{% endmacro %}

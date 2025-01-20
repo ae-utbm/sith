@@ -171,7 +171,9 @@
       }
 
       .news_event {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        gap: .5em;
         padding: 1em;
 
         header {

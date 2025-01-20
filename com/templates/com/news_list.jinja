@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from "com/macros.jinja" import news_moderation_alert %}
 
 {% block title %}
   {% trans %}News{% endtrans %}
@@ -14,6 +15,7 @@
 
 {% block additional_js %}
   <script type="module" src={{ static("bundled/com/components/ics-calendar-index.ts") }}></script>
+  <script type="module" src={{ static("bundled/com/components/moderation-alert-index.ts") }}></script>
 {% endblock %}
 
 {% block content %}
@@ -46,32 +48,39 @@
           </div>
           <div class="news_events_group_items">
             {% for date in dates_group %}
-              <article class="news_event">
-                <header class="row gap">
-                  {% if date.news.club.logo %}
-                    <img src="{{ date.news.club.logo.url }}" alt="{{ date.news.club }}"/>
-                  {% else %}
-                    <img src="{{ static("com/img/news.png") }}" alt="{{ date.news.club }}"/>
-                  {% endif %}
-                  <div class="header_content">
-                    <h4>
-                      <a href="{{ url('com:news_detail', news_id=date.news_id) }}">
-                        {{ date.news.title }}
-                      </a>
-                    </h4>
-                    <a href="{{ date.news.club.get_absolute_url() }}">{{ date.news.club }}</a>
-                    <div class="news_date">
-                      <time datetime="{{ date.start_date.isoformat(timespec="seconds") }}">
-                        {{ date.start_date|localtime|time(DATETIME_FORMAT) }}
-                      </time> -
-                      <time datetime="{{ date.end_date.isoformat(timespec="seconds") }}">
-                        {{ date.end_date|localtime|time(DATETIME_FORMAT) }}
-                      </time>
+              <article class="news_event" x-data="{newsState: AlertState.PENDING}">
+                {% if not date.news.is_moderated %}
+                  {# if a non moderated news is in the object list,
+                  the logged user is either an admin or the news author #}
+                  {{ news_moderation_alert(date.news, user, "newsState") }}
+                {% endif %}
+                <div x-show="newsState !== AlertState.DELETED">
+                  <header class="row gap">
+                    {% if date.news.club.logo %}
+                      <img src="{{ date.news.club.logo.url }}" alt="{{ date.news.club }}"/>
+                    {% else %}
+                      <img src="{{ static("com/img/news.png") }}" alt="{{ date.news.club }}"/>
+                    {% endif %}
+                    <div class="header_content">
+                      <h4>
+                        <a href="{{ url('com:news_detail', news_id=date.news_id) }}">
+                          {{ date.news.title }}
+                        </a>
+                      </h4>
+                      <a href="{{ date.news.club.get_absolute_url() }}">{{ date.news.club }}</a>
+                      <div class="news_date">
+                        <time datetime="{{ date.start_date.isoformat(timespec="seconds") }}">
+                          {{ date.start_date|localtime|time(DATETIME_FORMAT) }}
+                        </time> -
+                        <time datetime="{{ date.end_date.isoformat(timespec="seconds") }}">
+                          {{ date.end_date|localtime|time(DATETIME_FORMAT) }}
+                        </time>
+                      </div>
                     </div>
+                  </header>
+                  <div class="news_content markdown">
+                    {{ date.news.summary|markdown }}
                   </div>
-                </header>
-                <div class="news_content markdown">
-                  {{ date.news.summary|markdown }}
                 </div>
               </article>
             {% endfor %}
