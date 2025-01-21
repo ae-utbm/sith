@@ -30,7 +30,7 @@
     "@rollup/plugin-inject": "^5.0.5",
     "@types/alpinejs": "^3.13.10",
     "@types/jquery": "^3.5.31",
-    "vite": "^6.0.7",
+    "vite": "^6.0.11",
     "vite-bundle-visualizer": "^1.2.1",
     "vite-plugin-static-copy": "^2.1.0"
   },
