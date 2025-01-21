@@ -46,12 +46,7 @@
       const codeInput = document.querySelector('input[name="code"]')
 
       autofillBtn.addEventListener('click', () => {
-        const today = new Date()
-        let year = today.getFullYear()
-        if (today.getMonth() < 7) {  // student year starts in september
-          year--
-        }
-        const url = `/api/uv/${year}/${codeInput.value}`;
+        const url = `/api/uv/${codeInput.value}`;
         deleteQuickNotifs()
 
         $.ajax({
@@ -70,7 +65,7 @@
               .filter(([elem, _]) => !!elem)  // skip non-existing DOM elements
               .forEach(([elem, val]) => {  // write the value in the form field
                 if (elem.tagName === 'TEXTAREA') {
-                                // MD editor text input
+                  // MD editor text input
                   elem.parentNode.querySelector('.CodeMirror').CodeMirror.setValue(val);
                 } else {
                   elem.value = val;

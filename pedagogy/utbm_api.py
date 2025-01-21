@@ -2,27 +2,59 @@
 
 import requests
 from django.conf import settings
+from django.utils.functional import cached_property
 
 from pedagogy.schemas import ShortUvList, UtbmFullUvSchema, UtbmShortUvSchema, UvSchema
 
 
-def find_uv(lang, year, code) -> UvSchema | None:
-    """Find an UV from the UTBM API."""
-    # query the UV list
-    base_url = settings.SITH_PEDAGOGY_UTBM_API
-    uvs_url = f"{base_url}/uvs/{lang}/{year}"
-    response = requests.get(uvs_url)
-    uvs: list[UtbmShortUvSchema] = ShortUvList.validate_json(response.content)
+class UtbmApiClient(requests.Session):
+    """A wrapper around `requests.Session` to perform requests to the UTBM UV API."""
 
-    short_uv = next((uv for uv in uvs if uv.code == code), None)
-    if short_uv is None:
-        return None
+    BASE_URL = settings.SITH_PEDAGOGY_UTBM_API
+    _cache = {}
 
-    # get detailed information about the UV
-    uv_url = f"{base_url}/uv/{lang}/{year}/{code}/{short_uv.code_formation}"
-    response = requests.get(uv_url)
-    full_uv = UtbmFullUvSchema.model_validate_json(response.content)
-    return make_clean_uv(short_uv, full_uv)
+    @cached_property
+    def current_year(self) -> int:
+        """Fetch from the API the latest existing year"""
+        url = f"{self.BASE_URL}/guides/fr"
+        response = self.get(url)
+        return response.json()[-1]["annee"]
+
+    def fetch_short_uvs(
+        self, lang: str = "fr", year: int | None = None
+    ) -> list[UtbmShortUvSchema]:
+        """Get the list of UVs in their short format from the UTBM API"""
+        if year is None:
+            year = self.current_year
+        if "short_uvs" not in self._cache:
+            self._cache["short_uvs"] = {}
+        if lang not in self._cache["short_uvs"]:
+            self._cache["short_uvs"][lang] = {}
+        if year not in self._cache["short_uvs"][lang]:
+            url = f"{self.BASE_URL}/uvs/{lang}/{year}"
+            response = self.get(url)
+            uvs = ShortUvList.validate_json(response.content)
+            self._cache["short_uvs"][lang][year] = uvs
+        return self._cache["short_uvs"][lang][year]
+
+    def find_uv(self, lang: str, code: str, year: int | None = None) -> UvSchema | None:
+        """Find an UV from the UTBM API."""
+        # query the UV list
+        if not year:
+            year = self.current_year
+        # the UTBM API has no way to fetch a single short uv,
+        # and short uvs contain infos that we need and are not
+        # in the full uv schema, so we must fetch everything.
+        short_uvs = self.fetch_short_uvs(lang, year)
+        short_uv = next((uv for uv in short_uvs if uv.code == code), None)
+        if short_uv is None:
+            return None
+
+        # get detailed information about the UV
+        uv_url = f"{self.BASE_URL}/uv/{lang}/{year}/{code}/{short_uv.code_formation}"
+        response = requests.get(uv_url)
+        full_uv = UtbmFullUvSchema.model_validate_json(response.content)
+        return make_clean_uv(short_uv, full_uv)
 
 
 def make_clean_uv(short_uv: UtbmShortUvSchema, full_uv: UtbmFullUvSchema) -> UvSchema:
