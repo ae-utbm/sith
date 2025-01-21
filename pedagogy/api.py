@@ -46,4 +46,4 @@ class UvController(ControllerBase):
     )
     @paginate(PageNumberPaginationExtra, page_size=100)
     def fetch_uv_list(self, search: Query[UvFilterSchema]):
-        return search.filter(UV.objects.values())
+        return search.filter(UV.objects.order_by("code").values())
