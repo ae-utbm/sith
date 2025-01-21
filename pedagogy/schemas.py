@@ -54,11 +54,11 @@ class UtbmFullUvSchema(Schema):
 
     code: str
     departement: str = "NA"
-    libelle: str
-    objectifs: str
-    programme: str
-    acquisition_competences: str
-    acquisition_notions: str
+    libelle: str | None
+    objectifs: str | None
+    programme: str | None
+    acquisition_competences: str | None
+    acquisition_notions: str | None
     langue: str
     code_langue: str
     credits_ects: int
