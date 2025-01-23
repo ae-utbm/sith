@@ -442,6 +442,7 @@ def test_update_balance():
             _quantity=len(customers),
             unit_price=10,
             quantity=1,
+            payment_method="SITH_ACCOUNT",
             _save_related=True,
         ),
         *sale_recipe.prepare(
@@ -449,10 +450,26 @@ def test_update_balance():
             _quantity=3,
             unit_price=5,
             quantity=2,
+            payment_method="SITH_ACCOUNT",
             _save_related=True,
         ),
         sale_recipe.prepare(
-            customer=customers[4], quantity=1, unit_price=50, _save_related=True
+            customer=customers[4],
+            quantity=1,
+            unit_price=50,
+            payment_method="SITH_ACCOUNT",
+            _save_related=True,
+        ),
+        *sale_recipe.prepare(
+            # all customers also bought products without using their AE account.
+            # All purchases made with another mean than the AE account should
+            # be ignored when updating the account balance.
+            customer=iter(customers),
+            _quantity=len(customers),
+            unit_price=50,
+            quantity=1,
+            payment_method="CARD",
+            _save_related=True,
         ),
     ]
     Selling.objects.bulk_create(sales)

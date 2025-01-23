@@ -52,7 +52,8 @@ class CustomerQuerySet(models.QuerySet):
     def update_amount(self) -> int:
         """Update the amount of all customers selected by this queryset.
 
-        The result is given as the sum of all refills minus the sum of all purchases.
+        The result is given as the sum of all refills
+        minus the sum of all purchases paid with the AE account.
 
         Returns:
             The number of updated rows.
@@ -73,7 +74,9 @@ class CustomerQuerySet(models.QuerySet):
             .values("res")
         )
         money_out = Subquery(
-            Selling.objects.filter(customer=OuterRef("pk"))
+            Selling.objects.filter(
+                customer=OuterRef("pk"), payment_method="SITH_ACCOUNT"
+            )
             .values("customer_id")
             .annotate(res=Sum(F("unit_price") * F("quantity"), default=0))
             .values("res")
