@@ -142,14 +142,15 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
     """
 
     model = Counter
-    queryset = Counter.objects.annotate_is_open()
+    queryset = (
+        Counter.objects.exclude(type="EBOUTIC")
+        .annotate_is_open()
+        .select_related("club")
+    )
     form_class = BasketForm
     template_name = "counter/counter_click.jinja"
     pk_url_kwarg = "counter_id"
     current_tab = "counter"
-
-    def get_queryset(self):
-        return super().get_queryset().exclude(type="EBOUTIC").annotate_is_open()
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -168,9 +169,15 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
             return redirect(obj)  # Redirect to counter
 
         if obj.type == "OFFICE" and (
-            obj.sellers.filter(pk=request.user.pk).exists()
-            or not obj.club.has_rights_in_club(request.user)
+            request.user.is_anonymous
+            or not (
+                obj.sellers.contains(request.user)
+                or obj.club.has_rights_in_club(request.user)
+            )
         ):
+            # To be able to click on an office counter,
+            # a user must either be in the board of the club that own the counter
+            # or a seller of this counter.
             raise PermissionDenied
 
         if obj.type == "BAR" and (
