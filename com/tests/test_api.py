@@ -136,13 +136,21 @@ class TestModerateNews:
         # The API call should work even if the news is initially moderated.
         # In the latter case, the result should be a noop, rather than an error.
         news = baker.make(News, is_moderated=news_is_moderated)
+        initial_moderator = news.moderator
         client.force_login(user)
         response = client.patch(
             reverse("api:moderate_news", kwargs={"news_id": news.id})
         )
+        # if it wasn't moderated, it should now be moderated and the moderator should
+        # be the user that made the request.
+        # If it was already moderated, it should be a no-op, but not an error
         assert response.status_code == 200
         news.refresh_from_db()
         assert news.is_moderated
+        if not news_is_moderated:
+            assert news.moderator == user
+        else:
+            assert news.moderator == initial_moderator
 
     def test_moderation_forbidden(self, client: Client):
         user = baker.make(User)

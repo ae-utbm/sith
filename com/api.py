@@ -45,6 +45,7 @@ class NewsController(ControllerBase):
         news = self.get_object_or_exception(News, id=news_id)
         if not news.is_moderated:
             news.is_moderated = True
+            news.moderator = self.context.request.user
             news.save()
 
     @route.delete(
