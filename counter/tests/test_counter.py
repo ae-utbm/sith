@@ -937,13 +937,23 @@ class TestClubCounterClickAccess(TestCase):
         assert res.status_code == 403
 
     def test_board_member(self):
+        """By default, board members should be able to click on office counters"""
         baker.make(Membership, club=self.counter.club, user=self.user, role=3)
         self.client.force_login(self.user)
         res = self.client.get(self.click_url)
         assert res.status_code == 200
 
     def test_barman(self):
+        """Sellers should be able to click on office counters"""
         self.counter.sellers.add(self.user)
         self.client.force_login(self.user)
         res = self.client.get(self.click_url)
-        assert res.status_code == 403
+        assert res.status_code == 200
+
+    def test_both_barman_and_board_member(self):
+        """If the user is barman and board member, he should be authorized as well."""
+        self.counter.sellers.add(self.user)
+        baker.make(Membership, club=self.counter.club, user=self.user, role=3)
+        self.client.force_login(self.user)
+        res = self.client.get(self.click_url)
+        assert res.status_code == 200
