@@ -7,6 +7,7 @@ Certaines dépendances sont nécessaires niveau système :
 - libjpeg
 - zlib1g-dev
 - gettext
+- redis
 
 ### Installer WSL
 
@@ -65,8 +66,8 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
         
         ```bash
         sudo apt install curl build-essential libssl-dev \
-        libjpeg-dev zlib1g-dev npm libffi-dev pkg-config \
-        gettext git
+            libjpeg-dev zlib1g-dev npm libffi-dev pkg-config \
+            gettext git redis
         curl -LsSf https://astral.sh/uv/install.sh | sh
         ```
 
@@ -75,7 +76,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
         ```bash
         sudo pacman -Syu  # on s'assure que les dépôts et le système sont à jour
 
-        sudo pacman -S uv gcc git gettext pkgconf npm
+        sudo pacman -S uv gcc git gettext pkgconf npm redis
         ```
 
 === "macOS"
@@ -84,7 +85,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
     Il est également nécessaire d'avoir installé xcode
     
     ```bash    
-    brew install git uv npm
+    brew install git uv npm redis
     
     # Pour bien configurer gettext
     brew link gettext # (suivez bien les instructions supplémentaires affichées)
@@ -98,6 +99,15 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
 
     Python ne fait pas parti des dépendances puisqu'il est automatiquement
     installé par uv.
+
+Parmi les dépendances installées se trouve redis (que nous utilisons comme cache).
+Redis est un service qui doit être activé pour être utilisé.
+Pour cela, effectuez les commandes :
+
+```bash
+sudo systemctl start redis
+sudo systemctl enable redis  # si vous voulez que redis démarre automatiquement au boot
+```
 
 ## Finaliser l'installation
 
@@ -120,20 +130,24 @@ uv run ./manage.py install_xapian
     de texte à l'écran.
     C'est normal, il ne faut pas avoir peur.
 
-Maintenant que les dépendances sont installées, nous
-allons créer la base de données, la remplir avec des données de test,
-et compiler les traductions.
-Cependant, avant de faire cela, il est nécessaire de modifier
-la configuration pour signifier que nous sommes en mode développement.
-Pour cela, nous allons créer un fichier `sith/settings_custom.py`
-et l'utiliser pour surcharger les settings de base.
+Une fois les dépendances installées, il faut encore
+mettre en place quelques éléments de configuration,
+qui peuvent varier d'un environnement à l'autre.
+Ces variables sont stockées dans un fichier `.env`.
+Pour le créer, vous pouvez copier le fichier `.env.example` :
 
 ```bash
-echo "DEBUG=True" > sith/settings_custom.py
-echo 'SITH_URL = "localhost:8000"' >> sith/settings_custom.py
+cp .env.example .env
 ```
 
-Enfin, nous pouvons lancer les commandes suivantes :
+Les variables par défaut contenues dans le fichier `.env`
+devraient convenir pour le développement, sans modification.
+
+Maintenant que les dépendances sont installées
+et la configuration remplie, nous allons pouvoir générer
+des données utiles pendant le développement.
+
+Pour cela, lancez les commandes suivantes :
 
 ```bash
 # Prépare la base de données
@@ -170,6 +184,30 @@ uv run ./manage.py runserver
     Vous trouverez également, à l'adresse
     [http://localhost:8000/api/docs](http://localhost:8000/api/docs),
     une interface swagger, avec toutes les routes de l'API.
+
+!!! question "Pourquoi l'installation est aussi complexe ?"
+
+    Cette question nous a été posée de nombreuses fois par des personnes
+    essayant d'installer le projet.
+    Il y a en effet un certain nombre d'étapes à suivre,
+    de paquets à installer et de commandes à exécuter.
+    
+    Le processus d'installation peut donc sembler complexe.
+
+    En réalité, il est difficile de faire plus simple.
+    En effet, un site web a besoin de beaucoup de composants
+    pour être développé : il lui faut au minimum
+    une base de données, un cache, un bundler Javascript
+    et un interpréteur pour le code du serveur.
+    Pour nos besoin particuliers, nous utilisons également
+    un moteur de recherche full-text.
+    
+    Nous avons tenté au maximum de limiter le nombre de dépendances
+    et de sélecionner les plus simples à installer.
+    Cependant, il est impossible de retirer l'intégralité
+    de la complexité du processus.
+    Si vous rencontrez des difficulté lors de l'installation,
+    n'hésitez pas à demander de l'aide.
 
 ## Générer la documentation
 
