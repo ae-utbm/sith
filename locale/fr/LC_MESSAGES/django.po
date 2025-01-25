@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-19 18:12+0100\n"
+"POT-Creation-Date: 2025-01-21 15:48+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -934,10 +934,6 @@ msgstr "rôle"
 #: forum/models.py
 msgid "description"
 msgstr "description"
-
-#: club/models.py
-msgid "past member"
-msgstr "ancien membre"
 
 #: club/models.py
 msgid "Email address"
@@ -3299,8 +3295,8 @@ msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
 #: core/views/forms.py
 msgid ""
-"Profile: you need to be visible on the picture, in order to be recognized "
-"(e.g. by the barmen)"
+"Profile: you need to be visible on the picture, in order to be recognized (e."
+"g. by the barmen)"
 msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
@@ -3906,8 +3902,8 @@ msgstr ""
 #: counter/templates/counter/mails/account_dump.jinja
 msgid "If you think this was a mistake, please mail us at ae@utbm.fr."
 msgstr ""
-"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à "
-"ae@utbm.fr."
+"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à ae@utbm."
+"fr."
 
 #: counter/templates/counter/mails/account_dump.jinja
 msgid ""
@@ -4934,6 +4930,10 @@ msgstr "Département"
 #: pedagogy/templates/pedagogy/guide.jinja
 msgid "Credit type"
 msgstr "Type de crédit"
+
+#: pedagogy/templates/pedagogy/guide.jinja
+msgid "closed uv"
+msgstr "uv fermée"
 
 #: pedagogy/templates/pedagogy/macros.jinja
 msgid " not rated "
@@ -5973,3 +5973,6 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
+
+#~ msgid "past member"
+#~ msgstr "ancien membre"

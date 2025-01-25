@@ -16,11 +16,11 @@ from com.calendar import IcsCalendar
 
 @dataclass
 class MockResponse:
-    status: int
+    ok: bool
     value: str
 
     @property
-    def data(self):
+    def content(self):
         return self.value.encode("utf8")
 
 
@@ -38,7 +38,7 @@ class TestExternalCalendar:
     @pytest.fixture
     def mock_request(self):
         mock = MagicMock()
-        with patch("urllib3.request", mock):
+        with patch("requests.get", mock):
             yield mock
 
     @pytest.fixture
@@ -52,15 +52,12 @@ class TestExternalCalendar:
     def clear_cache(self):
         IcsCalendar._EXTERNAL_CALENDAR.unlink(missing_ok=True)
 
-    @pytest.mark.parametrize("error_code", [403, 404, 500])
-    def test_fetch_error(
-        self, client: Client, mock_request: MagicMock, error_code: int
-    ):
-        mock_request.return_value = MockResponse(error_code, "not allowed")
+    def test_fetch_error(self, client: Client, mock_request: MagicMock):
+        mock_request.return_value = MockResponse(ok=False, value="not allowed")
         assert client.get(reverse("api:calendar_external")).status_code == 404
 
     def test_fetch_success(self, client: Client, mock_request: MagicMock):
-        external_response = MockResponse(200, "Definitely an ICS")
+        external_response = MockResponse(ok=True, value="Definitely an ICS")
         mock_request.return_value = external_response
         response = client.get(reverse("api:calendar_external"))
         assert response.status_code == 200
