@@ -1,5 +1,4 @@
 import { exportToHtml } from "#core:utils/globals";
-import Alpine from "alpinejs";
 import { newsDeleteNews, newsModerateNews } from "#openapi";
 
 // This will be used in jinja templates,
