@@ -65,6 +65,7 @@ INTERNAL_IPS = ["127.0.0.1"]
 
 # force csrf tokens and cookies to be secure when in https
 CSRF_COOKIE_SECURE = env.bool("HTTPS", default=True)
+CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 SESSION_COOKIE_SECURE = env.bool("HTTPS", default=True)
 X_FRAME_OPTIONS = "SAMEORIGIN"
 
