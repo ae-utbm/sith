@@ -1263,7 +1263,7 @@ msgstr "Format : 16:9 | Résolution : 1920x1080"
 msgid "Start date"
 msgstr "Date de début"
 
-#: com/forms.py
+#: com/forms.py com/templates/com/macros.jinja
 msgid "Weekly event"
 msgstr "Événement Hebdomadaire"
 
@@ -1421,6 +1421,16 @@ msgid "It will stay hidden for other users until it has been moderated."
 msgstr ""
 "Elle sera cachée pour les autres utilisateurs tant qu'elle ne sera pas "
 "modérée."
+
+#: com/templates/com/macros.jinja
+#, python-format
+msgid ""
+"This event will take place every week for %(nb)s weeks. If you moderate or delete "
+"this event, it will also be moderated (or deleted) for the following weeks."
+msgstr ""
+"Cet événement se déroulera chaque semaine pendant %(nb)s semaines. Si vous "
+"modérez ou supprimez cet événement, il sera également modéré (ou supprimé) "
+"pour les semaines suivantes."
 
 #: com/templates/com/macros.jinja com/templates/com/mailing_admin.jinja
 #: com/templates/com/news_admin_list.jinja com/templates/com/news_detail.jinja
