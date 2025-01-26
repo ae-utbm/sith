@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: accounting/models.py club/models.py com/models.py counter/models.py
-#: forum/models.py launderette/models.py
+#: forum/models.py launderette/models.py sas/models.py
 msgid "name"
 msgstr "nom"
 
@@ -948,7 +948,7 @@ msgid "Enter a valid address. Only the root of the address is needed."
 msgstr ""
 "Entrez une adresse valide. Seule la racine de l'adresse est nécessaire."
 
-#: club/models.py com/models.py core/models.py
+#: club/models.py com/models.py core/models.py sas/models.py
 msgid "is moderated"
 msgstr "est modéré"
 
@@ -2096,11 +2096,11 @@ msgstr "avoir une notification pour chaque click"
 msgid "get a notification for every refilling"
 msgstr "avoir une notification pour chaque rechargement"
 
-#: core/models.py sas/forms.py
+#: core/models.py sas/models.py
 msgid "file name"
 msgstr "nom du fichier"
 
-#: core/models.py
+#: core/models.py sas/models.py
 msgid "parent"
 msgstr "parent"
 
@@ -2108,11 +2108,11 @@ msgstr "parent"
 msgid "compressed file"
 msgstr "version allégée"
 
-#: core/models.py
+#: core/models.py sas/models.py
 msgid "thumbnail"
 msgstr "miniature"
 
-#: core/models.py
+#: core/models.py sas/models.py
 msgid "owner"
 msgstr "propriétaire"
 
@@ -2136,13 +2136,9 @@ msgstr "type mime"
 msgid "size"
 msgstr "taille"
 
-#: core/models.py
+#: core/models.py sas/models.py
 msgid "asked for removal"
 msgstr "retrait demandé"
-
-#: core/models.py
-msgid "is in the SAS"
-msgstr "est dans le SAS"
 
 #: core/models.py
 msgid "Character '/' not authorized in name"
@@ -3685,7 +3681,7 @@ msgstr "élément de relevé de caisse"
 msgid "banner"
 msgstr "bannière"
 
-#: counter/models.py
+#: counter/models.py sas/models.py
 msgid "event date"
 msgstr "date de l'événement"
 
@@ -4367,11 +4363,11 @@ msgstr "début des candidatures"
 msgid "end candidature"
 msgstr "fin des candidatures"
 
-#: election/models.py
+#: election/models.py sas/models.py
 msgid "edit groups"
 msgstr "groupe d'édition"
 
-#: election/models.py
+#: election/models.py sas/models.py
 msgid "view groups"
 msgstr "groupe de vue"
 
@@ -5189,6 +5185,22 @@ msgstr "Erreur de création de l'album %(album)s : %(msg)s"
 #: sas/forms.py
 msgid "You already requested moderation for this picture."
 msgstr "Vous avez déjà déposé une demande de retrait pour cette photo."
+
+#: sas/models.py
+msgid "The date on which the photos in this album were taken"
+msgstr "La date à laquelle les photos de cet album ont été prises"
+
+#: sas/models.py
+msgid "album"
+msgstr "album"
+
+#: sas/models.py
+msgid "original image"
+msgstr "image originale"
+
+#: sas/models.py
+msgid "compressed image"
+msgstr "version compressée"
 
 #: sas/models.py
 msgid "picture"
