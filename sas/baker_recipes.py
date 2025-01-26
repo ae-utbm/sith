@@ -3,13 +3,7 @@ from model_bakery.recipe import Recipe
 
 from sas.models import Picture
 
-picture_recipe = Recipe(
-    Picture,
-    is_in_sas=True,
-    is_folder=False,
-    is_moderated=True,
-    name=seq("Picture "),
-)
+picture_recipe = Recipe(Picture, is_moderated=True, name=seq("Picture "))
 """A SAS Picture fixture.
 
 Warnings:
