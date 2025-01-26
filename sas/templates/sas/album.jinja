@@ -18,7 +18,7 @@
 
 {% block content %}
   <code>
-    <a href="{{ url('sas:main') }}">SAS</a> / {{ print_path(album.parent) }} {{ album.get_display_name() }}
+    <a href="{{ url('sas:main') }}">SAS</a> / {{ print_path(album.parent) }} {{ album.name }}
   </code>
 
   {% set is_sas_admin = user.can_edit(album) %}
@@ -29,7 +29,7 @@
       {% csrf_token %}
 
       <div class="album-navbar">
-        <h3>{{ album.get_display_name() }}</h3>
+        <h3>{{ album.name }}</h3>
 
         <div class="toolbar">
           <a href="{{ url('sas:album_edit', album_id=album.id) }}">{% trans %}Edit{% endtrans %}</a>
