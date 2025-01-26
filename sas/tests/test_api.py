@@ -27,8 +27,8 @@ class TestSas(TestCase):
         cls.user_b, cls.user_c = subscriber_user.make(_quantity=2)
 
         picture = picture_recipe.extend(owner=owner)
-        cls.album_a = baker.make(Album, is_in_sas=True, parent=sas)
-        cls.album_b = baker.make(Album, is_in_sas=True, parent=sas)
+        cls.album_a = baker.make(Album)
+        cls.album_b = baker.make(Album)
         relation_recipe = Recipe(PeoplePictureRelation)
         relations = []
         for album in cls.album_a, cls.album_b:

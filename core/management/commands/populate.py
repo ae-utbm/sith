@@ -124,8 +124,9 @@ class Command(BaseCommand):
         p.save(force_lock=True)
 
         club_root = SithFile.objects.create(name="clubs", owner=root)
-        sas = SithFile.objects.create(
-            name="SAS", owner=root, id=settings.SITH_SAS_ROOT_DIR_ID
+        sas = SithFile.objects.create(name="SAS", owner=root)
+        main_club = Club.objects.create(
+            id=1, name="AE", address="6 Boulevard Anatole France, 90000 Belfort"
         )
         clubs = self._create_clubs()
 
@@ -575,14 +576,7 @@ class Command(BaseCommand):
         # SAS
         for f in self.SAS_FIXTURE_PATH.glob("*"):
             if f.is_dir():
-                album = Album(
-                    parent=sas,
-                    name=f.name,
-                    owner=root,
-                    is_folder=True,
-                    is_in_sas=True,
-                    is_moderated=True,
-                )
+                album = Album(name=f.name)
                 album.clean()
                 album.save()
                 for p in f.iterdir():
@@ -590,17 +584,13 @@ class Command(BaseCommand):
                     pict = Picture(
                         parent=album,
                         name=p.name,
-                        file=file,
+                        original=file,
                         owner=root,
-                        is_folder=False,
-                        is_in_sas=True,
                         is_moderated=True,
-                        mime_type="image/webp",
-                        size=file.size,
                     )
-                    pict.file.name = p.name
-                    pict.full_clean()
-                    pict.generate_thumbnails(save=True)
+                    pict.original.name = pict.name
+                    pict.generate_thumbnails()
+                    pict.full_clean(save=True)
 
         img_skia = Picture.objects.get(name="skia.jpg")
         img_sli = Picture.objects.get(name="sli.jpg")

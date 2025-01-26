@@ -96,7 +96,7 @@ class PicturesController(ControllerBase):
         return (
             filters.filter(Picture.objects.viewable_by(user))
             .distinct()
-            .order_by("-parent__date", "date")
+            .order_by("-parent__event_date", "created_at")
             .select_related("owner", "parent")
         )
 

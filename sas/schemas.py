@@ -73,7 +73,7 @@ class PictureSchema(ModelSchema):
         fields = [
             "id",
             "name",
-            "date",
+            "created_at",
             "updated_at",
             "size",
             "is_moderated",
