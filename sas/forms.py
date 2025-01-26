@@ -23,12 +23,7 @@ class SASForm(forms.Form):
     def process(self, parent, owner, files, *, automodere=False):
         try:
             if self.cleaned_data["album_name"] != "":
-                album = Album(
-                    parent=parent,
-                    name=self.cleaned_data["album_name"],
-                    owner=owner,
-                    is_moderated=automodere,
-                )
+                album = Album(parent=parent, name=self.cleaned_data["album_name"])
                 album.clean()
                 album.save()
         except Exception as e:
@@ -41,11 +36,8 @@ class SASForm(forms.Form):
             new_file = Picture(
                 parent=parent,
                 name=f.name,
-                file=f,
+                original=f,
                 owner=owner,
-                mime_type=f.content_type,
-                size=f.size,
-                is_folder=False,
                 is_moderated=automodere,
             )
             if automodere:
@@ -72,13 +64,12 @@ class PictureEditForm(forms.ModelForm):
 class AlbumEditForm(forms.ModelForm):
     class Meta:
         model = Album
-        fields = ["name", "date", "file", "parent", "edit_groups"]
+        fields = ["name", "date", "thumbnail", "parent", "edit_groups"]
         widgets = {
             "parent": AutoCompleteSelectAlbum,
             "edit_groups": AutoCompleteSelectMultipleGroup,
         }
 
-    name = forms.CharField(max_length=Album.NAME_MAX_LENGTH, label=_("file name"))
     date = forms.DateField(label=_("Date"), widget=SelectDate, required=True)
     recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
 
