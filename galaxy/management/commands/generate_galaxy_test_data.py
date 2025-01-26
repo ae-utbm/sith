@@ -25,16 +25,23 @@ import warnings
 from datetime import timedelta
 from typing import Final, Optional
 
-from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from club.models import Club, Membership
-from core.models import Group, Page, SithFile, User
+from core.models import Group, Page, User
 from core.utils import RED_PIXEL_PNG
 from sas.models import Album, PeoplePictureRelation, Picture
 from subscription.models import Subscription
+
+RED_PIXEL_PNG: Final[bytes] = (
+    b"\x89\x50\x4e\x47\x0d\x0a\x1a\x0a\x00\x00\x00\x0d\x49\x48\x44\x52"
+    b"\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90\x77\x53"
+    b"\xde\x00\x00\x00\x0c\x49\x44\x41\x54\x08\xd7\x63\xf8\xcf\xc0\x00"
+    b"\x00\x03\x01\x01\x00\x18\xdd\x8d\xb0\x00\x00\x00\x00\x49\x45\x4e"
+    b"\x44\xae\x42\x60\x82"
+)
 
 USER_PACK_SIZE: Final[int] = 1000
 
@@ -91,13 +98,8 @@ class Command(BaseCommand):
         self.NB_CLUBS = options["club_count"]
 
         root = User.objects.filter(username="root").first()
-        sas = SithFile.objects.get(id=settings.SITH_SAS_ROOT_DIR_ID)
         self.galaxy_album = Album.objects.create(
-            name="galaxy-register-file",
-            owner=root,
-            is_moderated=True,
-            is_in_sas=True,
-            parent=sas,
+            name="galaxy-register-file", owner=root, is_moderated=True
         )
 
         self.make_clubs()
@@ -285,14 +287,10 @@ class Command(BaseCommand):
                     owner=u,
                     name=f"galaxy-picture {u} {i // self.NB_USERS}",
                     is_moderated=True,
-                    is_folder=False,
                     parent=self.galaxy_album,
-                    is_in_sas=True,
-                    file=ContentFile(RED_PIXEL_PNG),
+                    original=ContentFile(RED_PIXEL_PNG),
                     compressed=ContentFile(RED_PIXEL_PNG),
                     thumbnail=ContentFile(RED_PIXEL_PNG),
-                    mime_type="image/png",
-                    size=len(RED_PIXEL_PNG),
                 )
             )
             self.picts[i].file.name = self.picts[i].name
