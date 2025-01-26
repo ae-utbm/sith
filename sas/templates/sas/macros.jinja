@@ -1,6 +1,6 @@
 {% macro display_album(a, edit_mode) %}
   <a href="{{ url('sas:album', album_id=a.id) }}">
-    {% if a.file %}
+    {% if a.thumbnail %}
       {% set img = a.get_download_url() %}
       {% set src = a.name %}
     {% elif a.children.filter(is_folder=False, is_moderated=True).exists() %}
@@ -31,7 +31,7 @@
 {% macro print_path(file) %}
   {% if file and file.parent %}
     {{ print_path(file.parent) }}
-    <a href="{{ url('sas:album', album_id=file.id) }}">{{ file.get_display_name() }}</a> /
+    <a href="{{ url("sas:album", album_id=file.id) }}">{{ file.name }}</a> /
   {% endif %}
 {% endmacro %}
 
