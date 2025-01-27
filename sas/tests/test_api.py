@@ -61,7 +61,7 @@ class TestPictureSearch(TestSas):
         self.client.force_login(self.user_b)
         res = self.client.get(self.url + f"?album_id={self.album_a.id}")
         assert res.status_code == 200
-        expected = list(self.album_a.children_pictures.values_list("id", flat=True))
+        expected = list(self.album_a.pictures.values_list("id", flat=True))
         assert [i["id"] for i in res.json()["results"]] == expected
 
     def test_filter_by_user(self):
@@ -70,7 +70,7 @@ class TestPictureSearch(TestSas):
         assert res.status_code == 200
         expected = list(
             self.user_a.pictures.order_by(
-                "-picture__parent__date", "picture__date"
+                "-picture__parent__event_date", "picture__created_at"
             ).values_list("picture_id", flat=True)
         )
         assert [i["id"] for i in res.json()["results"]] == expected
@@ -84,7 +84,7 @@ class TestPictureSearch(TestSas):
         assert res.status_code == 200
         expected = list(
             self.user_a.pictures.union(self.user_b.pictures.all())
-            .order_by("-picture__parent__date", "picture__date")
+            .order_by("-picture__parent__event_date", "picture__created_at")
             .values_list("picture_id", flat=True)
         )
         assert [i["id"] for i in res.json()["results"]] == expected
@@ -97,7 +97,7 @@ class TestPictureSearch(TestSas):
         assert res.status_code == 200
         expected = list(
             self.user_a.pictures.order_by(
-                "-picture__parent__date", "picture__date"
+                "-picture__parent__event_date", "picture__created_at"
             ).values_list("picture_id", flat=True)
         )
         assert [i["id"] for i in res.json()["results"]] == expected
@@ -123,7 +123,7 @@ class TestPictureSearch(TestSas):
         assert res.status_code == 200
         expected = list(
             self.user_b.pictures.intersection(self.user_a.pictures.all())
-            .order_by("-picture__parent__date", "picture__date")
+            .order_by("-picture__parent__event_date", "picture__created_at")
             .values_list("picture_id", flat=True)
         )
         assert [i["id"] for i in res.json()["results"]] == expected
