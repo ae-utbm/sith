@@ -70,9 +70,7 @@ def test_album_access_non_subscriber(client: Client):
 class TestSasModeration(TestCase):
     @classmethod
     def setUpTestData(cls):
-        album = baker.make(
-            Album, parent_id=settings.SITH_SAS_ROOT_DIR_ID, is_moderated=True
-        )
+        album = baker.make(Album)
         cls.pictures = picture_recipe.make(
             parent=album, _quantity=10, _bulk_create=True
         )
