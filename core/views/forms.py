@@ -323,6 +323,19 @@ class UserGroupsForm(forms.ModelForm):
         model = User
         fields = ["groups"]
 
+    def save(self, *args, **kwargs) -> User:
+        # make the super method manage error without persisting in db
+        super().save(commit=False)
+        # Don't forget to add the non-manageable groups when setting groups,
+        # or the user would lose all of those when the form is submitted
+        self.instance.groups.set(
+            [
+                *self.cleaned_data["groups"],
+                *self.instance.groups.filter(is_manually_manageable=False),
+            ]
+        )
+        return self.instance
+
 
 class UserGodfathersForm(forms.Form):
     type = forms.ChoiceField(

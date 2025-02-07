@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils.timezone import now
 from model_bakery import baker, seq
 from model_bakery.recipe import Recipe, foreign_key
+from pytest_django.asserts import assertRedirects
 
 from com.models import News
 from core.baker_recipes import (
@@ -15,7 +16,7 @@ from core.baker_recipes import (
     subscriber_user,
     very_old_subscriber_user,
 )
-from core.models import User
+from core.models import Group, User
 from counter.models import Counter, Refilling, Selling
 from eboutic.models import Invoice, InvoiceItem
 
@@ -198,3 +199,23 @@ def test_user_added_to_public_group():
     user = baker.make(User)
     assert user.groups.filter(pk=settings.SITH_GROUP_PUBLIC_ID).exists()
     assert user.is_in_group(pk=settings.SITH_GROUP_PUBLIC_ID)
+
+
+@pytest.mark.django_db
+def test_user_update_groups(client: Client):
+    client.force_login(baker.make(User, is_superuser=True))
+    manageable_groups = baker.make(Group, is_manually_manageable=True, _quantity=3)
+    hidden_groups = baker.make(Group, is_manually_manageable=False, _quantity=4)
+    user = baker.make(User, groups=[*manageable_groups[1:], *hidden_groups[:3]])
+    response = client.post(
+        reverse("core:user_groups", kwargs={"user_id": user.id}),
+        data={"groups": [manageable_groups[0].id, manageable_groups[1].id]},
+    )
+    assertRedirects(response, user.get_absolute_url())
+    # only the manually manageable groups should have changed
+    assert set(user.groups.all()) == {
+        Group.objects.get(pk=settings.SITH_GROUP_PUBLIC_ID),
+        manageable_groups[0],
+        manageable_groups[1],
+        *hidden_groups[:3],
+    }
