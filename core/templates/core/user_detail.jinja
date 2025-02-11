@@ -166,7 +166,7 @@
   </div>
 {% endif %}
 <br>
-{% if profile.was_subscribed and (user == profile or user.can_read_subscription_history)%}
+{% if profile.was_subscribed and (user == profile or user.has_perm("subscription.view_subscription")) %}
   <div class="collapse" :class="{'shadow': collapsed}" x-data="{collapsed: false}" x-cloak>
     <div class="collapse-header clickable" @click="collapsed = !collapsed">
       <span class="collapse-header-text">

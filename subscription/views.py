@@ -14,7 +14,7 @@
 #
 
 from django.conf import settings
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import localdate
@@ -30,13 +30,9 @@ from subscription.forms import (
 from subscription.models import Subscription
 
 
-class CanCreateSubscriptionMixin(UserPassesTestMixin):
-    def test_func(self):
-        return self.request.user.can_create_subscription
-
-
-class NewSubscription(CanCreateSubscriptionMixin, TemplateView):
+class NewSubscription(PermissionRequiredMixin, TemplateView):
     template_name = "subscription/subscription.jinja"
+    permission_required = "subscription.add_subscription"
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -49,8 +45,9 @@ class NewSubscription(CanCreateSubscriptionMixin, TemplateView):
         }
 
 
-class CreateSubscriptionFragment(CanCreateSubscriptionMixin, CreateView):
+class CreateSubscriptionFragment(PermissionRequiredMixin, CreateView):
     template_name = "subscription/fragments/creation_form.jinja"
+    permission_required = "subscription.add_subscription"
 
     def get_success_url(self):
         return reverse(
@@ -72,8 +69,9 @@ class CreateSubscriptionNewUserFragment(CreateSubscriptionFragment):
     extra_context = {"post_url": reverse_lazy("subscription:fragment-new-user")}
 
 
-class SubscriptionCreatedFragment(CanCreateSubscriptionMixin, DetailView):
+class SubscriptionCreatedFragment(PermissionRequiredMixin, DetailView):
     template_name = "subscription/fragments/creation_success.jinja"
+    permission_required = "subscription.add_subscription"
     model = Subscription
     pk_url_kwarg = "subscription_id"
     context_object_name = "subscription"

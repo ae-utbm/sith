@@ -13,7 +13,7 @@
     <h3>{% trans %}User Tools{% endtrans %}</h3>
 
     <div class="container">
-      {% if user.can_create_subscription or user.is_root or user.is_board_member %}
+      {% if user.has_perm("subscription.add_subscription") or user.is_root or user.is_board_member %}
         <div>
           <h4>{% trans %}Sith management{% endtrans %}</h4>
           <ul>
@@ -26,7 +26,7 @@
             {% if user.has_perm("core.view_userban") %}
               <li><a href="{{ url("rootplace:ban_list") }}">{% trans %}Bans{% endtrans %}</a></li>
             {% endif %}
-            {% if user.can_create_subscription or user.is_root %}
+            {% if user.has_perm("subscription.add_subscription") %}
               <li><a href="{{ url('subscription:subscription') }}">{% trans %}Subscriptions{% endtrans %}</a></li>
             {% endif %}
             {% if user.is_board_member or user.is_root %}
