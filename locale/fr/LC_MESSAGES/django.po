@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-19 18:12+0100\n"
+"POT-Creation-Date: 2025-02-12 15:32+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -2914,7 +2914,7 @@ msgstr "Blouse"
 msgid "Not subscribed"
 msgstr "Non cotisant"
 
-#: core/templates/core/user_detail.jinja
+#: core/templates/core/user_detail.jinja core/templates/core/user_tools.jinja
 #: subscription/templates/subscription/subscription.jinja
 msgid "New subscription"
 msgstr "Nouvelle cotisation"
@@ -3146,15 +3146,6 @@ msgstr "Supprimer les messages forum d'un utilisateur"
 msgid "Bans"
 msgstr "Bans"
 
-#: core/templates/core/user_tools.jinja
-msgid "Subscriptions"
-msgstr "Cotisations"
-
-#: core/templates/core/user_tools.jinja
-#: subscription/templates/subscription/stats.jinja
-msgid "Subscription stats"
-msgstr "Statistiques de cotisation"
-
 #: core/templates/core/user_tools.jinja counter/forms.py
 #: counter/views/mixins.py
 msgid "Counters"
@@ -3226,6 +3217,19 @@ msgstr "Modérer les fichiers"
 #: core/templates/core/user_tools.jinja
 msgid "Moderate pictures"
 msgstr "Modérer les photos"
+
+#: core/templates/core/user_tools.jinja
+msgid "Subscriptions"
+msgstr "Cotisations"
+
+#: core/templates/core/user_tools.jinja
+msgid "Manage permissions"
+msgstr "Gérer les permissions"
+
+#: core/templates/core/user_tools.jinja
+#: subscription/templates/subscription/stats.jinja
+msgid "Subscription stats"
+msgstr "Statistiques de cotisation"
 
 #: core/templates/core/user_tools.jinja pedagogy/templates/pedagogy/guide.jinja
 msgid "Create UV"

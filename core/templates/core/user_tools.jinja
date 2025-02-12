@@ -30,11 +30,7 @@
             {% if user.has_perm("core.view_userban") %}
               <li><a href="{{ url("rootplace:ban_list") }}">{% trans %}Bans{% endtrans %}</a></li>
             {% endif %}
-            {% if user.has_perm("subscription.add_subscription") %}
-              <li><a href="{{ url('subscription:subscription') }}">{% trans %}Subscriptions{% endtrans %}</a></li>
-            {% endif %}
             {% if user.is_board_member or user.is_root %}
-              <li><a href="{{ url('subscription:stats') }}">{% trans %}Subscription stats{% endtrans %}</a></li>
               <li><a href="{{ url('club:club_new') }}">{% trans %}New club{% endtrans %}</a></li>
             {% endif %}
           </ul>
@@ -158,6 +154,35 @@
             {% endif %}
             {% if user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
               <li><a href="{{ url('sas:moderation') }}">{% trans %}Moderate pictures{% endtrans %}</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      {% endif %}
+
+      {% if user.has_perm("subscription.add_subscription") or user.has_perm("auth.change_perm") or user.is_root or user.is_board_member %}
+        <div>
+          <h4>{% trans %}Subscriptions{% endtrans %}</h4>
+          <ul>
+            {% if user.has_perm("subscription.add_subscription") %}
+              <li>
+                <a href="{{ url("subscription:subscription") }}">
+                  {% trans %}New subscription{% endtrans %}
+                </a>
+              </li>
+            {% endif %}
+            {% if user.has_perm("auth.change_permission") %}
+              <li>
+                <a href="{{ url("subscription:perms") }}">
+                  {% trans %}Manage permissions{% endtrans %}
+                </a>
+              </li>
+            {% endif %}
+            {% if user.is_root or user.is_board_member %}
+              <li>
+                <a href="{{ url("subscription:stats") }}">
+                  {% trans %}Subscription stats{% endtrans %}
+                </a>
+              </li>
             {% endif %}
           </ul>
         </div>

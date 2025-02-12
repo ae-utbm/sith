@@ -197,9 +197,9 @@
       </table>
     </div>
   </div>
+  <hr>
 {% endif %}
 
-<hr>
 <div>
   {% if user.is_root or user.is_board_member %}
     <form class="form-gifts" action="{{ url('core:user_gift_create', user_id=profile.id) }}" method="post">

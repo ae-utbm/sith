@@ -21,6 +21,7 @@ from django.utils.timezone import localdate
 from django.views.generic import CreateView, DetailView, TemplateView
 from django.views.generic.edit import FormView
 
+from core.views.group import PermissionGroupsUpdateView
 from counter.apps import PAYMENT_METHOD
 from subscription.forms import (
     SelectionDateForm,
@@ -75,6 +76,12 @@ class SubscriptionCreatedFragment(PermissionRequiredMixin, DetailView):
     model = Subscription
     pk_url_kwarg = "subscription_id"
     context_object_name = "subscription"
+
+
+class SubscriptionPermissionView(PermissionGroupsUpdateView):
+    """Manage the groups that have access to the subscription creation page."""
+
+    permission = "subscription.add_subscription"
 
 
 class SubscriptionsStatsView(FormView):
