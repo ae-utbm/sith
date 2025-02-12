@@ -18,6 +18,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
 from django.utils.timezone import localdate
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DetailView, TemplateView
 from django.views.generic.edit import FormView
 
@@ -82,6 +83,7 @@ class SubscriptionPermissionView(PermissionGroupsUpdateView):
     """Manage the groups that have access to the subscription creation page."""
 
     permission = "subscription.add_subscription"
+    extra_context = {"object_name": _("the groups that can create subscriptions")}
 
 
 class SubscriptionsStatsView(FormView):

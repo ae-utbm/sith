@@ -18,6 +18,7 @@
 from django import forms
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import Permission
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
@@ -136,7 +137,9 @@ class GroupDeleteView(CanEditMixin, DeleteView):
     success_url = reverse_lazy("core:group_list")
 
 
-class PermissionGroupsUpdateView(PermissionRequiredMixin, UpdateView):
+class PermissionGroupsUpdateView(
+    PermissionRequiredMixin, SuccessMessageMixin, UpdateView
+):
     """Manage the groups that have a specific permission.
 
     Notes:
@@ -151,9 +154,8 @@ class PermissionGroupsUpdateView(PermissionRequiredMixin, UpdateView):
 
     Example:
         ```python
-        class AddSubscriptionGroupsView(PermissionGroupsUpdateView):
+        class SubscriptionPermissionView(PermissionGroupsUpdateView):
             permission = "subscription.add_subscription"
-            success_url = reverse_lazy("foo:bar")
         ```
     """
 
@@ -161,6 +163,7 @@ class PermissionGroupsUpdateView(PermissionRequiredMixin, UpdateView):
     template_name = "core/edit.jinja"
     form_class = PermissionGroupsForm
     permission = None
+    success_message = _("Groups have been successfully updated.")
 
     def get_object(self, *args, **kwargs):
         if not self.permission:
