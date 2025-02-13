@@ -451,7 +451,10 @@ class PermissionGroupsForm(forms.ModelForm):
         fields = []
 
     groups = forms.ModelMultipleChoiceField(
-        Group.objects.all(), widget=AutoCompleteSelectMultipleGroup, required=False
+        Group.objects.all(),
+        label=_("Groups"),
+        widget=AutoCompleteSelectMultipleGroup,
+        required=False,
     )
 
     def __init__(self, instance: Permission, **kwargs):
