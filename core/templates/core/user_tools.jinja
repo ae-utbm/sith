@@ -13,7 +13,7 @@
     <h3>{% trans %}User Tools{% endtrans %}</h3>
 
     <div class="container">
-      {% if user.has_perm("subscription.add_subscription") or user.is_root or user.is_board_member %}
+      {% if user.has_perm("subscription.view_userban") or user.is_root or user.is_board_member %}
         <div>
           <h4>{% trans %}Sith management{% endtrans %}</h4>
           <ul>
@@ -199,12 +199,24 @@
         </div>
       {% endif %}
 
-      {% if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID) %}
+      {% if user.has_perm("pedagogy.add_uv") or user.has_perm("pedagogy.delete_uvcomment") %}
         <div>
           <h4>{% trans %}Pedagogy{% endtrans %}</h4>
           <ul>
-            <li><a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a></li>
-            <li><a href="{{ url('pedagogy:moderation') }}">{% trans %}Moderate comments{% endtrans %}</a></li>
+            {% if user.has_perm("pedagogy.add_uv") %}
+              <li>
+                <a href="{{ url("pedagogy:uv_create") }}">
+                  {% trans %}Create UV{% endtrans %}
+                </a>
+              </li>
+            {% endif %}
+            {% if user.has_perm("pedagogy.delete_uvcomment") %}
+              <li>
+                <a href="{{ url("pedagogy:moderation") }}">
+                  {% trans %}Moderate comments{% endtrans %}
+                </a>
+              </li>
+            {% endif %}
           </ul>
         </div>
       {% endif %}
