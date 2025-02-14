@@ -75,10 +75,10 @@ ics-calendar {
   }
 
   td {
-    overflow-x: visible; // Show events on multiple days
+    overflow: visible; // Show events on multiple days
   }
 
-	//Reset from style.scss
+  //Reset from style.scss
   table {
     box-shadow: none;
     border-radius: 0px;
@@ -86,13 +86,13 @@ ics-calendar {
     margin: 0px;
   }
 
-	// Reset from style.scss
+  // Reset from style.scss
   thead {
     background-color: white;
     color: black;
   }
 
-	// Reset from style.scss
+  // Reset from style.scss
   tbody>tr {
     &:nth-child(even):not(.highlight) {
       background: white;
