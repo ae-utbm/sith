@@ -5,6 +5,7 @@ from typing import Callable
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.contrib.auth.models import Permission
 from django.test import Client
 from django.urls import reverse
 from django.utils.timezone import localdate
@@ -108,7 +109,12 @@ def test_page_access(
 
 @pytest.mark.django_db
 def test_submit_form_existing_user(client: Client, settings: SettingsWrapper):
-    client.force_login(board_user.make())
+    client.force_login(
+        baker.make(
+            User,
+            user_permissions=Permission.objects.filter(codename="add_subscription"),
+        )
+    )
     user = old_subscriber_user.make()
     response = client.post(
         reverse("subscription:fragment-existing-user"),
@@ -133,7 +139,12 @@ def test_submit_form_existing_user(client: Client, settings: SettingsWrapper):
 
 @pytest.mark.django_db
 def test_submit_form_new_user(client: Client, settings: SettingsWrapper):
-    client.force_login(board_user.make())
+    client.force_login(
+        baker.make(
+            User,
+            user_permissions=Permission.objects.filter(codename="add_subscription"),
+        )
+    )
     response = client.post(
         reverse("subscription:fragment-new-user"),
         {

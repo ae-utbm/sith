@@ -418,29 +418,6 @@ class User(AbstractUser):
         return self.groups.filter(club_board=settings.SITH_MAIN_CLUB_ID).exists()
 
     @cached_property
-    def can_read_subscription_history(self) -> bool:
-        if self.is_root or self.is_board_member:
-            return True
-
-        from club.models import Club
-
-        for club in Club.objects.filter(
-            id__in=settings.SITH_CAN_READ_SUBSCRIPTION_HISTORY
-        ):
-            if club in self.clubs_with_rights:
-                return True
-        return False
-
-    @cached_property
-    def can_create_subscription(self) -> bool:
-        return self.is_root or (
-            self.memberships.board()
-            .ongoing()
-            .filter(club_id__in=settings.SITH_CAN_CREATE_SUBSCRIPTIONS)
-            .exists()
-        )
-
-    @cached_property
     def is_launderette_manager(self):
         from club.models import Club
 
@@ -678,14 +655,6 @@ class User(AbstractUser):
 class AnonymousUser(AuthAnonymousUser):
     def __init__(self):
         super().__init__()
-
-    @property
-    def can_create_subscription(self):
-        return False
-
-    @property
-    def can_read_subscription_history(self):
-        return False
 
     @property
     def was_subscribed(self):

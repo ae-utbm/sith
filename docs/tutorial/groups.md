@@ -228,3 +228,38 @@ Les groupes de ban existants sont les suivants :
 - `Banned from buying alcohol` : les utilisateurs interdits de vente d'alcool (non mineurs)
 - `Banned from counters` : les utilisateurs interdits d'utilisation des comptoirs
 - `Banned to subscribe` : les utilisateurs interdits de cotisation
+
+## Groupes liés à une permission
+
+Certaines actions sur le site demandent une permission en particulier,
+que l'on veut donner ou retirer n'importe quand.
+
+Prenons par exemple les cotisations : lors de l'intégration,
+on veut permettre aux membres du bureau de l'Integ
+de créer des cotisations, et pareil pour les membres du bureau 
+de la Welcome Week pendant cette dernière.
+
+Dans ces cas-là, il est pertinent de mettre à disposition
+des administrateurs du site une page leur permettant
+de gérer quels groupes ont une permission donnée.
+Pour ce faire, il existe 
+[PermissionGroupsUpdateView][core.views.PermissionGroupsUpdateView].
+
+Pour l'utiliser, il suffit de créer une vue qui en hérite
+et de lui dire quelle est la permission dont on veut gérer
+les groupes :
+
+```python
+from core.views.group import PermissionGroupsUpdateView
+
+
+class SubscriptionPermissionView(PermissionGroupsUpdateView):
+    permission = "subscription.add_subscription"
+```
+
+Configurez l'url de la vue, et c'est tout !
+La page ainsi générée contiendra un formulaire
+avec un unique champ permettant de sélectionner des groupes.
+Par défaut, seuls les utilisateurs avec la permission
+`auth.change_permission` auront accès à ce formulaire
+(donc, normalement, uniquement les utilisateurs Root).

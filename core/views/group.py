@@ -17,6 +17,10 @@
 
 from django import forms
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.models import Permission
+from django.contrib.messages.views import SuccessMessageMixin
+from django.core.exceptions import ImproperlyConfigured
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
@@ -25,6 +29,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from core.auth.mixins import CanEditMixin
 from core.models import Group, User
 from core.views import DetailFormView
+from core.views.forms import PermissionGroupsForm
 from core.views.widgets.select import AutoCompleteSelectMultipleUser
 
 # Forms
@@ -130,3 +135,62 @@ class GroupDeleteView(CanEditMixin, DeleteView):
     pk_url_kwarg = "group_id"
     template_name = "core/delete_confirm.jinja"
     success_url = reverse_lazy("core:group_list")
+
+
+class PermissionGroupsUpdateView(
+    PermissionRequiredMixin, SuccessMessageMixin, UpdateView
+):
+    """Manage the groups that have a specific permission.
+
+    Notes:
+        This is an `UpdateView`, but unlike typical `UpdateView`,
+        it doesn't accept url arguments to retrieve the object
+        to update.
+        As such, a `PermissionGroupsUpdateView` can only deal with
+        a single hardcoded permission.
+
+        This is not a limitation, but an on-purpose design,
+        mainly for security matters.
+
+    Example:
+        ```python
+        class SubscriptionPermissionView(PermissionGroupsUpdateView):
+            permission = "subscription.add_subscription"
+        ```
+    """
+
+    permission_required = "auth.change_permission"
+    template_name = "core/edit.jinja"
+    form_class = PermissionGroupsForm
+    permission = None
+    success_message = _("Groups have been successfully updated.")
+
+    def get_object(self, *args, **kwargs):
+        if not self.permission:
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} is missing the permission attribute. "
+                "Please fill it with either a permission string "
+                "or a Permission object."
+            )
+        if isinstance(self.permission, Permission):
+            return self.permission
+        if isinstance(self.permission, str):
+            try:
+                app_label, codename = self.permission.split(".")
+            except ValueError as e:
+                raise ValueError(
+                    "Permission name should be in the form "
+                    "app_label.permission_codename."
+                ) from e
+            return get_object_or_404(
+                Permission, codename=codename, content_type__app_label=app_label
+            )
+        raise TypeError(
+            f"{self.__class__.__name__}.permission "
+            f"must be a string or a permission instance."
+        )
+
+    def get_success_url(self):
+        # if children classes define a success url, return it,
+        # else stay on the same page
+        return self.success_url or self.request.path

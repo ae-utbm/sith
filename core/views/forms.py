@@ -28,6 +28,7 @@ from captcha.fields import CaptchaField
 from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.models import Permission
 from django.contrib.staticfiles.management.commands.collectstatic import (
     staticfiles_storage,
 )
@@ -440,3 +441,28 @@ class GiftForm(forms.ModelForm):
                 id=user_id
             )
             self.fields["user"].widget = forms.HiddenInput()
+
+
+class PermissionGroupsForm(forms.ModelForm):
+    """Manage the groups that have a specific permission."""
+
+    class Meta:
+        model = Permission
+        fields = []
+
+    groups = forms.ModelMultipleChoiceField(
+        Group.objects.all(),
+        label=_("Groups"),
+        widget=AutoCompleteSelectMultipleGroup,
+        required=False,
+    )
+
+    def __init__(self, instance: Permission, **kwargs):
+        super().__init__(instance=instance, **kwargs)
+        self.fields["groups"].initial = instance.group_set.all()
+
+    def save(self, commit: bool = True):  # noqa FTB001
+        instance = super().save(commit=False)
+        if commit:
+            instance.group_set.set(self.cleaned_data["groups"])
+        return instance

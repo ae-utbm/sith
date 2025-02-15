@@ -20,6 +20,7 @@ from subscription.views import (
     CreateSubscriptionNewUserFragment,
     NewSubscription,
     SubscriptionCreatedFragment,
+    SubscriptionPermissionView,
     SubscriptionsStatsView,
 )
 
@@ -40,6 +41,11 @@ urlpatterns = [
         "fragment/<int:subscription_id>/creation-success",
         SubscriptionCreatedFragment.as_view(),
         name="creation-success",
+    ),
+    path(
+        "perms/",
+        SubscriptionPermissionView.as_view(),
+        name="perms",
     ),
     path("stats/", SubscriptionsStatsView.as_view(), name="stats"),
 ]

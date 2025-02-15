@@ -125,6 +125,11 @@ class Command(BaseCommand):
             unix_name=settings.SITH_MAIN_CLUB["unix_name"],
             address=settings.SITH_MAIN_CLUB["address"],
         )
+        main_club.board_group.permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_subscription", "add_subscription"]
+            )
+        )
         bar_club = Club.objects.create(
             id=2,
             name=settings.SITH_BAR_MANAGER["name"],
