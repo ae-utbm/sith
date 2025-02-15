@@ -8,6 +8,9 @@
 {% block additional_css %}
   <link rel="stylesheet" href="{{ static('com/css/news-list.scss') }}">
   <link rel="stylesheet" href="{{ static('com/components/ics-calendar.scss') }}">
+
+  {# Atom feed discovery, not really css but also goes there #}
+  <link rel="alternate" type="application/rss+xml" title="{% trans %}News feed{% endtrans %}" href="{{ url("com:news_feed") }}">
 {% endblock %}
 
 {% block additional_js %}
@@ -19,7 +22,10 @@
   <div id="news">
     <div id="left_column" class="news_column">
       {% set events_dates = NewsDate.objects.filter(end_date__gte=timezone.now(), start_date__lte=timezone.now()+timedelta(days=5), news__is_moderated=True).datetimes('start_date', 'day') %}
-      <h3>{% trans %}Events today and the next few days{% endtrans %}</h3>
+      <h3>
+        {% trans %}Events today and the next few days{% endtrans %}
+        <a target="#" href="{{ url("com:news_feed") }}"><i class="fa fa-rss feed"></i></a>
+      </h3>
       {% if user.is_authenticated and (user.is_com_admin or user.memberships.board().ongoing().exists()) %}
         <a class="btn btn-blue margin-bottom" href="{{ url("com:news_new") }}">
           <i class="fa fa-plus"></i>
@@ -73,7 +79,10 @@
         </div>
       {% endif %}
 
-      <h3>{% trans %}All coming events{% endtrans %}</h3>
+      <h3>
+        {% trans %}All coming events{% endtrans %}
+        <a target="#" href="{{ url("com:news_feed") }}"><i class="fa fa-rss feed"></i></a>
+      </h3>
       <ics-calendar locale="{{ get_language() }}"></ics-calendar>
     </div>
 

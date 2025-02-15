@@ -1,18 +1,39 @@
 {% extends "core/base.jinja" %}
 
+{# if the template context has the `object_name` variable,
+   then this one will be used in the page title,
+   instead of the result of `str(object)` #}
+{% if object and not object_name %}
+  {% set object_name=object %}
+{% endif %}
+
 {% block title %}
-  {% if object %}
-    {% trans obj=object %}Edit {{ obj }}{% endtrans %}
+  {% if object_name %}
+    {% trans name=object_name %}Edit {{ name }}{% endtrans %}
   {% else %}
     {% trans %}Save{% endtrans %}
   {% endif %}
 {% endblock %}
 
 {% block content %}
-  {% if object %}
-    <h2>{% trans obj=object %}Edit {{ obj }}{% endtrans %}</h2>
+  {% if object_name %}
+    <h2>{% trans name=object_name %}Edit {{ name }}{% endtrans %}</h2>
   {% else %}
     <h2>{% trans %}Save{% endtrans %}</h2>
+  {% endif %}
+  {% if messages %}
+    <div x-data="{show_alert: true}" class="alert alert-green" x-show="show_alert" x-transition>
+      <span class="alert-main">
+        {% for message in messages %}
+          {% if message.level_tag == "success" %}
+            {{ message }}
+          {% endif %}
+        {% endfor %}
+      </span>
+      <span class="clickable" @click="show_alert = false">
+        <i class="fa fa-close"></i>
+      </span>
+    </div>
   {% endif %}
   <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}

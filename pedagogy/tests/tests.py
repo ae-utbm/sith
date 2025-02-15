@@ -20,14 +20,18 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+from typing import Callable
 
 import pytest
 from django.conf import settings
+from django.contrib.auth.models import Permission
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
+from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import Notification, User
 from pedagogy.models import UV, UVComment, UVCommentReport
 
@@ -144,17 +148,17 @@ class TestUVCreation(TestCase):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    ("username", "expected_code"),
+    ("user_factory", "expected_code"),
     [
-        ("root", 200),
-        ("tutu", 200),
-        ("sli", 200),
-        ("old_subscriber", 200),
-        ("public", 403),
+        (subscriber_user.make, 200),
+        (old_subscriber_user.make, 200),
+        (lambda: baker.make(User), 403),
     ],
 )
-def test_guide_permissions(client: Client, username: str, expected_code: int):
-    client.force_login(User.objects.get(username=username))
+def test_guide_permissions(
+    client: Client, user_factory: Callable[[], User], expected_code: int
+):
+    client.force_login(user_factory())
     res = client.get(reverse("pedagogy:guide"))
     assert res.status_code == expected_code
 
@@ -190,20 +194,15 @@ class TestUVDelete(TestCase):
     def test_uv_delete_pedagogy_unauthorized_fail(self):
         # Anonymous user
         response = self.client.post(self.delete_uv_url)
-        assert response.status_code == 403
+        assertRedirects(response, reverse("core:login") + f"?next={self.delete_uv_url}")
         assert UV.objects.filter(pk=self.uv.pk).exists()
 
-        # Not subscribed user
-        self.client.force_login(self.guy)
-        response = self.client.post(self.delete_uv_url)
-        assert response.status_code == 403
-        assert UV.objects.filter(pk=self.uv.pk).exists()
-
-        # Simply subscribed user
-        self.client.force_login(self.sli)
-        response = self.client.post(self.delete_uv_url)
-        assert response.status_code == 403
-        assert UV.objects.filter(pk=self.uv.pk).exists()
+        for user in baker.make(User), subscriber_user.make():
+            with self.subTest():
+                self.client.force_login(user)
+                response = self.client.post(self.delete_uv_url)
+                assert response.status_code == 403
+                assert UV.objects.filter(pk=self.uv.pk).exists()
 
 
 class TestUVUpdate(TestCase):
@@ -249,7 +248,7 @@ class TestUVUpdate(TestCase):
         response = self.client.post(
             self.update_uv_url, create_uv_template(self.bibou.id, code="PA00")
         )
-        assert response.status_code == 403
+        assertRedirects(response, reverse("core:login") + f"?next={self.update_uv_url}")
 
         # Not subscribed user
         self.client.force_login(self.guy)
@@ -312,7 +311,7 @@ class TestUVCommentCreationAndDisplay(TestCase):
         response = self.client.post(
             self.uv_url, create_uv_comment_template(self.bibou.id)
         )
-        self.assertRedirects(response, self.uv_url)
+        assertRedirects(response, self.uv_url)
         response = self.client.get(self.uv_url)
         self.assertContains(response, text="Superbe UV")
 
@@ -338,7 +337,7 @@ class TestUVCommentCreationAndDisplay(TestCase):
         nb_comments = self.uv.comments.count()
         # Test with anonymous user
         response = self.client.post(self.uv_url, create_uv_comment_template(0))
-        assert response.status_code == 403
+        assertRedirects(response, reverse("core:login") + f"?next={self.uv_url}")
 
         # Test with non subscribed user
         self.client.force_login(self.guy)
@@ -405,62 +404,35 @@ class TestUVCommentDelete(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.bibou = User.objects.get(username="root")
-        cls.tutu = User.objects.get(username="tutu")
-        cls.sli = User.objects.get(username="sli")
-        cls.guy = User.objects.get(username="guy")
-        cls.krophil = User.objects.get(username="krophil")
+        cls.comment = baker.make(UVComment)
 
-    def setUp(self):
-        comment_kwargs = create_uv_comment_template(
-            User.objects.get(username="krophil").id
-        )
-        comment_kwargs["author"] = User.objects.get(id=comment_kwargs["author"])
-        comment_kwargs["uv"] = UV.objects.get(id=comment_kwargs["uv"])
-        self.comment = UVComment(**comment_kwargs)
-        self.comment.save()
-
-    def test_uv_comment_delete_root_success(self):
-        self.client.force_login(self.bibou)
-        self.client.post(
-            reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
-        )
-        assert not UVComment.objects.filter(id=self.comment.id).exists()
-
-    def test_uv_comment_delete_pedagogy_admin_success(self):
-        self.client.force_login(self.tutu)
-        self.client.post(
-            reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
-        )
-        assert not UVComment.objects.filter(id=self.comment.id).exists()
-
-    def test_uv_comment_delete_author_success(self):
-        self.client.force_login(self.krophil)
-        self.client.post(
-            reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
-        )
-        assert not UVComment.objects.filter(id=self.comment.id).exists()
+    def test_uv_comment_delete_success(self):
+        url = reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
+        for user in (
+            baker.make(User, is_superuser=True),
+            baker.make(
+                User, user_permissions=[Permission.objects.get(codename="view_uv")]
+            ),
+            self.comment.author,
+        ):
+            with self.subTest():
+                self.client.force_login(user)
+                self.client.post(url)
+                assert not UVComment.objects.filter(id=self.comment.id).exists()
 
     def test_uv_comment_delete_unauthorized_fail(self):
+        url = reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
+
         # Anonymous user
-        response = self.client.post(
-            reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
-        )
-        assert response.status_code == 403
+        response = self.client.post(url)
+        assertRedirects(response, reverse("core:login") + f"?next={url}")
 
         # Unsbscribed user
-        self.client.force_login(self.guy)
-        response = self.client.post(
-            reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
-        )
-        assert response.status_code == 403
-
-        # Subscribed user (not author of the comment)
-        self.client.force_login(self.sli)
-        response = self.client.post(
-            reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
-        )
-        assert response.status_code == 403
+        for user in baker.make(User), subscriber_user.make():
+            with self.subTest():
+                self.client.force_login(user)
+                response = self.client.post(url)
+                assert response.status_code == 403
 
         # Check that the comment still exists
         assert UVComment.objects.filter(id=self.comment.id).exists()
@@ -499,16 +471,6 @@ class TestUVCommentUpdate(TestCase):
         self.comment.refresh_from_db()
         self.assertEqual(self.comment.comment, self.comment_edit["comment"])
 
-    def test_uv_comment_update_pedagogy_admin_success(self):
-        self.client.force_login(self.tutu)
-        response = self.client.post(
-            reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
-            self.comment_edit,
-        )
-        assert response.status_code == 302
-        self.comment.refresh_from_db()
-        self.assertEqual(self.comment.comment, self.comment_edit["comment"])
-
     def test_uv_comment_update_author_success(self):
         self.client.force_login(self.krophil)
         response = self.client.post(
@@ -520,25 +482,18 @@ class TestUVCommentUpdate(TestCase):
         self.assertEqual(self.comment.comment, self.comment_edit["comment"])
 
     def test_uv_comment_update_unauthorized_fail(self):
+        url = reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id})
         # Anonymous user
-        response = self.client.post(
-            reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
-            self.comment_edit,
-        )
-        assert response.status_code == 403
+        response = self.client.post(url, self.comment_edit)
+        assertRedirects(response, reverse("core:login") + f"?next={url}")
 
         # Unsbscribed user
-        response = self.client.post(
-            reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
-            self.comment_edit,
-        )
+        self.client.force_login(baker.make(User))
+        response = self.client.post(url, self.comment_edit)
         assert response.status_code == 403
 
         # Subscribed user (not author of the comment)
-        response = self.client.post(
-            reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
-            self.comment_edit,
-        )
+        response = self.client.post(url, self.comment_edit)
         assert response.status_code == 403
 
         # Check that the comment hasn't change
@@ -611,18 +566,19 @@ class TestUVModerationForm(TestCase):
         assert response.status_code == 200
 
     def test_access_unauthorized_fail(self):
+        url = reverse("pedagogy:moderation")
         # Test with anonymous user
-        response = self.client.get(reverse("pedagogy:moderation"))
-        assert response.status_code == 403
+        response = self.client.get(url)
+        assertRedirects(response, reverse("core:login") + f"?next={url}")
 
         # Test with unsubscribed user
         self.client.force_login(self.guy)
-        response = self.client.get(reverse("pedagogy:moderation"))
+        response = self.client.get(url)
         assert response.status_code == 403
 
         # Test with subscribed user
         self.client.force_login(self.sli)
-        response = self.client.get(reverse("pedagogy:moderation"))
+        response = self.client.get(url)
         assert response.status_code == 403
 
     def test_do_nothing(self):

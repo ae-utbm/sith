@@ -4,7 +4,7 @@ runs:
   using: composite
   steps:
     - name: Install apt packages
-      uses: awalsh128/cache-apt-pkgs-action@latest
+      uses: awalsh128/cache-apt-pkgs-action@v1.4.3
       with:
         packages: gettext
         version: 1.0  # increment to reset cache

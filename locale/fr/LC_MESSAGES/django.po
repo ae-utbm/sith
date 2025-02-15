@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-10 14:52+0100\n"
+"POT-Creation-Date: 2025-02-12 15:55+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1447,7 +1447,7 @@ msgid "News admin"
 msgstr "Administration des nouvelles"
 
 #: com/templates/com/news_admin_list.jinja com/templates/com/news_detail.jinja
-#: com/templates/com/news_list.jinja
+#: com/templates/com/news_list.jinja com/views.py
 msgid "News"
 msgstr "Nouvelles"
 
@@ -1524,6 +1524,10 @@ msgstr "Éditer (sera soumise de nouveau à la modération)"
 #: com/templates/com/news_edit.jinja
 msgid "Edit news"
 msgstr "Éditer la nouvelle"
+
+#: com/templates/com/news_list.jinja
+msgid "News feed"
+msgstr "Flux d'actualités"
 
 #: com/templates/com/news_list.jinja
 msgid "Events today and the next few days"
@@ -1766,6 +1770,10 @@ msgstr "Message d'alerte"
 #: com/views.py
 msgid "Screens list"
 msgstr "Liste d'écrans"
+
+#: com/views.py
+msgid "All incoming events"
+msgstr "Tous les événements à venir"
 
 #: com/views.py
 msgid "Delete and save to regenerate"
@@ -2375,11 +2383,10 @@ msgstr "Confirmation"
 msgid "Cancel"
 msgstr "Annuler"
 
-#: core/templates/core/edit.jinja core/templates/core/file_edit.jinja
-#: counter/templates/counter/cash_register_summary.jinja
+#: core/templates/core/edit.jinja
 #, python-format
-msgid "Edit %(obj)s"
-msgstr "Éditer %(obj)s"
+msgid "Edit %(name)s"
+msgstr "Éditer %(name)s"
 
 #: core/templates/core/file.jinja core/templates/core/file_list.jinja
 msgid "File list"
@@ -2448,6 +2455,12 @@ msgstr "octets"
 #: core/templates/core/file_detail.jinja
 msgid "Download"
 msgstr "Télécharger"
+
+#: core/templates/core/file_edit.jinja
+#: counter/templates/counter/cash_register_summary.jinja
+#, python-format
+msgid "Edit %(obj)s"
+msgstr "Éditer %(obj)s"
 
 #: core/templates/core/file_list.jinja
 msgid "There is no file in this website."
@@ -2906,7 +2919,7 @@ msgstr "Blouse"
 msgid "Not subscribed"
 msgstr "Non cotisant"
 
-#: core/templates/core/user_detail.jinja
+#: core/templates/core/user_detail.jinja core/templates/core/user_tools.jinja
 #: subscription/templates/subscription/subscription.jinja
 msgid "New subscription"
 msgstr "Nouvelle cotisation"
@@ -3138,15 +3151,6 @@ msgstr "Supprimer les messages forum d'un utilisateur"
 msgid "Bans"
 msgstr "Bans"
 
-#: core/templates/core/user_tools.jinja
-msgid "Subscriptions"
-msgstr "Cotisations"
-
-#: core/templates/core/user_tools.jinja
-#: subscription/templates/subscription/stats.jinja
-msgid "Subscription stats"
-msgstr "Statistiques de cotisation"
-
 #: core/templates/core/user_tools.jinja counter/forms.py
 #: counter/views/mixins.py
 msgid "Counters"
@@ -3218,6 +3222,19 @@ msgstr "Modérer les fichiers"
 #: core/templates/core/user_tools.jinja
 msgid "Moderate pictures"
 msgstr "Modérer les photos"
+
+#: core/templates/core/user_tools.jinja
+msgid "Subscriptions"
+msgstr "Cotisations"
+
+#: core/templates/core/user_tools.jinja
+msgid "Manage permissions"
+msgstr "Gérer les permissions"
+
+#: core/templates/core/user_tools.jinja
+#: subscription/templates/subscription/stats.jinja
+msgid "Subscription stats"
+msgstr "Statistiques de cotisation"
 
 #: core/templates/core/user_tools.jinja pedagogy/templates/pedagogy/guide.jinja
 msgid "Create UV"
@@ -3346,6 +3363,10 @@ msgstr "Utilisateurs à ajouter au groupe"
 #: core/views/group.py
 msgid "Users to remove from group"
 msgstr "Utilisateurs à retirer du groupe"
+
+#: core/views/group.py
+msgid "Groups have been successfully updated."
+msgstr "Les groupes ont été mis à jour avec succès."
 
 #: core/views/user.py
 msgid "We couldn't verify that this email actually exists"
@@ -5667,6 +5688,10 @@ msgstr "Cotisations par type"
 #: subscription/templates/subscription/subscription.jinja
 msgid "Existing member"
 msgstr "Membre existant"
+
+#: subscription/views.py
+msgid "the groups that can create subscriptions"
+msgstr "les groupes pouvant créer des cotisations"
 
 #: trombi/models.py
 msgid "subscription deadline"

@@ -89,7 +89,7 @@
         <div id="leave_comment_not_allowed">
           <p>{% trans %}You already posted a comment on this UV. If you want to comment again, please modify or delete your previous comment.{% endtrans %}</p>
         </div>
-      {% else %}
+      {% elif user.has_perm("pedagogy.add_uvcomment") %}
         <div id="leave_comment">
           <h2>{% trans %}Leave comment{% endtrans %}</h2>
           <div>
@@ -146,9 +146,9 @@
       {% endif %}
       <br>
 
-      {% if object.comments.exists() %}
+      {% if comments %}
         <h2>{% trans %}Comments{% endtrans %}</h2>
-        {% for comment in object.comments.order_by("-publish_date").all() %}
+        {% for comment in comments %}
           <div id="{{ comment.id }}" class="comment-container">
 
             <div class="grade-block">
@@ -183,16 +183,28 @@
                 </p>
               {% endif %}
 
-              {% if user.is_owner(comment) %}
+              {% if comment.author_id == user.id or user.has_perm("pedagogy.change_comment") %}
                 <p class="actions">
-                  <a href="{{ url('pedagogy:comment_update', comment_id=comment.id) }}">{% trans %}Edit{% endtrans %}</a>
-                  <a href="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}">{% trans %}Delete{% endtrans %}</a>
+                  <a href="{{ url('pedagogy:comment_update', comment_id=comment.id) }}">
+                    {% trans %}Edit{% endtrans %}
+                  </a>
+              {% endif %}
+              {% if comment.author_id == user.id or user.has_perm("pedagogy.delete_comment") %}
+                <a href="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}">
+                  {% trans %}Delete{% endtrans %}
+                </a>
                 </p>
               {% endif %}
             </div>
 
             <div class="comment-end-bar">
-              <div class="report"><p><a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">{% trans %}Report this comment{% endtrans %}</a></p></div>
+              <div class="report">
+                <p>
+                  <a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">
+                    {% trans %}Report this comment{% endtrans %}
+                  </a>
+                </p>
+              </div>
 
               <div class="date"><p>{{ comment.publish_date.strftime('%d/%m/%Y') }}</p></div>
 
@@ -209,7 +221,7 @@
   <script type="text/javascript">
     $("#return_noscript").hide();
     $("#return_js").show();
-    var icons = {
+    const icons = {
       header: "fa fa-toggle-right",
       activeHeader: "fa fa-toggle-down"
     };

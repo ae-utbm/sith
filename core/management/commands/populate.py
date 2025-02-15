@@ -92,7 +92,12 @@ class Command(BaseCommand):
             raise Exception("Never call this command in prod. Never.")
 
         Sith.objects.create(weekmail_destinations="etudiants@git.an personnel@git.an")
-        Site.objects.create(domain=settings.SITH_URL, name=settings.SITH_NAME)
+
+        site = Site.objects.get_current()
+        site.domain = settings.SITH_URL
+        site.name = settings.SITH_NAME
+        site.save()
+
         groups = self._create_groups()
         self._create_ban_groups()
 
@@ -119,6 +124,11 @@ class Command(BaseCommand):
             name=settings.SITH_MAIN_CLUB["name"],
             unix_name=settings.SITH_MAIN_CLUB["unix_name"],
             address=settings.SITH_MAIN_CLUB["address"],
+        )
+        main_club.board_group.permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_subscription", "add_subscription"]
+            )
         )
         bar_club = Club.objects.create(
             id=2,
@@ -895,13 +905,16 @@ Welcome to the wiki page!
 
         subscribers = Group.objects.create(name="Subscribers")
         subscribers.permissions.add(
-            *list(perms.filter(codename__in=["add_news", "add_uvcommentreport"]))
+            *list(perms.filter(codename__in=["add_news", "add_uvcomment"]))
         )
         old_subscribers = Group.objects.create(name="Old subscribers")
         old_subscribers.permissions.add(
             *list(
                 perms.filter(
                     codename__in=[
+                        "view_uv",
+                        "view_uvcomment",
+                        "add_uvcommentreport",
                         "view_user",
                         "view_picture",
                         "view_album",
@@ -973,9 +986,9 @@ Welcome to the wiki page!
         )
         pedagogy_admin.permissions.add(
             *list(
-                perms.filter(content_type__app_label="pedagogy").values_list(
-                    "pk", flat=True
-                )
+                perms.filter(content_type__app_label="pedagogy")
+                .exclude(codename__in=["change_uvcomment"])
+                .values_list("pk", flat=True)
             )
         )
         self.reset_index("core", "auth")

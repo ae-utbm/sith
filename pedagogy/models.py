@@ -20,10 +20,12 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+from typing import Self
 
 from django.conf import settings
 from django.core import validators
 from django.db import models
+from django.db.models import Exists, OuterRef
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -145,14 +147,6 @@ class UV(models.Model):
     def get_absolute_url(self):
         return reverse("pedagogy:uv_detail", kwargs={"uv_id": self.id})
 
-    def is_owned_by(self, user):
-        """Can be created by superuser, root or pedagogy admin user."""
-        return user.is_in_group(pk=settings.SITH_GROUP_PEDAGOGY_ADMIN_ID)
-
-    def can_be_viewed_by(self, user):
-        """Only visible by subscribers."""
-        return user.is_subscribed
-
     def __grade_average_generic(self, field):
         comments = self.comments.filter(**{field + "__gte": 0})
         if not comments.exists():
@@ -189,6 +183,22 @@ class UV(models.Model):
     @cached_property
     def grade_work_load_average(self):
         return self.__grade_average_generic("grade_work_load")
+
+
+class UVCommentQuerySet(models.QuerySet):
+    def viewable_by(self, user: User) -> Self:
+        if user.has_perms(["pedagogy.view_uvcomment", "pedagogy.view_uvcommentreport"]):
+            # the user can view uv comment reports,
+            # so he can view non-moderated comments
+            return self
+        if user.has_perm("pedagogy.view_uvcomment"):
+            return self.filter(reports=None)
+        return self.filter(author=user)
+
+    def annotate_is_reported(self) -> Self:
+        return self.annotate(
+            is_reported=Exists(UVCommentReport.objects.filter(comment=OuterRef("pk")))
+        )
 
 
 class UVComment(models.Model):
@@ -243,6 +253,8 @@ class UVComment(models.Model):
     )
     publish_date = models.DateTimeField(_("publish date"), blank=True)
 
+    objects = UVCommentQuerySet.as_manager()
+
     def __str__(self):
         return f"{self.uv} - {self.author}"
 
@@ -250,15 +262,6 @@ class UVComment(models.Model):
         if self.publish_date is None:
             self.publish_date = timezone.now()
         super().save(*args, **kwargs)
-
-    def is_owned_by(self, user):
-        """Is owned by a pedagogy admin, a superuser or the author himself."""
-        return self.author == user or user.is_owner(self.uv)
-
-    @cached_property
-    def is_reported(self):
-        """Return True if someone reported this UV."""
-        return self.reports.exists()
 
 
 # TODO : it seems that some views were meant to be implemented
@@ -323,7 +326,3 @@ class UVCommentReport(models.Model):
     @cached_property
     def uv(self):
         return self.comment.uv
-
-    def is_owned_by(self, user):
-        """Can be created by a pedagogy admin, a superuser or a subscriber."""
-        return user.is_subscribed or user.is_owner(self.comment.uv)
