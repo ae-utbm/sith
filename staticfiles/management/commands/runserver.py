@@ -20,9 +20,15 @@ class Command(Runserver):
         OpenApi.compile()
         # Run all other web processes but only if debug mode is enabled
         # Also protects from re-launching the server if django reloads it
-        if os.environ.get(DJANGO_AUTORELOAD_ENV) is None and settings.DEBUG:
+        if os.environ.get(DJANGO_AUTORELOAD_ENV) is None:
             logging.getLogger("django").info("Running complementary processes")
-            with subprocess.Popen([sys.executable, "-m", "honcho", "start"]):
+            with subprocess.Popen(
+                [sys.executable, "-m", "honcho", "start"],
+                env={
+                    **os.environ,
+                    **{"BUNDLER_MODE": "serve" if settings.DEBUG else "compile"},
+                },
+            ):
                 super().run(**options)
                 return
         super().run(**options)
