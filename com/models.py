@@ -172,6 +172,22 @@ def news_notification_callback(notif):
         notif.viewed = True
 
 
+class NewsDateQuerySet(models.QuerySet):
+    def viewable_by(self, user: User) -> Self:
+        """Filter the event dates that the given user can view.
+
+        - If the can view non moderated news, he can view all news dates
+        - else, he can view the dates of news that are either
+          authored by him or moderated.
+        """
+        if user.has_perm("com.view_unmoderated_news"):
+            return self
+        q_filter = Q(news__is_moderated=True)
+        if user.is_authenticated:
+            q_filter |= Q(news__author_id=user.id)
+        return self.filter(q_filter)
+
+
 class NewsDate(models.Model):
     """A date associated with news.
 
@@ -186,6 +202,8 @@ class NewsDate(models.Model):
     )
     start_date = models.DateTimeField(_("start_date"))
     end_date = models.DateTimeField(_("end_date"))
+
+    objects = NewsDateQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("news date")
