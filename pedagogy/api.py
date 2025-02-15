@@ -10,13 +10,13 @@ from ninja_extra.pagination import PageNumberPaginationExtra, PaginatedResponseS
 from core.auth.api_permissions import HasPerm
 from pedagogy.models import UV
 from pedagogy.schemas import SimpleUvSchema, UvFilterSchema, UvSchema
-from pedagogy.utbm_api import find_uv
+from pedagogy.utbm_api import UtbmApiClient
 
 
 @api_controller("/uv")
 class UvController(ControllerBase):
     @route.get(
-        "/{year}/{code}",
+        "/{code}",
         permissions=[
             # this route will almost always be called in the context
             # of a UV creation/edition
@@ -26,10 +26,14 @@ class UvController(ControllerBase):
         response=UvSchema,
     )
     def fetch_from_utbm_api(
-        self, year: Annotated[int, Ge(2010)], code: str, lang: Query[str] = "fr"
+        self,
+        code: str,
+        lang: Query[str] = "fr",
+        year: Query[Annotated[int, Ge(2010)] | None] = None,
     ):
         """Fetch UV data from the UTBM API and returns it after some parsing."""
-        res = find_uv(lang, year, code)
+        with UtbmApiClient() as client:
+            res = client.find_uv(lang, code, year)
         if res is None:
             raise NotFound
         return res
@@ -42,4 +46,4 @@ class UvController(ControllerBase):
     )
     @paginate(PageNumberPaginationExtra, page_size=100)
     def fetch_uv_list(self, search: Query[UvFilterSchema]):
-        return search.filter(UV.objects.values())
+        return search.filter(UV.objects.order_by("code").values())

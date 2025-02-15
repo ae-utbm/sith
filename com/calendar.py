@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import final
 
-import urllib3
+import requests
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.urls import reverse
@@ -35,16 +35,15 @@ class IcsCalendar:
 
     @classmethod
     def make_external(cls) -> Path | None:
-        calendar = urllib3.request(
-            "GET",
-            "https://calendar.google.com/calendar/ical/ae.utbm%40gmail.com/public/basic.ics",
+        calendar = requests.get(
+            "https://calendar.google.com/calendar/ical/ae.utbm%40gmail.com/public/basic.ics"
         )
-        if calendar.status != 200:
+        if not calendar.ok:
             return None
 
         cls._CACHE_FOLDER.mkdir(parents=True, exist_ok=True)
         with open(cls._EXTERNAL_CALENDAR, "wb") as f:
-            _ = f.write(calendar.data)
+            _ = f.write(calendar.content)
         return cls._EXTERNAL_CALENDAR
 
     @classmethod
