@@ -47,6 +47,7 @@ dependencies = [
     "redis[hiredis]<6.0.0,>=5.2.0",
     "environs[django]<15.0.0,>=14.1.0",
     "requests>=2.32.3",
+    "honcho>=2.0.0",
 ]
 
 [project.urls]
