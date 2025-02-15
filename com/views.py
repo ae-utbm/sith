@@ -22,7 +22,7 @@
 #
 #
 import itertools
-from datetime import timedelta
+from datetime import date, timedelta
 from smtplib import SMTPRecipientsRefused
 from typing import Any
 
@@ -254,9 +254,23 @@ class NewsListView(TemplateView):
         )
 
     def get_news_dates(self):
+        """Return the event dates to display.
+
+        The selected events are the ones that happens in the next 3 days
+        where something happen.
+        For example, if there are 6 events : A on 15/03, B and C on 17/03,
+        D on 20/03, E on 21/03 and F on 22/03 ; then the displayed dates
+        will be A, B, C and D.
+        """
+        last_date: date = list(
+            NewsDate.objects.filter(end_date__gt=now())
+            .order_by("start_date")
+            .values_list("start_date__date", flat=True)
+            .distinct()[:4]
+        )[-1]
         return itertools.groupby(
             NewsDate.objects.viewable_by(self.request.user)
-            .filter(end_date__gt=now(), start_date__lt=now() + timedelta(days=6))
+            .filter(end_date__gt=now(), start_date__date__lte=last_date)
             .order_by("start_date")
             .select_related("news", "news__club"),
             key=lambda d: d.start_date.date(),
