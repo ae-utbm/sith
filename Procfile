@@ -1,1 +1,1 @@
-bundler: npm run serve
+bundler: npm run $BUNDLER_MODE
