@@ -80,6 +80,7 @@ sith/
 ├── pyproject.toml (30)
 ├── .venv/ (31)
 ├── .python-version (32)
+├── Procfile (33)
 └── README.md
 ```
 </div>
@@ -136,7 +137,8 @@ sith/
     de certaines d'entre elles.
 31. Dossier d'environnement virtuel généré par uv
 32. Fichier qui contrôle quelle version de python utiliser pour le projet
-    
+33. Fichier qui contrôle les services additionnels à lancer
+    avec le serveur de développement   
 
 ## L'application principale
 
