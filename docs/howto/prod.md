@@ -8,7 +8,7 @@ Cette variable est composée d'un lien complet vers votre projet sentry.
 ## Récupérer les statiques
 
 Nous utilisons du SCSS dans le projet.
-En environnement de développement (`DEBUG=true`),
+En environnement de développement (`SITH_DEBUG=true`),
 le SCSS est compilé à chaque fois que le fichier est demandé.
 Pour la production, le projet considère 
 que chacun des fichiers est déjà compilé.

@@ -212,7 +212,7 @@ Puis lancez ou relancez nginx :
 sudo systemctl restart nginx
 ```
 
-Dans votre `.env`, remplacez `DEBUG=true` par `DEBUG=false`.
+Dans votre `.env`, remplacez `SITH_DEBUG=true` par `SITH_DEBUG=false`.
 
 Enfin, démarrez le serveur Django :
 
@@ -224,7 +224,7 @@ uv run ./manage.py runserver 8001
 Et c'est bon, votre reverse-proxy est prêt à tourner devant votre serveur.
 Nginx écoutera sur le port 8000.
 Toutes les requêtes vers des fichiers statiques et les medias publiques
-seront seront servies directement par nginx.
+seront servies directement par nginx.
 Toutes les autres requêtes seront transmises au serveur django.
 
 
@@ -238,3 +238,64 @@ un cron pour la mettre à jour au moins une fois par jour.
 ```bash
 python manage.py update_spam_database
 ```
+
+## Personnaliser l'environnement
+
+Le site utilise beaucoup de variables configurables via l'environnement.
+Cependant, pour des raisons de maintenabilité et de simplicité
+pour les nouveaux développeurs, nous n'avons mis dans le fichier
+`.env.example` que celles qui peuvent nécessiter d'être fréquemment modifiées
+(par exemple, l'url de connexion à la db, ou l'activation du mode debug).
+
+Cependant, il en existe beaucoup d'autres, que vous pouvez trouver
+dans le `settings.py` en recherchant `env.` 
+(avec `grep` ou avec un ++ctrl+f++ dans votre éditeur).
+
+Si le besoin de les modifier se présente, c'est chose possible.
+Il suffit de rajouter la paire clef-valeur correspondante dans le `.env`.
+
+!!!tip
+
+    Si vous utilisez nushell, 
+    vous pouvez automatiser le processus avec
+    avec le script suivant, qui va parser le `settings.py`
+    pour récupérer toutes les variables d'environnement qui ne sont pas
+    définies dans le .env puis va les rajouter :
+
+    ```nu
+    # si le fichier .env n'existe pas, on le crée
+    if not (".env" | path exists) {
+        cp .env.example .env
+    }
+    
+    # puis on récupère les variables d'environnement déjà existantes
+    let existing = open .env 
+    
+    # on récupère toutes les variables d'environnement utilisées
+    # dans le settings.py qui ne sont pas encore définies dans le .env,
+    # on les convertit dans un format .env,
+    # puis on les ajoute à la fin du .env
+    let regex = '(env\.)(?<method>\w+)\(\s*"(?<env_name>\w+)"(\s*(, default=)(?<value>.+))?\s*\)';
+    let content = open sith/settings.py;
+    let vars = $content
+        | parse --regex $regex 
+        | filter { |i| $i.env_name not-in $existing }
+        | each { |i|
+            let parsed_value = match [$i.method, $i.value] {
+                ["str", "None"] => ""
+                ["bool", $val] => ($val | str downcase)
+                ["list", $val] => ($val | str trim -c '[' | str trim -c ']')
+                ["path", $val] => ($val | str replace 'BASE_DIR / "' $'"(pwd)/')
+                [_, $val] => $val
+            }
+            $"($i.env_name)=($parsed_value)"
+        }
+    
+    if ($vars | is-not-empty) {
+        # on ajoute les nouvelles valeurs, 
+        # en mettant une ligne vide de séparation avec les anciennes
+        ["", ...$vars] | save --append .env
+    }
+    
+    print $"($vars | length) values added to .env"
+    ```
