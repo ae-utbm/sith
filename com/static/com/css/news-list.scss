@@ -51,6 +51,13 @@
     }
   }
 
+  /* UPCOMING EVENTS */
+
+  #upcoming-events {
+    max-height: 600px;
+    overflow-y: scroll;
+  }
+
   /* LINKS/BIRTHDAYS */
   #links,
   #birthdays {
