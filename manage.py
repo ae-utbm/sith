@@ -13,13 +13,25 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-
 import os
 import sys
+
+from django.utils.autoreload import DJANGO_AUTORELOAD_ENV
+
+from processes.composer import start_composer, stop_composer
+from sith.environ import env
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sith.settings")
 
     from django.core.management import execute_from_command_line
 
+    if (
+        os.environ.get(DJANGO_AUTORELOAD_ENV) is None
+        and (procfile := env.str("PROCFILE_RUNSERVER", None)) is not None
+    ):
+        start_composer(procfile)
+
     execute_from_command_line(sys.argv)
+
+    stop_composer()

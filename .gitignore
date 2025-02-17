@@ -22,3 +22,9 @@ node_modules/
 # compiled documentation
 site/
 .env
+
+### Redis ###
+
+# Ignore redis binary dump (dump.rdb) files
+
+*.rdb
