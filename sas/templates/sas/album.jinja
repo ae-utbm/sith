@@ -1,5 +1,6 @@
 {% extends "core/base.jinja" %}
 {% from 'core/macros.jinja' import paginate_alpine %}
+{% from "core/download_pictures.jinja" import download_button %}
 
 {%- block additional_css -%}
   <link rel="stylesheet" href="{{ static('sas/css/album.scss') }}">
@@ -7,6 +8,7 @@
 
 {%- block additional_js -%}
   <script type="module" src="{{ static('bundled/sas/album-index.js') }}"></script>
+  <script type="module" src="{{ static('bundled/user/pictures-index.js') }}"></script>
 {%- endblock -%}
 
 {% block title %}
@@ -27,7 +29,6 @@
   {% if is_sas_admin %}
     <form action="" method="post" enctype="multipart/form-data">
       {% csrf_token %}
-
       <div class="album-navbar">
         <h3>{{ album.get_display_name() }}</h3>
 
@@ -62,6 +63,10 @@
 
     <br>
   {% endif %}
+
+  <div x-data="user_pictures">
+      {{ download_button() }}
+  </div>
 
   <div x-data="pictures">
     <h4>{% trans %}Pictures{% endtrans %}</h4>
@@ -117,6 +122,9 @@
         albumId: {{ album.id }},
         maxPageSize: {{ settings.SITH_SAS_IMAGES_PER_PAGE }},
       });
+
+      loadPicturePage({ albumId: {{ album.id }} })
+
     });
 
     // Todo: migrate to alpine.js if we have some time
@@ -225,6 +233,5 @@
       }
     });
   </script>
-
 {% endblock %}
 

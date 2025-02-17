@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from "core/download_pictures.jinja" import download_button %}
 
 {%- block additional_css -%}
   <link rel="stylesheet" href="{{ static('sas/css/album.scss') }}">
@@ -14,19 +15,9 @@
 
 {% block content %}
   <main x-data="user_pictures">
-    {% if user.id == object.id %}
-      <div x-show="pictures.length > 0" x-cloak>
-        <button
-          :disabled="isDownloading"
-          class="btn btn-blue"
-          @click="downloadZip()"
-        >
-          <i class="fa fa-download"></i>
-          {% trans %}Download all my pictures{% endtrans %}
-        </button>
-        <progress x-ref="progress" x-show="isDownloading"></progress>
-      </div>
-    {% endif %}
+  {% if user.id == object.id %}
+    {{ download_button() }}
+  {% endif %}
 
     <template x-for="[album, pictures] in Object.entries(albums)" x-cloak>
       <section>

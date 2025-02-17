@@ -30,7 +30,8 @@ import { picturesFetchPictures } from "#openapi";
 
 /**
  * @typedef PicturePageConfig
- * @property {number} userId Id of the user to get the pictures from
+ * @property {number} userId Id of the user to get the pictures from (optional if albumId defined)
+ * @property {number} albumId Id of the album to get the pictures from (optinal if userId defined)
  **/
 
 /**
@@ -46,9 +47,17 @@ window.loadPicturePage = (config) => {
       albums: {},
 
       async init() {
-        this.pictures = await paginated(picturesFetchPictures, {
+        let query = {};
+
+        if (config.userId) {
           // biome-ignore lint/style/useNamingConvention: api is in snake_case
-          query: { users_identified: [config.userId] },
+          query = { users_identified: [config.userId] };
+        } else {
+          // biome-ignore lint/style/useNamingConvention: api is in snake_case
+          query = { album_id: config.albumId };
+        }
+        this.pictures = await paginated(picturesFetchPictures, {
+          query,
         });
         this.albums = this.pictures.reduce((acc, picture) => {
           if (!acc[picture.album]) {

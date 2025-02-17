@@ -1,0 +1,13 @@
+{% macro download_button() %}
+<div x-show="pictures.length > 0" x-cloak>
+<button
+  :disabled="isDownloading"
+  class="btn btn-blue"
+  @click="downloadZip()"
+>
+  <i class="fa fa-download"></i>
+  {% trans %}Download all pictures{% endtrans %}
+</button>
+<progress x-ref="progress" x-show="isDownloading"></progress>
+</div>
+{% endmacro %}
