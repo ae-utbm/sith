@@ -2,8 +2,8 @@ import { paginated } from "#core:utils/api";
 import { HttpReader, ZipWriter } from "@zip.js/zip.js";
 import { showSaveFilePicker } from "native-file-system-adapter";
 import {
-  type PicturesFetchPicturesData,
   type PictureSchema,
+  type PicturesFetchPicturesData,
   picturesFetchPictures,
 } from "#openapi";
 
