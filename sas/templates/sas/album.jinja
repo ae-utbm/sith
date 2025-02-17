@@ -8,7 +8,7 @@
 
 {%- block additional_js -%}
   <script type="module" src="{{ static('bundled/sas/album-index.js') }}"></script>
-  <script type="module" src="{{ static('bundled/user/pictures-index.js') }}"></script>
+  <script type="module" src="{{ static('bundled/user/pictures-index.ts') }}"></script>
 {%- endblock -%}
 
 {% block title %}
@@ -64,7 +64,7 @@
     <br>
   {% endif %}
 
-  <div x-data="user_pictures">
+  <div x-data="user_pictures({ albumId: {{ album.id }} })">
     {{ download_button() }}
   </div>
 
