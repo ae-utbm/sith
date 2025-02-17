@@ -122,9 +122,6 @@
         albumId: {{ album.id }},
         maxPageSize: {{ settings.SITH_SAS_IMAGES_PER_PAGE }},
       });
-
-      loadPicturePage({ albumId: {{ album.id }} })
-
     });
 
     // Todo: migrate to alpine.js if we have some time

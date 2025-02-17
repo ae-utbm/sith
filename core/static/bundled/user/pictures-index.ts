@@ -1,43 +1,11 @@
 import { paginated } from "#core:utils/api";
 import { HttpReader, ZipWriter } from "@zip.js/zip.js";
 import { showSaveFilePicker } from "native-file-system-adapter";
-import { picturesFetchPictures } from "#openapi";
-
-/**
- * @typedef UserProfile
- * @property {number} id
- * @property {string} first_name
- * @property {string} last_name
- * @property {string} nick_name
- * @property {string} display_name
- * @property {string} profile_url
- * @property {string} profile_pict
- */
-/**
- * @typedef Picture
- * @property {number} id
- * @property {string} name
- * @property {number} size
- * @property {string} date
- * @property {UserProfile} owner
- * @property {string} full_size_url
- * @property {string} compressed_url
- * @property {string} thumb_url
- * @property {string} album
- * @property {boolean} is_moderated
- * @property {boolean} asked_for_removal
- */
-
-/**
- * @typedef PicturePageConfig
- * @property {number} userId Id of the user to get the pictures from (optional if albumId defined)
- * @property {number} albumId Id of the album to get the pictures from (optinal if userId defined)
- **/
-
-/**
- * Load user picture page with a nice download bar
- * @param {PicturePageConfig} config
- **/
+import {
+  type PicturesFetchPicturesData,
+  type PictureSchema,
+  picturesFetchPictures,
+} from "#openapi";
 
 interface PagePictureConfig {
   userId?: number;
@@ -48,26 +16,29 @@ document.addEventListener("alpine:init", () => {
   Alpine.data("user_pictures", (config: PagePictureConfig) => ({
     isDownloading: false,
     loading: true,
-    pictures: [],
-    albums: {},
+    pictures: [] as PictureSchema[],
+    albums: {} as Record<string, PictureSchema[]>,
 
     async init() {
-      const query: Record<string, number> = {};
+      const query: PicturesFetchPicturesData["query"] = {};
 
       if (config.userId) {
-        query.user_identified = config.userId;
+        query.users_identified = [config.userId];
       } else {
         query.album_id = config.albumId;
       }
       this.pictures = await paginated(picturesFetchPictures, { query: query });
 
-      this.albums = this.pictures.reduce((acc, picture) => {
-        if (!acc[picture.album]) {
-          acc[picture.album] = [];
-        }
-        acc[picture.album].push(picture);
-        return acc;
-      }, {});
+      this.albums = this.pictures.reduce(
+        (acc: Record<string, PictureSchema[]>, picture: PictureSchema) => {
+          if (!acc[picture.album]) {
+            acc[picture.album] = [];
+          }
+          acc[picture.album].push(picture);
+          return acc;
+        },
+        {},
+      );
       this.loading = false;
     },
 
@@ -77,8 +48,9 @@ document.addEventListener("alpine:init", () => {
       bar.value = 0;
       bar.max = this.pictures.length;
 
-      const incrementProgressBar = () => {
+      const incrementProgressBar = (_total: number): undefined => {
         bar.value++;
+        return undefined;
       };
 
       const fileHandle = await showSaveFilePicker({
@@ -88,14 +60,13 @@ document.addEventListener("alpine:init", () => {
           { extension: "zip" },
           true,
         ),
-        types: {},
         excludeAcceptAllOption: false,
       });
       const zipWriter = new ZipWriter(await fileHandle.createWritable());
 
       await Promise.all(
-        this.pictures.map((p) => {
-          const imgName = `${p.album}/IMG_${p.date.replaceAll(/[:\-]/g, "_")}${p.name.slice(p.name.lastIndexOf("."))}`;
+        this.pictures.map((p: PictureSchema) => {
+          const imgName = `${p.album}/IMG_${p.date.replace(/[:\-]/g, "_")}${p.name.slice(p.name.lastIndexOf("."))}`;
           return zipWriter.add(imgName, new HttpReader(p.full_size_url), {
             level: 9,
             lastModDate: new Date(p.date),

@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block content %}
-  <main x-data="user_pictures">
+  <main x-data="user_pictures({ userId: {{ object.id }} })">
     {% if user.id == object.id %}
       {{ download_button() }}
     {% endif %}
@@ -49,11 +49,5 @@
 {% endblock content %}
 
 {% block script %}
-
   {{ super() }}
-  <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      loadPicturePage({ userId: {{ object.id }} });
-    })
-  </script>
 {% endblock script %}
