@@ -169,6 +169,7 @@ TEMPLATES = [
                 "Launderette": "launderette.models.Launderette",
                 "Counter": "counter.models.Counter",
                 "timezone": "django.utils.timezone",
+                "timedelta": "datetime.timedelta",
                 "get_sith": "com.views.sith",
                 "get_language": "django.utils.translation.get_language",
             },

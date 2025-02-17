@@ -33,7 +33,7 @@ from django.contrib.syndication.views import Feed
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Max
 from django.forms.models import modelform_factory
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -52,7 +52,7 @@ from core.auth.mixins import (
     PermissionOrAuthorRequiredMixin,
 )
 from core.models import User
-from core.views.mixins import QuickNotifMixin, TabedViewMixin
+from core.views.mixins import AllowFragment, QuickNotifMixin, TabedViewMixin
 from core.views.widgets.markdown import MarkdownInput
 
 # Sith object
@@ -236,8 +236,17 @@ class NewsAdminListView(PermissionRequiredMixin, ListView):
     permission_required = ["com.moderate_news", "com.delete_news"]
 
 
-class NewsListView(TemplateView):
+class NewsListView(AllowFragment, TemplateView):
     template_name = "com/news_list.jinja"
+
+    def get_number_weeks_displayed(self) -> int:
+        try:
+            max_weeks = max(int(self.request.GET.get("weeks", 1)), 0)
+        except ValueError as e:
+            raise Http404 from e
+        if max_weeks < 1 or max_weeks > 10:
+            raise Http404
+        return max_weeks
 
     def get_birthdays(self):
         if not self.request.user.has_perm("core.view_user"):
@@ -256,7 +265,11 @@ class NewsListView(TemplateView):
     def get_news_dates(self):
         return itertools.groupby(
             NewsDate.objects.viewable_by(self.request.user)
-            .filter(end_date__gt=now(), start_date__lt=now() + timedelta(days=6))
+            .filter(
+                end_date__gt=now(),
+                start_date__lt=now()
+                + timedelta(days=6 * self.get_number_weeks_displayed()),
+            )
             .order_by("start_date")
             .select_related("news", "news__club"),
             key=lambda d: d.start_date.date(),
@@ -266,6 +279,7 @@ class NewsListView(TemplateView):
         return super().get_context_data(**kwargs) | {
             "news_dates": self.get_news_dates(),
             "birthdays": self.get_birthdays(),
+            "max_weeks_displayed": self.get_number_weeks_displayed(),
         }
 
 

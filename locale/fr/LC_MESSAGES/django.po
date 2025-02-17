@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-12 15:55+0100\n"
+"POT-Creation-Date: 2025-02-17 01:30+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -936,6 +936,10 @@ msgid "description"
 msgstr "description"
 
 #: club/models.py
+msgid "past member"
+msgstr "ancien membre"
+
+#: club/models.py
 msgid "Email address"
 msgstr "Adresse email"
 
@@ -1425,8 +1429,9 @@ msgstr ""
 #: com/templates/com/macros.jinja
 #, python-format
 msgid ""
-"This event will take place every week for %(nb)s weeks. If you moderate or delete "
-"this event, it will also be moderated (or deleted) for the following weeks."
+"This event will take place every week for %(nb)s weeks. If you moderate or "
+"delete this event, it will also be moderated (or deleted) for the following "
+"weeks."
 msgstr ""
 "Cet événement se déroulera chaque semaine pendant %(nb)s semaines. Si vous "
 "modérez ou supprimez cet événement, il sera également modéré (ou supprimé) "
@@ -1572,6 +1577,10 @@ msgstr "Administrer les news"
 #: com/templates/com/news_list.jinja
 msgid "Nothing to come..."
 msgstr "Rien à venir..."
+
+#: com/templates/com/news_list.jinja
+msgid "Display until %(date)s"
+msgstr "Afficher jusqu'au %(date)s"
 
 #: com/templates/com/news_list.jinja
 msgid "All coming events"
@@ -3336,8 +3345,8 @@ msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
 #: core/views/forms.py
 msgid ""
-"Profile: you need to be visible on the picture, in order to be recognized (e."
-"g. by the barmen)"
+"Profile: you need to be visible on the picture, in order to be recognized "
+"(e.g. by the barmen)"
 msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
@@ -3947,8 +3956,8 @@ msgstr ""
 #: counter/templates/counter/mails/account_dump.jinja
 msgid "If you think this was a mistake, please mail us at ae@utbm.fr."
 msgstr ""
-"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à ae@utbm."
-"fr."
+"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à "
+"ae@utbm.fr."
 
 #: counter/templates/counter/mails/account_dump.jinja
 msgid ""
@@ -6022,6 +6031,3 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
-
-#~ msgid "past member"
-#~ msgstr "ancien membre"
