@@ -1,11 +1,16 @@
 from pathlib import Path
+from typing import Literal
 
 from django.conf import settings
 from django.http import Http404
-from ninja_extra import ControllerBase, api_controller, route
+from ninja import Query
+from ninja_extra import ControllerBase, api_controller, paginate, route
+from ninja_extra.pagination import PageNumberPaginationExtra
+from ninja_extra.schemas import PaginatedResponseSchema
 
 from com.calendar import IcsCalendar
-from com.models import News
+from com.models import News, NewsDate
+from com.schemas import NewsDateFilterSchema, NewsDateSchema
 from core.auth.api_permissions import HasPerm
 from core.views.files import send_raw_file
 
@@ -37,7 +42,7 @@ class CalendarController(ControllerBase):
 @api_controller("/news")
 class NewsController(ControllerBase):
     @route.patch(
-        "/{news_id}/moderate",
+        "/{int:news_id}/moderate",
         permissions=[HasPerm("com.moderate_news")],
         url_name="moderate_news",
     )
@@ -49,10 +54,27 @@ class NewsController(ControllerBase):
             news.save()
 
     @route.delete(
-        "/{news_id}",
+        "/{int:news_id}",
         permissions=[HasPerm("com.delete_news")],
         url_name="delete_news",
     )
     def delete_news(self, news_id: int):
         news = self.get_object_or_exception(News, id=news_id)
         news.delete()
+
+    @route.get(
+        "/date",
+        url_name="fetch_news_dates",
+        response=PaginatedResponseSchema[NewsDateSchema],
+    )
+    @paginate(PageNumberPaginationExtra, page_size=50)
+    def fetch_news_dates(
+        self,
+        filters: Query[NewsDateFilterSchema],
+        text_format: Literal["md", "html"] = "md",
+    ):
+        return filters.filter(
+            NewsDate.objects.viewable_by(self.context.request.user)
+            .order_by("start_date")
+            .select_related("news", "news__club")
+        )
