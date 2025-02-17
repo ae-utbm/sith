@@ -100,14 +100,6 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
     Python ne fait pas parti des dépendances puisqu'il est automatiquement
     installé par uv.
 
-Parmi les dépendances installées se trouve redis (que nous utilisons comme cache).
-Redis est un service qui doit être activé pour être utilisé.
-Pour cela, effectuez les commandes :
-
-```bash
-sudo systemctl start redis
-sudo systemctl enable redis  # si vous voulez que redis démarre automatiquement au boot
-```
 
 ## Finaliser l'installation
 
@@ -178,6 +170,11 @@ uv run ./manage.py runserver
     Le serveur est alors accessible à l'adresse
     [http://localhost:8000](http://localhost:8000) 
     ou bien [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
+
+!!!note
+
+    Le serveur de développement se charge de lancer redis
+    et les autres services nécessaires au bon fonctionnement du site.
 
 !!!tip
 

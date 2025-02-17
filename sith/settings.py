@@ -216,8 +216,7 @@ DATABASES = {
     "default": env.dj_db_url("DATABASE_URL", conn_max_age=None, conn_health_checks=True)
 }
 
-if "CACHE_URL" in os.environ:
-    CACHES = {"default": env.dj_cache_url("CACHE_URL")}
+CACHES = {"default": env.dj_cache_url("CACHE_URL")}
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
