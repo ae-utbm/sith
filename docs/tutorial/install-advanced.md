@@ -77,6 +77,30 @@ uv sync --group prod
     C'est parce que ces dépendances compilent certains modules
     à l'installation.
 
+## Configurer Redis
+
+Redis est installé comme dépendance mais pas lancé par défaut.
+
+En mode développement, le sith se charge de le démarrer mais
+pas en production !
+
+Il faut donc lancer le service comme ceci:
+
+```bash
+sudo systemctl start redis
+sudo systemctl enable redis  # si vous voulez que redis démarre automatiquement au boot
+```
+
+Puis modifiez votre `.env` pour y configurer le bon port redis.
+Le port du fichier d'exemple est un port non standard pour éviter
+les conflits avec les instances de redis déjà en fonctionnement.
+
+```dotenv
+REDIS_PORT=6379
+CACHE_URL=redis://127.0.0.1:${REDIS_PORT}/0
+```
+
+
 ## Configurer PostgreSQL
 
 PostgreSQL est utilisé comme base de données.
