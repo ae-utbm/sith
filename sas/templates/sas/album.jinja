@@ -78,8 +78,8 @@
           <div
             class="photo"
             :class="{not_moderated: !picture.is_moderated}"
-            :style="`background-image: url(${picture.thumb_url})`"
           >
+            <img :src="picture.thumb_url" :alt="picture.name" loading="lazy" />
             <template x-if="!picture.is_moderated">
               <div class="overlay">&nbsp;</div>
               <div class="text">{% trans %}To be moderated{% endtrans %}</div>
