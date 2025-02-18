@@ -7,6 +7,7 @@
 
 {% block additional_js %}
   <script type="module" src="{{ static('bundled/sas/user/pictures-index.ts') }}"></script>
+  <script type="module" src="{{ static('bundled/sas/pictures-download-index.ts') }}"></script>
 {% endblock %}
 
 {% block title %}
@@ -16,16 +17,21 @@
 {% block content %}
   <main x-data="user_pictures({ userId: {{ object.id }} })">
     {% if user.id == object.id %}
-      {{ download_button() }}
+      {{ download_button("Download all my pictures") }}
     {% endif %}
 
     <template x-for="[album, pictures] in Object.entries(albums)" x-cloak>
       <section>
         <br />
-        <h4 x-text="album"></h4>
+        <div class="row">
+          <h4 x-text="album"></h4>
+          {% if user.id == object.id %}
+            {{ download_button("") }}
+          {% endif %}
+        </div>
         <div class="photos">
           <template x-for="picture in pictures">
-            <a :href="`/sas/picture/${picture.id}`">
+            <a :href="picture.sas_url">
               <div
                 class="photo"
                 :class="{not_moderated: !picture.is_moderated}"
@@ -47,7 +53,3 @@
     <div class="photos" :aria-busy="loading"></div>
   </main>
 {% endblock content %}
-
-{% block script %}
-  {{ super() }}
-{% endblock script %}

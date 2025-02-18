@@ -7,8 +7,8 @@
 {%- endblock -%}
 
 {%- block additional_js -%}
-  <script type="module" src="{{ static('bundled/sas/album-index.js') }}"></script>
-  <script type="module" src="{{ static('bundled/sas/user/pictures-index.ts') }}"></script>
+  <script type="module" src="{{ static('bundled/sas/album-index.ts') }}"></script>
+  <script type="module" src="{{ static('bundled/sas/pictures-download-index.ts') }}"></script>
 {%- endblock -%}
 
 {% block title %}
@@ -64,15 +64,17 @@
     <br>
   {% endif %}
 
-  <div x-data="user_pictures({ albumId: {{ album.id }} })">
-    {{ download_button() }}
-  </div>
+  <div x-data="pictures({
+               albumId: {{ album.id }},
+               maxPageSize: {{ settings.SITH_SAS_IMAGES_PER_PAGE }},
+               })">
 
-  <div x-data="pictures">
+    {{ download_button("Download album") }}
+
     <h4>{% trans %}Pictures{% endtrans %}</h4>
     <div class="photos" :aria-busy="loading">
-      <template x-for="picture in pictures.results">
-        <a :href="`/sas/picture/${picture.id}`">
+      <template x-for="picture in pictures.slice((page - 1) * config.maxPageSize, config.maxPageSize * page)">
+        <a :href="picture.sas_url">
           <div
             class="photo"
             :class="{not_moderated: !picture.is_moderated}"
@@ -117,13 +119,6 @@
 {% block script %}
   {{ super() }}
   <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      loadAlbum({
-        albumId: {{ album.id }},
-        maxPageSize: {{ settings.SITH_SAS_IMAGES_PER_PAGE }},
-      });
-    });
-
     // Todo: migrate to alpine.js if we have some time
     $("form#upload_form").submit(function (event) {
       let formData = new FormData($(this)[0]);
