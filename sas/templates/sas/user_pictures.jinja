@@ -1,12 +1,12 @@
 {% extends "core/base.jinja" %}
-{% from "core/download_pictures.jinja" import download_button %}
+{% from "sas/download_pictures.jinja" import download_button %}
 
 {%- block additional_css -%}
   <link rel="stylesheet" href="{{ static('sas/css/album.scss') }}">
 {%- endblock -%}
 
 {% block additional_js %}
-  <script type="module" src="{{ static('bundled/user/pictures-index.ts') }}"></script>
+  <script type="module" src="{{ static('bundled/sas/user/pictures-index.ts') }}"></script>
 {% endblock %}
 
 {% block title %}

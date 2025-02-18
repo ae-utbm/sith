@@ -64,40 +64,6 @@ class TestImageAccess:
         assert not picture.is_owned_by(user)
 
 
-@pytest.mark.django_db
-class TestUserPicture:
-    def test_anonymous_user_unauthorized(self, client):
-        """An anonymous user shouldn't have access to an user's photo page."""
-        response = client.get(
-            reverse(
-                "core:user_pictures",
-                kwargs={"user_id": User.objects.get(username="sli").pk},
-            )
-        )
-        assert response.status_code == 403
-
-    @pytest.mark.parametrize(
-        ("username", "status"),
-        [
-            ("guy", 403),
-            ("root", 200),
-            ("skia", 200),
-            ("sli", 200),
-        ],
-    )
-    def test_page_is_working(self, client, username, status):
-        """Only user that subscribed (or admins) should be able to see the page."""
-        # Test for simple user
-        client.force_login(User.objects.get(username=username))
-        response = client.get(
-            reverse(
-                "core:user_pictures",
-                kwargs={"user_id": User.objects.get(username="sli").pk},
-            )
-        )
-        assert response.status_code == status
-
-
 # TODO: many tests on the pages:
 #   - renaming a page
 #   - changing a page's parent --> check that page's children's full_name

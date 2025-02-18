@@ -68,7 +68,6 @@ from core.views import (
     UserGodfathersView,
     UserListView,
     UserMiniView,
-    UserPicturesView,
     UserPreferencesView,
     UserStatsView,
     UserToolsView,
@@ -143,9 +142,6 @@ urlpatterns = [
     path("user/", UserListView.as_view(), name="user_list"),
     path("user/<int:user_id>/mini/", UserMiniView.as_view(), name="user_profile_mini"),
     path("user/<int:user_id>/", UserView.as_view(), name="user_profile"),
-    path(
-        "user/<int:user_id>/pictures/", UserPicturesView.as_view(), name="user_pictures"
-    ),
     path(
         "user/<int:user_id>/godfathers/",
         UserGodfathersView.as_view(),

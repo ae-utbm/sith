@@ -200,7 +200,7 @@ class UserTabsMixin(TabedViewMixin):
                 "name": _("Family"),
             },
             {
-                "url": reverse("core:user_pictures", kwargs={"user_id": user.id}),
+                "url": reverse("sas:user_pictures", kwargs={"user_id": user.id}),
                 "slug": "pictures",
                 "name": _("Pictures"),
             },
@@ -295,16 +295,6 @@ class UserView(UserTabsMixin, CanViewMixin, DetailView):
             user_id=self.object.id, initial={"user": self.object}
         )
         return kwargs
-
-
-class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
-    """Display a user's pictures."""
-
-    model = User
-    pk_url_kwarg = "user_id"
-    context_object_name = "profile"
-    template_name = "core/user_pictures.jinja"
-    current_tab = "pictures"
 
 
 def delete_user_godfather(request, user_id, godfather_id, is_father):
