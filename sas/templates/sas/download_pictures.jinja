@@ -9,7 +9,7 @@
     This requires importing `bundled/sas/pictures-download-index.ts`
 
   Parameters:
-    name (str): name displayed on the button, will be translated
+    name (str): name displayed on the button
  #}
 {% macro download_button(name) %}
   <div x-data="pictures_download">
@@ -21,7 +21,7 @@
       >
         <i class="fa fa-download"></i>
         {%- if name != "" -%}
-          {% trans %}{{ name }}{% endtrans %}
+          {{ name }}
         {%- endif -%}
       </button>
       <progress x-ref="progress" x-show="isDownloading"></progress>

@@ -17,7 +17,7 @@
 {% block content %}
   <main x-data="user_pictures({ userId: {{ object.id }} })">
     {% if user.id == object.id %}
-      {{ download_button("Download all my pictures") }}
+      {{ download_button(_("Download all my pictures")) }}
     {% endif %}
 
     <template x-for="[album, pictures] in Object.entries(albums)" x-cloak>

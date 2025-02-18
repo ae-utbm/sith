@@ -69,7 +69,7 @@
                maxPageSize: {{ settings.SITH_SAS_IMAGES_PER_PAGE }},
                })">
 
-    {{ download_button("Download album") }}
+    {{ download_button(_("Download album")) }}
 
     <h4>{% trans %}Pictures{% endtrans %}</h4>
     <div class="photos" :aria-busy="loading">
