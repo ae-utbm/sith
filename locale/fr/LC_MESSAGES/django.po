@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-18 15:03+0100\n"
+"POT-Creation-Date: 2025-02-19 19:12+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1429,11 +1429,11 @@ msgstr ""
 #: com/templates/com/macros.jinja
 #, python-format
 msgid ""
-"This event will take place every week for %(nb)s weeks. If you moderate or "
+"This event will take place every week for %%s weeks. If you moderate or "
 "delete this event, it will also be moderated (or deleted) for the following "
 "weeks."
 msgstr ""
-"Cet événement se déroulera chaque semaine pendant %(nb)s semaines. Si vous "
+"Cet événement se déroulera chaque semaine pendant %%s semaines. Si vous "
 "modérez ou supprimez cet événement, il sera également modéré (ou supprimé) "
 "pour les semaines suivantes."
 
@@ -1577,6 +1577,18 @@ msgstr "Administrer les news"
 #: com/templates/com/news_list.jinja
 msgid "Nothing to come..."
 msgstr "Rien à venir..."
+
+#: com/templates/com/news_list.jinja
+msgid "See more"
+msgstr "Voir plus"
+
+#: com/templates/com/news_list.jinja
+msgid ""
+"It was too short. You already reached the end of the upcoming events "
+"list."
+msgstr ""
+"C'était trop court. Vous êtes déjà arrivés à la fin de la liste des "
+"événements à venir."
 
 #: com/templates/com/news_list.jinja
 msgid "All coming events"
