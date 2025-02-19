@@ -169,7 +169,7 @@ class Command(BaseCommand):
         Weekmail().save()
 
         # Here we add a lot of test datas, that are not necessary for the Sith, but that provide a basic development environment
-        self.now = timezone.now().replace(hour=12)
+        self.now = timezone.now().replace(hour=12, second=0)
 
         skia = User.objects.create_user(
             username="skia",
@@ -681,7 +681,7 @@ Welcome to the wiki page!
         friday = self.now
         while friday.weekday() != 4:
             friday += timedelta(hours=6)
-        friday.replace(hour=20, minute=0, second=0)
+        friday.replace(hour=20, minute=0)
         # Event
         news_dates = []
         n = News.objects.create(
