@@ -3,18 +3,22 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Callable
 from unittest.mock import MagicMock, patch
+from urllib.parse import quote
 
 import pytest
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.http import HttpResponse
-from django.test.client import Client
+from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
-from model_bakery import baker
+from django.utils.timezone import now
+from model_bakery import baker, seq
+from pytest_django.asserts import assertNumQueries
 
 from com.calendar import IcsCalendar
-from com.models import News
+from com.models import News, NewsDate
+from core.markdown import markdown
 from core.models import User
 
 
@@ -184,3 +188,63 @@ class TestDeleteNews:
         )
         assert response.status_code == 403
         assert News.objects.filter(id=news.id).exists()
+
+
+class TestFetchNewsDates(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        News.objects.all().delete()
+        cls.dates = baker.make(
+            NewsDate,
+            _quantity=5,
+            _bulk_create=True,
+            start_date=seq(value=now(), increment_by=timedelta(days=1)),
+            end_date=seq(
+                value=now() + timedelta(hours=2), increment_by=timedelta(days=1)
+            ),
+            news=iter(
+                baker.make(News, is_moderated=True, _quantity=5, _bulk_create=True)
+            ),
+        )
+        cls.dates.append(
+            baker.make(
+                NewsDate,
+                start_date=now() + timedelta(days=2, hours=1),
+                end_date=now() + timedelta(days=2, hours=5),
+                news=baker.make(News, is_moderated=True),
+            )
+        )
+        cls.dates.sort(key=lambda d: d.start_date)
+
+    def test_num_queries(self):
+        with assertNumQueries(2):
+            self.client.get(reverse("api:fetch_news_dates"))
+
+    def test_html_format(self):
+        """Test that when the summary is asked in html, the summary is in html."""
+        summary_1 = "# First event\nThere is something happening.\n"
+        self.dates[0].news.summary = summary_1
+        self.dates[0].news.save()
+        summary_2 = (
+            "# Second event\n"
+            "There is something happening **for real**.\n"
+            "Everything is [here](https://youtu.be/dQw4w9WgXcQ)\n"
+        )
+        self.dates[1].news.summary = summary_2
+        self.dates[1].news.save()
+        response = self.client.get(
+            reverse("api:fetch_news_dates") + "?page_size=2&text_format=html"
+        )
+        assert response.status_code == 200
+        dates = response.json()["results"]
+        assert dates[0]["news"]["summary"] == markdown(summary_1)
+        assert dates[1]["news"]["summary"] == markdown(summary_2)
+
+    def test_fetch(self):
+        after = quote((now() + timedelta(days=1)).isoformat())
+        response = self.client.get(
+            reverse("api:fetch_news_dates") + f"?page_size=3&after={after}"
+        )
+        assert response.status_code == 200
+        dates = response.json()["results"]
+        assert [d["id"] for d in dates] == [d.id for d in self.dates[1:4]]

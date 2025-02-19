@@ -6,15 +6,41 @@
     the given `alpineState` variable.
     This state is a `AlertState`, as defined in `moderation-alert-index.ts`
 
-    Example :
+    This comes in three flavours :
+    - You can pass the `News` object itself to the macro.
+      In this case, if `request.user` can moderate news,
+      it will perform an additional db query to know if it is a recurring event.
+    - You can also give only the news id.
+      In this case, a server request will be issued to know
+      if it is a recurring event.
+    - Finally, you can pass the name of an alpine variable, which value is the id.
+      In this case, a server request will be issued to know
+      if it is a recurring event.
+
+    Example with full `News` object :
     ```jinja
     <div x-data="{state: AlertState.PENDING}">
       {{ news_moderation_alert(news, user, "state") }}
     </div>
     ```
+    With an id :
+    ```jinja
+    <div x-data="{state: AlertState.PENDING}">
+      {{ news_moderation_alert(news.id, user, "state") }}
+    </div>
+    ```
+    An with an alpine variable
+    ```jinja
+    <div x-data="{state: AlertState.PENDING, newsId: {{ news.id }}">
+      {{ news_moderation_alert("newsId", user, "state") }}
+    </div>
+    ```
+
 
     Args:
-        news: The `News` object to which this alert is related
+        news: (News | int | string)
+          Either the `News` object to which this alert is related,
+          or its id, or the name of an Alpine which value is its id
         user: The request.user
         alpineState: An alpine variable name
 
@@ -23,7 +49,13 @@
         in your template.
     #}
   <div
-    x-data="moderationAlert({{ news.id }})"
+    {% if news is integer or news is string %}
+      x-data="moderationAlert({{ news }})"
+    {% else %}
+      x-data="moderationAlert({{ news.id }})"
+    {% endif %}
+    {# the news-moderated is received when a moderation alert is deleted or moderated #}
+    @news-moderated.window="dispatchModeration($event)"
     {% if alpineState %}
       x-modelable="{{ alpineState }}"
       x-model="state"
@@ -49,18 +81,31 @@
             but it will be executed only for admin users, and only one time
             (if they do their job and moderated news as soon as they see them),
             so it's still reasonable #}
-            {% set nb_event=news.dates.count() %}
-            {% if nb_event > 1 %}
-              <br>
-              <strong>{% trans %}Weekly event{% endtrans %}</strong>
-              <p>
-                {% trans trimmed nb=nb_event %}
-                  This event will take place every week for {{ nb }} weeks.
-                  If you moderate or delete this event,
-                  it will also be moderated (or deleted) for the following weeks.
-                {% endtrans %}
-              </p>
-            {% endif %}
+            <div
+              {% if news is integer or news is string %}
+                x-data="{ nbEvents: nbModerated() }"
+              {% else %}
+                x-data="{ nbEvents: {{ news.dates.count() }} }"
+              {% endif %}
+            >
+              <template x-if="nbEvents > 1">
+                <div>
+                  <br>
+                  <strong>{% trans %}Weekly event{% endtrans %}</strong>
+                  {# hybrid translation : the text is translated server-side,
+                  but the interpolation of `nbEvents` is done client-side. #}
+                  <p
+                    x-text="interpolate('
+                            {%- trans trimmed -%}
+                              This event will take place every week for %s weeks.
+                              If you moderate or delete this event,
+                              it will also be moderated (or deleted) for the following weeks.
+                            {%- endtrans -%}
+                            ', [nbEvents])"
+                  ></p>
+                </div>
+              </template>
+            </div>
           {% endif %}
         </div>
         {% if user.has_perm("com.moderate_news") %}
