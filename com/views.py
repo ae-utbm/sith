@@ -253,33 +253,41 @@ class NewsListView(TemplateView):
             key=lambda u: u.date_of_birth.year,
         )
 
-    def get_news_dates(self):
-        """Return the event dates to display.
+    def get_last_day(self) -> date:
+        """Get the last day when news will be displayed
 
-        The selected events are the ones that happens in the next 3 days
-        where something happen.
+        The returned day is the third one where something happen.
         For example, if there are 6 events : A on 15/03, B and C on 17/03,
-        D on 20/03, E on 21/03 and F on 22/03 ; then the displayed dates
-        will be A, B, C and D.
+        D on 20/03, E on 21/03 and F on 22/03 ;
+        then the result is 20/03.
         """
-        last_date: date = list(
+        return list(
             NewsDate.objects.filter(end_date__gt=now())
             .order_by("start_date")
             .values_list("start_date__date", flat=True)
             .distinct()[:4]
         )[-1]
+
+    def get_news_dates(self, until: date):
+        """Return the event dates to display.
+
+        The selected events are the ones that happens between
+        right now and the given day (included).
+        """
         return itertools.groupby(
             NewsDate.objects.viewable_by(self.request.user)
-            .filter(end_date__gt=now(), start_date__date__lte=last_date)
+            .filter(end_date__gt=now(), start_date__date__lte=until)
             .order_by("start_date")
             .select_related("news", "news__club"),
             key=lambda d: d.start_date.date(),
         )
 
     def get_context_data(self, **kwargs):
+        last_day = self.get_last_day()
         return super().get_context_data(**kwargs) | {
-            "news_dates": self.get_news_dates(),
+            "news_dates": self.get_news_dates(until=last_day),
             "birthdays": self.get_birthdays(),
+            "last_day": last_day,
         }
 
 

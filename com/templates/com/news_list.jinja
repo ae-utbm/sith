@@ -16,6 +16,7 @@
 {% block additional_js %}
   <script type="module" src={{ static("bundled/com/components/ics-calendar-index.ts") }}></script>
   <script type="module" src={{ static("bundled/com/components/moderation-alert-index.ts") }}></script>
+  <script type="module" src={{ static("bundled/com/components/upcoming-news-loader-index.ts") }}></script>
 {% endblock %}
 
 {% block content %}
@@ -38,69 +39,140 @@
         <br>
       {% endif %}
       <section id="upcoming-events">
-        {% for day, dates_group in news_dates %}
-          <div class="news_events_group">
-            <div class="news_events_group_date">
-              <div>
-                <div>{{ day|date('D') }}</div>
-                <div class="day">{{ day|date('d') }}</div>
-                <div>{{ day|date('b') }}</div>
-              </div>
-            </div>
-            <div class="news_events_group_items">
-              {% for date in dates_group %}
-                <article
-                  class="news_event"
-                  {%- if not date.news.is_moderated -%}
-                    x-data="{newsState: AlertState.PENDING}"
-                  {%- endif -%}
-                >
-                  {% if not date.news.is_moderated %}
-                  {# if a non moderated news is in the object list,
-                  the logged user is either an admin or the news author #}
-                    {{ news_moderation_alert(date.news, user, "newsState") }}
-                  {% endif %}
-                  <div
-                    {% if not date.news.is_moderated -%}
-                      x-show="newsState !== AlertState.DELETED"
-                    {%- endif -%}
-                  >
-                    <header class="row gap">
-                      {% if date.news.club.logo %}
-                        <img src="{{ date.news.club.logo.url }}" alt="{{ date.news.club }}"/>
-                      {% else %}
-                        <img src="{{ static("com/img/news.png") }}" alt="{{ date.news.club }}"/>
-                      {% endif %}
-                      <div class="header_content">
-                        <h4>
-                          <a href="{{ url('com:news_detail', news_id=date.news_id) }}">
-                            {{ date.news.title }}
-                          </a>
-                        </h4>
-                        <a href="{{ date.news.club.get_absolute_url() }}">{{ date.news.club }}</a>
-                        <div class="news_date">
-                          <time datetime="{{ date.start_date.isoformat(timespec="seconds") }}">
-                            {{ date.start_date|localtime|time(DATETIME_FORMAT) }}
-                          </time> -
-                          <time datetime="{{ date.end_date.isoformat(timespec="seconds") }}">
-                            {{ date.end_date|localtime|time(DATETIME_FORMAT) }}
-                          </time>
-                        </div>
-                      </div>
-                    </header>
-                    <div class="news_content markdown">
-                      {{ date.news.summary|markdown }}
-                    </div>
-                  </div>
-                </article>
-              {% endfor %}
-            </div>
-          </div>
-        {% else %}
+        {% if not news_dates %}
           <div class="news_empty">
             <em>{% trans %}Nothing to come...{% endtrans %}</em>
           </div>
-        {% endfor %}
+        {% else %}
+          {% for day, dates_group in news_dates %}
+            <div class="news_events_group">
+              <div class="news_events_group_date">
+                <div>
+                  <div>{{ day|date('D') }}</div>
+                  <div class="day">{{ day|date('d') }}</div>
+                  <div>{{ day|date('b') }}</div>
+                </div>
+              </div>
+              <div class="news_events_group_items">
+                {% for date in dates_group %}
+                  <article
+                    class="news_event"
+                    {%- if not date.news.is_moderated -%}
+                      x-data="{newsState: AlertState.PENDING}"
+                    {%- endif -%}
+                  >
+                    {% if not date.news.is_moderated %}
+                      {# if a non moderated news is in the object list,
+                      the logged user is either an admin or the news author #}
+                      {{ news_moderation_alert(date.news, user, "newsState") }}
+                    {% endif %}
+                    <div
+                      {% if not date.news.is_moderated -%}
+                        x-show="newsState !== AlertState.DELETED"
+                      {%- endif -%}
+                    >
+                      <header class="row gap">
+                        {% if date.news.club.logo %}
+                          <img src="{{ date.news.club.logo.url }}" alt="{{ date.news.club }}"/>
+                        {% else %}
+                          <img src="{{ static("com/img/news.png") }}" alt="{{ date.news.club }}"/>
+                        {% endif %}
+                        <div class="header_content">
+                          <h4>
+                            <a href="{{ url('com:news_detail', news_id=date.news_id) }}">
+                              {{ date.news.title }}
+                            </a>
+                          </h4>
+                          <a href="{{ date.news.club.get_absolute_url() }}">{{ date.news.club }}</a>
+                          <div class="news_date">
+                            <time datetime="{{ date.start_date.isoformat(timespec="seconds") }}">
+                              {{ date.start_date|localtime|time(DATETIME_FORMAT) }}
+                            </time> -
+                            <time datetime="{{ date.end_date.isoformat(timespec="seconds") }}">
+                              {{ date.end_date|localtime|time(DATETIME_FORMAT) }}
+                            </time>
+                          </div>
+                        </div>
+                      </header>
+                      <div class="news_content markdown">
+                        {{ date.news.summary|markdown }}
+                      </div>
+                    </div>
+                  </article>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+          <div x-data="upcomingNewsLoader(new Date('{{ last_day + timedelta(days=1) }}'))">
+            <template x-for="newsList in Object.values(groupedDates())">
+              <div class="news_events_group">
+                <div class="news_events_group_date">
+                  <div x-data="{day: newsList[0].start_date}">
+                    <div x-text="day.toLocaleString('{{ get_language() }}', { weekday: 'short' }).substring(0, 3)"></div>
+                    <div
+                      class="day"
+                      x-text="day.toLocaleString('{{ get_language() }}', { day: 'numeric' })"
+                    ></div>
+                    <div x-text="day.toLocaleString('{{ get_language() }}', { month: 'short' }).substring(0, 3)"></div>
+                  </div>
+                </div>
+                <div class="news_events_group_items">
+                  <template x-for="newsDate in newsList" :key="newsDate.id">
+                    <article
+                      class="news_event"
+                      x-data="{ newsState: newsDate.news.is_moderated ? AlertState.MODERATED : AlertState.PENDING }"
+                    >
+                      <template x-if="!newsDate.news.is_moderated">
+                        {{ news_moderation_alert("newsDate.news.id", user, "newsState") }}
+                      </template>
+                      <div x-show="newsState !== AlertState.DELETED">
+                        <header class="row gap">
+                          <img
+                            :src="newsDate.news.club.logo || '{{ static("com/img/news.png") }}'"
+                            :alt="newsDate.news.club.name"
+                          />
+                          <div class="header_content">
+                            <h4>
+                              <a :href="newsDate.news.url" x-text="newsDate.news.title"></a>
+                            </h4>
+                            <a :href="newsDate.news.club.url" x-text="newsDate.news.club.name"></a>
+                            <div class="news_date">
+                              <time
+                                :datetime="newsDate.start_date.toISOString()"
+                                x-text="`${newsDate.start_date.getHours()}:${newsDate.start_date.getMinutes()}`"
+                              ></time> -
+                              <time
+                                :datetime="newsDate.end_date.toISOString()"
+                                x-text="`${newsDate.end_date.getHours()}:${newsDate.end_date.getMinutes()}`"
+                              ></time>
+                            </div>
+                          </div>
+                        </header>
+                        {# The API returns a summary in html.
+                           It's generated from our markdown subset, so it should be safe #}
+                        <div class="news_content markdown" x-html="newsDate.news.summary"></div>
+                      </div>
+                    </article>
+                  </template>
+                </div>
+              </div>
+            </template>
+
+            <div id="load-more-news-button" :aria-busy="loading">
+              <button class="btn btn-grey" x-show="!loading && hasNext" @click="loadMore()">
+                {% trans %}See more{% endtrans %} &nbsp;<i class="fa fa-arrow-down"></i>
+              </button>
+              <p x-show="!loading && !hasNext">
+                <em>
+                  {% trans trimmed %}
+                    It was too short.
+                    You already reached the end of the upcoming events list.
+                  {% endtrans %}
+                </em>
+              </p>
+            </div>
+          </div>
+        {% endif %}
       </section>
 
       <h3>
