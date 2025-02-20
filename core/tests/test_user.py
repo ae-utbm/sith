@@ -19,6 +19,7 @@ from core.baker_recipes import (
 from core.models import Group, User
 from counter.models import Counter, Refilling, Selling
 from eboutic.models import Invoice, InvoiceItem
+from sas.models import Picture
 
 
 class TestSearchUsers(TestCase):
@@ -26,6 +27,7 @@ class TestSearchUsers(TestCase):
     def setUpTestData(cls):
         # News.author has on_delete=PROTECT, so news must be deleted beforehand
         News.objects.all().delete()
+        Picture.objects.all().delete()  # same for pictures
         User.objects.all().delete()
         user_recipe = Recipe(
             User,
