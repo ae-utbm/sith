@@ -2,7 +2,7 @@ import { AjaxSelect } from "#core:core/components/ajax-select-base";
 import { registerComponent } from "#core:utils/web-components";
 import type { TomOption } from "tom-select/dist/types/types";
 import type { escape_html } from "tom-select/dist/types/utils";
-import { type AlbumSchema, albumSearchAlbum } from "#openapi";
+import { type AlbumAutocompleteSchema, albumSearchAlbum } from "#openapi";
 
 @registerComponent("album-ajax-select")
 export class AlbumAjaxSelect extends AjaxSelect {
@@ -18,13 +18,13 @@ export class AlbumAjaxSelect extends AjaxSelect {
     return [];
   }
 
-  protected renderOption(item: AlbumSchema, sanitize: typeof escape_html) {
+  protected renderOption(item: AlbumAutocompleteSchema, sanitize: typeof escape_html) {
     return `<div class="select-item">
             <span class="select-item-text">${sanitize(item.path)}</span>
           </div>`;
   }
 
-  protected renderItem(item: AlbumSchema, sanitize: typeof escape_html) {
+  protected renderItem(item: AlbumAutocompleteSchema, sanitize: typeof escape_html) {
     return `<span>${sanitize(item.path)}</span>`;
   }
 }
