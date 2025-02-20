@@ -7,20 +7,32 @@ import frLocale from "@fullcalendar/core/locales/fr";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import iCalendarPlugin from "@fullcalendar/icalendar";
 import listPlugin from "@fullcalendar/list";
-import { calendarCalendarExternal, calendarCalendarInternal } from "#openapi";
+import {
+  calendarCalendarExternal,
+  calendarCalendarInternal,
+  calendarCalendarUnmoderated,
+  newsDeleteNews,
+  newsModerateNews,
+} from "#openapi";
 
 @registerComponent("ics-calendar")
 export class IcsCalendar extends inheritHtmlElement("div") {
-  static observedAttributes = ["locale"];
+  static observedAttributes = ["locale", "can_moderate", "can_delete"];
   private calendar: Calendar;
   private locale = "en";
+  private canModerate = false;
+  private canDelete = false;
 
   attributeChangedCallback(name: string, _oldValue?: string, newValue?: string) {
-    if (name !== "locale") {
-      return;
+    if (name === "locale") {
+      this.locale = newValue;
     }
-
-    this.locale = newValue;
+    if (name === "can_moderate") {
+      this.canModerate = newValue.toLowerCase() === "true";
+    }
+    if (name === "can_delete") {
+      this.canDelete = newValue.toLowerCase() === "true";
+    }
   }
 
   isMobile() {
@@ -52,6 +64,68 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       dateStyle: "medium",
       timeStyle: "short",
     }).format(date);
+  }
+
+  getNewsId(event: EventImpl) {
+    // return Number.parseInt(event.url.split("/").pop());
+    return Number.parseInt(
+      event.url
+        .toString()
+        .split("/")
+        .filter((s) => s) // Remove blank characters
+        .pop(),
+    );
+  }
+
+  async refreshEvents() {
+    this.click(); // Remove focus from popup
+    this.calendar.removeAllEventSources();
+    for (const source of await this.getEventSources()) {
+      this.calendar.addEventSource(source);
+    }
+    this.calendar.refetchEvents();
+  }
+
+  async moderate(id: number) {
+    await newsModerateNews({
+      path: {
+        // biome-ignore lint/style/useNamingConvention: python API
+        news_id: id,
+      },
+    });
+    await this.refreshEvents();
+  }
+
+  async delete(id: number) {
+    await newsDeleteNews({
+      path: {
+        // biome-ignore lint/style/useNamingConvention: python API
+        news_id: id,
+      },
+    });
+    await this.refreshEvents();
+  }
+
+  async getEventSources() {
+    const cacheInvalidate = `?invalidate=${Date.now()}`;
+    return [
+      {
+        url: `${await makeUrl(calendarCalendarInternal)}${cacheInvalidate}`,
+        format: "ics",
+        className: "internal",
+      },
+      {
+        url: `${await makeUrl(calendarCalendarExternal)}${cacheInvalidate}`,
+        format: "ics",
+        className: "external",
+      },
+      {
+        url: `${await makeUrl(calendarCalendarUnmoderated)}${cacheInvalidate}`,
+        format: "ics",
+        color: "red",
+        className: "unmoderated",
+      },
+    ];
   }
 
   createEventDetailPopup(event: EventClickArg) {
@@ -112,6 +186,40 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       return makePopupInfo(url, "fa-solid fa-link");
     };
 
+    const makePopupTools = (event: EventImpl) => {
+      if (event.source.internalEventSource.ui.classNames.indexOf("external") >= 0) {
+        return null;
+      }
+      if (!(this.canDelete || this.canModerate)) {
+        return null;
+      }
+      const newsId = this.getNewsId(event);
+      const div = document.createElement("div");
+      if (
+        this.canModerate &&
+        event.source.internalEventSource.ui.classNames.indexOf("unmoderated") >= 0
+      ) {
+        const button = document.createElement("button");
+        button.innerHTML = `<i class="fa fa-check"></i>${gettext("Moderate")}`;
+        button.setAttribute("class", "btn btn-green");
+        button.onclick = () => {
+          this.moderate(newsId);
+        };
+        div.appendChild(button);
+      }
+      if (this.canDelete) {
+        const button = document.createElement("button");
+        button.innerHTML = `<i class="fa fa-trash-can"></i>${gettext("Delete")}`;
+        button.setAttribute("class", "btn btn-red");
+        button.onclick = () => {
+          this.delete(newsId);
+        };
+        div.appendChild(button);
+      }
+
+      return makePopupInfo(div, "fa-solid fa-toolbox");
+    };
+
     // Create new popup
     const popup = document.createElement("div");
     const popupContainer = document.createElement("div");
@@ -129,6 +237,11 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     const url = makePopupUrl(event.event);
     if (url !== null) {
       popupContainer.appendChild(url);
+    }
+
+    const tools = makePopupTools(event.event);
+    if (tools !== null) {
+      popupContainer.appendChild(tools);
     }
 
     popup.appendChild(popupContainer);
@@ -152,7 +265,6 @@ export class IcsCalendar extends inheritHtmlElement("div") {
 
   async connectedCallback() {
     super.connectedCallback();
-    const cacheInvalidate = `?invalidate=${Date.now()}`;
     this.calendar = new Calendar(this.node, {
       plugins: [dayGridPlugin, iCalendarPlugin, listPlugin],
       locales: [frLocale, enLocale],
@@ -160,16 +272,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       locale: this.locale,
       initialView: this.currentView(),
       headerToolbar: this.currentToolbar(),
-      eventSources: [
-        {
-          url: `${await makeUrl(calendarCalendarInternal)}${cacheInvalidate}`,
-          format: "ics",
-        },
-        {
-          url: `${await makeUrl(calendarCalendarExternal)}${cacheInvalidate}`,
-          format: "ics",
-        },
-      ],
+      eventSources: await this.getEventSources(),
       windowResize: () => {
         this.calendar.changeView(this.currentView());
         this.calendar.setOption("headerToolbar", this.currentToolbar());

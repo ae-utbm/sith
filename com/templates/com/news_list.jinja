@@ -179,7 +179,11 @@
         {% trans %}All coming events{% endtrans %}
         <a target="#" href="{{ url("com:news_feed") }}"><i class="fa fa-rss feed"></i></a>
       </h3>
-      <ics-calendar locale="{{ get_language() }}"></ics-calendar>
+      <ics-calendar
+        locale="{{ get_language() }}"
+        can_moderate="{{ user.has_perm("com.moderate_news") }}"
+        can_delete="{{ user.has_perm("com.delete_news") }}"
+      ></ics-calendar>
     </div>
 
     <div id="right_column">

@@ -5,6 +5,7 @@ from typing import final
 import requests
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.db.models import QuerySet
 from django.urls import reverse
 from django.utils import timezone
 from ical.calendar import Calendar
@@ -12,6 +13,7 @@ from ical.calendar_stream import IcsCalendarStream
 from ical.event import Event
 
 from com.models import NewsDate
+from core.models import User
 
 
 @final
@@ -55,11 +57,32 @@ class IcsCalendar:
     @classmethod
     def make_internal(cls) -> Path:
         # Updated through a post_save signal on News in com.signals
+        # Create a file so we can offload the download to the reverse proxy if available
+        cls._CACHE_FOLDER.mkdir(parents=True, exist_ok=True)
+        with open(cls._INTERNAL_CALENDAR, "wb") as f:
+            _ = f.write(
+                cls.ics_from_queryset(
+                    NewsDate.objects.filter(
+                        news__is_moderated=True,
+                        end_date__gte=timezone.now() - (relativedelta(months=6)),
+                    )
+                )
+            )
+        return cls._INTERNAL_CALENDAR
+
+    @classmethod
+    def get_unmoderated(cls, user: User) -> bytes:
+        return cls.ics_from_queryset(
+            NewsDate.objects.viewable_by(user).filter(
+                news__is_moderated=False,
+                end_date__gte=timezone.now() - (relativedelta(months=6)),
+            ),
+        )
+
+    @classmethod
+    def ics_from_queryset(cls, queryset: QuerySet) -> bytes:
         calendar = Calendar()
-        for news_date in NewsDate.objects.filter(
-            news__is_moderated=True,
-            end_date__gte=timezone.now() - (relativedelta(months=6)),
-        ).prefetch_related("news"):
+        for news_date in queryset.prefetch_related("news"):
             event = Event(
                 summary=news_date.news.title,
                 start=news_date.start_date,
@@ -68,8 +91,4 @@ class IcsCalendar:
             )
             calendar.events.append(event)
 
-        # Create a file so we can offload the download to the reverse proxy if available
-        cls._CACHE_FOLDER.mkdir(parents=True, exist_ok=True)
-        with open(cls._INTERNAL_CALENDAR, "wb") as f:
-            _ = f.write(IcsCalendarStream.calendar_to_ics(calendar).encode("utf-8"))
-        return cls._INTERNAL_CALENDAR
+        return IcsCalendarStream.calendar_to_ics(calendar).encode("utf-8")

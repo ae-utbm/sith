@@ -2,10 +2,11 @@ from pathlib import Path
 from typing import Literal
 
 from django.conf import settings
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from ninja import Query
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
+from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 
 from com.calendar import IcsCalendar
@@ -37,6 +38,17 @@ class CalendarController(ControllerBase):
     @route.get("/internal.ics", url_name="calendar_internal")
     def calendar_internal(self):
         return send_raw_file(IcsCalendar.get_internal())
+
+    @route.get(
+        "/unmoderated.ics",
+        permissions=[IsAuthenticated],
+        url_name="calendar_unmoderated",
+    )
+    def calendar_unmoderated(self):
+        return HttpResponse(
+            IcsCalendar.get_unmoderated(self.context.request.user),
+            content_type="text/calendar",
+        )
 
 
 @api_controller("/news")
