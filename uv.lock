@@ -1513,7 +1513,7 @@ wheels = [
 [[package]]
 name = "sith"
 version = "3"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "cryptography" },
     { name = "dict2xml" },
