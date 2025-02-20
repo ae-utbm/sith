@@ -53,7 +53,7 @@
     <div x-show="pictures.length > 0" x-cloak>
       <button
         :disabled="isDownloading"
-        class="btn btn-blue"
+        class="btn btn-blue {% if name == "" %}btn-no-text{% endif %}"
         @click="downloadZip()"
       >
         <i class="fa fa-download"></i>{{ name }}
