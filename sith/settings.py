@@ -52,6 +52,10 @@ env.read_env()
 
 BASE_DIR = Path(__file__).parent.parent.resolve()
 
+# Composer settings
+PROCFILE_RUNSERVER = env.str("PROCFILE_RUNSERVER", None)
+PROCFILE_PYTEST = env.str("PROCFILE_PYTEST", None)
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
@@ -218,8 +222,7 @@ DATABASES = {
     "default": env.dj_db_url("DATABASE_URL", conn_max_age=None, conn_health_checks=True)
 }
 
-if "CACHE_URL" in os.environ:
-    CACHES = {"default": env.dj_cache_url("CACHE_URL")}
+CACHES = {"default": env.dj_cache_url("CACHE_URL")}
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 

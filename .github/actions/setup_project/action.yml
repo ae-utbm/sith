@@ -9,6 +9,11 @@ runs:
         packages: gettext
         version: 1.0  # increment to reset cache
 
+    - name: Install Redis
+      uses: shogo82148/actions-setup-redis@v1
+      with:
+        redis-version: "7.x"
+
     - name: Install uv
       uses: astral-sh/setup-uv@v5
       with:

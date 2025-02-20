@@ -47,6 +47,8 @@ dependencies = [
     "redis[hiredis]<6.0.0,>=5.2.0",
     "environs[django]<15.0.0,>=14.1.0",
     "requests>=2.32.3",
+    "honcho>=2.0.0",
+    "psutil>=7.0.0",
 ]
 
 [project.urls]
@@ -123,6 +125,13 @@ ignore = [
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[build-system] # A build system is needed to register a pytest plugin
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.entry-points.pytest11]
+sith = "sith.pytest"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "sith.settings"
