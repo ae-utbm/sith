@@ -1,10 +1,6 @@
 import { paginated } from "#core:utils/api";
 import { History, initialUrlParams, updateQueryString } from "#core:utils/history";
-import {
-  type PictureSchema,
-  type PicturesFetchPicturesData,
-  picturesFetchPictures,
-} from "#openapi";
+import { type PictureSchema, type PicturesFetchPicturesData, picturesFetchPictures } from "#openapi";
 
 interface AlbumConfig {
   albumId: number;
@@ -17,12 +13,14 @@ document.addEventListener("alpine:init", () => {
     page: Number.parseInt(initialUrlParams.get("page")) || 1,
     pushstate: History.Push /* Used to avoid pushing a state on a back action */,
     loading: false,
+    config: config,
 
     async init() {
       await this.fetchPictures();
       this.$watch("page", () => {
         updateQueryString("page", this.page === 1 ? null : this.page, this.pushstate);
         this.pushstate = History.Push;
+        this.fetchPictures();
       });
 
       window.addEventListener("popstate", () => {
@@ -30,7 +28,6 @@ document.addEventListener("alpine:init", () => {
         this.page =
           Number.parseInt(new URLSearchParams(window.location.search).get("page")) || 1;
       });
-      this.config = config;
     },
 
     getPage(page: number) {
