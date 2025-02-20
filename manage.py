@@ -18,19 +18,16 @@ import sys
 
 from django.utils.autoreload import DJANGO_AUTORELOAD_ENV
 
-from processes.composer import start_composer, stop_composer
-from sith.environ import env
+from sith.composer import start_composer, stop_composer
+from sith.settings import PROCFILE_RUNSERVER
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sith.settings")
 
     from django.core.management import execute_from_command_line
 
-    if (
-        os.environ.get(DJANGO_AUTORELOAD_ENV) is None
-        and (procfile := env.str("PROCFILE_RUNSERVER", None)) is not None
-    ):
-        start_composer(procfile)
+    if os.environ.get(DJANGO_AUTORELOAD_ENV) is None and PROCFILE_RUNSERVER is not None:
+        start_composer(PROCFILE_RUNSERVER)
 
     execute_from_command_line(sys.argv)
 

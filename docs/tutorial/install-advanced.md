@@ -77,7 +77,22 @@ uv sync --group prod
     C'est parce que ces dépendances compilent certains modules
     à l'installation.
 
-## Configurer Redis
+## Désactiver Honcho
+
+Honcho est utilisé en développement pour simplifier la gestion
+des services externes (redis, vite et autres futures).
+
+En mode production, il est nécessaire de le désactiver puisque normalement
+tous ces services sont déjà configurés.
+
+Pour désactiver Honcho il suffit de sélectionner aucun `PROCFILE_` dans la config.
+
+```dotenv
+PROCFILE_RUNSERVER=
+PROCFILE_PYTEST=
+```
+
+## Configurer Redis en service externe
 
 Redis est installé comme dépendance mais pas lancé par défaut.
 
@@ -100,6 +115,11 @@ REDIS_PORT=6379
 CACHE_URL=redis://127.0.0.1:${REDIS_PORT}/0
 ```
 
+Si on souhaite configurer redis pour communiquer via un socket :
+
+```dovenv
+CACHE_URL=redis:///path/to/redis-server.sock
+```
 
 ## Configurer PostgreSQL
 
