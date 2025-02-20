@@ -1,8 +1,9 @@
 from pathlib import Path
 
 from django.conf import settings
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from ninja_extra import ControllerBase, api_controller, route
+from ninja_extra.permissions import IsAuthenticated
 
 from com.calendar import IcsCalendar
 from com.models import News
@@ -33,6 +34,17 @@ class CalendarController(ControllerBase):
     def calendar_internal(self):
         return send_raw_file(IcsCalendar.get_internal())
 
+    @route.get(
+        "/unmoderated.ics",
+        permissions=[IsAuthenticated],
+        url_name="calendar_unmoderated",
+    )
+    def calendar_unmoderated(self):
+        return HttpResponse(
+            IcsCalendar.get_unmoderated(self.context.request.user),
+            content_type="text/calendar",
+        )
+
 
 @api_controller("/news")
 class NewsController(ControllerBase):
@@ -45,6 +57,18 @@ class NewsController(ControllerBase):
         news = self.get_object_or_exception(News, id=news_id)
         if not news.is_moderated:
             news.is_moderated = True
+            news.moderator = self.context.request.user
+            news.save()
+
+    @route.patch(
+        "/{int:news_id}/remove",
+        permissions=[HasPerm("com.moderate_news")],
+        url_name="remove_news",
+    )
+    def remove_news(self, news_id: int):
+        news = self.get_object_or_exception(News, id=news_id)
+        if news.is_moderated:
+            news.is_moderated = False
             news.moderator = self.context.request.user
             news.save()
 

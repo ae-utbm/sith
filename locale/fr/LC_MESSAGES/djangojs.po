@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-08 12:23+0100\n"
+"POT-Creation-Date: 2025-02-20 17:57+0100\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -21,9 +21,18 @@ msgstr ""
 msgid "More info"
 msgstr "Plus d'informations"
 
+#: com/static/bundled/com/components/ics-calendar-index.ts
+msgid "Moderate"
+msgstr "Modérer"
+
+#: com/static/bundled/com/components/ics-calendar-index.ts
 #: core/static/bundled/core/components/ajax-select-base.ts
 msgid "Remove"
 msgstr "Retirer"
+
+#: com/static/bundled/com/components/ics-calendar-index.ts
+msgid "Delete"
+msgstr "Supprimer"
 
 #: core/static/bundled/core/components/ajax-select-base.ts
 msgid "You need to type %(number)s more characters"
