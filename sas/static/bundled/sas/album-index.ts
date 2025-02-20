@@ -17,7 +17,6 @@ document.addEventListener("alpine:init", () => {
     page: Number.parseInt(initialUrlParams.get("page")) || 1,
     pushstate: History.Push /* Used to avoid pushing a state on a back action */,
     loading: false,
-    config: {} as AlbumConfig,
 
     async init() {
       await this.fetchPictures();
@@ -32,6 +31,13 @@ document.addEventListener("alpine:init", () => {
           Number.parseInt(new URLSearchParams(window.location.search).get("page")) || 1;
       });
       this.config = config;
+    },
+
+    getPage(page: number) {
+      return this.pictures.slice(
+        (page - 1) * config.maxPageSize,
+        config.maxPageSize * page,
+      );
     },
 
     async fetchPictures() {

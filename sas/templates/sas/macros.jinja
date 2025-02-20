@@ -34,3 +34,31 @@
     <a href="{{ url('sas:album', album_id=file.id) }}">{{ file.get_display_name() }}</a> /
   {% endif %}
 {% endmacro %}
+
+{# Helper macro to create a download button for a
+  record of albums with alpine
+
+  This needs to be used inside an alpine environment.
+  Downloaded pictures will be `pictures` from the 
+  parent data store.
+
+  Note:
+    This requires importing `bundled/sas/pictures-download-index.ts`
+
+  Parameters:
+    name (str): name displayed on the button
+ #}
+{% macro download_button(name) %}
+  <div x-data="pictures_download">
+    <div x-show="pictures.length > 0" x-cloak>
+      <button
+        :disabled="isDownloading"
+        class="btn btn-blue"
+        @click="downloadZip()"
+      >
+        <i class="fa fa-download"></i>{{ name }}
+      </button>
+      <progress x-ref="progress" x-show="isDownloading"></progress>
+    </div>
+  </div>
+{% endmacro %}
