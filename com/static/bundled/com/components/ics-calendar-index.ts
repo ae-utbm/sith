@@ -13,6 +13,7 @@ import {
   calendarCalendarUnmoderated,
   newsDeleteNews,
   newsModerateNews,
+  newsRemoveNews,
 } from "#openapi";
 
 @registerComponent("ics-calendar")
@@ -86,7 +87,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     this.calendar.refetchEvents();
   }
 
-  async moderate(id: number) {
+  async moderateNews(id: number) {
     await newsModerateNews({
       path: {
         // biome-ignore lint/style/useNamingConvention: python API
@@ -96,7 +97,17 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     await this.refreshEvents();
   }
 
-  async delete(id: number) {
+  async removeNews(id: number) {
+    await newsRemoveNews({
+      path: {
+        // biome-ignore lint/style/useNamingConvention: python API
+        news_id: id,
+      },
+    });
+    await this.refreshEvents();
+  }
+
+  async deleteNews(id: number) {
     await newsDeleteNews({
       path: {
         // biome-ignore lint/style/useNamingConvention: python API
@@ -195,24 +206,33 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       }
       const newsId = this.getNewsId(event);
       const div = document.createElement("div");
-      if (
-        this.canModerate &&
-        event.source.internalEventSource.ui.classNames.indexOf("unmoderated") >= 0
-      ) {
-        const button = document.createElement("button");
-        button.innerHTML = `<i class="fa fa-check"></i>${gettext("Moderate")}`;
-        button.setAttribute("class", "btn btn-green");
-        button.onclick = () => {
-          this.moderate(newsId);
-        };
-        div.appendChild(button);
+      if (this.canModerate) {
+        if (
+          event.source.internalEventSource.ui.classNames.indexOf("unmoderated") >= 0
+        ) {
+          const button = document.createElement("button");
+          button.innerHTML = `<i class="fa fa-check"></i>${gettext("Moderate")}`;
+          button.setAttribute("class", "btn btn-green");
+          button.onclick = () => {
+            this.moderateNews(newsId);
+          };
+          div.appendChild(button);
+        } else {
+          const button = document.createElement("button");
+          button.innerHTML = `<i class="fa fa-times"></i>${gettext("Remove")}`;
+          button.setAttribute("class", "btn btn-orange");
+          button.onclick = () => {
+            this.removeNews(newsId);
+          };
+          div.appendChild(button);
+        }
       }
       if (this.canDelete) {
         const button = document.createElement("button");
         button.innerHTML = `<i class="fa fa-trash-can"></i>${gettext("Delete")}`;
         button.setAttribute("class", "btn btn-red");
         button.onclick = () => {
-          this.delete(newsId);
+          this.deleteNews(newsId);
         };
         div.appendChild(button);
       }
