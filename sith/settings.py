@@ -42,12 +42,19 @@ from pathlib import Path
 import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django.utils.translation import gettext_lazy as _
+from environs import Env
 from sentry_sdk.integrations.django import DjangoIntegration
 
-from .environ import env
 from .honeypot import custom_honeypot_error
 
+env = Env()
+env.read_env()
+
 BASE_DIR = Path(__file__).parent.parent.resolve()
+
+# Composer settings
+PROCFILE_RUNSERVER = env.str("PROCFILE_RUNSERVER", None)
+PROCFILE_PYTEST = env.str("PROCFILE_PYTEST", None)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
