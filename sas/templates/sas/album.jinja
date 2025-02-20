@@ -64,11 +64,7 @@
     <br>
   {% endif %}
 
-  <div x-data="pictures({
-               albumId: {{ album.id }},
-               maxPageSize: {{ settings.SITH_SAS_IMAGES_PER_PAGE }},
-               })">
-
+  <div x-data="pictures({ albumId: {{ album.id }}, maxPageSize: {{ settings.SITH_SAS_IMAGES_PER_PAGE }} })">
     {{ download_button(_("Download album")) }}
 
     <h4>{% trans %}Pictures{% endtrans %}</h4>
@@ -94,7 +90,7 @@
         </a>
       </template>
     </div>
-    {{  paginate_alpine("page", "nbPages()") }}
+    {{ paginate_alpine("page", "nbPages()") }}
   </div>
 
   {% if is_sas_admin %}
