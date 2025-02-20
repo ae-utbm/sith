@@ -1,6 +1,3 @@
-from typing import Annotated
-
-from annotated_types import MinLen
 from django.conf import settings
 from django.db.models import F
 from django.urls import reverse
@@ -16,6 +13,8 @@ from core.auth.api_permissions import CanAccessLookup, CanView, IsInGroup, IsRoo
 from core.models import Notification, User
 from sas.models import Album, PeoplePictureRelation, Picture
 from sas.schemas import (
+    AlbumAutocompleteSchema,
+    AlbumFilterSchema,
     AlbumSchema,
     IdentifiedUserSchema,
     ModerationRequestSchema,
@@ -31,11 +30,30 @@ class AlbumController(ControllerBase):
     @route.get(
         "/search",
         response=PaginatedResponseSchema[AlbumSchema],
+        permissions=[IsAuthenticated],
+        url_name="search-album",
+    )
+    @paginate(PageNumberPaginationExtra, page_size=50)
+    def fetch_album(self, filters: Query[AlbumFilterSchema]):
+        """General-purpose album search."""
+        return filters.filter(Album.objects.viewable_by(self.context.request.user))
+
+    @route.get(
+        "/autocomplete-search",
+        response=PaginatedResponseSchema[AlbumAutocompleteSchema],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
-    def search_album(self, search: Annotated[str, MinLen(1)]):
-        return Album.objects.filter(name__icontains=search)
+    def autocomplete_album(self, filters: Query[AlbumFilterSchema]):
+        """Search route to use exclusively on autocomplete input fields.
+
+        This route is separated from `GET /sas/album/search` because
+        getting the path of an album may need an absurd amount of db queries.
+
+        If you don't need the path of the albums,
+        do NOT use this route.
+        """
+        return filters.filter(Album.objects.viewable_by(self.context.request.user))
 
 
 @api_controller("/sas/picture")
