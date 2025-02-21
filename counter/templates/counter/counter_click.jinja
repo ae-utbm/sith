@@ -27,7 +27,13 @@
 {% block content %}
   <h4>{{ counter }}</h4>
 
-  <div id="bar-ui" x-data="counter">
+  <div id="bar-ui" x-data="counter({
+                           customerBalance: {{ customer.amount }},
+                           products: products,
+                           customerId: {{ customer.pk }},
+                           formInitial: formInitial,
+                           cancelUrl: '{{ cancel_url }}',
+                           })">
     <noscript>
       <p class="important">Javascript is required for the counter UI.</p>
     </noscript>
@@ -256,13 +262,7 @@
       {%- endfor -%}
     ];
     window.addEventListener("DOMContentLoaded", () => {
-      loadCounter({
-        customerBalance: {{ customer.amount }},
-        products: products,
-        customerId: {{ customer.pk }},
-        formInitial: formInitial,
-        cancelUrl: "{{ cancel_url }}",
-      });
+      loadCounter();
     });
   </script>
 {% endblock script %}

@@ -126,6 +126,11 @@ class BaseBasketForm(BaseFormSet):
             if form.product.is_unrecord_product:
                 self.total_recordings += form.cleaned_data["quantity"]
 
+        # We don't want to block an user that have negative recordings
+        # if he isn't recording anything or reducing it's recording count
+        if self.total_recordings <= 0:
+            return
+
         if not customer.can_record_more(self.total_recordings):
             raise ValidationError(_("This user have reached his recording limit"))
 
