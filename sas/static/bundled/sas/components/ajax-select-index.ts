@@ -2,7 +2,7 @@ import { AjaxSelect } from "#core:core/components/ajax-select-base";
 import { registerComponent } from "#core:utils/web-components";
 import type { TomOption } from "tom-select/dist/types/types";
 import type { escape_html } from "tom-select/dist/types/utils";
-import { type AlbumAutocompleteSchema, albumSearchAlbum } from "#openapi";
+import { type AlbumAutocompleteSchema, albumAutocompleteAlbum } from "#openapi";
 
 @registerComponent("album-ajax-select")
 export class AlbumAjaxSelect extends AjaxSelect {
@@ -11,7 +11,7 @@ export class AlbumAjaxSelect extends AjaxSelect {
   protected searchField = ["path", "name"];
 
   protected async search(query: string): Promise<TomOption[]> {
-    const resp = await albumSearchAlbum({ query: { search: query } });
+    const resp = await albumAutocompleteAlbum({ query: { search: query } });
     if (resp.data) {
       return resp.data.results;
     }

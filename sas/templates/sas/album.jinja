@@ -52,15 +52,33 @@
       {% endif %}
   {% endif %}
 
-  {% if children_albums|length > 0 %}
-    <h4>{% trans %}Albums{% endtrans %}</h4>
-    <div class="albums">
-      {% for a in children_albums %}
-        {{ display_album(a, is_sas_admin) }}
-      {% endfor %}
+  {% if show_albums %}
+    <div x-data="albums({ parentId: {{ album.id }} })" class="margin-bottom">
+      <h4>{% trans %}Albums{% endtrans %}</h4>
+      <div class="albums" :aria-busy="loading">
+        <template x-for="album in albums" :key="album.id">
+          <a :href="album.sas_url">
+            <div
+              x-data="{thumbUrl: album.thumbnail || '{{ static("core/img/sas.jpg") }}'}"
+              class="album"
+              :class="{not_moderated: !album.is_moderated}"
+              :style="`background-image: url('${thumbUrl}');`"
+            >
+              <template x-if="album.is_moderated">
+                <div class="text" x-text="album.name"></div>
+              </template>
+              <template x-if="!album.is_moderated">
+                <div class="overlay">&nbsp;</div>
+                <div class="text">{% trans %}To be moderated{% endtrans %}</div>
+              </template>
+            </div>
+            {% if edit_mode %}
+              <input type="checkbox" name="file_list" :value="album.id">
+            {% endif %}
+          </a>
+        </template>
+      </div>
     </div>
-
-    <br>
   {% endif %}
 
   <div x-data="pictures({ albumId: {{ album.id }}, maxPageSize: {{ settings.SITH_SAS_IMAGES_PER_PAGE }} })">
