@@ -447,7 +447,7 @@ body {
     flex-wrap: wrap;
 
     $col-gap: 1rem;
-    $row-gap: 0.5rem;
+    $row-gap: $col-gap / 3;
 
     &.gap {
       column-gap: $col-gap;
