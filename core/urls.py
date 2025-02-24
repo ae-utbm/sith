@@ -23,6 +23,7 @@
 #
 
 from django.urls import path, re_path, register_converter
+from django.views.generic import RedirectView
 
 from core.converters import (
     BooleanStringConverter,
@@ -68,7 +69,6 @@ from core.views import (
     UserGodfathersView,
     UserListView,
     UserMiniView,
-    UserPicturesView,
     UserPreferencesView,
     UserStatsView,
     UserToolsView,
@@ -144,7 +144,8 @@ urlpatterns = [
     path("user/<int:user_id>/mini/", UserMiniView.as_view(), name="user_profile_mini"),
     path("user/<int:user_id>/", UserView.as_view(), name="user_profile"),
     path(
-        "user/<int:user_id>/pictures/", UserPicturesView.as_view(), name="user_pictures"
+        "user/<int:user_id>/pictures/",
+        RedirectView.as_view(pattern_name="sas:user_pictures", permanent=True),
     ),
     path(
         "user/<int:user_id>/godfathers/",

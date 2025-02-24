@@ -272,9 +272,12 @@ body {
       }
     }
 
-    i {
-      margin-right: 4px;
+    &:not(.btn-no-text) {
+      i {
+        margin-right: 4px;
+      }
     }
+
   }
 
   /**

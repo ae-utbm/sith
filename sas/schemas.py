@@ -39,6 +39,8 @@ class PictureSchema(ModelSchema):
     compressed_url: str
     thumb_url: str
     album: str
+    report_url: str
+    edit_url: str
 
     @staticmethod
     def resolve_sas_url(obj: Picture) -> str:
@@ -55,6 +57,14 @@ class PictureSchema(ModelSchema):
     @staticmethod
     def resolve_thumb_url(obj: Picture) -> str:
         return obj.get_download_thumb_url()
+
+    @staticmethod
+    def resolve_report_url(obj: Picture) -> str:
+        return reverse("sas:picture_ask_removal", kwargs={"picture_id": obj.id})
+
+    @staticmethod
+    def resolve_edit_url(obj: Picture) -> str:
+        return reverse("sas:picture_edit", kwargs={"picture_id": obj.id})
 
 
 class PictureRelationCreationSchema(Schema):

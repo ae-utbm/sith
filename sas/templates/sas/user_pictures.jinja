@@ -1,11 +1,13 @@
 {% extends "core/base.jinja" %}
+{% from "sas/macros.jinja" import download_button %}
 
 {%- block additional_css -%}
   <link rel="stylesheet" href="{{ static('sas/css/album.scss') }}">
 {%- endblock -%}
 
 {% block additional_js %}
-  <script type="module" src="{{ static('bundled/user/pictures-index.js') }}"></script>
+  <script type="module" src="{{ static('bundled/sas/user/pictures-index.ts') }}"></script>
+  <script type="module" src="{{ static('bundled/sas/pictures-download-index.ts') }}"></script>
 {% endblock %}
 
 {% block title %}
@@ -13,33 +15,28 @@
 {% endblock %}
 
 {% block content %}
-  <main x-data="user_pictures">
+  <main x-data="user_pictures({ userId: {{ object.id }} })">
     {% if user.id == object.id %}
-      <div x-show="pictures.length > 0" x-cloak>
-        <button
-          :disabled="isDownloading"
-          class="btn btn-blue"
-          @click="downloadZip()"
-        >
-          <i class="fa fa-download"></i>
-          {% trans %}Download all my pictures{% endtrans %}
-        </button>
-        <progress x-ref="progress" x-show="isDownloading"></progress>
-      </div>
+      {{ download_button(_("Download all my pictures")) }}
     {% endif %}
 
     <template x-for="[album, pictures] in Object.entries(albums)" x-cloak>
       <section>
         <br />
-        <h4 x-text="album"></h4>
+        <div class="row">
+          <h4 x-text="album"></h4>
+          {% if user.id == object.id %}
+            &nbsp;{{ download_button("") }}
+          {% endif %}
+        </div>
         <div class="photos">
           <template x-for="picture in pictures">
-            <a :href="`/sas/picture/${picture.id}`">
+            <a :href="picture.sas_url">
               <div
                 class="photo"
                 :class="{not_moderated: !picture.is_moderated}"
-                :style="`background-image: url(${picture.thumb_url})`"
               >
+                <img :src="picture.thumb_url" :alt="picture.name" loading="lazy" />
                 <template x-if="!picture.is_moderated">
                   <div class="overlay">&nbsp;</div>
                   <div class="text">{% trans %}To be moderated{% endtrans %}</div>
@@ -56,13 +53,3 @@
     <div class="photos" :aria-busy="loading"></div>
   </main>
 {% endblock content %}
-
-{% block script %}
-
-  {{ super() }}
-  <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      loadPicturePage({ userId: {{ object.id }} });
-    })
-  </script>
-{% endblock script %}

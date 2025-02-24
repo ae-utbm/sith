@@ -26,6 +26,7 @@ from django.views.generic.edit import FormMixin, FormView, UpdateView
 from core.auth.mixins import CanEditMixin, CanViewMixin
 from core.models import SithFile, User
 from core.views.files import FileView, send_file
+from core.views.user import UserTabsMixin
 from sas.forms import (
     AlbumEditForm,
     PictureEditForm,
@@ -191,6 +192,16 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
             .order_by("-date")
         )
         return kwargs
+
+
+class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
+    """Display a user's pictures."""
+
+    model = User
+    pk_url_kwarg = "user_id"
+    context_object_name = "profile"
+    template_name = "sas/user_pictures.jinja"
+    current_tab = "pictures"
 
 
 # Admin views

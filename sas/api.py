@@ -104,7 +104,7 @@ class PicturesController(ControllerBase):
                 viewed=False,
                 type="NEW_PICTURES",
                 defaults={
-                    "url": reverse("core:user_pictures", kwargs={"user_id": u.id})
+                    "url": reverse("sas:user_pictures", kwargs={"user_id": u.id})
                 },
             )
 

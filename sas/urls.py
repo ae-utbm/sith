@@ -24,6 +24,7 @@ from sas.views import (
     PictureEditView,
     PictureView,
     SASMainView,
+    UserPicturesView,
     send_album,
     send_compressed,
     send_pict,
@@ -55,4 +56,7 @@ urlpatterns = [
         name="download_compressed",
     ),
     path("picture/<int:picture_id>/download/thumb/", send_thumb, name="download_thumb"),
+    path(
+        "user/<int:user_id>/pictures/", UserPicturesView.as_view(), name="user_pictures"
+    ),
 ]
