@@ -1056,7 +1056,7 @@ class CashRegisterSummary(models.Model):
 
     def __getattribute__(self, name):
         if name[:5] == "check":
-            checks = self.items.filter(check=True).order_by("value").all()
+            checks = self.items.filter(is_check=True).order_by("value").all()
         if name == "ten_cents":
             return self.items.filter(value=0.1, is_check=False).first()
         elif name == "twenty_cents":
