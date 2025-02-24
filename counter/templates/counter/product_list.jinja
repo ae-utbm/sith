@@ -7,6 +7,7 @@
 
 {% block additional_js %}
   <script type="module" src="{{ static("bundled/counter/components/ajax-select-index.ts") }}"></script>
+  <script type="module" src="{{ static("bundled/club/components/ajax-select-index.ts") }}"></script>
   <script type="module" src="{{ static("bundled/counter/product-list-index.ts") }}"></script>
 {% endblock %}
 
@@ -22,7 +23,6 @@
     <h4 class="margin-bottom">{% trans %}Filter products{% endtrans %}</h4>
     <form id="search-form" class="margin-bottom">
       <div class="row gap-4x">
-
         <fieldset>
           <label for="search-input">{% trans %}Product name{% endtrans %}</label>
           <input
@@ -48,16 +48,34 @@
           </div>
         </fieldset>
       </div>
-      <fieldset>
-        <label for="type-search-input">{% trans %}Product type{% endtrans %}</label>
-        <product-type-ajax-select
-          id="type-search-input"
-          name="product-type"
-          x-ref="productTypesInput"
-          multiple
-        >
-        </product-type-ajax-select>
-      </fieldset>
+      <div class="row gap-4x">
+        <fieldset class="grow">
+          <label for="type-search-input">{% trans %}Product type{% endtrans %}</label>
+          <product-type-ajax-select
+            id="type-search-input"
+            name="product-type"
+            x-ref="productTypesInput"
+            multiple
+          ></product-type-ajax-select>
+        </fieldset>
+        <fieldset class="grow">
+          <label for="club-search-input">{% trans %}Clubs{% endtrans %}</label>
+          <club-ajax-select
+            id="club-search-input"
+            name="club"
+            x-ref="clubsInput"
+            multiple></club-ajax-select>
+        </fieldset>
+        <fieldset class="grow">
+          <label for="counter-search-input">{% trans %}Counters{% endtrans %}</label>
+          <counter-ajax-select
+            id="counter-search-input"
+            name="counter"
+            x-ref="countersInput"
+            multiple
+          ></counter-ajax-select>
+        </fieldset>
+      </div>
     </form>
     <h3 class="margin-bottom">{% trans %}Product list{% endtrans %}</h3>
 

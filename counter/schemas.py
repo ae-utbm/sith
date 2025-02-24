@@ -98,3 +98,5 @@ class ProductFilterSchema(FilterSchema):
     is_archived: bool | None = Field(None, q="archived")
     buying_groups: set[int] | None = Field(None, q="buying_groups__in")
     product_type: set[int] | None = Field(None, q="product_type__in")
+    club: set[int] | None = Field(None, q="club__in")
+    counter: set[int] | None = Field(None, q="counters__in")
