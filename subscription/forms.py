@@ -100,6 +100,13 @@ class SubscriptionNewUserForm(SubscriptionForm):
             email=self.cleaned_data.get("email"),
             date_of_birth=self.cleaned_data.get("date_of_birth"),
         )
+        if self.cleaned_data.get("subscription_type") in [
+            "un-semestre",
+            "deux-semestres",
+            "cursus-tronc-commun",
+            "cursus-branche",
+        ]:
+            member.role = "STUDENT"
         member.generate_username()
         member.set_password(secrets.token_urlsafe(nbytes=10))
         self.instance.member = member
