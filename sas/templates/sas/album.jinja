@@ -6,7 +6,7 @@
 {%- endblock -%}
 
 {%- block additional_js -%}
-  <script type="module" src="{{ static('bundled/sas/album-index.js') }}"></script>
+  <script type="module" src="{{ static('bundled/sas/album-index.ts') }}"></script>
 {%- endblock -%}
 
 {% block title %}
@@ -52,18 +52,36 @@
       {% endif %}
   {% endif %}
 
-  {% if children_albums|length > 0 %}
-    <h4>{% trans %}Albums{% endtrans %}</h4>
-    <div class="albums">
-      {% for a in children_albums %}
-        {{ display_album(a, is_sas_admin) }}
-      {% endfor %}
+  {% if show_albums %}
+    <div x-data="albums({ parentId: {{ album.id }} })" class="margin-bottom">
+      <h4>{% trans %}Albums{% endtrans %}</h4>
+      <div class="albums" :aria-busy="loading">
+        <template x-for="album in albums" :key="album.id">
+          <a :href="album.sas_url">
+            <div
+              x-data="{thumbUrl: album.thumbnail || '{{ static("core/img/sas.jpg") }}'}"
+              class="album"
+              :class="{not_moderated: !album.is_moderated}"
+              :style="`background-image: url('${thumbUrl}');`"
+            >
+              <template x-if="album.is_moderated">
+                <div class="text" x-text="album.name"></div>
+              </template>
+              <template x-if="!album.is_moderated">
+                <div class="overlay">&nbsp;</div>
+                <div class="text">{% trans %}To be moderated{% endtrans %}</div>
+              </template>
+            </div>
+            {% if edit_mode %}
+              <input type="checkbox" name="file_list" :value="album.id">
+            {% endif %}
+          </a>
+        </template>
+      </div>
     </div>
-
-    <br>
   {% endif %}
 
-  <div x-data="pictures">
+  <div x-data="pictures({ albumId: {{ album.id }}, maxPageSize: {{ settings.SITH_SAS_IMAGES_PER_PAGE }} })">
     <h4>{% trans %}Pictures{% endtrans %}</h4>
     <div class="photos" :aria-busy="loading">
       <template x-for="picture in pictures.results">
@@ -87,7 +105,7 @@
         </a>
       </template>
     </div>
-    {{  paginate_alpine("page", "nbPages()") }}
+    {{ paginate_alpine("page", "nbPages()") }}
   </div>
 
   {% if is_sas_admin %}
@@ -112,13 +130,6 @@
 {% block script %}
   {{ super() }}
   <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      loadAlbum({
-        albumId: {{ album.id }},
-        maxPageSize: {{ settings.SITH_SAS_IMAGES_PER_PAGE }},
-      });
-    });
-
     // Todo: migrate to alpine.js if we have some time
     $("form#upload_form").submit(function (event) {
       let formData = new FormData($(this)[0]);
