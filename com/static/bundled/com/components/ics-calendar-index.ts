@@ -68,7 +68,6 @@ export class IcsCalendar extends inheritHtmlElement("div") {
   }
 
   getNewsId(event: EventImpl) {
-    // return Number.parseInt(event.url.split("/").pop());
     return Number.parseInt(
       event.url
         .toString()
@@ -80,6 +79,9 @@ export class IcsCalendar extends inheritHtmlElement("div") {
 
   async refreshEvents() {
     this.click(); // Remove focus from popup
+    // We can't just refresh events because some ics files are in
+    // local browser cache (especially internal.ics)
+    // To invalidate the cache, we need to remove the source and add it again
     this.calendar.removeAllEventSources();
     for (const source of await this.getEventSources()) {
       this.calendar.addEventSource(source);
@@ -198,7 +200,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     };
 
     const makePopupTools = (event: EventImpl) => {
-      if (event.source.internalEventSource.ui.classNames.indexOf("external") >= 0) {
+      if (event.source.internalEventSource.ui.classNames.includes("external")) {
         return null;
       }
       if (!(this.canDelete || this.canModerate)) {
@@ -207,9 +209,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       const newsId = this.getNewsId(event);
       const div = document.createElement("div");
       if (this.canModerate) {
-        if (
-          event.source.internalEventSource.ui.classNames.indexOf("unmoderated") >= 0
-        ) {
+        if (event.source.internalEventSource.ui.classNames.includes("unmoderated")) {
           const button = document.createElement("button");
           button.innerHTML = `<i class="fa fa-check"></i>${gettext("Moderate")}`;
           button.setAttribute("class", "btn btn-green");

@@ -5,7 +5,7 @@ from typing import final
 import requests
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.db.models import QuerySet
+from django.db.models import F, QuerySet
 from django.urls import reverse
 from django.utils import timezone
 from ical.calendar import Calendar
@@ -80,11 +80,11 @@ class IcsCalendar:
         )
 
     @classmethod
-    def ics_from_queryset(cls, queryset: QuerySet) -> bytes:
+    def ics_from_queryset(cls, queryset: QuerySet[NewsDate]) -> bytes:
         calendar = Calendar()
-        for news_date in queryset.prefetch_related("news"):
+        for news_date in queryset.annotate(news_title=F("news__title")):
             event = Event(
-                summary=news_date.news.title,
+                summary=news_date.news_title,
                 start=news_date.start_date,
                 end=news_date.end_date,
                 url=reverse("com:news_detail", kwargs={"news_id": news_date.news.id}),
