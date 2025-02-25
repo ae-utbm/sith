@@ -261,15 +261,13 @@ class NewsListView(TemplateView):
         D on 20/03, E on 21/03 and F on 22/03 ;
         then the result is 20/03.
         """
-        try:
-            return list(
-                NewsDate.objects.filter(end_date__gt=now())
-                .order_by("start_date")
-                .values_list("start_date__date", flat=True)
-                .distinct()[:4]
-            )[-1]
-        except IndexError:
-            return None
+        dates = list(
+            NewsDate.objects.filter(end_date__gt=now())
+            .order_by("start_date")
+            .values_list("start_date__date", flat=True)
+            .distinct()[:4]
+        )
+        return dates[-1] if len(dates) > 0 else None
 
     def get_news_dates(self, until: date) -> dict[date, list[date]]:
         """Return the event dates to display.
