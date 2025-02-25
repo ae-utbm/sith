@@ -253,7 +253,7 @@ class NewsListView(TemplateView):
             key=lambda u: u.date_of_birth.year,
         )
 
-    def get_last_day(self) -> date:
+    def get_last_day(self) -> date | None:
         """Get the last day when news will be displayed
 
         The returned day is the third one where something happen.
@@ -261,31 +261,39 @@ class NewsListView(TemplateView):
         D on 20/03, E on 21/03 and F on 22/03 ;
         then the result is 20/03.
         """
-        return list(
-            NewsDate.objects.filter(end_date__gt=now())
-            .order_by("start_date")
-            .values_list("start_date__date", flat=True)
-            .distinct()[:4]
-        )[-1]
+        try:
+            return list(
+                NewsDate.objects.filter(end_date__gt=now())
+                .order_by("start_date")
+                .values_list("start_date__date", flat=True)
+                .distinct()[:4]
+            )[-1]
+        except IndexError:
+            return None
 
-    def get_news_dates(self, until: date):
+    def get_news_dates(self, until: date) -> dict[date, list[date]]:
         """Return the event dates to display.
 
         The selected events are the ones that happens between
         right now and the given day (included).
         """
-        return itertools.groupby(
-            NewsDate.objects.viewable_by(self.request.user)
-            .filter(end_date__gt=now(), start_date__date__lte=until)
-            .order_by("start_date")
-            .select_related("news", "news__club"),
-            key=lambda d: d.start_date.date(),
-        )
+        return {
+            date: list(dates)
+            for date, dates in itertools.groupby(
+                NewsDate.objects.viewable_by(self.request.user)
+                .filter(end_date__gt=now(), start_date__date__lte=until)
+                .order_by("start_date")
+                .select_related("news", "news__club"),
+                key=lambda d: d.start_date.date(),
+            )
+        }
 
     def get_context_data(self, **kwargs):
         last_day = self.get_last_day()
         return super().get_context_data(**kwargs) | {
-            "news_dates": self.get_news_dates(until=last_day),
+            "news_dates": self.get_news_dates(until=last_day)
+            if last_day is not None
+            else {},
             "birthdays": self.get_birthdays(),
             "last_day": last_day,
         }

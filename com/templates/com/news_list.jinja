@@ -44,7 +44,7 @@
             <em>{% trans %}Nothing to come...{% endtrans %}</em>
           </div>
         {% else %}
-          {% for day, dates_group in news_dates %}
+          {% for day, dates_group in news_dates.items() %}
             <div class="news_events_group">
               <div class="news_events_group_date">
                 <div>
@@ -120,7 +120,7 @@
                   <template x-for="newsDate in newsList" :key="newsDate.id">
                     <article
                       class="news_event"
-                      x-data="{ newsState: newsDate.news.is_published ? AlertState.PULISHED : AlertState.PENDING }"
+                      x-data="{ newsState: newsDate.news.is_published ? AlertState.PUBLISHED : AlertState.PENDING }"
                     >
                       <template x-if="!newsDate.news.is_published">
                         {{ news_moderation_alert("newsDate.news.id", user, "newsState") }}
