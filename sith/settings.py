@@ -171,6 +171,7 @@ TEMPLATES = [
                 "timezone": "django.utils.timezone",
                 "get_sith": "com.views.sith",
                 "get_language": "django.utils.translation.get_language",
+                "timedelta": "datetime.timedelta",
             },
             "bytecode_cache": {
                 "name": "default",
