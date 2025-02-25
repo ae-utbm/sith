@@ -217,9 +217,9 @@ class NewsModerateView(PermissionRequiredMixin, DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         if "remove" in request.GET:
-            self.object.is_moderated = False
+            self.object.is_published = False
         else:
-            self.object.is_moderated = True
+            self.object.is_published = True
         self.object.moderator = request.user
         self.object.save()
         if "next" in self.request.GET:
@@ -309,7 +309,7 @@ class NewsFeed(Feed):
     def items(self):
         return (
             NewsDate.objects.filter(
-                news__is_moderated=True,
+                news__is_published=True,
                 end_date__gte=timezone.now() - (relativedelta(months=6)),
             )
             .select_related("news", "news__author")

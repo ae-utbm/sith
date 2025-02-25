@@ -10,10 +10,10 @@ import listPlugin from "@fullcalendar/list";
 import {
   calendarCalendarExternal,
   calendarCalendarInternal,
-  calendarCalendarUnmoderated,
+  calendarCalendarUnpublished,
   newsDeleteNews,
-  newsModerateNews,
-  newsRemoveNews,
+  newsPublishNews,
+  newsUnpublishNews,
 } from "#openapi";
 
 @registerComponent("ics-calendar")
@@ -89,15 +89,15 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     this.calendar.refetchEvents();
   }
 
-  async moderateNews(id: number) {
-    await newsModerateNews({
+  async publishNews(id: number) {
+    await newsPublishNews({
       path: {
         // biome-ignore lint/style/useNamingConvention: python API
         news_id: id,
       },
     });
     this.dispatchEvent(
-      new CustomEvent("calendar-moderate", {
+      new CustomEvent("calendar-publish", {
         bubbles: true,
         detail: {
           id: id,
@@ -107,15 +107,15 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     await this.refreshEvents();
   }
 
-  async removeNews(id: number) {
-    await newsRemoveNews({
+  async unpublishNews(id: number) {
+    await newsUnpublishNews({
       path: {
         // biome-ignore lint/style/useNamingConvention: python API
         news_id: id,
       },
     });
     this.dispatchEvent(
-      new CustomEvent("calendar-remove", {
+      new CustomEvent("calendar-unpublish", {
         bubbles: true,
         detail: {
           id: id,
@@ -157,10 +157,10 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         className: "external",
       },
       {
-        url: `${await makeUrl(calendarCalendarUnmoderated)}${cacheInvalidate}`,
+        url: `${await makeUrl(calendarCalendarUnpublished)}${cacheInvalidate}`,
         format: "ics",
         color: "red",
-        className: "unmoderated",
+        className: "unpublished",
       },
     ];
   }
@@ -233,20 +233,20 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       const newsId = this.getNewsId(event);
       const div = document.createElement("div");
       if (this.canModerate) {
-        if (event.source.internalEventSource.ui.classNames.includes("unmoderated")) {
+        if (event.source.internalEventSource.ui.classNames.includes("unpublished")) {
           const button = document.createElement("button");
-          button.innerHTML = `<i class="fa fa-check"></i>${gettext("Moderate")}`;
+          button.innerHTML = `<i class="fa fa-check"></i>${gettext("Publish")}`;
           button.setAttribute("class", "btn btn-green");
           button.onclick = () => {
-            this.moderateNews(newsId);
+            this.publishNews(newsId);
           };
           div.appendChild(button);
         } else {
           const button = document.createElement("button");
-          button.innerHTML = `<i class="fa fa-times"></i>${gettext("Remove")}`;
+          button.innerHTML = `<i class="fa fa-times"></i>${gettext("Unpublish")}`;
           button.setAttribute("class", "btn btn-orange");
           button.onclick = () => {
-            this.removeNews(newsId);
+            this.unpublishNews(newsId);
           };
           div.appendChild(button);
         }

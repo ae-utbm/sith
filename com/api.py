@@ -40,13 +40,13 @@ class CalendarController(ControllerBase):
         return send_raw_file(IcsCalendar.get_internal())
 
     @route.get(
-        "/unmoderated.ics",
+        "/unpublished.ics",
         permissions=[IsAuthenticated],
-        url_name="calendar_unmoderated",
+        url_name="calendar_unpublished",
     )
-    def calendar_unmoderated(self):
+    def calendar_unpublished(self):
         return HttpResponse(
-            IcsCalendar.get_unmoderated(self.context.request.user),
+            IcsCalendar.get_unpublished(self.context.request.user),
             content_type="text/calendar",
         )
 
@@ -54,26 +54,26 @@ class CalendarController(ControllerBase):
 @api_controller("/news")
 class NewsController(ControllerBase):
     @route.patch(
-        "/{int:news_id}/moderate",
+        "/{int:news_id}/publish",
         permissions=[HasPerm("com.moderate_news")],
         url_name="moderate_news",
     )
-    def moderate_news(self, news_id: int):
+    def publish_news(self, news_id: int):
         news = self.get_object_or_exception(News, id=news_id)
-        if not news.is_moderated:
-            news.is_moderated = True
+        if not news.is_published:
+            news.is_published = True
             news.moderator = self.context.request.user
             news.save()
 
     @route.patch(
-        "/{int:news_id}/remove",
+        "/{int:news_id}/unpublish",
         permissions=[HasPerm("com.moderate_news")],
-        url_name="remove_news",
+        url_name="unpublish_news",
     )
-    def remove_news(self, news_id: int):
+    def unpublish_news(self, news_id: int):
         news = self.get_object_or_exception(News, id=news_id)
-        if news.is_moderated:
-            news.is_moderated = False
+        if news.is_published:
+            news.is_published = False
             news.moderator = self.context.request.user
             news.save()
 

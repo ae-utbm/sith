@@ -63,7 +63,7 @@ class IcsCalendar:
             _ = f.write(
                 cls.ics_from_queryset(
                     NewsDate.objects.filter(
-                        news__is_moderated=True,
+                        news__is_published=True,
                         end_date__gte=timezone.now() - (relativedelta(months=6)),
                     )
                 )
@@ -71,10 +71,10 @@ class IcsCalendar:
         return cls._INTERNAL_CALENDAR
 
     @classmethod
-    def get_unmoderated(cls, user: User) -> bytes:
+    def get_unpublished(cls, user: User) -> bytes:
         return cls.ics_from_queryset(
             NewsDate.objects.viewable_by(user).filter(
-                news__is_moderated=False,
+                news__is_published=False,
                 end_date__gte=timezone.now() - (relativedelta(months=6)),
             ),
         )

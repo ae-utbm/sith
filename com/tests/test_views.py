@@ -168,7 +168,7 @@ class TestNews(TestCase):
         assert not self.new.can_be_viewed_by(self.sli)
         assert not self.new.can_be_viewed_by(self.anonymous)
 
-        self.new.is_moderated = True
+        self.new.is_published = True
         self.new.save()
         assert self.new.can_be_viewed_by(self.com_admin)
         assert self.new.can_be_viewed_by(self.sli)
@@ -258,7 +258,7 @@ class TestNewsCreation(TestCase):
         created = News.objects.order_by("id").last()
         assertRedirects(response, created.get_absolute_url())
         assert created.title == "Test news"
-        assert not created.is_moderated
+        assert not created.is_published
         dates = list(created.dates.values("start_date", "end_date"))
         assert dates == [{"start_date": self.start, "end_date": self.end}]
 
@@ -281,7 +281,7 @@ class TestNewsCreation(TestCase):
         ]
 
     def test_edit_news(self):
-        news = baker.make(News, author=self.user, is_moderated=True)
+        news = baker.make(News, author=self.user, is_published=True)
         baker.make(
             NewsDate,
             news=news,
@@ -296,7 +296,7 @@ class TestNewsCreation(TestCase):
         created = News.objects.order_by("id").last()
         assertRedirects(response, created.get_absolute_url())
         assert created.title == "Test news"
-        assert not created.is_moderated
+        assert not created.is_published
         dates = list(created.dates.values("start_date", "end_date"))
         assert dates == [{"start_date": self.start, "end_date": self.end}]
 

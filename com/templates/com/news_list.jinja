@@ -57,17 +57,17 @@
                 {% for date in dates_group %}
                   <article
                     class="news_event"
-                    {%- if not date.news.is_moderated -%}
+                    {%- if not date.news.is_published -%}
                       x-data="{newsState: AlertState.PENDING}"
                     {%- endif -%}
                   >
-                    {% if not date.news.is_moderated %}
-                      {# if a non moderated news is in the object list,
+                    {% if not date.news.is_published %}
+                      {# if a non published news is in the object list,
                       the logged user is either an admin or the news author #}
                       {{ news_moderation_alert(date.news, user, "newsState") }}
                     {% endif %}
                     <div
-                      {% if not date.news.is_moderated -%}
+                      {% if not date.news.is_published -%}
                         x-show="newsState !== AlertState.DELETED"
                       {%- endif -%}
                     >
@@ -120,9 +120,9 @@
                   <template x-for="newsDate in newsList" :key="newsDate.id">
                     <article
                       class="news_event"
-                      x-data="{ newsState: newsDate.news.is_moderated ? AlertState.MODERATED : AlertState.PENDING }"
+                      x-data="{ newsState: newsDate.news.is_published ? AlertState.PULISHED : AlertState.PENDING }"
                     >
-                      <template x-if="!newsDate.news.is_moderated">
+                      <template x-if="!newsDate.news.is_published">
                         {{ news_moderation_alert("newsDate.news.id", user, "newsState") }}
                       </template>
                       <div x-show="newsState !== AlertState.DELETED">
@@ -183,15 +183,15 @@
         x-data
         x-ref="calendar"
         @news-moderated.window="
+                                if ($event.target !== $refs.calendar){
                                 // Avoid triggering a refresh with a dispatch
                                 // from the calendar itself
-                                if ($event.target !== $refs.calendar){
                                 $refs.calendar.refreshEvents($event);
                                 }
                                "
-        @calendar-remove="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.PENDING})"
-        @calendar-delete="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.DELETED})"
-        @calendar-moderate="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.MODERATED})"
+        @calendar-remove="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.DELETED})"
+        @calendar-unpublish="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.PENDING})"
+        @calendar-publish="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.PUBLISHED})"
         locale="{{ get_language() }}"
         can_moderate="{{ user.has_perm("com.moderate_news") }}"
         can_delete="{{ user.has_perm("com.delete_news") }}"

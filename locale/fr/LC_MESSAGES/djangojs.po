@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-25 14:38+0100\n"
+"POT-Creation-Date: 2025-02-25 16:10+0100\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -22,28 +22,29 @@ msgid "More info"
 msgstr "Plus d'informations"
 
 #: com/static/bundled/com/components/ics-calendar-index.ts
-msgid "Moderate"
-msgstr "Modérer"
+msgid "Publish"
+msgstr "Publier"
 
 #: com/static/bundled/com/components/ics-calendar-index.ts
-#: core/static/bundled/core/components/ajax-select-base.ts
-msgid "Remove"
-msgstr "Retirer"
+msgid "Unpublish"
+msgstr "Dépublier"
 
 #: com/static/bundled/com/components/ics-calendar-index.ts
 msgid "Delete"
 msgstr "Supprimer"
 
 #: com/static/bundled/com/components/moderation-alert-index.ts
-#, javascript-format
 msgid ""
-"This event will take place every week for %s weeks. If you moderate or "
-"delete this event, it will also be moderated (or deleted) for the following "
-"weeks."
+"This event will take place every week for %s weeks. If you publish or delete "
+"this event, it will also be published (or deleted) for the following weeks."
 msgstr ""
 "Cet événement se déroulera chaque semaine pendant %s semaines. Si vous "
-"modérez ou supprimez cet événement, il sera également modéré (ou supprimé) "
+"publiez ou supprimez cet événement, il sera également publié (ou supprimé) "
 "pour les semaines suivantes."
+
+#: core/static/bundled/core/components/ajax-select-base.ts
+msgid "Remove"
+msgstr "Retirer"
 
 #: core/static/bundled/core/components/ajax-select-base.ts
 msgid "You need to type %(number)s more characters"

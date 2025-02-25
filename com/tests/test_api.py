@@ -129,14 +129,14 @@ class TestInternalCalendar:
 
 @pytest.mark.django_db
 class TestModerateNews:
-    @pytest.mark.parametrize("news_is_moderated", [True, False])
-    def test_moderation_ok(self, client: Client, news_is_moderated: bool):  # noqa FBT
+    @pytest.mark.parametrize("news_is_published", [True, False])
+    def test_moderation_ok(self, client: Client, news_is_published: bool):  # noqa FBT
         user = baker.make(
             User, user_permissions=[Permission.objects.get(codename="moderate_news")]
         )
         # The API call should work even if the news is initially moderated.
         # In the latter case, the result should be a noop, rather than an error.
-        news = baker.make(News, is_moderated=news_is_moderated)
+        news = baker.make(News, is_published=news_is_published)
         initial_moderator = news.moderator
         client.force_login(user)
         response = client.patch(
@@ -147,22 +147,22 @@ class TestModerateNews:
         # If it was already moderated, it should be a no-op, but not an error
         assert response.status_code == 200
         news.refresh_from_db()
-        assert news.is_moderated
-        if not news_is_moderated:
+        assert news.is_published
+        if not news_is_published:
             assert news.moderator == user
         else:
             assert news.moderator == initial_moderator
 
     def test_moderation_forbidden(self, client: Client):
         user = baker.make(User)
-        news = baker.make(News, is_moderated=False)
+        news = baker.make(News, is_published=False)
         client.force_login(user)
         response = client.patch(
             reverse("api:moderate_news", kwargs={"news_id": news.id})
         )
         assert response.status_code == 403
         news.refresh_from_db()
-        assert not news.is_moderated
+        assert not news.is_published
 
 
 @pytest.mark.django_db
@@ -203,7 +203,7 @@ class TestFetchNewsDates(TestCase):
                 value=now() + timedelta(hours=2), increment_by=timedelta(days=1)
             ),
             news=iter(
-                baker.make(News, is_moderated=True, _quantity=5, _bulk_create=True)
+                baker.make(News, is_published=True, _quantity=5, _bulk_create=True)
             ),
         )
         cls.dates.append(
@@ -211,7 +211,7 @@ class TestFetchNewsDates(TestCase):
                 NewsDate,
                 start_date=now() + timedelta(days=2, hours=1),
                 end_date=now() + timedelta(days=2, hours=5),
-                news=baker.make(News, is_moderated=True),
+                news=baker.make(News, is_published=True),
             )
         )
         cls.dates.sort(key=lambda d: d.start_date)
