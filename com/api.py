@@ -65,6 +65,18 @@ class NewsController(ControllerBase):
             news.moderator = self.context.request.user
             news.save()
 
+    @route.patch(
+        "/{int:news_id}/remove",
+        permissions=[HasPerm("com.moderate_news")],
+        url_name="remove_news",
+    )
+    def remove_news(self, news_id: int):
+        news = self.get_object_or_exception(News, id=news_id)
+        if news.is_moderated:
+            news.is_moderated = False
+            news.moderator = self.context.request.user
+            news.save()
+
     @route.delete(
         "/{int:news_id}",
         permissions=[HasPerm("com.delete_news")],
