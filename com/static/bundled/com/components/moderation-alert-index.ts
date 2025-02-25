@@ -54,7 +54,7 @@ document.addEventListener("alpine:init", () => {
      * Query the server to know the number of news dates that would be moderated
      * if this one is moderated.
      */
-    async nbModerated() {
+    async nbToModerate(): Promise<number> {
       // What we want here is the count attribute of the response.
       // We don't care about the actual results,
       // so we ask for the minimum page size possible.

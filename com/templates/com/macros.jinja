@@ -83,7 +83,8 @@
             so it's still reasonable #}
             <div
               {% if news is integer or news is string %}
-                x-data="{ nbEvents: nbModerated() }"
+                x-data="{ nbEvents: 0 }"
+                x-init="nbEvents = await nbToModerate()"
               {% else %}
                 x-data="{ nbEvents: {{ news.dates.count() }} }"
               {% endif %}
