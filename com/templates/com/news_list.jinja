@@ -86,9 +86,11 @@
                           <a href="{{ date.news.club.get_absolute_url() }}">{{ date.news.club }}</a>
                           <div class="news_date">
                             <time datetime="{{ date.start_date.isoformat(timespec="seconds") }}">
+                              {{ date.start_date|localtime|date(DATETIME_FORMAT) }}
                               {{ date.start_date|localtime|time(DATETIME_FORMAT) }}
                             </time> -
                             <time datetime="{{ date.end_date.isoformat(timespec="seconds") }}">
+                              {{ date.end_date|localtime|date(DATETIME_FORMAT) }}
                               {{ date.end_date|localtime|time(DATETIME_FORMAT) }}
                             </time>
                           </div>
