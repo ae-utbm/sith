@@ -96,6 +96,14 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         news_id: id,
       },
     });
+    this.dispatchEvent(
+      new CustomEvent("calendar-moderate", {
+        bubbles: true,
+        detail: {
+          id: id,
+        },
+      }),
+    );
     await this.refreshEvents();
   }
 
@@ -106,6 +114,14 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         news_id: id,
       },
     });
+    this.dispatchEvent(
+      new CustomEvent("calendar-remove", {
+        bubbles: true,
+        detail: {
+          id: id,
+        },
+      }),
+    );
     await this.refreshEvents();
   }
 
@@ -116,6 +132,14 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         news_id: id,
       },
     });
+    this.dispatchEvent(
+      new CustomEvent("calendar-delete", {
+        bubbles: true,
+        detail: {
+          id: id,
+        },
+      }),
+    );
     await this.refreshEvents();
   }
 

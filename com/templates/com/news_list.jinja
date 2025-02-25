@@ -180,6 +180,18 @@
         <a target="#" href="{{ url("com:news_feed") }}"><i class="fa fa-rss feed"></i></a>
       </h3>
       <ics-calendar
+        x-data
+        x-ref="calendar"
+        @news-moderated.window="
+                                // Avoid triggering a refresh with a dispatch
+                                // from the calendar itself
+                                if ($event.target !== $refs.calendar){
+                                $refs.calendar.refreshEvents($event);
+                                }
+                               "
+        @calendar-remove="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.PENDING})"
+        @calendar-delete="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.DELETED})"
+        @calendar-moderate="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.MODERATED})"
         locale="{{ get_language() }}"
         can_moderate="{{ user.has_perm("com.moderate_news") }}"
         can_delete="{{ user.has_perm("com.delete_news") }}"
