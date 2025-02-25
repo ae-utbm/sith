@@ -59,17 +59,15 @@
                     class="news_event"
                     {%- if not date.news.is_published -%}
                       x-data="{newsState: AlertState.PENDING}"
+                    {% else %}
+                      x-data="{newsState: AlertState.DISPLAYED}"
                     {%- endif -%}
                   >
-                    {% if not date.news.is_published %}
-                      {# if a non published news is in the object list,
-                      the logged user is either an admin or the news author #}
-                      {{ news_moderation_alert(date.news, user, "newsState") }}
-                    {% endif %}
+                    {# if a non published news is in the object list,
+                    the logged user is either an admin or the news author #}
+                    {{ news_moderation_alert(date.news, user, "newsState") }}
                     <div
-                      {% if not date.news.is_published -%}
-                        x-show="newsState !== AlertState.DELETED"
-                      {%- endif -%}
+                      x-show="newsState !== AlertState.DELETED"
                     >
                       <header class="row gap">
                         {% if date.news.club.logo %}
@@ -191,7 +189,7 @@
                                 $refs.calendar.refreshEvents($event);
                                 }
                                "
-        @calendar-remove="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.DELETED})"
+        @calendar-delete="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.DELETED})"
         @calendar-unpublish="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.PENDING})"
         @calendar-publish="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.PUBLISHED})"
         locale="{{ get_language() }}"

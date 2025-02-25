@@ -57,8 +57,8 @@
     {# the news-moderated is received when a moderation alert is deleted or moderated #}
     @news-moderated.window="dispatchModeration($event)"
     {% if alpineState %}
-      x-modelable="{{ alpineState }}"
-      x-model="state"
+      x-model="{{ alpineState }}"
+      x-modelable="state"
     {% endif %}
   >
     <template x-if="state === AlertState.PENDING">

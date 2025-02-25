@@ -10,6 +10,8 @@ const AlertState = {
   PUBLISHED: 2,
   // biome-ignore lint/style/useNamingConvention: this feels more like an enum
   DELETED: 3,
+  // biome-ignore lint/style/useNamingConvention: this feels more like an enum
+  DISPLAYED: 4, // When published at page generation
 };
 exportToHtml("AlertState", AlertState);
 
