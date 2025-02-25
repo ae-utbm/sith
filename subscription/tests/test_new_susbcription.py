@@ -91,6 +91,28 @@ def test_form_new_user(settings: SettingsWrapper):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
+    "subscription_type",
+    ["un-semestre", "deux-semestres", "cursus-tronc-commun", "cursus-branche"],
+)
+def test_form_set_new_user_as_student(settings: SettingsWrapper, subscription_type):
+    """Test that new users have the student role by default."""
+    data = {
+        "first_name": "John",
+        "last_name": "Doe",
+        "email": "jdoe@utbm.fr",
+        "date_of_birth": localdate() - relativedelta(years=18),
+        "subscription_type": subscription_type,
+        "location": settings.SITH_SUBSCRIPTION_LOCATIONS[0][0],
+        "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
+    }
+    form = SubscriptionNewUserForm(data)
+    assert form.is_valid()
+    form.clean()
+    assert form.instance.member.role == "STUDENT"
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
     ("user_factory", "status_code"),
     [
         (lambda: baker.make(User, is_superuser=True), 200),
