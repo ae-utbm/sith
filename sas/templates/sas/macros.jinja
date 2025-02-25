@@ -2,15 +2,19 @@
   <a href="{{ url('sas:album', album_id=a.id) }}">
     {% if a.file %}
       {% set img = a.get_download_url() %}
+      {% set src = a.name %}
     {% elif a.children.filter(is_folder=False, is_moderated=True).exists() %}
-      {% set img = a.children.filter(is_folder=False).first().as_picture.get_download_thumb_url() %}
+      {% set picture = a.children.filter(is_folder=False).first().as_picture %}
+      {% set img = picture.get_download_thumb_url()  %}
+      {% set src = picture.name %}
     {% else %}
       {% set img = static('core/img/sas.jpg') %}
+      {% set src = "sas.jpg" %}
     {% endif %}
     <div
       class="album{% if not a.is_moderated %} not_moderated{% endif %}"
-      style="background-image: url('{{ img }}');"
     >
+      <img src="{{ img }}" alt="{{ src }}" loading="lazy" />
       {% if not a.is_moderated %}
         <div class="overlay">&nbsp;</div>
         <div class="text">{% trans %}To be moderated{% endtrans %}</div>
@@ -29,4 +33,32 @@
     {{ print_path(file.parent) }}
     <a href="{{ url('sas:album', album_id=file.id) }}">{{ file.get_display_name() }}</a> /
   {% endif %}
+{% endmacro %}
+
+{# Helper macro to create a download button for a
+  record of albums with alpine
+
+  This needs to be used inside an alpine environment.
+  Downloaded pictures will be `pictures` from the 
+  parent data store.
+
+  Note:
+    This requires importing `bundled/sas/pictures-download-index.ts`
+
+  Parameters:
+    name (str): name displayed on the button
+ #}
+{% macro download_button(name) %}
+  <div x-data="pictures_download">
+    <div x-show="pictures.length > 0" x-cloak>
+      <button
+        :disabled="isDownloading"
+        class="btn btn-blue {% if name == "" %}btn-no-text{% endif %}"
+        @click="downloadZip()"
+      >
+        <i class="fa fa-download"></i>{{ name }}
+      </button>
+      <progress x-ref="progress" x-show="isDownloading"></progress>
+    </div>
+  </div>
 {% endmacro %}

@@ -27,7 +27,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for news in weeklies.filter(is_moderated=True) %}
+      {% for news in weeklies.filter(is_published=True) %}
         <tr>
           <td>{{ news.title }}</td>
           <td>{{ news.summary|markdown }}</td>
@@ -47,7 +47,7 @@
           </td>
           <td><a href="{{ url('com:news_detail', news_id=news.id) }}">{% trans %}View{% endtrans %}</a>
             <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit{% endtrans %}</a>
-            <a href="{{ url('com:news_moderate', news_id=news.id) }}?remove">{% trans %}Remove{% endtrans %}</a>
+            <a href="{{ url('com:news_moderate', news_id=news.id) }}?remove">{% trans %}Unpublish{% endtrans %}</a>
             <a href="{{ url('com:news_delete', news_id=news.id) }}">{% trans %}Delete{% endtrans %}</a>
           </td>
         </tr>
@@ -67,7 +67,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for news in weeklies.filter(is_moderated=False) %}
+      {% for news in weeklies.filter(is_published=False) %}
         <tr>
           <td>{{ news.title }}</td>
           <td>{{ news.summary|markdown }}</td>
@@ -86,7 +86,7 @@
           </td>
           <td><a href="{{ url('com:news_detail', news_id=news.id) }}">{% trans %}View{% endtrans %}</a>
             <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit{% endtrans %}</a>
-            <a href="{{ url('com:news_moderate', news_id=news.id) }}">{% trans %}Moderate{% endtrans %}</a>
+            <a href="{{ url('com:news_moderate', news_id=news.id) }}">{% trans %}Publish{% endtrans %}</a>
             <a href="{{ url('com:news_delete', news_id=news.id) }}">{% trans %}Delete{% endtrans %}</a>
           </td>
         </tr>
@@ -111,7 +111,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for news in events.filter(is_moderated=True) %}
+      {% for news in events.filter(is_published=True) %}
         <tr>
           <td>{{ news.title }}</td>
           <td>{{ news.summary|markdown }}</td>
@@ -124,7 +124,7 @@
             {{ news.dates.all()[0].end_date|localtime|time(DATETIME_FORMAT) }}</td>
           <td><a href="{{ url('com:news_detail', news_id=news.id) }}">{% trans %}View{% endtrans %}</a>
             <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit{% endtrans %}</a>
-            <a href="{{ url('com:news_moderate', news_id=news.id) }}?remove">{% trans %}Remove{% endtrans %}</a>
+            <a href="{{ url('com:news_moderate', news_id=news.id) }}?remove">{% trans %}Unpublish{% endtrans %}</a>
             <a href="{{ url('com:news_delete', news_id=news.id) }}">{% trans %}Delete{% endtrans %}</a>
           </td>
         </tr>
@@ -145,7 +145,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for news in events.filter(is_moderated=False) %}
+      {% for news in events.filter(is_published=False) %}
         <tr>
           <td>{{ news.title }}</td>
           <td>{{ news.summary|markdown }}</td>
@@ -157,7 +157,7 @@
             {{ news.dates.all()[0].end_date|localtime|time(DATETIME_FORMAT) }}</td>
           <td><a href="{{ url('com:news_detail', news_id=news.id) }}">{% trans %}View{% endtrans %}</a>
             <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit{% endtrans %}</a>
-            <a href="{{ url('com:news_moderate', news_id=news.id) }}">{% trans %}Moderate{% endtrans %}</a>
+            <a href="{{ url('com:news_moderate', news_id=news.id) }}">{% trans %}Publish{% endtrans %}</a>
             <a href="{{ url('com:news_delete', news_id=news.id) }}">{% trans %}Delete{% endtrans %}</a>
           </td>
         </tr>

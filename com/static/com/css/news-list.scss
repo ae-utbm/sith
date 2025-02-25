@@ -51,6 +51,20 @@
     }
   }
 
+  /* UPCOMING EVENTS */
+
+  #upcoming-events {
+    max-height: 600px;
+    overflow-y: scroll;
+
+    #load-more-news-button {
+      text-align: center;
+      button {
+        width: 150px;
+      }
+    }
+  }
+
   /* LINKS/BIRTHDAYS */
   #links,
   #birthdays {
@@ -171,54 +185,24 @@
       }
 
       .news_event {
-        display: block;
-        padding: 0.4em;
+        display: flex;
+        flex-direction: column;
+        gap: .5em;
+        padding: 1em;
 
-        &:not(:last-child) {
-          border-bottom: 1px solid grey;
-        }
-
-        div {
-          margin: 0.2em;
-        }
-
-        h4 {
-          margin-top: 1em;
-          text-transform: uppercase;
-        }
-
-        .club_logo {
-          float: left;
-          min-width: 7em;
-          max-width: 9em;
-          margin: 0;
-          margin-right: 1em;
-          margin-top: 0.8em;
-
+        header {
           img {
-            max-height: 6em;
-            max-width: 8em;
-            display: block;
-            margin: 0 auto;
+            height: 75px;
           }
-        }
+          .header_content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: .2rem;
 
-        .news_date {
-          font-size: 100%;
-        }
-
-        .news_content {
-          clear: left;
-
-          .button_bar {
-            text-align: right;
-
-            .fb {
-              color: $faceblue;
-            }
-
-            .twitter {
-              color: $twitblue;
+            h4 {
+              margin-top: 0;
+              text-transform: uppercase;
             }
           }
         }
@@ -227,70 +211,6 @@
   }
 
   /* END EVENTS TODAY AND NEXT FEW DAYS */
-
-  /* COMING SOON */
-  .news_coming_soon {
-    display: list-item;
-    list-style-type: square;
-    list-style-position: inside;
-    margin-left: 1em;
-    padding-left: 0;
-
-    a {
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-
-    .news_date {
-      font-size: 0.9em;
-    }
-  }
-
-  /* END COMING SOON */
-
-  /* NOTICES */
-  .news_notice {
-    margin: 0 0 1em 1em;
-    padding: 0.4em;
-    padding-left: 1em;
-    background: $secondary-neutral-light-color;
-    box-shadow: $shadow-color 0 0 2px;
-    border-radius: 18px 5px 18px 5px;
-
-    h4 {
-      margin: 0;
-    }
-
-    .news_content {
-      margin-left: 1em;
-    }
-  }
-
-  /* END NOTICES */
-
-  /* CALLS */
-  .news_call {
-    margin: 0 0 1em 1em;
-    padding: 0.4em;
-    padding-left: 1em;
-    background: $secondary-neutral-light-color;
-    border: 1px solid grey;
-    box-shadow: $shadow-color 1px 1px 1px;
-
-    h4 {
-      margin: 0;
-    }
-
-    .news_date {
-      font-size: 0.9em;
-    }
-
-    .news_content {
-      margin-left: 1em;
-    }
-  }
-
-  /* END CALLS */
 
   .news_empty {
     margin-left: 1em;

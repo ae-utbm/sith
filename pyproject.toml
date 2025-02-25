@@ -44,6 +44,9 @@ dependencies = [
     "django-honeypot<2.0.0,>=1.2.1",
     "pydantic-extra-types<3.0.0,>=2.10.1",
     "ical<9.0.0,>=8.3.0",
+    "redis[hiredis]<6.0.0,>=5.2.0",
+    "environs[django]<15.0.0,>=14.1.0",
+    "requests>=2.32.3",
 ]
 
 [project.urls]
@@ -53,7 +56,6 @@ documentation = "https://sith-ae.readthedocs.io/"
 [dependency-groups]
 prod = [
     "psycopg[c]<4.0.0,>=3.2.3",
-    "redis[hiredis]<6.0.0,>=5.2.0",
 ]
 dev = [
     "django-debug-toolbar<5.0.0,>=4.4.6",

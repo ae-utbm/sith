@@ -7,6 +7,10 @@ on:
     branches: [master, taiste]
   workflow_dispatch:
 
+env:
+  SECRET_KEY: notTheRealOne
+  DATABASE_URL: sqlite:///db.sqlite3
+
 jobs:
   pre-commit:
     name: Launch pre-commits checks (ruff)

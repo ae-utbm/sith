@@ -244,6 +244,20 @@ body {
       }
     }
 
+    &.btn-green {
+      $bg-color: rgba(0, 210, 83, 0.4);
+      background-color: $bg-color;
+      color: $black-color;
+
+      &:not(:disabled):hover {
+        background-color: darken($bg-color, 15%);
+      }
+
+      &:disabled {
+        background-color: lighten($bg-color, 15%);
+      }
+    }
+
     &.btn-red {
       background-color: #fc8181;
       color: black;
@@ -258,9 +272,26 @@ body {
       }
     }
 
-    i {
-      margin-right: 4px;
+    &.btn-orange {
+      background-color: #fcbf81;
+      color: black;
+
+      &:not(:disabled):hover {
+        background-color: darken(#fcbf81, 15%);
+      }
+
+      &:disabled {
+        background-color: lighten(#fcbf81, 15%);
+        color: grey;
+      }
     }
+
+    &:not(.btn-no-text) {
+      i {
+        margin-right: 4px;
+      }
+    }
+
   }
 
   /**

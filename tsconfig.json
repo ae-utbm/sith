@@ -12,6 +12,7 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "types": ["jquery", "alpinejs"],
+    "lib": ["es7"],
     "paths": {
       "#openapi": ["./staticfiles/generated/openapi/index.ts"],
       "#core:*": ["./core/static/bundled/*"],

@@ -20,8 +20,8 @@ main {
   flex-wrap: wrap;
   gap: 5px;
 
-  > a,
-  > input {
+  >a,
+  >input {
     padding: 0.4em;
     margin: 0.1em;
     font-size: 1.2em;
@@ -46,14 +46,14 @@ main {
   display: flex;
   flex-direction: column;
 
-  > .inputs {
+  >.inputs {
     align-items: flex-end;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 10px;
 
-    > p {
+    >p {
       box-sizing: border-box;
       max-width: 300px;
       width: 100%;
@@ -62,7 +62,7 @@ main {
         max-width: 100%;
       }
 
-      > input {
+      >input {
         box-sizing: border-box;
         max-width: 100%;
         width: 100%;
@@ -72,8 +72,8 @@ main {
       }
     }
 
-    > div > input,
-    > input {
+    >div>input,
+    >input {
       box-sizing: border-box;
       height: 40px;
       width: 100%;
@@ -84,12 +84,12 @@ main {
       }
     }
 
-    > div {
+    >div {
       width: 100%;
       max-width: 300px;
     }
 
-    > input[type=submit]:hover {
+    >input[type=submit]:hover {
       background-color: #287fb8;
       color: white;
     }
@@ -100,27 +100,27 @@ main {
 .clipboard {
   margin-top: 10px;
   padding: 10px;
-  background-color: rgba(0,0,0,.1);
+  background-color: rgba(0, 0, 0, .1);
   border-radius: 10px;
 }
 
 .photos,
 .albums {
   margin: 20px;
-  min-height: 50px;  // To contain the aria-busy loading wheel, even if empty
+  min-height: 50px; // To contain the aria-busy loading wheel, even if empty
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   gap: 5px;
 
-  > div {
+  >div {
     background: rgba(0, 0, 0, .5);
     cursor: not-allowed;
   }
 
-  > div,
-  > a {
+  >div,
+  >a {
     box-sizing: border-box;
     position: relative;
     height: 128px;
@@ -138,7 +138,7 @@ main {
       background: rgba(0, 0, 0, .5);
     }
 
-    > input[type=checkbox] {
+    >input[type=checkbox] {
       position: absolute;
       top: 0;
       right: 0;
@@ -149,8 +149,8 @@ main {
       cursor: pointer;
     }
 
-    > .photo,
-    > .album {
+    >.photo,
+    >.album {
       box-sizing: border-box;
       background-color: #333333;
       background-size: contain;
@@ -166,25 +166,32 @@ main {
 
       border: 1px solid rgba(0, 0, 0, .3);
 
+      >img {
+        object-position: top bottom;
+        object-fit: contain;
+        height: 100%;
+        width: 100%
+      }
+
       @media (max-width: 500px) {
         width: 100%;
         height: 100%;
       }
 
-      &:hover > .text {
+      &:hover>.text {
         background-color: rgba(0, 0, 0, .5);
       }
 
-      &:hover > .overlay {
+      &:hover>.overlay {
         -webkit-backdrop-filter: blur(2px);
         backdrop-filter: blur(2px);
 
-        ~ .text {
+        ~.text {
           background-color: transparent;
         }
       }
 
-      > .text {
+      >.text {
         position: absolute;
         box-sizing: border-box;
         top: 0;
@@ -201,7 +208,7 @@ main {
         color: white;
       }
 
-      > .overlay {
+      >.overlay {
         position: absolute;
         width: 100%;
         height: 100%;
@@ -227,14 +234,14 @@ main {
       }
     }
 
-    > .album > div {
+    >.album>div {
       background: rgba(0, 0, 0, .5);
       background: linear-gradient(0deg, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, 0) 100%);
       text-align: left;
       word-break: break-word;
     }
 
-    > .photo > .text {
+    >.photo>.text {
       align-items: center;
       padding-bottom: 30px;
     }

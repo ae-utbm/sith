@@ -681,6 +681,42 @@ class TestCounterClick(TestFullClickBase):
             -3 - settings.SITH_ECOCUP_LIMIT
         )
 
+    def test_recordings_when_negative(self):
+        self.refill_user(
+            self.customer,
+            self.cons.selling_price * 3 + Decimal(self.beer.selling_price),
+        )
+        self.customer.customer.recorded_products = settings.SITH_ECOCUP_LIMIT * -10
+        self.customer.customer.save()
+        self.login_in_bar(self.barmen)
+        assert (
+            self.submit_basket(
+                self.customer,
+                [BasketItem(self.dcons.id, 1)],
+            ).status_code
+            == 200
+        )
+        assert self.updated_amount(
+            self.customer
+        ) == self.cons.selling_price * 3 + Decimal(self.beer.selling_price)
+        assert (
+            self.submit_basket(
+                self.customer,
+                [BasketItem(self.cons.id, 3)],
+            ).status_code
+            == 302
+        )
+        assert self.updated_amount(self.customer) == Decimal(self.beer.selling_price)
+
+        assert (
+            self.submit_basket(
+                self.customer,
+                [BasketItem(self.beer.id, 1)],
+            ).status_code
+            == 302
+        )
+        assert self.updated_amount(self.customer) == 0
+
 
 class TestCounterStats(TestCase):
     @classmethod

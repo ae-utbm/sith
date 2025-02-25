@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-08 12:23+0100\n"
+"POT-Creation-Date: 2025-02-25 16:10+0100\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -20,6 +20,27 @@ msgstr ""
 #: com/static/bundled/com/components/ics-calendar-index.ts
 msgid "More info"
 msgstr "Plus d'informations"
+
+#: com/static/bundled/com/components/ics-calendar-index.ts
+msgid "Publish"
+msgstr "Publier"
+
+#: com/static/bundled/com/components/ics-calendar-index.ts
+msgid "Unpublish"
+msgstr "Dépublier"
+
+#: com/static/bundled/com/components/ics-calendar-index.ts
+msgid "Delete"
+msgstr "Supprimer"
+
+#: com/static/bundled/com/components/moderation-alert-index.ts
+msgid ""
+"This event will take place every week for %s weeks. If you publish or delete "
+"this event, it will also be published (or deleted) for the following weeks."
+msgstr ""
+"Cet événement se déroulera chaque semaine pendant %s semaines. Si vous "
+"publiez ou supprimez cet événement, il sera également publié (ou supprimé) "
+"pour les semaines suivantes."
 
 #: core/static/bundled/core/components/ajax-select-base.ts
 msgid "Remove"
@@ -125,10 +146,6 @@ msgstr "Montrer plus"
 msgid "family_tree.%(extension)s"
 msgstr "arbre_genealogique.%(extension)s"
 
-#: core/static/bundled/user/pictures-index.js
-msgid "pictures.%(extension)s"
-msgstr "photos.%(extension)s"
-
 #: core/static/user/js/user_edit.js
 #, javascript-format
 msgid "captured.%s"
@@ -186,6 +203,10 @@ msgstr "La réorganisation des types de produit a échoué avec le code : %d"
 #: eboutic/static/eboutic/js/makecommand.js
 msgid "Incorrect value"
 msgstr "Valeur incorrecte"
+
+#: sas/static/bundled/sas/pictures-download-index.ts
+msgid "pictures.%(extension)s"
+msgstr "photos.%(extension)s"
 
 #: sas/static/bundled/sas/viewer-index.ts
 msgid "Couldn't moderate picture"

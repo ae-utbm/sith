@@ -1,5 +1,5 @@
 {% extends "core/base.jinja" %}
-{% from 'core/macros.jinja' import tweet_quick, fb_quick %}
+{% from "com/macros.jinja" import news_moderation_alert %}
 
 {% block title %}
   {% trans %}News{% endtrans %}
@@ -15,13 +15,13 @@
 
 {% block additional_js %}
   <script type="module" src={{ static("bundled/com/components/ics-calendar-index.ts") }}></script>
+  <script type="module" src={{ static("bundled/com/components/moderation-alert-index.ts") }}></script>
+  <script type="module" src={{ static("bundled/com/components/upcoming-news-loader-index.ts") }}></script>
 {% endblock %}
 
 {% block content %}
-
   <div id="news">
     <div id="left_column" class="news_column">
-      {% set events_dates = NewsDate.objects.filter(end_date__gte=timezone.now(), start_date__lte=timezone.now()+timedelta(days=5), news__is_moderated=True).datetimes('start_date', 'day') %}
       <h3>
         {% trans %}Events today and the next few days{% endtrans %}
         <a target="#" href="{{ url("com:news_feed") }}"><i class="fa fa-rss feed"></i></a>
@@ -33,57 +33,169 @@
         </a>
       {% endif %}
       {% if user.is_com_admin %}
-        <a class="btn btn-blue" href="{{ url('com:news_admin_list') }}">{% trans %}Administrate news{% endtrans %}</a>
+        <a class="btn btn-blue" href="{{ url('com:news_admin_list') }}">
+          {% trans %}Administrate news{% endtrans %}
+        </a>
         <br>
-      {% endif  %}
-      {% if events_dates %}
-        {% for d in events_dates %}
-          <div class="news_events_group">
-            <div class="news_events_group_date">
-              <div>
-                <div>{{ d|localtime|date('D') }}</div>
-                <div class="day">{{ d|localtime|date('d') }}</div>
-                <div>{{ d|localtime|date('b') }}</div>
+      {% endif %}
+      <section id="upcoming-events">
+        {% if not news_dates %}
+          <div class="news_empty">
+            <em>{% trans %}Nothing to come...{% endtrans %}</em>
+          </div>
+        {% else %}
+          {% for day, dates_group in news_dates.items() %}
+            <div class="news_events_group">
+              <div class="news_events_group_date">
+                <div>
+                  <div>{{ day|date('D') }}</div>
+                  <div class="day">{{ day|date('d') }}</div>
+                  <div>{{ day|date('b') }}</div>
+                </div>
+              </div>
+              <div class="news_events_group_items">
+                {% for date in dates_group %}
+                  <article
+                    class="news_event"
+                    {%- if not date.news.is_published -%}
+                      x-data="{newsState: AlertState.PENDING}"
+                    {% else %}
+                      x-data="{newsState: AlertState.DISPLAYED}"
+                    {%- endif -%}
+                  >
+                    {# if a non published news is in the object list,
+                    the logged user is either an admin or the news author #}
+                    {{ news_moderation_alert(date.news, user, "newsState") }}
+                    <div
+                      x-show="newsState !== AlertState.DELETED"
+                    >
+                      <header class="row gap">
+                        {% if date.news.club.logo %}
+                          <img src="{{ date.news.club.logo.url }}" alt="{{ date.news.club }}"/>
+                        {% else %}
+                          <img src="{{ static("com/img/news.png") }}" alt="{{ date.news.club }}"/>
+                        {% endif %}
+                        <div class="header_content">
+                          <h4>
+                            <a href="{{ url('com:news_detail', news_id=date.news_id) }}">
+                              {{ date.news.title }}
+                            </a>
+                          </h4>
+                          <a href="{{ date.news.club.get_absolute_url() }}">{{ date.news.club }}</a>
+                          <div class="news_date">
+                            <time datetime="{{ date.start_date.isoformat(timespec="seconds") }}">
+                              {{ date.start_date|localtime|date(DATETIME_FORMAT) }}
+                              {{ date.start_date|localtime|time(DATETIME_FORMAT) }}
+                            </time> -
+                            <time datetime="{{ date.end_date.isoformat(timespec="seconds") }}">
+                              {{ date.end_date|localtime|date(DATETIME_FORMAT) }}
+                              {{ date.end_date|localtime|time(DATETIME_FORMAT) }}
+                            </time>
+                          </div>
+                        </div>
+                      </header>
+                      <div class="news_content markdown">
+                        {{ date.news.summary|markdown }}
+                      </div>
+                    </div>
+                  </article>
+                {% endfor %}
               </div>
             </div>
-            <div class="news_events_group_items">
-              {% for news in object_list.filter(dates__start_date__gte=d,dates__start_date__lte=d+timedelta(days=1)).exclude(dates__end_date__lt=timezone.now()).order_by('dates__start_date') %}
-                <section class="news_event">
-                  <div class="club_logo">
-                    {% if news.club.logo %}
-                      <img src="{{ news.club.logo.url }}" alt="{{ news.club }}" />
-                    {% else %}
-                      <img src="{{ static("com/img/news.png") }}" alt="{{ news.club }}" />
-                    {% endif %}
+          {% endfor %}
+          <div x-data="upcomingNewsLoader(new Date('{{ last_day + timedelta(days=1) }}'))">
+            <template x-for="newsList in Object.values(groupedDates())">
+              <div class="news_events_group">
+                <div class="news_events_group_date">
+                  <div x-data="{day: newsList[0].start_date}">
+                    <div x-text="day.toLocaleString('{{ get_language() }}', { weekday: 'short' }).substring(0, 3)"></div>
+                    <div
+                      class="day"
+                      x-text="day.toLocaleString('{{ get_language() }}', { day: 'numeric' })"
+                    ></div>
+                    <div x-text="day.toLocaleString('{{ get_language() }}', { month: 'short' }).substring(0, 3)"></div>
                   </div>
-                  <h4> <a href="{{ url('com:news_detail', news_id=news.id) }}">{{ news.title }}</a></h4>
-                  <div><a href="{{ news.club.get_absolute_url() }}">{{ news.club }}</a></div>
-                  <div class="news_date">
-                    <span>{{ news.dates.first().start_date|localtime|time(DATETIME_FORMAT) }}</span> -
-                    <span>{{ news.dates.first().end_date|localtime|time(DATETIME_FORMAT) }}</span>
-                  </div>
-                  <div class="news_content">{{ news.summary|markdown }}
-                    <div class="button_bar">
-                      {{ fb_quick(news) }}
-                      {{ tweet_quick(news) }}
-                    </div>
-                  </div>
-                </section>
-              {% endfor %}
+                </div>
+                <div class="news_events_group_items">
+                  <template x-for="newsDate in newsList" :key="newsDate.id">
+                    <article
+                      class="news_event"
+                      x-data="{ newsState: newsDate.news.is_published ? AlertState.PUBLISHED : AlertState.PENDING }"
+                    >
+                      <template x-if="!newsDate.news.is_published">
+                        {{ news_moderation_alert("newsDate.news.id", user, "newsState") }}
+                      </template>
+                      <div x-show="newsState !== AlertState.DELETED">
+                        <header class="row gap">
+                          <img
+                            :src="newsDate.news.club.logo || '{{ static("com/img/news.png") }}'"
+                            :alt="newsDate.news.club.name"
+                          />
+                          <div class="header_content">
+                            <h4>
+                              <a :href="newsDate.news.url" x-text="newsDate.news.title"></a>
+                            </h4>
+                            <a :href="newsDate.news.club.url" x-text="newsDate.news.club.name"></a>
+                            <div class="news_date">
+                              <time
+                                :datetime="newsDate.start_date.toISOString()"
+                                x-text="`${newsDate.start_date.getHours()}:${newsDate.start_date.getMinutes()}`"
+                              ></time> -
+                              <time
+                                :datetime="newsDate.end_date.toISOString()"
+                                x-text="`${newsDate.end_date.getHours()}:${newsDate.end_date.getMinutes()}`"
+                              ></time>
+                            </div>
+                          </div>
+                        </header>
+                        {# The API returns a summary in html.
+                           It's generated from our markdown subset, so it should be safe #}
+                        <div class="news_content markdown" x-html="newsDate.news.summary"></div>
+                      </div>
+                    </article>
+                  </template>
+                </div>
+              </div>
+            </template>
+
+            <div id="load-more-news-button" :aria-busy="loading">
+              <button class="btn btn-grey" x-show="!loading && hasNext" @click="loadMore()">
+                {% trans %}See more{% endtrans %} &nbsp;<i class="fa fa-arrow-down"></i>
+              </button>
+              <p x-show="!loading && !hasNext">
+                <em>
+                  {% trans trimmed %}
+                    It was too short.
+                    You already reached the end of the upcoming events list.
+                  {% endtrans %}
+                </em>
+              </p>
             </div>
           </div>
-        {% endfor %}
-      {% else %}
-        <div class="news_empty">
-          <em>{% trans %}Nothing to come...{% endtrans %}</em>
-        </div>
-      {% endif %}
+        {% endif %}
+      </section>
 
       <h3>
         {% trans %}All coming events{% endtrans %}
         <a target="#" href="{{ url("com:news_feed") }}"><i class="fa fa-rss feed"></i></a>
       </h3>
-      <ics-calendar locale="{{ get_language() }}"></ics-calendar>
+      <ics-calendar
+        x-data
+        x-ref="calendar"
+        @news-moderated.window="
+                                if ($event.target !== $refs.calendar){
+                                // Avoid triggering a refresh with a dispatch
+                                // from the calendar itself
+                                $refs.calendar.refreshEvents($event);
+                                }
+                               "
+        @calendar-delete="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.DELETED})"
+        @calendar-unpublish="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.PENDING})"
+        @calendar-publish="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.PUBLISHED})"
+        locale="{{ get_language() }}"
+        can_moderate="{{ user.has_perm("com.moderate_news") }}"
+        can_delete="{{ user.has_perm("com.delete_news") }}"
+      ></ics-calendar>
     </div>
 
     <div id="right_column">
@@ -110,18 +222,26 @@
           <ul>
             <li>
               <i class="fa-brands fa-discord fa-xl"></i>
-              <a rel="nofollow" target="#" href="https://discord.gg/QvTm3XJrHR">{% trans %}Discord AE{% endtrans %}</a>
+              <a rel="nofollow" target="#" href="https://discord.gg/QvTm3XJrHR">
+                {% trans %}Discord AE{% endtrans %}
+              </a>
               {% if user.was_subscribed %}
-                - <a rel="nofollow" target="#" href="https://discord.gg/u6EuMfyGaJ">{% trans %}Dev Team{% endtrans %}</a>
+                - <a rel="nofollow" target="#" href="https://discord.gg/u6EuMfyGaJ">
+                  {% trans %}Dev Team{% endtrans %}
+                </a>
               {% endif %}
             </li>
             <li>
               <i class="fa-brands fa-facebook fa-xl"></i>
-              <a rel="nofollow" target="#" href="https://www.facebook.com/@AEUTBM/">{% trans %}Facebook{% endtrans %}</a>
+              <a rel="nofollow" target="#" href="https://www.facebook.com/@AEUTBM/">
+                Facebook
+              </a>
             </li>
             <li>
               <i class="fa-brands fa-square-instagram fa-xl"></i>
-              <a rel="nofollow" target="#" href="https://www.instagram.com/ae_utbm">{% trans %}Instagram{% endtrans %}</a>
+              <a rel="nofollow" target="#" href="https://www.instagram.com/ae_utbm">
+                Instagram
+              </a>
             </li>
           </ul>
         </div>
@@ -130,7 +250,7 @@
       <div id="birthdays">
         <h3>{% trans %}Birthdays{% endtrans %}</h3>
         <div id="birthdays_content">
-          {%- if user.was_subscribed -%}
+          {%- if user.has_perm("core.view_user") -%}
             <ul class="birthdays_year">
               {%- for year, users in birthdays -%}
                 <li>
@@ -143,8 +263,13 @@
                 </li>
               {%- endfor -%}
             </ul>
-          {%- else -%}
+          {%- elif not user.was_subscribed -%}
+            {# The user cannot view birthdays, because he never subscribed #}
             <p>{% trans %}You need to subscribe to access this content{% endtrans %}</p>
+          {%- else -%}
+            {# There is another reason why user cannot view birthdays (maybe he is banned)
+               but we cannot know exactly what is this reason #}
+            <p>{% trans %}You cannot access this content{% endtrans %}</p>
           {%- endif -%}
         </div>
       </div>

@@ -1,12 +1,14 @@
 {% extends "core/base.jinja" %}
 {% from 'core/macros.jinja' import paginate_alpine %}
+{% from "sas/macros.jinja" import download_button %}
 
 {%- block additional_css -%}
   <link rel="stylesheet" href="{{ static('sas/css/album.scss') }}">
 {%- endblock -%}
 
 {%- block additional_js -%}
-  <script type="module" src="{{ static('bundled/sas/album-index.js') }}"></script>
+  <script type="module" src="{{ static('bundled/sas/album-index.ts') }}"></script>
+  <script type="module" src="{{ static('bundled/sas/pictures-download-index.ts') }}"></script>
 {%- endblock -%}
 
 {% block title %}
@@ -27,7 +29,6 @@
   {% if is_sas_admin %}
     <form action="" method="post" enctype="multipart/form-data">
       {% csrf_token %}
-
       <div class="album-navbar">
         <h3>{{ album.get_display_name() }}</h3>
 
@@ -63,16 +64,22 @@
     <br>
   {% endif %}
 
-  <div x-data="pictures">
+  <div x-data="pictures({
+               albumId: {{ album.id }},
+               maxPageSize: {{ settings.SITH_SAS_IMAGES_PER_PAGE }},
+               })">
+
+    {{ download_button(_("Download album")) }}
+
     <h4>{% trans %}Pictures{% endtrans %}</h4>
     <div class="photos" :aria-busy="loading">
-      <template x-for="picture in pictures.results">
-        <a :href="`/sas/picture/${picture.id}`">
+      <template x-for="picture in getPage(page)">
+        <a :href="picture.sas_url">
           <div
             class="photo"
             :class="{not_moderated: !picture.is_moderated}"
-            :style="`background-image: url(${picture.thumb_url})`"
           >
+            <img :src="picture.thumb_url" :alt="picture.name" loading="lazy" />
             <template x-if="!picture.is_moderated">
               <div class="overlay">&nbsp;</div>
               <div class="text">{% trans %}To be moderated{% endtrans %}</div>
@@ -112,13 +119,6 @@
 {% block script %}
   {{ super() }}
   <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      loadAlbum({
-        albumId: {{ album.id }},
-        maxPageSize: {{ settings.SITH_SAS_IMAGES_PER_PAGE }},
-      });
-    });
-
     // Todo: migrate to alpine.js if we have some time
     $("form#upload_form").submit(function (event) {
       let formData = new FormData($(this)[0]);
@@ -225,6 +225,5 @@
       }
     });
   </script>
-
 {% endblock %}
 

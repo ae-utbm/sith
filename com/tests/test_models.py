@@ -18,7 +18,7 @@ class TestNewsViewableBy(TestCase):
         cls.news = baker.make(
             News,
             author=itertools.cycle(cls.users),
-            is_moderated=iter([True, True, True, False, False, False]),
+            is_published=iter([True, True, True, False, False, False]),
             _quantity=6,
             _bulk_create=True,
         )

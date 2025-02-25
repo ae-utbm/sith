@@ -56,7 +56,7 @@ class Sith(models.Model):
 
 class NewsQuerySet(models.QuerySet):
     def moderated(self) -> Self:
-        return self.filter(is_moderated=True)
+        return self.filter(is_published=True)
 
     def viewable_by(self, user: User) -> Self:
         """Filter news that the given user can view.
@@ -68,7 +68,7 @@ class NewsQuerySet(models.QuerySet):
         """
         if user.has_perm("com.view_unmoderated_news"):
             return self
-        q_filter = Q(is_moderated=True)
+        q_filter = Q(is_published=True)
         if user.is_authenticated:
             q_filter |= Q(author_id=user.id)
         return self.filter(q_filter)
@@ -104,7 +104,7 @@ class News(models.Model):
         verbose_name=_("author"),
         on_delete=models.PROTECT,
     )
-    is_moderated = models.BooleanField(_("is moderated"), default=False)
+    is_published = models.BooleanField(_("is published"), default=False)
     moderator = models.ForeignKey(
         User,
         related_name="moderated_news",
@@ -127,7 +127,7 @@ class News(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if self.is_moderated:
+        if self.is_published:
             return
         for user in User.objects.filter(
             groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID]
@@ -154,7 +154,7 @@ class News(models.Model):
 
     def can_be_viewed_by(self, user: User):
         return (
-            self.is_moderated
+            self.is_published
             or user.has_perm("com.view_unmoderated_news")
             or (user.is_authenticated and self.author_id == user.id)
         )
@@ -162,7 +162,7 @@ class News(models.Model):
 
 def news_notification_callback(notif):
     count = News.objects.filter(
-        dates__start_date__gt=timezone.now(), is_moderated=False
+        dates__start_date__gt=timezone.now(), is_published=False
     ).count()
     if count:
         notif.viewed = False
@@ -170,6 +170,22 @@ def news_notification_callback(notif):
         notif.date = timezone.now()
     else:
         notif.viewed = True
+
+
+class NewsDateQuerySet(models.QuerySet):
+    def viewable_by(self, user: User) -> Self:
+        """Filter the event dates that the given user can view.
+
+        - If the can view non moderated news, he can view all news dates
+        - else, he can view the dates of news that are either
+          authored by him or moderated.
+        """
+        if user.has_perm("com.view_unmoderated_news"):
+            return self
+        q_filter = Q(news__is_published=True)
+        if user.is_authenticated:
+            q_filter |= Q(news__author_id=user.id)
+        return self.filter(q_filter)
 
 
 class NewsDate(models.Model):
@@ -186,6 +202,8 @@ class NewsDate(models.Model):
     )
     start_date = models.DateTimeField(_("start_date"))
     end_date = models.DateTimeField(_("end_date"))
+
+    objects = NewsDateQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("news date")
@@ -319,7 +337,7 @@ class Screen(models.Model):
 
     def active_posters(self):
         now = timezone.now()
-        return self.posters.filter(is_moderated=True, date_begin__lte=now).filter(
+        return self.posters.filter(d=True, date_begin__lte=now).filter(
             Q(date_end__isnull=True) | Q(date_end__gte=now)
         )
 
