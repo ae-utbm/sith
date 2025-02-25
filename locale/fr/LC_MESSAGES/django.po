@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-19 19:12+0100\n"
+"POT-Creation-Date: 2025-02-25 11:04+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1426,17 +1426,6 @@ msgstr ""
 "Elle sera cachée pour les autres utilisateurs tant qu'elle ne sera pas "
 "modérée."
 
-#: com/templates/com/macros.jinja
-#, python-format
-msgid ""
-"This event will take place every week for %%s weeks. If you moderate or "
-"delete this event, it will also be moderated (or deleted) for the following "
-"weeks."
-msgstr ""
-"Cet événement se déroulera chaque semaine pendant %%s semaines. Si vous "
-"modérez ou supprimez cet événement, il sera également modéré (ou supprimé) "
-"pour les semaines suivantes."
-
 #: com/templates/com/macros.jinja com/templates/com/mailing_admin.jinja
 #: com/templates/com/news_admin_list.jinja com/templates/com/news_detail.jinja
 #: core/templates/core/file_detail.jinja
@@ -1584,8 +1573,7 @@ msgstr "Voir plus"
 
 #: com/templates/com/news_list.jinja
 msgid ""
-"It was too short. You already reached the end of the upcoming events "
-"list."
+"It was too short. You already reached the end of the upcoming events list."
 msgstr ""
 "C'était trop court. Vous êtes déjà arrivés à la fin de la liste des "
 "événements à venir."
@@ -6043,3 +6031,13 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
+
+#, python-format
+#~ msgid ""
+#~ "This event will take place every week for %%s weeks. If you moderate or "
+#~ "delete this event, it will also be moderated (or deleted) for the "
+#~ "following weeks."
+#~ msgstr ""
+#~ "Cet événement se déroulera chaque semaine pendant %%s semaines. Si vous "
+#~ "modérez ou supprimez cet événement, il sera également modéré (ou "
+#~ "supprimé) pour les semaines suivantes."

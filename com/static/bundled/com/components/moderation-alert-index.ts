@@ -64,5 +64,16 @@ document.addEventListener("alpine:init", () => {
       });
       return response.data.count;
     },
+
+    weeklyEventWarningMessage(nbEvents: number): string {
+      return interpolate(
+        gettext(
+          "This event will take place every week for %s weeks. " +
+            "If you moderate or delete this event, " +
+            "it will also be moderated (or deleted) for the following weeks.",
+        ),
+        [nbEvents],
+      );
+    },
   }));
 });

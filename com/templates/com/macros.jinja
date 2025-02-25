@@ -92,17 +92,7 @@
                 <div>
                   <br>
                   <strong>{% trans %}Weekly event{% endtrans %}</strong>
-                  {# hybrid translation : the text is translated server-side,
-                  but the interpolation of `nbEvents` is done client-side. #}
-                  <p
-                    x-text="interpolate('
-                            {%- trans trimmed -%}
-                              This event will take place every week for %s weeks.
-                              If you moderate or delete this event,
-                              it will also be moderated (or deleted) for the following weeks.
-                            {%- endtrans -%}
-                            ', [nbEvents])"
-                  ></p>
+                  <p x-text="weeklyEventWarningMessage(nbEvents)"></p>
                 </div>
               </template>
             </div>
