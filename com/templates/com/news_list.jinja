@@ -44,7 +44,7 @@
             <em>{% trans %}Nothing to come...{% endtrans %}</em>
           </div>
         {% else %}
-          {% for day, dates_group in news_dates %}
+          {% for day, dates_group in news_dates.items() %}
             <div class="news_events_group">
               <div class="news_events_group_date">
                 <div>
@@ -57,19 +57,17 @@
                 {% for date in dates_group %}
                   <article
                     class="news_event"
-                    {%- if not date.news.is_moderated -%}
+                    {%- if not date.news.is_published -%}
                       x-data="{newsState: AlertState.PENDING}"
+                    {% else %}
+                      x-data="{newsState: AlertState.DISPLAYED}"
                     {%- endif -%}
                   >
-                    {% if not date.news.is_moderated %}
-                      {# if a non moderated news is in the object list,
-                      the logged user is either an admin or the news author #}
-                      {{ news_moderation_alert(date.news, user, "newsState") }}
-                    {% endif %}
+                    {# if a non published news is in the object list,
+                    the logged user is either an admin or the news author #}
+                    {{ news_moderation_alert(date.news, user, "newsState") }}
                     <div
-                      {% if not date.news.is_moderated -%}
-                        x-show="newsState !== AlertState.DELETED"
-                      {%- endif -%}
+                      x-show="newsState !== AlertState.DELETED"
                     >
                       <header class="row gap">
                         {% if date.news.club.logo %}
@@ -86,9 +84,11 @@
                           <a href="{{ date.news.club.get_absolute_url() }}">{{ date.news.club }}</a>
                           <div class="news_date">
                             <time datetime="{{ date.start_date.isoformat(timespec="seconds") }}">
+                              {{ date.start_date|localtime|date(DATETIME_FORMAT) }}
                               {{ date.start_date|localtime|time(DATETIME_FORMAT) }}
                             </time> -
                             <time datetime="{{ date.end_date.isoformat(timespec="seconds") }}">
+                              {{ date.end_date|localtime|date(DATETIME_FORMAT) }}
                               {{ date.end_date|localtime|time(DATETIME_FORMAT) }}
                             </time>
                           </div>
@@ -120,9 +120,9 @@
                   <template x-for="newsDate in newsList" :key="newsDate.id">
                     <article
                       class="news_event"
-                      x-data="{ newsState: newsDate.news.is_moderated ? AlertState.MODERATED : AlertState.PENDING }"
+                      x-data="{ newsState: newsDate.news.is_published ? AlertState.PUBLISHED : AlertState.PENDING }"
                     >
-                      <template x-if="!newsDate.news.is_moderated">
+                      <template x-if="!newsDate.news.is_published">
                         {{ news_moderation_alert("newsDate.news.id", user, "newsState") }}
                       </template>
                       <div x-show="newsState !== AlertState.DELETED">
@@ -179,7 +179,23 @@
         {% trans %}All coming events{% endtrans %}
         <a target="#" href="{{ url("com:news_feed") }}"><i class="fa fa-rss feed"></i></a>
       </h3>
-      <ics-calendar locale="{{ get_language() }}"></ics-calendar>
+      <ics-calendar
+        x-data
+        x-ref="calendar"
+        @news-moderated.window="
+                                if ($event.target !== $refs.calendar){
+                                // Avoid triggering a refresh with a dispatch
+                                // from the calendar itself
+                                $refs.calendar.refreshEvents($event);
+                                }
+                               "
+        @calendar-delete="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.DELETED})"
+        @calendar-unpublish="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.PENDING})"
+        @calendar-publish="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.PUBLISHED})"
+        locale="{{ get_language() }}"
+        can_moderate="{{ user.has_perm("com.moderate_news") }}"
+        can_delete="{{ user.has_perm("com.delete_news") }}"
+      ></ics-calendar>
     </div>
 
     <div id="right_column">

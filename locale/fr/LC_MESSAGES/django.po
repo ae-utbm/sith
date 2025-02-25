@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-25 11:04+0100\n"
+"POT-Creation-Date: 2025-02-25 16:38+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -812,7 +812,7 @@ msgstr "Nouvelle mailing liste"
 msgid "Subscribe"
 msgstr "S'abonner"
 
-#: club/forms.py com/templates/com/news_admin_list.jinja
+#: club/forms.py
 msgid "Remove"
 msgstr "Retirer"
 
@@ -1296,8 +1296,8 @@ msgstr ""
 "Combien de fois l'événement doit-il se répéter (en incluant la première fois)"
 
 #: com/forms.py
-msgid "Automoderation"
-msgstr "Automodération"
+msgid "Auto publication"
+msgstr "Publication automatique"
 
 #: com/models.py
 msgid "alert message"
@@ -1343,6 +1343,10 @@ msgstr "Le club qui organise l'évènement."
 #: com/models.py pedagogy/models.py trombi/models.py
 msgid "author"
 msgstr "auteur"
+
+#: com/models.py
+msgid "is published"
+msgstr "est publié"
 
 #: com/models.py
 msgid "news"
@@ -1409,34 +1413,31 @@ msgid "Begin date should be before end date"
 msgstr "La date de début doit être avant celle de fin"
 
 #: com/templates/com/macros.jinja
-msgid "Waiting moderation"
-msgstr "En attente de modération"
+msgid "Waiting publication"
+msgstr "En attente de publication"
 
 #: com/templates/com/macros.jinja
 msgid ""
-"This news isn't moderated and is visible only by its author and the "
+"This news isn't published and is visible only by its author and the "
 "communication admins."
 msgstr ""
-"Cette nouvelle n'est pas modérée et n'est visible que par son auteur et les "
+"Cette nouvelle n'est pas publiée et n'est visible que par son auteur et les "
 "admins communication."
 
 #: com/templates/com/macros.jinja
-msgid "It will stay hidden for other users until it has been moderated."
+msgid "It will stay hidden for other users until it has been published."
 msgstr ""
 "Elle sera cachée pour les autres utilisateurs tant qu'elle ne sera pas "
-"modérée."
+"publiée."
 
-#: com/templates/com/macros.jinja com/templates/com/mailing_admin.jinja
-#: com/templates/com/news_admin_list.jinja com/templates/com/news_detail.jinja
-#: core/templates/core/file_detail.jinja
-#: core/templates/core/file_moderation.jinja sas/templates/sas/moderation.jinja
-#: sas/templates/sas/picture.jinja
-msgid "Moderate"
-msgstr "Modérer"
+#: com/templates/com/macros.jinja com/templates/com/news_admin_list.jinja
+#: com/templates/com/news_detail.jinja
+msgid "Publish"
+msgstr "Publier"
 
 #: com/templates/com/macros.jinja
-msgid "News moderated"
-msgstr "Nouvelle modérée"
+msgid "News published"
+msgstr "Nouvelle publiée"
 
 #: com/templates/com/macros.jinja
 msgid "News deleted"
@@ -1446,6 +1447,12 @@ msgstr "Nouvelle supprimée"
 #: core/templates/core/user_tools.jinja
 msgid "Mailing lists administration"
 msgstr "Administration des mailing listes"
+
+#: com/templates/com/mailing_admin.jinja core/templates/core/file_detail.jinja
+#: core/templates/core/file_moderation.jinja sas/templates/sas/moderation.jinja
+#: sas/templates/sas/picture.jinja
+msgid "Moderate"
+msgstr "Modérer"
 
 #: com/templates/com/mailing_admin.jinja
 #, python-format
@@ -1513,6 +1520,10 @@ msgstr "Modérateur"
 #: trombi/templates/trombi/edit_profile.jinja
 msgid "Dates"
 msgstr "Dates"
+
+#: com/templates/com/news_admin_list.jinja
+msgid "Unpublish"
+msgstr "Dépublier"
 
 #: com/templates/com/news_admin_list.jinja
 msgid "Weeklies to moderate"
@@ -6031,13 +6042,3 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
-
-#, python-format
-#~ msgid ""
-#~ "This event will take place every week for %%s weeks. If you moderate or "
-#~ "delete this event, it will also be moderated (or deleted) for the "
-#~ "following weeks."
-#~ msgstr ""
-#~ "Cet événement se déroulera chaque semaine pendant %%s semaines. Si vous "
-#~ "modérez ou supprimez cet événement, il sera également modéré (ou "
-#~ "supprimé) pour les semaines suivantes."

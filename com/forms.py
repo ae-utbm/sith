@@ -147,8 +147,8 @@ class NewsForm(forms.ModelForm):
             "content": MarkdownInput,
         }
 
-    auto_moderate = forms.BooleanField(
-        label=_("Automoderation"),
+    auto_publish = forms.BooleanField(
+        label=_("Auto publication"),
         widget=CheckboxInput(attrs={"class": "switch"}),
         required=False,
     )
@@ -182,12 +182,12 @@ class NewsForm(forms.ModelForm):
     def save(self, commit: bool = True):  # noqa FBT001
         self.instance.author = self.author
         if (self.author.is_com_admin or self.author.is_root) and (
-            self.cleaned_data.get("auto_moderate") is True
+            self.cleaned_data.get("auto_publish") is True
         ):
-            self.instance.is_moderated = True
+            self.instance.is_published = True
             self.instance.moderator = self.author
         else:
-            self.instance.is_moderated = False
+            self.instance.is_published = False
         created_news = super().save(commit=commit)
         self.date_form.save(commit=commit, news=created_news)
         return created_news

@@ -80,9 +80,9 @@
     </fieldset>
     {% if user.is_root or user.is_com_admin %}
       <fieldset>
-        {{ form.auto_moderate.errors }}
-        {{ form.auto_moderate }}
-        {{ form.auto_moderate.label_tag() }}
+        {{ form.auto_publish.errors }}
+        {{ form.auto_publish }}
+        {{ form.auto_publish.label_tag() }}
       </fieldset>
     {% endif %}
     <p><input type="submit" value="{% trans %}Save{% endtrans %}" class="btn btn-blue"/></p>

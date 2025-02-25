@@ -690,7 +690,7 @@ Welcome to the wiki page!
             content="Glou glou glou glou glou glou glou",
             club=bar_club,
             author=subscriber,
-            is_moderated=True,
+            is_published=True,
             moderator=skia,
         )
         news_dates.append(
@@ -704,12 +704,11 @@ Welcome to the wiki page!
             title="Repas barman",
             summary="Enjoy la fin du semestre!",
             content=(
-                "Viens donc t'enjailler avec les autres barmans aux "
-                "frais du BdF! \\o/"
+                "Viens donc t'enjailler avec les autres barmans aux frais du BdF! \\o/"
             ),
             club=bar_club,
             author=subscriber,
-            is_moderated=True,
+            is_published=True,
             moderator=skia,
         )
         news_dates.append(
@@ -725,7 +724,7 @@ Welcome to the wiki page!
             content="Fô viendre mangey d'la bonne fondue!",
             club=bar_club,
             author=subscriber,
-            is_moderated=True,
+            is_published=True,
             moderator=skia,
         )
         news_dates.append(
@@ -741,7 +740,7 @@ Welcome to the wiki page!
             content="Viens faire la fête avec tout plein de gens!",
             club=bar_club,
             author=subscriber,
-            is_moderated=True,
+            is_published=True,
             moderator=skia,
         )
         news_dates.append(
@@ -759,7 +758,7 @@ Welcome to the wiki page!
             "t'amuser le Vendredi soir!",
             club=troll,
             author=subscriber,
-            is_moderated=True,
+            is_published=True,
             moderator=skia,
         )
         news_dates.extend(

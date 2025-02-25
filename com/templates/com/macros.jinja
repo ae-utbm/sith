@@ -1,6 +1,6 @@
 {% macro news_moderation_alert(news, user, alpineState = None) %}
-    {# An alert to display on top of non moderated news,
-    with actions to either moderate or delete them.
+    {# An alert to display on top of unpublished news,
+    with actions to either publish or delete them.
 
     The current state of the alert is accessible through
     the given `alpineState` variable.
@@ -8,7 +8,7 @@
 
     This comes in three flavours :
     - You can pass the `News` object itself to the macro.
-      In this case, if `request.user` can moderate news,
+      In this case, if `request.user` can publish news,
       it will perform an additional db query to know if it is a recurring event.
     - You can also give only the news id.
       In this case, a server request will be issued to know
@@ -57,23 +57,23 @@
     {# the news-moderated is received when a moderation alert is deleted or moderated #}
     @news-moderated.window="dispatchModeration($event)"
     {% if alpineState %}
-      x-modelable="{{ alpineState }}"
-      x-model="state"
+      x-model="{{ alpineState }}"
+      x-modelable="state"
     {% endif %}
   >
     <template x-if="state === AlertState.PENDING">
       <div class="alert alert-yellow">
         <div class="alert-main">
-          <strong>{% trans %}Waiting moderation{% endtrans %}</strong>
+          <strong>{% trans %}Waiting publication{% endtrans %}</strong>
           <p>
             {% trans trimmed %}
-              This news isn't moderated and is visible
+              This news isn't published and is visible
               only by its author and the communication admins.
             {% endtrans %}
           </p>
           <p>
             {% trans trimmed %}
-              It will stay hidden for other users until it has been moderated.
+              It will stay hidden for other users until it has been published.
             {% endtrans %}
           </p>
           {% if user.has_perm("com.moderate_news") %}
@@ -84,7 +84,7 @@
             <div
               {% if news is integer or news is string %}
                 x-data="{ nbEvents: 0 }"
-                x-init="nbEvents = await nbToModerate()"
+                x-init="nbEvents = await nbToPublish()"
               {% else %}
                 x-data="{ nbEvents: {{ news.dates.count() }} }"
               {% endif %}
@@ -101,8 +101,8 @@
         </div>
         {% if user.has_perm("com.moderate_news") %}
           <span class="alert-aside" :aria-busy="loading">
-            <button class="btn btn-green" @click="moderateNews()" :disabled="loading">
-              <i class="fa fa-check"></i> {% trans %}Moderate{% endtrans %}
+            <button class="btn btn-green" @click="publishNews()" :disabled="loading">
+              <i class="fa fa-check"></i> {% trans %}Publish{% endtrans %}
             </button>
         {% endif %}
         {% if user.has_perm("com.delete_news") %}
@@ -113,9 +113,9 @@
         {% endif %}
       </div>
     </template>
-    <template x-if="state === AlertState.MODERATED">
+    <template x-if="state === AlertState.PUBLISHED">
       <div class="alert alert-green">
-        {% trans %}News moderated{% endtrans %}
+        {% trans %}News published{% endtrans %}
       </div>
     </template>
     <template x-if="state === AlertState.DELETED">

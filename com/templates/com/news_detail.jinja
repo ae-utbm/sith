@@ -25,7 +25,7 @@
   <p><a href="{{ url('com:news_list') }}">{% trans %}Back to news{% endtrans %}</a></p>
   <div x-data="{newsState: AlertState.PENDING}">
 
-    {% if not news.is_moderated %}
+    {% if not news.is_published %}
       {{ news_moderation_alert(news, user, "newsState") }}
     {% endif %}
     <article id="news_details" x-show="newsState !== AlertState.DELETED">
@@ -35,10 +35,10 @@
       </div>
       <h4>{{ news.title }}</h4>
       <p class="date">
-        <span>{{ date.start_date|localtime|date(DATETIME_FORMAT) }}
-          {{ date.start_date|localtime|time(DATETIME_FORMAT) }}</span> -
-        <span>{{ date.end_date|localtime|date(DATETIME_FORMAT) }}
-          {{ date.end_date|localtime|time(DATETIME_FORMAT) }}</span>
+        <time datetime="{{ date.start_date.isoformat(timespec="seconds") }}">{{ date.start_date|localtime|date(DATETIME_FORMAT) }}
+          {{ date.start_date|localtime|time(DATETIME_FORMAT) }}</time> -
+        <time datetime="{{ date.end_date.isoformat(timespec="seconds") }}">{{ date.end_date|localtime|date(DATETIME_FORMAT) }}
+          {{ date.end_date|localtime|time(DATETIME_FORMAT) }}</time>
       </p>
       <div class="news_content">
         <div><em>{{ news.summary|markdown }}</em></div>
@@ -51,7 +51,7 @@
           {% if news.moderator %}
             <p>{% trans %}Moderator: {% endtrans %}{{ user_profile_link(news.moderator) }}</p>
           {% elif user.is_com_admin %}
-            <p> <a href="{{ url('com:news_moderate', news_id=news.id) }}">{% trans %}Moderate{% endtrans %}</a></p>
+            <p> <a href="{{ url('com:news_moderate', news_id=news.id) }}">{% trans %}Publish{% endtrans %}</a></p>
           {% endif %}
           {% if user.can_edit(news) %}
             <p> <a href="{{ url('com:news_edit', news_id=news.id) }}">{% trans %}Edit (will be moderated again){% endtrans %}</a></p>

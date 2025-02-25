@@ -15,14 +15,14 @@ class NewsDateFilterSchema(FilterSchema):
     after: datetime | None = Field(None, q="start_date__gt")
     club_id: int | None = Field(None, q="news__club_id")
     news_id: int | None = None
-    is_moderated: bool | None = Field(None, q="news__is_moderated")
+    is_published: bool | None = Field(None, q="news__is_published")
     title: str | None = Field(None, q="news__title__icontains")
 
 
 class NewsSchema(ModelSchema):
     class Meta:
         model = News
-        fields = ["id", "title", "summary", "is_moderated"]
+        fields = ["id", "title", "summary", "is_published"]
 
     club: ClubProfileSchema
     url: str

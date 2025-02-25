@@ -1,5 +1,5 @@
 import { exportToHtml } from "#core:utils/globals";
-import { newsDeleteNews, newsFetchNewsDates, newsModerateNews } from "#openapi";
+import { newsDeleteNews, newsFetchNewsDates, newsPublishNews } from "#openapi";
 
 // This will be used in jinja templates,
 // so we cannot use real enums as those are purely an abstraction of Typescript
@@ -7,9 +7,11 @@ const AlertState = {
   // biome-ignore lint/style/useNamingConvention: this feels more like an enum
   PENDING: 1,
   // biome-ignore lint/style/useNamingConvention: this feels more like an enum
-  MODERATED: 2,
+  PUBLISHED: 2,
   // biome-ignore lint/style/useNamingConvention: this feels more like an enum
   DELETED: 3,
+  // biome-ignore lint/style/useNamingConvention: this feels more like an enum
+  DISPLAYED: 4, // When published at page generation
 };
 exportToHtml("AlertState", AlertState);
 
@@ -19,11 +21,11 @@ document.addEventListener("alpine:init", () => {
     newsId: newsId as number,
     loading: false,
 
-    async moderateNews() {
+    async publishNews() {
       this.loading = true;
       // biome-ignore lint/style/useNamingConvention: api is snake case
-      await newsModerateNews({ path: { news_id: this.newsId } });
-      this.state = AlertState.MODERATED;
+      await newsPublishNews({ path: { news_id: this.newsId } });
+      this.state = AlertState.PUBLISHED;
       this.$dispatch("news-moderated", { newsId: this.newsId, state: this.state });
       this.loading = false;
     },
@@ -54,7 +56,7 @@ document.addEventListener("alpine:init", () => {
      * Query the server to know the number of news dates that would be moderated
      * if this one is moderated.
      */
-    async nbToModerate(): Promise<number> {
+    async nbToPublish(): Promise<number> {
       // What we want here is the count attribute of the response.
       // We don't care about the actual results,
       // so we ask for the minimum page size possible.
@@ -69,8 +71,8 @@ document.addEventListener("alpine:init", () => {
       return interpolate(
         gettext(
           "This event will take place every week for %s weeks. " +
-            "If you moderate or delete this event, " +
-            "it will also be moderated (or deleted) for the following weeks.",
+            "If you publish or delete this event, " +
+            "it will also be published (or deleted) for the following weeks.",
         ),
         [nbEvents],
       );
