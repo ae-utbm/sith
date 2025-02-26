@@ -13,6 +13,8 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+import atexit
+import logging
 import os
 import sys
 
@@ -22,13 +24,14 @@ from sith.composer import start_composer, stop_composer
 from sith.settings import PROCFILE_RUNSERVER
 
 if __name__ == "__main__":
+    logging.basicConfig(encoding="utf-8", level=logging.INFO)
+
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sith.settings")
 
     from django.core.management import execute_from_command_line
 
     if os.environ.get(DJANGO_AUTORELOAD_ENV) is None and PROCFILE_RUNSERVER is not None:
         start_composer(PROCFILE_RUNSERVER)
+        _ = atexit.register(stop_composer)
 
     execute_from_command_line(sys.argv)
-
-    stop_composer()
