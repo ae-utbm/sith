@@ -42,11 +42,11 @@ class MarkdownController(ControllerBase):
 
 @api_controller("/upload")
 class UploadController(ControllerBase):
-    @route.post("/images", response=UploadedFileSchema, permissions=[IsOldSubscriber])
-    def upload_assets(self, file: UploadedFile):
+    @route.post("/image", response=UploadedFileSchema, permissions=[IsOldSubscriber])
+    def upload_image(self, file: UploadedFile):
         if file.content_type.split("/")[0] != "image":
             return self.create_response(
-                message=f"{file.name} isn't a file image", status_code=400
+                message=f"{file.name} isn't a file image", status_code=415
             )
 
         def convert_image(file: UploadedFile) -> ContentFile:
@@ -60,7 +60,7 @@ class UploadController(ControllerBase):
             converted = convert_image(file)
         except UnidentifiedImageError:
             return self.create_response(
-                message=f"{file.name} can't be processed", status_code=400
+                message=f"{file.name} can't be processed", status_code=415
             )
 
         with transaction.atomic():
