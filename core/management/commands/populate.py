@@ -764,6 +764,10 @@ Welcome to the wiki page!
             ]
         )
 
+        # Upload folder
+        SithFile.objects.create(name="upload", owner=root)
+        (settings.MEDIA_ROOT / "upload").mkdir(parents=True, exist_ok=True)
+
     def _create_profile_pict(self, user: User):
         path = self.SAS_FIXTURE_PATH / "Family" / f"{user.username}.jpg"
         file = resize_image(Image.open(path), 400, "WEBP")

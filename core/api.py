@@ -1,23 +1,30 @@
+from io import BytesIO
+from pathlib import Path
 from typing import Annotated
+from uuid import uuid4
 
 import annotated_types
 from django.conf import settings
+from django.core.files.base import ContentFile
+from django.db import transaction
 from django.db.models import F
 from django.http import HttpResponse
-from ninja import Query
+from ninja import Query, UploadedFile
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import PermissionDenied
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
+from PIL import Image, UnidentifiedImageError
 
 from club.models import Mailing
-from core.auth.api_permissions import CanAccessLookup, CanView
+from core.auth.api_permissions import CanAccessLookup, CanView, IsOldSubscriber
 from core.models import Group, SithFile, User
 from core.schemas import (
     FamilyGodfatherSchema,
     GroupSchema,
     MarkdownSchema,
     SithFileSchema,
+    UploadedFileSchema,
     UserFamilySchema,
     UserFilterSchema,
     UserProfileSchema,
@@ -31,6 +38,59 @@ class MarkdownController(ControllerBase):
     def render_markdown(self, body: MarkdownSchema):
         """Convert the markdown text into html."""
         return HttpResponse(markdown(body.text), content_type="text/html")
+
+
+@api_controller("/upload")
+class UploadController(ControllerBase):
+    @route.post("/images", response=UploadedFileSchema, permissions=[IsOldSubscriber])
+    def upload_assets(self, file: UploadedFile):
+        if file.content_type.split("/")[0] != "image":
+            return self.create_response(
+                message=f"{file.name} isn't a file image", status_code=400
+            )
+
+        def convert_image(file: UploadedFile) -> ContentFile:
+            content = BytesIO()
+            Image.open(BytesIO(file.read())).save(
+                fp=content, format="webp", optimize=True
+            )
+            return ContentFile(content.getvalue())
+
+        try:
+            converted = convert_image(file)
+        except UnidentifiedImageError:
+            return self.create_response(
+                message=f"{file.name} can't be processed", status_code=400
+            )
+
+        with transaction.atomic():
+            parent = SithFile.objects.filter(parent=None, name="upload").first()
+            if parent is None:
+                root = User.objects.get(id=settings.SITH_ROOT_USER_ID)
+                parent = SithFile.objects.create(
+                    parent=None,
+                    name="upload",
+                    owner=root,
+                )
+            image = SithFile(
+                parent=parent,
+                name=f"{Path(file.name).stem}_{uuid4()}.webp",
+                file=converted,
+                owner=self.context.request.user,
+                is_folder=False,
+                mime_type="img/webp",
+                size=converted.size,
+                moderator=self.context.request.user,
+                is_moderated=True,
+            )
+            image.file.name = image.name
+            image.clean()
+            image.save()
+            image.view_groups.add(
+                Group.objects.filter(id=settings.SITH_GROUP_PUBLIC_ID).first()
+            )
+            image.save()
+        return image
 
 
 @api_controller("/mailings")
