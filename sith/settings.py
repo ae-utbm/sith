@@ -56,6 +56,9 @@ BASE_DIR = Path(__file__).parent.parent.resolve()
 PROCFILE_RUNSERVER = env.str("PROCFILE_RUNSERVER", None)
 PROCFILE_PYTEST = env.str("PROCFILE_PYTEST", None)
 
+## File path used to avoid running the composer multiple times at the same time
+COMPOSER_PID_PATH = env.path("COMPOSER_PID_PATH", BASE_DIR / "composer.pid")
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 

@@ -1,3 +1,5 @@
+import atexit
+
 import pytest
 
 from .composer import start_composer, stop_composer
@@ -15,7 +17,4 @@ def pytest_load_initial_conftests(early_config, parser, args):
     """Hook that loads the composer before the pytest-django plugin"""
     if PROCFILE_PYTEST is not None:
         start_composer(PROCFILE_PYTEST)
-
-
-def pytest_unconfigure(config):
-    stop_composer()
+        _ = atexit.register(stop_composer)
