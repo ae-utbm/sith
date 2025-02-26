@@ -50,11 +50,22 @@ from .honeypot import custom_honeypot_error
 env = Env()
 env.read_env()
 
+
+@env.parser_for("optional_file")
+def optional_file_parser(value: str) -> Path | None:
+    if not value:
+        return None
+    path = Path(value)
+    if not path.is_file():
+        return None
+    return path
+
+
 BASE_DIR = Path(__file__).parent.parent.resolve()
 
 # Composer settings
-PROCFILE_RUNSERVER = env.str("PROCFILE_RUNSERVER", None)
-PROCFILE_PYTEST = env.str("PROCFILE_PYTEST", None)
+PROCFILE_RUNSERVER = env.optional_file("PROCFILE_RUNSERVER", None)
+PROCFILE_PYTEST = env.optional_file("PROCFILE_PYTEST", None)
 
 ## File path used to avoid running the composer multiple times at the same time
 COMPOSER_PID_PATH = env.path("COMPOSER_PID_PATH", BASE_DIR / "composer.pid")

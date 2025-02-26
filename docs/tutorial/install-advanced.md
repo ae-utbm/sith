@@ -85,12 +85,20 @@ des services externes (redis, vite et autres futures).
 En mode production, il est nécessaire de le désactiver puisque normalement
 tous ces services sont déjà configurés.
 
-Pour désactiver Honcho il suffit de sélectionner aucun `PROCFILE_` dans la config.
+Pour désactiver Honcho il suffit de ne sélectionner aucun `PROCFILE_` dans la config.
 
 ```dotenv
 PROCFILE_RUNSERVER=
 PROCFILE_PYTEST=
 ```
+
+!!! note
+
+    Si honcho ne tourne plus, la recompilation automatique
+    des fichiers statiques ne se fait plus.
+    Si vous en avez besoin et que vous travaillez sans honcho,
+    vous devez ouvrir une autre fenêtre de votre terminal
+    et lancer la commande `npm run serve`
 
 ## Configurer Redis en service externe
 
