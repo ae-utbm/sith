@@ -228,3 +228,16 @@ class TestPictureModeration(TestSas):
         assert res.status_code == 200
         assert len(res.json()) == 1
         assert res.json()[0]["author"]["id"] == self.user_a.id
+
+
+class TestAlbumSearch(TestSas):
+    def test_num_queries(self):
+        """Check the number of queries is stable"""
+        self.client.force_login(subscriber_user.make())
+        cache.clear()
+        with self.assertNumQueries(7):
+            # - 2 for authentication
+            # - 3 to check permissions
+            # - 1 for pagination
+            # - 1 for the actual results
+            self.client.get(reverse("api:search-album"))
