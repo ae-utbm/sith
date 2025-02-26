@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-25 16:10+0100\n"
+"POT-Creation-Date: 2025-02-27 00:27+0100\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -34,6 +34,7 @@ msgid "Delete"
 msgstr "Supprimer"
 
 #: com/static/bundled/com/components/moderation-alert-index.ts
+#, javascript-format
 msgid ""
 "This event will take place every week for %s weeks. If you publish or delete "
 "this event, it will also be published (or deleted) for the following weeks."
@@ -53,6 +54,34 @@ msgstr "Vous devez taper %(number)s caractères de plus"
 #: core/static/bundled/core/components/ajax-select-base.ts
 msgid "No results found"
 msgstr "Aucun résultat trouvé"
+
+#: core/static/bundled/core/components/easymde-index.ts
+msgid "Invalid file"
+msgstr "Fichier invalide"
+
+#: core/static/bundled/core/components/easymde-index.ts
+msgid "Attach files by drag and dropping or pasting from clipboard."
+msgstr "Ajoutez des fichiez en glissant déposant ou collant depuis votre presse papier."
+
+#: core/static/bundled/core/components/easymde-index.ts
+msgid "Drop image to upload it."
+msgstr "Glissez une image pour la téléverser."
+
+#: core/static/bundled/core/components/easymde-index.ts
+msgid "Uploading image #images_names# …"
+msgstr "Téléversement de l'image #images_names# …"
+
+#: core/static/bundled/core/components/easymde-index.ts
+msgid "Uploading #file_name#: #progress#%"
+msgstr "Téléversement de #file_name#: #progress#%"
+
+#: core/static/bundled/core/components/easymde-index.ts
+msgid "Uploaded #image_name#"
+msgstr "#image_name# téléversé"
+
+#: core/static/bundled/core/components/easymde-index.ts
+msgid " B, KB, MB"
+msgstr " B, KB, MB"
 
 #: core/static/bundled/core/components/easymde-index.ts
 msgid "Heading"
@@ -105,6 +134,10 @@ msgstr "Insérer lien"
 #: core/static/bundled/core/components/easymde-index.ts
 msgid "Insert image"
 msgstr "Insérer image"
+
+#: core/static/bundled/core/components/easymde-index.ts
+msgid "Upload image"
+msgstr "Téléverser une image"
 
 #: core/static/bundled/core/components/easymde-index.ts
 msgid "Insert table"
