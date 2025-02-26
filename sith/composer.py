@@ -2,6 +2,7 @@ import logging
 import signal
 import subprocess
 import sys
+from pathlib import Path
 
 import psutil
 
@@ -40,7 +41,7 @@ def is_composer_running() -> bool:
         return False
 
 
-def start_composer(procfile: str):
+def start_composer(procfile: Path):
     """Starts the composer and stores the PID as an environment variable
     This allows for running smoothly with the django reloader
     """
@@ -51,7 +52,7 @@ def start_composer(procfile: str):
         )
         return
     process = subprocess.Popen(
-        [sys.executable, "-m", "honcho", "-f", procfile, "start"],
+        [sys.executable, "-m", "honcho", "-f", str(procfile), "start"],
     )
     write_pid(process.pid)
 
