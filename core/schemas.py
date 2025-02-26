@@ -9,6 +9,7 @@ from django.utils.text import slugify
 from haystack.query import SearchQuerySet
 from ninja import FilterSchema, ModelSchema, Schema
 from pydantic import AliasChoices, Field
+from pydantic_core import Url
 
 from core.models import Group, SithFile, User
 
@@ -45,6 +46,18 @@ class UserProfileSchema(ModelSchema):
         if obj.profile_pict_id is None:
             return staticfiles_storage.url("core/img/unknown.jpg")
         return reverse("core:download", kwargs={"file_id": obj.profile_pict_id})
+
+
+class UploadedFileSchema(ModelSchema):
+    class Meta:
+        model = SithFile
+        fields = ["id", "name", "mime_type", "size"]
+
+    href: str
+
+    @staticmethod
+    def resolve_href(obj: SithFile) -> Url:
+        return reverse("core:download", kwargs={"file_id": obj.id})
 
 
 class SithFileSchema(ModelSchema):
