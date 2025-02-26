@@ -23,20 +23,21 @@
 
 from __future__ import annotations
 
+import itertools
 import logging
 import math
 import time
+from collections import defaultdict
 from typing import NamedTuple, TypedDict
 
 from django.db import models
-from django.db.models import Case, Count, F, Q, Value, When
-from django.db.models.functions import Concat
+from django.db.models import Count, F, Q, QuerySet
 from django.utils.timezone import localdate
 from django.utils.translation import gettext_lazy as _
 
-from club.models import Club
+from club.models import Membership
 from core.models import User
-from sas.models import Picture
+from sas.models import PeoplePictureRelation, Picture
 
 
 class GalaxyStar(models.Model):
@@ -114,18 +115,9 @@ class GalaxyLane(models.Model):
         default=0,
         help_text=_("Distance separating star1 and star2"),
     )
-    family = models.PositiveIntegerField(
-        _("family score"),
-        default=0,
-    )
-    pictures = models.PositiveIntegerField(
-        _("pictures score"),
-        default=0,
-    )
-    clubs = models.PositiveIntegerField(
-        _("clubs score"),
-        default=0,
-    )
+    family = models.PositiveIntegerField(_("family score"), default=0)
+    pictures = models.PositiveIntegerField(_("pictures score"), default=0)
+    clubs = models.PositiveIntegerField(_("clubs score"), default=0)
 
     def __str__(self):
         return f"{self.star1} -> {self.star2} ({self.distance})"
@@ -174,6 +166,7 @@ class Galaxy(models.Model):
     logger = logging.getLogger("main")
 
     GALAXY_SCALE_FACTOR = 2_000
+    DEFAULT_PICTURE_COUNT_THRESHOLD = 10
     FAMILY_LINK_POINTS = 366  # Equivalent to a leap year together in a club, because.
     PICTURE_POINTS = 2  # Equivalent to two days as random members of a club.
     CLUBS_POINTS = 1  # One day together as random members in a club is one point.
@@ -187,15 +180,13 @@ class Galaxy(models.Model):
         stars_count = self.stars.count()
         s = f"GLX-ID{self.pk}-SC{stars_count}-"
         if self.state is None:
-            s += "CHS"  # CHAOS
+            s += "CHAOS"
         else:
-            s += "RLD"  # RULED
+            s += "RULED"
         return s
 
     @classmethod
-    def get_current_galaxy(
-        cls,
-    ) -> Galaxy:  # __future__.annotations is required for this
+    def get_current_galaxy(cls) -> Galaxy:
         return Galaxy.objects.filter(state__isnull=False).last()
 
     ###################
@@ -203,7 +194,18 @@ class Galaxy(models.Model):
     ###################
 
     @classmethod
-    def compute_user_score(cls, user: User) -> int:
+    def get_rulable_users(
+        cls, picture_count_threshold: int = DEFAULT_PICTURE_COUNT_THRESHOLD
+    ) -> QuerySet[User]:
+        return (
+            User.objects.exclude(subscriptions=None)
+            .annotate(pictures_count=Count("pictures"))
+            .filter(pictures_count__gt=picture_count_threshold)
+            .distinct()
+        )
+
+    @classmethod
+    def compute_individual_scores(cls) -> dict[int, int]:
         """Compute an individual score for each citizen.
 
         It will later be used by the graph algorithm to push
@@ -211,87 +213,50 @@ class Galaxy(models.Model):
 
         Idea: This could be added to the computation:
 
-        - Forum posts
         - Picture count
         - Counter consumption
         - Barman time
         - ...
         """
-        user_score = 1
-        user_score += cls.query_user_score(user)
-
+        users = (
+            User.objects.annotate(
+                score=(
+                    Count("godchildren", distinct=True) * cls.FAMILY_LINK_POINTS
+                    + Count("godfathers", distinct=True) * cls.FAMILY_LINK_POINTS
+                    + Count("pictures", distinct=True) * cls.PICTURE_POINTS
+                    + Count("memberships", distinct=True) * cls.CLUBS_POINTS
+                )
+            )
+            .filter(score__gt=0)
+            .values("id", "score")
+        )
         # TODO:
         # Scale that value with some magic number to accommodate to typical data
         # Really active galaxy citizen after 5 years typically have a score of about XXX
         # Citizen that were seen regularly without taking much part in organizations typically have a score of about XXX
         # Citizen that only went to a few events typically score about XXX
-        user_score = int(math.log2(user_score))
-
-        return user_score
-
-    @classmethod
-    def query_user_score(cls, user: User) -> int:
-        """Get the individual score of the given user in the galaxy."""
-        score_query = (
-            User.objects.filter(id=user.id)
-            .annotate(
-                godchildren_count=Count("godchildren", distinct=True)
-                * cls.FAMILY_LINK_POINTS,
-                godfathers_count=Count("godfathers", distinct=True)
-                * cls.FAMILY_LINK_POINTS,
-                pictures_score=Count("pictures", distinct=True) * cls.PICTURE_POINTS,
-                clubs_score=Count("memberships", distinct=True) * cls.CLUBS_POINTS,
-            )
-            .aggregate(
-                score=models.Sum(
-                    F("godchildren_count")
-                    + F("godfathers_count")
-                    + F("pictures_score")
-                    + F("clubs_score")
-                )
-            )
-        )
-        return score_query.get("score")
+        res = {u["id"]: int(math.log2(u["score"] + 1)) for u in users}
+        return res
 
     ####################
     # Inter-user score #
     ####################
 
     @classmethod
-    def compute_users_score(cls, user1: User, user2: User) -> RelationScore:
-        """Compute the relationship scores of the two given users.
-
-        The computation is done with the following fields :
-
-        - family: if they have some godfather/godchild relation
-        - pictures: in how many pictures are both tagged
-        - clubs: during how many days they were members of the same clubs
-        """
-        family = cls.compute_users_family_score(user1, user2)
-        pictures = cls.compute_users_pictures_score(user1, user2)
-        clubs = cls.compute_users_clubs_score(user1, user2)
-        return RelationScore(family=family, pictures=pictures, clubs=clubs)
-
-    @classmethod
-    def compute_users_family_score(cls, user1: User, user2: User) -> int:
+    def compute_user_family_score(cls, user: User) -> defaultdict[int, int]:
         """Compute the family score of the relation between the given users.
 
         This takes into account mutual godfathers.
-
-        Returns:
-             366 if user1 is the godfather of user2 (or vice versa) else 0
         """
-        link_count = User.objects.filter(
-            Q(id=user1.id, godfathers=user2) | Q(id=user2.id, godfathers=user1)
-        ).count()
-        if link_count > 0:
-            cls.logger.debug(
-                f"\t\t- '{user1}' and '{user2}' have {link_count} direct family link"
-            )
-        return link_count * cls.FAMILY_LINK_POINTS
+        godchildren = User.objects.filter(godchildren=user).values_list("id", flat=True)
+        godfathers = User.objects.filter(godfathers=user).values_list("id", flat=True)
+        result = defaultdict(int)
+        for parent in itertools.chain(godchildren, godfathers):
+            result[parent] += cls.FAMILY_LINK_POINTS
+        return result
 
     @classmethod
-    def compute_users_pictures_score(cls, user1: User, user2: User) -> int:
+    def compute_user_pictures_score(cls, user: User) -> defaultdict[int, int]:
         """Compute the pictures score of the relation between the given users.
 
         The pictures score is obtained by counting the number
@@ -301,19 +266,19 @@ class Galaxy(models.Model):
         Returns:
              The number of pictures both users have in common, times 2
         """
-        picture_count = (
-            Picture.objects.filter(people__user__in=(user1,))
-            .filter(people__user__in=(user2,))
-            .count()
-        )
-        if picture_count:
-            cls.logger.debug(
-                f"\t\t- '{user1}' was pictured with '{user2}' {picture_count} times"
+        common_photos = (
+            PeoplePictureRelation.objects.filter(
+                picture__in=Picture.objects.filter(people__user=user)
             )
-        return picture_count * cls.PICTURE_POINTS
+            .values("user")
+            .annotate(count=Count("user"))
+        )
+        return defaultdict(
+            int, {p["user"]: p["count"] * cls.PICTURE_POINTS for p in common_photos}
+        )
 
     @classmethod
-    def compute_users_clubs_score(cls, user1: User, user2: User) -> int:
+    def compute_user_clubs_score(cls, user: User) -> defaultdict[int, int]:
         """Compute the clubs score of the relation between the given users.
 
         The club score is obtained by counting the number of days
@@ -324,54 +289,36 @@ class Galaxy(models.Model):
         (two years) and user2 was a member of the same club from 01/01/2021 to
         31/12/2022 (also two years, but with an offset of one year), then their
         club score is 365.
-
-        Returns:
-            the number of days during which both users were in the same club
         """
-        common_clubs = Club.objects.filter(members__in=user1.memberships.all()).filter(
-            members__in=user2.memberships.all()
-        )
-        user1_memberships = user1.memberships.filter(club__in=common_clubs)
-        user2_memberships = user2.memberships.filter(club__in=common_clubs)
-
-        score = 0
-        for user1_membership in user1_memberships:
-            if user1_membership.end_date is None:
-                # user1_membership.save() is not called in this function, hence this is safe
-                user1_membership.end_date = localdate()
-            query = Q(  # start2 <= start1 <= end2
-                start_date__lte=user1_membership.start_date,
-                end_date__gte=user1_membership.start_date,
-            )
-            query |= Q(  # start2 <= start1 <= now
-                start_date__lte=user1_membership.start_date, end_date=None
-            )
-            query |= Q(  # start1 <= start2 <= end2
-                start_date__gte=user1_membership.start_date,
-                start_date__lte=user1_membership.end_date,
-            )
-            for user2_membership in user2_memberships.filter(
-                query, club=user1_membership.club
-            ):
-                if user2_membership.end_date is None:
-                    user2_membership.end_date = localdate()
-                latest_start = max(
-                    user1_membership.start_date, user2_membership.start_date
-                )
-                earliest_end = min(user1_membership.end_date, user2_membership.end_date)
-                cls.logger.debug(
-                    "\t\t- '%s' was with '%s' in %s starting on %s until %s (%s days)"
-                    % (
-                        user1,
-                        user2,
-                        user2_membership.club,
-                        latest_start,
-                        earliest_end,
-                        (earliest_end - latest_start).days,
+        memberships = user.memberships.only("start_date", "end_date", "club_id")
+        result = defaultdict(int)
+        now = localdate()
+        for membership in memberships:
+            # This is a N+1 query, but 92% of galaxy users have less than 10 memberships.
+            # Only 5 users have more than 30 memberships.
+            common_memberships = (
+                Membership.objects.exclude(user=user)
+                .filter(
+                    Q(  # start2 <= start1 <= end2
+                        start_date__lte=membership.start_date,
+                        end_date__gte=membership.start_date,
                     )
+                    | Q(  # start2 <= start1 <= now
+                        start_date__lte=membership.start_date, end_date=None
+                    )
+                    | Q(  # start1 <= start2 <= end2
+                        start_date__gte=membership.start_date,
+                        start_date__lte=membership.end_date or now,
+                    ),
+                    club_id=membership.club_id,
                 )
-                score += cls.CLUBS_POINTS * (earliest_end - latest_start).days
-        return score
+                .only("start_date", "end_date", "user_id")
+            )
+            for other in common_memberships:
+                start = max(membership.start_date, other.start_date)
+                end = min(membership.end_date or now, other.end_date or now)
+                result[other.user_id] += (end - start).days * cls.CLUBS_POINTS
+        return result
 
     ###################
     # Rule the galaxy #
@@ -406,7 +353,9 @@ class Galaxy(models.Model):
         cls.logger.debug(f"\t\t> Scaled distance: {value}")
         return int(value)
 
-    def rule(self, picture_count_threshold=10) -> None:
+    def rule(
+        self, picture_count_threshold: int = DEFAULT_PICTURE_COUNT_THRESHOLD
+    ) -> None:
         """Main function of the Galaxy.
 
         Iterate over all the rulable users to promote them to citizens.
@@ -427,41 +376,30 @@ class Galaxy(models.Model):
         """
         total_time = time.time()
         self.logger.info("Listing rulable citizen.")
-        rulable_users = (
-            User.objects.filter(subscriptions__isnull=False)
-            .annotate(pictures_count=Count("pictures"))
-            .filter(pictures_count__gt=picture_count_threshold)
-            .distinct()
-        )
 
         # force fetch of the whole query to make sure there won't
         # be any more db hits
         # this is memory expensive but prevents a lot of db hits, therefore
         # is far more time efficient
 
-        rulable_users = list(rulable_users)
+        rulable_users = list(self.get_rulable_users(picture_count_threshold))
         rulable_users_count = len(rulable_users)
         user1_count = 0
         self.logger.info(
             f"{rulable_users_count} citizen have been listed. Starting to rule."
         )
 
-        stars = []
         self.logger.info("Creating stars for all citizen")
-        for user in rulable_users:
-            star = GalaxyStar(
-                owner=user, galaxy=self, mass=self.compute_user_score(user)
-            )
-            stars.append(star)
-        GalaxyStar.objects.bulk_create(stars)
-
-        stars = {}
-        for star in GalaxyStar.objects.filter(galaxy=self):
-            stars[star.owner.id] = star
+        individual_scores = self.compute_individual_scores()
+        GalaxyStar.objects.bulk_create(
+            [
+                GalaxyStar(owner=user, galaxy=self, mass=individual_scores[user.id])
+                for user in rulable_users
+            ]
+        )
+        stars = {star.owner_id: star for star in self.stars.all()}
 
         self.logger.info("Creating lanes between stars")
-        # Display current speed every $speed_count_frequency users
-        speed_count_frequency = max(rulable_users_count // 10, 1)  # ten time at most
         global_avg_speed_accumulator = 0
         global_avg_speed_count = 0
         t_global_start = time.time()
@@ -472,20 +410,19 @@ class Galaxy(models.Model):
 
             star1 = stars[user1.id]
 
-            user_avg_speed = 0
-            user_avg_speed_count = 0
-
-            tstart = time.time()
             lanes = []
-            for user2_count, user2 in enumerate(rulable_users, start=1):
-                self.logger.debug("")
-                self.logger.debug(
-                    f"\t> Examining '{user1}' ({user1_count}/{rulable_users_count}) with '{user2}' ({user2_count}/{rulable_users_count2})"
-                )
+            family_scores = self.compute_user_family_score(user1)
+            picture_scores = self.compute_user_pictures_score(user1)
+            club_scores = self.compute_user_clubs_score(user1)
 
+            for user2 in rulable_users:
                 star2 = stars[user2.id]
 
-                score = Galaxy.compute_users_score(user1, user2)
+                score = RelationScore(
+                    family=family_scores.get(user2.id, 0),
+                    pictures=picture_scores.get(user2.id, 0),
+                    clubs=club_scores.get(user2.id, 0),
+                )
                 distance = self.scale_distance(sum(score))
                 if distance < 30:  # TODO: this needs tuning with real-world data
                     lanes.append(
@@ -498,21 +435,7 @@ class Galaxy(models.Model):
                             clubs=score.clubs,
                         )
                     )
-
-                if user2_count % speed_count_frequency == 0:
-                    tend = time.time()
-                    delta = tend - tstart
-                    speed = float(speed_count_frequency) / delta
-                    user_avg_speed += speed
-                    user_avg_speed_count += 1
-                    self.logger.debug(
-                        f"\tSpeed: {speed:.2f} users per second (time for last {speed_count_frequency} citizens: {delta:.2f} second)"
-                    )
-                    tstart = time.time()
-
             GalaxyLane.objects.bulk_create(lanes)
-
-            self.logger.info("")
 
             t_global_end = time.time()
             global_delta = t_global_end - t_global_start
@@ -521,21 +444,19 @@ class Galaxy(models.Model):
             global_avg_speed_count += 1
             global_avg_speed = global_avg_speed_accumulator / global_avg_speed_count
 
-            self.logger.info(f" Ruling of {self} ".center(60, "#"))
-            self.logger.info(
-                f"Progression: {user1_count}/{rulable_users_count} citizen -- {rulable_users_count - user1_count} remaining"
-            )
-            self.logger.info(f"Speed: {60.0 * global_avg_speed:.2f} citizen per minute")
-
-            # We can divide the computed ETA by 2 because each loop, there is one citizen less to check, and maths tell
-            # us that this averages to a division by two
-            eta = rulable_users_count2 / global_avg_speed / 2
-            eta_hours = int(eta // 3600)
-            eta_minutes = int(eta // 60 % 60)
-            self.logger.info(
-                f"ETA: {eta_hours} hours {eta_minutes} minutes ({eta / 3600 / 24:.2f} days)"
-            )
-            self.logger.info("#" * 60)
+            if user1_count % 50 == 0:
+                self.logger.info("")
+                self.logger.info(f" Ruling of {self} ".center(60, "#"))
+                self.logger.info(
+                    f"Progression: {user1_count}/{rulable_users_count} "
+                    f"citizen -- {rulable_users_count - user1_count} remaining"
+                )
+                self.logger.info(f"Speed: {global_avg_speed:.2f} citizen per second")
+                eta = rulable_users_count2 // global_avg_speed
+                self.logger.info(
+                    f"ETA: {int(eta // 60 % 60)} minutes {int(eta % 60)} seconds"
+                )
+                self.logger.info("#" * 60)
             t_global_start = time.time()
 
         # Here, we get the IDs of the old galaxies that we'll need to delete. In normal operation, only one galaxy
@@ -556,11 +477,10 @@ class Galaxy(models.Model):
             Galaxy.objects.filter(pk__in=old_galaxies_pks).delete()
 
         total_time = time.time() - total_time
-        total_time_hours = int(total_time // 3600)
         total_time_minutes = int(total_time // 60 % 60)
         total_time_seconds = int(total_time % 60)
         self.logger.info(
-            f"{self} ruled in {total_time:.2f} seconds ({total_time_hours} hours, {total_time_minutes} minutes, {total_time_seconds} seconds)"
+            f"{self} ruled in {total_time_minutes} minutes, {total_time_seconds} seconds"
         )
 
     def make_state(self) -> None:
@@ -568,59 +488,34 @@ class Galaxy(models.Model):
         self.logger.info(
             "Caching current Galaxy state for a quicker display of the Empire's power."
         )
-
-        without_nickname = Concat(
-            F("owner__first_name"), Value(" "), F("owner__last_name")
-        )
-        with_nickname = Concat(
-            F("owner__first_name"),
-            Value(" "),
-            F("owner__last_name"),
-            Value(" ("),
-            F("owner__nick_name"),
-            Value(")"),
-        )
         stars = (
             GalaxyStar.objects.filter(galaxy=self)
-            .order_by(
-                "owner"
-            )  # This helps determinism for the tests and doesn't cost much
-            .annotate(
-                owner_name=Case(
-                    When(owner__nick_name=None, then=without_nickname),
-                    default=with_nickname,
-                )
-            )
+            .order_by("owner_id")
+            .select_related("owner")
         )
         lanes = (
             GalaxyLane.objects.filter(star1__galaxy=self)
-            .order_by(
-                "star1"
-            )  # This helps determinism for the tests and doesn't cost much
+            .order_by("star1")
             .annotate(
-                star1_owner=F("star1__owner__id"),
-                star2_owner=F("star2__owner__id"),
+                star1_owner=F("star1__owner_id"), star2_owner=F("star2__owner_id")
             )
         )
         json = GalaxyDict(
             nodes=[
                 StarDict(
-                    id=star.owner_id,
-                    name=star.owner_name,
-                    mass=star.mass,
+                    id=star.owner_id, name=star.owner.get_display_name(), mass=star.mass
                 )
                 for star in stars
             ],
-            links=[],
-        )
-        for path in lanes:
-            json["links"].append(
+            links=[
                 {
                     "source": path.star1_owner,
                     "target": path.star2_owner,
                     "value": path.distance,
                 }
-            )
+                for path in lanes
+            ],
+        )
         self.state = json
         self.save()
         self.logger.info(f"{self} is now ready!")
