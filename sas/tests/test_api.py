@@ -24,8 +24,8 @@ class TestSas(TestCase):
         cls.user_b, cls.user_c = subscriber_user.make(_quantity=2)
 
         picture = picture_recipe.extend(owner=owner)
-        cls.album_a = baker.make(Album, is_in_sas=True, parent=sas)
-        cls.album_b = baker.make(Album, is_in_sas=True, parent=sas)
+        cls.album_a = baker.make(Album)
+        cls.album_b = baker.make(Album)
         relation_recipe = Recipe(PeoplePictureRelation)
         relations = []
         for album in cls.album_a, cls.album_b:
@@ -58,7 +58,7 @@ class TestPictureSearch(TestSas):
         self.client.force_login(self.user_b)
         res = self.client.get(self.url + f"?album_id={self.album_a.id}")
         assert res.status_code == 200
-        expected = list(self.album_a.children_pictures.values_list("id", flat=True))
+        expected = list(self.album_a.pictures.values_list("id", flat=True))
         assert [i["id"] for i in res.json()["results"]] == expected
 
     def test_filter_by_user(self):
@@ -67,7 +67,7 @@ class TestPictureSearch(TestSas):
         assert res.status_code == 200
         expected = list(
             self.user_a.pictures.order_by(
-                "-picture__parent__date", "picture__date"
+                "-picture__parent__event_date", "picture__created_at"
             ).values_list("picture_id", flat=True)
         )
         assert [i["id"] for i in res.json()["results"]] == expected
@@ -81,7 +81,7 @@ class TestPictureSearch(TestSas):
         assert res.status_code == 200
         expected = list(
             self.user_a.pictures.union(self.user_b.pictures.all())
-            .order_by("-picture__parent__date", "picture__date")
+            .order_by("-picture__parent__event_date", "picture__created_at")
             .values_list("picture_id", flat=True)
         )
         assert [i["id"] for i in res.json()["results"]] == expected
@@ -94,7 +94,7 @@ class TestPictureSearch(TestSas):
         assert res.status_code == 200
         expected = list(
             self.user_a.pictures.order_by(
-                "-picture__parent__date", "picture__date"
+                "-picture__parent__event_date", "picture__created_at"
             ).values_list("picture_id", flat=True)
         )
         assert [i["id"] for i in res.json()["results"]] == expected
@@ -120,7 +120,7 @@ class TestPictureSearch(TestSas):
         assert res.status_code == 200
         expected = list(
             self.user_b.pictures.intersection(self.user_a.pictures.all())
-            .order_by("-picture__parent__date", "picture__date")
+            .order_by("-picture__parent__event_date", "picture__created_at")
             .values_list("picture_id", flat=True)
         )
         assert [i["id"] for i in res.json()["results"]] == expected
@@ -228,3 +228,16 @@ class TestPictureModeration(TestSas):
         assert res.status_code == 200
         assert len(res.json()) == 1
         assert res.json()[0]["author"]["id"] == self.user_a.id
+
+
+class TestAlbumSearch(TestSas):
+    def test_num_queries(self):
+        """Check the number of queries is stable"""
+        self.client.force_login(subscriber_user.make())
+        cache.clear()
+        with self.assertNumQueries(7):
+            # - 2 for authentication
+            # - 3 to check permissions
+            # - 1 for pagination
+            # - 1 for the actual results
+            self.client.get(reverse("api:search-album"))
