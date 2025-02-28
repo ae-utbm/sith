@@ -1,0 +1,281 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700');
+
+html, body, #header, #edt {
+  height: 100%;
+}
+body {
+  overflow: hidden;
+}
+body > form {
+  font-family: 'Montserrat';
+  font-weight: 400;
+  background-color: white;
+  height: 100%;
+  overflow: auto;
+  text-align: center;
+  position:  fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 100;
+  border-right: 25px solid #91BAD0;
+}
+form > div {
+  padding: 10px;
+  position: relative;
+  min-height: 100%;
+}
+body > form > div::after {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url(https://static.wixstatic.com/media/491c06_e006ce9ed8474f36a4812272424e6033~mv2.png);
+  background-repeat: no-repeat;
+  background-size: 80%;
+  background-position: center;
+  z-index: -1;
+  opacity: .25;
+}
+body > form .middle > div {
+  width: 650px;
+  max-width: 100%;
+}
+body > form h1 {
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #323270;
+}
+body > form h3 {
+  font-weight: 600;
+  color: #777;
+  margin: 20px 0;
+  line-height: 120%;
+}
+body > form h2 {
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #525289;
+  margin: 20px 0;
+}
+body > form h2 + div {
+  margin-bottom: 5px;
+}
+body > form textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  background: #f1f1f1;
+  border: 0px none;
+  border-left: 17px solid #212121;
+  padding: 10px 3px;
+}
+body > form textarea + * {
+  display: block;
+}
+body > form #bandw:checked {
+  background: #808080;
+}
+body > form input.nostyle {
+  display: block;
+  margin: 0 auto;
+  margin-top: 10px;
+  background: #323270;
+  color: white;
+  padding: 10px 30px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+body > form #download-option {
+  margin: 7px 0;
+}
+body > form input.nostyle:hover {
+  background: #535389;
+}
+body > form #promo {
+  position: absolute;
+  bottom: 0;
+  right: 35px;
+  width: 200px;
+  background: #323270;
+  padding: 15px 35px 0;
+}
+body > form #promo::after {
+  content: "";
+  display: block;
+  position: absolute;
+  bottom: 143px;
+  right: 0;
+  border: 100px solid black;
+  border-width: 20px 100px;
+  border-color: transparent #323270 #323270 transparent;
+}
+#promo p {
+  margin: 35px 0;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 24px
+}
+#promo #generated {
+  display: none;
+}
+#container {
+  padding: 20px;
+  overflow: hidden;
+  height: 1358px; /* 1357,5757px or 1080px */
+  width: 1920px;
+  background: #ffffff;
+}
+#header {
+  padding: 30px 20px 20px 60px;
+}
+#entete {
+  position: absolute;
+  top: -30px;
+  left: 0;
+  right: 0;
+  height: 30px;
+  line-height: 30px;
+}
+#entete > div {
+  display: inline-block;
+}
+#header, #edt {
+  position: relative;
+  text-align: center;
+}
+#edt.impression .cour {
+  border: 7px solid black;
+}
+.cour {
+  background: green;
+  color: white;
+}
+.cour .groupe {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px 8px;
+}
+#heures {
+  position: absolute;
+  left: 0;
+  top: 30px;
+  bottom: 20px;
+  width: 60px;
+}
+#heures .heure {
+  height: 24px;
+  line-height: 24px;
+  font-size: 14px;
+  margin-top: -12px;
+  position: absolute;
+  right: 0;
+  padding-right: 15px;
+}
+.heure div {
+  content: "";
+  position :absolute;
+  width: 20000%;
+  height: 1px;
+  background: lightgray;
+  top: 50%;
+  left: 100%;
+  margin-left: -10px;
+}
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+@media screen and (max-width: 1020px) {
+  body > form {
+    border: 0px none;
+  }
+  body > form > div {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  body > form > div::after {
+    background-size: 100% auto;
+    background-size: cover;
+  }
+
+  body > form textarea {
+    border: 0px none;
+    display: block;
+    width: calc(100% + 20px);
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+
+  body > form #promo {
+    position: static;
+    margin-left: -10px;
+    margin-right: -10px;
+    margin-bottom: -20px;
+    padding-bottom: 15px;
+    margin-top: 20px;
+    width: auto;
+  }
+  body > form #promo::after {
+    display: none;
+  }
+  body > form #promo #generated {
+    display: block;
+    font-size: 16px;
+    font-weight: normal;
+  }
+  body > form #promo p {
+    margin: 0 auto;
+  }
+  body > form #promo br {
+    display: none;
+  }
+  body > form #promo p span {
+    margin-left: 5px;
+  }
+}
+
+#changelog, #more-changelog {
+  font-size: 0.8rem;
+  line-height: 1rem;
+}
+
+#more {
+  display: none;
+}
+#more + label {
+  background: #323270;
+  color: white;
+  padding: 4px 8px;
+  display: inline-block;
+  margin: 3px 0;
+}
+
+#more + label::before {
+  content: "+ ";
+  display: inline-block;
+  width: 15px;
+}
+#more:checked + label::before {
+  content: "- ";
+}
+
+
+#more + label + #more-changelog {
+  display: block;
+  max-height: 0;
+  overflow: hidden;
+}
+#more:checked + label + #more-changelog {
+  max-height: 999px;
+}
