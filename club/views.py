@@ -522,15 +522,6 @@ class MembershipDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse_lazy("core:user_clubs", kwargs={"user_id": self.object.user.id})
 
 
-class ClubStatView(TemplateView):
-    template_name = "club/stats.jinja"
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["club_list"] = Club.objects.all()
-        return kwargs
-
-
 class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
     """A list of mailing for a given club."""
 
