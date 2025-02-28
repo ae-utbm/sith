@@ -9,9 +9,8 @@ from django.utils.text import slugify
 from haystack.query import SearchQuerySet
 from ninja import FilterSchema, ModelSchema, Schema
 from pydantic import AliasChoices, Field
-from pydantic_core import Url
 
-from core.models import Group, SithFile, User
+from core.models import Group, QuickUploadImage, SithFile, User
 
 
 class SimpleUserSchema(ModelSchema):
@@ -50,14 +49,29 @@ class UserProfileSchema(ModelSchema):
 
 class UploadedFileSchema(ModelSchema):
     class Meta:
-        model = SithFile
-        fields = ["id", "name", "mime_type", "size"]
+        model = QuickUploadImage
+        fields = ["uuid", "name", "content_type"]
 
+    width: int
+    height: int
+    size: int
     href: str
 
     @staticmethod
-    def resolve_href(obj: SithFile) -> Url:
-        return reverse("core:download", kwargs={"file_id": obj.id})
+    def resolve_width(obj: QuickUploadImage):
+        return obj.image.width
+
+    @staticmethod
+    def resolve_height(obj: QuickUploadImage):
+        return obj.image.height
+
+    @staticmethod
+    def resolve_size(obj: QuickUploadImage):
+        return obj.image.size
+
+    @staticmethod
+    def resolve_href(obj: QuickUploadImage) -> str:
+        return obj.get_absolute_url()
 
 
 class SithFileSchema(ModelSchema):

@@ -17,7 +17,16 @@ from django.contrib import admin
 from django.contrib.auth.models import Group as AuthGroup
 from django.contrib.auth.models import Permission
 
-from core.models import BanGroup, Group, OperationLog, Page, SithFile, User, UserBan
+from core.models import (
+    BanGroup,
+    Group,
+    OperationLog,
+    Page,
+    QuickUploadImage,
+    SithFile,
+    User,
+    UserBan,
+)
 
 admin.site.unregister(AuthGroup)
 
@@ -89,3 +98,10 @@ class OperationLogAdmin(admin.ModelAdmin):
     list_display = ("label", "operator", "operation_type", "date")
     search_fields = ("label", "date", "operation_type")
     autocomplete_fields = ("operator",)
+
+
+@admin.register(QuickUploadImage)
+class QuickUploadImageAdmin(admin.ModelAdmin):
+    list_display = ("uuid", "name", "uploader", "content_type", "date")
+    search_fields = ("uuid", "name", "uploader")
+    autocomplete_fields = ("uploader",)
