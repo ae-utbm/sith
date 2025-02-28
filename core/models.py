@@ -17,7 +17,7 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
@@ -32,6 +32,7 @@ from datetime import timedelta
 from io import BytesIO
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional, Self
+from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
@@ -41,6 +42,8 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core import validators
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.files import File
+from django.core.files.base import ContentFile
 from django.core.mail import send_mail
 from django.db import models, transaction
 from django.db.models import Exists, F, OuterRef, Q
@@ -54,6 +57,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from PIL import Image
 
 if TYPE_CHECKING:
+    from django.core.files.uploadedfile import UploadedFile
     from pydantic import NonNegativeInt
 
     from club.models import Club
@@ -1100,6 +1104,55 @@ class SithFile(models.Model):
 
     def get_download_url(self):
         return reverse("core:download", kwargs={"file_id": self.id})
+
+
+class QuickUploadImage(models.Model):
+    """Images uploaded by user outside of the SithFile mechanism"""
+
+    IMAGE_NAME_SIZE = 100
+    UUID_4_SIZE = 36
+
+    uuid = models.CharField(max_length=UUID_4_SIZE, blank=False, primary_key=True)
+    name = models.CharField(max_length=IMAGE_NAME_SIZE, blank=False)
+    image = models.ImageField(upload_to="upload")
+    content_type = models.CharField(max_length=50, blank=False)
+    uploader = models.ForeignKey(
+        "User",
+        related_name="quick_uploads",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    date = models.DateTimeField(_("date"), auto_now=True)
+
+    def __str__(self) -> str:
+        return f"{self.name}{Path(self.image.path).suffix}"
+
+    def get_absolute_url(self):
+        return reverse("core:uploaded_image", kwargs={"image_uuid": self.uuid})
+
+    @classmethod
+    def create_from_uploaded(
+        cls, image: UploadedFile, uploader: User | None = None
+    ) -> Self:
+        def convert_image(file: UploadedFile) -> ContentFile:
+            content = BytesIO()
+            Image.open(BytesIO(file.read())).save(
+                fp=content, format="webp", optimize=True
+            )
+            return ContentFile(content.getvalue())
+
+        identifier = str(uuid4())
+        name = Path(image.name).stem[: cls.IMAGE_NAME_SIZE - 1]
+        file = File(convert_image(image), name=f"{identifier}.webp")
+
+        return cls.objects.create(
+            uuid=identifier,
+            name=name,
+            image=file,
+            content_type="image/webp",
+            uploader=uploader,
+        )
 
 
 class LockError(Exception):

@@ -33,7 +33,7 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
       easymde.codemirror.replaceSelection("!");
 
       easymde.codemirror.setSelection({ line: cursor.line, ch: cursor.ch + 1 });
-      easymde.codemirror.replaceSelection(file.name.split(".").slice(0, -1).join("."));
+      easymde.codemirror.replaceSelection(response.data.name);
 
       // Move cursor at the end of the url and add a new line
       cursor = easymde.codemirror.getCursor();

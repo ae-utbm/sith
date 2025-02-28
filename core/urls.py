@@ -30,6 +30,7 @@ from core.converters import (
     FourDigitYearConverter,
     TwoDigitMonthConverter,
 )
+from core.models import QuickUploadImage
 from core.views import (
     FileDeleteView,
     FileEditPropView,
@@ -213,6 +214,16 @@ urlpatterns = [
         "file/<int:file_id>/moderate/", FileModerateView.as_view(), name="file_moderate"
     ),
     path("file/<int:file_id>/download/", send_file, name="download"),
+    path(
+        "file/<str:image_uuid>/uploads/",
+        lambda request, image_uuid: send_file(
+            request=request,
+            file_id=image_uuid,
+            file_class=QuickUploadImage,
+            file_attr="image",
+        ),
+        name="uploaded_image",
+    ),
     # Page views
     path("page/", PageListView.as_view(), name="page_list"),
     path("page/create/", PageCreateView.as_view(), name="page_new"),
