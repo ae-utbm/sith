@@ -337,7 +337,7 @@ class Screen(models.Model):
 
     def active_posters(self):
         now = timezone.now()
-        return self.posters.filter(d=True, date_begin__lte=now).filter(
+        return self.posters.filter(is_moderated=True, date_begin__lte=now).filter(
             Q(date_end__isnull=True) | Q(date_end__gte=now)
         )
 
