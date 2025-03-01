@@ -18,7 +18,13 @@ sith/search_indexes/
 .coverage
 coverage_report/
 node_modules/
+.env
 
 # compiled documentation
 site/
-.env
+
+### Redis ###
+
+# Ignore redis binary dump (dump.rdb) files
+
+*.rdb

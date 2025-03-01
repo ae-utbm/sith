@@ -10,6 +10,7 @@ on:
 env:
   SECRET_KEY: notTheRealOne
   DATABASE_URL: sqlite:///db.sqlite3
+  CACHE_URL: redis://127.0.0.1:6379/0
 
 jobs:
   pre-commit:
