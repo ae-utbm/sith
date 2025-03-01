@@ -4,7 +4,7 @@
 {% block content %}
   <div id="club_detail">
     {% if club.logo %}
-      <div class="club_logo"><img src="{{ club.logo.url }}" alt="{{ club.unix_name }}"></div>
+      <div class="club_logo"><img src="{{ club.logo.url }}" alt="{{ club.name }}"></div>
     {% endif %}
     {% if page_revision %}
       {{ page_revision|markdown }}

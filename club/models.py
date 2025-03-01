@@ -26,7 +26,6 @@ from __future__ import annotations
 from typing import Iterable, Self
 
 from django.conf import settings
-from django.core import validators
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import RegexValidator, validate_email
@@ -35,48 +34,43 @@ from django.db.models import Exists, F, OuterRef, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.text import slugify
 from django.utils.timezone import localdate
 from django.utils.translation import gettext_lazy as _
 
+from core.fields import ResizedImageField
 from core.models import Group, Notification, Page, SithFile, User
-
-# Create your models here.
-
-
-# This function prevents generating migration upon settings change
-def get_default_owner_group():
-    return settings.SITH_GROUP_ROOT_ID
 
 
 class Club(models.Model):
     """The Club class, made as a tree to allow nice tidy organization."""
 
-    id = models.AutoField(primary_key=True, db_index=True)
-    name = models.CharField(_("name"), max_length=64)
+    name = models.CharField(_("name"), unique=True, max_length=64)
     parent = models.ForeignKey(
         "Club", related_name="children", null=True, blank=True, on_delete=models.CASCADE
     )
-    unix_name = models.CharField(
-        _("unix name"),
-        max_length=30,
-        unique=True,
-        validators=[
-            validators.RegexValidator(
-                r"^[a-z0-9][a-z0-9._-]*[a-z0-9]$",
-                _(
-                    "Enter a valid unix name. This value may contain only "
-                    "letters, numbers ./-/_ characters."
-                ),
-            )
-        ],
-        error_messages={"unique": _("A club with that unix name already exists.")},
+    slug_name = models.SlugField(
+        _("slug name"), max_length=30, unique=True, editable=False
     )
-    logo = models.ImageField(
-        upload_to="club_logos", verbose_name=_("logo"), null=True, blank=True
+    logo = ResizedImageField(
+        upload_to="club_logos",
+        verbose_name=_("logo"),
+        null=True,
+        blank=True,
+        force_format="WEBP",
+        height=200,
+        width=200,
     )
     is_active = models.BooleanField(_("is active"), default=True)
     short_description = models.CharField(
-        _("short description"), max_length=1000, default="", blank=True, null=True
+        _("short description"),
+        max_length=1000,
+        default="",
+        blank=True,
+        help_text=_(
+            "A summary of what your club does. "
+            "This will be displayed on the club list page."
+        ),
     )
     address = models.CharField(_("address"), max_length=254)
     home = models.OneToOneField(
@@ -88,7 +82,7 @@ class Club(models.Model):
         on_delete=models.SET_NULL,
     )
     page = models.OneToOneField(
-        Page, related_name="club", blank=True, null=True, on_delete=models.CASCADE
+        Page, related_name="club", blank=True, on_delete=models.CASCADE
     )
     members_group = models.OneToOneField(
         Group, related_name="club", on_delete=models.PROTECT
@@ -98,7 +92,7 @@ class Club(models.Model):
     )
 
     class Meta:
-        ordering = ["name", "unix_name"]
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -106,10 +100,12 @@ class Club(models.Model):
     @transaction.atomic()
     def save(self, *args, **kwargs):
         creation = self._state.adding
+        if (slug := slugify(self.name)[:30]) != self.slug_name:
+            self.slug_name = slug
         if not creation:
             db_club = Club.objects.get(id=self.id)
-            if self.unix_name != db_club.unix_name:
-                self.home.name = self.unix_name
+            if self.name != db_club.name:
+                self.home.name = self.slug_name
                 self.home.save()
             if self.name != db_club.name:
                 self.board_group.name = f"{self.name} - Bureau"
@@ -123,11 +119,9 @@ class Club(models.Model):
             self.members_group = Group.objects.create(
                 name=f"{self.name} - Membres", is_manually_manageable=False
             )
-        super().save(*args, **kwargs)
-        if creation:
             self.make_home()
         self.make_page()
-        cache.set(f"sith_club_{self.unix_name}", self)
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse("club:club_view", kwargs={"club_id": self.id})
@@ -155,49 +149,37 @@ class Club(models.Model):
     def make_home(self) -> None:
         if self.home:
             return
-        home_root = SithFile.objects.filter(parent=None, name="clubs").first()
-        root = User.objects.filter(username="root").first()
-        if home_root and root:
-            home = SithFile(parent=home_root, name=self.unix_name, owner=root)
-            home.save()
-            self.home = home
-            self.save()
+        home_root = SithFile.objects.get(parent=None, name="clubs")
+        root = User.objects.get(id=settings.SITH_ROOT_USER_ID)
+        self.home = SithFile.objects.create(
+            parent=home_root, name=self.slug_name, owner=root
+        )
 
     def make_page(self) -> None:
-        root = User.objects.filter(username="root").first()
-        if not self.page:
-            club_root = Page.objects.filter(name=settings.SITH_CLUB_ROOT_PAGE).first()
-            if root and club_root:
-                public = Group.objects.filter(id=settings.SITH_GROUP_PUBLIC_ID).first()
-                p = Page(name=self.unix_name)
-                p.parent = club_root
-                p.save(force_lock=True)
-                if public:
-                    p.view_groups.add(public)
-                p.save(force_lock=True)
-                if self.parent and self.parent.page:
-                    p.parent = self.parent.page
-                self.page = p
-                self.save()
-        elif self.page and self.page.name != self.unix_name:
-            self.page.unset_lock()
-            self.page.name = self.unix_name
-            self.page.save(force_lock=True)
-        elif (
-            self.page
-            and self.parent
-            and self.parent.page
-            and self.page.parent != self.parent.page
-        ):
-            self.page.unset_lock()
+        page_name = self.slug_name
+        if not self.page_id:
+            # Club.page is a OneToOneField, so if we are inside this condition
+            # then self._meta.state.adding is True.
+            club_root = Page.objects.get(name=settings.SITH_CLUB_ROOT_PAGE)
+            public = Group.objects.get(id=settings.SITH_GROUP_PUBLIC_ID)
+            p = Page(name=page_name, parent=club_root)
+            p.save(force_lock=True)
+            p.view_groups.add(public)
+            if self.parent and self.parent.page_id:
+                p.parent_id = self.parent.page_id
+            self.page = p
+            return
+        self.page.unset_lock()
+        if self.page.name != page_name:
+            self.page.name = page_name
+        elif self.parent and self.parent.page and self.page.parent != self.parent.page:
             self.page.parent = self.parent.page
-            self.page.save(force_lock=True)
+        self.page.save(force_lock=True)
 
     def delete(self, *args, **kwargs) -> tuple[int, dict[str, int]]:
         # Invalidate the cache of this club and of its memberships
         for membership in self.members.ongoing().select_related("user"):
             cache.delete(f"membership_{self.id}_{membership.user.id}")
-        cache.delete(f"sith_club_{self.unix_name}")
         self.board_group.delete()
         self.members_group.delete()
         return super().delete(*args, **kwargs)

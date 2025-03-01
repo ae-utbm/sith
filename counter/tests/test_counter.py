@@ -783,7 +783,7 @@ class TestCounterStats(TestCase):
         s = Selling(
             label=barbar.name,
             product=barbar,
-            club=Club.objects.get(name=settings.SITH_MAIN_CLUB["name"]),
+            club=baker.make(Club),
             counter=cls.counter,
             unit_price=2,
             seller=cls.skia,

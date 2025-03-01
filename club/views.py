@@ -39,10 +39,16 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext as _t
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, ListView, TemplateView, View
+from django.views.generic import DetailView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from club.forms import ClubEditForm, ClubMemberForm, MailingForm, SellingsForm
+from club.forms import (
+    ClubAdminEditForm,
+    ClubEditForm,
+    ClubMemberForm,
+    MailingForm,
+    SellingsForm,
+)
 from club.models import Club, Mailing, MailingSubscription, Membership
 from com.views import (
     PosterCreateBaseView,
@@ -50,12 +56,7 @@ from com.views import (
     PosterEditBaseView,
     PosterListBaseView,
 )
-from core.auth.mixins import (
-    CanCreateMixin,
-    CanEditMixin,
-    CanEditPropMixin,
-    CanViewMixin,
-)
+from core.auth.mixins import CanCreateMixin, CanEditMixin, CanViewMixin
 from core.models import PageRev
 from core.views import DetailFormView, PageEditViewBase
 from core.views.mixins import TabedViewMixin
@@ -78,23 +79,23 @@ class ClubTabsMixin(TabedViewMixin):
             }
         ]
         if self.request.user.can_view(self.object):
-            tab_list.append(
-                {
-                    "url": reverse(
-                        "club:club_members", kwargs={"club_id": self.object.id}
-                    ),
-                    "slug": "members",
-                    "name": _("Members"),
-                }
-            )
-            tab_list.append(
-                {
-                    "url": reverse(
-                        "club:club_old_members", kwargs={"club_id": self.object.id}
-                    ),
-                    "slug": "elderlies",
-                    "name": _("Old members"),
-                }
+            tab_list.extend(
+                [
+                    {
+                        "url": reverse(
+                            "club:club_members", kwargs={"club_id": self.object.id}
+                        ),
+                        "slug": "members",
+                        "name": _("Members"),
+                    },
+                    {
+                        "url": reverse(
+                            "club:club_old_members", kwargs={"club_id": self.object.id}
+                        ),
+                        "slug": "elderlies",
+                        "name": _("Old members"),
+                    },
+                ]
             )
         if self.object.page:
             tab_list.append(
@@ -107,21 +108,23 @@ class ClubTabsMixin(TabedViewMixin):
                 }
             )
         if self.request.user.can_edit(self.object):
-            tab_list.append(
-                {
-                    "url": reverse("club:tools", kwargs={"club_id": self.object.id}),
-                    "slug": "tools",
-                    "name": _("Tools"),
-                }
-            )
-            tab_list.append(
-                {
-                    "url": reverse(
-                        "club:club_edit", kwargs={"club_id": self.object.id}
-                    ),
-                    "slug": "edit",
-                    "name": _("Edit"),
-                }
+            tab_list.extend(
+                [
+                    {
+                        "url": reverse(
+                            "club:tools", kwargs={"club_id": self.object.id}
+                        ),
+                        "slug": "tools",
+                        "name": _("Tools"),
+                    },
+                    {
+                        "url": reverse(
+                            "club:club_edit", kwargs={"club_id": self.object.id}
+                        ),
+                        "slug": "edit",
+                        "name": _("Edit"),
+                    },
+                ]
             )
             if self.object.page and self.request.user.can_edit(self.object.page):
                 tab_list.append(
@@ -134,40 +137,30 @@ class ClubTabsMixin(TabedViewMixin):
                         "name": _("Edit club page"),
                     }
                 )
-            tab_list.append(
-                {
-                    "url": reverse(
-                        "club:club_sellings", kwargs={"club_id": self.object.id}
-                    ),
-                    "slug": "sellings",
-                    "name": _("Sellings"),
-                }
-            )
-            tab_list.append(
-                {
-                    "url": reverse("club:mailing", kwargs={"club_id": self.object.id}),
-                    "slug": "mailing",
-                    "name": _("Mailing list"),
-                }
-            )
-            tab_list.append(
-                {
-                    "url": reverse(
-                        "club:poster_list", kwargs={"club_id": self.object.id}
-                    ),
-                    "slug": "posters",
-                    "name": _("Posters list"),
-                }
-            )
-        if self.request.user.is_owner(self.object):
-            tab_list.append(
-                {
-                    "url": reverse(
-                        "club:club_prop", kwargs={"club_id": self.object.id}
-                    ),
-                    "slug": "props",
-                    "name": _("Props"),
-                }
+            tab_list.extend(
+                [
+                    {
+                        "url": reverse(
+                            "club:club_sellings", kwargs={"club_id": self.object.id}
+                        ),
+                        "slug": "sellings",
+                        "name": _("Sellings"),
+                    },
+                    {
+                        "url": reverse(
+                            "club:mailing", kwargs={"club_id": self.object.id}
+                        ),
+                        "slug": "mailing",
+                        "name": _("Mailing list"),
+                    },
+                    {
+                        "url": reverse(
+                            "club:poster_list", kwargs={"club_id": self.object.id}
+                        ),
+                        "slug": "posters",
+                        "name": _("Posters list"),
+                    },
+                ]
             )
         return tab_list
 
@@ -189,8 +182,11 @@ class ClubView(ClubTabsMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        if self.object.page and self.object.page.revisions.exists():
-            kwargs["page_revision"] = self.object.page.revisions.last().content
+        kwargs["page_revision"] = (
+            PageRev.objects.filter(page_id=self.object.page_id)
+            .order_by("-date")
+            .first()
+        )
         return kwargs
 
 
@@ -452,23 +448,23 @@ class ClubSellingCSVView(ClubSellingView):
 
 
 class ClubEditView(ClubTabsMixin, CanEditMixin, UpdateView):
-    """Edit a Club's main informations (for the club's members)."""
+    """Edit a Club.
+
+    Regular club board members will be able to edit the main infos
+    (like the logo and the description).
+    Admins will also be able to edit the club properties
+    (like the name and the parent club).
+    """
 
     model = Club
     pk_url_kwarg = "club_id"
-    form_class = ClubEditForm
-    template_name = "core/edit.jinja"
+    template_name = "club/edit_club.jinja"
     current_tab = "edit"
 
-
-class ClubEditPropView(ClubTabsMixin, CanEditPropMixin, UpdateView):
-    """Edit the properties of a Club object (for the Sith admins)."""
-
-    model = Club
-    pk_url_kwarg = "club_id"
-    fields = ["name", "unix_name", "parent", "is_active"]
-    template_name = "core/edit.jinja"
-    current_tab = "props"
+    def get_form_class(self):
+        if self.object.is_owned_by(self.request.user):
+            return ClubAdminEditForm
+        return ClubEditForm
 
 
 class ClubCreateView(PermissionRequiredMixin, CreateView):
@@ -476,8 +472,8 @@ class ClubCreateView(PermissionRequiredMixin, CreateView):
 
     model = Club
     pk_url_kwarg = "club_id"
-    fields = ["name", "unix_name", "parent"]
-    template_name = "core/edit.jinja"
+    fields = ["name", "parent"]
+    template_name = "core/create.jinja"
     permission_required = "club.add_club"
 
 
@@ -522,15 +518,6 @@ class MembershipDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse_lazy("core:user_clubs", kwargs={"user_id": self.object.user.id})
 
 
-class ClubStatView(TemplateView):
-    template_name = "club/stats.jinja"
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["club_list"] = Club.objects.all()
-        return kwargs
-
-
 class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
     """A list of mailing for a given club."""
 
@@ -542,26 +529,19 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["club_id"] = self.get_object().id
+        kwargs["club_id"] = self.object.id
         kwargs["user_id"] = self.request.user.id
-        kwargs["mailings"] = self.mailings
+        kwargs["mailings"] = self.object.mailings.all()
         return kwargs
-
-    def dispatch(self, request, *args, **kwargs):
-        self.mailings = Mailing.objects.filter(club_id=self.get_object().id).all()
-        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["club"] = self.get_object()
+        mailings = list(self.object.mailings.all())
+        kwargs["club"] = self.object
         kwargs["user"] = self.request.user
-        kwargs["mailings"] = self.mailings
-        kwargs["mailings_moderated"] = (
-            kwargs["mailings"].exclude(is_moderated=False).all()
-        )
-        kwargs["mailings_not_moderated"] = (
-            kwargs["mailings"].exclude(is_moderated=True).all()
-        )
+        kwargs["mailings"] = mailings
+        kwargs["mailings_moderated"] = [m for m in mailings if m.is_moderated]
+        kwargs["mailings_not_moderated"] = [m for m in mailings if not m.is_moderated]
         kwargs["form_actions"] = {
             "NEW_MALING": self.form_class.ACTION_NEW_MAILING,
             "NEW_SUBSCRIPTION": self.form_class.ACTION_NEW_SUBSCRIPTION,
@@ -572,7 +552,7 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
     def add_new_mailing(self, cleaned_data) -> ValidationError | None:
         """Create a new mailing list from the form."""
         mailing = Mailing(
-            club=self.get_object(),
+            club=self.object,
             email=cleaned_data["mailing_email"],
             moderator=self.request.user,
             is_moderated=False,
@@ -649,7 +629,7 @@ class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         return resp
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy("club:mailing", kwargs={"club_id": self.get_object().id})
+        return reverse("club:mailing", kwargs={"club_id": self.object.id})
 
 
 class MailingDeleteView(CanEditMixin, DeleteView):
