@@ -56,12 +56,7 @@ from com.views import (
     PosterEditBaseView,
     PosterListBaseView,
 )
-from core.auth.mixins import (
-    CanCreateMixin,
-    CanEditMixin,
-    CanEditPropMixin,
-    CanViewMixin,
-)
+from core.auth.mixins import CanCreateMixin, CanEditMixin, CanViewMixin
 from core.models import PageRev
 from core.views import DetailFormView, PageEditViewBase
 from core.views.mixins import TabedViewMixin
@@ -113,21 +108,23 @@ class ClubTabsMixin(TabedViewMixin):
                 }
             )
         if self.request.user.can_edit(self.object):
-            tab_list.append(
-                {
-                    "url": reverse("club:tools", kwargs={"club_id": self.object.id}),
-                    "slug": "tools",
-                    "name": _("Tools"),
-                }
-            )
-            tab_list.append(
-                {
-                    "url": reverse(
-                        "club:club_edit", kwargs={"club_id": self.object.id}
-                    ),
-                    "slug": "edit",
-                    "name": _("Edit"),
-                }
+            tab_list.extend(
+                [
+                    {
+                        "url": reverse(
+                            "club:tools", kwargs={"club_id": self.object.id}
+                        ),
+                        "slug": "tools",
+                        "name": _("Tools"),
+                    },
+                    {
+                        "url": reverse(
+                            "club:club_edit", kwargs={"club_id": self.object.id}
+                        ),
+                        "slug": "edit",
+                        "name": _("Edit"),
+                    },
+                ]
             )
             if self.object.page and self.request.user.can_edit(self.object.page):
                 tab_list.append(
@@ -164,16 +161,6 @@ class ClubTabsMixin(TabedViewMixin):
                         "name": _("Posters list"),
                     },
                 ]
-            )
-        if self.request.user.is_owner(self.object):
-            tab_list.append(
-                {
-                    "url": reverse(
-                        "club:club_prop", kwargs={"club_id": self.object.id}
-                    ),
-                    "slug": "props",
-                    "name": _("Props"),
-                }
             )
         return tab_list
 
@@ -461,23 +448,23 @@ class ClubSellingCSVView(ClubSellingView):
 
 
 class ClubEditView(ClubTabsMixin, CanEditMixin, UpdateView):
-    """Edit a Club's main informations (for the club's members)."""
+    """Edit a Club.
+
+    Regular club board members will be able to edit the main infos
+    (like the logo and the description).
+    Admins will also be able to edit the club properties
+    (like the name and the parent club).
+    """
 
     model = Club
     pk_url_kwarg = "club_id"
-    form_class = ClubEditForm
-    template_name = "core/edit.jinja"
+    template_name = "club/edit_club.jinja"
     current_tab = "edit"
 
-
-class ClubEditPropView(ClubTabsMixin, CanEditPropMixin, UpdateView):
-    """Edit the properties of a Club object (for the Sith admins)."""
-
-    model = Club
-    pk_url_kwarg = "club_id"
-    fields = ["name", "parent", "is_active"]
-    template_name = "core/edit.jinja"
-    current_tab = "props"
+    def get_form_class(self):
+        if self.object.is_owned_by(self.request.user):
+            return ClubAdminEditForm
+        return ClubEditForm
 
 
 class ClubCreateView(PermissionRequiredMixin, CreateView):

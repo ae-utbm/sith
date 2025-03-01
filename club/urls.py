@@ -26,7 +26,6 @@ from django.urls import path
 
 from club.views import (
     ClubCreateView,
-    ClubEditPropView,
     ClubEditView,
     ClubListView,
     ClubMailingView,
@@ -70,7 +69,6 @@ urlpatterns = [
     path(
         "<int:club_id>/sellings/csv/", ClubSellingCSVView.as_view(), name="sellings_csv"
     ),
-    path("<int:club_id>/prop/", ClubEditPropView.as_view(), name="club_prop"),
     path("<int:club_id>/tools/", ClubToolsView.as_view(), name="tools"),
     path("<int:club_id>/mailing/", ClubMailingView.as_view(), name="mailing"),
     path(
