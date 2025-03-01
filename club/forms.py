@@ -34,13 +34,20 @@ from counter.models import Counter
 
 
 class ClubEditForm(forms.ModelForm):
+    error_css_class = "error"
+    required_css_class = "required"
+
     class Meta:
         model = Club
         fields = ["address", "logo", "short_description"]
+        widgets = {"short_description": forms.Textarea()}
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["short_description"].widget = forms.Textarea()
+
+class ClubAdminEditForm(ClubEditForm):
+    admin_fields = ["name", "parent", "is_active"]
+
+    class Meta(ClubEditForm.Meta):
+        fields = ["name", "parent", "is_active", *ClubEditForm.Meta.fields]
 
 
 class MailingForm(forms.Form):

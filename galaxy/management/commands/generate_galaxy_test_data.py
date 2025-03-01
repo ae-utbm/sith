@@ -130,8 +130,7 @@ class Command(BaseCommand):
         self.clubs = Club.objects.bulk_create(
             [
                 Club(
-                    unix_name=f"galaxy-club-{i}",
-                    name=f"club-{i}",
+                    name=f"galaxy-club-{i}",
                     board_group=Group.objects.create(name=f"board {i}"),
                     members_group=Group.objects.create(name=f"members {i}"),
                 )
