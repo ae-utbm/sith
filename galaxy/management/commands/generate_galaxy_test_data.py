@@ -86,7 +86,7 @@ class Command(BaseCommand):
         self.logger.info("The Galaxy is being populated by the Sith.")
 
         self.logger.info("Cleaning old Galaxy population")
-        Club.objects.filter(unix_name__startswith="galaxy-").delete()
+        Club.objects.filter(name__startswith="galaxy-").delete()
         Group.objects.filter(name__startswith="galaxy-").delete()
         Page.objects.filter(name__startswith="galaxy-").delete()
         User.objects.filter(username__startswith="galaxy-").delete()

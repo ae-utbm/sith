@@ -27,7 +27,6 @@ from club.forms import MailingForm
 from club.models import Club, Mailing, Membership
 from core.baker_recipes import subscriber_user
 from core.models import AnonymousUser, User
-from sith.settings import SITH_BAR_MANAGER, SITH_MAIN_CLUB_ID
 
 
 class TestClub(TestCase):
@@ -64,12 +63,8 @@ class TestClub(TestCase):
         # not subscribed
         cls.public = User.objects.get(username="public")
 
-        cls.ae = Club.objects.filter(pk=SITH_MAIN_CLUB_ID)[0]
-        cls.club = Club.objects.create(
-            name="Fake Club",
-            unix_name="fake-club",
-            address="5 rue de la République, 90000 Belfort",
-        )
+        cls.ae = Club.objects.get(pk=settings.SITH_MAIN_CLUB_ID)
+        cls.club = baker.make(Club)
         cls.members_url = reverse("club:club_members", kwargs={"club_id": cls.club.id})
         a_month_ago = now() - timedelta(days=30)
         yesterday = now() - timedelta(days=1)
@@ -579,13 +574,11 @@ class TestMailingForm(TestCase):
         cls.krophil = User.objects.get(username="krophil")
         cls.comunity = User.objects.get(username="comunity")
         cls.root = User.objects.get(username="root")
-        cls.bdf = Club.objects.get(unix_name=SITH_BAR_MANAGER["unix_name"])
-        cls.mail_url = reverse("club:mailing", kwargs={"club_id": cls.bdf.id})
-
-    def setUp(self):
+        cls.club = Club.objects.get(id=settings.SITH_PDF_CLUB_ID)
+        cls.mail_url = reverse("club:mailing", kwargs={"club_id": cls.club.id})
         Membership(
-            user=self.rbatsbak,
-            club=self.bdf,
+            user=cls.rbatsbak,
+            club=cls.club,
             start_date=timezone.now(),
             role=settings.SITH_CLUB_ROLES_ID["Board member"],
         ).save()
@@ -894,13 +887,13 @@ class TestClubSellingView(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.ae = Club.objects.get(unix_name="ae")
-        cls.skia = User.objects.get(username="skia")
+        cls.club = baker.make(Club)
+        cls.admin = baker.make(User, is_superuser=True)
 
     def test_page_not_internal_error(self):
         """Test that the page does not return and internal error."""
-        self.client.force_login(self.skia)
+        self.client.force_login(self.admin)
         response = self.client.get(
-            reverse("club:club_sellings", kwargs={"club_id": self.ae.id})
+            reverse("club:club_sellings", kwargs={"club_id": self.club.id})
         )
         assert response.status_code == 200

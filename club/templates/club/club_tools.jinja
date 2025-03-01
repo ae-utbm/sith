@@ -16,7 +16,7 @@
     </ul>
     <h4>{% trans %}Counters:{% endtrans %}</h4>
     <ul>
-      {% if object.unix_name == settings.SITH_LAUNDERETTE_MANAGER['unix_name'] %}
+      {% if object.id == settings.SITH_LAUNDERETTE_CLUB_ID %}
         {% for l in Launderette.objects.all() %}
           <li><a href="{{ url('launderette:main_click', launderette_id=l.id) }}">{{ l }}</a></li>
         {% endfor %}
@@ -37,7 +37,7 @@
         {% endfor %}
       </ul>
     {% endif %}
-    {% if object.unix_name == settings.SITH_LAUNDERETTE_MANAGER['unix_name'] %}
+    {% if object.id == settings.SITH_LAUNDERETTE_CLUB_ID %}
       <li><a href="{{ url('launderette:launderette_list') }}">{% trans %}Manage launderettes{% endtrans %}</a></li>
     {% endif %}
   </div>

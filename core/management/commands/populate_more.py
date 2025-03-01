@@ -64,12 +64,12 @@ class Command(BaseCommand):
             )
         )
         self.make_club(
-            Club.objects.get(unix_name="ae"),
+            Club.objects.get(id=settings.SITH_MAIN_CLUB_ID),
             random.sample(subscribers_now, k=min(30, len(subscribers_now))),
             random.sample(old_subscribers, k=min(60, len(old_subscribers))),
         )
         self.make_club(
-            Club.objects.get(unix_name="troll"),
+            Club.objects.get(name="Troll Penché"),
             random.sample(subscribers_now, k=min(20, len(subscribers_now))),
             random.sample(old_subscribers, k=min(80, len(old_subscribers))),
         )
@@ -235,7 +235,7 @@ class Command(BaseCommand):
         categories = list(
             ProductType.objects.filter(name__in=[c.name for c in categories])
         )
-        ae = Club.objects.get(unix_name="ae")
+        ae = Club.objects.get(id=settings.SITH_MAIN_CLUB_ID)
         other_clubs = random.sample(list(Club.objects.all()), k=3)
         groups = list(
             Group.objects.filter(name__in=["Subscribers", "Old subscribers", "Public"])

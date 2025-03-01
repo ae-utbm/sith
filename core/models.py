@@ -421,13 +421,9 @@ class User(AbstractUser):
     def is_launderette_manager(self):
         from club.models import Club
 
-        return (
-            Club.objects.filter(
-                unix_name=settings.SITH_LAUNDERETTE_MANAGER["unix_name"]
-            )
-            .first()
-            .get_membership_for(self)
-        )
+        return Club.objects.get(
+            id=settings.SITH_LAUNDERETTE_CLUB_ID
+        ).get_membership_for(self)
 
     @cached_property
     def is_banned_alcohol(self) -> bool:

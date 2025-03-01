@@ -19,8 +19,8 @@ from club.models import Club, Membership
 
 @admin.register(Club)
 class ClubAdmin(admin.ModelAdmin):
-    list_display = ("name", "unix_name", "parent", "is_active")
-    search_fields = ("name", "unix_name")
+    list_display = ("name", "slug_name", "parent", "is_active")
+    search_fields = ("name", "slug_name")
     autocomplete_fields = (
         "parent",
         "board_group",
