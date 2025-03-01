@@ -120,10 +120,7 @@ class Command(BaseCommand):
         club_root = SithFile.objects.create(name="clubs", owner=root)
         sas = SithFile.objects.create(name="SAS", owner=root)
         main_club = Club.objects.create(
-            id=1,
-            name=settings.SITH_MAIN_CLUB["name"],
-            unix_name=settings.SITH_MAIN_CLUB["unix_name"],
-            address=settings.SITH_MAIN_CLUB["address"],
+            id=1, name="AE", address="6 Boulevard Anatole France, 90000 Belfort"
         )
         main_club.board_group.permissions.add(
             *Permission.objects.filter(
@@ -131,16 +128,14 @@ class Command(BaseCommand):
             )
         )
         bar_club = Club.objects.create(
-            id=2,
-            name=settings.SITH_BAR_MANAGER["name"],
-            unix_name=settings.SITH_BAR_MANAGER["unix_name"],
-            address=settings.SITH_BAR_MANAGER["address"],
+            id=settings.SITH_PDF_CLUB_ID,
+            name="PdF",
+            address="6 Boulevard Anatole France, 90000 Belfort",
         )
         Club.objects.create(
-            id=84,
-            name=settings.SITH_LAUNDERETTE_MANAGER["name"],
-            unix_name=settings.SITH_LAUNDERETTE_MANAGER["unix_name"],
-            address=settings.SITH_LAUNDERETTE_MANAGER["address"],
+            id=settings.SITH_LAUNDERETTE_CLUB_ID,
+            name="Laverie",
+            address="6 Boulevard Anatole France, 90000 Belfort",
         )
 
         self.reset_index("club")
@@ -353,31 +348,17 @@ Welcome to the wiki page!
 
         # Clubs
         Club.objects.create(
-            name="Bibo'UT",
-            unix_name="bibout",
-            address="46 de la Boustifaille",
-            parent=main_club,
+            name="Bibo'UT", address="46 de la Boustifaille", parent=main_club
         )
         guyut = Club.objects.create(
-            name="Guy'UT",
-            unix_name="guyut",
-            address="42 de la Boustifaille",
-            parent=main_club,
+            name="Guy'UT", address="42 de la Boustifaille", parent=main_club
         )
-        Club.objects.create(
-            name="Woenzel'UT", unix_name="woenzel", address="Woenzel", parent=guyut
-        )
+        Club.objects.create(name="Woenzel'UT", address="Woenzel", parent=guyut)
         troll = Club.objects.create(
-            name="Troll Penché",
-            unix_name="troll",
-            address="Terre Du Milieu",
-            parent=main_club,
+            name="Troll Penché", address="Terre Du Milieu", parent=main_club
         )
         refound = Club.objects.create(
-            name="Carte AE",
-            unix_name="carte_ae",
-            address="Jamais imprimée",
-            parent=main_club,
+            name="Carte AE", address="Jamais imprimée", parent=main_club
         )
 
         Membership.objects.create(user=skia, club=main_club, role=3)

@@ -44,7 +44,6 @@ from core.fields import ResizedImageField
 from core.models import Group, Notification, User
 from core.utils import get_start_of_semester
 from counter.apps import PAYMENT_METHOD
-from sith.settings import SITH_MAIN_CLUB
 from subscription.models import Subscription
 
 
@@ -519,13 +518,6 @@ class Counter(models.Model):
             return reverse("eboutic:main")
         return reverse("counter:details", kwargs={"counter_id": self.id})
 
-    def __getattribute__(self, name: str):
-        if name == "edit_groups":
-            return Group.objects.filter(
-                name=self.club.unix_name + settings.SITH_BOARD_SUFFIX
-            ).all()
-        return object.__getattribute__(self, name)
-
     def is_owned_by(self, user: User) -> bool:
         if user.is_anonymous:
             return False
@@ -569,7 +561,7 @@ class Counter(models.Model):
         if self.type != "BAR":
             return False
         # at least one of the barmen is in the AE board
-        ae = Club.objects.get(unix_name=SITH_MAIN_CLUB["unix_name"])
+        ae = Club.objects.get(id=settings.SITH_MAIN_CLUB_ID)
         return any(ae.get_membership_for(barman) for barman in self.barmen_list)
 
     def get_top_barmen(self) -> QuerySet:

@@ -251,17 +251,7 @@ class UserTabsMixin(TabedViewMixin):
         if (
             hasattr(user, "customer")
             and user.customer
-            and (
-                user == self.request.user
-                or self.request.user.is_in_group(
-                    pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
-                )
-                or self.request.user.is_in_group(
-                    name=settings.SITH_BAR_MANAGER["unix_name"]
-                    + settings.SITH_BOARD_SUFFIX
-                )
-                or self.request.user.is_root
-            )
+            and (user == self.request.user or user.has_perm("counter.view_customer"))
         ):
             tab_list.append(
                 {
@@ -370,12 +360,7 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
             raise Http404
 
         if not (
-            profile == request.user
-            or request.user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-            or request.user.is_in_group(
-                name=settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
-            )
-            or request.user.is_root
+            profile == request.user or request.user.has_perm("counter.view_customer")
         ):
             raise PermissionDenied
 
@@ -599,14 +584,9 @@ class UserAccountBase(UserTabsMixin, DetailView):
     current_tab = "account"
     queryset = User.objects.select_related("customer")
 
-    def dispatch(self, request, *arg, **kwargs):  # Manually validates the rights
-        if (
-            kwargs.get("user_id") == request.user.id
-            or request.user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-            or request.user.is_in_group(
-                name=settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
-            )
-            or request.user.is_root
+    def dispatch(self, request, *arg, **kwargs):
+        if kwargs.get("user_id") == request.user.id or request.user.has_perm(
+            "counter.view_customer"
         ):
             return super().dispatch(request, *arg, **kwargs)
         raise PermissionDenied
