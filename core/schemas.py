@@ -10,7 +10,7 @@ from haystack.query import SearchQuerySet
 from ninja import FilterSchema, ModelSchema, Schema
 from pydantic import AliasChoices, Field
 
-from core.models import Group, SithFile, User
+from core.models import Group, QuickUploadImage, SithFile, User
 
 
 class SimpleUserSchema(ModelSchema):
@@ -45,6 +45,33 @@ class UserProfileSchema(ModelSchema):
         if obj.profile_pict_id is None:
             return staticfiles_storage.url("core/img/unknown.jpg")
         return reverse("core:download", kwargs={"file_id": obj.profile_pict_id})
+
+
+class UploadedFileSchema(ModelSchema):
+    class Meta:
+        model = QuickUploadImage
+        fields = ["id", "name", "content_type"]
+
+    width: int
+    height: int
+    size: int
+    href: str
+
+    @staticmethod
+    def resolve_width(obj: QuickUploadImage):
+        return obj.image.width
+
+    @staticmethod
+    def resolve_height(obj: QuickUploadImage):
+        return obj.image.height
+
+    @staticmethod
+    def resolve_size(obj: QuickUploadImage):
+        return obj.image.size
+
+    @staticmethod
+    def resolve_href(obj: QuickUploadImage) -> str:
+        return reverse("core:uploaded_image", kwargs={"image_id": obj.id})
 
 
 class SithFileSchema(ModelSchema):
