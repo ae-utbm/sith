@@ -1,0 +1,49 @@
+{% extends 'core/base.jinja' %}
+
+{%- block additional_css -%}
+  <link rel="stylesheet" href="{{ static('timetable/css/generator.scss') }}">
+{%- endblock -%}
+
+{%- block additional_js -%}
+  <script type="module" src="{{ static('bundled/timetable/generator-index.ts') }}"></script>
+{%- endblock -%}
+
+{% block title %}
+  {% trans %}Timeplan generator{% endtrans %}
+{% endblock %}
+
+{% block content %}
+  <div x-data="timetableGenerator">
+    <form @submit.prevent="generate()">
+      <h1>Générateur d'emploi du temps</h1>
+      <div class="alert alert-red" x-show="!!error" x-cloak>
+        <p class="alert-main" x-text="error"></p>
+      </div>
+      <div class="form-group">
+        <label for="timetable-input">Colle ton emploi du temps (sans l'entête)</label>
+        <textarea id="timetable-input" cols="30" rows="15" x-model="content"></textarea>
+      </div>
+      <input type="submit" class="btn btn-blue" value="{% trans %}Generate{% endtrans %}">
+    </form>
+    <div
+      id="timetable"
+      x-show="table.height > 0 && table.width > 0"
+      :style="{width: `${table.width}px`, height: `${table.height}px`}"
+    >
+      <div class="header">
+        <template x-for="weekday in displayedWeekdays">
+          <span x-text="weekday"></span>
+        </template>
+      </div>
+      <div class="content">
+        <template x-for="course in courses">
+          <div class="slot" :style="getStyle(course)">
+            <span x-text="`${course.ueCode} (${course.courseType})`"></span>
+            <span x-text="`${course.startHour} - ${course.endHour}`"></span>
+            <span x-text="course.room"></span>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
