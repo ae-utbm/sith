@@ -6,7 +6,7 @@
   "scripts": {
     "compile": "vite build --mode production",
     "compile-dev": "vite build --mode development",
-    "serve": "vite build --mode development --watch",
+    "serve": "vite build --mode development --watch --minify false",
     "analyse-dev": "vite-bundle-visualizer --mode development",
     "analyse-prod": "vite-bundle-visualizer --mode production",
     "check": "biome check --write"
