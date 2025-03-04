@@ -9,30 +9,37 @@ import psutil
 from sith import settings
 
 
-def get_pid() -> int | None:
+def get_pid_file(procfile: Path) -> Path:
+    """Get the PID file associated with a procfile"""
+    return settings.BASE_DIR / procfile.with_suffix(f"{procfile.suffix}.pid")
+
+
+def get_pid(procfile: Path) -> int | None:
     """Read the PID file to get the currently running composer if it exists"""
-    if not settings.COMPOSER_PID_PATH.exists():
+    file = get_pid_file(procfile)
+    if not file.exists():
         return None
-    with open(settings.COMPOSER_PID_PATH, "r", encoding="utf8") as f:
+    with open(file, "r", encoding="utf8") as f:
         return int(f.read())
 
 
-def write_pid(pid: int):
+def write_pid(procfile: Path, pid: int):
     """Write currently running composer pid in PID file"""
-    if not settings.COMPOSER_PID_PATH.exists():
-        settings.COMPOSER_PID_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with open(settings.COMPOSER_PID_PATH, "w", encoding="utf8") as f:
+    file = get_pid_file(procfile)
+    if not file.exists():
+        file.parent.mkdir(parents=True, exist_ok=True)
+    with open(file, "w", encoding="utf8") as f:
         _ = f.write(str(pid))
 
 
-def delete_pid():
+def delete_pid(procfile: Path):
     """Delete PID file for cleanup"""
-    settings.COMPOSER_PID_PATH.unlink(missing_ok=True)
+    get_pid_file(procfile).unlink(missing_ok=True)
 
 
-def is_composer_running() -> bool:
+def is_composer_running(procfile: Path) -> bool:
     """Check if the process in the PID file is running"""
-    pid = get_pid()
+    pid = get_pid(procfile)
     if pid is None:
         return False
     try:
@@ -45,25 +52,29 @@ def start_composer(procfile: Path):
     """Starts the composer and stores the PID as an environment variable
     This allows for running smoothly with the django reloader
     """
-    if is_composer_running():
-        logging.info(f"Composer is already running with pid {get_pid()}")
+    if is_composer_running(procfile):
         logging.info(
-            f"If this is a mistake, please delete {settings.COMPOSER_PID_PATH} and restart the process"
+            f"Composer for {procfile} is already running with pid {get_pid(procfile)}"
+        )
+        logging.info(
+            f"If this is a mistake, please delete {get_pid_file(procfile)} and restart the process"
         )
         return
     process = subprocess.Popen(
         [sys.executable, "-m", "honcho", "-f", str(procfile), "start"],
     )
-    write_pid(process.pid)
+    write_pid(procfile, process.pid)
 
 
-def stop_composer():
+def stop_composer(procfile: Path):
     """Stops the composer if it was started before"""
-    if is_composer_running():
-        process = psutil.Process(get_pid())
+    if is_composer_running(procfile):
+        process = psutil.Process(get_pid(procfile))
         if process.parent() != psutil.Process():
-            logging.info("Currently running composer is controlled by another process")
+            logging.info(
+                f"Currently running composer for {procfile} is controlled by another process"
+            )
             return
         process.send_signal(signal.SIGTERM)
         _ = process.wait()
-        delete_pid()
+        delete_pid(procfile)

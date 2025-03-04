@@ -64,11 +64,8 @@ def optional_file_parser(value: str) -> Path | None:
 BASE_DIR = Path(__file__).parent.parent.resolve()
 
 # Composer settings
-PROCFILE_FULL = env.optional_file("PROCFILE_FULL", None)
-PROCFILE_MINIMAL = env.optional_file("PROCFILE_MINIMAL", None)
-
-## File path used to avoid running the composer multiple times at the same time
-COMPOSER_PID_PATH = env.path("COMPOSER_PID_PATH", BASE_DIR / "composer.pid")
+PROCFILE_STATIC = env.optional_file("PROCFILE_STATIC", None)
+PROCFILE_SERVICE = env.optional_file("PROCFILE_SERVICE", None)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/

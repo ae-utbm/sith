@@ -1,2 +1,0 @@
-bundler: npm run serve
-redis: redis-server --port $REDIS_PORT

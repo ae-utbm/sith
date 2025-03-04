@@ -88,15 +88,15 @@ tous ces services sont déjà configurés.
 Pour désactiver Honcho il suffit de ne sélectionner aucun `PROCFILE_` dans la config.
 
 ```dotenv
-PROCFILE_FULL=
-PROCFILE_MINIMAL=
+PROCFILE_STATIC=
+PROCFILE_SERVICE=
 ```
 
 !!! note
 
-    Si honcho ne tourne plus, la recompilation automatique
+    Si `PROCFILE_STATIC` est désactivé, la recompilation automatique
     des fichiers statiques ne se fait plus.
-    Si vous en avez besoin et que vous travaillez sans honcho,
+    Si vous en avez besoin et que vous travaillez sans `PROCFILE_STATIC`,
     vous devez ouvrir une autre fenêtre de votre terminal
     et lancer la commande `npm run serve`
 

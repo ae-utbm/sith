@@ -3,7 +3,7 @@ import atexit
 import pytest
 
 from .composer import start_composer, stop_composer
-from .settings import PROCFILE_MINIMAL
+from .settings import PROCFILE_SERVICE
 
 # it's the first hook loaded by pytest and can only
 # be defined in a proper pytest plugin
@@ -15,6 +15,6 @@ from .settings import PROCFILE_MINIMAL
 @pytest.hookimpl(tryfirst=True)
 def pytest_load_initial_conftests(early_config, parser, args):
     """Hook that loads the composer before the pytest-django plugin"""
-    if PROCFILE_MINIMAL is not None:
-        start_composer(PROCFILE_MINIMAL)
-        _ = atexit.register(stop_composer)
+    if PROCFILE_SERVICE is not None:
+        start_composer(PROCFILE_SERVICE)
+        _ = atexit.register(stop_composer, procfile=PROCFILE_SERVICE)

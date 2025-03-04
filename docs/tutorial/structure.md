@@ -82,8 +82,8 @@ sith/
 ├── pyproject.toml (31)
 ├── .venv/ (32)
 ├── .python-version (33)
-├── Procfile.full (34)
-├── Procfile.minimal (35)
+├── Procfile.static (34)
+├── Procfile.service (35)
 └── README.md
 ```
 </div>
@@ -142,10 +142,10 @@ sith/
     de certaines d'entre elles.
 32. Dossier d'environnement virtuel généré par uv
 33. Fichier qui contrôle quelle version de python utiliser pour le projet
-34. Fichier qui contrôle les services additionnels à lancer
-    avec le serveur de développement. Serveurs + gestion des statics.
-35. Fichier qui contrôle les services additionnels à lancer
-    avec les autres commandes (pytest, shell…). Serveurs uniquement.
+34. Fichier qui contrôle les commandes à lancer pour gérer la compilation
+    automatique des static et autres services nécessaires à la command runserver.
+35. Fichier qui contrôle les services tiers nécessaires au fonctionnement
+    du Sith tel que redis.
 
 ## L'application principale
 
