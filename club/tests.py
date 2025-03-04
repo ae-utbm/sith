@@ -14,14 +14,16 @@
 #
 from datetime import timedelta
 
+import pytest
 from django.conf import settings
 from django.core.cache import cache
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.timezone import localdate, localtime, now
 from django.utils.translation import gettext as _
 from model_bakery import baker
+from pytest_django.asserts import assertRedirects
 
 from club.forms import MailingForm
 from club.models import Club, Mailing, Membership
@@ -897,3 +899,22 @@ class TestClubSellingView(TestCase):
             reverse("club:club_sellings", kwargs={"club_id": self.club.id})
         )
         assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_club_board_member_cannot_edit_club_properties(client: Client):
+    user = subscriber_user.make()
+    club = baker.make(Club, name="old name", is_active=True, address="old address")
+    baker.make(Membership, club=club, user=user, role=7)
+    client.force_login(user)
+    res = client.post(
+        reverse("club:club_edit", kwargs={"club_id": club.id}),
+        {"name": "new name", "is_active": False, "address": "new address"},
+    )
+    # The request should success,
+    # but admin-only fields shouldn't be taken into account
+    assertRedirects(res, club.get_absolute_url())
+    club.refresh_from_db()
+    assert club.name == "old name"
+    assert club.is_active
+    assert club.address == "new address"
