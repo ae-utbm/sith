@@ -21,7 +21,7 @@ import sys
 from django.utils.autoreload import DJANGO_AUTORELOAD_ENV
 
 from sith.composer import start_composer, stop_composer
-from sith.settings import PROCFILE_RUNSERVER
+from sith.settings import PROCFILE_FULL, PROCFILE_MINIMAL
 
 if __name__ == "__main__":
     logging.basicConfig(encoding="utf-8", level=logging.INFO)
@@ -30,8 +30,9 @@ if __name__ == "__main__":
 
     from django.core.management import execute_from_command_line
 
-    if os.environ.get(DJANGO_AUTORELOAD_ENV) is None and PROCFILE_RUNSERVER is not None:
-        start_composer(PROCFILE_RUNSERVER)
+    procfile = PROCFILE_FULL if sys.argv[1] == "runserver" else PROCFILE_MINIMAL
+    if os.environ.get(DJANGO_AUTORELOAD_ENV) is None and procfile is not None:
+        start_composer(procfile)
         _ = atexit.register(stop_composer)
 
     execute_from_command_line(sys.argv)

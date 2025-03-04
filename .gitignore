@@ -19,6 +19,7 @@ sith/search_indexes/
 coverage_report/
 node_modules/
 .env
+*.pid
 
 # compiled documentation
 site/

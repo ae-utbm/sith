@@ -88,8 +88,8 @@ tous ces services sont déjà configurés.
 Pour désactiver Honcho il suffit de ne sélectionner aucun `PROCFILE_` dans la config.
 
 ```dotenv
-PROCFILE_RUNSERVER=
-PROCFILE_PYTEST=
+PROCFILE_FULL=
+PROCFILE_MINIMAL=
 ```
 
 !!! note
