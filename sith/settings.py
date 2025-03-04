@@ -50,7 +50,22 @@ from .honeypot import custom_honeypot_error
 env = Env()
 env.read_env()
 
+
+@env.parser_for("optional_file")
+def optional_file_parser(value: str) -> Path | None:
+    if not value:
+        return None
+    path = Path(value)
+    if not path.is_file():
+        return None
+    return path
+
+
 BASE_DIR = Path(__file__).parent.parent.resolve()
+
+# Composer settings
+PROCFILE_STATIC = env.optional_file("PROCFILE_STATIC", None)
+PROCFILE_SERVICE = env.optional_file("PROCFILE_SERVICE", None)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -219,8 +234,7 @@ DATABASES = {
     "default": env.dj_db_url("DATABASE_URL", conn_max_age=None, conn_health_checks=True)
 }
 
-if "CACHE_URL" in os.environ:
-    CACHES = {"default": env.dj_cache_url("CACHE_URL")}
+CACHES = {"default": env.dj_cache_url("CACHE_URL")}
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 

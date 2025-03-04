@@ -1,0 +1,1 @@
+bundler: npm run serve

@@ -1,3 +1,4 @@
+import atexit
 import os
 
 from django.conf import settings
@@ -6,19 +7,19 @@ from django.contrib.staticfiles.management.commands.runserver import (
 )
 from django.utils.autoreload import DJANGO_AUTORELOAD_ENV
 
-from staticfiles.processors import JSBundler, OpenApi
+from sith.composer import start_composer, stop_composer
+from staticfiles.processors import OpenApi
 
 
 class Command(Runserver):
     """Light wrapper around default runserver that integrates javascirpt auto bundling."""
 
     def run(self, **options):
-        # OpenApi generation needs to be before the bundler
         OpenApi.compile()
-        # Only run the bundling server when debug is enabled
-        # Also protects from re-launching the server if django reloads it
-        if os.environ.get(DJANGO_AUTORELOAD_ENV) is None and settings.DEBUG:
-            with JSBundler.runserver():
-                super().run(**options)
-                return
+        if (
+            os.environ.get(DJANGO_AUTORELOAD_ENV) is None
+            and settings.PROCFILE_STATIC is not None
+        ):
+            start_composer(settings.PROCFILE_STATIC)
+            _ = atexit.register(stop_composer, procfile=settings.PROCFILE_STATIC)
         super().run(**options)

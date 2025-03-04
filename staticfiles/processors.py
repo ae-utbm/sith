@@ -100,12 +100,6 @@ class JSBundler:
             raise RuntimeError(f"Bundler failed with returncode {process.returncode}")
 
     @staticmethod
-    def runserver() -> subprocess.Popen:
-        """Bundle js files automatically in background when called in debug mode."""
-        logging.getLogger("django").info("Running javascript bundling server")
-        return subprocess.Popen(["npm", "run", "serve"])
-
-    @staticmethod
     def get_manifest() -> JSBundlerManifest:
         return JSBundlerManifest(BUNDLED_ROOT / ".vite" / "manifest.json")
 
