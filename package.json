@@ -14,7 +14,9 @@
   "keywords": [],
   "author": "",
   "license": "GPL-3.0-only",
-  "sideEffects": [".css"],
+  "sideEffects": [
+    ".css"
+  ],
   "imports": {
     "#openapi": "./staticfiles/generated/openapi/index.ts",
     "#core:*": "./core/static/bundled/*",
@@ -48,6 +50,7 @@
     "3d-force-graph": "^1.73.4",
     "alpinejs": "^3.14.7",
     "chart.js": "^4.4.4",
+    "country-flag-emoji-polyfill": "^0.1.8",
     "cytoscape": "^3.30.2",
     "cytoscape-cxtmenu": "^3.5.0",
     "cytoscape-klay": "^3.1.4",
