@@ -1,6 +1,7 @@
 import { paginated } from "#core:utils/api";
 import { History, initialUrlParams, updateQueryString } from "#core:utils/history";
 import {
+  type AlbumFetchAlbumData,
   type AlbumSchema,
   type PictureSchema,
   type PicturesFetchPicturesData,
@@ -77,7 +78,7 @@ document.addEventListener("alpine:init", () => {
       this.albums = await paginated(albumFetchAlbum, {
         // biome-ignore lint/style/useNamingConvention: API is snake_case
         query: { parent_id: this.config.parentId },
-      });
+      } as AlbumFetchAlbumData);
       this.loading = false;
     },
   }));

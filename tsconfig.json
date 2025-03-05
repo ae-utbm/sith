@@ -3,8 +3,8 @@
     "outDir": "./staticfiles/generated/bundled/",
     "sourceMap": true,
     "noImplicitAny": true,
-    "module": "es6",
-    "target": "es6",
+    "module": "esnext",
+    "target": "es2022",
     "allowJs": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
@@ -12,7 +12,6 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "types": ["jquery", "alpinejs"],
-    "lib": ["es7"],
     "paths": {
       "#openapi": ["./staticfiles/generated/openapi/client/index.ts"],
       "#core:*": ["./core/static/bundled/*"],

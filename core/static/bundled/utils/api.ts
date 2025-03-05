@@ -1,4 +1,4 @@
-import type { Client, Options, RequestResult } from "@hey-api/client-fetch";
+import type { Client, Options, RequestResult, TDataShape } from "@hey-api/client-fetch";
 import { client } from "#openapi";
 
 export interface PaginatedResponse<T> {
@@ -14,6 +14,7 @@ export interface PaginatedRequest {
     // biome-ignore lint/style/useNamingConvention: api is in snake_case
     page_size?: number;
   };
+  url: string;
 }
 
 type PaginatedEndpoint<T> = <ThrowOnError extends boolean = false>(
@@ -30,7 +31,7 @@ export const paginated = async <T>(
   options?: PaginatedRequest,
 ): Promise<T[]> => {
   const maxPerPage = 199;
-  const queryParams = options ?? {};
+  const queryParams = options ?? ({} as PaginatedRequest);
   queryParams.query = queryParams.query ?? {};
   queryParams.query.page_size = maxPerPage;
   queryParams.query.page = 1;
@@ -53,8 +54,9 @@ export const paginated = async <T>(
   return results;
 };
 
-interface Request {
+interface Request extends TDataShape {
   client?: Client;
+  url: string;
 }
 
 interface InterceptorOptions {
