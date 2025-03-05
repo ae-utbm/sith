@@ -14,6 +14,7 @@ export interface PaginatedRequest {
     // biome-ignore lint/style/useNamingConvention: api is in snake_case
     page_size?: number;
   };
+  url: string;
 }
 
 type PaginatedEndpoint<T> = <ThrowOnError extends boolean = false>(
@@ -30,7 +31,7 @@ export const paginated = async <T>(
   options?: PaginatedRequest,
 ): Promise<T[]> => {
   const maxPerPage = 199;
-  const queryParams = options ?? {};
+  const queryParams = options ?? ({} as PaginatedRequest);
   queryParams.query = queryParams.query ?? {};
   queryParams.query.page_size = maxPerPage;
   queryParams.query.page = 1;
@@ -55,6 +56,7 @@ export const paginated = async <T>(
 
 interface Request {
   client?: Client;
+  url: string;
 }
 
 interface InterceptorOptions {
