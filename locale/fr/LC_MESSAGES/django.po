@@ -3474,10 +3474,6 @@ msgid "account id"
 msgstr "numéro de compte"
 
 #: counter/models.py
-msgid "recorded product"
-msgstr "produits consignés"
-
-#: counter/models.py
 msgid "customer"
 msgstr "client"
 
@@ -3721,6 +3717,30 @@ msgstr "carte étudiante"
 #: counter/models.py
 msgid "student cards"
 msgstr "cartes étudiantes"
+
+#: counter/models.py
+msgid "returnable product"
+msgstr "produit consigné"
+
+#: counter/models.py
+msgid "returned product"
+msgstr "produits déconsignés"
+
+#: counter/models.py
+msgid "maximum returns"
+msgstr "nombre de déconsignes maximum"
+
+#: counter/models.py
+msgid ""
+"The maximum number of items a customer can return without having actually "
+"bought them."
+msgstr ""
+"Le nombre maximum d'articles qu'un client peut déconsigner sans les avoir "
+"acheté."
+
+#: counter/models.py
+msgid "returnable products"
+msgstr "produits consignés"
 
 #: counter/templates/counter/activity.jinja
 #, python-format
@@ -4174,12 +4194,20 @@ msgid "The selected product isn't available for this user"
 msgstr "Le produit sélectionné n'est pas disponnible pour cet utilisateur"
 
 #: counter/views/click.py
-msgid "Submmited basket is invalid"
+msgid "Submitted basket is invalid"
 msgstr "Le panier envoyé est invalide"
 
 #: counter/views/click.py
-msgid "This user have reached his recording limit"
-msgstr "Cet utilisateur a atteint sa limite de déconsigne"
+msgid "Duplicated product entries."
+msgstr "Saisie de produit dupliquée"
+
+#: counter/views/click.py
+#, python-format
+msgid ""
+"This user have reached his recording limit for the following products : %s"
+msgstr ""
+"Cet utilisateur a atteint sa limite de déconsigne pour les produits "
+"suivants : %s"
 
 #: counter/views/eticket.py
 msgid "people(s)"

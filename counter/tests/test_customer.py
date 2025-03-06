@@ -14,12 +14,13 @@ from model_bakery import baker
 from club.models import Membership
 from core.baker_recipes import board_user, subscriber_user
 from core.models import User
-from counter.baker_recipes import refill_recipe, sale_recipe
+from counter.baker_recipes import product_recipe, refill_recipe, sale_recipe
 from counter.models import (
     BillingInfo,
     Counter,
     Customer,
     Refilling,
+    ReturnableProduct,
     Selling,
     StudentCard,
 )
@@ -482,3 +483,31 @@ def test_update_balance():
     for customer, amount in zip(customers, [40, 10, 20, 40, 0], strict=False):
         customer.refresh_from_db()
         assert customer.amount == amount
+
+
+@pytest.mark.django_db
+def test_update_returnable_balance():
+    ReturnableProduct.objects.all().delete()
+    customer = baker.make(Customer)
+    products = product_recipe.make(selling_price=0, _quantity=4, _bulk_create=True)
+    returnables = [
+        baker.make(
+            ReturnableProduct, product=products[0], returned_product=products[1]
+        ),
+        baker.make(
+            ReturnableProduct, product=products[2], returned_product=products[3]
+        ),
+    ]
+    balance_qs = ReturnableProduct.objects.annotate_balance_for(customer)
+    assert not customer.return_balances.exists()
+    assert list(balance_qs.values_list("balance", flat=True)) == [0, 0]
+
+    sale_recipe.make(customer=customer, product=products[0], unit_price=0, quantity=5)
+    sale_recipe.make(customer=customer, product=products[2], unit_price=0, quantity=1)
+    sale_recipe.make(customer=customer, product=products[3], unit_price=0, quantity=3)
+    customer.update_returnable_balance()
+    assert list(customer.return_balances.values("returnable_id", "balance")) == [
+        {"returnable_id": returnables[0].id, "balance": 5},
+        {"returnable_id": returnables[1].id, "balance": -2},
+    ]
+    assert set(balance_qs.values_list("balance", flat=True)) == {-2, 5}

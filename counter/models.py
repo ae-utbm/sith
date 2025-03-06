@@ -21,7 +21,7 @@ import string
 from datetime import date, datetime, timedelta
 from datetime import timezone as tz
 from decimal import Decimal
-from typing import Self
+from typing import Literal, Self
 
 from dict2xml import dict2xml
 from django.conf import settings
@@ -93,7 +93,6 @@ class Customer(models.Model):
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     account_id = models.CharField(_("account id"), max_length=10, unique=True)
     amount = CurrencyField(_("amount"), default=0)
-    recorded_products = models.IntegerField(_("recorded product"), default=0)
 
     objects = CustomerQuerySet.as_manager()
 
@@ -105,24 +104,50 @@ class Customer(models.Model):
     def __str__(self):
         return "%s - %s" % (self.user.username, self.account_id)
 
-    def save(self, *args, allow_negative=False, is_selling=False, **kwargs):
+    def save(self, *args, allow_negative=False, **kwargs):
         """is_selling : tell if the current action is a selling
         allow_negative : ignored if not a selling. Allow a selling to put the account in negative
         Those two parameters avoid blocking the save method of a customer if his account is negative.
         """
-        if self.amount < 0 and (is_selling and not allow_negative):
+        if self.amount < 0 and not allow_negative:
             raise ValidationError(_("Not enough money"))
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse("core:user_account", kwargs={"user_id": self.user.pk})
 
-    @property
-    def can_record(self):
-        return self.recorded_products > -settings.SITH_ECOCUP_LIMIT
+    def update_returnable_balance(self):
+        """Update all returnable balances of this user to their real amount."""
 
-    def can_record_more(self, number):
-        return self.recorded_products - number >= -settings.SITH_ECOCUP_LIMIT
+        def purchases_qs(outer_ref: Literal["product_id", "returned_product_id"]):
+            return (
+                Selling.objects.filter(customer=self, product=OuterRef(outer_ref))
+                .values("product")
+                .annotate(quantity=Sum("quantity", default=0))
+                .values("quantity")
+            )
+
+        balances = (
+            ReturnableProduct.objects.annotate_balance_for(self)
+            .annotate(
+                nb_cons=Coalesce(Subquery(purchases_qs("product_id")), 0),
+                nb_dcons=Coalesce(Subquery(purchases_qs("returned_product_id")), 0),
+            )
+            .annotate(new_balance=F("nb_cons") - F("nb_dcons"))
+            .values("id", "new_balance")
+        )
+        updated_balances = [
+            ReturnableProductBalance(
+                customer=self, returnable_id=b["id"], balance=b["new_balance"]
+            )
+            for b in balances
+        ]
+        ReturnableProductBalance.objects.bulk_create(
+            updated_balances,
+            update_conflicts=True,
+            update_fields=["balance"],
+            unique_fields=["customer", "returnable"],
+        )
 
     @property
     def can_buy(self) -> bool:
@@ -377,14 +402,6 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse("counter:product_list")
-
-    @property
-    def is_record_product(self):
-        return self.id == settings.SITH_ECOCUP_CONS
-
-    @property
-    def is_unrecord_product(self):
-        return self.id == settings.SITH_ECOCUP_DECO
 
     def is_owned_by(self, user):
         """Method to see if that object can be edited by the given user."""
@@ -859,7 +876,7 @@ class Selling(models.Model):
         self.full_clean()
         if not self.is_validated:
             self.customer.amount -= self.quantity * self.unit_price
-            self.customer.save(allow_negative=allow_negative, is_selling=True)
+            self.customer.save(allow_negative=allow_negative)
             self.is_validated = True
         user = self.customer.user
         if user.was_subscribed:
@@ -944,6 +961,7 @@ class Selling(models.Model):
             self.customer.amount += self.quantity * self.unit_price
             self.customer.save()
         super().delete(*args, **kwargs)
+        self.customer.update_returnable_balance()
 
     def send_mail_customer(self):
         event = self.product.eticket.event_title or _("Unknown event")
@@ -1210,3 +1228,134 @@ class StudentCard(models.Model):
         if isinstance(obj, User):
             return StudentCard.can_create(self.customer, obj)
         return False
+
+
+class ReturnableProductQuerySet(models.QuerySet):
+    def annotate_balance_for(self, customer: Customer):
+        return self.annotate(
+            balance=Coalesce(
+                Subquery(
+                    ReturnableProductBalance.objects.filter(
+                        returnable=OuterRef("pk"), customer=customer
+                    ).values("balance")
+                ),
+                0,
+            )
+        )
+
+
+class ReturnableProduct(models.Model):
+    """A returnable relation between two products (*consigne/déconsigne*)."""
+
+    product = models.OneToOneField(
+        to=Product,
+        on_delete=models.CASCADE,
+        related_name="cons",
+        verbose_name=_("returnable product"),
+    )
+    returned_product = models.OneToOneField(
+        to=Product,
+        on_delete=models.CASCADE,
+        related_name="dcons",
+        verbose_name=_("returned product"),
+    )
+    max_return = models.PositiveSmallIntegerField(
+        _("maximum returns"),
+        default=0,
+        help_text=_(
+            "The maximum number of items a customer can return "
+            "without having actually bought them."
+        ),
+    )
+
+    objects = ReturnableProductQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("returnable product")
+        verbose_name_plural = _("returnable products")
+        constraints = [
+            models.CheckConstraint(
+                check=~Q(product=F("returned_product")),
+                name="returnableproduct_product_different_from_returned",
+                violation_error_message=_(
+                    "The returnable product cannot be the same as the returned one"
+                ),
+            )
+        ]
+
+    def __str__(self):
+        return f"returnable product ({self.product_id} -> {self.returned_product_id})"
+
+    def update_balances(self):
+        """Update all returnable balances linked to this object.
+
+        Call this when a ReturnableProduct is created or updated.
+
+        Warning:
+            This function is expensive (around a few seconds),
+            so try not to run it outside a management command
+            or a task.
+        """
+
+        def product_balance_subquery(product_id: int):
+            return Subquery(
+                Selling.objects.filter(customer=OuterRef("pk"), product_id=product_id)
+                .values("customer")
+                .annotate(res=Sum("quantity"))
+                .values("res")
+            )
+
+        old_balance_subquery = Subquery(
+            ReturnableProductBalance.objects.filter(
+                customer=OuterRef("pk"), returnable=self
+            ).values("balance")
+        )
+        new_balances = (
+            Customer.objects.annotate(
+                nb_cons=Coalesce(product_balance_subquery(self.product_id), 0),
+                nb_dcons=Coalesce(
+                    product_balance_subquery(self.returned_product_id), 0
+                ),
+            )
+            .annotate(new_balance=F("nb_cons") - F("nb_dcons"))
+            .exclude(new_balance=Coalesce(old_balance_subquery, 0))
+            .values("pk", "new_balance")
+        )
+        updates = [
+            ReturnableProductBalance(
+                customer_id=c["pk"], returnable=self, balance=c["new_balance"]
+            )
+            for c in new_balances
+        ]
+        ReturnableProductBalance.objects.bulk_create(
+            updates,
+            update_conflicts=True,
+            update_fields=["balance"],
+            unique_fields=["customer_id", "returnable"],
+        )
+
+
+class ReturnableProductBalance(models.Model):
+    """The returnable products balances of a customer"""
+
+    customer = models.ForeignKey(
+        to=Customer, on_delete=models.CASCADE, related_name="return_balances"
+    )
+    returnable = models.ForeignKey(
+        to=ReturnableProduct, on_delete=models.CASCADE, related_name="balances"
+    )
+    balance = models.SmallIntegerField(blank=True, default=0)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["customer", "returnable"],
+                name="returnable_product_unique_type_per_customer",
+            )
+        ]
+
+    def __str__(self):
+        return (
+            f"return balance of {self.customer} "
+            f"for {self.returnable.product_id} : {self.balance}"
+        )
