@@ -28,7 +28,6 @@ from datetime import date, timedelta
 from operator import itemgetter
 from smtplib import SMTPException
 
-from django.conf import settings
 from django.contrib.auth import login, views
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin

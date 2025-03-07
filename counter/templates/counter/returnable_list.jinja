@@ -1,0 +1,67 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+  {% trans %}Returnable products{% endtrans %}
+{% endblock %}
+
+{% block additional_js %}
+{% endblock %}
+
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("core/components/card.scss") }}">
+  <link rel="stylesheet" href="{{ static("counter/css/admin.scss") }}">
+  <link rel="stylesheet" href="{{ static("bundled/core/components/ajax-select-index.css") }}">
+  <link rel="stylesheet" href="{{ static("core/components/ajax-select.scss") }}">
+{% endblock %}
+
+{% block content %}
+  <h3 class="margin-bottom">{% trans %}Returnable products{% endtrans %}</h3>
+  {% if user.has_perm("counter.add_returnableproduct") %}
+    <a href="{{ url('counter:create_returnable') }}" class="btn btn-blue margin-bottom">
+      {% trans %}New returnable product{% endtrans %} <i class="fa fa-plus"></i>
+    </a>
+  {% endif %}
+  <div class="product-group">
+    {% for returnable in object_list %}
+      {% if user.has_perm("counter.change_returnableproduct") %}
+        <a
+          class="card card-row shadow clickable"
+          href="{{ url("counter:edit_returnable", returnable_id=returnable.id) }}"
+        >
+      {% else %}
+        <div class="card card-row shadow">
+      {% endif %}
+      {% if returnable.product.icon %}
+        <img
+          class="card-image"
+          src="{{ returnable.product.icon.url }}"
+          alt="{{ returnable.product.name }}"
+        >
+      {% else %}
+        <i class="fa-regular fa-image fa-2x card-image"></i>
+      {% endif %}
+      <div class="card-content">
+        <strong class="card-title">{{ returnable.product }}</strong>
+        <p>{% trans %}Returned product{% endtrans %} : {{ returnable.returned_product }}</p>
+      </div>
+      {% if user.has_perm("counter.delete_returnableproduct") %}
+        <button
+          x-data
+          class="btn btn-red btn-no-text card-top-left"
+          @click.prevent="document.location.href = '{{ url("counter:delete_returnable", returnable_id=returnable.id) }}'"
+        >
+          {# The delete link is a button with a JS event listener
+            instead of a proper <a> element,
+            because the enclosing card is already a <a>,
+            and HTML forbids nested <a> #}
+          <i class="fa fa-trash"></i>
+        </button>
+      {% endif %}
+      {% if user.has_perm("counter.change_returnableproduct") %}
+        </a>
+      {% else %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endblock content %}

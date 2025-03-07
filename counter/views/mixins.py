@@ -99,6 +99,11 @@ class CounterAdminTabsMixin(TabedViewMixin):
             "name": _("Product types"),
         },
         {
+            "url": reverse_lazy("counter:returnable_list"),
+            "slug": "returnable_products",
+            "name": _("Returnable products"),
+        },
+        {
             "url": reverse_lazy("counter:cash_summary_list"),
             "slug": "cash_summary",
             "name": _("Cash register summaries"),

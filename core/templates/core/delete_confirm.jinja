@@ -10,10 +10,17 @@
 {% block nav %}
 {% endblock %}
 
+{# if the template context has the `object_name` variable,
+   then this one will be used,
+   instead of the result of `str(object)` #}
+{% if object and not object_name %}
+  {% set object_name=object %}
+{% endif %}
+
 {% block content %}
   <h2>{% trans %}Delete confirmation{% endtrans %}</h2>
   <form action="" method="post">{% csrf_token %}
-    <p>{% trans obj=object %}Are you sure you want to delete "{{ obj }}"?{% endtrans %}</p>
+    <p>{% trans name=object_name %}Are you sure you want to delete "{{ name }}"?{% endtrans %}</p>
     <input type="submit" value="{% trans %}Confirm{% endtrans %}" />
   </form>
   <form method="GET" action="javascript:history.back();">
