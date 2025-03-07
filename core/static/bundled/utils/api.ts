@@ -56,7 +56,6 @@ export const paginated = async <T>(
 
 interface Request extends TDataShape {
   client?: Client;
-  url: string;
 }
 
 interface InterceptorOptions {

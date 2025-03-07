@@ -24,7 +24,6 @@ document.addEventListener("alpine:init", () => {
     page: Number.parseInt(initialUrlParams.get("page")) || 1,
     pushstate: History.Push /* Used to avoid pushing a state on a back action */,
     loading: false,
-    config: config,
 
     async init() {
       await this.fetchPictures();
@@ -51,11 +50,9 @@ document.addEventListener("alpine:init", () => {
     async fetchPictures() {
       this.loading = true;
       this.pictures = await paginated(picturesFetchPictures, {
-        query: {
-          // biome-ignore lint/style/useNamingConvention: API is in snake_case
-          album_id: config.albumId,
-        } as PicturesFetchPicturesData["query"],
-      });
+        // biome-ignore lint/style/useNamingConvention: API is in snake_case
+        query: { album_id: config.albumId },
+      } as PicturesFetchPicturesData);
       this.loading = false;
     },
 
@@ -66,7 +63,6 @@ document.addEventListener("alpine:init", () => {
 
   Alpine.data("albums", (config: SubAlbumsConfig) => ({
     albums: [] as AlbumSchema[],
-    config: config,
     loading: false,
 
     async init() {
@@ -77,7 +73,7 @@ document.addEventListener("alpine:init", () => {
       this.loading = true;
       this.albums = await paginated(albumFetchAlbum, {
         // biome-ignore lint/style/useNamingConvention: API is snake_case
-        query: { parent_id: this.config.parentId },
+        query: { parent_id: config.parentId },
       } as AlbumFetchAlbumData);
       this.loading = false;
     },
