@@ -479,10 +479,7 @@ class TrombiCommentFormView(LoginRequiredMixin, View):
             )
         if self.trombi.comments_deadline < date.today():
             raise Http404(
-                _(
-                    "You can not write comment anymore, the deadline is "
-                    "already passed."
-                )
+                _("You can not write comment anymore, the deadline is already passed.")
             )
         return modelform_factory(
             self.model,

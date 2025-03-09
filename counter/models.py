@@ -514,17 +514,17 @@ class Counter(models.Model):
     def __str__(self):
         return self.name
 
-    def get_absolute_url(self) -> str:
-        if self.type == "EBOUTIC":
-            return reverse("eboutic:main")
-        return reverse("counter:details", kwargs={"counter_id": self.id})
-
     def __getattribute__(self, name: str):
         if name == "edit_groups":
             return Group.objects.filter(
                 name=self.club.unix_name + settings.SITH_BOARD_SUFFIX
             ).all()
         return object.__getattribute__(self, name)
+
+    def get_absolute_url(self) -> str:
+        if self.type == "EBOUTIC":
+            return reverse("eboutic:main")
+        return reverse("counter:details", kwargs={"counter_id": self.id})
 
     def is_owned_by(self, user: User) -> bool:
         if user.is_anonymous:
@@ -1045,14 +1045,6 @@ class CashRegisterSummary(models.Model):
     def __str__(self):
         return "At %s by %s - Total: %s €" % (self.counter, self.user, self.get_total())
 
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.date = timezone.now()
-        return super().save(*args, **kwargs)
-
-    def get_absolute_url(self):
-        return reverse("counter:cash_summary_list")
-
     def __getattribute__(self, name):
         if name[:5] == "check":
             checks = self.items.filter(is_check=True).order_by("value").all()
@@ -1088,6 +1080,14 @@ class CashRegisterSummary(models.Model):
             return checks[4] if len(checks) > 4 else None
         else:
             return object.__getattribute__(self, name)
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.date = timezone.now()
+        return super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse("counter:cash_summary_list")
 
     def is_owned_by(self, user):
         """Method to see if that object can be edited by the given user."""
