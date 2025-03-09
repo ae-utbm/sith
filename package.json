@@ -17,7 +17,7 @@
   "license": "GPL-3.0-only",
   "sideEffects": [".css"],
   "imports": {
-    "#openapi": "./staticfiles/generated/openapi/index.ts",
+    "#openapi": "./staticfiles/generated/openapi/client/index.ts",
     "#core:*": "./core/static/bundled/*",
     "#pedagogy:*": "./pedagogy/static/bundled/*",
     "#counter:*": "./counter/static/bundled/*",
