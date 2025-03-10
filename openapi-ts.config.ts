@@ -6,9 +6,7 @@ import { defineConfig } from "@hey-api/openapi-ts";
 export default defineConfig({
   input: resolve(__dirname, "./staticfiles/generated/openapi/schema.json"),
   output: {
-    lint: "biome",
-    format: "biome",
-    path: resolve(__dirname, "./staticfiles/generated/openapi"),
+    path: resolve(__dirname, "./staticfiles/generated/openapi/client"),
   },
   plugins: [
     {
