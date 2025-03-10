@@ -41,7 +41,7 @@ from core.auth.mixins import (
 )
 from core.models import Notification, SithFile, User
 from core.views.mixins import AllowFragment
-from core.views.widgets.select import (
+from core.views.widgets.ajax_select import (
     AutoCompleteSelectMultipleGroup,
     AutoCompleteSelectSithFile,
     AutoCompleteSelectUser,

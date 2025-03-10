@@ -16,7 +16,7 @@ from django.utils.timezone import now
 from model_bakery import baker, seq
 from pytest_django.asserts import assertNumQueries
 
-from com.calendar import IcsCalendar
+from com.ics_calendar import IcsCalendar
 from com.models import News, NewsDate
 from core.markdown import markdown
 from core.models import User

@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 from core.models import User, UserBan
 from core.views.forms import FutureDateTimeField, SelectDateTime
-from core.views.widgets.select import AutoCompleteSelectUser
+from core.views.widgets.ajax_select import AutoCompleteSelectUser
 
 
 class MergeForm(forms.Form):

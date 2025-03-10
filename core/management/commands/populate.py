@@ -46,7 +46,7 @@ from accounting.models import (
     SimplifiedAccountingType,
 )
 from club.models import Club, Membership
-from com.calendar import IcsCalendar
+from com.ics_calendar import IcsCalendar
 from com.models import News, NewsDate, Sith, Weekmail
 from core.models import BanGroup, Group, Page, PageRev, SithFile, User
 from core.utils import resize_image

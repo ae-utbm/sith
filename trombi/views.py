@@ -47,7 +47,7 @@ from core.auth.mixins import (
 from core.models import User
 from core.views.forms import SelectDate
 from core.views.mixins import QuickNotifMixin, TabedViewMixin
-from core.views.widgets.select import AutoCompleteSelectUser
+from core.views.widgets.ajax_select import AutoCompleteSelectUser
 from trombi.models import Trombi, TrombiClubMembership, TrombiComment, TrombiUser
 
 

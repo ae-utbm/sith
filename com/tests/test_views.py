@@ -305,7 +305,7 @@ class TestNewsCreation(TestCase):
 
         # we will just test that the ICS is modified.
         # Checking that the ICS is *well* modified is up to the ICS tests
-        with patch("com.calendar.IcsCalendar.make_internal") as mocked:
+        with patch("com.ics_calendar.IcsCalendar.make_internal") as mocked:
             self.client.post(reverse("com:news_new"), self.valid_payload)
             mocked.assert_called()
 
@@ -314,7 +314,7 @@ class TestNewsCreation(TestCase):
         self.valid_payload["occurrences"] = 2
         last_news = News.objects.order_by("id").last()
 
-        with patch("com.calendar.IcsCalendar.make_internal") as mocked:
+        with patch("com.ics_calendar.IcsCalendar.make_internal") as mocked:
             self.client.post(
                 reverse("com:news_edit", kwargs={"news_id": last_news.id}),
                 self.valid_payload,

@@ -2,7 +2,10 @@ from pydantic import TypeAdapter
 
 from accounting.models import ClubAccount, Company
 from accounting.schemas import ClubAccountSchema, CompanySchema
-from core.views.widgets.select import AutoCompleteSelect, AutoCompleteSelectMultiple
+from core.views.widgets.ajax_select import (
+    AutoCompleteSelect,
+    AutoCompleteSelectMultiple,
+)
 
 _js = ["bundled/accounting/components/ajax-select-index.ts"]
 

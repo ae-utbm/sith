@@ -29,7 +29,7 @@ from django.utils.translation import gettext_lazy as _
 from club.models import Club, Mailing, MailingSubscription, Membership
 from core.models import User
 from core.views.forms import SelectDate, SelectDateTime
-from core.views.widgets.select import AutoCompleteSelectMultipleUser
+from core.views.widgets.ajax_select import AutoCompleteSelectMultipleUser
 from counter.models import Counter
 
 

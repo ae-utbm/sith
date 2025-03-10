@@ -65,6 +65,6 @@ class DetailFormView(FormView, BaseDetailView):
 # E402: putting those import at the top of the file would also be difficult
 from .files import *  # noqa: F403 E402
 from .group import *  # noqa: F403 E402
+from .index import *  # noqa: F403 E402
 from .page import *  # noqa: F403 E402
-from .site import *  # noqa: F403 E402
 from .user import *  # noqa: F403 E402

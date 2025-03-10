@@ -2,9 +2,9 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
-from club.widgets.select import AutoCompleteSelectClub
+from club.widgets.ajax_select import AutoCompleteSelectClub
 from core.views.forms import NFCTextInput, SelectDate, SelectDateTime
-from core.views.widgets.select import (
+from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
     AutoCompleteSelectMultipleGroup,
     AutoCompleteSelectMultipleUser,
@@ -19,7 +19,7 @@ from counter.models import (
     Refilling,
     StudentCard,
 )
-from counter.widgets.select import (
+from counter.widgets.ajax_select import (
     AutoCompleteSelectMultipleCounter,
     AutoCompleteSelectMultipleProduct,
     AutoCompleteSelectProduct,
