@@ -63,9 +63,7 @@ class Trombi(models.Model):
     comments_deadline = models.DateField(
         _("comments deadline"),
         default=date.today,
-        help_text=_(
-            "After this date, users won't be " "able to make comments anymore."
-        ),
+        help_text=_("After this date, users won't be able to make comments anymore."),
     )
     max_chars = models.IntegerField(
         _("maximum characters"),

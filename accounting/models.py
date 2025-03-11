@@ -328,6 +328,12 @@ class Operation(models.Model):
     def __str__(self):
         return f"{self.amount} € | {self.date} | {self.accounting_type} | {self.done}"
 
+    def __getattribute__(self, attr):
+        if attr == "target":
+            return self.get_target()
+        else:
+            return object.__getattribute__(self, attr)
+
     def save(self, *args, **kwargs):
         if self.number is None:
             self.number = self.journal.operations.count() + 1
@@ -336,12 +342,6 @@ class Operation(models.Model):
 
     def get_absolute_url(self):
         return reverse("accounting:journal_details", kwargs={"j_id": self.journal.id})
-
-    def __getattribute__(self, attr):
-        if attr == "target":
-            return self.get_target()
-        else:
-            return object.__getattribute__(self, attr)
 
     def clean(self):
         super().clean()

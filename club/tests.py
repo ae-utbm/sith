@@ -265,7 +265,7 @@ class TestClubModel(TestClub):
         for membership in memberships.select_related("user"):
             user = membership.user
             expected_html += (
-                f"<tr><td><a href=\"{reverse('core:user_profile', args=[user.id])}\">"
+                f'<tr><td><a href="{reverse("core:user_profile", args=[user.id])}">'
                 f"{user.get_display_name()}</a></td>"
                 f"<td>{settings.SITH_CLUB_ROLES[membership.role]}</td>"
                 f"<td>{membership.description}</td>"

@@ -1366,6 +1366,18 @@ class PageRev(models.Model):
     class Meta:
         ordering = ["date"]
 
+    def __getattribute__(self, attr):
+        if attr == "owner_group":
+            return self.page.owner_group
+        elif attr == "edit_groups":
+            return self.page.edit_groups
+        elif attr == "view_groups":
+            return self.page.view_groups
+        elif attr == "unset_lock":
+            return self.page.unset_lock
+        else:
+            return object.__getattribute__(self, attr)
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -1378,18 +1390,6 @@ class PageRev(models.Model):
 
     def get_absolute_url(self):
         return reverse("core:page", kwargs={"page_name": self.page._full_name})
-
-    def __getattribute__(self, attr):
-        if attr == "owner_group":
-            return self.page.owner_group
-        elif attr == "edit_groups":
-            return self.page.edit_groups
-        elif attr == "view_groups":
-            return self.page.view_groups
-        elif attr == "unset_lock":
-            return self.page.unset_lock
-        else:
-            return object.__getattribute__(self, attr)
 
     def can_be_edited_by(self, user):
         return self.page.can_be_edited_by(user)

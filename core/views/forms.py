@@ -50,7 +50,7 @@ from PIL import Image
 from antispam.forms import AntiSpamEmailField
 from core.models import Gift, Group, Page, SithFile, User
 from core.utils import resize_image
-from core.views.widgets.select import (
+from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
     AutoCompleteSelectGroup,
     AutoCompleteSelectMultipleGroup,

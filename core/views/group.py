@@ -30,7 +30,7 @@ from core.auth.mixins import CanEditMixin
 from core.models import Group, User
 from core.views import DetailFormView
 from core.views.forms import PermissionGroupsForm
-from core.views.widgets.select import AutoCompleteSelectMultipleUser
+from core.views.widgets.ajax_select import AutoCompleteSelectMultipleUser
 
 # Forms
 

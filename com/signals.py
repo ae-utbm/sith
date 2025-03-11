@@ -1,7 +1,7 @@
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
-from com.calendar import IcsCalendar
+from com.ics_calendar import IcsCalendar
 from com.models import News
 
 

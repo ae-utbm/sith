@@ -2,7 +2,10 @@ from pydantic import TypeAdapter
 
 from club.models import Club
 from club.schemas import ClubSchema
-from core.views.widgets.select import AutoCompleteSelect, AutoCompleteSelectMultiple
+from core.views.widgets.ajax_select import (
+    AutoCompleteSelect,
+    AutoCompleteSelectMultiple,
+)
 
 _js = ["bundled/club/components/ajax-select-index.ts"]
 

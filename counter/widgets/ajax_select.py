@@ -1,6 +1,9 @@
 from pydantic import TypeAdapter
 
-from core.views.widgets.select import AutoCompleteSelect, AutoCompleteSelectMultiple
+from core.views.widgets.ajax_select import (
+    AutoCompleteSelect,
+    AutoCompleteSelectMultiple,
+)
 from counter.models import Counter, Product, ProductType
 from counter.schemas import (
     ProductTypeSchema,
