@@ -186,10 +186,10 @@ class AlbumView(CanViewMixin, DetailView, FormMixin):
         kwargs["clipboard"] = SithFile.objects.filter(
             id__in=self.request.session["clipboard"]
         )
-        kwargs["children_albums"] = list(
+        kwargs["show_albums"] = (
             Album.objects.viewable_by(self.request.user)
             .filter(parent_id=self.object.id)
-            .order_by("-date")
+            .exists()
         )
         return kwargs
 

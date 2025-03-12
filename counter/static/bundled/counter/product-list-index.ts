@@ -108,7 +108,7 @@ document.addEventListener("alpine:init", () => {
      * Build the object containing the query parameters corresponding
      * to the current filters
      */
-    getQueryParams(): ProductSearchProductsDetailedData {
+    getQueryParams(): Omit<ProductSearchProductsDetailedData, "url"> {
       const search = this.search.length > 0 ? this.search : null;
       // If active or archived products must be filtered, put the filter in the request
       // Else, don't include the filter

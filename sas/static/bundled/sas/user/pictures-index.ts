@@ -17,11 +17,9 @@ document.addEventListener("alpine:init", () => {
 
     async init() {
       this.pictures = await paginated(picturesFetchPictures, {
-        query: {
-          // biome-ignore lint/style/useNamingConvention: from python api
-          users_identified: [config.userId],
-        } as PicturesFetchPicturesData["query"],
-      });
+        // biome-ignore lint/style/useNamingConvention: from python api
+        query: { users_identified: [config.userId] },
+      } as PicturesFetchPicturesData);
 
       this.albums = this.pictures.reduce(
         (acc: Record<string, PictureSchema[]>, picture: PictureSchema) => {
