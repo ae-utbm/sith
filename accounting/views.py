@@ -17,7 +17,7 @@ import collections
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.db.models import Sum
@@ -846,27 +846,16 @@ class CloseCustomerAccountForm(forms.Form):
     )
 
 
-class RefoundAccountView(FormView):
+class RefoundAccountView(UserPassesTestMixin, FormView):
     """Create a selling with the same amount than the current user money."""
 
     template_name = "accounting/refound_account.jinja"
     form_class = CloseCustomerAccountForm
 
-    def permission(self, user):
-        if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
-            return True
-        else:
-            raise PermissionDenied
-
-    def dispatch(self, request, *arg, **kwargs):
-        res = super().dispatch(request, *arg, **kwargs)
-        if self.permission(request.user):
-            return res
-
-    def post(self, request, *arg, **kwargs):
-        self.operator = request.user
-        if self.permission(request.user):
-            return super().post(self, request, *arg, **kwargs)
+    def test_func(self):
+        return self.request.user.is_root or self.request.user.is_in_group(
+            pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
+        )
 
     def form_valid(self, form):
         self.customer = form.cleaned_data["user"]
@@ -887,7 +876,7 @@ class RefoundAccountView(FormView):
                 label=_("Refound account"),
                 unit_price=uprice,
                 quantity=1,
-                seller=self.operator,
+                seller=self.request.user,
                 customer=self.customer.customer,
                 club=refound_club,
                 counter=refound_club_counter,
