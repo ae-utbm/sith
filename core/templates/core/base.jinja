@@ -84,18 +84,18 @@
       </ul>
 
       <div id="content">
-        {% block tabs %}
+        {%- block tabs -%}
           {% include "core/base/tabs.jinja" %}
-        {% endblock %}
+        {%- endblock -%}
 
-        {% block errors%}
+        {%- block errors -%}
           {% if error %}
             {{ error }}
           {% endif %}
-        {% endblock %}
+        {%- endblock -%}
 
-        {% block content %}
-        {% endblock %}
+        {%- block content -%}
+        {%- endblock -%}
       </div>
     </div>
 

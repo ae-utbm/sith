@@ -12,16 +12,15 @@
   {% endif %}
 {% endblock %}
 
-{% macro print_page_name(page) %}
-  {% if page %}
+{%- macro print_page_name(page) -%}
+  {%- if page -%}
     {{ print_page_name(page.parent) }} >
     <a href="{{ url('core:page', page_name=page.get_full_name()) }}">{{ page.get_display_name() }}</a>
-  {% endif %}
-{% endmacro %}
+  {%- endif -%}
+{%- endmacro -%}
 
 {% block content %}
   {{ print_page_name(page) }}
-
   <div class="tool_bar">
     <div class="tools">
       {% if page %}
