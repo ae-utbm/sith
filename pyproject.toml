@@ -74,6 +74,8 @@ tests = [
     "pytest-cov<7.0.0,>=6.0.0",
     "pytest-django<5.0.0,>=4.10.0",
     "model-bakery<2.0.0,>=1.20.4",
+    "beautifulsoup4>=4.13.3,<5",
+    "lxml>=5.3.1,<6",
 ]
 docs = [
     "mkdocs<2.0.0,>=1.6.1",
