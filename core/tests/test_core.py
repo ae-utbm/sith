@@ -18,7 +18,9 @@ from smtplib import SMTPException
 
 import freezegun
 import pytest
+from bs4 import BeautifulSoup
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import Permission
 from django.core import mail
 from django.core.cache import cache
 from django.core.mail import EmailMessage
@@ -223,17 +225,19 @@ def test_full_markdown_syntax():
 class TestPageHandling(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.root = User.objects.get(username="root")
-        cls.root_group = Group.objects.get(name="Root")
+        cls.group = baker.make(
+            Group, permissions=[Permission.objects.get(codename="add_page")]
+        )
+        cls.user = baker.make(User, groups=[cls.group])
 
     def setUp(self):
-        self.client.force_login(self.root)
+        self.client.force_login(self.user)
 
     def test_create_page_ok(self):
         """Should create a page correctly."""
         response = self.client.post(
             reverse("core:page_new"),
-            {"parent": "", "name": "guy", "owner_group": self.root_group.id},
+            {"parent": "", "name": "guy", "owner_group": self.group.id},
         )
         self.assertRedirects(
             response, reverse("core:page", kwargs={"page_name": "guy"})
@@ -249,32 +253,38 @@ class TestPageHandling(TestCase):
 
     def test_create_child_page_ok(self):
         """Should create a page correctly."""
-        # remove all other pages to make sure there is no side effect
-        Page.objects.all().delete()
-        self.client.post(
-            reverse("core:page_new"),
-            {"parent": "", "name": "guy", "owner_group": str(self.root_group.id)},
+        parent = baker.prepare(Page)
+        parent.save(force_lock=True)
+        response = self.client.get(
+            reverse("core:page_new") + f"?page={parent._full_name}/new"
         )
-        page = Page.objects.first()
-        self.client.post(
+
+        assert response.status_code == 200
+        # The name and parent inputs should be already filled
+        soup = BeautifulSoup(response.content.decode(), "lxml")
+        assert soup.find("input", {"name": "name"})["value"] == "new"
+        select = soup.find("autocomplete-select", {"name": "parent"})
+        assert select.find("option", {"selected": True})["value"] == str(parent.id)
+
+        response = self.client.post(
             reverse("core:page_new"),
             {
-                "parent": str(page.id),
-                "name": "bibou",
-                "owner_group": str(self.root_group.id),
+                "parent": str(parent.id),
+                "name": "new",
+                "owner_group": str(self.group.id),
             },
         )
-        response = self.client.get(
-            reverse("core:page", kwargs={"page_name": "guy/bibou"})
-        )
+        new_url = reverse("core:page", kwargs={"page_name": f"{parent._full_name}/new"})
+        assertRedirects(response, new_url, fetch_redirect_response=False)
+        response = self.client.get(new_url)
         assert response.status_code == 200
-        assert '<a href="/page/guy/bibou/">' in str(response.content)
+        assert f'<a href="/page/{parent._full_name}/new/">' in response.content.decode()
 
     def test_access_child_page_ok(self):
         """Should display a page correctly."""
-        parent = Page(name="guy", owner_group=self.root_group)
+        parent = Page(name="guy", owner_group=self.group)
         parent.save(force_lock=True)
-        page = Page(name="bibou", owner_group=self.root_group, parent=parent)
+        page = Page(name="bibou", owner_group=self.group, parent=parent)
         page.save(force_lock=True)
         response = self.client.get(
             reverse("core:page", kwargs={"page_name": "guy/bibou"})
@@ -293,7 +303,8 @@ class TestPageHandling(TestCase):
     def test_create_page_markdown_safe(self):
         """Should format the markdown and escape html correctly."""
         self.client.post(
-            reverse("core:page_new"), {"parent": "", "name": "guy", "owner_group": "1"}
+            reverse("core:page_new"),
+            {"parent": "", "name": "guy", "owner_group": self.group.id},
         )
         self.client.post(
             reverse("core:page_edit", kwargs={"page_name": "guy"}),

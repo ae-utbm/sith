@@ -169,10 +169,9 @@ class CanCreateMixin(View):
         super().__init__(*args, **kwargs)
 
     def dispatch(self, request, *arg, **kwargs):
-        res = super().dispatch(request, *arg, **kwargs)
         if not request.user.is_authenticated:
             raise PermissionDenied
-        return res
+        return super().dispatch(request, *arg, **kwargs)
 
     def form_valid(self, form):
         obj = form.instance

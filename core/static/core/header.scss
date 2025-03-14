@@ -251,21 +251,31 @@ $hovered-red-text-color: #ff4d4d;
               justify-content: flex-start;
             }
 
-            >a {
+            a, button {
+              font-size: 100%;
+              margin: 0;
               text-align: right;
               color: $text-color;
 
               &:hover {
                 color: $hovered-text-color;
               }
+            }
 
-              &:last-child {
-                color: $red-text-color;
+            form#logout-form {
+              margin: 0;
+              display: inline;
+            }
+            #logout-form button {
+              color: $red-text-color;
 
-                &:hover {
-                  color: $hovered-red-text-color;
-                }
+              &:hover {
+                color: $hovered-red-text-color;
               }
+              background: none;
+              border: none;
+              cursor: pointer;
+              padding: 0;
             }
           }
         }

@@ -2,6 +2,7 @@ from datetime import timedelta
 
 import pytest
 from django.conf import settings
+from django.contrib import auth
 from django.core.management import call_command
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -219,3 +220,12 @@ def test_user_update_groups(client: Client):
         manageable_groups[1],
         *hidden_groups[:3],
     }
+
+
+@pytest.mark.django_db
+def test_logout(client: Client):
+    user = baker.make(User)
+    client.force_login(user)
+    res = client.post(reverse("core:logout"))
+    assertRedirects(res, reverse("core:login"))
+    assert auth.get_user(client).is_anonymous

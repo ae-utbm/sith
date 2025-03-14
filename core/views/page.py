@@ -12,6 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 # This file contains all the views that concern the page model
 from django.forms.models import modelform_factory
@@ -22,7 +23,6 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from core.auth.mixins import (
-    CanCreateMixin,
     CanEditMixin,
     CanEditPropMixin,
     CanViewMixin,
@@ -115,20 +115,22 @@ class PageRevView(CanViewMixin, DetailView):
         return context
 
 
-class PageCreateView(CanCreateMixin, CreateView):
+class PageCreateView(PermissionRequiredMixin, CreateView):
     model = Page
     form_class = PageForm
     template_name = "core/page_prop.jinja"
+    permission_required = "core.add_page"
 
     def get_initial(self):
-        init = {}
-        if "page" in self.request.GET:
-            page_name = self.request.GET["page"]
-            parent_name = "/".join(page_name.split("/")[:-1])
-            parent = Page.get_page_by_full_name(parent_name)
+        init = super().get_initial()
+        if "page" not in self.request.GET:
+            return init
+        page_name = self.request.GET["page"].rsplit("/", maxsplit=1)
+        if len(page_name) == 2:
+            parent = Page.get_page_by_full_name(page_name[0])
             if parent is not None:
                 init["parent"] = parent.id
-            init["name"] = page_name.split("/")[-1]
+        init["name"] = page_name[-1]
         return init
 
     def get_context_data(self, **kwargs):

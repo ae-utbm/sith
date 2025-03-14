@@ -32,7 +32,7 @@ class TestRefoundAccount(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.skia = User.objects.get(username="skia")
-        # reffil skia's account
+        # refill skia's account
         cls.skia.customer.amount = 800
         cls.skia.customer.save()
         cls.refound_account_url = reverse("accounting:refound_account")

@@ -30,7 +30,7 @@ export const paginated = async <T>(
   endpoint: PaginatedEndpoint<T>,
   options?: PaginatedRequest,
 ): Promise<T[]> => {
-  const maxPerPage = 199;
+  const maxPerPage = 200;
   const queryParams = options ?? ({} as PaginatedRequest);
   queryParams.query = queryParams.query ?? {};
   queryParams.query.page_size = maxPerPage;

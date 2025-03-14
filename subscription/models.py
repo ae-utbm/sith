@@ -92,9 +92,13 @@ class Subscription(models.Model):
         self.member.make_home()
 
     def get_absolute_url(self):
-        return reverse("core:user_edit", kwargs={"user_id": self.member.pk})
+        return reverse("core:user_edit", kwargs={"user_id": self.member_id})
 
     def clean(self):
+        if self.member._state.adding:
+            # if the user is being created, then it makes no sense
+            # to check if the user is already subscribed
+            return
         today = localdate()
         threshold = timedelta(weeks=settings.SITH_SUBSCRIPTION_END)
         # a user may subscribe if :

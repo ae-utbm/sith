@@ -919,6 +919,7 @@ Welcome to the wiki page!
                         "view_album",
                         "view_peoplepicturerelation",
                         "add_peoplepicturerelation",
+                        "add_page",
                     ]
                 )
             )
