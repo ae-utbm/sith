@@ -155,26 +155,22 @@ class CandidatureCreateView(LoginRequiredMixin, CreateView):
 
     def dispatch(self, request, *arg, **kwargs):
         self.election = get_object_or_404(Election, pk=kwargs["election_id"])
+        self.can_edit = self.request.user.can_edit(self.election)
         return super().dispatch(request, *arg, **kwargs)
 
     def get_initial(self):
-        init = {}
-        self.can_edit = self.request.user.can_edit(self.election)
-        init["user"] = self.request.user.id
-        return init
+        return {"user": self.request.user.id}
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["election_id"] = self.election.id
-        kwargs["can_edit"] = self.can_edit
-        return kwargs
+        return super().get_form_kwargs() | {
+            "election": self.election,
+            "can_edit": self.can_edit,
+        }
 
-    def form_valid(self, form):
+    def form_valid(self, form: CandidateForm):
         """Verify that the selected user is in candidate group."""
         obj = form.instance
         obj.election = self.election
-        if not hasattr(obj, "user"):
-            obj.user = self.request.user
         if (obj.election.can_candidate(obj.user)) and (
             obj.user == self.request.user or self.can_edit
         ):
@@ -182,9 +178,7 @@ class CandidatureCreateView(LoginRequiredMixin, CreateView):
         raise PermissionDenied
 
     def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["election"] = self.election
-        return kwargs
+        return super().get_context_data(**kwargs) | {"election": self.election}
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
@@ -302,45 +296,23 @@ class ElectionUpdateView(CanEditMixin, UpdateView):
         return reverse_lazy("election:detail", kwargs={"election_id": self.object.id})
 
 
-class CandidatureUpdateView(CanEditMixin, UpdateView):
+class CandidatureUpdateView(LoginRequiredMixin, CanEditMixin, UpdateView):
     model = Candidature
     form_class = CandidateForm
     template_name = "core/edit.jinja"
     pk_url_kwarg = "candidature_id"
 
-    def dispatch(self, request, *arg, **kwargs):
-        self.object = self.get_object()
-        if not self.object.role.election.is_vote_editable:
-            raise PermissionDenied
-        return super().dispatch(request, *arg, **kwargs)
-
-    def remove_fields(self):
-        self.form.fields.pop("role", None)
-
-    def get(self, request, *args, **kwargs):
-        self.form = self.get_form()
-        self.remove_fields()
-        return self.render_to_response(self.get_context_data(form=self.form))
-
-    def post(self, request, *args, **kwargs):
-        self.form = self.get_form()
-        self.remove_fields()
-        if (
-            request.user.is_authenticated
-            and request.user.can_edit(self.object)
-            and self.form.is_valid()
-        ):
-            return super().form_valid(self.form)
-        return self.form_invalid(self.form)
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields.pop("role", None)
+        return form
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["election_id"] = self.object.role.election.id
-        return kwargs
+        return super().get_form_kwargs() | {"election": self.object.role.election}
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            "election:detail", kwargs={"election_id": self.object.role.election.id}
+        return reverse(
+            "election:detail", kwargs={"election_id": self.object.role.election_id}
         )
 
 
