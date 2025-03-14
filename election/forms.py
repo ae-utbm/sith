@@ -1,12 +1,6 @@
 from django import forms
-from django.db import transaction
-from django.db.models import QuerySet
-from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import FormView
 
-from core.auth.mixins import CanCreateMixin
 from core.views.forms import SelectDateTime
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
@@ -14,7 +8,7 @@ from core.views.widgets.ajax_select import (
     AutoCompleteSelectUser,
 )
 from core.views.widgets.markdown import MarkdownInput
-from election.models import Candidature, Election, ElectionList, Role, Vote
+from election.models import Candidature, Election, ElectionList, Role
 
 
 class LimitedCheckboxField(forms.ModelMultipleChoiceField):
@@ -39,6 +33,8 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
 class CandidateForm(forms.ModelForm):
     """Form to candidate."""
 
+    required_css_class = "required"
+
     class Meta:
         model = Candidature
         fields = ["user", "role", "program", "election_list"]
@@ -52,17 +48,12 @@ class CandidateForm(forms.ModelForm):
             "election_list": AutoCompleteSelect,
         }
 
-    def __init__(self, *args, **kwargs):
-        election_id = kwargs.pop("election_id", None)
-        can_edit = kwargs.pop("can_edit", False)
+    def __init__(
+        self, *args, election: Election | None, can_edit: bool = False, **kwargs
+    ):
         super().__init__(*args, **kwargs)
-        if election_id:
-            self.fields["role"].queryset = Role.objects.filter(
-                election__id=election_id
-            ).all()
-            self.fields["election_list"].queryset = ElectionList.objects.filter(
-                election__id=election_id
-            ).all()
+        self.fields["role"].queryset = election.roles.select_related("election")
+        self.fields["election_list"].queryset = election.election_lists.all()
         if not can_edit:
             self.fields["user"].widget = forms.HiddenInput()
 
