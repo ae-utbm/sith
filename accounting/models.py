@@ -17,15 +17,12 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.core import validators
-from django.core.exceptions import ValidationError
 from django.db import models
-from django.template import defaultfilters
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
 from club.models import Club
-from core.models import SithFile, User
+from core.models import SithFile
 
 
 class CurrencyField(models.DecimalField):
@@ -74,28 +71,6 @@ class Company(models.Model):
     def __str__(self):
         return self.name
 
-    def get_absolute_url(self):
-        return reverse("accounting:co_edit", kwargs={"co_id": self.id})
-
-    def get_display_name(self):
-        return self.name
-
-    def is_owned_by(self, user):
-        """Check if that object can be edited by the given user."""
-        return user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-
-    def can_be_edited_by(self, user):
-        """Check if that object can be edited by the given user."""
-        return user.memberships.filter(
-            end_date=None, club__role=settings.SITH_CLUB_ROLES_ID["Treasurer"]
-        ).exists()
-
-    def can_be_viewed_by(self, user):
-        """Check if that object can be viewed by the given user."""
-        return user.memberships.filter(
-            end_date=None, club__role_gte=settings.SITH_CLUB_ROLES_ID["Treasurer"]
-        ).exists()
-
 
 class BankAccount(models.Model):
     name = models.CharField(_("name"), max_length=30)
@@ -114,18 +89,6 @@ class BankAccount(models.Model):
 
     def __str__(self):
         return self.name
-
-    def get_absolute_url(self):
-        return reverse("accounting:bank_details", kwargs={"b_account_id": self.id})
-
-    def is_owned_by(self, user):
-        """Check if that object can be edited by the given user."""
-        if user.is_anonymous:
-            return False
-        if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
-            return True
-        m = self.club.get_membership_for(user)
-        return m is not None and m.role >= settings.SITH_CLUB_ROLES_ID["Treasurer"]
 
 
 class ClubAccount(models.Model):
@@ -149,37 +112,6 @@ class ClubAccount(models.Model):
 
     def __str__(self):
         return self.name
-
-    def get_absolute_url(self):
-        return reverse("accounting:club_details", kwargs={"c_account_id": self.id})
-
-    def is_owned_by(self, user):
-        """Check if that object can be edited by the given user."""
-        if user.is_anonymous:
-            return False
-        return user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-
-    def can_be_edited_by(self, user):
-        """Check if that object can be edited by the given user."""
-        m = self.club.get_membership_for(user)
-        return m and m.role == settings.SITH_CLUB_ROLES_ID["Treasurer"]
-
-    def can_be_viewed_by(self, user):
-        """Check if that object can be viewed by the given user."""
-        m = self.club.get_membership_for(user)
-        return m and m.role >= settings.SITH_CLUB_ROLES_ID["Treasurer"]
-
-    def has_open_journal(self):
-        return self.journals.filter(closed=False).exists()
-
-    def get_open_journal(self):
-        return self.journals.filter(closed=False).first()
-
-    def get_display_name(self):
-        return _("%(club_account)s on %(bank_account)s") % {
-            "club_account": self.name,
-            "bank_account": self.bank_account,
-        }
 
 
 class GeneralJournal(models.Model):
@@ -205,40 +137,6 @@ class GeneralJournal(models.Model):
 
     def __str__(self):
         return self.name
-
-    def get_absolute_url(self):
-        return reverse("accounting:journal_details", kwargs={"j_id": self.id})
-
-    def is_owned_by(self, user):
-        """Check if that object can be edited by the given user."""
-        if user.is_anonymous:
-            return False
-        if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
-            return True
-        return self.club_account.can_be_edited_by(user)
-
-    def can_be_edited_by(self, user):
-        """Check if that object can be edited by the given user."""
-        if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
-            return True
-        return self.club_account.can_be_edited_by(user)
-
-    def can_be_viewed_by(self, user):
-        return self.club_account.can_be_viewed_by(user)
-
-    def update_amounts(self):
-        self.amount = 0
-        self.effective_amount = 0
-        for o in self.operations.all():
-            if o.accounting_type.movement_type == "CREDIT":
-                if o.done:
-                    self.effective_amount += o.amount
-                self.amount += o.amount
-            else:
-                if o.done:
-                    self.effective_amount -= o.amount
-                self.amount -= o.amount
-        self.save()
 
 
 class Operation(models.Model):
@@ -328,88 +226,6 @@ class Operation(models.Model):
     def __str__(self):
         return f"{self.amount} € | {self.date} | {self.accounting_type} | {self.done}"
 
-    def __getattribute__(self, attr):
-        if attr == "target":
-            return self.get_target()
-        else:
-            return object.__getattribute__(self, attr)
-
-    def save(self, *args, **kwargs):
-        if self.number is None:
-            self.number = self.journal.operations.count() + 1
-        super().save(*args, **kwargs)
-        self.journal.update_amounts()
-
-    def get_absolute_url(self):
-        return reverse("accounting:journal_details", kwargs={"j_id": self.journal.id})
-
-    def clean(self):
-        super().clean()
-        if self.date is None:
-            raise ValidationError(_("The date must be set."))
-        elif self.date < self.journal.start_date:
-            raise ValidationError(
-                _(
-                    """The date can not be before the start date of the journal, which is
-%(start_date)s."""
-                )
-                % {
-                    "start_date": defaultfilters.date(
-                        self.journal.start_date, settings.DATE_FORMAT
-                    )
-                }
-            )
-        if self.target_type != "OTHER" and self.get_target() is None:
-            raise ValidationError(_("Target does not exists"))
-        if self.target_type == "OTHER" and self.target_label == "":
-            raise ValidationError(
-                _("Please add a target label if you set no existing target")
-            )
-        if not self.accounting_type and not self.simpleaccounting_type:
-            raise ValidationError(
-                _(
-                    "You need to provide ether a simplified accounting type or a standard accounting type"
-                )
-            )
-        if self.simpleaccounting_type:
-            self.accounting_type = self.simpleaccounting_type.accounting_type
-
-    @property
-    def target(self):
-        return self.get_target()
-
-    def get_target(self):
-        tar = None
-        if self.target_type == "USER":
-            tar = User.objects.filter(id=self.target_id).first()
-        elif self.target_type == "CLUB":
-            tar = Club.objects.filter(id=self.target_id).first()
-        elif self.target_type == "ACCOUNT":
-            tar = ClubAccount.objects.filter(id=self.target_id).first()
-        elif self.target_type == "COMPANY":
-            tar = Company.objects.filter(id=self.target_id).first()
-        return tar
-
-    def is_owned_by(self, user):
-        """Check if that object can be edited by the given user."""
-        if user.is_anonymous:
-            return False
-        if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
-            return True
-        if self.journal.closed:
-            return False
-        m = self.journal.club_account.club.get_membership_for(user)
-        return m is not None and m.role >= settings.SITH_CLUB_ROLES_ID["Treasurer"]
-
-    def can_be_edited_by(self, user):
-        """Check if that object can be edited by the given user."""
-        if user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID):
-            return True
-        if self.journal.closed:
-            return False
-        m = self.journal.club_account.club.get_membership_for(user)
-        return m is not None and m.role == settings.SITH_CLUB_ROLES_ID["Treasurer"]
-
 
 class AccountingType(models.Model):
     """Accounting types.
@@ -444,15 +260,6 @@ class AccountingType(models.Model):
     def __str__(self):
         return self.code + " - " + self.get_movement_type_display() + " - " + self.label
 
-    def get_absolute_url(self):
-        return reverse("accounting:type_list")
-
-    def is_owned_by(self, user):
-        """Check if that object can be edited by the given user."""
-        if user.is_anonymous:
-            return False
-        return user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-
 
 class SimplifiedAccountingType(models.Model):
     """Simplified version of `AccountingType`."""
@@ -474,9 +281,6 @@ class SimplifiedAccountingType(models.Model):
             f"{self.get_movement_type_display()} "
             f"- {self.accounting_type.code} - {self.label}"
         )
-
-    def get_absolute_url(self):
-        return reverse("accounting:simple_type_list")
 
     @property
     def movement_type(self):
@@ -502,19 +306,3 @@ class Label(models.Model):
 
     def __str__(self):
         return "%s (%s)" % (self.name, self.club_account.name)
-
-    def get_absolute_url(self):
-        return reverse(
-            "accounting:label_list", kwargs={"clubaccount_id": self.club_account.id}
-        )
-
-    def is_owned_by(self, user):
-        if user.is_anonymous:
-            return False
-        return self.club_account.is_owned_by(user)
-
-    def can_be_edited_by(self, user):
-        return self.club_account.can_be_edited_by(user)
-
-    def can_be_viewed_by(self, user):
-        return self.club_account.can_be_viewed_by(user)

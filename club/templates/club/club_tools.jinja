@@ -29,14 +29,6 @@
         {% endfor %}
       {% endif %}
     </ul>
-    {% if object.club_account.exists() %}
-      <h4>{% trans %}Accounting: {% endtrans %}</h4>
-      <ul>
-        {% for ca in object.club_account.all() %}
-          <li><a href="{{ url('accounting:club_details', c_account_id=ca.id) }}">{{ ca.get_display_name() }}</a></li>
-        {% endfor %}
-      </ul>
-    {% endif %}
     {% if object.id == settings.SITH_LAUNDERETTE_CLUB_ID %}
       <li><a href="{{ url('launderette:launderette_list') }}">{% trans %}Manage launderettes{% endtrans %}</a></li>
     {% endif %}
