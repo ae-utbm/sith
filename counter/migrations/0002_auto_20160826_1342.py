@@ -4,7 +4,7 @@ import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
-import accounting.models
+import counter.fields
 
 
 class Migration(migrations.Migration):
@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "value",
-                    accounting.models.CurrencyField(
+                    counter.fields.CurrencyField(
                         max_digits=12, verbose_name="value", decimal_places=2
                     ),
                 ),

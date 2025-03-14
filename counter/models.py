@@ -38,12 +38,12 @@ from django_countries.fields import CountryField
 from ordered_model.models import OrderedModel
 from phonenumber_field.modelfields import PhoneNumberField
 
-from accounting.models import CurrencyField
 from club.models import Club
 from core.fields import ResizedImageField
 from core.models import Group, Notification, User
 from core.utils import get_start_of_semester
 from counter.apps import PAYMENT_METHOD
+from counter.fields import CurrencyField
 from subscription.models import Subscription
 
 

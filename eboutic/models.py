@@ -25,8 +25,8 @@ from django.db.models import F, OuterRef, Subquery, Sum
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from accounting.models import CurrencyField
 from core.models import User
+from counter.fields import CurrencyField
 from counter.models import BillingInfo, Counter, Customer, Product, Refilling, Selling
 
 
