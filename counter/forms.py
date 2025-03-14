@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
 from club.widgets.ajax_select import AutoCompleteSelectClub
+from core.models import User
 from core.views.forms import NFCTextInput, SelectDate, SelectDateTime
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
@@ -250,3 +251,13 @@ class EticketForm(forms.ModelForm):
             "product": AutoCompleteSelectProduct,
             "event_date": SelectDate,
         }
+
+
+class CloseCustomerAccountForm(forms.Form):
+    user = forms.ModelChoiceField(
+        label=_("Refound this account"),
+        help_text=None,
+        required=True,
+        widget=AutoCompleteSelectUser,
+        queryset=User.objects.all(),
+    )

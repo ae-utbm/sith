@@ -114,7 +114,7 @@
           <h4>{% trans %}Accounting{% endtrans %}</h4>
           <ul>
             {% if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
-              <li><a href="{{ url('accounting:refound_account') }}">{% trans %}Refound Account{% endtrans %}</a></li>
+              <li><a href="{{ url("counter:account_refound") }}">{% trans %}Refound Account{% endtrans %}</a></li>
             {% endif %}
           </ul>
         </div>

@@ -64,7 +64,7 @@ from core.views.forms import (
     UserProfileForm,
 )
 from core.views.mixins import QuickNotifMixin, TabedViewMixin
-from counter.models import Refilling, Selling
+from counter.models import Counter, Refilling, Selling
 from eboutic.models import Invoice
 from subscription.models import Subscription
 from trombi.views import UserTrombiForm
@@ -360,8 +360,6 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         from django.db.models import Sum
-
-        from counter.models import Counter
 
         foyer = Counter.objects.filter(name="Foyer").first()
         mde = Counter.objects.filter(name="MDE").first()

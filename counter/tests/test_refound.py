@@ -27,7 +27,7 @@ class TestRefoundAccount(TestCase):
         # refill skia's account
         cls.skia.customer.amount = 800
         cls.skia.customer.save()
-        cls.refound_account_url = reverse("accounting:refound_account")
+        cls.refound_account_url = reverse("counter:account_refound")
 
     def test_permission_denied(self):
         self.client.force_login(User.objects.get(username="guy"))

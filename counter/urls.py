@@ -30,6 +30,7 @@ from counter.views.admin import (
     ProductTypeEditView,
     ProductTypeListView,
     RefillingDeleteView,
+    RefoundAccountView,
     ReturnableProductCreateView,
     ReturnableProductDeleteView,
     ReturnableProductListView,
@@ -170,4 +171,5 @@ urlpatterns = [
         CounterRefillingListView.as_view(),
         name="refilling_list",
     ),
+    path("admin/refound/", RefoundAccountView.as_view(), name="account_refound"),
 ]

@@ -41,10 +41,6 @@ urlpatterns = [
     path("com/", include(("com.urls", "com"), namespace="com")),
     path("club/", include(("club.urls", "club"), namespace="club")),
     path("counter/", include(("counter.urls", "counter"), namespace="counter")),
-    path(
-        "accounting/",
-        include(("accounting.urls", "accounting"), namespace="accounting"),
-    ),
     path("eboutic/", include(("eboutic.urls", "eboutic"), namespace="eboutic")),
     path(
         "launderette/",
