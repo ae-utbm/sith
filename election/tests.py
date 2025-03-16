@@ -1,7 +1,10 @@
+from datetime import timedelta
+
 import pytest
 from django.conf import settings
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils.timezone import now
 from model_bakery import baker
 
 from core.baker_recipes import subscriber_user
@@ -47,6 +50,27 @@ class TestElectionUpdateView(TestElection):
             reverse("election:update", args=str(self.election.id))
         )
         assert response.status_code == 403
+
+
+@pytest.mark.django_db
+def test_election_create_list_permission(client: Client):
+    election = baker.make(Election, end_candidature=now() + timedelta(hours=1))
+    groups = [
+        Group.objects.get(pk=settings.SITH_GROUP_SUBSCRIBERS_ID),
+        baker.make(Group),
+    ]
+    election.candidature_groups.add(groups[0])
+    election.edit_groups.add(groups[1])
+    url = reverse("election:create_list", kwargs={"election_id": election.id})
+    for user in subscriber_user.make(), baker.make(User, groups=[groups[1]]):
+        client.force_login(user)
+        assert client.get(url).status_code == 200
+        # the post is a 200 instead of a 302, because we don't give form data,
+        # but we don't care as we only test permissions here
+        assert client.post(url).status_code == 200
+    client.force_login(baker.make(User))
+    assert client.get(url).status_code == 403
+    assert client.post(url).status_code == 403
 
 
 @pytest.mark.django_db
