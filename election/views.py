@@ -1,6 +1,12 @@
 from typing import TYPE_CHECKING
 
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from cryptography.utils import cached_property
+from django.conf import settings
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    UserPassesTestMixin,
+)
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import QuerySet
@@ -9,7 +15,7 @@ from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
-from core.auth.mixins import CanCreateMixin, CanEditMixin, CanViewMixin
+from core.auth.mixins import CanEditMixin, CanViewMixin
 from election.forms import (
     CandidateForm,
     ElectionForm,
@@ -94,15 +100,26 @@ class ElectionDetailView(CanViewMixin, DetailView):
 # Form view
 
 
-class VoteFormView(CanCreateMixin, FormView):
+class VoteFormView(LoginRequiredMixin, UserPassesTestMixin, FormView):
     """Alows users to vote."""
 
     form_class = VoteForm
     template_name = "election/election_detail.jinja"
 
-    def dispatch(self, request, *arg, **kwargs):
-        self.election = get_object_or_404(Election, pk=kwargs["election_id"])
-        return super().dispatch(request, *arg, **kwargs)
+    @cached_property
+    def election(self):
+        return get_object_or_404(Election, pk=self.kwargs["election_id"])
+
+    def test_func(self):
+        groups = set(self.election.vote_groups.values_list("id", flat=True))
+        if (
+            settings.SITH_GROUP_SUBSCRIBERS_ID in groups
+            and self.request.user.is_subscribed
+        ):
+            # the subscriber group isn't truly attached to users,
+            # so it must be dealt with separately
+            return True
+        return self.request.user.groups.filter(id__in=groups).exists()
 
     def vote(self, election_data):
         with transaction.atomic():
@@ -122,20 +139,16 @@ class VoteFormView(CanCreateMixin, FormView):
             self.election.voters.add(self.request.user)
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["election"] = self.election
-        kwargs["user"] = self.request.user
-        return kwargs
+        return super().get_form_kwargs() | {
+            "election": self.election,
+            "user": self.request.user,
+        }
 
     def form_valid(self, form):
         """Verify that the user is part in a vote group."""
         data = form.clean()
-        res = super(FormView, self).form_valid(form)
-        for grp_id in self.election.vote_groups.values_list("pk", flat=True):
-            if self.request.user.is_in_group(pk=grp_id):
-                self.vote(data)
-                return res
-        return res
+        self.vote(data)
+        return super().form_valid(form)
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
@@ -200,80 +213,79 @@ class ElectionCreateView(PermissionRequiredMixin, CreateView):
         return reverse("election:detail", kwargs={"election_id": self.object.id})
 
 
-class RoleCreateView(CanCreateMixin, CreateView):
+class RoleCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Role
     form_class = RoleForm
     template_name = "core/create.jinja"
 
-    def dispatch(self, request, *arg, **kwargs):
-        self.election = get_object_or_404(Election, pk=kwargs["election_id"])
+    @cached_property
+    def election(self):
+        return get_object_or_404(Election, pk=self.kwargs["election_id"])
+
+    def test_func(self):
         if not self.election.is_vote_editable:
-            raise PermissionDenied
-        return super().dispatch(request, *arg, **kwargs)
+            return False
+        if self.request.user.has_perm("election.add_role"):
+            return True
+        groups = set(self.election.edit_groups.values_list("id", flat=True))
+        if (
+            settings.SITH_GROUP_SUBSCRIBERS_ID in groups
+            and self.request.user.is_subscribed
+        ):
+            # the subscriber group isn't truly attached to users,
+            # so it must be dealt with separately
+            return True
+        return self.request.user.groups.filter(id__in=groups).exists()
 
     def get_initial(self):
-        init = {}
-        init["election"] = self.election
-        return init
-
-    def form_valid(self, form):
-        """Verify that the user can edit properly."""
-        obj: Role = form.instance
-        user: User = self.request.user
-        if obj.election:
-            for grp_id in obj.election.edit_groups.values_list("pk", flat=True):
-                if user.is_in_group(pk=grp_id):
-                    return super(CreateView, self).form_valid(form)
-        raise PermissionDenied
+        return {"election": self.election}
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["election_id"] = self.election.id
-        return kwargs
+        return super().get_form_kwargs() | {"election_id": self.election.id}
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            "election:detail", kwargs={"election_id": self.object.election.id}
+        return reverse(
+            "election:detail", kwargs={"election_id": self.object.election_id}
         )
 
 
-class ElectionListCreateView(CanCreateMixin, CreateView):
+class ElectionListCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ElectionList
     form_class = ElectionListForm
     template_name = "core/create.jinja"
 
-    def dispatch(self, request, *arg, **kwargs):
-        self.election = get_object_or_404(Election, pk=kwargs["election_id"])
+    @cached_property
+    def election(self):
+        return get_object_or_404(Election, pk=self.kwargs["election_id"])
+
+    def test_func(self):
         if not self.election.is_vote_editable:
-            raise PermissionDenied
-        return super().dispatch(request, *arg, **kwargs)
+            return False
+        if self.request.user.has_perm("election.add_electionlist"):
+            return True
+        groups = set(
+            self.election.candidature_groups.values("id")
+            .union(self.election.edit_groups.values("id"))
+            .values_list("id", flat=True)
+        )
+        if (
+            settings.SITH_GROUP_SUBSCRIBERS_ID in groups
+            and self.request.user.is_subscribed
+        ):
+            # the subscriber group isn't truly attached to users,
+            # so it must be dealt with separately
+            return True
+        return self.request.user.groups.filter(id__in=groups).exists()
 
     def get_initial(self):
-        init = {}
-        init["election"] = self.election
-        return init
+        return {"election": self.election}
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["election_id"] = self.election.id
-        return kwargs
-
-    def form_valid(self, form):
-        """Verify that the user can vote on this election."""
-        obj: ElectionList = form.instance
-        user: User = self.request.user
-        if obj.election:
-            for grp_id in obj.election.candidature_groups.values_list("pk", flat=True):
-                if user.is_in_group(pk=grp_id):
-                    return super(CreateView, self).form_valid(form)
-            for grp_id in obj.election.edit_groups.values_list("pk", flat=True):
-                if user.is_in_group(pk=grp_id):
-                    return super(CreateView, self).form_valid(form)
-        raise PermissionDenied
+        return super().get_form_kwargs() | {"election_id": self.election.id}
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            "election:detail", kwargs={"election_id": self.object.election.id}
+        return reverse(
+            "election:detail", kwargs={"election_id": self.object.election_id}
         )
 
 
