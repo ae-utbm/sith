@@ -63,7 +63,13 @@
         {%- for role in role_list %}
           {%- set count = [0] %}
           {%- set role_data = election_form.data.getlist(role.title) if role.title in election_form.data else [] %}
-          <tbody data-max-choice="{{role.max_choice}}" class="role{{ ' role_error' if role.title in election_form.errors else '' }}{{ ' role__multiple-choices' if role.max_choice > 1 else ''}}">
+
+          <tbody
+            {% if role.max_choice > 1 -%}
+              x-data x-limited-choices="{{ role.max_choice }}"
+            {%- endif %}
+            class="role {% if role.title in election_form.errors %}role_error{% endif %}"
+          >
             <tr>
               <td class="role_title">
                 <div class="role_text">
@@ -196,31 +202,4 @@
       <button class="button button_send" form="vote-form">{% trans %}Submit the vote !{% endtrans %}</button>
     </section>
   {%- endif %}
-{% endblock %}
-
-{% block script %}
-  {{ super() }}
-  <script type="text/javascript">
-    document.querySelectorAll('.role__multiple-choices').forEach(setupRestrictions);
-
-    function setupRestrictions(role) {
-      var selectedChoices = [];
-      role.querySelectorAll('input').forEach(setupRestriction);
-
-      function setupRestriction(choice) {
-        if (choice.checked)
-          selectedChoices.push(choice);
-        choice.addEventListener('change', onChange);
-
-        function onChange() {
-          if (choice.checked)
-            selectedChoices.push(choice);
-          else
-            selectedChoices.splice(selectedChoices.indexOf(choice), 1);
-          while (selectedChoices.length > role.dataset.maxChoice)
-            selectedChoices.shift().checked = false;
-        }
-      }
-    }
-  </script>
 {% endblock %}
