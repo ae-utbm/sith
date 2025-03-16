@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 
@@ -84,7 +85,7 @@ class Election(models.Model):
     def has_voted(self, user):
         return self.voters.filter(id=user.id).exists()
 
-    @property
+    @cached_property
     def results(self):
         results = {}
         total_vote = self.voters.count()
