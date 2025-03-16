@@ -31,7 +31,7 @@
       <time datetime="{{ election.end_date }}">{{ election.end_date|localtime|date(DATETIME_FORMAT)}}</time>
       {% trans %} at {% endtrans %}<time>{{ election.end_date|localtime|time(DATETIME_FORMAT)}}</time>
     </p>
-    {%- if election.has_voted(user) %}
+    {%- if user_has_voted %}
       <p class="election__elector-infos">
         {%- if election.is_vote_active %}
           <span>{% trans %}You already have submitted your vote.{% endtrans %}</span>
@@ -45,12 +45,11 @@
     <form action="{{ url('election:vote', election.id) }}" method="post" class="election__vote-form" name="vote-form" id="vote-form">
       {% csrf_token %}
       <table class="election_table">
-        {%- set election_lists = election.election_lists.all() -%}
         <thead class="lists">
           <tr>
-            <th class="column" style="width: {{ 100 / (election_lists.count() + 1) }}%">{% trans %}Blank vote{% endtrans %}</th>
+            <th class="column" style="width: {{ 100 / (election_lists|length + 1) }}%">{% trans %}Blank vote{% endtrans %}</th>
             {%- for election_list in election_lists %}
-              <th class="column" style="width: {{ 100 / (election_lists.count() + 1) }}%">
+              <th class="column" style="width: {{ 100 / (election_lists|length + 1) }}%">
                 <span>{{ election_list.title }}</span>
                 {% if user.can_edit(election_list) and election.is_vote_editable -%}
                   <a href="{{ url('election:delete_list', list_id=election_list.id) }}"><i class="fa-regular fa-trash-can delete-action"></i></a>
@@ -59,9 +58,7 @@
             {%- endfor %}
           </tr>
         </thead>
-        {%- set role_list = election.roles.order_by('order').all() %}
-        {%- for role in role_list %}
-          {%- set count = [0] %}
+        {%- for role in election_roles %}
           {%- set role_data = election_form.data.getlist(role.title) if role.title in election_form.data else [] %}
 
           <tbody
@@ -75,8 +72,12 @@
                 <div class="role_text">
                   <h4>{{ role.title }}</h4>
                   <p class="role_description" show-more="300">{{ role.description }}</p>
-                  {%- if role.max_choice > 1 and not election.has_voted(user) and election.can_vote(user) %}
-                    <strong>{% trans %}You may choose up to{% endtrans %} {{ role.max_choice }} {% trans %}people.{% endtrans %}</strong>
+                  {%- if role.max_choice > 1 and show_vote_buttons %}
+                    <strong>
+                      {% trans trimmed nb_choices=role.max_choice %}
+                        You may choose up to {{ nb_choices }} people.
+                      {% endtrans %}
+                    </strong>
                   {%- endif %}
 
                   {%- if election_form.errors[role.title] is defined %}
@@ -87,36 +88,40 @@
                 </div>
                 {% if user.can_edit(role) and election.is_vote_editable -%}
                   <div class="role_buttons">
-                    <a href="{{url('election:update_role', role_id=role.id)}}">️<i class="fa-regular fa-pen-to-square edit-action"></i></a>
-                    <a href="{{url('election:delete_role', role_id=role.id)}}"><i class="fa-regular fa-trash-can delete-action"></i></a>
-                    {%- if role == role_list.last() %}
+                    <a href="{{ url('election:update_role', role_id=role.id) }}">️
+                      <i class="fa-regular fa-pen-to-square edit-action"></i>
+                    </a>
+                    <a href="{{ url('election:delete_role', role_id=role.id) }}">
+                      <i class="fa-regular fa-trash-can delete-action"></i>
+                    </a>
+                    {%- if loop.last -%}
                       <button disabled><i class="fa fa-arrow-down"></i></button>
                       <button disabled><i class="fa fa-caret-down"></i></button>
-                    {%- else %}
+                    {%- else -%}
                       <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=bottom');"><i class="fa fa-arrow-down"></i></button>
                       <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=down');"><i class="fa fa-caret-down"></i></button>
-                    {%- endif %}
-                    {% if role == role_list.first() %}
+                    {%- endif -%}
+                    {%- if loop.first -%}
                       <button disabled><i class="fa fa-caret-up"></i></button>
                       <button disabled><i class="fa fa-arrow-up"></i></button>
-                    {% else %}
+                    {%- else -%}
                       <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=up');"><i class="fa fa-caret-up"></i></button>
                       <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=top');"><i class="fa fa-arrow-up"></i></button>
-                    {% endif %}
+                    {%- endif -%}
                   </div>
                 {%- endif -%}
               </td>
             </tr>
             <tr class="role_candidates">
-              <td class="list_per_role" style="width: 100%; max-width: {{ 100 / (election_lists.count() + 1) }}%">
-                {%- if role.max_choice == 1 and election.can_vote(user) %}
+              <td class="list_per_role" style="width: 100%; max-width: {{ 100 / (election_lists|length + 1) }}%">
+                {%- if role.max_choice == 1 and show_vote_buttons %}
                   <div class="radio-btn">
-                    <input id="id_{{ role.title }}_{{ count[0] }}" type="radio" name="{{ role.title }}" value {{ '' if role_data in election_form else 'checked' }} {{ 'disabled' if election.has_voted(user) else '' }}>
-                    <label for="id_{{ role.title }}_{{ count[0] }}">
+                    {% set input_id = "blank_vote_" + role.id|string %}
+                    <input id="{{ input_id }}" type="radio" name="{{ role.title }}">
+                    <label for="{{ input_id }}">
                       <span>{% trans %}Choose blank vote{% endtrans %}</span>
                     </label>
                   </div>
-                  {%- set _ = count.append(count.pop() + 1) %}
                 {%- endif %}
                 {%- if election.is_vote_finished %}
                   {%- set results = election_results[role.title]['blank vote'] %}
@@ -126,13 +131,14 @@
                 {%- endif %}
               </td>
               {%- for election_list in election_lists %}
-                <td class="list_per_role" style="width: 100%; max-width: {{ 100 / (election_lists.count() + 1) }}%">
+                <td class="list_per_role" style="width: 100%; max-width: {{ 100 / (election_lists|length + 1) }}%">
                   <ul class="candidates">
-                    {%- for candidature in election_list.candidatures.filter(role=role) %}
+                    {%- for candidature in election_list.candidatures.select_related("user", "user__profile_pict").filter(role=role) %}
                       <li class="candidate">
-                        {%- if election.can_vote(user) %}
-                          <input id="id_{{ role.title }}_{{ count[0] }}" type="{{ 'checkbox' if role.max_choice > 1 else 'radio' }}" {{ 'checked' if candidature.id|string in role_data else '' }} {{ 'disabled' if election.has_voted(user) else '' }} name="{{ role.title }}" value="{{ candidature.id }}">
-                          <label for="id_{{ role.title }}_{{ count[0] }}">
+                        {%- if show_vote_buttons %}
+                          {% set input_id = "candidature_" + candidature.id|string %}
+                          <input id="{{ input_id }}" type="{{ 'checkbox' if role.max_choice > 1 else 'radio' }}" {{ 'checked' if candidature.id|string in role_data else '' }} {{ 'disabled' if user_has_voted else '' }} name="{{ role.title }}" value="{{ candidature.id }}">
+                          <label for="{{ input_id }}">
                         {%- endif %}
                         <figure>
                           {%- if user.is_subscriber_viewable %}
@@ -146,7 +152,7 @@
                             <h5>{{ candidature.user.first_name }} <em>{{candidature.user.nick_name or ''}} </em>{{ candidature.user.last_name }}</h5>
                             {%- if not election.is_vote_finished %}
                               <q class="candidate_program" show-more="200">
-                                {{ candidature.program|markdown or '' }}
+                                {{ candidature.program|markdown }}
                               </q>
                             {%- endif %}
                           </figcaption>
@@ -159,9 +165,8 @@
                             {%- endif -%}
                           {%- endif -%}
                         </figure>
-                        {%- if election.can_vote(user) %}
+                        {%- if show_vote_buttons %}
                           </label>
-                          {%- set _ = count.append(count.pop() + 1) %}
                         {%- endif %}
                         {%- if election.is_vote_finished %}
                           {%- set results = election_results[role.title][candidature.user.username] %}
@@ -197,7 +202,7 @@
       <a  class="button" href="{{ url('election:delete', election_id=object.id) }}">{% trans %}Delete{% endtrans %}</a>
     {%- endif %}
   </section>
-  {%- if not election.has_voted(user) and election.can_vote(user) %}
+  {%- if show_vote_buttons %}
     <section class="buttons">
       <button class="button button_send" form="vote-form">{% trans %}Submit the vote !{% endtrans %}</button>
     </section>
