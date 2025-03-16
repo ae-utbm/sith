@@ -1,6 +1,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from core.models import User
 from core.views.forms import SelectDateTime
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
@@ -59,22 +60,23 @@ class CandidateForm(forms.ModelForm):
 
 
 class VoteForm(forms.Form):
-    def __init__(self, election, user, *args, **kwargs):
+    def __init__(self, election: Election, user: User, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if not election.has_voted(user):
-            for role in election.roles.all():
-                cand = role.candidatures
-                if role.max_choice > 1:
-                    self.fields[role.title] = LimitedCheckboxField(
-                        cand, role.max_choice, required=False
-                    )
-                else:
-                    self.fields[role.title] = forms.ModelChoiceField(
-                        cand,
-                        required=False,
-                        widget=forms.RadioSelect(),
-                        empty_label=_("Blank vote"),
-                    )
+        if election.can_vote(user):
+            return
+        for role in election.roles.all():
+            cand = role.candidatures
+            if role.max_choice > 1:
+                self.fields[role.title] = LimitedCheckboxField(
+                    cand, role.max_choice, required=False
+                )
+            else:
+                self.fields[role.title] = forms.ModelChoiceField(
+                    cand,
+                    required=False,
+                    widget=forms.RadioSelect(),
+                    empty_label=_("Blank vote"),
+                )
 
 
 class RoleForm(forms.ModelForm):

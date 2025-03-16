@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import QuerySet
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
@@ -30,24 +30,20 @@ class ElectionsListView(CanViewMixin, ListView):
     """A list of all non archived elections visible."""
 
     model = Election
+    queryset = model.objects.filter(archived=False)
     ordering = ["-id"]
     paginate_by = 10
     template_name = "election/election_list.jinja"
-
-    def get_queryset(self):
-        return super().get_queryset().filter(archived=False).all()
 
 
 class ElectionListArchivedView(CanViewMixin, ListView):
     """A list of all archived elections visible."""
 
     model = Election
+    queryset = model.objects.filter(archived=True)
     ordering = ["-id"]
     paginate_by = 10
     template_name = "election/election_list.jinja"
-
-    def get_queryset(self):
-        return super().get_queryset().filter(archived=True).all()
 
 
 class ElectionDetailView(CanViewMixin, DetailView):
@@ -57,32 +53,42 @@ class ElectionDetailView(CanViewMixin, DetailView):
     template_name = "election/election_detail.jinja"
     pk_url_kwarg = "election_id"
 
+    @staticmethod
+    def _reorder_votes(action: str, role: int):
+        role = Role.objects.filter(id=role).first()
+        if not role:
+            return
+        if action == "up":
+            role.up()
+        elif action == "down":
+            role.down()
+        elif action == "bottom":
+            role.bottom()
+        elif action == "top":
+            role.top()
+
     def get(self, request, *arg, **kwargs):
-        response = super().get(request, *arg, **kwargs)
         election: Election = self.get_object()
-        if request.user.can_edit(election) and election.is_vote_editable:
+        if election.is_vote_editable and request.user.can_edit(election):
             action = request.GET.get("action", None)
             role = request.GET.get("role", None)
-            if action and role and Role.objects.filter(id=role).exists():
-                if action == "up":
-                    Role.objects.get(id=role).up()
-                elif action == "down":
-                    Role.objects.get(id=role).down()
-                elif action == "bottom":
-                    Role.objects.get(id=role).bottom()
-                elif action == "top":
-                    Role.objects.get(id=role).top()
-                return redirect(
-                    reverse("election:detail", kwargs={"election_id": election.id})
-                )
-        return response
+            if action and role and role.isdigit():
+                self._reorder_votes(action, int(role))
+        return super().get(request, *arg, **kwargs)
 
     def get_context_data(self, **kwargs):
         """Add additionnal data to the template."""
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["election_form"] = VoteForm(self.object, self.request.user)
-        kwargs["election_results"] = self.object.results
-        return kwargs
+        user: User = self.request.user
+        return super().get_context_data(**kwargs) | {
+            "election_form": VoteForm(self.object, user),
+            "show_vote_buttons": self.object.can_vote(user),
+            "user_has_voted": self.object.has_voted(user),
+            "election_results": (
+                self.object.results if self.object.is_vote_finished else None
+            ),
+            "election_lists": list(self.object.election_lists.all()),
+            "election_roles": list(self.object.roles.order_by("order")),
+        }
 
 
 # Form view
@@ -363,18 +369,12 @@ class RoleUpdateView(CanEditMixin, UpdateView):
 # Delete Views
 
 
-class ElectionDeleteView(DeleteView):
+class ElectionDeleteView(PermissionRequiredMixin, DeleteView):
     model = Election
     template_name = "core/delete_confirm.jinja"
     pk_url_kwarg = "election_id"
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_root:
-            return super().dispatch(request, *args, **kwargs)
-        raise PermissionDenied
-
-    def get_success_url(self, **kwargs):
-        return reverse_lazy("election:list")
+    permission_required = "election.delete_election"
+    success_url = reverse_lazy("election:list")
 
 
 class CandidatureDeleteView(CanEditMixin, DeleteView):
@@ -390,7 +390,7 @@ class CandidatureDeleteView(CanEditMixin, DeleteView):
         return super().dispatch(request, *arg, **kwargs)
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
+        return reverse("election:detail", kwargs={"election_id": self.election.id})
 
 
 class RoleDeleteView(CanEditMixin, DeleteView):
@@ -406,7 +406,7 @@ class RoleDeleteView(CanEditMixin, DeleteView):
         return super().dispatch(request, *arg, **kwargs)
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
+        return reverse("election:detail", kwargs={"election_id": self.election.id})
 
 
 class ElectionListDeleteView(CanEditMixin, DeleteView):
@@ -422,4 +422,4 @@ class ElectionListDeleteView(CanEditMixin, DeleteView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
+        return reverse("election:detail", kwargs={"election_id": self.election.id})
