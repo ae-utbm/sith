@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Count
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -110,27 +111,28 @@ class Role(OrderedModel):
     def __str__(self):
         return f"{self.title} - {self.election.title}"
 
-    def results(self, total_vote):
-        results = {}
-        total_vote *= self.max_choice
-        non_blank = 0
-        for candidature in self.candidatures.all():
-            cand_results = {}
-            cand_results["vote"] = self.votes.filter(candidature=candidature).count()
-            if total_vote == 0:
-                cand_results["percent"] = 0
-            else:
-                cand_results["percent"] = cand_results["vote"] * 100 / total_vote
-            non_blank += cand_results["vote"]
-            results[candidature.user.username] = cand_results
-        results["total vote"] = total_vote
+    def results(self, total_vote: int) -> dict[str, dict[str, int | float]]:
         if total_vote == 0:
-            results["blank vote"] = {"vote": 0, "percent": 0}
-        else:
-            results["blank vote"] = {
-                "vote": total_vote - non_blank,
-                "percent": (total_vote - non_blank) * 100 / total_vote,
+            candidates = self.candidatures.values_list("user__username")
+            return {
+                key: {"vote": 0, "percent": 0} for key in ["blank_votes", *candidates]
             }
+        total_vote *= self.max_choice
+        results = {"total vote": total_vote}
+        non_blank = 0
+        candidatures = self.candidatures.annotate(nb_votes=Count("votes")).values(
+            "nb_votes", "user__username"
+        )
+        for candidature in candidatures:
+            non_blank += candidature["nb_votes"]
+            results[candidature["user__username"]] = {
+                "vote": candidature["nb_votes"],
+                "percent": candidature["nb_votes"] * 100 / total_vote,
+            }
+        results["blank vote"] = {
+            "vote": total_vote - non_blank,
+            "percent": (total_vote - non_blank) * 100 / total_vote,
+        }
         return results
 
     @property
