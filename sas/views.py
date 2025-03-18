@@ -12,6 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from pathlib import Path
 from typing import Any
 
 from django.conf import settings
@@ -25,7 +26,7 @@ from django.views.generic.edit import FormMixin, FormView, UpdateView
 
 from core.auth.mixins import CanEditMixin, CanViewMixin
 from core.models import SithFile, User
-from core.views.files import FileView, send_file
+from core.views.files import FileView, send_raw_file
 from core.views.user import UserTabsMixin
 from sas.forms import (
     AlbumEditForm,
@@ -43,16 +44,12 @@ class SASMainView(FormView):
 
     def post(self, request, *args, **kwargs):
         self.form = self.get_form()
-        parent = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
-        files = request.FILES.getlist("images")
         root = User.objects.filter(username="root").first()
         if request.user.is_authenticated and request.user.is_in_group(
             pk=settings.SITH_GROUP_SAS_ADMIN_ID
         ):
             if self.form.is_valid():
-                self.form.process(
-                    parent=parent, owner=root, files=files, automodere=True
-                )
+                self.form.process(parent=None, owner=root, files=[], automodere=True)
                 if self.form.is_valid():
                     return super().form_valid(self.form)
         else:
@@ -61,10 +58,8 @@ class SASMainView(FormView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        albums_qs = Album.objects.viewable_by(self.request.user)
-        kwargs["categories"] = list(
-            albums_qs.filter(parent_id=settings.SITH_SAS_ROOT_DIR_ID).order_by("id")
-        )
+        albums_qs = Album.objects.annotate_is_moderated().viewable_by(self.request.user)
+        kwargs["categories"] = list(albums_qs.filter(parent=None).order_by("id"))
         kwargs["latest"] = list(albums_qs.order_by("-id")[:5])
         return kwargs
 
@@ -73,6 +68,9 @@ class PictureView(CanViewMixin, DetailView):
     model = Picture
     pk_url_kwarg = "picture_id"
     template_name = "sas/picture.jinja"
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("parent")
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -83,25 +81,35 @@ class PictureView(CanViewMixin, DetailView):
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
-            "album": Album.objects.get(children=self.object)
-        }
+        return super().get_context_data(**kwargs) | {"album": self.object.parent}
 
 
 def send_album(request, album_id):
-    return send_file(request, album_id, Album)
+    album = get_object_or_404(Album, id=album_id)
+    if not album.can_be_viewed_by(request.user):
+        raise PermissionDenied
+    return send_raw_file(Path(album.thumbnail.path))
 
 
 def send_pict(request, picture_id):
-    return send_file(request, picture_id, Picture)
+    picture = get_object_or_404(Picture, id=picture_id)
+    if not picture.can_be_viewed_by(request.user):
+        raise PermissionDenied
+    return send_raw_file(Path(picture.original.path))
 
 
 def send_compressed(request, picture_id):
-    return send_file(request, picture_id, Picture, "compressed")
+    picture = get_object_or_404(Picture, id=picture_id)
+    if not picture.can_be_viewed_by(request.user):
+        raise PermissionDenied
+    return send_raw_file(Path(picture.compressed.path))
 
 
 def send_thumb(request, picture_id):
-    return send_file(request, picture_id, Picture, "thumbnail")
+    picture = get_object_or_404(Picture, id=picture_id)
+    if not picture.can_be_viewed_by(request.user):
+        raise PermissionDenied
+    return send_raw_file(Path(picture.thumbnail.path))
 
 
 class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
@@ -114,11 +122,10 @@ class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
         if not self.object.file:
             self.object.generate_thumbnail()
         self.form = self.get_form()
-        parent = SithFile.objects.filter(id=self.object.id).first()
         files = request.FILES.getlist("images")
         if request.user.is_subscribed and self.form.is_valid():
             self.form.process(
-                parent=parent,
+                parent=self.object,
                 owner=request.user,
                 files=files,
                 automodere=(
@@ -231,7 +238,7 @@ class ModerationView(TemplateView):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         kwargs["albums_to_moderate"] = Album.objects.filter(
-            is_moderated=False, is_in_sas=True, is_folder=True
+            is_moderated=False
         ).order_by("id")
         pictures = Picture.objects.filter(is_moderated=False).select_related("parent")
         kwargs["pictures"] = pictures
