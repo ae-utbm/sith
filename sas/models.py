@@ -23,7 +23,7 @@ from typing import ClassVar, Self
 from django.conf import settings
 from django.core.cache import cache
 from django.db import models
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, OuterRef, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -73,7 +73,7 @@ class PictureQuerySet(models.QuerySet):
         if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
             return self.all()
         if user.was_subscribed:
-            return self.filter(is_moderated=True)
+            return self.filter(Q(is_moderated=True) | Q(owner=user))
         return self.filter(people__user_id=user.id, is_moderated=True)
 
 
@@ -187,7 +187,7 @@ class AlbumQuerySet(models.QuerySet):
         if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
             return self.all()
         if user.was_subscribed:
-            return self.filter(is_moderated=True)
+            return self.filter(Q(is_moderated=True) | Q(owner=user))
         # known bug : if all children of an album are also albums
         # then this album is excluded, even if one of the sub-albums should be visible.
         # The fs-like navigation is likely to be half-broken for non-subscribers,

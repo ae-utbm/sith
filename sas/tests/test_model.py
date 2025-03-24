@@ -16,17 +16,22 @@ class TestPictureQuerySet(TestCase):
 
     def test_root(self):
         root = baker.make(User, is_superuser=True)
-        pictures = list(Picture.objects.viewable_by(root))
-        self.assertCountEqual(pictures, self.pictures)
+        pictures = list(Picture.objects.viewable_by(root).order_by("id"))
+        assert pictures == self.pictures
 
     def test_subscriber(self):
+        """Test that subscribed users see moderated pictures and pictures they own."""
         subscriber = subscriber_user.make()
         old_subcriber = old_subscriber_user.make()
+        qs = Picture.objects.filter(pk=self.pictures[1].id)
+        qs.update(is_moderated=False)
         for user in (subscriber, old_subcriber):
-            pictures = list(Picture.objects.viewable_by(user))
-            self.assertCountEqual(pictures, self.pictures[1:])
+            qs.update(owner=user)
+            pictures = list(Picture.objects.viewable_by(user).order_by("id"))
+            assert pictures == self.pictures[1:]
 
     def test_not_subscribed_identified(self):
+        """Public users should only see moderated photos on which they are identified."""
         user = baker.make(
             # This is the guy who asked the feature of making pictures
             # available for tagged users, even if not subscribed
@@ -35,7 +40,7 @@ class TestPictureQuerySet(TestCase):
             last_name="Dheilly",
             nick_name="Sahmer",
         )
-        user.pictures.create(picture=self.pictures[0])
-        user.pictures.create(picture=self.pictures[1])
+        user.pictures.create(picture=self.pictures[0])  # non-moderated
+        user.pictures.create(picture=self.pictures[1])  # moderated
         pictures = list(Picture.objects.viewable_by(user))
         assert pictures == [self.pictures[1]]

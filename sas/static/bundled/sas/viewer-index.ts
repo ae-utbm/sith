@@ -4,9 +4,9 @@ import { History } from "#core:utils/history";
 import type TomSelect from "tom-select";
 import {
   type IdentifiedUserSchema,
+  type ModerationRequestSchema,
   type PictureSchema,
   type PicturesFetchIdentificationsResponse,
-  type PicturesFetchModerationRequestsResponse,
   type PicturesFetchPicturesData,
   type UserProfileSchema,
   picturesDeletePicture,
@@ -30,7 +30,7 @@ class PictureWithIdentifications {
   id: number;
   // biome-ignore lint/style/useNamingConvention: api is in snake_case
   compressed_url: string;
-  moderationRequests: PicturesFetchModerationRequestsResponse = null;
+  moderationRequests: ModerationRequestSchema[] = null;
 
   constructor(picture: PictureSchema) {
     Object.assign(this, picture);
@@ -156,9 +156,6 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
        * The select2 component used to identify users
        **/
       selector: undefined,
-      /**
-       * true if the page is in a loading state, else false
-       **/
       /**
        * Error message when a moderation operation fails
        **/
