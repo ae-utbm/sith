@@ -17,6 +17,7 @@ from datetime import date, timedelta
 
 # Image utils
 from io import BytesIO
+from typing import Final
 
 import PIL
 from django.conf import settings
@@ -25,6 +26,19 @@ from django.http import HttpRequest
 from django.utils.timezone import localdate
 from PIL import ExifTags
 from PIL.Image import Image, Resampling
+
+RED_PIXEL_PNG: Final[bytes] = (
+    b"\x89\x50\x4e\x47\x0d\x0a\x1a\x0a\x00\x00\x00\x0d\x49\x48\x44\x52"
+    b"\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90\x77\x53"
+    b"\xde\x00\x00\x00\x0c\x49\x44\x41\x54\x08\xd7\x63\xf8\xcf\xc0\x00"
+    b"\x00\x03\x01\x01\x00\x18\xdd\x8d\xb0\x00\x00\x00\x00\x49\x45\x4e"
+    b"\x44\xae\x42\x60\x82"
+)
+"""A single red pixel, in PNG format.
+
+Can be used in tests and in dev, when there is a need
+to generate a dummy image that is considered valid nonetheless
+"""
 
 
 def get_start_of_semester(today: date | None = None) -> date:
