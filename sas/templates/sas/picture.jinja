@@ -17,6 +17,8 @@
 
 {% from "sas/macros.jinja" import print_path %}
 
+{% set user_is_sas_admin = user.is_root or user.is_in_group(pk = settings.SITH_GROUP_SAS_ADMIN_ID) %}
+
 {% block content %}
   <main x-data="picture_viewer">
     <code>
@@ -31,8 +33,13 @@
     </div>
     <br>
 
+    {# Non-moderated pictures (hence, this moderation alert too)
+       should be shown only to admins and to the picture owner.
+       Admins should see all infos and have access to all actions.
+       Non-admin picture owners should only see the message warning them that
+       the picture isn't moderated yet. #}
     <template x-if="!currentPicture.is_moderated">
-      <div class="alert alert-red" @click="console.log(currentPicture)">
+      <div id="picture-moderation-alert" class="alert alert-red">
         <div class="alert-main">
           <template x-if="currentPicture.asked_for_removal">
             <h3 class="alert-title">{% trans %}Asked for removal{% endtrans %}</h3>
@@ -43,35 +50,37 @@
               It will be hidden to other users until it has been moderated.
             {% endtrans %}
           </p>
-          <template x-if="currentPicture.asked_for_removal">
-            <div>
-              <h5 @click="console.log(currentPicture.moderationRequests)">
-                {% trans %}The following issues have been raised:{% endtrans %}
-              </h5>
-              <template x-for="req in (currentPicture.moderationRequests ?? [])" :key="req.id">
-                <div>
-                  <h6
-                    x-text="`${req.author.first_name} ${req.author.last_name}`"
-                  ></h6>
-                  <i x-text="Intl.DateTimeFormat(
-                             '{{ LANGUAGE_CODE }}',
-                             {dateStyle: 'long', timeStyle: 'short'}
-                             ).format(new Date(req.created_at))"></i>
-                  <blockquote x-text="`> ${req.reason}`"></blockquote>
-                </div>
-              </template>
-            </div>
-          </template>
+          {% if user_is_sas_admin %}
+            <template x-if="currentPicture.asked_for_removal">
+              <div>
+                <h5>{% trans %}The following issues have been raised:{% endtrans %}</h5>
+                <template x-for="req in (currentPicture.moderationRequests ?? [])" :key="req.id">
+                  <div>
+                    <h6
+                      x-text="`${req.author.first_name} ${req.author.last_name}`"
+                    ></h6>
+                    <i x-text="Intl.DateTimeFormat(
+                               '{{ LANGUAGE_CODE }}',
+                               {dateStyle: 'long', timeStyle: 'short'}
+                               ).format(new Date(req.created_at))"></i>
+                    <blockquote x-text="`${req.reason}`"></blockquote>
+                  </div>
+                </template>
+              </div>
+            </template>
+          {% endif %}
         </div>
-        <div class="alert-aside">
-          <button class="btn btn-blue" @click="moderatePicture()">
-            {% trans %}Moderate{% endtrans %}
-          </button>
-          <button class="btn btn-red" @click.prevent="deletePicture()">
-            {% trans %}Delete{% endtrans %}
-          </button>
-          <p x-show="!!moderationError" x-text="moderationError"></p>
-        </div>
+        {% if user_is_sas_admin %}
+          <div class="alert-aside">
+            <button class="btn btn-blue" @click="moderatePicture()">
+              {% trans %}Moderate{% endtrans %}
+            </button>
+            <button class="btn btn-red" @click.prevent="deletePicture()">
+              {% trans %}Delete{% endtrans %}
+            </button>
+            <p x-show="!!moderationError" x-text="moderationError"></p>
+          </div>
+        {% endif %}
       </div>
     </template>
 
@@ -203,7 +212,7 @@
         albumUrl: "{{ album.get_absolute_url() }}",
         firstPictureId: {{ picture.id }},  {# id of the first picture to show after page load #}
         userId: {{ user.id }},
-        userIsSasAdmin: {{ (user.is_root or user.is_in_group(pk = settings.SITH_GROUP_SAS_ADMIN_ID))|tojson }}
+        userIsSasAdmin: {{ user_is_sas_admin|tojson }}
       });
     })
   </script>

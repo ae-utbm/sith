@@ -880,11 +880,9 @@ class SithFile(models.Model):
     def save(self, *args, **kwargs):
         sas = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
         self.is_in_sas = sas in self.get_parent_list() or self == sas
-        copy_rights = False
-        if self.id is None:
-            copy_rights = True
+        adding = self._state.adding
         super().save(*args, **kwargs)
-        if copy_rights:
+        if adding:
             self.copy_rights()
         if self.is_in_sas:
             for user in User.objects.filter(
