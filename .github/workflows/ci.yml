@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false  # don't interrupt the other test processes
       matrix:
-        pytest-mark: [slow, not slow]
+        pytest-mark: [not slow]
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

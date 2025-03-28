@@ -205,14 +205,6 @@ class UserTabsMixin(TabedViewMixin):
                 "name": _("Pictures"),
             },
         ]
-        if settings.SITH_ENABLE_GALAXY and self.request.user.was_subscribed:
-            tab_list.append(
-                {
-                    "url": reverse("galaxy:user", kwargs={"user_id": user.id}),
-                    "slug": "galaxy",
-                    "name": _("Galaxy"),
-                }
-            )
         if self.request.user == user:
             tab_list.append(
                 {"url": reverse("core:user_tools"), "slug": "tools", "name": _("Tools")}
