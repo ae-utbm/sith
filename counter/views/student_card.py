@@ -13,16 +13,16 @@
 #
 #
 
-
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.utils.safestring import SafeString
 from django.utils.translation import gettext as _
 from django.views.generic.edit import DeleteView, FormView
 
 from core.auth.mixins import can_edit
-from core.utils import FormFragmentTemplateData
+from core.views.mixins import FragmentMixin
 from counter.forms import StudentCardForm
 from counter.models import Customer, StudentCard
 from counter.utils import is_logged_in_counter
@@ -62,27 +62,11 @@ class StudentCardDeleteView(DeleteView):
         )
 
 
-class StudentCardFormView(FormView):
-    """Add a new student card. This is a fragment view !"""
+class StudentCardFormFragment(FragmentMixin, FormView):
+    """Add a new student card."""
 
     form_class = StudentCardForm
     template_name = "counter/fragments/create_student_card.jinja"
-
-    @classmethod
-    def get_template_data(
-        cls, customer: Customer, *, form_instance: form_class | None = None
-    ) -> FormFragmentTemplateData[form_class]:
-        """Get necessary data to pre-render the fragment"""
-        return FormFragmentTemplateData(
-            form=form_instance if form_instance else cls.form_class(),
-            template=cls.template_name,
-            context={
-                "action": reverse(
-                    "counter:add_student_card", kwargs={"customer_id": customer.pk}
-                ),
-                "customer": customer,
-            },
-        )
 
     def dispatch(self, request: HttpRequest, *args, **kwargs):
         self.customer = get_object_or_404(
@@ -96,6 +80,10 @@ class StudentCardFormView(FormView):
 
         return super().dispatch(request, *args, **kwargs)
 
+    def render_fragment(self, request, **kwargs) -> SafeString:
+        self.customer = kwargs.pop("customer")
+        return super().render_fragment(request, **kwargs)
+
     def form_valid(self, form: StudentCardForm) -> HttpResponse:
         data = form.clean()
         StudentCard.objects.update_or_create(
@@ -104,10 +92,12 @@ class StudentCardFormView(FormView):
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        data = self.get_template_data(self.customer, form_instance=context["form"])
-        context.update(data.context)
-        return context
+        return super().get_context_data(**kwargs) | {
+            "action": reverse(
+                "counter:add_student_card", kwargs={"customer_id": self.customer.pk}
+            ),
+            "customer": self.customer,
+        }
 
     def get_success_url(self, **kwargs):
         return self.request.path
