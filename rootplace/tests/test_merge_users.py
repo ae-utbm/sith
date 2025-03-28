@@ -22,6 +22,7 @@ from django.utils.timezone import localtime, now
 from club.models import Club
 from core.models import Group, User
 from counter.models import Counter, Customer, Product, Refilling, Selling
+from rootplace.forms import MergeForm
 from subscription.models import Subscription
 
 
@@ -78,6 +79,15 @@ class TestMergeUser(TestCase):
             mde_admin.id,
             sas_admin.id,
         }
+
+    def test_identical_accounts(self):
+        form = MergeForm(data={"user1": self.to_keep.id, "user2": self.to_keep.id})
+        assert not form.is_valid()
+        assert "__all__" in form.errors
+        assert (
+            "Vous ne pouvez pas fusionner deux utilisateurs identiques."
+            in form.errors["__all__"]
+        )
 
     def test_both_subscribers_and_with_account(self):
         Customer(user=self.to_keep, account_id="11000l", amount=0).save()
