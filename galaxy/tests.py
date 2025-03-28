@@ -33,6 +33,7 @@ from core.models import User
 from galaxy.models import Galaxy
 
 
+@pytest.mark.skip(reason="Galaxy is disabled for now")
 class TestGalaxyModel(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -144,6 +145,7 @@ class TestGalaxyModel(TestCase):
 
 
 @pytest.mark.slow
+@pytest.mark.skip(reason="Galaxy is disabled for now")
 class TestGalaxyView(TestCase):
     @classmethod
     def setUpTestData(cls):

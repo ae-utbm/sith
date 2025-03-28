@@ -53,7 +53,6 @@ urlpatterns = [
     path("sas/", include(("sas.urls", "sas"), namespace="sas")),
     path("election/", include(("election.urls", "election"), namespace="election")),
     path("forum/", include(("forum.urls", "forum"), namespace="forum")),
-    path("galaxy/", include(("galaxy.urls", "galaxy"), namespace="galaxy")),
     path("trombi/", include(("trombi.urls", "trombi"), namespace="trombi")),
     path("matmatronch/", include(("matmat.urls", "matmat"), namespace="matmat")),
     path("pedagogy/", include(("pedagogy.urls", "pedagogy"), namespace="pedagogy")),
@@ -68,7 +67,10 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     import debug_toolbar
 
-    urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
+    urlpatterns += [
+        path("__debug__/", include(debug_toolbar.urls)),
+        path("galaxy/", include(("galaxy.urls", "galaxy"), namespace="galaxy")),
+    ]
 
 
 def sentry_debug(request):

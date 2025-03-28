@@ -341,10 +341,6 @@ SITH_URL = env.str("SITH_URL", default="127.0.0.1:8000")
 SITH_NAME = env.str("SITH_NAME", default="AE UTBM")
 SITH_TWITTER = "@ae_utbm"
 
-# Enable experimental features
-# Enable/Disable the galaxy button on user profile (urls stay activated)
-SITH_ENABLE_GALAXY = False
-
 # AE configuration
 # TODO: keep only that first setting, with the ID, and do the same for the other clubs
 SITH_MAIN_CLUB_ID = env.int("SITH_MAIN_CLUB_ID", default=1)
