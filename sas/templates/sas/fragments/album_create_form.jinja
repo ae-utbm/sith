@@ -1,0 +1,18 @@
+<form
+  class="add-files"
+  hx-post="{{ url("sas:album_create") }}"
+  hx-disabled-elt="find input[type='submit']"
+  hx-swap="outerHTML"
+>
+  {% csrf_token %}
+  <div class="inputs">
+    <div>
+      <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+      {{ form.name }}
+    </div>
+    {{ form.parent }}
+    <input type="submit" value="{% trans %}Create{% endtrans %}" />
+  </div>
+  {{ form.non_field_errors() }}
+  {{ form.name.errors }}
+</form>
