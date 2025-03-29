@@ -16,22 +16,25 @@ from typing import Any
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.urls import reverse, reverse_lazy
-from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, TemplateView
-from django.views.generic.edit import FormMixin, FormView, UpdateView
+from django.urls import reverse
+from django.utils.safestring import SafeString
+from django.views.generic import CreateView, DetailView, TemplateView
+from django.views.generic.edit import FormView, UpdateView
 
 from core.auth.mixins import CanEditMixin, CanViewMixin
 from core.models import SithFile, User
+from core.views import UseFragmentsMixin
 from core.views.files import FileView, send_file
+from core.views.mixins import FragmentMixin, FragmentRenderer
 from core.views.user import UserTabsMixin
 from sas.forms import (
+    AlbumCreateForm,
     AlbumEditForm,
     PictureEditForm,
     PictureModerationRequestForm,
-    SASForm,
+    PictureUploadForm,
 )
 from sas.models import Album, Picture
 
@@ -115,32 +118,6 @@ def send_compressed(request, picture_id):
 def send_thumb(request, picture_id):
     return send_file(request, picture_id, Picture, "thumbnail")
 
-
-class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
-    model = Album
-    form_class = SASForm
-    pk_url_kwarg = "album_id"
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if not self.object.file:
-            self.object.generate_thumbnail()
-        self.form = self.get_form()
-        parent = SithFile.objects.filter(id=self.object.id).first()
-        files = request.FILES.getlist("images")
-        if request.user.is_subscribed and self.form.is_valid():
-            self.form.process(
-                parent=parent,
-                owner=request.user,
-                files=files,
-                automodere=(
-                    request.user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
-                    or request.user.is_root
-                ),
-            )
-            if self.form.is_valid():
-                return HttpResponse(str(self.form.errors), status=200)
-        return HttpResponse(str(self.form.errors), status=500)
 
 class AlbumView(CanViewMixin, UseFragmentsMixin, DetailView):
     model = Album
