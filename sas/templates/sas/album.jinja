@@ -110,13 +110,28 @@
 
   {% if is_sas_admin %}
     </form>
-    <form class="add-files" id="upload_form" action="" method="post" enctype="multipart/form-data">
+    {{ album_create_fragment }}
+    <form
+      class="add-files"
+      id="upload_form"
+      x-data="pictureUpload({{ album.id }})"
+      @submit.prevent="sendPictures()"
+    >
       {% csrf_token %}
       <div class="inputs">
-        {{ form.as_p() }}
-
+        <p>
+          <label for="{{ upload_form.images.id_for_label }}">{{ upload_form.images.label }} :</label>
+          {{ upload_form.images|add_attr("x-ref=pictures") }}
+          <span class="helptext">{{ upload_form.images.help_text }}</span>
+        </p>
         <input type="submit" value="{% trans %}Upload{% endtrans %}" />
+        <progress x-ref="progress" x-show="sending"></progress>
       </div>
+      <ul class="errorlist">
+        <template x-for="error in errors">
+          <li class="error" x-text="error"></li>
+        </template>
+      </ul>
     </form>
   {% endif %}
 

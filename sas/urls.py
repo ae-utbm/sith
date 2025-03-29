@@ -16,6 +16,7 @@
 from django.urls import path
 
 from sas.views import (
+    AlbumCreateFragment,
     AlbumEditView,
     AlbumUploadView,
     AlbumView,
@@ -59,4 +60,5 @@ urlpatterns = [
     path(
         "user/<int:user_id>/pictures/", UserPicturesView.as_view(), name="user_pictures"
     ),
+    path("fragment/album-create", AlbumCreateFragment.as_view(), name="album_create"),
 ]

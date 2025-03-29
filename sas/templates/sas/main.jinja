@@ -61,23 +61,8 @@
 
       {% if is_sas_admin %}
         </form>
-
         <br>
-
-        <form class="add-files" action="" method="post" enctype="multipart/form-data">
-          {% csrf_token %}
-
-          <div class="inputs">
-            <div>
-              <label for="{{ form.album_name.name }}">{{ form.album_name.label }}</label>
-              {{ form.album_name }}
-            </div>
-            <input type="submit" value="{% trans %}Create{% endtrans %}" />
-          </div>
-
-          {{ form.non_field_errors() }}
-          {{ form.album_name.errors }}
-        </form>
+        {{ album_create_fragment }}
       {% endif %}
     {% endif %}
   </main>
