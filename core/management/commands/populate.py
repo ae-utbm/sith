@@ -740,8 +740,9 @@ Welcome to the wiki page!
                         size=file.size,
                     )
                     pict.file.name = p.name
-                    pict.clean()
+                    pict.full_clean()
                     pict.generate_thumbnails()
+                    pict.save()
 
         img_skia = Picture.objects.get(name="skia.jpg")
         img_sli = Picture.objects.get(name="sli.jpg")
