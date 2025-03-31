@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="" class="grid">
+  <head>
+    <title>AE UTBM</title>
+    <link rel="shortcut icon" href="{{ static('core/img/favicon.ico') }}">
+
+    <style>
+      :root {
+        --main-text: #ffffff;
+        --lightest-gray: #fafafa;
+        --light-gray: #bbbbbb;
+        --mid-light-gray: #616161;
+        --gray: #4b4b4b;
+        --mid-gray: #363636;
+        --light-mid-gray: #444444;
+        --mid-gray-border: #313131;
+        --dark-gray: #232323;
+        --shadow-dark-gray: #707070;
+        --darkest-gray: #161617;
+        --main-background: #000;
+        --main-theme: #ec567c;
+        --main-theme-hover: #e33561;
+        --error: #b02020;
+        --main-error: #d32f2f;
+        --main-enable: #8faf20;
+        --main-theme-information: #ed6398;
+        --intersti-blue: #00aef1;
+        --tooltip-background: #444444;
+        --tooltip-text: #EEEEEE;
+      }
+    </style>
+
+    <link rel="stylesheet" href="{{ static("april/age_confirm.scss") }}"/>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <script type="module" src="{{ static('bundled/alpine-index.js') }}"></script>
+  </head>
+
+  <body>
+    <div id="ageDisclaimerMainBG"
+         style="position:fixed; padding:0; margin:0; top:0; left:0; width: 100%; height: 100%; z-index: 10000; background: #000;"></div>
+
+    <div id="ageDisclaimerWrapper" x-data>
+      <div class="age-disclaimer-modal main">
+        <div class="logo-wrapper">
+          <img src="{{ static('core/img/logo_no_text.png') }}" width="160"/>
+        </div>
+        <p class="age_verification_title">
+          {% trans %}Age Verification{% endtrans %}
+        </p>
+        <div class="content">
+          <p>
+            {% trans trimmed %}
+              This website contains age-restricted materials including blousards
+              and explicit depictions of student activity.
+              By entering, you affirm that you are at least 18 years of age
+              or the age of majority in the campus you are accessing the website from
+              and you consent to viewing explicit student content.
+            {% endtrans %}
+          </p>
+        </div>
+        <div class="buttons-wrapper">
+          <button
+            id="accessButton"
+            class="button button-pink gtm-event-avmodal"
+            @click="ageConfirm"
+          >
+            {% trans %}I am 18 or older{% endtrans %}
+          </button>
+          <button
+            id="exitButton"
+            class="button button-close gtm-event-avmodal"
+            @click="document.location = 'https://youtu.be/dQw4w9WgXcQ'"
+          >
+            {% trans %}I am under 18{% endtrans %}
+          </button>
+        </div>
+        <div class="parental-control-message">
+          <p>
+            {% trans trimmed %}
+              Our <a href="https://ae.utbm.fr/forum/topic/18125/" target="_blank" rel="noopener nofollow">
+                parental controls page</a> explains if you can access this website
+            {% endtrans %}
+          </p>
+          <span class='block-copyright'>AE UTBM 2025</span>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    function ageConfirm() {
+          {# If this cookie exists, the middleware shouldn't render this view #}
+      document.cookie = "prankDone=true;Max-Age=3600;";  {# one hour #}
+      document.location.reload();
+    }
+  </script>
+</html>

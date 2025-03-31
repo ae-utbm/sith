@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-28 13:51+0100\n"
+"POT-Creation-Date: 2025-04-01 01:33+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -796,6 +796,42 @@ msgstr ""
 "True si gardé à jour par le biais d'un fournisseur externe de domains "
 "toxics, False sinon"
 
+#: april/templates/april/age_confirm.jinja
+msgid "Age Verification"
+msgstr "Vérification de l'âge"
+
+#: april/templates/april/age_confirm.jinja
+msgid ""
+"This website contains age-restricted materials including blousards and "
+"explicit depictions of student activity. By entering, you affirm that you "
+"are at least 18 years of age or the age of majority in the campus you are "
+"accessing the website from and you consent to viewing explicit student "
+"content."
+msgstr ""
+"Ce site possède du contenu dont l'accès est limité à un certain âge, "
+"incluant des blousards et des représentations explicites d'activités "
+"étudiantes. En rentrant sur le site, vous affirmez que vous avez au moins 18 "
+"ans ou l'âge de la majorité dans le campus depuis lequel vous accédez au "
+"site et vous acceptez de voir du contenu explicite étudiant."
+
+#: april/templates/april/age_confirm.jinja
+msgid "I am 18 or older"
+msgstr "J'ai 18 ans ou plus"
+
+#: april/templates/april/age_confirm.jinja
+msgid "I am under 18"
+msgstr "J'ai moins de 18 ans"
+
+#: april/templates/april/age_confirm.jinja
+msgid ""
+"Our <a href=\"https://ae.utbm.fr/forum/topic/18125/\" target=\"_blank\" "
+"rel=\"noopener nofollow\"> parental controls page</a> explains if you can "
+"access this website"
+msgstr ""
+"Notre <a href=\"https://ae.utbm.fr/forum/topic/18125/\" target=\"_blank\" "
+"rel=\"noopener nofollow\"> page de contrôle parental</a> explique si vous "
+"pouvez accéder à ce site."
+
 #: club/forms.py
 msgid "Users to add"
 msgstr "Utilisateurs à ajouter"
@@ -934,6 +970,10 @@ msgstr "rôle"
 #: forum/models.py
 msgid "description"
 msgstr "description"
+
+#: club/models.py
+msgid "past member"
+msgstr "ancien membre"
 
 #: club/models.py
 msgid "Email address"
@@ -3335,8 +3375,8 @@ msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
 #: core/views/forms.py
 msgid ""
-"Profile: you need to be visible on the picture, in order to be recognized (e."
-"g. by the barmen)"
+"Profile: you need to be visible on the picture, in order to be recognized "
+"(e.g. by the barmen)"
 msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
@@ -3408,10 +3448,6 @@ msgstr "Famille"
 #: trombi/templates/trombi/user_profile.jinja
 msgid "Pictures"
 msgstr "Photos"
-
-#: core/views/user.py
-msgid "Galaxy"
-msgstr "Galaxie"
 
 #: counter/apps.py sith/settings.py
 msgid "Check"
@@ -3946,8 +3982,8 @@ msgstr ""
 #: counter/templates/counter/mails/account_dump.jinja
 msgid "If you think this was a mistake, please mail us at ae@utbm.fr."
 msgstr ""
-"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à ae@utbm."
-"fr."
+"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à "
+"ae@utbm.fr."
 
 #: counter/templates/counter/mails/account_dump.jinja
 msgid ""
@@ -6043,6 +6079,3 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
-
-#~ msgid "past member"
-#~ msgstr "ancien membre"

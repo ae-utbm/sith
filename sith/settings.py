@@ -98,6 +98,7 @@ INSTALLED_APPS = (
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "april",
     "staticfiles",
     "django.contrib.sites",
     "honeypot",
@@ -135,6 +136,7 @@ MIDDLEWARE = (
     "django.middleware.security.SecurityMiddleware",
     "core.middleware.AuthenticationMiddleware",
     "core.middleware.SignalRequestMiddleware",
+    "april.middleware.AprilFoolMiddleware",
 )
 
 ROOT_URLCONF = "sith.urls"

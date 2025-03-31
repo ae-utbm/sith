@@ -1,0 +1,165 @@
+a, body, div, h3, img, li, p, small, span, ul {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+}
+
+body {
+  line-height: 1;
+}
+
+ul {
+  list-style: none;
+}
+
+body {
+  font-size: 14px;
+  color: var(--main-text);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: var(--main-theme);
+  cursor: pointer;
+  outline: 0;
+}
+
+p {
+  margin-bottom: 10px;
+  line-height: 21px;
+}
+
+h3 {
+  font-weight: 700;
+  margin-bottom: 10px;
+  font-size: 1.4em;
+}
+
+.button {
+  display: inline-block;
+  padding: 7px;
+  border: 0;
+  border-radius: 3px;
+  color: var(--main-text);
+  font-size: 1em;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  outline: 0;
+}
+
+button.button {
+  border: 0;
+}
+
+.button.button-pink {
+  background-color: var(--main-theme);
+}
+
+.button.button-close {
+  background-color: var(--gray);
+  color: var(--light-gray);
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+#ageDisclaimerWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 20240;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background-color: var(--main-background);
+}
+
+#ageDisclaimerWrapper .age-disclaimer-modal {
+  max-width: 850px;
+  width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  box-sizing: border-box;
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  -webkit-transform: translate(-50%, -30%);
+  transform: translate(-50%, -30%);
+  background: var(--darkest-gray);
+  border: 1px solid var(--gray);
+  padding: 50px;
+  text-align: center;
+}
+
+#ageDisclaimerWrapper .age-disclaimer-modal .logo-wrapper {
+  margin-bottom: 20px;
+}
+
+#ageDisclaimerWrapper .age-disclaimer-modal .content {
+  font-size: 1.2em;
+  margin: 30px 0;
+}
+
+#ageDisclaimerWrapper .age-disclaimer-modal .buttons-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+#ageDisclaimerWrapper .age-disclaimer-modal .buttons-wrapper .button-close, #ageDisclaimerWrapper .age-disclaimer-modal .buttons-wrapper .button-pink {
+  font-size: 1.3em;
+  padding: 15px 10px;
+  -webkit-transition: all .2s;
+  transition: all .2s;
+  flex-basis: 40%;
+  max-width: 350px;
+}
+
+#ageDisclaimerWrapper .age-disclaimer-modal .buttons-wrapper .button-pink:hover {
+  background-color: var(--main-theme-hover);
+}
+
+#ageDisclaimerWrapper .age-disclaimer-modal .buttons-wrapper .button-close {
+  margin-left: 10px;
+}
+
+#ageDisclaimerWrapper .age-disclaimer-modal .buttons-wrapper .button-close:hover {
+  background-color: var(--mid-gray);
+}
+
+#ageDisclaimerWrapper .age-disclaimer-modal .parental-control-message {
+  margin-top: 30px;
+  line-height: 18px;
+}
+
+#ageDisclaimerWrapper .age-disclaimer-modal .parental-control-message .block-copyright {
+  position: relative;
+  bottom: 10px;
+  color: var(--shadow-dark-gray);
+}
+
+#ageDisclaimerWrapper .age-disclaimer-modal .parental-control-message a {
+  display: inline-block;
+}
+
+#ageDisclaimerWrapper .age-disclaimer-modal .parental-control-message a:hover {
+  color: var(--main-theme-hover);
+}
+
+#ageDisclaimerWrapper .age-disclaimer-modal .age_verification_title {
+  font-size: 2em;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
