@@ -25,7 +25,8 @@ from django.forms import (
 )
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, resolve_url
-from django.urls import reverse_lazy
+from django.urls import reverse
+from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 from django.views.generic.detail import SingleObjectMixin
@@ -33,12 +34,12 @@ from ninja.main import HttpRequest
 
 from core.auth.mixins import CanViewMixin
 from core.models import User
-from core.utils import FormFragmentTemplateData
+from core.views.mixins import FragmentMixin, UseFragmentsMixin
 from counter.forms import RefillForm
 from counter.models import Counter, Customer, Product, Selling
 from counter.utils import is_logged_in_counter
 from counter.views.mixins import CounterTabsMixin
-from counter.views.student_card import StudentCardFormView
+from counter.views.student_card import StudentCardFormFragment
 
 
 def get_operator(request: HttpRequest, counter: Counter, customer: Customer) -> User:
@@ -140,7 +141,9 @@ BasketForm = formset_factory(
 )
 
 
-class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
+class CounterClick(
+    CounterTabsMixin, UseFragmentsMixin, CanViewMixin, SingleObjectMixin, FormView
+):
     """The click view
     This is a detail view not to have to worry about loading the counter
     Everything is made by hand in the post method.
@@ -251,6 +254,18 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
     def get_success_url(self):
         return resolve_url(self.object)
 
+    def get_fragment_context_data(self) -> dict[str, SafeString]:
+        res = super().get_fragment_context_data()
+        if self.object.type == "BAR":
+            res["student_card_fragment"] = StudentCardFormFragment.as_fragment()(
+                self.request, customer=self.customer
+            )
+        if self.object.can_refill():
+            res["refilling_fragment"] = RefillingCreateView.as_fragment()(
+                self.request, customer=self.customer
+            )
+        return res
+
     def get_context_data(self, **kwargs):
         """Add customer to the context."""
         kwargs = super().get_context_data(**kwargs)
@@ -268,38 +283,14 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
         kwargs["form_errors"] = [
             list(field_error.values()) for field_error in kwargs["form"].errors
         ]
-        if self.object.type == "BAR":
-            kwargs["student_card_fragment"] = StudentCardFormView.get_template_data(
-                self.customer
-            ).render(self.request)
-
-        if self.object.can_refill():
-            kwargs["refilling_fragment"] = RefillingCreateView.get_template_data(
-                self.customer
-            ).render(self.request)
-
         return kwargs
 
 
-class RefillingCreateView(FormView):
+class RefillingCreateView(FragmentMixin, FormView):
     """This is a fragment only view which integrates with counter_click.jinja"""
 
     form_class = RefillForm
     template_name = "counter/fragments/create_refill.jinja"
-
-    @classmethod
-    def get_template_data(
-        cls, customer: Customer, *, form_instance: form_class | None = None
-    ) -> FormFragmentTemplateData[form_class]:
-        return FormFragmentTemplateData(
-            form=form_instance if form_instance else cls.form_class(),
-            template=cls.template_name,
-            context={
-                "action": reverse_lazy(
-                    "counter:refilling_create", kwargs={"customer_id": customer.pk}
-                ),
-            },
-        )
 
     def dispatch(self, request, *args, **kwargs):
         self.customer: Customer = get_object_or_404(Customer, pk=kwargs["customer_id"])
@@ -320,6 +311,10 @@ class RefillingCreateView(FormView):
 
         return super().dispatch(request, *args, **kwargs)
 
+    def render_fragment(self, request, **kwargs) -> SafeString:
+        self.customer = kwargs.pop("customer")
+        return super().render_fragment(request, **kwargs)
+
     def form_valid(self, form):
         res = super().form_valid(form)
         form.clean()
@@ -330,10 +325,11 @@ class RefillingCreateView(FormView):
         return res
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        data = self.get_template_data(self.customer, form_instance=context["form"])
-        context.update(data.context)
-        return context
+        kwargs = super().get_context_data(**kwargs)
+        kwargs["action"] = reverse(
+            "counter:refilling_create", kwargs={"customer_id": self.customer.pk}
+        )
+        return kwargs
 
     def get_success_url(self, **kwargs):
         return self.request.path
