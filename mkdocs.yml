@@ -81,9 +81,6 @@ nav:
     - Terminal: howto/terminal.md
     - Direnv: howto/direnv.md
   - Reference:
-    - accounting:
-      - reference/accounting/models.md
-      - reference/accounting/views.md
     - antispam:
       - reference/antispam/models.md
       - reference/antispam/forms.md
