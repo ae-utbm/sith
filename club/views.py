@@ -185,6 +185,7 @@ class ClubView(ClubTabsMixin, DetailView):
         kwargs["page_revision"] = (
             PageRev.objects.filter(page_id=self.object.page_id)
             .order_by("-date")
+            .values_list("content", flat=True)
             .first()
         )
         return kwargs
