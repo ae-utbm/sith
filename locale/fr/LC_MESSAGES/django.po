@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-25 16:38+0100\n"
+"POT-Creation-Date: 2025-04-04 10:35+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -15,767 +15,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-
-#: accounting/models.py club/models.py com/models.py counter/models.py
-#: forum/models.py launderette/models.py
-msgid "name"
-msgstr "nom"
-
-#: accounting/models.py
-msgid "street"
-msgstr "rue"
-
-#: accounting/models.py
-msgid "city"
-msgstr "ville"
-
-#: accounting/models.py
-msgid "postcode"
-msgstr "code postal"
-
-#: accounting/models.py
-msgid "country"
-msgstr "pays"
-
-#: accounting/models.py core/models.py
-msgid "phone"
-msgstr "téléphone"
-
-#: accounting/models.py
-msgid "email"
-msgstr "email"
-
-#: accounting/models.py
-msgid "website"
-msgstr "site internet"
-
-#: accounting/models.py
-msgid "company"
-msgstr "entreprise"
-
-#: accounting/models.py
-msgid "iban"
-msgstr "IBAN"
-
-#: accounting/models.py
-msgid "account number"
-msgstr "numéro de compte"
-
-#: accounting/models.py club/models.py com/models.py counter/models.py
-#: trombi/models.py
-msgid "club"
-msgstr "club"
-
-#: accounting/models.py
-msgid "Bank account"
-msgstr "Compte en banque"
-
-#: accounting/models.py
-msgid "bank account"
-msgstr "compte en banque"
-
-#: accounting/models.py
-msgid "Club account"
-msgstr "Compte club"
-
-#: accounting/models.py
-#, python-format
-msgid "%(club_account)s on %(bank_account)s"
-msgstr "%(club_account)s sur %(bank_account)s"
-
-#: accounting/models.py club/models.py counter/models.py election/models.py
-#: launderette/models.py
-msgid "start date"
-msgstr "date de début"
-
-#: accounting/models.py club/models.py counter/models.py election/models.py
-msgid "end date"
-msgstr "date de fin"
-
-#: accounting/models.py
-msgid "is closed"
-msgstr "est fermé"
-
-#: accounting/models.py
-msgid "club account"
-msgstr "compte club"
-
-#: accounting/models.py counter/models.py
-msgid "amount"
-msgstr "montant"
-
-#: accounting/models.py
-msgid "effective_amount"
-msgstr "montant effectif"
-
-#: accounting/models.py
-msgid "General journal"
-msgstr "Classeur"
-
-#: accounting/models.py
-msgid "number"
-msgstr "numéro"
-
-#: accounting/models.py
-msgid "journal"
-msgstr "classeur"
-
-#: accounting/models.py core/models.py counter/models.py eboutic/models.py
-#: forum/models.py
-msgid "date"
-msgstr "date"
-
-#: accounting/models.py counter/models.py pedagogy/models.py
-msgid "comment"
-msgstr "commentaire"
-
-#: accounting/models.py counter/models.py subscription/models.py
-msgid "payment method"
-msgstr "méthode de paiement"
-
-#: accounting/models.py
-msgid "cheque number"
-msgstr "numéro de chèque"
-
-#: accounting/models.py eboutic/models.py
-msgid "invoice"
-msgstr "facture"
-
-#: accounting/models.py
-msgid "is done"
-msgstr "est fait"
-
-#: accounting/models.py
-msgid "simple type"
-msgstr "type simplifié"
-
-#: accounting/models.py
-msgid "accounting type"
-msgstr "type comptable"
-
-#: accounting/models.py core/models.py counter/models.py
-msgid "label"
-msgstr "étiquette"
-
-#: accounting/models.py
-msgid "target type"
-msgstr "type de cible"
-
-#: accounting/models.py club/models.py club/templates/club/club_members.jinja
-#: club/templates/club/club_old_members.jinja club/templates/club/mailing.jinja
-#: counter/templates/counter/cash_summary_list.jinja
-#: counter/templates/counter/stats.jinja
-#: launderette/templates/launderette/launderette_admin.jinja
-msgid "User"
-msgstr "Utilisateur"
-
-#: accounting/models.py club/models.py club/templates/club/club_detail.jinja
-#: com/templates/com/mailing_admin.jinja
-#: com/templates/com/news_admin_list.jinja com/templates/com/weekmail.jinja
-#: core/templates/core/user_clubs.jinja
-#: counter/templates/counter/invoices_call.jinja
-#: trombi/templates/trombi/edit_profile.jinja
-#: trombi/templates/trombi/export.jinja
-#: trombi/templates/trombi/user_profile.jinja
-msgid "Club"
-msgstr "Club"
-
-#: accounting/models.py core/views/user.py
-msgid "Account"
-msgstr "Compte"
-
-#: accounting/models.py
-msgid "Company"
-msgstr "Entreprise"
-
-#: accounting/models.py core/models.py sith/settings.py
-msgid "Other"
-msgstr "Autre"
-
-#: accounting/models.py
-msgid "target id"
-msgstr "id de la cible"
-
-#: accounting/models.py
-msgid "target label"
-msgstr "nom de la cible"
-
-#: accounting/models.py
-msgid "linked operation"
-msgstr "opération liée"
-
-#: accounting/models.py
-msgid "The date must be set."
-msgstr "La date doit être indiquée."
-
-#: accounting/models.py
-#, python-format
-msgid ""
-"The date can not be before the start date of the journal, which is\n"
-"%(start_date)s."
-msgstr ""
-"La date ne peut pas être avant la date de début du journal, qui est\n"
-"%(start_date)s."
-
-#: accounting/models.py
-msgid "Target does not exists"
-msgstr "La cible n'existe pas."
-
-#: accounting/models.py
-msgid "Please add a target label if you set no existing target"
-msgstr ""
-"Merci d'ajouter un nom de cible si vous ne spécifiez pas de cible existante"
-
-#: accounting/models.py
-msgid ""
-"You need to provide ether a simplified accounting type or a standard "
-"accounting type"
-msgstr ""
-"Vous devez fournir soit un type comptable simplifié ou un type comptable "
-"standard"
-
-#: accounting/models.py counter/models.py pedagogy/models.py
-msgid "code"
-msgstr "code"
-
-#: accounting/models.py
-msgid "An accounting type code contains only numbers"
-msgstr "Un code comptable ne contient que des numéros"
-
-#: accounting/models.py
-msgid "movement type"
-msgstr "type de mouvement"
-
-#: accounting/models.py
-#: accounting/templates/accounting/journal_statement_nature.jinja
-#: accounting/templates/accounting/journal_statement_person.jinja
-#: accounting/views.py
-msgid "Credit"
-msgstr "Crédit"
-
-#: accounting/models.py
-#: accounting/templates/accounting/journal_statement_nature.jinja
-#: accounting/templates/accounting/journal_statement_person.jinja
-#: accounting/views.py
-msgid "Debit"
-msgstr "Débit"
-
-#: accounting/models.py
-msgid "Neutral"
-msgstr "Neutre"
-
-#: accounting/models.py
-msgid "simplified accounting types"
-msgstr "type simplifié"
-
-#: accounting/models.py
-msgid "simplified type"
-msgstr "type simplifié"
-
-#: accounting/templates/accounting/accountingtype_list.jinja
-msgid "Accounting type list"
-msgstr "Liste des types comptable"
-
-#: accounting/templates/accounting/accountingtype_list.jinja
-#: accounting/templates/accounting/bank_account_details.jinja
-#: accounting/templates/accounting/bank_account_list.jinja
-#: accounting/templates/accounting/club_account_details.jinja
-#: accounting/templates/accounting/journal_details.jinja
-#: accounting/templates/accounting/label_list.jinja
-#: accounting/templates/accounting/operation_edit.jinja
-#: accounting/templates/accounting/simplifiedaccountingtype_list.jinja
-#: core/templates/core/user_tools.jinja
-msgid "Accounting"
-msgstr "Comptabilité"
-
-#: accounting/templates/accounting/accountingtype_list.jinja
-msgid "Accounting types"
-msgstr "Type comptable"
-
-#: accounting/templates/accounting/accountingtype_list.jinja
-msgid "New accounting type"
-msgstr "Nouveau type comptable"
-
-#: accounting/templates/accounting/accountingtype_list.jinja
-#: accounting/templates/accounting/simplifiedaccountingtype_list.jinja
-msgid "There is no types in this website."
-msgstr "Il n'y a pas de types comptable dans ce site web."
-
-#: accounting/templates/accounting/bank_account_details.jinja
-#: core/templates/core/user_tools.jinja
-msgid "Bank account: "
-msgstr "Compte en banque : "
-
-#: accounting/templates/accounting/bank_account_details.jinja
-#: accounting/templates/accounting/club_account_details.jinja
-#: accounting/templates/accounting/label_list.jinja
-#: club/templates/club/club_sellings.jinja club/templates/club/mailing.jinja
-#: com/templates/com/macros.jinja com/templates/com/mailing_admin.jinja
-#: com/templates/com/news_admin_list.jinja com/templates/com/poster_edit.jinja
-#: com/templates/com/screen_edit.jinja com/templates/com/weekmail.jinja
-#: core/templates/core/file_detail.jinja
-#: core/templates/core/file_moderation.jinja
-#: core/templates/core/group_detail.jinja core/templates/core/group_list.jinja
-#: core/templates/core/macros.jinja core/templates/core/page_prop.jinja
-#: core/templates/core/user_account_detail.jinja
-#: core/templates/core/user_clubs.jinja core/templates/core/user_edit.jinja
-#: counter/templates/counter/fragments/create_student_card.jinja
-#: counter/templates/counter/last_ops.jinja
-#: election/templates/election/election_detail.jinja
-#: forum/templates/forum/macros.jinja
-#: launderette/templates/launderette/launderette_admin.jinja
-#: launderette/views.py pedagogy/templates/pedagogy/guide.jinja
-#: pedagogy/templates/pedagogy/uv_detail.jinja sas/templates/sas/album.jinja
-#: sas/templates/sas/moderation.jinja sas/templates/sas/picture.jinja
-#: trombi/templates/trombi/detail.jinja
-#: trombi/templates/trombi/edit_profile.jinja
-msgid "Delete"
-msgstr "Supprimer"
-
-#: accounting/templates/accounting/bank_account_details.jinja club/views.py
-#: core/views/user.py sas/templates/sas/picture.jinja
-msgid "Infos"
-msgstr "Infos"
-
-#: accounting/templates/accounting/bank_account_details.jinja
-msgid "IBAN: "
-msgstr "IBAN : "
-
-#: accounting/templates/accounting/bank_account_details.jinja
-msgid "Number: "
-msgstr "Numéro : "
-
-#: accounting/templates/accounting/bank_account_details.jinja
-msgid "New club account"
-msgstr "Nouveau compte club"
-
-#: accounting/templates/accounting/bank_account_details.jinja
-#: accounting/templates/accounting/bank_account_list.jinja
-#: accounting/templates/accounting/club_account_details.jinja
-#: accounting/templates/accounting/journal_details.jinja club/views.py
-#: com/templates/com/news_admin_list.jinja com/templates/com/poster_list.jinja
-#: com/templates/com/screen_list.jinja com/templates/com/weekmail.jinja
-#: core/templates/core/file.jinja core/templates/core/group_list.jinja
-#: core/templates/core/page.jinja core/templates/core/user_tools.jinja
-#: core/views/user.py counter/templates/counter/cash_summary_list.jinja
-#: counter/templates/counter/counter_list.jinja
-#: election/templates/election/election_detail.jinja
-#: forum/templates/forum/macros.jinja
-#: launderette/templates/launderette/launderette_list.jinja
-#: pedagogy/templates/pedagogy/guide.jinja
-#: pedagogy/templates/pedagogy/uv_detail.jinja sas/templates/sas/album.jinja
-#: trombi/templates/trombi/detail.jinja
-#: trombi/templates/trombi/edit_profile.jinja
-msgid "Edit"
-msgstr "Éditer"
-
-#: accounting/templates/accounting/bank_account_list.jinja
-msgid "Bank account list"
-msgstr "Liste des comptes en banque"
-
-#: accounting/templates/accounting/bank_account_list.jinja
-msgid "Manage simplified types"
-msgstr "Gérer les types simplifiés"
-
-#: accounting/templates/accounting/bank_account_list.jinja
-msgid "Manage accounting types"
-msgstr "Gérer les types comptable"
-
-#: accounting/templates/accounting/bank_account_list.jinja
-msgid "New bank account"
-msgstr "Nouveau compte en banque"
-
-#: accounting/templates/accounting/bank_account_list.jinja
-msgid "There is no accounts in this website."
-msgstr "Il n'y a pas de comptes dans ce site web."
-
-#: accounting/templates/accounting/club_account_details.jinja
-msgid "Club account:"
-msgstr "Compte club : "
-
-#: accounting/templates/accounting/club_account_details.jinja
-#: accounting/templates/accounting/journal_details.jinja
-#: accounting/templates/accounting/label_list.jinja
-msgid "New label"
-msgstr "Nouvelle étiquette"
-
-#: accounting/templates/accounting/club_account_details.jinja
-#: accounting/templates/accounting/journal_details.jinja
-#: accounting/templates/accounting/label_list.jinja
-msgid "Label list"
-msgstr "Liste des étiquettes"
-
-#: accounting/templates/accounting/club_account_details.jinja
-msgid "New journal"
-msgstr "Nouveau classeur"
-
-#: accounting/templates/accounting/club_account_details.jinja
-msgid "You can not create new journal while you still have one opened"
-msgstr "Vous ne pouvez pas créer de journal tant qu'il y en a un d'ouvert"
-
-#: accounting/templates/accounting/club_account_details.jinja
-#: launderette/templates/launderette/launderette_admin.jinja
-msgid "Name"
-msgstr "Nom"
-
-#: accounting/templates/accounting/club_account_details.jinja
-#: com/templates/com/news_admin_list.jinja
-msgid "Start"
-msgstr "Début"
-
-#: accounting/templates/accounting/club_account_details.jinja
-#: com/templates/com/news_admin_list.jinja
-msgid "End"
-msgstr "Fin"
-
-#: accounting/templates/accounting/club_account_details.jinja
-#: accounting/templates/accounting/journal_details.jinja
-#: core/templates/core/user_account_detail.jinja
-#: counter/templates/counter/last_ops.jinja
-#: counter/templates/counter/refilling_list.jinja
-msgid "Amount"
-msgstr "Montant"
-
-#: accounting/templates/accounting/club_account_details.jinja
-msgid "Effective amount"
-msgstr "Montant effectif"
-
-#: accounting/templates/accounting/club_account_details.jinja sith/settings.py
-msgid "Closed"
-msgstr "Fermé"
-
-#: accounting/templates/accounting/club_account_details.jinja
-#: accounting/templates/accounting/journal_details.jinja
-#: com/templates/com/mailing_admin.jinja
-#: com/templates/com/news_admin_list.jinja com/templates/com/weekmail.jinja
-#: counter/templates/counter/refilling_list.jinja
-msgid "Actions"
-msgstr "Actions"
-
-#: accounting/templates/accounting/club_account_details.jinja
-#: accounting/templates/accounting/journal_details.jinja
-msgid "Yes"
-msgstr "Oui"
-
-#: accounting/templates/accounting/club_account_details.jinja
-#: accounting/templates/accounting/journal_details.jinja
-msgid "No"
-msgstr "Non"
-
-#: accounting/templates/accounting/club_account_details.jinja
-#: com/templates/com/news_admin_list.jinja core/templates/core/file.jinja
-#: core/templates/core/page.jinja
-msgid "View"
-msgstr "Voir"
-
-#: accounting/templates/accounting/co_list.jinja
-#: accounting/templates/accounting/journal_details.jinja
-#: core/templates/core/user_tools.jinja
-msgid "Company list"
-msgstr "Liste des entreprises"
-
-#: accounting/templates/accounting/co_list.jinja
-msgid "Create new company"
-msgstr "Nouvelle entreprise"
-
-#: accounting/templates/accounting/co_list.jinja
-msgid "Companies"
-msgstr "Entreprises"
-
-#: accounting/templates/accounting/journal_details.jinja
-#: accounting/templates/accounting/journal_statement_accounting.jinja
-#: accounting/templates/accounting/journal_statement_nature.jinja
-#: accounting/templates/accounting/journal_statement_person.jinja
-msgid "General journal:"
-msgstr "Classeur : "
-
-#: accounting/templates/accounting/journal_details.jinja
-#: accounting/templates/accounting/journal_statement_accounting.jinja
-#: core/templates/core/user_account.jinja
-#: core/templates/core/user_account_detail.jinja
-#: counter/templates/counter/counter_click.jinja
-msgid "Amount: "
-msgstr "Montant : "
-
-#: accounting/templates/accounting/journal_details.jinja
-#: accounting/templates/accounting/journal_statement_accounting.jinja
-msgid "Effective amount: "
-msgstr "Montant effectif: "
-
-#: accounting/templates/accounting/journal_details.jinja
-msgid "Journal is closed, you can not create operation"
-msgstr "Le classeur est fermé, vous ne pouvez pas créer d'opération"
-
-#: accounting/templates/accounting/journal_details.jinja
-msgid "New operation"
-msgstr "Nouvelle opération"
-
-#: accounting/templates/accounting/journal_details.jinja
-msgid "Nb"
-msgstr "No"
-
-#: accounting/templates/accounting/journal_details.jinja
-#: club/templates/club/club_sellings.jinja
-#: core/templates/core/user_account_detail.jinja
-#: counter/templates/counter/cash_summary_list.jinja
-#: counter/templates/counter/last_ops.jinja
-#: counter/templates/counter/refilling_list.jinja
-#: rootplace/templates/rootplace/logs.jinja sas/forms.py
-#: trombi/templates/trombi/user_profile.jinja
-msgid "Date"
-msgstr "Date"
-
-#: accounting/templates/accounting/journal_details.jinja
-#: club/templates/club/club_sellings.jinja
-#: core/templates/core/user_account_detail.jinja
-#: counter/templates/counter/last_ops.jinja
-#: rootplace/templates/rootplace/logs.jinja
-msgid "Label"
-msgstr "Étiquette"
-
-#: accounting/templates/accounting/journal_details.jinja
-msgid "Payment mode"
-msgstr "Méthode de paiement"
-
-#: accounting/templates/accounting/journal_details.jinja
-msgid "Target"
-msgstr "Cible"
-
-#: accounting/templates/accounting/journal_details.jinja
-msgid "Code"
-msgstr "Code"
-
-#: accounting/templates/accounting/journal_details.jinja
-msgid "Nature"
-msgstr "Nature"
-
-#: accounting/templates/accounting/journal_details.jinja
-msgid "Done"
-msgstr "Effectuées"
-
-#: accounting/templates/accounting/journal_details.jinja
-#: counter/templates/counter/cash_summary_list.jinja counter/views/cash.py
-#: pedagogy/templates/pedagogy/moderation.jinja
-#: pedagogy/templates/pedagogy/uv_detail.jinja
-#: trombi/templates/trombi/comment.jinja
-#: trombi/templates/trombi/user_tools.jinja
-msgid "Comment"
-msgstr "Commentaire"
-
-#: accounting/templates/accounting/journal_details.jinja
-msgid "File"
-msgstr "Fichier"
-
-#: accounting/templates/accounting/journal_details.jinja
-msgid "PDF"
-msgstr "PDF"
-
-#: accounting/templates/accounting/journal_details.jinja
-msgid ""
-"Warning: this operation has no linked operation because the targeted club "
-"account has no opened journal."
-msgstr ""
-"Attention: cette opération n'a pas d'opération liée parce qu'il n'y a pas de "
-"classeur ouvert dans le compte club cible"
-
-#: accounting/templates/accounting/journal_details.jinja
-#, python-format
-msgid ""
-"Open a journal in <a href=\"%(url)s\">this club account</a>, then save this "
-"operation again to make the linked operation."
-msgstr ""
-"Ouvrez un classeur dans <a href=\"%(url)s\">ce compte club</a>, puis sauver "
-"cette opération à nouveau pour créer l'opération liée."
-
-#: accounting/templates/accounting/journal_details.jinja
-msgid "Generate"
-msgstr "Générer"
-
-#: accounting/templates/accounting/journal_statement_accounting.jinja
-msgid "Accounting statement: "
-msgstr "Bilan comptable : "
-
-#: accounting/templates/accounting/journal_statement_accounting.jinja
-#: rootplace/templates/rootplace/logs.jinja
-msgid "Operation type"
-msgstr "Type d'opération"
-
-#: accounting/templates/accounting/journal_statement_accounting.jinja
-#: accounting/templates/accounting/journal_statement_nature.jinja
-#: accounting/templates/accounting/journal_statement_person.jinja
-#: counter/templates/counter/invoices_call.jinja
-msgid "Sum"
-msgstr "Somme"
-
-#: accounting/templates/accounting/journal_statement_nature.jinja
-msgid "Nature of operation"
-msgstr "Nature de l'opération"
-
-#: accounting/templates/accounting/journal_statement_nature.jinja
-#: club/templates/club/club_sellings.jinja
-#: counter/templates/counter/counter_main.jinja
-msgid "Total: "
-msgstr "Total : "
-
-#: accounting/templates/accounting/journal_statement_nature.jinja
-msgid "Statement by nature: "
-msgstr "Bilan par nature : "
-
-#: accounting/templates/accounting/journal_statement_person.jinja
-msgid "Statement by person: "
-msgstr "Bilan par personne : "
-
-#: accounting/templates/accounting/journal_statement_person.jinja
-msgid "Target of the operation"
-msgstr "Cible de l'opération"
-
-#: accounting/templates/accounting/label_list.jinja
-msgid "Back to club account"
-msgstr "Retour au compte club"
-
-#: accounting/templates/accounting/label_list.jinja
-msgid "There is no label in this club account."
-msgstr "Il n'y a pas d'étiquette dans ce compte club."
-
-#: accounting/templates/accounting/operation_edit.jinja
-msgid "Edit operation"
-msgstr "Éditer l'opération"
-
-#: accounting/templates/accounting/operation_edit.jinja
-msgid ""
-"Warning: if you select <em>Account</em>, the opposite operation will be "
-"created in the target account. If you don't want that, select <em>Club</em> "
-"instead of <em>Account</em>."
-msgstr ""
-"Attention : si vous sélectionnez <em>Compte</em>, l'opération inverse sera "
-"créée dans le compte cible. Si vous ne le voulez pas, sélectionnez <em>Club</"
-"em> à la place de <em>Compte</em>."
-
-#: accounting/templates/accounting/operation_edit.jinja
-msgid "Linked operation:"
-msgstr "Opération liée : "
-
-#: accounting/templates/accounting/operation_edit.jinja
-#: com/templates/com/news_edit.jinja com/templates/com/poster_edit.jinja
-#: com/templates/com/screen_edit.jinja com/templates/com/weekmail.jinja
-#: core/templates/core/create.jinja core/templates/core/edit.jinja
-#: core/templates/core/file_edit.jinja core/templates/core/macros_pages.jinja
-#: core/templates/core/page_prop.jinja
-#: core/templates/core/user_godfathers.jinja
-#: core/templates/core/user_godfathers_tree.jinja
-#: core/templates/core/user_preferences.jinja
-#: counter/templates/counter/cash_register_summary.jinja
-#: forum/templates/forum/reply.jinja
-#: subscription/templates/subscription/fragments/creation_form.jinja
-#: trombi/templates/trombi/comment.jinja
-#: trombi/templates/trombi/edit_profile.jinja
-#: trombi/templates/trombi/user_tools.jinja
-msgid "Save"
-msgstr "Sauver"
-
-#: accounting/templates/accounting/refound_account.jinja accounting/views.py
-msgid "Refound account"
-msgstr "Remboursement de compte"
-
-#: accounting/templates/accounting/refound_account.jinja
-msgid "Refound"
-msgstr "Rembourser"
-
-#: accounting/templates/accounting/simplifiedaccountingtype_list.jinja
-msgid "Simplified type list"
-msgstr "Liste des types simplifiés"
-
-#: accounting/templates/accounting/simplifiedaccountingtype_list.jinja
-msgid "Simplified types"
-msgstr "Types simplifiés"
-
-#: accounting/templates/accounting/simplifiedaccountingtype_list.jinja
-msgid "New simplified type"
-msgstr "Nouveau type simplifié"
-
-#: accounting/views.py
-msgid "Journal"
-msgstr "Classeur"
-
-#: accounting/views.py
-msgid "Statement by nature"
-msgstr "Bilan par nature"
-
-#: accounting/views.py
-msgid "Statement by person"
-msgstr "Bilan par personne"
-
-#: accounting/views.py
-msgid "Accounting statement"
-msgstr "Bilan comptable"
-
-#: accounting/views.py
-msgid "Link this operation to the target account"
-msgstr "Lier cette opération au compte cible"
-
-#: accounting/views.py
-msgid "The target must be set."
-msgstr "La cible doit être indiquée."
-
-#: accounting/views.py
-msgid "The amount must be set."
-msgstr "Le montant doit être indiqué."
-
-#: accounting/views.py
-msgid "Operation"
-msgstr "Opération"
-
-#: accounting/views.py
-msgid "Financial proof: "
-msgstr "Justificatif de libellé : "
-
-#: accounting/views.py
-#, python-format
-msgid "Club: %(club_name)s"
-msgstr "Club : %(club_name)s"
-
-#: accounting/views.py
-#, python-format
-msgid "Label: %(op_label)s"
-msgstr "Libellé : %(op_label)s"
-
-#: accounting/views.py
-#, python-format
-msgid "Date: %(date)s"
-msgstr "Date : %(date)s"
-
-#: accounting/views.py
-#, python-format
-msgid "Amount: %(amount).2f €"
-msgstr "Montant : %(amount).2f €"
-
-#: accounting/views.py
-msgid "Debtor"
-msgstr "Débiteur"
-
-#: accounting/views.py
-msgid "Creditor"
-msgstr "Créditeur"
-
-#: accounting/views.py
-msgid "Comment:"
-msgstr "Commentaire :"
-
-#: accounting/views.py
-msgid "Signature:"
-msgstr "Signature :"
-
-#: accounting/views.py
-msgid "General statement"
-msgstr "Bilan général"
-
-#: accounting/views.py
-msgid "No label operations"
-msgstr "Opérations sans étiquette"
-
-#: accounting/views.py
-msgid "Refound this account"
-msgstr "Rembourser ce compte"
 
 #: antispam/forms.py
 msgid "Email domain is not allowed."
@@ -881,21 +120,14 @@ msgstr "Vous devez choisir un rôle"
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
-#: club/models.py
-msgid "unix name"
-msgstr "nom unix"
+#: club/models.py com/models.py counter/models.py forum/models.py
+#: launderette/models.py
+msgid "name"
+msgstr "nom"
 
 #: club/models.py
-msgid ""
-"Enter a valid unix name. This value may contain only letters, numbers ./-/_ "
-"characters."
-msgstr ""
-"Entrez un nom UNIX valide. Cette valeur peut contenir uniquement des "
-"lettres, des nombres, et les caractères ./-/_"
-
-#: club/models.py
-msgid "A club with that unix name already exists."
-msgstr "Un club avec ce nom UNIX existe déjà."
+msgid "slug name"
+msgstr "nom slug"
 
 #: club/models.py
 msgid "logo"
@@ -908,6 +140,14 @@ msgstr "actif"
 #: club/models.py
 msgid "short description"
 msgstr "description courte"
+
+#: club/models.py
+msgid ""
+"A summary of what your club does. This will be displayed on the club list "
+"page."
+msgstr ""
+"Un résumé des activités des activités de votre club. Ceci sera affiché sur "
+"la page de la liste des clubs."
 
 #: club/models.py core/models.py
 msgid "address"
@@ -926,6 +166,18 @@ msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 msgid "user"
 msgstr "utilisateur"
 
+#: club/models.py com/models.py counter/models.py trombi/models.py
+msgid "club"
+msgstr "club"
+
+#: club/models.py counter/models.py election/models.py launderette/models.py
+msgid "start date"
+msgstr "date de début"
+
+#: club/models.py counter/models.py election/models.py
+msgid "end date"
+msgstr "date de fin"
+
 #: club/models.py core/models.py election/models.py trombi/models.py
 msgid "role"
 msgstr "rôle"
@@ -938,6 +190,17 @@ msgstr "description"
 #: club/models.py
 msgid "past member"
 msgstr "ancien membre"
+
+#: club/models.py club/templates/club/club_detail.jinja
+#: com/templates/com/mailing_admin.jinja
+#: com/templates/com/news_admin_list.jinja com/templates/com/weekmail.jinja
+#: core/templates/core/user_clubs.jinja
+#: counter/templates/counter/invoices_call.jinja
+#: trombi/templates/trombi/edit_profile.jinja
+#: trombi/templates/trombi/export.jinja
+#: trombi/templates/trombi/user_profile.jinja
+msgid "Club"
+msgstr "Club"
 
 #: club/models.py
 msgid "Email address"
@@ -964,6 +227,14 @@ msgstr "Cette liste de diffusion existe déjà."
 msgid "Mailing"
 msgstr "Liste de diffusion"
 
+#: club/models.py club/templates/club/club_members.jinja
+#: club/templates/club/club_old_members.jinja club/templates/club/mailing.jinja
+#: counter/templates/counter/cash_summary_list.jinja
+#: counter/templates/counter/stats.jinja
+#: launderette/templates/launderette/launderette_admin.jinja
+msgid "User"
+msgstr "Utilisateur"
+
 #: club/models.py
 msgid "At least user or email is required"
 msgstr "Au moins un utilisateur ou un email est nécessaire"
@@ -988,7 +259,7 @@ msgstr "inactif"
 msgid "New club"
 msgstr "Nouveau club"
 
-#: club/templates/club/club_list.jinja club/templates/club/stats.jinja
+#: club/templates/club/club_list.jinja
 msgid "There is no club in this website."
 msgstr "Il n'y a pas de club dans ce site web."
 
@@ -1059,7 +330,7 @@ msgstr "Suivant"
 msgid "Sales"
 msgstr "Ventes"
 
-#: club/templates/club/club_sellings.jinja club/templates/club/stats.jinja
+#: club/templates/club/club_sellings.jinja
 #: counter/templates/counter/cash_summary_list.jinja
 msgid "Show"
 msgstr "Montrer"
@@ -1078,8 +349,23 @@ msgid "units"
 msgstr "unités"
 
 #: club/templates/club/club_sellings.jinja
+#: counter/templates/counter/counter_main.jinja
+msgid "Total: "
+msgstr "Total : "
+
+#: club/templates/club/club_sellings.jinja
 msgid "Benefit: "
 msgstr "Bénéfice : "
+
+#: club/templates/club/club_sellings.jinja
+#: core/templates/core/user_account_detail.jinja
+#: counter/templates/counter/cash_summary_list.jinja
+#: counter/templates/counter/last_ops.jinja
+#: counter/templates/counter/refilling_list.jinja
+#: rootplace/templates/rootplace/logs.jinja sas/forms.py
+#: trombi/templates/trombi/user_profile.jinja
+msgid "Date"
+msgstr "Date"
 
 #: club/templates/club/club_sellings.jinja
 #: core/templates/core/user_account_detail.jinja
@@ -1093,6 +379,13 @@ msgstr "Barman"
 #: counter/templates/counter/refilling_list.jinja
 msgid "Customer"
 msgstr "Client"
+
+#: club/templates/club/club_sellings.jinja
+#: core/templates/core/user_account_detail.jinja
+#: counter/templates/counter/last_ops.jinja
+#: rootplace/templates/rootplace/logs.jinja
+msgid "Label"
+msgstr "Étiquette"
 
 #: club/templates/club/club_sellings.jinja
 #: core/templates/core/user_account_detail.jinja
@@ -1118,6 +411,29 @@ msgstr "Total"
 #: counter/templates/counter/refilling_list.jinja
 msgid "Payment method"
 msgstr "Méthode de paiement"
+
+#: club/templates/club/club_sellings.jinja club/templates/club/mailing.jinja
+#: com/templates/com/macros.jinja com/templates/com/mailing_admin.jinja
+#: com/templates/com/news_admin_list.jinja com/templates/com/poster_edit.jinja
+#: com/templates/com/screen_edit.jinja com/templates/com/weekmail.jinja
+#: core/templates/core/file_detail.jinja
+#: core/templates/core/file_moderation.jinja
+#: core/templates/core/group_detail.jinja core/templates/core/group_list.jinja
+#: core/templates/core/macros.jinja core/templates/core/page_prop.jinja
+#: core/templates/core/user_account_detail.jinja
+#: core/templates/core/user_clubs.jinja core/templates/core/user_edit.jinja
+#: counter/templates/counter/fragments/create_student_card.jinja
+#: counter/templates/counter/last_ops.jinja
+#: election/templates/election/election_detail.jinja
+#: forum/templates/forum/macros.jinja
+#: launderette/templates/launderette/launderette_admin.jinja
+#: launderette/views.py pedagogy/templates/pedagogy/guide.jinja
+#: pedagogy/templates/pedagogy/uv_detail.jinja sas/templates/sas/album.jinja
+#: sas/templates/sas/moderation.jinja sas/templates/sas/picture.jinja
+#: trombi/templates/trombi/detail.jinja
+#: trombi/templates/trombi/edit_profile.jinja
+msgid "Delete"
+msgstr "Supprimer"
 
 #: club/templates/club/club_tools.jinja core/templates/core/user_tools.jinja
 msgid "Club tools"
@@ -1153,12 +469,54 @@ msgid "Counters:"
 msgstr "Comptoirs : "
 
 #: club/templates/club/club_tools.jinja
-msgid "Accounting: "
-msgstr "Comptabilité : "
-
-#: club/templates/club/club_tools.jinja
 msgid "Manage launderettes"
 msgstr "Gestion des laveries"
+
+#: club/templates/club/edit_club.jinja core/templates/core/edit.jinja
+#, python-format
+msgid "Edit %(name)s"
+msgstr "Éditer %(name)s"
+
+#: club/templates/club/edit_club.jinja
+msgid "Club properties"
+msgstr "Propriétés du club"
+
+#: club/templates/club/edit_club.jinja
+msgid ""
+"The following form fields are linked to the core properties of a club. Only "
+"admin users can see and edit them."
+msgstr ""
+"Les champs de formulaire suivants sont liées aux propriétés essentielles "
+"d'un club. Seuls les administrateurs peuvent voir et modifier ceux-ci."
+
+#: club/templates/club/edit_club.jinja
+msgid "Club informations"
+msgstr "Informations du club"
+
+#: club/templates/club/edit_club.jinja
+msgid ""
+"The following form fields are linked to the basic description of a club. All "
+"board members of this club can see and edit them."
+msgstr ""
+"Les champs de formulaire suivants sont liées à la description basique d'un "
+"club. Tous les membres du bureau du club peuvent voir et modifier ceux-ci."
+
+#: club/templates/club/edit_club.jinja com/templates/com/news_edit.jinja
+#: com/templates/com/poster_edit.jinja com/templates/com/screen_edit.jinja
+#: com/templates/com/weekmail.jinja core/templates/core/create.jinja
+#: core/templates/core/edit.jinja core/templates/core/file_edit.jinja
+#: core/templates/core/macros_pages.jinja core/templates/core/page_prop.jinja
+#: core/templates/core/user_godfathers.jinja
+#: core/templates/core/user_godfathers_tree.jinja
+#: core/templates/core/user_preferences.jinja
+#: counter/templates/counter/cash_register_summary.jinja
+#: forum/templates/forum/reply.jinja
+#: subscription/templates/subscription/fragments/creation_form.jinja
+#: trombi/templates/trombi/comment.jinja
+#: trombi/templates/trombi/edit_profile.jinja
+#: trombi/templates/trombi/user_tools.jinja
+msgid "Save"
+msgstr "Sauver"
 
 #: club/templates/club/mailing.jinja
 msgid "Mailing lists"
@@ -1218,9 +576,9 @@ msgstr "Créer une liste de diffusion"
 msgid "No page existing for this club"
 msgstr "Aucune page n'existe pour ce club"
 
-#: club/templates/club/stats.jinja
-msgid "Club stats"
-msgstr "Statistiques du club"
+#: club/views.py core/views/user.py sas/templates/sas/picture.jinja
+msgid "Infos"
+msgstr "Infos"
 
 #: club/views.py
 msgid "Members"
@@ -1239,6 +597,23 @@ msgstr "Historique"
 msgid "Tools"
 msgstr "Outils"
 
+#: club/views.py com/templates/com/news_admin_list.jinja
+#: com/templates/com/poster_list.jinja com/templates/com/screen_list.jinja
+#: com/templates/com/weekmail.jinja core/templates/core/file.jinja
+#: core/templates/core/group_list.jinja core/templates/core/page.jinja
+#: core/templates/core/user_tools.jinja core/views/user.py
+#: counter/templates/counter/cash_summary_list.jinja
+#: counter/templates/counter/counter_list.jinja
+#: election/templates/election/election_detail.jinja
+#: forum/templates/forum/macros.jinja
+#: launderette/templates/launderette/launderette_list.jinja
+#: pedagogy/templates/pedagogy/guide.jinja
+#: pedagogy/templates/pedagogy/uv_detail.jinja sas/templates/sas/album.jinja
+#: trombi/templates/trombi/detail.jinja
+#: trombi/templates/trombi/edit_profile.jinja
+msgid "Edit"
+msgstr "Éditer"
+
 #: club/views.py
 msgid "Edit club page"
 msgstr "Éditer la page de club"
@@ -1254,10 +629,6 @@ msgstr "Listes de diffusion"
 #: club/views.py com/views.py
 msgid "Posters list"
 msgstr "Liste d'affiches"
-
-#: club/views.py counter/templates/counter/counter_list.jinja
-msgid "Props"
-msgstr "Propriétés"
 
 #: com/forms.py
 msgid "Format: 16:9 | Resolution: 1920x1080"
@@ -1448,6 +819,12 @@ msgstr "Nouvelle supprimée"
 msgid "Mailing lists administration"
 msgstr "Administration des mailing listes"
 
+#: com/templates/com/mailing_admin.jinja
+#: com/templates/com/news_admin_list.jinja com/templates/com/weekmail.jinja
+#: counter/templates/counter/refilling_list.jinja
+msgid "Actions"
+msgstr "Actions"
+
 #: com/templates/com/mailing_admin.jinja core/templates/core/file_detail.jinja
 #: core/templates/core/file_moderation.jinja sas/templates/sas/moderation.jinja
 #: sas/templates/sas/picture.jinja
@@ -1521,6 +898,11 @@ msgstr "Modérateur"
 msgid "Dates"
 msgstr "Dates"
 
+#: com/templates/com/news_admin_list.jinja core/templates/core/file.jinja
+#: core/templates/core/page.jinja
+msgid "View"
+msgstr "Voir"
+
 #: com/templates/com/news_admin_list.jinja
 msgid "Unpublish"
 msgstr "Dépublier"
@@ -1537,6 +919,14 @@ msgstr "Événements"
 #: com/templates/com/news_admin_list.jinja
 msgid "Displayed events"
 msgstr "Événements affichés"
+
+#: com/templates/com/news_admin_list.jinja
+msgid "Start"
+msgstr "Début"
+
+#: com/templates/com/news_admin_list.jinja
+msgid "End"
+msgstr "Fin"
 
 #: com/templates/com/news_admin_list.jinja
 msgid "Events to moderate"
@@ -1920,6 +1310,10 @@ msgstr "Homme"
 msgid "Woman"
 msgstr "Femme"
 
+#: core/models.py sith/settings.py
+msgid "Other"
+msgstr "Autre"
+
 #: core/models.py
 msgid "pronouns"
 msgstr "pronoms"
@@ -2019,6 +1413,10 @@ msgstr "signature du forum"
 #: core/models.py
 msgid "second email address"
 msgstr "adresse email secondaire"
+
+#: core/models.py
+msgid "phone"
+msgstr "téléphone"
 
 #: core/models.py
 msgid "parent phone"
@@ -2136,6 +1534,10 @@ msgstr "type mime"
 msgid "size"
 msgstr "taille"
 
+#: core/models.py counter/models.py eboutic/models.py forum/models.py
+msgid "date"
+msgstr "date"
+
 #: core/models.py
 msgid "asked for removal"
 msgstr "retrait demandé"
@@ -2233,6 +1635,10 @@ msgstr "type"
 #: core/models.py
 msgid "viewed"
 msgstr "vue"
+
+#: core/models.py counter/models.py
+msgid "label"
+msgstr "étiquette"
 
 #: core/models.py
 msgid "operation type"
@@ -2407,11 +1813,9 @@ msgid "Delete confirmation"
 msgstr "Confirmation de suppression"
 
 #: core/templates/core/delete_confirm.jinja
-#: core/templates/core/file_delete_confirm.jinja
-#: counter/templates/counter/fragments/delete_student_card.jinja
 #, python-format
-msgid "Are you sure you want to delete \"%(obj)s\"?"
-msgstr "Êtes-vous sûr de vouloir supprimer \"%(obj)s\" ?"
+msgid "Are you sure you want to delete \"%(name)s\"?"
+msgstr "Êtes-vous sûr de vouloir supprimer \"%(name)s\" ?"
 
 #: core/templates/core/delete_confirm.jinja
 #: core/templates/core/file_delete_confirm.jinja
@@ -2426,11 +1830,6 @@ msgstr "Confirmation"
 #: sas/templates/sas/ask_picture_removal.jinja
 msgid "Cancel"
 msgstr "Annuler"
-
-#: core/templates/core/edit.jinja
-#, python-format
-msgid "Edit %(name)s"
-msgstr "Éditer %(name)s"
 
 #: core/templates/core/file.jinja core/templates/core/file_list.jinja
 msgid "File list"
@@ -2451,6 +1850,12 @@ msgstr "Mes fichiers"
 #: core/templates/core/file.jinja core/templates/core/page.jinja
 msgid "Prop"
 msgstr "Propriétés"
+
+#: core/templates/core/file_delete_confirm.jinja
+#: counter/templates/counter/fragments/delete_student_card.jinja
+#, python-format
+msgid "Are you sure you want to delete \"%(obj)s\"?"
+msgstr "Êtes-vous sûr de vouloir supprimer \"%(obj)s\" ?"
 
 #: core/templates/core/file_detail.jinja
 #: core/templates/core/file_moderation.jinja sas/templates/sas/picture.jinja
@@ -2837,6 +2242,7 @@ msgid "Users"
 msgstr "Utilisateurs"
 
 #: core/templates/core/search.jinja core/views/user.py
+#: counter/templates/counter/product_list.jinja
 msgid "Clubs"
 msgstr "Clubs"
 
@@ -2858,6 +2264,12 @@ msgstr "Compte de %(user_name)s"
 #: core/templates/core/user_account_detail.jinja
 msgid "User account"
 msgstr "Compte utilisateur"
+
+#: core/templates/core/user_account.jinja
+#: core/templates/core/user_account_detail.jinja
+#: counter/templates/counter/counter_click.jinja
+msgid "Amount: "
+msgstr "Montant : "
 
 #: core/templates/core/user_account.jinja
 #: core/templates/core/user_account_detail.jinja
@@ -2884,6 +2296,12 @@ msgstr "Etickets"
 #: core/templates/core/user_account.jinja core/views/user.py
 msgid "User has no account"
 msgstr "L'utilisateur n'a pas de compte"
+
+#: core/templates/core/user_account_detail.jinja
+#: counter/templates/counter/last_ops.jinja
+#: counter/templates/counter/refilling_list.jinja
+msgid "Amount"
+msgstr "Montant"
 
 #: core/templates/core/user_account_detail.jinja
 msgid "Items"
@@ -3182,7 +2600,7 @@ msgid "Bans"
 msgstr "Bans"
 
 #: core/templates/core/user_tools.jinja counter/forms.py
-#: counter/views/mixins.py
+#: counter/templates/counter/product_list.jinja counter/views/mixins.py
 msgid "Counters"
 msgstr "Comptoirs"
 
@@ -3197,6 +2615,10 @@ msgstr "Gestion des produits"
 #: core/templates/core/user_tools.jinja
 msgid "Product types management"
 msgstr "Gestion des types de produit"
+
+#: core/templates/core/user_tools.jinja
+msgid "Returnable products management"
+msgstr "Gestion des consignes"
 
 #: core/templates/core/user_tools.jinja
 #: counter/templates/counter/cash_summary_list.jinja counter/views/mixins.py
@@ -3214,16 +2636,12 @@ msgid "Stats"
 msgstr "Stats"
 
 #: core/templates/core/user_tools.jinja
+msgid "Accounting"
+msgstr "Comptabilité"
+
+#: core/templates/core/user_tools.jinja
 msgid "Refound Account"
 msgstr "Rembourser un compte"
-
-#: core/templates/core/user_tools.jinja
-msgid "General accounting"
-msgstr "Comptabilité générale"
-
-#: core/templates/core/user_tools.jinja
-msgid "Club account: "
-msgstr "Compte club : "
 
 #: core/templates/core/user_tools.jinja
 msgid "Communication"
@@ -3413,8 +2831,8 @@ msgid "Pictures"
 msgstr "Photos"
 
 #: core/views/user.py
-msgid "Galaxy"
-msgstr "Galaxie"
+msgid "Account"
+msgstr "Compte"
 
 #: counter/apps.py sith/settings.py
 msgid "Check"
@@ -3448,6 +2866,10 @@ msgstr ""
 "Décrivez le produit. Si c'est un click pour un évènement, donnez quelques "
 "détails dessus, comme la date (en incluant l'année)."
 
+#: counter/forms.py
+msgid "Refound this account"
+msgstr "Rembourser ce compte"
+
 #: counter/management/commands/dump_accounts.py
 msgid "Your AE account has been emptied"
 msgstr "Votre compte AE a été vidé"
@@ -3461,8 +2883,8 @@ msgid "account id"
 msgstr "numéro de compte"
 
 #: counter/models.py
-msgid "recorded product"
-msgstr "produits consignés"
+msgid "amount"
+msgstr "montant"
 
 #: counter/models.py
 msgid "customer"
@@ -3520,6 +2942,10 @@ msgstr "Mettre à True si le mail a reçu une erreur"
 msgid "The operation that emptied the account."
 msgstr "L'opération qui a vidé le compte."
 
+#: counter/models.py pedagogy/models.py
+msgid "comment"
+msgstr "commentaire"
+
 #: counter/models.py
 msgid "A text that will be shown on the eboutic."
 msgstr "Un texte qui sera affiché sur l'eboutic."
@@ -3527,6 +2953,10 @@ msgstr "Un texte qui sera affiché sur l'eboutic."
 #: counter/models.py
 msgid "product type"
 msgstr "type du produit"
+
+#: counter/models.py pedagogy/models.py
+msgid "code"
+msgstr "code"
 
 #: counter/models.py
 msgid "purchase price"
@@ -3595,6 +3025,10 @@ msgstr "vendeurs"
 #: counter/models.py launderette/models.py
 msgid "token"
 msgstr "jeton"
+
+#: counter/models.py subscription/models.py
+msgid "payment method"
+msgstr "méthode de paiement"
 
 #: counter/models.py
 msgid "bank"
@@ -3709,6 +3143,35 @@ msgstr "carte étudiante"
 msgid "student cards"
 msgstr "cartes étudiantes"
 
+#: counter/models.py
+msgid "returnable product"
+msgstr "produit consigné"
+
+#: counter/models.py
+msgid "returned product"
+msgstr "produit déconsigné"
+
+#: counter/models.py
+msgid "maximum returns"
+msgstr "nombre de déconsignes maximum"
+
+#: counter/models.py
+msgid ""
+"The maximum number of items a customer can return without having actually "
+"bought them."
+msgstr ""
+"Le nombre maximum d'articles qu'un client peut déconsigner sans les avoir "
+"achetés."
+
+#: counter/models.py
+msgid "returnable products"
+msgstr "produits consignés"
+
+#: counter/models.py
+msgid "The returnable product cannot be the same as the returned one"
+msgstr ""
+"Le produit consigné ne peut pas être le même que le produit de déconsigne"
+
 #: counter/templates/counter/activity.jinja
 #, python-format
 msgid "%(counter_name)s activity"
@@ -3753,6 +3216,14 @@ msgstr "Sommes théoriques"
 #: counter/templates/counter/cash_summary_list.jinja counter/views/cash.py
 msgid "Emptied"
 msgstr "Coffre vidé"
+
+#: counter/templates/counter/cash_summary_list.jinja counter/views/cash.py
+#: pedagogy/templates/pedagogy/moderation.jinja
+#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: trombi/templates/trombi/comment.jinja
+#: trombi/templates/trombi/user_tools.jinja
+msgid "Comment"
+msgstr "Commentaire"
 
 #: counter/templates/counter/cash_summary_list.jinja
 msgid "yes"
@@ -3833,6 +3304,10 @@ msgstr "Liste des comptoirs"
 #: counter/templates/counter/counter_list.jinja
 msgid "New counter"
 msgstr "Nouveau comptoir"
+
+#: counter/templates/counter/counter_list.jinja
+msgid "Props"
+msgstr "Propriétés"
 
 #: counter/templates/counter/counter_list.jinja
 #: counter/templates/counter/refilling_list.jinja
@@ -3926,6 +3401,10 @@ msgstr "Choisir un autre mois : "
 #: counter/templates/counter/invoices_call.jinja
 msgid "CB Payments"
 msgstr "Payements en Carte Bancaire"
+
+#: counter/templates/counter/invoices_call.jinja
+msgid "Sum"
+msgstr "Somme"
 
 #: counter/templates/counter/last_ops.jinja
 #, python-format
@@ -4076,6 +3555,26 @@ msgstr "Il n'y a pas de types de produit dans ce site web."
 msgid "Seller"
 msgstr "Vendeur"
 
+#: counter/templates/counter/refound_account.jinja counter/views/admin.py
+msgid "Refound account"
+msgstr "Remboursement de compte"
+
+#: counter/templates/counter/refound_account.jinja
+msgid "Refound"
+msgstr "Rembourser"
+
+#: counter/templates/counter/returnable_list.jinja counter/views/mixins.py
+msgid "Returnable products"
+msgstr "Produits consignés"
+
+#: counter/templates/counter/returnable_list.jinja
+msgid "New returnable product"
+msgstr "Nouveau produit consignable"
+
+#: counter/templates/counter/returnable_list.jinja
+msgid "Returned product"
+msgstr "Produit déconsigné"
+
 #: counter/templates/counter/stats.jinja
 #, python-format
 msgid "%(counter_name)s stats"
@@ -4107,6 +3606,11 @@ msgstr "Temps"
 #, python-format
 msgid "Top 100 barman %(counter_name)s (all semesters)"
 msgstr "Top 100 barman %(counter_name)s (tous les semestres)"
+
+#: counter/views/admin.py
+#, python-format
+msgid "returnable product : %(returnable)s -> %(returned)s"
+msgstr "produit consigné : %(returnable)s -> %(returned)s"
 
 #: counter/views/cash.py
 msgid "10 cents"
@@ -4161,12 +3665,20 @@ msgid "The selected product isn't available for this user"
 msgstr "Le produit sélectionné n'est pas disponnible pour cet utilisateur"
 
 #: counter/views/click.py
-msgid "Submmited basket is invalid"
+msgid "Submitted basket is invalid"
 msgstr "Le panier envoyé est invalide"
 
 #: counter/views/click.py
-msgid "This user have reached his recording limit"
-msgstr "Cet utilisateur a atteint sa limite de déconsigne"
+msgid "Duplicated product entries."
+msgstr "Saisie de produit dupliquée"
+
+#: counter/views/click.py
+#, python-format
+msgid ""
+"This user have reached his recording limit for the following products : %s"
+msgstr ""
+"Cet utilisateur a atteint sa limite de déconsigne pour les produits "
+"suivants : %s"
 
 #: counter/views/eticket.py
 msgid "people(s)"
@@ -4241,6 +3753,10 @@ msgstr "id du type du produit"
 #: eboutic/models.py
 msgid "basket"
 msgstr "panier"
+
+#: eboutic/models.py
+msgid "invoice"
+msgstr "facture"
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja
@@ -4753,6 +4269,10 @@ msgstr "Nouvelle machine"
 msgid "Type"
 msgstr "Type"
 
+#: launderette/templates/launderette/launderette_admin.jinja
+msgid "Name"
+msgstr "Nom"
+
 #: launderette/templates/launderette/launderette_book.jinja
 msgid "Choose"
 msgstr "Choisir"
@@ -5121,6 +4641,10 @@ msgid "User that will be deleted"
 msgstr "Utilisateur qui sera supprimé"
 
 #: rootplace/forms.py
+msgid "You cannot merge two identical users."
+msgstr "Vous ne pouvez pas fusionner deux utilisateurs identiques."
+
+#: rootplace/forms.py
 msgid "User to be selected"
 msgstr "Utilisateur à sélectionner"
 
@@ -5140,6 +4664,10 @@ msgstr ""
 "Si vous avez des soucis en utilisant cet utilitaire (connexion expirée, "
 "erreur 500), essayez en utilisant l'utilitaire en ligne de commande. "
 "Utilisez ./manage.py delete_user_messages ID."
+
+#: rootplace/templates/rootplace/logs.jinja
+msgid "Operation type"
+msgstr "Type d'opération"
 
 #: rootplace/templates/rootplace/logs.jinja
 msgid "Operator"
@@ -5219,14 +4747,14 @@ msgstr "SAS"
 msgid "Albums"
 msgstr "Albums"
 
-#: sas/templates/sas/album.jinja
-msgid "Download album"
-msgstr "Télécharger l'album"
-
 #: sas/templates/sas/album.jinja sas/templates/sas/macros.jinja
 #: sas/templates/sas/user_pictures.jinja
 msgid "To be moderated"
 msgstr "A modérer"
+
+#: sas/templates/sas/album.jinja
+msgid "Download album"
+msgstr "Télécharger l'album"
 
 #: sas/templates/sas/album.jinja
 msgid "Upload"
@@ -5417,6 +4945,10 @@ msgstr "ST"
 #: sith/settings.py
 msgid "EXT"
 msgstr "EXT"
+
+#: sith/settings.py
+msgid "Closed"
+msgstr "Fermé"
 
 #: sith/settings.py
 msgid "Autumn"

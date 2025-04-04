@@ -42,7 +42,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from haystack.query import RelatedSearchQuerySet
 from honeypot.decorators import check_honeypot
 
-from club.widgets.select import AutoCompleteSelectClub
+from club.widgets.ajax_select import AutoCompleteSelectClub
 from core.auth.mixins import (
     CanCreateMixin,
     CanEditMixin,
@@ -50,11 +50,11 @@ from core.auth.mixins import (
     CanViewMixin,
     can_view,
 )
-from core.views.widgets.markdown import MarkdownInput
-from core.views.widgets.select import (
+from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
     AutoCompleteSelectMultipleGroup,
 )
+from core.views.widgets.markdown import MarkdownInput
 from forum.models import Forum, ForumMessage, ForumMessageMeta, ForumTopic
 
 

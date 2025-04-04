@@ -28,7 +28,6 @@ from datetime import date, timedelta
 from operator import itemgetter
 from smtplib import SMTPException
 
-from django.conf import settings
 from django.contrib.auth import login, views
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -65,7 +64,7 @@ from core.views.forms import (
     UserProfileForm,
 )
 from core.views.mixins import QuickNotifMixin, TabedViewMixin
-from counter.models import Refilling, Selling
+from counter.models import Counter, Refilling, Selling
 from eboutic.models import Invoice
 from subscription.models import Subscription
 from trombi.views import UserTrombiForm
@@ -205,14 +204,6 @@ class UserTabsMixin(TabedViewMixin):
                 "name": _("Pictures"),
             },
         ]
-        if settings.SITH_ENABLE_GALAXY and self.request.user.was_subscribed:
-            tab_list.append(
-                {
-                    "url": reverse("galaxy:user", kwargs={"user_id": user.id}),
-                    "slug": "galaxy",
-                    "name": _("Galaxy"),
-                }
-            )
         if self.request.user == user:
             tab_list.append(
                 {"url": reverse("core:user_tools"), "slug": "tools", "name": _("Tools")}
@@ -251,17 +242,7 @@ class UserTabsMixin(TabedViewMixin):
         if (
             hasattr(user, "customer")
             and user.customer
-            and (
-                user == self.request.user
-                or self.request.user.is_in_group(
-                    pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
-                )
-                or self.request.user.is_in_group(
-                    name=settings.SITH_BAR_MANAGER["unix_name"]
-                    + settings.SITH_BOARD_SUFFIX
-                )
-                or self.request.user.is_root
-            )
+            and (user == self.request.user or user.has_perm("counter.view_customer"))
         ):
             tab_list.append(
                 {
@@ -370,12 +351,7 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
             raise Http404
 
         if not (
-            profile == request.user
-            or request.user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-            or request.user.is_in_group(
-                name=settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
-            )
-            or request.user.is_root
+            profile == request.user or request.user.has_perm("counter.view_customer")
         ):
             raise PermissionDenied
 
@@ -384,8 +360,6 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         from django.db.models import Sum
-
-        from counter.models import Counter
 
         foyer = Counter.objects.filter(name="Foyer").first()
         mde = Counter.objects.filter(name="MDE").first()
@@ -599,14 +573,9 @@ class UserAccountBase(UserTabsMixin, DetailView):
     current_tab = "account"
     queryset = User.objects.select_related("customer")
 
-    def dispatch(self, request, *arg, **kwargs):  # Manually validates the rights
-        if (
-            kwargs.get("user_id") == request.user.id
-            or request.user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
-            or request.user.is_in_group(
-                name=settings.SITH_BAR_MANAGER["unix_name"] + settings.SITH_BOARD_SUFFIX
-            )
-            or request.user.is_root
+    def dispatch(self, request, *arg, **kwargs):
+        if kwargs.get("user_id") == request.user.id or request.user.has_perm(
+            "counter.view_customer"
         ):
             return super().dispatch(request, *arg, **kwargs)
         raise PermissionDenied

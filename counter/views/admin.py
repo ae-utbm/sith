@@ -15,19 +15,34 @@
 from datetime import timedelta
 
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.forms import CheckboxSelectMultiple
 from django.forms.models import modelform_factory
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django.views.generic import DetailView, ListView, TemplateView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
 from core.auth.mixins import CanEditMixin, CanViewMixin
 from core.utils import get_semester_code, get_start_of_semester
-from counter.forms import CounterEditForm, ProductEditForm
-from counter.models import Counter, Product, ProductType, Refilling, Selling
+from counter.forms import (
+    CloseCustomerAccountForm,
+    CounterEditForm,
+    ProductEditForm,
+    ReturnableProductForm,
+)
+from counter.models import (
+    Counter,
+    Product,
+    ProductType,
+    Refilling,
+    ReturnableProduct,
+    Selling,
+)
 from counter.utils import is_logged_in_counter
 from counter.views.mixins import CounterAdminMixin, CounterAdminTabsMixin
 
@@ -146,6 +161,69 @@ class ProductEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     current_tab = "products"
 
 
+class ReturnableProductListView(
+    CounterAdminTabsMixin, PermissionRequiredMixin, ListView
+):
+    model = ReturnableProduct
+    queryset = model.objects.select_related("product", "returned_product")
+    template_name = "counter/returnable_list.jinja"
+    current_tab = "returnable_products"
+    permission_required = "counter.view_returnableproduct"
+
+
+class ReturnableProductCreateView(
+    CounterAdminTabsMixin, PermissionRequiredMixin, CreateView
+):
+    form_class = ReturnableProductForm
+    template_name = "core/create.jinja"
+    current_tab = "returnable_products"
+    success_url = reverse_lazy("counter:returnable_list")
+    permission_required = "counter.add_returnableproduct"
+
+
+class ReturnableProductUpdateView(
+    CounterAdminTabsMixin, PermissionRequiredMixin, UpdateView
+):
+    model = ReturnableProduct
+    pk_url_kwarg = "returnable_id"
+    queryset = model.objects.select_related("product", "returned_product")
+    form_class = ReturnableProductForm
+    template_name = "core/edit.jinja"
+    current_tab = "returnable_products"
+    success_url = reverse_lazy("counter:returnable_list")
+    permission_required = "counter.change_returnableproduct"
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "object_name": _("returnable product : %(returnable)s -> %(returned)s")
+            % {
+                "returnable": self.object.product.name,
+                "returned": self.object.returned_product.name,
+            }
+        }
+
+
+class ReturnableProductDeleteView(
+    CounterAdminTabsMixin, PermissionRequiredMixin, DeleteView
+):
+    model = ReturnableProduct
+    pk_url_kwarg = "returnable_id"
+    queryset = model.objects.select_related("product", "returned_product")
+    template_name = "core/delete_confirm.jinja"
+    current_tab = "returnable_products"
+    success_url = reverse_lazy("counter:returnable_list")
+    permission_required = "counter.delete_returnableproduct"
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "object_name": _("returnable product : %(returnable)s -> %(returned)s")
+            % {
+                "returnable": self.object.product.name,
+                "returned": self.object.returned_product.name,
+            }
+        }
+
+
 class RefillingDeleteView(DeleteView):
     """Delete a refilling (for the admins)."""
 
@@ -253,3 +331,42 @@ class CounterRefillingListView(CounterAdminTabsMixin, CounterAdminMixin, ListVie
         kwargs = super().get_context_data(**kwargs)
         kwargs["counter"] = self.counter
         return kwargs
+
+
+class RefoundAccountView(UserPassesTestMixin, FormView):
+    """Create a selling with the same amount as the current user money."""
+
+    template_name = "counter/refound_account.jinja"
+    form_class = CloseCustomerAccountForm
+
+    def test_func(self):
+        return self.request.user.is_root or self.request.user.is_in_group(
+            pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
+        )
+
+    def form_valid(self, form):
+        self.customer = form.cleaned_data["user"]
+        self.create_selling()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.request.path
+
+    def create_selling(self):
+        with transaction.atomic():
+            uprice = self.customer.customer.amount
+            refound_club_counter = Counter.objects.get(
+                id=settings.SITH_COUNTER_REFOUND_ID
+            )
+            refound_club = refound_club_counter.club
+            s = Selling(
+                label=_("Refound account"),
+                unit_price=uprice,
+                quantity=1,
+                seller=self.request.user,
+                customer=self.customer.customer,
+                club=refound_club,
+                counter=refound_club_counter,
+                product=Product.objects.get(id=settings.SITH_PRODUCT_REFOUND_ID),
+            )
+            s.save()

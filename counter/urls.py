@@ -30,6 +30,11 @@ from counter.views.admin import (
     ProductTypeEditView,
     ProductTypeListView,
     RefillingDeleteView,
+    RefoundAccountView,
+    ReturnableProductCreateView,
+    ReturnableProductDeleteView,
+    ReturnableProductListView,
+    ReturnableProductUpdateView,
     SellingDeleteView,
 )
 from counter.views.auth import counter_login, counter_logout
@@ -51,10 +56,7 @@ from counter.views.home import (
     CounterMain,
 )
 from counter.views.invoice import InvoiceCallView
-from counter.views.student_card import (
-    StudentCardDeleteView,
-    StudentCardFormView,
-)
+from counter.views.student_card import StudentCardDeleteView, StudentCardFormView
 
 urlpatterns = [
     path("<int:counter_id>/", CounterMain.as_view(), name="details"),
@@ -129,6 +131,24 @@ urlpatterns = [
         ProductTypeEditView.as_view(),
         name="product_type_edit",
     ),
+    path(
+        "admin/returnable/", ReturnableProductListView.as_view(), name="returnable_list"
+    ),
+    path(
+        "admin/returnable/create/",
+        ReturnableProductCreateView.as_view(),
+        name="create_returnable",
+    ),
+    path(
+        "admin/returnable/<int:returnable_id>/",
+        ReturnableProductUpdateView.as_view(),
+        name="edit_returnable",
+    ),
+    path(
+        "admin/returnable/delete/<int:returnable_id>/",
+        ReturnableProductDeleteView.as_view(),
+        name="delete_returnable",
+    ),
     path("admin/eticket/list/", EticketListView.as_view(), name="eticket_list"),
     path("admin/eticket/new/", EticketCreateView.as_view(), name="new_eticket"),
     path(
@@ -151,4 +171,5 @@ urlpatterns = [
         CounterRefillingListView.as_view(),
         name="refilling_list",
     ),
+    path("admin/refound/", RefoundAccountView.as_view(), name="account_refound"),
 ]

@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from core.models import User
 from core.views.forms import SelectDate, SelectDateTime
-from core.views.widgets.select import AutoCompleteSelectUser
+from core.views.widgets.ajax_select import AutoCompleteSelectUser
 from subscription.models import Subscription
 
 
@@ -94,6 +94,13 @@ class SubscriptionNewUserForm(SubscriptionForm):
         return email
 
     def clean(self) -> dict[str, Any]:
+        """Initialize the [User][core.models.User] linked to this subscription.
+
+        Warning:
+            The `User` is initialized, but not saved.
+            Don't use it for operations that expect
+            a persisted object.
+        """
         member = User(
             first_name=self.cleaned_data.get("first_name"),
             last_name=self.cleaned_data.get("last_name"),

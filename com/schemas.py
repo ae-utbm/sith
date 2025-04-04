@@ -2,7 +2,7 @@ from datetime import datetime
 
 from ninja import FilterSchema, ModelSchema
 from ninja_extra import service_resolver
-from ninja_extra.controllers import RouteContext
+from ninja_extra.context import RouteContext
 from pydantic import Field
 
 from club.schemas import ClubProfileSchema

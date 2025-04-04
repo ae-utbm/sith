@@ -4,7 +4,7 @@ import django.core.validators
 import django.db.models.deletion
 from django.db import migrations, models
 
-import accounting.models
+import counter.fields
 
 
 class Migration(migrations.Migration):
@@ -142,7 +142,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "amount",
-                    accounting.models.CurrencyField(
+                    counter.fields.CurrencyField(
                         decimal_places=2,
                         default=0,
                         verbose_name="amount",
@@ -151,7 +151,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "effective_amount",
-                    accounting.models.CurrencyField(
+                    counter.fields.CurrencyField(
                         decimal_places=2,
                         default=0,
                         verbose_name="effective_amount",
@@ -176,7 +176,7 @@ class Migration(migrations.Migration):
                 ("number", models.IntegerField(verbose_name="number")),
                 (
                     "amount",
-                    accounting.models.CurrencyField(
+                    counter.fields.CurrencyField(
                         decimal_places=2, max_digits=12, verbose_name="amount"
                     ),
                 ),

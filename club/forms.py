@@ -29,18 +29,25 @@ from django.utils.translation import gettext_lazy as _
 from club.models import Club, Mailing, MailingSubscription, Membership
 from core.models import User
 from core.views.forms import SelectDate, SelectDateTime
-from core.views.widgets.select import AutoCompleteSelectMultipleUser
+from core.views.widgets.ajax_select import AutoCompleteSelectMultipleUser
 from counter.models import Counter
 
 
 class ClubEditForm(forms.ModelForm):
+    error_css_class = "error"
+    required_css_class = "required"
+
     class Meta:
         model = Club
         fields = ["address", "logo", "short_description"]
+        widgets = {"short_description": forms.Textarea()}
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["short_description"].widget = forms.Textarea()
+
+class ClubAdminEditForm(ClubEditForm):
+    admin_fields = ["name", "parent", "is_active"]
+
+    class Meta(ClubEditForm.Meta):
+        fields = ["name", "parent", "is_active", *ClubEditForm.Meta.fields]
 
 
 class MailingForm(forms.Form):

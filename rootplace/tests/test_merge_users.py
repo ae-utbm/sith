@@ -18,17 +18,19 @@ from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.timezone import localtime, now
+from model_bakery import baker
 
 from club.models import Club
 from core.models import Group, User
 from counter.models import Counter, Customer, Product, Refilling, Selling
+from rootplace.forms import MergeForm
 from subscription.models import Subscription
 
 
 class TestMergeUser(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.ae = Club.objects.get(unix_name="ae")
+        cls.club = baker.make(Club)
         cls.eboutic = Counter.objects.get(name="Eboutic")
         cls.barbar = Product.objects.get(code="BARB")
         cls.barbar.selling_price = 2
@@ -79,6 +81,15 @@ class TestMergeUser(TestCase):
             sas_admin.id,
         }
 
+    def test_identical_accounts(self):
+        form = MergeForm(data={"user1": self.to_keep.id, "user2": self.to_keep.id})
+        assert not form.is_valid()
+        assert "__all__" in form.errors
+        assert (
+            "Vous ne pouvez pas fusionner deux utilisateurs identiques."
+            in form.errors["__all__"]
+        )
+
     def test_both_subscribers_and_with_account(self):
         Customer(user=self.to_keep, account_id="11000l", amount=0).save()
         Customer(user=self.to_delete, account_id="12000m", amount=0).save()
@@ -97,7 +108,7 @@ class TestMergeUser(TestCase):
         Selling(
             label="barbar",
             counter=self.eboutic,
-            club=self.ae,
+            club=self.club,
             product=self.barbar,
             customer=self.to_keep.customer,
             seller=self.root,
@@ -108,7 +119,7 @@ class TestMergeUser(TestCase):
         Selling(
             label="barbar",
             counter=self.eboutic,
-            club=self.ae,
+            club=self.club,
             product=self.barbar,
             customer=self.to_delete.customer,
             seller=self.root,
@@ -180,7 +191,7 @@ class TestMergeUser(TestCase):
         Selling(
             label="barbar",
             counter=self.eboutic,
-            club=self.ae,
+            club=self.club,
             product=self.barbar,
             customer=self.to_delete.customer,
             seller=self.root,
@@ -208,7 +219,7 @@ class TestMergeUser(TestCase):
         Selling(
             label="barbar",
             counter=self.eboutic,
-            club=self.ae,
+            club=self.club,
             product=self.barbar,
             customer=self.to_keep.customer,
             seller=self.root,

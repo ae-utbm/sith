@@ -6,9 +6,9 @@ from django.utils.translation import gettext_lazy as _
 from core.models import User
 from core.views import MultipleImageField
 from core.views.forms import SelectDate
-from core.views.widgets.select import AutoCompleteSelectMultipleGroup
+from core.views.widgets.ajax_select import AutoCompleteSelectMultipleGroup
 from sas.models import Album, Picture, PictureModerationRequest
-from sas.widgets.select import AutoCompleteSelectAlbum
+from sas.widgets.ajax_select import AutoCompleteSelectAlbum
 
 
 class SASForm(forms.Form):

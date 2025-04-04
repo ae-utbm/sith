@@ -23,6 +23,7 @@
       <script type="module" src={{ static("bundled/core/components/include-index.ts") }}></script>
       <script type="module" src="{{ static('bundled/alpine-index.js') }}"></script>
       <script type="module" src="{{ static('bundled/htmx-index.js') }}"></script>
+      <script type="module" src="{{ static('bundled/country-flags-index.ts') }}"></script>
 
       <!-- Jquery declared here to be accessible in every django widgets -->
       <script src="{{ static('bundled/vendored/jquery.min.js') }}"></script>
@@ -83,18 +84,18 @@
       </ul>
 
       <div id="content">
-        {% block tabs %}
+        {%- block tabs -%}
           {% include "core/base/tabs.jinja" %}
-        {% endblock %}
+        {%- endblock -%}
 
-        {% block errors%}
+        {%- block errors -%}
           {% if error %}
             {{ error }}
           {% endif %}
-        {% endblock %}
+        {%- endblock -%}
 
-        {% block content %}
-        {% endblock %}
+        {%- block content -%}
+        {%- endblock -%}
       </div>
     </div>
 

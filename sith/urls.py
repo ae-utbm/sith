@@ -27,7 +27,7 @@ handler403 = "core.views.forbidden"
 handler404 = "core.views.not_found"
 handler500 = "core.views.internal_servor_error"
 
-api = NinjaExtraAPI(version="0.2.0", urls_namespace="api")
+api = NinjaExtraAPI(version="0.2.0", urls_namespace="api", csrf=True)
 api.auto_discover_controllers()
 
 urlpatterns = [
@@ -41,10 +41,6 @@ urlpatterns = [
     path("com/", include(("com.urls", "com"), namespace="com")),
     path("club/", include(("club.urls", "club"), namespace="club")),
     path("counter/", include(("counter.urls", "counter"), namespace="counter")),
-    path(
-        "accounting/",
-        include(("accounting.urls", "accounting"), namespace="accounting"),
-    ),
     path("eboutic/", include(("eboutic.urls", "eboutic"), namespace="eboutic")),
     path(
         "launderette/",
@@ -53,7 +49,6 @@ urlpatterns = [
     path("sas/", include(("sas.urls", "sas"), namespace="sas")),
     path("election/", include(("election.urls", "election"), namespace="election")),
     path("forum/", include(("forum.urls", "forum"), namespace="forum")),
-    path("galaxy/", include(("galaxy.urls", "galaxy"), namespace="galaxy")),
     path("trombi/", include(("trombi.urls", "trombi"), namespace="trombi")),
     path("matmatronch/", include(("matmat.urls", "matmat"), namespace="matmat")),
     path("pedagogy/", include(("pedagogy.urls", "pedagogy"), namespace="pedagogy")),
@@ -68,7 +63,10 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     import debug_toolbar
 
-    urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
+    urlpatterns += [
+        path("__debug__/", include(debug_toolbar.urls)),
+        path("galaxy/", include(("galaxy.urls", "galaxy"), namespace="galaxy")),
+    ]
 
 
 def sentry_debug(request):

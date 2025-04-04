@@ -43,8 +43,8 @@ from django.views.generic import DetailView, ListView, TemplateView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from club.models import Club, Mailing
-from com.calendar import IcsCalendar
 from com.forms import NewsDateForm, NewsForm, PosterForm
+from com.ics_calendar import IcsCalendar
 from com.models import News, NewsDate, Poster, Screen, Sith, Weekmail, WeekmailArticle
 from core.auth.mixins import (
     CanEditPropMixin,

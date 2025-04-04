@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from club.models import Club
-from club.widgets.select import AutoCompleteSelectClub
+from club.widgets.ajax_select import AutoCompleteSelectClub
 from com.models import News, NewsDate, Poster
 from core.models import User
 from core.utils import get_end_of_semester

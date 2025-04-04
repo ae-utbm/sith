@@ -4,7 +4,16 @@ import { defineConfig } from "@hey-api/openapi-ts";
 
 // biome-ignore lint/style/noDefaultExport: needed for openapi-ts
 export default defineConfig({
-  client: "@hey-api/client-fetch",
   input: resolve(__dirname, "./staticfiles/generated/openapi/schema.json"),
-  output: resolve(__dirname, "./staticfiles/generated/openapi"),
+  output: {
+    path: resolve(__dirname, "./staticfiles/generated/openapi/client"),
+  },
+  plugins: [
+    {
+      name: "@hey-api/client-fetch",
+      baseUrl: false,
+      runtimeConfigPath: "./openapi-csrf.ts",
+      exportFromIndex: true,
+    },
+  ],
 });

@@ -2,9 +2,10 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
-from club.widgets.select import AutoCompleteSelectClub
+from club.widgets.ajax_select import AutoCompleteSelectClub
+from core.models import User
 from core.views.forms import NFCTextInput, SelectDate, SelectDateTime
-from core.views.widgets.select import (
+from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
     AutoCompleteSelectMultipleGroup,
     AutoCompleteSelectMultipleUser,
@@ -17,9 +18,10 @@ from counter.models import (
     Eticket,
     Product,
     Refilling,
+    ReturnableProduct,
     StudentCard,
 )
-from counter.widgets.select import (
+from counter.widgets.ajax_select import (
     AutoCompleteSelectMultipleCounter,
     AutoCompleteSelectMultipleProduct,
     AutoCompleteSelectProduct,
@@ -213,6 +215,25 @@ class ProductEditForm(forms.ModelForm):
         return ret
 
 
+class ReturnableProductForm(forms.ModelForm):
+    class Meta:
+        model = ReturnableProduct
+        fields = ["product", "returned_product", "max_return"]
+        widgets = {
+            "product": AutoCompleteSelectProduct(),
+            "returned_product": AutoCompleteSelectProduct(),
+        }
+
+    def save(self, commit: bool = True) -> ReturnableProduct:  # noqa FBT
+        instance: ReturnableProduct = super().save(commit=commit)
+        if commit:
+            # This is expensive, but we don't have a task queue to offload it.
+            # Hopefully, creations and updates of returnable products
+            # occur very rarely
+            instance.update_balances()
+        return instance
+
+
 class CashSummaryFormBase(forms.Form):
     begin_date = forms.DateTimeField(
         label=_("Begin date"), widget=SelectDateTime, required=False
@@ -230,3 +251,13 @@ class EticketForm(forms.ModelForm):
             "product": AutoCompleteSelectProduct,
             "event_date": SelectDate,
         }
+
+
+class CloseCustomerAccountForm(forms.Form):
+    user = forms.ModelChoiceField(
+        label=_("Refound this account"),
+        help_text=None,
+        required=True,
+        widget=AutoCompleteSelectUser,
+        queryset=User.objects.all(),
+    )

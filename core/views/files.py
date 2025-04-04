@@ -41,7 +41,7 @@ from core.auth.mixins import (
 )
 from core.models import Notification, SithFile, User
 from core.views.mixins import AllowFragment
-from core.views.widgets.select import (
+from core.views.widgets.ajax_select import (
     AutoCompleteSelectMultipleGroup,
     AutoCompleteSelectSithFile,
     AutoCompleteSelectUser,
@@ -403,6 +403,7 @@ class FileModerationView(AllowFragment, ListView):
     model = SithFile
     template_name = "core/file_moderation.jinja"
     queryset = SithFile.objects.filter(is_moderated=False, is_in_sas=False)
+    ordering = "id"
     paginate_by = 100
 
     def dispatch(self, request: HttpRequest, *args, **kwargs):

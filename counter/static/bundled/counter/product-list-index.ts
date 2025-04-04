@@ -60,6 +60,8 @@ document.addEventListener("alpine:init", () => {
     productStatus: "" as "active" | "archived" | "both",
     search: "",
     productTypes: [] as string[],
+    clubs: [] as string[],
+    counters: [] as string[],
     pageSize: defaultPageSize,
     page: defaultPage,
 
@@ -67,13 +69,27 @@ document.addEventListener("alpine:init", () => {
       const url = getCurrentUrlParams();
       this.search = url.get("search") || "";
       this.productStatus = url.get("productStatus") ?? "active";
-      const widget = this.$refs.productTypesInput.widget as TomSelect;
-      widget.on("change", (items: string[]) => {
+      const productTypesWidget = this.$refs.productTypesInput.widget as TomSelect;
+      productTypesWidget.on("change", (items: string[]) => {
         this.productTypes = [...items];
+      });
+      const clubsWidget = this.$refs.clubsInput.widget as TomSelect;
+      clubsWidget.on("change", (items: string[]) => {
+        this.clubs = [...items];
+      });
+      const countersWidget = this.$refs.countersInput.widget as TomSelect;
+      countersWidget.on("change", (items: string[]) => {
+        this.counters = [...items];
       });
 
       await this.load();
-      const searchParams = ["search", "productStatus", "productTypes"];
+      const searchParams = [
+        "search",
+        "productStatus",
+        "productTypes",
+        "clubs",
+        "counters",
+      ];
       for (const param of searchParams) {
         this.$watch(param, () => {
           this.page = defaultPage;
@@ -92,7 +108,7 @@ document.addEventListener("alpine:init", () => {
      * Build the object containing the query parameters corresponding
      * to the current filters
      */
-    getQueryParams(): ProductSearchProductsDetailedData {
+    getQueryParams(): Omit<ProductSearchProductsDetailedData, "url"> {
       const search = this.search.length > 0 ? this.search : null;
       // If active or archived products must be filtered, put the filter in the request
       // Else, don't include the filter
@@ -109,6 +125,8 @@ document.addEventListener("alpine:init", () => {
           is_archived: isArchived,
           // biome-ignore lint/style/useNamingConvention: api is in snake_case
           product_type: [...this.productTypes],
+          club: [...this.clubs],
+          counter: [...this.counters],
         },
       };
     },
@@ -121,14 +139,17 @@ document.addEventListener("alpine:init", () => {
       const options = this.getQueryParams();
       const resp = await productSearchProductsDetailed(options);
       this.nbPages = Math.ceil(resp.data.count / defaultPageSize);
-      this.products = resp.data.results.reduce<GroupedProducts>((acc, curr) => {
-        const key = curr.product_type?.name ?? gettext("Uncategorized");
-        if (!(key in acc)) {
-          acc[key] = [];
-        }
-        acc[key].push(curr);
-        return acc;
-      }, {});
+      this.products = resp.data.results.reduce<GroupedProducts>(
+        (acc: GroupedProducts, curr: ProductSchema) => {
+          const key = curr.product_type?.name ?? gettext("Uncategorized");
+          if (!(key in acc)) {
+            acc[key] = [];
+          }
+          acc[key].push(curr);
+          return acc;
+        },
+        {},
+      );
       this.loading = false;
     },
 

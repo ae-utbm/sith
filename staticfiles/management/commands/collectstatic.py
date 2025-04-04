@@ -50,7 +50,13 @@ class Command(CollectStatic):
             return Path(location)
 
         Scss.compile(self.collect_scss())
-        OpenApi.compile()  # This needs to be prior to javascript bundling
+        openapi = OpenApi.compile()  # This needs to be prior to javascript bundling
+        if openapi is not None:
+            _ = openapi.wait()
+            if openapi.returncode:
+                raise RuntimeError(
+                    f"Openapi generation failed with returncode {openapi.returncode}"
+                )
         JSBundler.compile()
 
         collected = super().collect()

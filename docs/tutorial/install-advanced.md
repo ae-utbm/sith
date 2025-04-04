@@ -77,6 +77,58 @@ uv sync --group prod
     C'est parce que ces dépendances compilent certains modules
     à l'installation.
 
+## Désactiver Honcho
+
+Honcho est utilisé en développement pour simplifier la gestion
+des services externes (redis, vite et autres futures).
+
+En mode production, il est nécessaire de le désactiver puisque normalement
+tous ces services sont déjà configurés.
+
+Pour désactiver Honcho il suffit de ne sélectionner aucun `PROCFILE_` dans la config.
+
+```dotenv
+PROCFILE_STATIC=
+PROCFILE_SERVICE=
+```
+
+!!! note
+
+    Si `PROCFILE_STATIC` est désactivé, la recompilation automatique
+    des fichiers statiques ne se fait plus.
+    Si vous en avez besoin et que vous travaillez sans `PROCFILE_STATIC`,
+    vous devez ouvrir une autre fenêtre de votre terminal
+    et lancer la commande `npm run serve`
+
+## Configurer Redis en service externe
+
+Redis est installé comme dépendance mais pas lancé par défaut.
+
+En mode développement, le sith se charge de le démarrer mais
+pas en production !
+
+Il faut donc lancer le service comme ceci:
+
+```bash
+sudo systemctl start redis
+sudo systemctl enable redis  # si vous voulez que redis démarre automatiquement au boot
+```
+
+Puis modifiez votre `.env` pour y configurer le bon port redis.
+Le port du fichier d'exemple est un port non standard pour éviter
+les conflits avec les instances de redis déjà en fonctionnement.
+
+```dotenv
+REDIS_PORT=6379
+CACHE_URL=redis://127.0.0.1:${REDIS_PORT}/0
+```
+
+Si on souhaite configurer redis pour communiquer via un socket :
+
+```dovenv
+CACHE_URL=redis:///path/to/redis-server.sock
+```
+
 ## Configurer PostgreSQL
 
 PostgreSQL est utilisé comme base de données.

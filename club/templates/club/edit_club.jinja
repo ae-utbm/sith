@@ -1,0 +1,54 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+  {% trans name=object %}Edit {{ name }}{% endtrans %}
+{% endblock %}
+
+{% block content %}
+  <h2>{% trans name=object %}Edit {{ name }}{% endtrans %}</h2>
+
+  <form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {{ form.non_field_errors() }}
+
+    {% if form.admin_fields %}
+      {# If the user is admin, display the admin fields,
+         and explicitly separate them from the non-admin ones,
+         with some help text.
+         Non-admin users will only see the regular form fields,
+         so they don't need thoses explanations #}
+      <h3>{% trans %}Club properties{% endtrans %}</h3>
+      <p class="helptext">
+        {% trans trimmed %}
+          The following form fields are linked to the core properties of a club.
+          Only admin users can see and edit them.
+        {% endtrans %}
+      </p>
+      <fieldset class="required margin-bottom">
+        {% for field_name in form.admin_fields %}
+          {% set field = form[field_name] %}
+          <div class="form-group">
+            {{ field.errors }}
+            {{ field.label_tag() }}
+            {{ field }}
+          </div>
+          {# Remove the the admin fields from the form.
+             The remaining non-admin fields will be rendered
+             at once with a simple {{ form.as_p() }} #}
+          {% set _ = form.fields.pop(field_name) %}
+        {% endfor %}
+      </fieldset>
+
+      <h3>{% trans %}Club informations{% endtrans %}</h3>
+      <p class="helptext">
+        {% trans trimmed %}
+          The following form fields are linked to the basic description of a club.
+          All board members of this club can see and edit them.
+        {% endtrans %}
+      </p>
+    {% endif %}
+    {{ form.as_p() }}
+    <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
+  </form>
+{% endblock content %}

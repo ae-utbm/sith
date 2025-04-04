@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.views import View
@@ -6,20 +8,24 @@ from django.views import View
 class TabedViewMixin(View):
     """Basic functions for displaying tabs in the template."""
 
+    current_tab: ClassVar[str | None] = None
+    list_of_tabs: ClassVar[list | None] = None
+    tabs_title: ClassVar[str | None] = None
+
     def get_tabs_title(self):
-        if hasattr(self, "tabs_title"):
-            return self.tabs_title
-        raise ImproperlyConfigured("tabs_title is required")
+        if not self.tabs_title:
+            raise ImproperlyConfigured("tabs_title is required")
+        return self.tabs_title
 
     def get_current_tab(self):
-        if hasattr(self, "current_tab"):
-            return self.current_tab
-        raise ImproperlyConfigured("current_tab is required")
+        if not self.current_tab:
+            raise ImproperlyConfigured("current_tab is required")
+        return self.current_tab
 
     def get_list_of_tabs(self):
-        if hasattr(self, "list_of_tabs"):
-            return self.list_of_tabs
-        raise ImproperlyConfigured("list_of_tabs is required")
+        if not self.list_of_tabs:
+            raise ImproperlyConfigured("list_of_tabs is required")
+        return self.list_of_tabs
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)

@@ -9,7 +9,7 @@ from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 
-from com.calendar import IcsCalendar
+from com.ics_calendar import IcsCalendar
 from com.models import News, NewsDate
 from com.schemas import NewsDateFilterSchema, NewsDateSchema
 from core.auth.api_permissions import HasPerm

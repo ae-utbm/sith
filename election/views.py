@@ -13,12 +13,12 @@ from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateVi
 
 from core.auth.mixins import CanCreateMixin, CanEditMixin, CanViewMixin
 from core.views.forms import SelectDateTime
-from core.views.widgets.markdown import MarkdownInput
-from core.views.widgets.select import (
+from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
     AutoCompleteSelectMultipleGroup,
     AutoCompleteSelectUser,
 )
+from core.views.widgets.markdown import MarkdownInput
 from election.models import Candidature, Election, ElectionList, Role, Vote
 
 if TYPE_CHECKING:

@@ -47,7 +47,7 @@ from core.auth.mixins import (
 from core.models import User
 from core.views.forms import SelectDate
 from core.views.mixins import QuickNotifMixin, TabedViewMixin
-from core.views.widgets.select import AutoCompleteSelectUser
+from core.views.widgets.ajax_select import AutoCompleteSelectUser
 from trombi.models import Trombi, TrombiClubMembership, TrombiComment, TrombiUser
 
 
@@ -479,10 +479,7 @@ class TrombiCommentFormView(LoginRequiredMixin, View):
             )
         if self.trombi.comments_deadline < date.today():
             raise Http404(
-                _(
-                    "You can not write comment anymore, the deadline is "
-                    "already passed."
-                )
+                _("You can not write comment anymore, the deadline is already passed.")
             )
         return modelform_factory(
             self.model,

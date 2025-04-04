@@ -1,6 +1,8 @@
 from datetime import datetime
 from pathlib import Path
+from typing import Annotated
 
+from annotated_types import MinLen
 from django.urls import reverse
 from ninja import FilterSchema, ModelSchema, Schema
 from pydantic import Field, NonNegativeInt
@@ -9,7 +11,37 @@ from core.schemas import SimpleUserSchema, UserProfileSchema
 from sas.models import Album, Picture, PictureModerationRequest
 
 
+class AlbumFilterSchema(FilterSchema):
+    search: Annotated[str, MinLen(1)] | None = Field(None, q="name__icontains")
+    before_date: datetime | None = Field(None, q="event_date__lte")
+    after_date: datetime | None = Field(None, q="event_date__gte")
+    parent_id: int | None = Field(None, q="parent_id")
+
+
 class AlbumSchema(ModelSchema):
+    class Meta:
+        model = Album
+        fields = ["id", "name", "is_moderated"]
+
+    thumbnail: str | None
+    sas_url: str
+
+    @staticmethod
+    def resolve_thumbnail(obj: Album) -> str | None:
+        # Album thumbnails aren't stored in `Album.thumbnail` but in `Album.file`
+        # Don't ask me why.
+        if not obj.file:
+            return None
+        return obj.get_download_url()
+
+    @staticmethod
+    def resolve_sas_url(obj: Album) -> str:
+        return obj.get_absolute_url()
+
+
+class AlbumAutocompleteSchema(ModelSchema):
+    """Schema to use on album autocomplete input field."""
+
     class Meta:
         model = Album
         fields = ["id", "name"]

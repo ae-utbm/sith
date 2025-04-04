@@ -26,6 +26,7 @@ from counter.models import (
     Product,
     ProductType,
     Refilling,
+    ReturnableProduct,
     Selling,
 )
 
@@ -41,6 +42,18 @@ class ProductAdmin(SearchModelAdmin):
         "archived",
     )
     search_fields = ("name", "code")
+
+
+@admin.register(ReturnableProduct)
+class ReturnableProductAdmin(admin.ModelAdmin):
+    list_display = ("product", "returned_product", "max_return")
+    search_fields = (
+        "product__name",
+        "product__code",
+        "returned_product__name",
+        "returned_product__code",
+    )
+    autocomplete_fields = ("product", "returned_product")
 
 
 @admin.register(Customer)

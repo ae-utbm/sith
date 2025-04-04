@@ -196,9 +196,7 @@ class LaunderetteCreateView(PermissionRequiredMixin, CreateView):
     permission_required = "launderette.add_launderette"
 
     def form_valid(self, form):
-        club = Club.objects.filter(
-            unix_name=settings.SITH_LAUNDERETTE_MANAGER["unix_name"]
-        ).first()
+        club = Club.objects.get(id=settings.SITH_LAUNDERETTE_CLUB_ID)
         c = Counter(name=form.instance.name, club=club, type="OFFICE")
         c.save()
         form.instance.counter = c

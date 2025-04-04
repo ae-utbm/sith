@@ -50,7 +50,22 @@ from .honeypot import custom_honeypot_error
 env = Env()
 env.read_env()
 
+
+@env.parser_for("optional_file")
+def optional_file_parser(value: str) -> Path | None:
+    if not value:
+        return None
+    path = Path(value)
+    if not path.is_file():
+        return None
+    return path
+
+
 BASE_DIR = Path(__file__).parent.parent.resolve()
+
+# Composer settings
+PROCFILE_STATIC = env.optional_file("PROCFILE_STATIC", None)
+PROCFILE_SERVICE = env.optional_file("PROCFILE_SERVICE", None)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -219,8 +234,7 @@ DATABASES = {
     "default": env.dj_db_url("DATABASE_URL", conn_max_age=None, conn_health_checks=True)
 }
 
-if "CACHE_URL" in os.environ:
-    CACHES = {"default": env.dj_cache_url("CACHE_URL")}
+CACHES = {"default": env.dj_cache_url("CACHE_URL")}
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
@@ -327,32 +341,10 @@ SITH_URL = env.str("SITH_URL", default="127.0.0.1:8000")
 SITH_NAME = env.str("SITH_NAME", default="AE UTBM")
 SITH_TWITTER = "@ae_utbm"
 
-# Enable experimental features
-# Enable/Disable the galaxy button on user profile (urls stay activated)
-SITH_ENABLE_GALAXY = False
-
 # AE configuration
-# TODO: keep only that first setting, with the ID, and do the same for the other clubs
 SITH_MAIN_CLUB_ID = env.int("SITH_MAIN_CLUB_ID", default=1)
-SITH_MAIN_CLUB = {
-    "name": "AE",
-    "unix_name": "ae",
-    "address": "6 Boulevard Anatole France, 90000 Belfort",
-}
-
-# Bar managers
-SITH_BAR_MANAGER = {
-    "name": "Pdf",
-    "unix_name": "pdfesti",
-    "address": "6 Boulevard Anatole France, 90000 Belfort",
-}
-
-# Launderette managers
-SITH_LAUNDERETTE_MANAGER = {
-    "name": "Laverie",
-    "unix_name": "laverie",
-    "address": "6 Boulevard Anatole France, 90000 Belfort",
-}
+SITH_PDF_CLUB_ID = env.int("SITH_PDF_CLUB_ID", default=2)
+SITH_LAUNDERETTE_CLUB_ID = env.int("SITH_LAUNDERETTE_CLUB_ID", default=84)
 
 # Main root for club pages
 SITH_CLUB_ROOT_PAGE = "clubs"
@@ -404,10 +396,6 @@ SITH_SAS_IMAGES_PER_PAGE = 60
 
 SITH_BOARD_SUFFIX = "-bureau"
 SITH_MEMBER_SUFFIX = "-membres"
-
-SITH_MAIN_BOARD_GROUP = SITH_MAIN_CLUB["unix_name"] + SITH_BOARD_SUFFIX
-SITH_MAIN_MEMBERS_GROUP = SITH_MAIN_CLUB["unix_name"] + SITH_MEMBER_SUFFIX
-SITH_BAR_MANAGER_BOARD_GROUP = SITH_BAR_MANAGER["unix_name"] + SITH_BOARD_SUFFIX
 
 SITH_PROFILE_DEPARTMENTS = [
     ("TC", _("TC")),

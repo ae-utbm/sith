@@ -525,7 +525,7 @@ class Galaxy(models.Model):
             self.logger.info(
                 f"Progression: {user1_count}/{rulable_users_count} citizen -- {rulable_users_count - user1_count} remaining"
             )
-            self.logger.info(f"Speed: {60.0*global_avg_speed:.2f} citizen per minute")
+            self.logger.info(f"Speed: {60.0 * global_avg_speed:.2f} citizen per minute")
 
             # We can divide the computed ETA by 2 because each loop, there is one citizen less to check, and maths tell
             # us that this averages to a division by two

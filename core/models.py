@@ -421,13 +421,9 @@ class User(AbstractUser):
     def is_launderette_manager(self):
         from club.models import Club
 
-        return (
-            Club.objects.filter(
-                unix_name=settings.SITH_LAUNDERETTE_MANAGER["unix_name"]
-            )
-            .first()
-            .get_membership_for(self)
-        )
+        return Club.objects.get(
+            id=settings.SITH_LAUNDERETTE_CLUB_ID
+        ).get_membership_for(self)
 
     @cached_property
     def is_banned_alcohol(self) -> bool:
@@ -880,11 +876,9 @@ class SithFile(models.Model):
     def save(self, *args, **kwargs):
         sas = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
         self.is_in_sas = sas in self.get_parent_list() or self == sas
-        copy_rights = False
-        if self.id is None:
-            copy_rights = True
+        adding = self._state.adding
         super().save(*args, **kwargs)
-        if copy_rights:
+        if adding:
             self.copy_rights()
         if self.is_in_sas:
             for user in User.objects.filter(
@@ -1366,6 +1360,18 @@ class PageRev(models.Model):
     class Meta:
         ordering = ["date"]
 
+    def __getattribute__(self, attr):
+        if attr == "owner_group":
+            return self.page.owner_group
+        elif attr == "edit_groups":
+            return self.page.edit_groups
+        elif attr == "view_groups":
+            return self.page.view_groups
+        elif attr == "unset_lock":
+            return self.page.unset_lock
+        else:
+            return object.__getattribute__(self, attr)
+
     def __str__(self):
         return str(self.__dict__)
 
@@ -1378,18 +1384,6 @@ class PageRev(models.Model):
 
     def get_absolute_url(self):
         return reverse("core:page", kwargs={"page_name": self.page._full_name})
-
-    def __getattribute__(self, attr):
-        if attr == "owner_group":
-            return self.page.owner_group
-        elif attr == "edit_groups":
-            return self.page.edit_groups
-        elif attr == "view_groups":
-            return self.page.view_groups
-        elif attr == "unset_lock":
-            return self.page.unset_lock
-        else:
-            return object.__getattribute__(self, attr)
 
     def can_be_edited_by(self, user):
         return self.page.can_be_edited_by(user)

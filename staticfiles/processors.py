@@ -95,15 +95,9 @@ class JSBundler:
     def compile():
         """Bundle js files with the javascript bundler for production."""
         process = subprocess.Popen(["npm", "run", "compile"])
-        process.wait()
+        _ = process.wait()
         if process.returncode:
             raise RuntimeError(f"Bundler failed with returncode {process.returncode}")
-
-    @staticmethod
-    def runserver() -> subprocess.Popen:
-        """Bundle js files automatically in background when called in debug mode."""
-        logging.getLogger("django").info("Running javascript bundling server")
-        return subprocess.Popen(["npm", "run", "serve"])
 
     @staticmethod
     def get_manifest() -> JSBundlerManifest:
@@ -169,7 +163,7 @@ class OpenApi:
     OPENAPI_DIR = GENERATED_ROOT / "openapi"
 
     @classmethod
-    def compile(cls):
+    def compile(cls) -> subprocess.Popen[bytes] | None:
         """Compile a TS client for the sith API. Only generates it if it changed."""
         logging.getLogger("django").info("Compiling open api typescript client")
         out = cls.OPENAPI_DIR / "schema.json"
@@ -197,4 +191,4 @@ class OpenApi:
         with open(out, "w") as f:
             _ = f.write(schema)
 
-        subprocess.run(["npx", "openapi-ts"], check=True)
+        return subprocess.Popen(["npm", "run", "openapi"])
