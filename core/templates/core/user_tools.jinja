@@ -114,28 +114,8 @@
           <h4>{% trans %}Accounting{% endtrans %}</h4>
           <ul>
             {% if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
-              <li><a href="{{ url('accounting:refound_account') }}">{% trans %}Refound Account{% endtrans %}</a></li>
-              <li><a href="{{ url('accounting:bank_list') }}">{% trans %}General accounting{% endtrans %}</a></li>
-              <li><a href="{{ url('accounting:co_list') }}">{% trans %}Company list{% endtrans %}</a></li>
+              <li><a href="{{ url("counter:account_refound") }}">{% trans %}Refound Account{% endtrans %}</a></li>
             {% endif %}
-
-            {% for m in user.memberships.filter(end_date=None).filter(role__gte=7).all() -%}
-              {%- for b in m.club.bank_accounts.all() %}
-                <li class="rows">
-                  <strong>{% trans %}Bank account: {% endtrans %}</strong>
-                  <a href="{{ url('accounting:bank_details', b_account_id=b.id) }}">{{ b }}</a>
-                </li>
-              {%- endfor %}
-
-              {% if m.club.club_account.exists() -%}
-                {% for ca in m.club.club_account.all() %}
-                  <li class="rows">
-                    <strong>{% trans %}Club account: {% endtrans %}</strong>
-                    <a href="{{ url('accounting:club_details', c_account_id=ca.id) }}">{{ ca }}</a>
-                  </li>
-                {%- endfor %}
-              {%- endif -%}
-            {%- endfor %}
           </ul>
         </div>
       {% endif %}

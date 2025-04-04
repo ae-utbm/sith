@@ -2,7 +2,7 @@
 
 from django.db import migrations
 
-import accounting.models
+import counter.fields
 
 
 class Migration(migrations.Migration):
@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="customer",
             name="amount",
-            field=accounting.models.CurrencyField(
+            field=counter.fields.CurrencyField(
                 decimal_places=2, default=0, max_digits=12, verbose_name="amount"
             ),
         ),

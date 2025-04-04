@@ -4,7 +4,7 @@ import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
-import accounting.models
+import counter.fields
 
 
 class Migration(migrations.Migration):
@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "amount",
-                    accounting.models.CurrencyField(
+                    counter.fields.CurrencyField(
                         decimal_places=2, max_digits=12, verbose_name="amount"
                     ),
                 ),
@@ -145,19 +145,19 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "purchase_price",
-                    accounting.models.CurrencyField(
+                    counter.fields.CurrencyField(
                         decimal_places=2, max_digits=12, verbose_name="purchase price"
                     ),
                 ),
                 (
                     "selling_price",
-                    accounting.models.CurrencyField(
+                    counter.fields.CurrencyField(
                         decimal_places=2, max_digits=12, verbose_name="selling price"
                     ),
                 ),
                 (
                     "special_selling_price",
-                    accounting.models.CurrencyField(
+                    counter.fields.CurrencyField(
                         decimal_places=2,
                         max_digits=12,
                         verbose_name="special selling price",
@@ -240,7 +240,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "amount",
-                    accounting.models.CurrencyField(
+                    counter.fields.CurrencyField(
                         decimal_places=2, max_digits=12, verbose_name="amount"
                     ),
                 ),
@@ -324,7 +324,7 @@ class Migration(migrations.Migration):
                 ("label", models.CharField(max_length=64, verbose_name="label")),
                 (
                     "unit_price",
-                    accounting.models.CurrencyField(
+                    counter.fields.CurrencyField(
                         decimal_places=2, max_digits=12, verbose_name="unit price"
                     ),
                 ),

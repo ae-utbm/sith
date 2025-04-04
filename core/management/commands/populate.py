@@ -36,15 +36,6 @@ from django.utils import timezone
 from django.utils.timezone import localdate
 from PIL import Image
 
-from accounting.models import (
-    AccountingType,
-    BankAccount,
-    ClubAccount,
-    Company,
-    GeneralJournal,
-    Operation,
-    SimplifiedAccountingType,
-)
 from club.models import Club, Membership
 from com.ics_calendar import IcsCalendar
 from com.models import News, NewsDate, Sith, Weekmail
@@ -488,6 +479,14 @@ Welcome to the wiki page!
             club=main_club,
             limit_age=18,
         )
+        Product.objects.create(
+            name="remboursement",
+            code="REMBOURS",
+            purchase_price="0",
+            selling_price="0",
+            special_selling_price="0",
+            club=refound,
+        )
         groups.subscribers.products.add(
             cotis, cotis2, refill, barb, cble, cors, carolus
         )
@@ -500,84 +499,10 @@ Welcome to the wiki page!
         eboutic.products.add(barb, cotis, cotis2, refill)
 
         Counter.objects.create(name="Carte AE", club=refound, type="OFFICE")
-        Product.objects.create(
-            name="remboursement",
-            code="REMBOURS",
-            purchase_price="0",
-            selling_price="0",
-            special_selling_price="0",
-            club=refound,
-        )
+
         ReturnableProduct.objects.create(
             product=cons, returned_product=dcons, max_return=3
         )
-
-        # Accounting test values:
-        BankAccount.objects.create(name="AE TG", club=main_club)
-        BankAccount.objects.create(name="Carte AE", club=main_club)
-        ba = BankAccount.objects.create(name="AE TI", club=main_club)
-        ca = ClubAccount.objects.create(
-            name="Troll Penché", bank_account=ba, club=troll
-        )
-        gj = GeneralJournal.objects.create(
-            name="A16", start_date=date.today(), club_account=ca
-        )
-        credit = AccountingType.objects.create(
-            code="74", label="Subventions d'exploitation", movement_type="CREDIT"
-        )
-        debit = AccountingType.objects.create(
-            code="606",
-            label="Achats non stockés de matières et fournitures(*1)",
-            movement_type="DEBIT",
-        )
-        debit2 = AccountingType.objects.create(
-            code="604",
-            label="Achats d'études et prestations de services(*2)",
-            movement_type="DEBIT",
-        )
-        buying = AccountingType.objects.create(
-            code="60", label="Achats (sauf 603)", movement_type="DEBIT"
-        )
-        comptes = AccountingType.objects.create(
-            code="6", label="Comptes de charge", movement_type="DEBIT"
-        )
-        SimplifiedAccountingType.objects.create(
-            label="Je fais du simple 6", accounting_type=comptes
-        )
-        woenzco = Company.objects.create(name="Woenzel & co")
-
-        operation_list = [
-            (27, "J'avais trop de bière", "CASH", buying, "USER", skia.id, None),
-            (4000, "Pas une opération", "CHECK", debit, "COMPANY", woenzco.id, 23),
-            (22, "C'est de l'argent ?", "CARD", credit, "CLUB", troll.id, None),
-            (37, "Je paye CASH", "CASH", debit2, "OTHER", None, None),
-            (300, "Paiement Guy", "CASH", buying, "USER", skia.id, None),
-            (32.3, "Essence", "CASH", buying, "OTHER", None, None),
-            (46.42, "Allumette", "CHECK", credit, "CLUB", main_club.id, 57),
-            (666.42, "Subvention club", "CASH", comptes, "CLUB", main_club.id, None),
-            (496, "Ça, c'est un 6", "CARD", comptes, "USER", skia.id, None),
-            (17, "La Gargotte du Korrigan", "CASH", debit2, "CLUB", bar_club.id, None),
-        ]
-        operations = [
-            Operation(
-                number=index,
-                journal=gj,
-                date=localdate(),
-                amount=op[0],
-                remark=op[1],
-                mode=op[2],
-                done=True,
-                accounting_type=op[3],
-                target_type=op[4],
-                target_id=op[5],
-                target_label="" if op[4] != "OTHER" else "Autre source",
-                cheque_number=op[6],
-            )
-            for index, op in enumerate(operation_list, start=1)
-        ]
-        for operation in operations:
-            operation.clean()
-        Operation.objects.bulk_create(operations)
 
         # Add barman to counter
         Counter.sellers.through.objects.bulk_create(

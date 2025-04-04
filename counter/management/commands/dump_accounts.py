@@ -11,7 +11,7 @@ from django.utils.timezone import now
 from django.utils.translation import gettext as _
 
 from core.models import User, UserQuerySet
-from counter.models import AccountDump, Counter, Customer, Selling
+from counter.models import AccountDump, Counter, Customer, Product, Selling
 
 
 class Command(BaseCommand):
@@ -106,6 +106,7 @@ class Command(BaseCommand):
             raise ValueError("One or more accounts were not engaged in a dump process")
         counter = Counter.objects.get(pk=settings.SITH_COUNTER_ACCOUNT_DUMP_ID)
         seller = User.objects.get(pk=settings.SITH_ROOT_USER_ID)
+        product = Product.objects.get(id=settings.SITH_PRODUCT_REFOUND_ID)
         sales = Selling.objects.bulk_create(
             [
                 Selling(
@@ -113,7 +114,7 @@ class Command(BaseCommand):
                     club=counter.club,
                     counter=counter,
                     seller=seller,
-                    product=None,
+                    product=product,
                     customer=account,
                     quantity=1,
                     unit_price=account.amount,
@@ -126,7 +127,7 @@ class Command(BaseCommand):
         sales.sort(key=attrgetter("customer_id"))
 
         # dumps and sales are linked to the same customers
-        # and or both ordered with the same key, so zipping them is valid
+        # and both ordered with the same key, so zipping them is valid
         for dump, sale in zip(pending_dumps, sales, strict=False):
             dump.dump_operation = sale
         AccountDump.objects.bulk_update(pending_dumps, ["dump_operation"])
