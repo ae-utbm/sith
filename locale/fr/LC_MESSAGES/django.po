@@ -656,11 +656,11 @@ msgid "Linked operation:"
 msgstr "Opération liée : "
 
 #: accounting/templates/accounting/operation_edit.jinja
-#: com/templates/com/news_edit.jinja com/templates/com/poster_edit.jinja
-#: com/templates/com/screen_edit.jinja com/templates/com/weekmail.jinja
-#: core/templates/core/create.jinja core/templates/core/edit.jinja
-#: core/templates/core/file_edit.jinja core/templates/core/macros_pages.jinja
-#: core/templates/core/page_prop.jinja
+#: club/templates/club/edit_club.jinja com/templates/com/news_edit.jinja
+#: com/templates/com/poster_edit.jinja com/templates/com/screen_edit.jinja
+#: com/templates/com/weekmail.jinja core/templates/core/create.jinja
+#: core/templates/core/edit.jinja core/templates/core/file_edit.jinja
+#: core/templates/core/macros_pages.jinja core/templates/core/page_prop.jinja
 #: core/templates/core/user_godfathers.jinja
 #: core/templates/core/user_godfathers_tree.jinja
 #: core/templates/core/user_preferences.jinja
@@ -882,20 +882,8 @@ msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
 #: club/models.py
-msgid "unix name"
-msgstr "nom unix"
-
-#: club/models.py
-msgid ""
-"Enter a valid unix name. This value may contain only letters, numbers ./-/_ "
-"characters."
-msgstr ""
-"Entrez un nom UNIX valide. Cette valeur peut contenir uniquement des "
-"lettres, des nombres, et les caractères ./-/_"
-
-#: club/models.py
-msgid "A club with that unix name already exists."
-msgstr "Un club avec ce nom UNIX existe déjà."
+msgid "slug name"
+msgstr "nom slug"
 
 #: club/models.py
 msgid "logo"
@@ -908,6 +896,14 @@ msgstr "actif"
 #: club/models.py
 msgid "short description"
 msgstr "description courte"
+
+#: club/models.py
+msgid ""
+"A summary of what your club does. This will be displayed on the club list "
+"page."
+msgstr ""
+"Un résumé des activités des activités de votre club. Ceci sera affiché sur "
+"la page de la liste des clubs."
 
 #: club/models.py core/models.py
 msgid "address"
@@ -984,7 +980,7 @@ msgstr "inactif"
 msgid "New club"
 msgstr "Nouveau club"
 
-#: club/templates/club/club_list.jinja club/templates/club/stats.jinja
+#: club/templates/club/club_list.jinja
 msgid "There is no club in this website."
 msgstr "Il n'y a pas de club dans ce site web."
 
@@ -1055,7 +1051,7 @@ msgstr "Suivant"
 msgid "Sales"
 msgstr "Ventes"
 
-#: club/templates/club/club_sellings.jinja club/templates/club/stats.jinja
+#: club/templates/club/club_sellings.jinja
 #: counter/templates/counter/cash_summary_list.jinja
 msgid "Show"
 msgstr "Montrer"
@@ -1156,6 +1152,35 @@ msgstr "Comptabilité : "
 msgid "Manage launderettes"
 msgstr "Gestion des laveries"
 
+#: club/templates/club/edit_club.jinja core/templates/core/edit.jinja
+#, python-format
+msgid "Edit %(name)s"
+msgstr "Éditer %(name)s"
+
+#: club/templates/club/edit_club.jinja
+msgid "Club properties"
+msgstr "Propriétés du club"
+
+#: club/templates/club/edit_club.jinja
+msgid ""
+"The following form fields are linked to the core properties of a club. Only "
+"admin users can see and edit them."
+msgstr ""
+"Les champs de formulaire suivants sont liées aux propriétés essentielles d'un "
+"club. Seuls les administrateurs peuvent voir et modifier ceux-ci."
+
+#: club/templates/club/edit_club.jinja
+msgid "Club informations"
+msgstr "Informations du club"
+
+#: club/templates/club/edit_club.jinja
+msgid ""
+"The following form fields are linked to the basic description of a club. All "
+"board members of this club can see and edit them."
+msgstr ""
+"Les champs de formulaire suivants sont liées à la description basique d'un club. "
+"Tous les membres du bureau du club peuvent voir et modifier ceux-ci."
+
 #: club/templates/club/mailing.jinja
 msgid "Mailing lists"
 msgstr "Mailing listes"
@@ -1213,10 +1238,6 @@ msgstr "Créer une liste de diffusion"
 #: club/templates/club/page_history.jinja
 msgid "No page existing for this club"
 msgstr "Aucune page n'existe pour ce club"
-
-#: club/templates/club/stats.jinja
-msgid "Club stats"
-msgstr "Statistiques du club"
 
 #: club/views.py
 msgid "Members"
@@ -2422,11 +2443,6 @@ msgstr "Confirmation"
 #: sas/templates/sas/ask_picture_removal.jinja
 msgid "Cancel"
 msgstr "Annuler"
-
-#: core/templates/core/edit.jinja
-#, python-format
-msgid "Edit %(name)s"
-msgstr "Éditer %(name)s"
 
 #: core/templates/core/file.jinja core/templates/core/file_list.jinja
 msgid "File list"
@@ -6043,6 +6059,3 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
-
-#~ msgid "past member"
-#~ msgstr "ancien membre"

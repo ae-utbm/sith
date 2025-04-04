@@ -86,7 +86,7 @@ class Command(BaseCommand):
         self.logger.info("The Galaxy is being populated by the Sith.")
 
         self.logger.info("Cleaning old Galaxy population")
-        Club.objects.filter(unix_name__startswith="galaxy-").delete()
+        Club.objects.filter(name__startswith="galaxy-").delete()
         Group.objects.filter(name__startswith="galaxy-").delete()
         Page.objects.filter(name__startswith="galaxy-").delete()
         User.objects.filter(username__startswith="galaxy-").delete()
@@ -127,15 +127,19 @@ class Command(BaseCommand):
         # the galaxy doesn't care about the club groups,
         # but it's necessary to add them nonetheless in order
         # not to break the integrity constraints
+        pages = Page.objects.bulk_create(
+            [Page(name="page", _full_name="page") for _ in range(self.NB_CLUBS)]
+        )
         self.clubs = Club.objects.bulk_create(
             [
                 Club(
-                    unix_name=f"galaxy-club-{i}",
-                    name=f"club-{i}",
+                    name=f"galaxy-club-{i}",
+                    slug_name=f"galaxy-club-{i}",
                     board_group=Group.objects.create(name=f"board {i}"),
                     members_group=Group.objects.create(name=f"members {i}"),
+                    page=page,
                 )
-                for i in range(self.NB_CLUBS)
+                for i, page in enumerate(pages)
             ]
         )
 
