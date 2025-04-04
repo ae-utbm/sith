@@ -27,7 +27,7 @@
       </p>
       <fieldset class="required margin-bottom">
         {% for field_name in form.admin_fields %}
-          {% set field = form.pop(field_name) %}
+          {% set field = form[field_name] %}
           <div class="form-group">
             {{ field.errors }}
             {{ field.label_tag() }}

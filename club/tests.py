@@ -918,3 +918,14 @@ def test_club_board_member_cannot_edit_club_properties(client: Client):
     assert club.name == "old name"
     assert club.is_active
     assert club.address == "new address"
+
+
+@pytest.mark.django_db
+def test_edit_club_page_doesnt_crash(client: Client):
+    """crash test for club:club_edit"""
+    club = baker.make(Club)
+    user = subscriber_user.make()
+    baker.make(Membership, club=club, user=user, role=3)
+    client.force_login(user)
+    res = client.get(reverse("club:club_edit", kwargs={"club_id": club.id}))
+    assert res.status_code == 200
