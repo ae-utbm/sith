@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-03-28 13:51+0100\n"
+"POT-Creation-Date: 2025-04-04 09:31+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -932,6 +932,10 @@ msgid "description"
 msgstr "description"
 
 #: club/models.py
+msgid "past member"
+msgstr "ancien membre"
+
+#: club/models.py
 msgid "Email address"
 msgstr "Adresse email"
 
@@ -1166,8 +1170,8 @@ msgid ""
 "The following form fields are linked to the core properties of a club. Only "
 "admin users can see and edit them."
 msgstr ""
-"Les champs de formulaire suivants sont liées aux propriétés essentielles d'un "
-"club. Seuls les administrateurs peuvent voir et modifier ceux-ci."
+"Les champs de formulaire suivants sont liées aux propriétés essentielles "
+"d'un club. Seuls les administrateurs peuvent voir et modifier ceux-ci."
 
 #: club/templates/club/edit_club.jinja
 msgid "Club informations"
@@ -1178,8 +1182,8 @@ msgid ""
 "The following form fields are linked to the basic description of a club. All "
 "board members of this club can see and edit them."
 msgstr ""
-"Les champs de formulaire suivants sont liées à la description basique d'un club. "
-"Tous les membres du bureau du club peuvent voir et modifier ceux-ci."
+"Les champs de formulaire suivants sont liées à la description basique d'un "
+"club. Tous les membres du bureau du club peuvent voir et modifier ceux-ci."
 
 #: club/templates/club/mailing.jinja
 msgid "Mailing lists"
@@ -1271,10 +1275,6 @@ msgstr "Listes de diffusion"
 #: club/views.py com/views.py
 msgid "Posters list"
 msgstr "Liste d'affiches"
-
-#: club/views.py counter/templates/counter/counter_list.jinja
-msgid "Props"
-msgstr "Propriétés"
 
 #: com/forms.py
 msgid "Format: 16:9 | Resolution: 1920x1080"
@@ -2424,11 +2424,9 @@ msgid "Delete confirmation"
 msgstr "Confirmation de suppression"
 
 #: core/templates/core/delete_confirm.jinja
-#: core/templates/core/file_delete_confirm.jinja
-#: counter/templates/counter/fragments/delete_student_card.jinja
 #, python-format
-msgid "Are you sure you want to delete \"%(obj)s\"?"
-msgstr "Êtes-vous sûr de vouloir supprimer \"%(obj)s\" ?"
+msgid "Are you sure you want to delete \"%(name)s\"?"
+msgstr "Êtes-vous sûr de vouloir supprimer \"%(name)s\" ?"
 
 #: core/templates/core/delete_confirm.jinja
 #: core/templates/core/file_delete_confirm.jinja
@@ -2463,6 +2461,12 @@ msgstr "Mes fichiers"
 #: core/templates/core/file.jinja core/templates/core/page.jinja
 msgid "Prop"
 msgstr "Propriétés"
+
+#: core/templates/core/file_delete_confirm.jinja
+#: counter/templates/counter/fragments/delete_student_card.jinja
+#, python-format
+msgid "Are you sure you want to delete \"%(obj)s\"?"
+msgstr "Êtes-vous sûr de vouloir supprimer \"%(obj)s\" ?"
 
 #: core/templates/core/file_detail.jinja
 #: core/templates/core/file_moderation.jinja sas/templates/sas/picture.jinja
@@ -3212,6 +3216,10 @@ msgid "Product types management"
 msgstr "Gestion des types de produit"
 
 #: core/templates/core/user_tools.jinja
+msgid "Returnable products management"
+msgstr "Gestion des consignes"
+
+#: core/templates/core/user_tools.jinja
 #: counter/templates/counter/cash_summary_list.jinja counter/views/mixins.py
 msgid "Cash register summaries"
 msgstr "Relevés de caisse"
@@ -3351,8 +3359,8 @@ msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
 #: core/views/forms.py
 msgid ""
-"Profile: you need to be visible on the picture, in order to be recognized (e."
-"g. by the barmen)"
+"Profile: you need to be visible on the picture, in order to be recognized "
+"(e.g. by the barmen)"
 msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
@@ -3425,10 +3433,6 @@ msgstr "Famille"
 msgid "Pictures"
 msgstr "Photos"
 
-#: core/views/user.py
-msgid "Galaxy"
-msgstr "Galaxie"
-
 #: counter/apps.py sith/settings.py
 msgid "Check"
 msgstr "Chèque"
@@ -3472,10 +3476,6 @@ msgstr "Vidange de votre compte AE"
 #: counter/models.py
 msgid "account id"
 msgstr "numéro de compte"
-
-#: counter/models.py
-msgid "recorded product"
-msgstr "produits consignés"
 
 #: counter/models.py
 msgid "customer"
@@ -3722,6 +3722,35 @@ msgstr "carte étudiante"
 msgid "student cards"
 msgstr "cartes étudiantes"
 
+#: counter/models.py
+msgid "returnable product"
+msgstr "produit consigné"
+
+#: counter/models.py
+msgid "returned product"
+msgstr "produit déconsigné"
+
+#: counter/models.py
+msgid "maximum returns"
+msgstr "nombre de déconsignes maximum"
+
+#: counter/models.py
+msgid ""
+"The maximum number of items a customer can return without having actually "
+"bought them."
+msgstr ""
+"Le nombre maximum d'articles qu'un client peut déconsigner sans les avoir "
+"achetés."
+
+#: counter/models.py
+msgid "returnable products"
+msgstr "produits consignés"
+
+#: counter/models.py
+msgid "The returnable product cannot be the same as the returned one"
+msgstr ""
+"Le produit consigné ne peut pas être le même que le produit de déconsigne"
+
 #: counter/templates/counter/activity.jinja
 #, python-format
 msgid "%(counter_name)s activity"
@@ -3848,6 +3877,10 @@ msgid "New counter"
 msgstr "Nouveau comptoir"
 
 #: counter/templates/counter/counter_list.jinja
+msgid "Props"
+msgstr "Propriétés"
+
+#: counter/templates/counter/counter_list.jinja
 #: counter/templates/counter/refilling_list.jinja
 msgid "Reloads list"
 msgstr "Liste de rechargements"
@@ -3962,8 +3995,8 @@ msgstr ""
 #: counter/templates/counter/mails/account_dump.jinja
 msgid "If you think this was a mistake, please mail us at ae@utbm.fr."
 msgstr ""
-"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à ae@utbm."
-"fr."
+"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à "
+"ae@utbm.fr."
 
 #: counter/templates/counter/mails/account_dump.jinja
 msgid ""
@@ -4089,6 +4122,18 @@ msgstr "Il n'y a pas de types de produit dans ce site web."
 msgid "Seller"
 msgstr "Vendeur"
 
+#: counter/templates/counter/returnable_list.jinja counter/views/mixins.py
+msgid "Returnable products"
+msgstr "Produits consignés"
+
+#: counter/templates/counter/returnable_list.jinja
+msgid "New returnable product"
+msgstr "Nouveau produit consignable"
+
+#: counter/templates/counter/returnable_list.jinja
+msgid "Returned product"
+msgstr "Produit déconsigné"
+
 #: counter/templates/counter/stats.jinja
 #, python-format
 msgid "%(counter_name)s stats"
@@ -4120,6 +4165,11 @@ msgstr "Temps"
 #, python-format
 msgid "Top 100 barman %(counter_name)s (all semesters)"
 msgstr "Top 100 barman %(counter_name)s (tous les semestres)"
+
+#: counter/views/admin.py
+#, python-format
+msgid "returnable product : %(returnable)s -> %(returned)s"
+msgstr "produit consigné : %(returnable)s -> %(returned)s"
 
 #: counter/views/cash.py
 msgid "10 cents"
@@ -4174,12 +4224,20 @@ msgid "The selected product isn't available for this user"
 msgstr "Le produit sélectionné n'est pas disponnible pour cet utilisateur"
 
 #: counter/views/click.py
-msgid "Submmited basket is invalid"
+msgid "Submitted basket is invalid"
 msgstr "Le panier envoyé est invalide"
 
 #: counter/views/click.py
-msgid "This user have reached his recording limit"
-msgstr "Cet utilisateur a atteint sa limite de déconsigne"
+msgid "Duplicated product entries."
+msgstr "Saisie de produit dupliquée"
+
+#: counter/views/click.py
+#, python-format
+msgid ""
+"This user have reached his recording limit for the following products : %s"
+msgstr ""
+"Cet utilisateur a atteint sa limite de déconsigne pour les produits "
+"suivants : %s"
 
 #: counter/views/eticket.py
 msgid "people(s)"

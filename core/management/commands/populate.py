@@ -50,7 +50,7 @@ from com.ics_calendar import IcsCalendar
 from com.models import News, NewsDate, Sith, Weekmail
 from core.models import BanGroup, Group, Page, PageRev, SithFile, User
 from core.utils import resize_image
-from counter.models import Counter, Product, ProductType, StudentCard
+from counter.models import Counter, Product, ProductType, ReturnableProduct, StudentCard
 from election.models import Candidature, Election, ElectionList, Role
 from forum.models import Forum
 from pedagogy.models import UV
@@ -451,7 +451,6 @@ Welcome to the wiki page!
             limit_age=18,
         )
         cons = Product.objects.create(
-            id=settings.SITH_ECOCUP_CONS,
             name="Consigne Eco-cup",
             code="CONS",
             product_type=verre,
@@ -461,7 +460,6 @@ Welcome to the wiki page!
             club=main_club,
         )
         dcons = Product.objects.create(
-            id=settings.SITH_ECOCUP_DECO,
             name="Déconsigne Eco-cup",
             code="DECO",
             product_type=verre,
@@ -509,6 +507,9 @@ Welcome to the wiki page!
             selling_price="0",
             special_selling_price="0",
             club=refound,
+        )
+        ReturnableProduct.objects.create(
+            product=cons, returned_product=dcons, max_return=3
         )
 
         # Accounting test values:

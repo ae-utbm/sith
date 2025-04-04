@@ -17,6 +17,7 @@ from counter.models import (
     Eticket,
     Product,
     Refilling,
+    ReturnableProduct,
     StudentCard,
 )
 from counter.widgets.ajax_select import (
@@ -211,6 +212,25 @@ class ProductEditForm(forms.ModelForm):
             counter.products.add(self.instance)
             counter.save()
         return ret
+
+
+class ReturnableProductForm(forms.ModelForm):
+    class Meta:
+        model = ReturnableProduct
+        fields = ["product", "returned_product", "max_return"]
+        widgets = {
+            "product": AutoCompleteSelectProduct(),
+            "returned_product": AutoCompleteSelectProduct(),
+        }
+
+    def save(self, commit: bool = True) -> ReturnableProduct:  # noqa FBT
+        instance: ReturnableProduct = super().save(commit=commit)
+        if commit:
+            # This is expensive, but we don't have a task queue to offload it.
+            # Hopefully, creations and updates of returnable products
+            # occur very rarely
+            instance.update_balances()
+        return instance
 
 
 class CashSummaryFormBase(forms.Form):

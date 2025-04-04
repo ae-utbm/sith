@@ -16,6 +16,7 @@ import math
 
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
+from django.db.models import Q
 from django.forms import (
     BaseFormSet,
     Form,
@@ -35,7 +36,13 @@ from core.auth.mixins import CanViewMixin
 from core.models import User
 from core.utils import FormFragmentTemplateData
 from counter.forms import RefillForm
-from counter.models import Counter, Customer, Product, Selling
+from counter.models import (
+    Counter,
+    Customer,
+    Product,
+    ReturnableProduct,
+    Selling,
+)
 from counter.utils import is_logged_in_counter
 from counter.views.mixins import CounterTabsMixin
 from counter.views.student_card import StudentCardFormView
@@ -99,17 +106,22 @@ class ProductForm(Form):
 
 class BaseBasketForm(BaseFormSet):
     def clean(self):
-        super().clean()
-        if len(self) == 0:
+        if len(self.forms) == 0:
             return
 
         self._check_forms_have_errors()
+        self._check_product_are_unique()
         self._check_recorded_products(self[0].customer)
         self._check_enough_money(self[0].counter, self[0].customer)
 
     def _check_forms_have_errors(self):
         if any(len(form.errors) > 0 for form in self):
-            raise ValidationError(_("Submmited basket is invalid"))
+            raise ValidationError(_("Submitted basket is invalid"))
+
+    def _check_product_are_unique(self):
+        product_ids = {form.cleaned_data["id"] for form in self.forms}
+        if len(product_ids) != len(self.forms):
+            raise ValidationError(_("Duplicated product entries."))
 
     def _check_enough_money(self, counter: Counter, customer: Customer):
         self.total_price = sum([data["total_price"] for data in self.cleaned_data])
@@ -118,21 +130,32 @@ class BaseBasketForm(BaseFormSet):
 
     def _check_recorded_products(self, customer: Customer):
         """Check for, among other things, ecocups and pitchers"""
-        self.total_recordings = 0
-        for form in self:
-            # form.product is stored by the clean step of each formset form
-            if form.product.is_record_product:
-                self.total_recordings -= form.cleaned_data["quantity"]
-            if form.product.is_unrecord_product:
-                self.total_recordings += form.cleaned_data["quantity"]
-
-        # We don't want to block an user that have negative recordings
-        # if he isn't recording anything or reducing it's recording count
-        if self.total_recordings <= 0:
-            return
-
-        if not customer.can_record_more(self.total_recordings):
-            raise ValidationError(_("This user have reached his recording limit"))
+        items = {
+            form.cleaned_data["id"]: form.cleaned_data["quantity"]
+            for form in self.forms
+        }
+        ids = list(items.keys())
+        returnables = list(
+            ReturnableProduct.objects.filter(
+                Q(product_id__in=ids) | Q(returned_product_id__in=ids)
+            ).annotate_balance_for(customer)
+        )
+        limit_reached = []
+        for returnable in returnables:
+            returnable.balance += items.get(returnable.product_id, 0)
+        for returnable in returnables:
+            dcons = items.get(returnable.returned_product_id, 0)
+            returnable.balance -= dcons
+            if dcons and returnable.balance < -returnable.max_return:
+                limit_reached.append(returnable.returned_product)
+        if limit_reached:
+            raise ValidationError(
+                _(
+                    "This user have reached his recording limit "
+                    "for the following products : %s"
+                )
+                % ", ".join([str(p) for p in limit_reached])
+            )
 
 
 BasketForm = formset_factory(
@@ -238,8 +261,7 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
                         customer=self.customer,
                     ).save()
 
-            self.customer.recorded_products -= formset.total_recordings
-            self.customer.save()
+            self.customer.update_returnable_balance()
 
         # Add some info for the main counter view to display
         self.request.session["last_customer"] = self.customer.user.get_display_name()
@@ -247,6 +269,37 @@ class CounterClick(CounterTabsMixin, CanViewMixin, SingleObjectMixin, FormView):
         self.request.session["new_customer_amount"] = str(self.customer.amount)
 
         return ret
+
+    def _update_returnable_balance(self, formset):
+        ids = [form.cleaned_data["id"] for form in formset]
+        returnables = list(
+            ReturnableProduct.objects.filter(
+                Q(product_id__in=ids) | Q(returned_product_id__in=ids)
+            ).annotate_balance_for(self.customer)
+        )
+        for returnable in returnables:
+            cons_quantity = next(
+                (
+                    form.cleaned_data["quantity"]
+                    for form in formset
+                    if form.cleaned_data["id"] == returnable.product_id
+                ),
+                0,
+            )
+            dcons_quantity = next(
+                (
+                    form.cleaned_data["quantity"]
+                    for form in formset
+                    if form.cleaned_data["id"] == returnable.returned_product_id
+                ),
+                0,
+            )
+            self.customer.return_balances.update_or_create(
+                returnable=returnable,
+                defaults={
+                    "balance": returnable.balance + cons_quantity - dcons_quantity
+                },
+            )
 
     def get_success_url(self):
         return resolve_url(self.object)
