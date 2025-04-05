@@ -4,20 +4,22 @@ import annotated_types
 from django.conf import settings
 from django.db.models import F
 from django.http import HttpResponse
-from ninja import Query
+from ninja import Query, UploadedFile
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import PermissionDenied
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
+from PIL import UnidentifiedImageError
 
 from club.models import Mailing
-from core.auth.api_permissions import CanAccessLookup, CanView
-from core.models import Group, SithFile, User
+from core.auth.api_permissions import CanAccessLookup, CanView, IsOldSubscriber
+from core.models import Group, QuickUploadImage, SithFile, User
 from core.schemas import (
     FamilyGodfatherSchema,
     GroupSchema,
     MarkdownSchema,
     SithFileSchema,
+    UploadedFileSchema,
     UserFamilySchema,
     UserFilterSchema,
     UserProfileSchema,
@@ -31,6 +33,27 @@ class MarkdownController(ControllerBase):
     def render_markdown(self, body: MarkdownSchema):
         """Convert the markdown text into html."""
         return HttpResponse(markdown(body.text), content_type="text/html")
+
+
+@api_controller("/upload")
+class UploadController(ControllerBase):
+    @route.post("/image", response=UploadedFileSchema, permissions=[IsOldSubscriber])
+    def upload_image(self, file: UploadedFile):
+        if file.content_type.split("/")[0] != "image":
+            return self.create_response(
+                message=f"{file.name} isn't a file image", status_code=415
+            )
+
+        try:
+            image = QuickUploadImage.create_from_uploaded(
+                file, uploader=self.context.request.user
+            )
+        except UnidentifiedImageError:
+            return self.create_response(
+                message=f"{file.name} can't be processed", status_code=415
+            )
+
+        return image
 
 
 @api_controller("/mailings")
