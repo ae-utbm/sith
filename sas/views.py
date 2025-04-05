@@ -16,48 +16,63 @@ from typing import Any
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.urls import reverse, reverse_lazy
-from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, TemplateView
-from django.views.generic.edit import FormMixin, FormView, UpdateView
+from django.urls import reverse
+from django.utils.safestring import SafeString
+from django.views.generic import CreateView, DetailView, TemplateView
+from django.views.generic.edit import FormView, UpdateView
 
 from core.auth.mixins import CanEditMixin, CanViewMixin
 from core.models import SithFile, User
+from core.views import UseFragmentsMixin
 from core.views.files import FileView, send_file
+from core.views.mixins import FragmentMixin, FragmentRenderer
 from core.views.user import UserTabsMixin
 from sas.forms import (
+    AlbumCreateForm,
     AlbumEditForm,
     PictureEditForm,
     PictureModerationRequestForm,
-    SASForm,
+    PictureUploadForm,
 )
 from sas.models import Album, Picture
 
 
-class SASMainView(FormView):
-    form_class = SASForm
-    template_name = "sas/main.jinja"
-    success_url = reverse_lazy("sas:main")
+class AlbumCreateFragment(FragmentMixin, CreateView):
+    model = Album
+    form_class = AlbumCreateForm
+    template_name = "sas/fragments/album_create_form.jinja"
+    reload_on_redirect = True
 
-    def post(self, request, *args, **kwargs):
-        self.form = self.get_form()
-        parent = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
-        files = request.FILES.getlist("images")
-        root = User.objects.filter(username="root").first()
-        if request.user.is_authenticated and request.user.is_in_group(
-            pk=settings.SITH_GROUP_SAS_ADMIN_ID
-        ):
-            if self.form.is_valid():
-                self.form.process(
-                    parent=parent, owner=root, files=files, automodere=True
-                )
-                if self.form.is_valid():
-                    return super().form_valid(self.form)
-        else:
-            self.form.add_error(None, _("You do not have the permission to do that"))
-        return self.form_invalid(self.form)
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"owner": self.request.user}
+
+    def render_fragment(
+        self, request, owner: User | None = None, **kwargs
+    ) -> SafeString:
+        self.object = None
+        self.owner = owner or self.request.user
+        return super().render_fragment(request, **kwargs)
+
+    def get_success_url(self):
+        parent = self.object.parent
+        parent.__class__ = Album
+        return parent.get_absolute_url()
+
+
+class SASMainView(UseFragmentsMixin, TemplateView):
+    template_name = "sas/main.jinja"
+
+    def get_fragments(self) -> dict[str, FragmentRenderer]:
+        form_init = {"parent": SithFile.objects.get(id=settings.SITH_SAS_ROOT_DIR_ID)}
+        return {
+            "album_create_fragment": AlbumCreateFragment.as_fragment(initial=form_init)
+        }
+
+    def get_fragment_data(self) -> dict[str, dict[str, Any]]:
+        root_user = User.objects.get(pk=settings.SITH_ROOT_USER_ID)
+        return {"album_create_fragment": {"owner": root_user}}
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
@@ -104,88 +119,45 @@ def send_thumb(request, picture_id):
     return send_file(request, picture_id, Picture, "thumbnail")
 
 
-class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
+class AlbumView(CanViewMixin, UseFragmentsMixin, DetailView):
     model = Album
-    form_class = SASForm
-    pk_url_kwarg = "album_id"
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if not self.object.file:
-            self.object.generate_thumbnail()
-        self.form = self.get_form()
-        parent = SithFile.objects.filter(id=self.object.id).first()
-        files = request.FILES.getlist("images")
-        if request.user.is_subscribed and self.form.is_valid():
-            self.form.process(
-                parent=parent,
-                owner=request.user,
-                files=files,
-                automodere=(
-                    request.user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
-                    or request.user.is_root
-                ),
-            )
-            if self.form.is_valid():
-                return HttpResponse(str(self.form.errors), status=200)
-        return HttpResponse(str(self.form.errors), status=500)
-
-
-class AlbumView(CanViewMixin, DetailView, FormMixin):
-    model = Album
-    form_class = SASForm
     pk_url_kwarg = "album_id"
     template_name = "sas/album.jinja"
+
+    def get_fragments(self) -> dict[str, FragmentRenderer]:
+        return {
+            "album_create_fragment": AlbumCreateFragment.as_fragment(
+                initial={"parent": self.object}
+            )
+        }
 
     def dispatch(self, request, *args, **kwargs):
         try:
             self.asked_page = int(request.GET.get("page", 1))
         except ValueError as e:
             raise Http404 from e
-        return super().dispatch(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        self.form = self.get_form()
         if "clipboard" not in request.session:
             request.session["clipboard"] = []
-        return super().get(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         if not self.object.file:
             self.object.generate_thumbnail()
-        self.form = self.get_form()
-        if "clipboard" not in request.session:
-            request.session["clipboard"] = []
         if request.user.can_edit(self.object):  # Handle the copy-paste functions
             FileView.handle_clipboard(request, self.object)
-        parent = SithFile.objects.filter(id=self.object.id).first()
-        files = request.FILES.getlist("images")
-        if request.user.is_authenticated and request.user.is_subscribed:
-            if self.form.is_valid():
-                self.form.process(
-                    parent=parent,
-                    owner=request.user,
-                    files=files,
-                    automodere=request.user.is_in_group(
-                        pk=settings.SITH_GROUP_SAS_ADMIN_ID
-                    ),
-                )
-                if self.form.is_valid():
-                    return super().form_valid(self.form)
-        else:
-            self.form.add_error(None, _("You do not have the permission to do that"))
-        return self.form_invalid(self.form)
+        return HttpResponseRedirect(self.request.path)
 
-    def get_success_url(self):
-        return reverse("sas:album", kwargs={"album_id": self.object.id})
+    def get_fragment_data(self) -> dict[str, dict[str, Any]]:
+        return {"album_create_fragment": {"owner": self.request.user}}
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["form"] = self.form
-        kwargs["clipboard"] = SithFile.objects.filter(
-            id__in=self.request.session["clipboard"]
-        )
+        if ids := self.request.session.get("clipboard", None):
+            kwargs["clipboard"] = SithFile.objects.filter(id__in=ids)
+        kwargs["upload_form"] = PictureUploadForm()
+        # if True, the albums will be fetched with a request to the API
+        # if False, the section won't be displayed at all
         kwargs["show_albums"] = (
             Album.objects.viewable_by(self.request.user)
             .filter(parent_id=self.object.id)

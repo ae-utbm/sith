@@ -73,7 +73,7 @@
                 <div class="text">{% trans %}To be moderated{% endtrans %}</div>
               </template>
             </div>
-            {% if edit_mode %}
+            {% if is_sas_admin %}
               <input type="checkbox" name="file_list" :value="album.id">
             {% endif %}
           </a>
@@ -86,7 +86,7 @@
     <h4>{% trans %}Pictures{% endtrans %}</h4>
     <br>
     {{ download_button(_("Download album")) }}
-    <div class="photos" :aria-busy="loading">
+    <div class="photos" :aria-busy="loading" @pictures-upload-done.window="fetchPictures">
       <template x-for="picture in getPage(page)">
         <a :href="picture.sas_url">
           <div class="photo" :class="{not_moderated: !picture.is_moderated}">
@@ -110,13 +110,28 @@
 
   {% if is_sas_admin %}
     </form>
-    <form class="add-files" id="upload_form" action="" method="post" enctype="multipart/form-data">
+    {{ album_create_fragment }}
+    <form
+      class="add-files"
+      id="upload_form"
+      x-data="pictureUpload({{ album.id }})"
+      @submit.prevent="sendPictures()"
+    >
       {% csrf_token %}
       <div class="inputs">
-        {{ form.as_p() }}
-
+        <p>
+          <label for="{{ upload_form.images.id_for_label }}">{{ upload_form.images.label }} :</label>
+          {{ upload_form.images|add_attr("x-ref=pictures") }}
+          <span class="helptext">{{ upload_form.images.help_text }}</span>
+        </p>
         <input type="submit" value="{% trans %}Upload{% endtrans %}" />
+        <progress x-ref="progress" x-show="sending"></progress>
       </div>
+      <ul class="errorlist">
+        <template x-for="error in errors">
+          <li class="error" x-text="error"></li>
+        </template>
+      </ul>
     </form>
   {% endif %}
 
@@ -126,115 +141,3 @@
     {{ timezone.now() - start }}
   </p>
 {% endblock %}
-
-{% block script %}
-  {{ super() }}
-  <script>
-    // Todo: migrate to alpine.js if we have some time
-    $("form#upload_form").submit(function (event) {
-      let formData = new FormData($(this)[0]);
-
-      if(!formData.get('album_name') && !formData.get('images').name)
-        return false;
-
-      if(!formData.get('images').name) {
-        return true;
-      }
-
-      event.preventDefault();
-
-      let errorList;
-      if((errorList = this.querySelector('#upload_form ul.errorlist.nonfield')) === null) {
-        errorList = document.createElement('ul');
-        errorList.classList.add('errorlist', 'nonfield');
-        this.insertBefore(errorList, this.firstElementChild);
-      }
-
-      while(errorList.childElementCount > 0)
-        errorList.removeChild(errorList.firstElementChild);
-
-      let progress;
-      if((progress = this.querySelector('progress')) === null) {
-        progress = document.createElement('progress');
-        progress.value = 0;
-        let p = document.createElement('p');
-        p.appendChild(progress);
-        this.insertBefore(p, this.lastElementChild);
-      }
-
-      let dataHolder;
-
-      if(formData.get('album_name')) {
-        dataHolder = new FormData();
-        dataHolder.set('csrfmiddlewaretoken', '{{ csrf_token }}');
-        dataHolder.set('album_name', formData.get('album_name'));
-        $.ajax({
-          method: 'POST',
-          url: "{{ url('sas:album_upload', album_id=object.id) }}",
-          data: dataHolder,
-          processData: false,
-          contentType: false,
-          success: onSuccess
-        });
-      }
-
-      let images = formData.getAll('images');
-      let imagesCount = images.length;
-      let completeCount = 0;
-
-      let poolSize = 1;
-      let imagePool = [];
-
-      while(images.length > 0 && imagePool.length < poolSize) {
-        let image = images.shift();
-        imagePool.push(image);
-        sendImage(image);
-      }
-
-      function sendImage(image) {
-        dataHolder = new FormData();
-        dataHolder.set('csrfmiddlewaretoken', '{{ csrf_token }}');
-        dataHolder.set('images', image);
-
-        $.ajax({
-          method: 'POST',
-          url: "{{ url('sas:album_upload', album_id=object.id) }}",
-          data: dataHolder,
-          processData: false,
-          contentType: false,
-        })
-          .fail(onSuccess.bind(undefined, image))
-          .done(onSuccess.bind(undefined, image))
-          .always(next.bind(undefined, image));
-      }
-
-      function next(image, _, __) {
-        let index = imagePool.indexOf(image);
-        let nextImage = images.shift();
-
-        if(index !== -1)
-          imagePool.splice(index, 1);
-
-        if(nextImage) {
-          imagePool.push(nextImage);
-          sendImage(nextImage);
-        }
-      }
-
-      function onSuccess(image, data, _, __) {
-        let errors = [];
-
-        if ($(data.responseText).find('.errorlist.nonfield')[0])
-          errors = Array.from($(data.responseText).find('.errorlist.nonfield')[0].children);
-
-        while(errors.length > 0)
-          errorList.appendChild(errors.shift());
-
-        progress.value = ++completeCount / imagesCount;
-        if(progress.value === 1 && errorList.children.length === 0)
-          document.location.reload()
-      }
-    });
-  </script>
-{% endblock %}
-

@@ -16,8 +16,8 @@
 from django.urls import path
 
 from sas.views import (
+    AlbumCreateFragment,
     AlbumEditView,
-    AlbumUploadView,
     AlbumView,
     ModerationView,
     PictureAskRemovalView,
@@ -35,9 +35,6 @@ urlpatterns = [
     path("", SASMainView.as_view(), name="main"),
     path("moderation/", ModerationView.as_view(), name="moderation"),
     path("album/<int:album_id>/", AlbumView.as_view(), name="album"),
-    path(
-        "album/<int:album_id>/upload/", AlbumUploadView.as_view(), name="album_upload"
-    ),
     path("album/<int:album_id>/edit/", AlbumEditView.as_view(), name="album_edit"),
     path("album/<int:album_id>/preview/", send_album, name="album_preview"),
     path("picture/<int:picture_id>/", PictureView.as_view(), name="picture"),
@@ -59,4 +56,5 @@ urlpatterns = [
     path(
         "user/<int:user_id>/pictures/", UserPicturesView.as_view(), name="user_pictures"
     ),
+    path("fragment/album-create", AlbumCreateFragment.as_view(), name="album_create"),
 ]
