@@ -17,12 +17,13 @@ document.addEventListener("alpine:init", () => {
     data: etData,
 
     async fill() {
-      document.getElementById("bank-submit-button").disabled = true;
+      const button = document.getElementById("bank-submit-button") as HTMLButtonElement;
+      button.disabled = true;
       // biome-ignore lint/correctness/noUndeclaredVariables: defined in eboutic_makecommand.jinja
       const res = await fetch(etDataUrl);
       if (res.ok) {
         this.data = await res.json();
-        document.getElementById("bank-submit-button").disabled = false;
+        button.disabled = false;
       }
     },
   });
