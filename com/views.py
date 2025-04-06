@@ -61,8 +61,7 @@ sith = Sith.objects.first
 
 
 class ComTabsMixin(TabedViewMixin):
-    def get_tabs_title(self):
-        return _("Communication administration")
+    tabs_title = _("Communication administration")
 
     def get_list_of_tabs(self):
         return [
@@ -559,7 +558,11 @@ class MailingModerateView(View):
         raise PermissionDenied
 
 
-class PosterListBaseView(ListView):
+class PosterAdminViewMixin(IsComAdminMixin, ComTabsMixin):
+    current_tab = "posters"
+
+
+class PosterListBaseView(PosterAdminViewMixin, ListView):
     """List communication posters."""
 
     current_tab = "posters"
@@ -586,7 +589,7 @@ class PosterListBaseView(ListView):
         return kwargs
 
 
-class PosterCreateBaseView(CreateView):
+class PosterCreateBaseView(PosterAdminViewMixin, CreateView):
     """Create communication poster."""
 
     current_tab = "posters"
@@ -618,7 +621,7 @@ class PosterCreateBaseView(CreateView):
         return super().form_valid(form)
 
 
-class PosterEditBaseView(UpdateView):
+class PosterEditBaseView(PosterAdminViewMixin, UpdateView):
     """Edit communication poster."""
 
     pk_url_kwarg = "poster_id"
@@ -664,7 +667,7 @@ class PosterEditBaseView(UpdateView):
         return super().form_valid(form)
 
 
-class PosterDeleteBaseView(DeleteView):
+class PosterDeleteBaseView(PosterAdminViewMixin, DeleteView):
     """Edit communication poster."""
 
     pk_url_kwarg = "poster_id"
@@ -681,7 +684,7 @@ class PosterDeleteBaseView(DeleteView):
         return super().dispatch(request, *args, **kwargs)
 
 
-class PosterListView(IsComAdminMixin, ComTabsMixin, PosterListBaseView):
+class PosterListView(PosterListBaseView):
     """List communication posters."""
 
     def get_context_data(self, **kwargs):
@@ -690,7 +693,7 @@ class PosterListView(IsComAdminMixin, ComTabsMixin, PosterListBaseView):
         return kwargs
 
 
-class PosterCreateView(IsComAdminMixin, ComTabsMixin, PosterCreateBaseView):
+class PosterCreateView(PosterCreateBaseView):
     """Create communication poster."""
 
     success_url = reverse_lazy("com:poster_list")
@@ -701,7 +704,7 @@ class PosterCreateView(IsComAdminMixin, ComTabsMixin, PosterCreateBaseView):
         return kwargs
 
 
-class PosterEditView(IsComAdminMixin, ComTabsMixin, PosterEditBaseView):
+class PosterEditView(PosterEditBaseView):
     """Edit communication poster."""
 
     success_url = reverse_lazy("com:poster_list")
@@ -712,13 +715,13 @@ class PosterEditView(IsComAdminMixin, ComTabsMixin, PosterEditBaseView):
         return kwargs
 
 
-class PosterDeleteView(IsComAdminMixin, ComTabsMixin, PosterDeleteBaseView):
+class PosterDeleteView(PosterDeleteBaseView):
     """Delete communication poster."""
 
     success_url = reverse_lazy("com:poster_list")
 
 
-class PosterModerateListView(IsComAdminMixin, ComTabsMixin, ListView):
+class PosterModerateListView(PosterAdminViewMixin, ListView):
     """Moderate list communication poster."""
 
     current_tab = "posters"
@@ -732,7 +735,7 @@ class PosterModerateListView(IsComAdminMixin, ComTabsMixin, ListView):
         return kwargs
 
 
-class PosterModerateView(IsComAdminMixin, ComTabsMixin, View):
+class PosterModerateView(PosterAdminViewMixin, View):
     """Moderate communication poster."""
 
     def get(self, request, *args, **kwargs):
