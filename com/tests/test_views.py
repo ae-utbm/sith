@@ -19,7 +19,7 @@ import pytest
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import html
 from django.utils.timezone import localtime, now
@@ -323,7 +323,7 @@ class TestNewsCreation(TestCase):
 
 
 @pytest.mark.django_db
-def test_feed(client):
+def test_feed(client: Client):
     """Smoke test that checks that the atom feed is working"""
     Site.objects.clear_cache()
     with assertNumQueries(2):
@@ -332,3 +332,22 @@ def test_feed(client):
         resp = client.get(reverse("com:news_feed"))
         assert resp.status_code == 200
         assert resp.headers["Content-Type"] == "application/rss+xml; charset=utf-8"
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "url",
+    [
+        reverse("com:poster_list"),
+        reverse("com:poster_create"),
+        reverse("com:poster_moderate_list"),
+    ],
+)
+def test_poster_management_views_crash_test(client: Client, url: str):
+    """Test that poster management views work"""
+    user = baker.make(
+        User, groups=[Group.objects.get(pk=settings.SITH_GROUP_COM_ADMIN_ID)]
+    )
+    client.force_login(user)
+    res = client.get(url)
+    assert res.status_code == 200
