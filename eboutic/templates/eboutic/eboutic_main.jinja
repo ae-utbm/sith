@@ -78,7 +78,11 @@
       {% if not request.user.date_of_birth %}
         <div class="alert alert-red" x-data="{show_alert: true}" x-show="show_alert" x-transition>
           <span class="alert-main">
-            {% trans %}You have not filled in your date of birth. As a result, you may not have access to all the products in the online shop. To fill in your date of birth, you can go to{% endtrans %}
+            {% trans trimmed %}
+              You have not filled in your date of birth.
+              As a result, you may not have access to all the products in the online shop.
+              To fill in your date of birth, you can go to
+            {% endtrans %}
             <a href="{{ url("core:user_edit", user_id=request.user.id) }}">
               {% trans %}this page{% endtrans %}
             </a>
@@ -88,7 +92,43 @@
           </span>
         </div>
       {% endif %}
-
+      <section>
+        <div class="category-header">
+          <h3 class="margin-bottom">{% trans %}Eurockéennes 2025 partnership{% endtrans %}</h3>
+          {% if user.is_subscribed %}
+            <a
+              title="Logiciel billetterie en ligne"
+              href="https://widget.weezevent.com/ticket/6ef65533-f5b0-4571-9d21-1f1bc63921f0?id_evenement=1211855&locale=fr-FR&code=34146"
+              class="weezevent-widget-integration"
+              target="_blank"
+              data-src="https://widget.weezevent.com/ticket/6ef65533-f5b0-4571-9d21-1f1bc63921f0?id_evenement=1211855&locale=fr-FR&code=34146"
+              data-width="650"
+              data-height="600"
+              data-resize="1"
+              data-nopb="0"
+              data-type="neo"
+              data-width_auto="1"
+              data-noscroll="0"
+              data-id="1211855">
+              Billetterie Weezevent
+            </a>
+            <script type="text/javascript" src="https://widget.weezevent.com/weez.js" async defer></script>
+          {% else %}
+            <p>
+              {%- trans trimmed %}
+                You must be subscribed to benefit from the partnership with the Eurockéennes.
+              {% endtrans -%}
+            </p>
+            <p>
+              {%- trans trimmed %}
+                This partnership offers a discount of up to 33%
+                on tickets for Friday, Saturday and Sunday,
+                as well as the 3-day package from Friday to Sunday.
+              {% endtrans -%}
+            </p>
+          {% endif %}
+        </div>
+      </section>
       {% for priority_groups in products|groupby('order') %}
         {% for category, items in priority_groups.list|groupby('category') %}
           {% if items|count > 0 %}
