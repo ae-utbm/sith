@@ -1,5 +1,4 @@
 version = 1
-revision = 1
 requires-python = ">=3.12, <4.0"
 
 [[package]]
@@ -640,7 +639,7 @@ wheels = [
 
 [[package]]
 name = "ical"
-version = "8.3.1"
+version = "9.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
@@ -648,9 +647,9 @@ dependencies = [
     { name = "python-dateutil" },
     { name = "tzdata" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/56/f6/f623166c503de1c3eff70a54e1e8a4cc83aca5de0c4d108ec4f6d97251b3/ical-8.3.1.tar.gz", hash = "sha256:4d3c8c215230c18b1544d11f8e3342301943b5c6fc1b9980442735b84f8015cd", size = 117126 }
+sdist = { url = "https://files.pythonhosted.org/packages/67/ed/3b23916c730d136d0a96366079de9c9ac619a0dbb85a1c1a4dcfb8ca25e8/ical-9.1.0.tar.gz", hash = "sha256:0d27946eec356536f4addacb63f8b9016b3b06160d77dc2a46981aa55519a2a7", size = 118297 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f9/ba/4abd303bd8f32bf482ab1f2f090f4a59edcfa8897bd68779b6853428a87a/ical-8.3.1-py3-none-any.whl", hash = "sha256:22e07acd9d36ef0ccb3970a47d5efd5ff29a833fe541145d6f1d3a7676334fa3", size = 117317 },
+    { url = "https://files.pythonhosted.org/packages/8e/41/e28a56f0ffd255f93195d3ce3b8b0aac59f00668dd0bfbae43b9ff9f08e3/ical-9.1.0-py3-none-any.whl", hash = "sha256:f931b22d2dbeae69b463784dc6e7ec26887554e5bab41251767d91067125f63b", size = 118736 },
 ]
 
 [[package]]
@@ -1640,7 +1639,7 @@ requires-dist = [
     { name = "django-simple-captcha", specifier = ">=0.6.2,<1.0.0" },
     { name = "environs", extras = ["django"], specifier = ">=14.1.0,<15.0.0" },
     { name = "honcho", specifier = ">=2.0.0" },
-    { name = "ical", specifier = ">=8.3.1,<9.0.0" },
+    { name = "ical", specifier = ">=9.1.0,<10.0.0" },
     { name = "jinja2", specifier = ">=3.1.6,<4.0.0" },
     { name = "libsass", specifier = ">=0.23.0,<1.0.0" },
     { name = "mistune", specifier = ">=3.1.2,<4.0.0" },
