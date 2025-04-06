@@ -1,56 +1,61 @@
-/**
- * @readonly
- * @enum {number}
- */
-const BillingInfoReqState = {
-  // biome-ignore lint/style/useNamingConvention: this feels more like an enum
-  SUCCESS: 1,
-  // biome-ignore lint/style/useNamingConvention: this feels more like an enum
-  FAILURE: 2,
-  // biome-ignore lint/style/useNamingConvention: this feels more like an enum
-  SENDING: 3,
-};
+import { exportToHtml } from "#core:utils/globals";
+import {
+  type BillingInfoSchema,
+  etransactioninfoFetchEtransactionData,
+  etransactioninfoPutUserBillingInfo,
+} from "#openapi";
+
+enum BillingInfoReqState {
+  Success = "0",
+  Failure = "1",
+  Sending = "2",
+}
+
+exportToHtml("BillingInfoReqState", BillingInfoReqState);
 
 document.addEventListener("alpine:init", () => {
-  Alpine.store("billing_inputs", {
-    // biome-ignore lint/correctness/noUndeclaredVariables: defined in eboutic_makecommand.jinja
-    data: etData,
+  Alpine.data("etransactionData", (initialData) => ({
+    data: initialData,
 
     async fill() {
       const button = document.getElementById("bank-submit-button") as HTMLButtonElement;
       button.disabled = true;
-      // biome-ignore lint/correctness/noUndeclaredVariables: defined in eboutic_makecommand.jinja
-      const res = await fetch(etDataUrl);
-      if (res.ok) {
-        this.data = await res.json();
+      const res = await etransactioninfoFetchEtransactionData();
+      if (res.response.ok) {
+        this.data = res.data;
         button.disabled = false;
       }
     },
-  });
+  }));
 
-  Alpine.data("billing_infos", () => ({
+  Alpine.data("billing_infos", (userId: number) => ({
     /** @type {BillingInfoReqState | null} */
     reqState: null,
 
     async sendForm() {
-      this.reqState = BillingInfoReqState.SENDING;
+      this.reqState = BillingInfoReqState.Sending;
       const form = document.getElementById("billing_info_form");
-      document.getElementById("bank-submit-button").disabled = true;
+      const submitButton = document.getElementById(
+        "bank-submit-button",
+      ) as HTMLButtonElement;
+      submitButton.disabled = true;
       const payload = Object.fromEntries(
         Array.from(form.querySelectorAll("input, select"))
-          .filter((elem) => elem.type !== "submit" && elem.value)
-          .map((elem) => [elem.name, elem.value]),
+          .filter((elem: HTMLInputElement) => elem.type !== "submit" && elem.value)
+          .map((elem: HTMLInputElement) => [elem.name, elem.value]),
       );
-      // biome-ignore lint/correctness/noUndeclaredVariables: defined in eboutic_makecommand.jinja
-      const res = await fetch(billingInfoUrl, {
-        method: "PUT",
-        body: JSON.stringify(payload),
+      const res = await etransactioninfoPutUserBillingInfo({
+        // biome-ignore lint/style/useNamingConvention: API is snake_case
+        path: { user_id: userId },
+        body: payload as unknown as BillingInfoSchema,
       });
-      this.reqState = res.ok
-        ? BillingInfoReqState.SUCCESS
-        : BillingInfoReqState.FAILURE;
-      if (res.status === 422) {
-        const errors = (await res.json()).detail.flatMap((err) => err.loc);
+      this.reqState = res.response.ok
+        ? BillingInfoReqState.Success
+        : BillingInfoReqState.Failure;
+      if (res.response.status === 422) {
+        const errors = await res.response
+          .json()
+          .detail.flatMap((err: Record<"loc", string>) => err.loc);
         for (const elem of Array.from(form.querySelectorAll("input")).filter((elem) =>
           errors.includes(elem.name),
         )) {
@@ -58,29 +63,27 @@ document.addEventListener("alpine:init", () => {
           elem.reportValidity();
           elem.oninput = () => elem.setCustomValidity("");
         }
-      } else if (res.ok) {
-        Alpine.store("billing_inputs").fill();
+      } else if (res.response.ok) {
+        this.$dispatch("billing-infos-filled");
       }
     },
 
     getAlertColor() {
-      if (this.reqState === BillingInfoReqState.SUCCESS) {
+      if (this.reqState === BillingInfoReqState.Success) {
         return "green";
       }
-      if (this.reqState === BillingInfoReqState.FAILURE) {
+      if (this.reqState === BillingInfoReqState.Failure) {
         return "red";
       }
       return "";
     },
 
     getAlertMessage() {
-      if (this.reqState === BillingInfoReqState.SUCCESS) {
-        // biome-ignore lint/correctness/noUndeclaredVariables: defined in eboutic_makecommand.jinja
-        return billingInfoSuccessMessage;
+      if (this.reqState === BillingInfoReqState.Success) {
+        return gettext("Billing info registration success");
       }
-      if (this.reqState === BillingInfoReqState.FAILURE) {
-        // biome-ignore lint/correctness/noUndeclaredVariables: defined in eboutic_makecommand.jinja
-        return billingInfoFailureMessage;
+      if (this.reqState === BillingInfoReqState.Failure) {
+        return gettext("Billing info registration failure");
       }
       return "";
     },

@@ -26,7 +26,7 @@ class EtransactionInfoController(ControllerBase):
             customer=customer, defaults=info.model_dump(exclude_none=True)
         )
 
-    @route.get("/data", url_name="etransaction_data", include_in_schema=False)
+    @route.get("/data", url_name="etransaction_data")
     def fetch_etransaction_data(self):
         """Generate the data to pay an eboutic command with paybox.
 

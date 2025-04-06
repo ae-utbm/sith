@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block additional_js %}
-  <script src="{{ static('bundled/eboutic/makecommand-index.ts') }}" defer></script>
+  <script type="module" src="{{ static('bundled/eboutic/makecommand-index.ts') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -56,7 +56,7 @@
           <div
             class="collapse"
             :class="{'shadow': collapsed}"
-            x-data="{collapsed: !billingInfoExist}"
+            x-data="{collapsed: !{{ "true" if billing_infos else "false" }}}"
             x-cloak
           >
             <div class="collapse-header clickable" @click="collapsed = !collapsed">
@@ -70,7 +70,7 @@
             <form
               class="collapse-body"
               id="billing_info_form"
-              x-data="billing_infos"
+              x-data="billing_infos({{ user.id }})"
               x-show="collapsed"
               x-transition.scale.origin.top
               @submit.prevent="await sendForm()"
@@ -79,7 +79,7 @@
               {{ billing_form }}
               <br />
               <div
-                x-show="[BillingInfoReqState.SUCCESS, BillingInfoReqState.FAILURE].includes(reqState)"
+                x-show="[BillingInfoReqState.Success, BillingInfoReqState.Failure].includes(reqState)"
                 class="alert"
                 :class="'alert-' + getAlertColor()"
                 x-transition
@@ -92,19 +92,20 @@
               <input
                 type="submit" class="btn btn-blue clickable"
                 value="{% trans %}Validate{% endtrans %}"
-                :disabled="reqState === BillingInfoReqState.SENDING"
+                :disabled="reqState === BillingInfoReqState.Sending"
               >
             </form>
           </div>
           <br>
           {% if billing_infos_state == BillingInfoState.EMPTY %}
             <div class="alert alert-yellow">
-              {% trans %}You must fill your billing infos if you want to pay with your credit
-                card{% endtrans %}
+              {% trans trimmed %}
+                You must fill your billing infos if you want to pay with your credit card
+              {% endtrans %}
             </div>
           {% elif billing_infos_state == BillingInfoState.MISSING_PHONE_NUMBER %}
             <div class="alert alert-yellow">
-              {% trans %}
+              {% trans trimmed %}
                 The Crédit Agricole changed its policy related to the billing
                 information that must be provided in order to pay with a credit card.
                 If you want to pay with your credit card, you must add a phone number
@@ -112,8 +113,14 @@
               {% endtrans %}
             </div>
           {% endif %}
-          <form method="post" action="{{ settings.SITH_EBOUTIC_ET_URL }}" name="bank-pay-form">
-            <template x-data x-for="[key, value] in Object.entries($store.billing_inputs.data)">
+          <form
+            method="post"
+            action="{{ settings.SITH_EBOUTIC_ET_URL }}"
+            name="bank-pay-form"
+            x-data="etransactionData(initialEtData)"
+            @billing-infos-filled.window="await fill()"
+          >
+            <template x-for="[key, value] in Object.entries(data)" :key="key">
               <input type="hidden" :name="key" :value="value">
             </template>
             <input
@@ -140,17 +147,11 @@
 
 {% block script %}
   <script>
-    const billingInfoUrl = '{{ url("api:put_billing_info", user_id=request.user.id) }}';
-    const etDataUrl = '{{ url("api:etransaction_data") }}';
-    const billingInfoExist = {{ "true" if billing_infos else "false" }};
-    const billingInfoSuccessMessage = "{% trans %}Billing info registration success{% endtrans %}";
-    const billingInfoFailureMessage = "{% trans %}Billing info registration failure{% endtrans %}";
-
-    {% if billing_infos %}
-      const etData = {{ billing_infos|safe }}
-    {% else %}
-      const etData = {}
-    {% endif %}
+    {% if billing_infos -%}
+      const initialEtData = {{ billing_infos|safe }}
+    {%- else -%}
+      const initialEtData = {}
+    {%- endif %}
   </script>
   {{ super() }}
 {% endblock %}
