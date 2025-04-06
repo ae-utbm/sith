@@ -1110,12 +1110,10 @@ class QuickUploadImage(models.Model):
     """Images uploaded by user outside of the SithFile mechanism"""
 
     IMAGE_NAME_SIZE = 100
-    UUID_4_SIZE = 36
 
-    uuid = models.CharField(max_length=UUID_4_SIZE, blank=False, primary_key=True)
+    uuid = models.UUIDField(unique=True, db_index=True)
     name = models.CharField(max_length=IMAGE_NAME_SIZE, blank=False)
-    image = models.ImageField(upload_to="upload")
-    content_type = models.CharField(max_length=50, blank=False)
+    image = models.ImageField(upload_to="upload/%Y/%m/%d")
     uploader = models.ForeignKey(
         "User",
         related_name="quick_uploads",
@@ -1123,13 +1121,16 @@ class QuickUploadImage(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
     )
-    date = models.DateTimeField(_("date"), auto_now=True)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    width = models.PositiveIntegerField(_("width"))
+    height = models.PositiveIntegerField(_("height"))
+    size = models.PositiveIntegerField(_("size"))
 
     def __str__(self) -> str:
-        return f"{self.name}{Path(self.image.path).suffix}"
+        return str(self.image.path)
 
     def get_absolute_url(self):
-        return reverse("core:uploaded_image", kwargs={"image_uuid": self.uuid})
+        return self.image.url
 
     @classmethod
     def create_from_uploaded(
@@ -1145,13 +1146,16 @@ class QuickUploadImage(models.Model):
         identifier = str(uuid4())
         name = Path(image.name).stem[: cls.IMAGE_NAME_SIZE - 1]
         file = File(convert_image(image), name=f"{identifier}.webp")
+        image = Image.open(file)
 
         return cls.objects.create(
             uuid=identifier,
             name=name,
             image=file,
-            content_type="image/webp",
             uploader=uploader,
+            width=image.width,
+            height=image.height,
+            size=file.size,
         )
 
 

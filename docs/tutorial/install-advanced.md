@@ -224,7 +224,7 @@ server {
     location /static/;
         root /repertoire/du/projet;
     }
-    location ~ ^/data/(products|com|club_logos)/ {
+    location ~ ^/data/(products|com|club_logos|upload)/ {
         root /repertoire/du/projet;
     }
     location ~ ^/data/(SAS|profiles|users|.compressed|.thumbnails)/ {

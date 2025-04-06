@@ -26,13 +26,14 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
         return;
       }
       onSuccess(response.data.href);
-      // Workaround function to add ! and image name to uploaded image
-      // Without this, you get [](url) instead of ![name](url)
+      // Workaround function to add an image name to uploaded image
+      // Without this, you get ![](url) instead of ![name](url)
       let cursor = easymde.codemirror.getCursor();
-      easymde.codemirror.setSelection({ line: cursor.line, ch: cursor.ch - 1 });
-      easymde.codemirror.replaceSelection("!");
 
-      easymde.codemirror.setSelection({ line: cursor.line, ch: cursor.ch + 1 });
+      easymde.codemirror.setSelection({
+        line: cursor.line,
+        ch: cursor.ch - response.data.href.length - 3,
+      });
       easymde.codemirror.replaceSelection(response.data.name);
 
       // Move cursor at the end of the url and add a new line

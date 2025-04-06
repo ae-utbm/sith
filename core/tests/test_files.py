@@ -1,5 +1,6 @@
 from io import BytesIO
 from itertools import cycle
+from pathlib import Path
 from typing import Callable
 from uuid import uuid4
 
@@ -294,6 +295,15 @@ def test_apply_rights_recursively():
         (
             lambda: old_subscriber_user.make(),
             SimpleUploadedFile(
+                "ttesttesttesttesttesttesttesttesttesttesttesttesttesttesttestesttesttesttesttesttesttesttesttesttesttesttest.jpg",
+                content=RED_PIXEL_PNG,
+                content_type="image/jpg",
+            ),
+            200,
+        ),  # very long file name
+        (
+            lambda: old_subscriber_user.make(),
+            SimpleUploadedFile(
                 "test.jpg", content=b"invalid", content_type="image/jpg"
             ),
             415,
@@ -329,4 +339,8 @@ def test_quick_upload_image(
     if expected_status != 200:
         return
 
-    assert QuickUploadImage.objects.filter(pk=resp.json()["uuid"]).exists()
+    parsed = resp.json()
+    assert QuickUploadImage.objects.filter(uuid=parsed["uuid"]).exists()
+    assert (
+        parsed["name"] == Path(file.name).stem[: QuickUploadImage.IMAGE_NAME_SIZE - 1]
+    )

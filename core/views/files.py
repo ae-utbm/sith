@@ -39,7 +39,7 @@ from core.auth.mixins import (
     CanViewMixin,
     can_view,
 )
-from core.models import Notification, QuickUploadImage, SithFile, User
+from core.models import Notification, SithFile, User
 from core.views.mixins import AllowFragment
 from core.views.widgets.ajax_select import (
     AutoCompleteSelectMultipleGroup,
@@ -87,7 +87,7 @@ def send_raw_file(path: Path) -> HttpResponse:
 def send_file(
     request: HttpRequest,
     file_id: int | str,
-    file_class: type[SithFile | QuickUploadImage] = SithFile,
+    file_class: type[SithFile] = SithFile,
     file_attr: str = "file",
 ) -> HttpResponse:
     """Send a protected file, if the user can see it.

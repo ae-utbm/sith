@@ -63,24 +63,9 @@ class UserProfileSchema(ModelSchema):
 class UploadedFileSchema(ModelSchema):
     class Meta:
         model = QuickUploadImage
-        fields = ["uuid", "name", "content_type"]
+        fields = ["uuid", "name", "width", "height", "size"]
 
-    width: int
-    height: int
-    size: int
     href: str
-
-    @staticmethod
-    def resolve_width(obj: QuickUploadImage):
-        return obj.image.width
-
-    @staticmethod
-    def resolve_height(obj: QuickUploadImage):
-        return obj.image.height
-
-    @staticmethod
-    def resolve_size(obj: QuickUploadImage):
-        return obj.image.size
 
     @staticmethod
     def resolve_href(obj: QuickUploadImage) -> str:

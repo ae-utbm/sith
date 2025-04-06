@@ -102,6 +102,7 @@ class OperationLogAdmin(admin.ModelAdmin):
 
 @admin.register(QuickUploadImage)
 class QuickUploadImageAdmin(admin.ModelAdmin):
-    list_display = ("uuid", "name", "uploader", "content_type", "date")
-    search_fields = ("uuid", "name", "uploader")
+    list_display = ("uuid", "uploader", "created_at", "name")
+    search_fields = ("uuid", "uploader", "name")
     autocomplete_fields = ("uploader",)
+    readonly_fields = ("width", "height", "size")
