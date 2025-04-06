@@ -37,7 +37,12 @@ class MarkdownController(ControllerBase):
 
 @api_controller("/upload")
 class UploadController(ControllerBase):
-    @route.post("/image", response=UploadedFileSchema, permissions=[IsOldSubscriber])
+    @route.post(
+        "/image",
+        response=UploadedFileSchema,
+        permissions=[IsOldSubscriber],
+        url_name="quick_upload_image",
+    )
     def upload_image(self, file: UploadedFile):
         if file.content_type.split("/")[0] != "image":
             return self.create_response(
