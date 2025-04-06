@@ -4,9 +4,10 @@ import pytest
 from django.conf import settings
 from django.contrib import auth
 from django.core.management import call_command
-from django.test import Client, TestCase
+from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
 from django.utils.timezone import now
+from django.views.generic import DetailView
 from model_bakery import baker, seq
 from model_bakery.recipe import Recipe, foreign_key
 from pytest_django.asserts import assertRedirects
@@ -18,6 +19,7 @@ from core.baker_recipes import (
     very_old_subscriber_user,
 )
 from core.models import Group, User
+from core.views import UserTabsMixin
 from counter.models import Counter, Refilling, Selling
 from eboutic.models import Invoice, InvoiceItem
 
@@ -229,3 +231,88 @@ def test_logout(client: Client):
     res = client.post(reverse("core:logout"))
     assertRedirects(res, reverse("core:login"))
     assert auth.get_user(client).is_anonymous
+
+
+class UserTabTestView(UserTabsMixin, DetailView): ...
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ["user_factory", "expected_tabs"],
+    [
+        (
+            subscriber_user.make,
+            [
+                "infos",
+                "godfathers",
+                "pictures",
+                "tools",
+                "edit",
+                "prefs",
+                "clubs",
+                "stats",
+                "account",
+            ],
+        ),
+        (
+            # this user is superuser, but still won't see a few tabs,
+            # because he is not subscribed
+            lambda: baker.make(User, is_superuser=True),
+            [
+                "infos",
+                "godfathers",
+                "pictures",
+                "tools",
+                "edit",
+                "prefs",
+                "clubs",
+                "groups",
+            ],
+        ),
+    ],
+)
+def test_displayed_user_self_tabs(user_factory, expected_tabs: list[str]):
+    """Test that a user can view the appropriate tabs in its own profile"""
+    user = user_factory()
+    request = RequestFactory().get("")
+    request.user = user
+    view = UserTabTestView()
+    view.setup(request)
+    view.object = user
+    tabs = [tab["slug"] for tab in view.get_list_of_tabs()]
+    assert tabs == expected_tabs
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ["user_factory", "expected_tabs"],
+    [
+        (subscriber_user.make, ["infos", "godfathers", "pictures", "clubs"]),
+        (
+            # this user is superuser, but still won't see a few tabs,
+            # because he is not subscribed
+            lambda: baker.make(User, is_superuser=True),
+            [
+                "infos",
+                "godfathers",
+                "pictures",
+                "edit",
+                "prefs",
+                "clubs",
+                "groups",
+                "stats",
+                "account",
+            ],
+        ),
+    ],
+)
+def test_displayed_other_user_tabs(user_factory, expected_tabs: list[str]):
+    """Test that a user can view the appropriate tabs in another user's profile."""
+    request_user = user_factory()
+    request = RequestFactory().get("")
+    request.user = request_user
+    view = UserTabTestView()
+    view.setup(request)
+    view.object = subscriber_user.make()  # user whose page is being seen
+    tabs = [tab["slug"] for tab in view.get_list_of_tabs()]
+    assert tabs == expected_tabs
