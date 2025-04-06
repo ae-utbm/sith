@@ -8,7 +8,6 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import iCalendarPlugin from "@fullcalendar/icalendar";
 import listPlugin from "@fullcalendar/list";
 import {
-  calendarCalendarExternal,
   calendarCalendarInternal,
   calendarCalendarUnpublished,
   newsDeleteNews,
@@ -152,11 +151,6 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         className: "internal",
       },
       {
-        url: `${await makeUrl(calendarCalendarExternal)}${cacheInvalidate}`,
-        format: "ics",
-        className: "external",
-      },
-      {
         url: `${await makeUrl(calendarCalendarUnpublished)}${cacheInvalidate}`,
         format: "ics",
         color: "red",
@@ -224,9 +218,6 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     };
 
     const makePopupTools = (event: EventImpl) => {
-      if (event.source.internalEventSource.ui.classNames.includes("external")) {
-        return null;
-      }
       if (!(this.canDelete || this.canModerate)) {
         return null;
       }

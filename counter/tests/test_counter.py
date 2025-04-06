@@ -18,7 +18,7 @@ from decimal import Decimal
 
 import pytest
 from django.conf import settings
-from django.contrib.auth.models import make_password
+from django.contrib.auth.models import Permission, make_password
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import resolve_url
@@ -28,9 +28,10 @@ from django.utils import timezone
 from django.utils.timezone import localdate, now
 from freezegun import freeze_time
 from model_bakery import baker
+from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertRedirects
 
-from club.models import Club, Membership
+from club.models import Membership
 from core.baker_recipes import board_user, subscriber_user, very_old_subscriber_user
 from core.models import BanGroup, User
 from counter.baker_recipes import product_recipe, sale_recipe
@@ -572,113 +573,78 @@ class TestCounterClick(TestFullClickBase):
 class TestCounterStats(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.counter = Counter.objects.get(id=2)
-        cls.krophil = User.objects.get(username="krophil")
-        cls.skia = User.objects.get(username="skia")
-        cls.sli = User.objects.get(username="sli")
-        cls.root = User.objects.get(username="root")
-        cls.subscriber = User.objects.get(username="subscriber")
-        cls.old_subscriber = User.objects.get(username="old_subscriber")
-        cls.counter.sellers.add(cls.sli, cls.root, cls.skia, cls.krophil)
-
-        barbar = Product.objects.get(code="BARB")
-
-        # remove everything to make sure the fixtures bring no side effect
-        Permanency.objects.all().delete()
-        Selling.objects.all().delete()
-
-        now = timezone.now()
-        # total of sli : 5 hours
-        Permanency.objects.create(
-            user=cls.sli, start=now, end=now + timedelta(hours=1), counter=cls.counter
-        )
-        Permanency.objects.create(
-            user=cls.sli,
-            start=now + timedelta(hours=4),
-            end=now + timedelta(hours=6),
-            counter=cls.counter,
-        )
-        Permanency.objects.create(
-            user=cls.sli,
-            start=now + timedelta(hours=7),
-            end=now + timedelta(hours=9),
-            counter=cls.counter,
+        cls.users = subscriber_user.make(_quantity=4)
+        product = product_recipe.make(selling_price=1)
+        cls.counter = baker.make(
+            Counter, type=["BAR"], sellers=cls.users[:4], products=[product]
         )
 
-        # total of skia : 16 days, 2 hours, 35 minutes and 54 seconds
-        Permanency.objects.create(
-            user=cls.skia, start=now, end=now + timedelta(hours=1), counter=cls.counter
-        )
-        Permanency.objects.create(
-            user=cls.skia,
-            start=now + timedelta(days=4, hours=1),
-            end=now + timedelta(days=20, hours=2, minutes=35, seconds=54),
-            counter=cls.counter,
-        )
+        _now = timezone.now()
+        permanence_recipe = Recipe(Permanency, counter=cls.counter)
+        perms = [
+            *[  # total of user 0 : 5 hours
+                permanence_recipe.prepare(user=cls.users[0], start=start, end=end)
+                for start, end in [
+                    (_now, _now + timedelta(hours=1)),
+                    (_now + timedelta(hours=4), _now + timedelta(hours=6)),
+                    (_now + timedelta(hours=7), _now + timedelta(hours=9)),
+                ]
+            ],
+            *[  # total of user 1 : 16 days, 2 hours, 35 minutes and 54 seconds
+                permanence_recipe.prepare(user=cls.users[1], start=start, end=end)
+                for start, end in [
+                    (_now, _now + timedelta(hours=1)),
+                    (
+                        _now + timedelta(days=4, hours=1),
+                        _now + timedelta(days=20, hours=2, minutes=35, seconds=54),
+                    ),
+                ]
+            ],
+            *[  # total of user 2 : 2 hour + 20 hours (but the 20 hours were on last year)
+                permanence_recipe.prepare(user=cls.users[2], start=start, end=end)
+                for start, end in [
+                    (_now + timedelta(days=5), _now + timedelta(days=5, hours=1)),
+                    (_now - timedelta(days=300, hours=20), _now - timedelta(days=300)),
+                ]
+            ],
+        ]
+        # user 3 has 0 hours of permanence
+        Permanency.objects.bulk_create(perms)
 
-        # total of root : 1 hour + 20 hours (but the 20 hours were on last year)
-        Permanency.objects.create(
-            user=cls.root,
-            start=now + timedelta(days=5),
-            end=now + timedelta(days=5, hours=1),
+        _sale_recipe = Recipe(
+            Selling,
+            club=cls.counter.club,
             counter=cls.counter,
-        )
-        Permanency.objects.create(
-            user=cls.root,
-            start=now - timedelta(days=300, hours=20),
-            end=now - timedelta(days=300),
-            counter=cls.counter,
-        )
-
-        # total of krophil : 0 hour
-        s = Selling(
-            label=barbar.name,
-            product=barbar,
-            club=baker.make(Club),
-            counter=cls.counter,
+            product=product,
             unit_price=2,
-            seller=cls.skia,
         )
+        sales = [
+            *_sale_recipe.prepare(
+                quantity=100, customer=cls.users[0].customer, _quantity=10
+            ),  # 2000 €
+            *_sale_recipe.prepare(
+                quantity=100, customer=cls.users[1].customer, _quantity=5
+            ),  # 1000 €
+            _sale_recipe.prepare(quantity=1, customer=cls.users[2].customer),  # 2€
+            _sale_recipe.prepare(quantity=50, customer=cls.users[3].customer),  # 100€
+        ]
+        Selling.objects.bulk_create(sales)
 
-        krophil_customer = Customer.get_or_create(cls.krophil)[0]
-        sli_customer = Customer.get_or_create(cls.sli)[0]
-        skia_customer = Customer.get_or_create(cls.skia)[0]
-        root_customer = Customer.get_or_create(cls.root)[0]
-
-        # moderate drinker. Total : 100 €
-        s.quantity = 50
-        s.customer = krophil_customer
-        s.save(allow_negative=True)
-
-        # Sli is a drunkard. Total : 2000 €
-        s.quantity = 100
-        s.customer = sli_customer
-        for _ in range(10):
-            # little trick to make sure the instance is duplicated in db
-            s.pk = None
-            s.save(allow_negative=True)  # save ten different sales
-
-        # Skia is a heavy drinker too. Total : 1000 €
-        s.customer = skia_customer
-        for _ in range(5):
-            s.pk = None
-            s.save(allow_negative=True)
-
-        # Root is quite an abstemious one. Total : 2 €
-        s.pk = None
-        s.quantity = 1
-        s.customer = root_customer
-        s.save(allow_negative=True)
-
-    def test_not_authenticated_user_fail(self):
-        # Test with not login user
-        response = self.client.get(reverse("counter:stats", args=[self.counter.id]))
-        assert response.status_code == 403
+    def test_not_authenticated_access_fail(self):
+        url = reverse("counter:stats", args=[self.counter.id])
+        response = self.client.get(url)
+        assertRedirects(response, reverse("core:login") + f"?next={url}")
 
     def test_unauthorized_user_fails(self):
-        self.client.force_login(User.objects.get(username="public"))
+        self.client.force_login(baker.make(User))
         response = self.client.get(reverse("counter:stats", args=[self.counter.id]))
         assert response.status_code == 403
+
+    def test_authorized_user_ok(self):
+        perm = Permission.objects.get(codename="view_counter_stats")
+        self.client.force_login(baker.make(User, user_permissions=[perm]))
+        response = self.client.get(reverse("counter:stats", args=[self.counter.id]))
+        assert response.status_code == 200
 
     def test_get_total_sales(self):
         """Test the result of the Counter.get_total_sales() method."""
@@ -686,7 +652,7 @@ class TestCounterStats(TestCase):
 
     def test_top_barmen(self):
         """Test the result of Counter.get_top_barmen() is correct."""
-        users = [self.skia, self.root, self.sli]
+        users = [self.users[1], self.users[2], self.users[0]]
         perm_times = [
             timedelta(days=16, hours=2, minutes=35, seconds=54),
             timedelta(hours=21),
@@ -700,12 +666,12 @@ class TestCounterStats(TestCase):
                 "nickname": user.nick_name,
                 "perm_sum": perm_time,
             }
-            for user, perm_time in zip(users, perm_times, strict=False)
+            for user, perm_time in zip(users, perm_times, strict=True)
         ]
 
     def test_top_customer(self):
         """Test the result of Counter.get_top_customers() is correct."""
-        users = [self.sli, self.skia, self.krophil, self.root]
+        users = [self.users[0], self.users[1], self.users[3], self.users[2]]
         sale_amounts = [2000, 1000, 100, 2]
         assert list(self.counter.get_top_customers()) == [
             {
@@ -715,7 +681,7 @@ class TestCounterStats(TestCase):
                 "nickname": user.nick_name,
                 "selling_sum": sale_amount,
             }
-            for user, sale_amount in zip(users, sale_amounts, strict=False)
+            for user, sale_amount in zip(users, sale_amounts, strict=True)
         ]
 
 

@@ -526,6 +526,7 @@ class Counter(models.Model):
 
     class Meta:
         verbose_name = _("counter")
+        permissions = [("view_counter_stats", "Can view counter stats")]
 
     def __str__(self):
         return self.name
@@ -598,13 +599,12 @@ class Counter(models.Model):
             - the promo of the barman
             - the total number of office hours the barman did attend
         """
+        name_expr = Concat(F("user__first_name"), Value(" "), F("user__last_name"))
         return (
             self.permanencies.exclude(end=None)
             .annotate(
-                name=Concat(F("user__first_name"), Value(" "), F("user__last_name"))
+                name=name_expr, nickname=F("user__nick_name"), promo=F("user__promo")
             )
-            .annotate(nickname=F("user__nick_name"))
-            .annotate(promo=F("user__promo"))
             .values("user", "name", "nickname", "promo")
             .annotate(perm_sum=Sum(F("end") - F("start")))
             .exclude(perm_sum=None)
@@ -628,18 +628,17 @@ class Counter(models.Model):
             since = get_start_of_semester()
         if isinstance(since, date):
             since = datetime(since.year, since.month, since.day, tzinfo=tz.utc)
+        name_expr = Concat(
+            F("customer__user__first_name"), Value(" "), F("customer__user__last_name")
+        )
         return (
             self.sellings.filter(date__gte=since)
             .annotate(
-                name=Concat(
-                    F("customer__user__first_name"),
-                    Value(" "),
-                    F("customer__user__last_name"),
-                )
+                name=name_expr,
+                nickname=F("customer__user__nick_name"),
+                promo=F("customer__user__promo"),
+                user=F("customer__user"),
             )
-            .annotate(nickname=F("customer__user__nick_name"))
-            .annotate(promo=F("customer__user__promo"))
-            .annotate(user=F("customer__user"))
             .values("user", "promo", "name", "nickname")
             .annotate(
                 selling_sum=Sum(

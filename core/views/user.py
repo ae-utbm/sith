@@ -242,7 +242,10 @@ class UserTabsMixin(TabedViewMixin):
         if (
             hasattr(user, "customer")
             and user.customer
-            and (user == self.request.user or user.has_perm("counter.view_customer"))
+            and (
+                user == self.request.user
+                or self.request.user.has_perm("counter.view_customer")
+            )
         ):
             tab_list.append(
                 {

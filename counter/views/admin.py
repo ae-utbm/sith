@@ -27,7 +27,7 @@ from django.utils.translation import gettext as _
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
-from core.auth.mixins import CanEditMixin, CanViewMixin
+from core.auth.mixins import CanViewMixin
 from core.utils import get_semester_code, get_start_of_semester
 from counter.forms import (
     CloseCustomerAccountForm,
@@ -274,12 +274,13 @@ class SellingDeleteView(DeleteView):
         raise PermissionDenied
 
 
-class CounterStatView(DetailView, CounterAdminMixin):
+class CounterStatView(PermissionRequiredMixin, DetailView):
     """Show the bar stats."""
 
     model = Counter
     pk_url_kwarg = "counter_id"
     template_name = "counter/stats.jinja"
+    permission_required = "counter.view_counter_stats"
 
     def get_context_data(self, **kwargs):
         """Add stats to the context."""
@@ -300,18 +301,6 @@ class CounterStatView(DetailView, CounterAdminMixin):
             }
         )
         return kwargs
-
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            return super().dispatch(request, *args, **kwargs)
-        except PermissionDenied:
-            if (
-                request.user.is_root
-                or request.user.is_board_member
-                or self.get_object().is_owned_by(request.user)
-            ):
-                return super(CanEditMixin, self).dispatch(request, *args, **kwargs)
-        raise PermissionDenied
 
 
 class CounterRefillingListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-04 10:35+0200\n"
+"POT-Creation-Date: 2025-04-06 15:54+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -60,11 +60,11 @@ msgstr "Retirer"
 msgid "Action"
 msgstr "Action"
 
-#: club/forms.py club/tests.py
+#: club/forms.py club/tests/test_mailing.py
 msgid "This field is required"
 msgstr "Ce champ est obligatoire"
 
-#: club/forms.py club/tests.py
+#: club/forms.py club/tests/test_mailing.py
 msgid "One of the selected users doesn't have an email address"
 msgstr "Un des utilisateurs sélectionnés n'a pas d'adresse email"
 
@@ -72,7 +72,7 @@ msgstr "Un des utilisateurs sélectionnés n'a pas d'adresse email"
 msgid "An action is required"
 msgstr "Une action est requise"
 
-#: club/forms.py club/tests.py
+#: club/forms.py club/tests/test_mailing.py
 msgid "You must specify at least an user or an email address"
 msgstr "vous devez spécifier au moins un utilisateur ou une adresse email"
 
@@ -239,7 +239,7 @@ msgstr "Utilisateur"
 msgid "At least user or email is required"
 msgstr "Au moins un utilisateur ou un email est nécessaire"
 
-#: club/models.py club/tests.py
+#: club/models.py club/tests/test_mailing.py
 msgid "This email is already suscribed in this mailing"
 msgstr "Cet email est déjà abonné à cette mailing"
 
@@ -3793,6 +3793,27 @@ msgid "this page"
 msgstr "cette page"
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "Eurockéennes 2025 partnership"
+msgstr "Partenariat Eurockéennes 2025"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid ""
+"You must be subscribed to benefit from the partnership with the Eurockéennes."
+msgstr ""
+"Vous devez être cotisant pour bénéficier du partenariat avec les "
+"Eurockéennes."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+#, python-format
+msgid ""
+"This partnership offers a discount of up to 33%% on tickets for Friday, "
+"Saturday and Sunday, as well as the 3-day package from Friday to Sunday."
+msgstr ""
+"Ce partenariat permet de profiter d'une réduction jusqu'à 33%% sur les "
+"billets du vendredi, du samedi et du dimanche, ainsi qu'au forfait 3 jours, "
+"du vendredi au dimanche."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "There are no items available for sale"
 msgstr "Aucun article n'est disponible à la vente"
 
@@ -3810,25 +3831,18 @@ msgstr "Informations de facturation"
 
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja
 msgid ""
-"You must fill your billing infos if you want to pay with your credit\n"
-"                card"
+"You must fill your billing infos if you want to pay with your credit card"
 msgstr ""
 "Vous devez renseigner vos coordonnées de facturation si vous voulez payer "
 "par carte bancaire"
 
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja
 msgid ""
-"\n"
-"                The Crédit Agricole changed its policy related to the "
-"billing\n"
-"                information that must be provided in order to pay with a "
-"credit card.\n"
-"                If you want to pay with your credit card, you must add a "
-"phone number\n"
-"                to the data you already provided.\n"
-"              "
+"The Crédit Agricole changed its policy related to the billing information "
+"that must be provided in order to pay with a credit card. If you want to pay "
+"with your credit card, you must add a phone number to the data you already "
+"provided."
 msgstr ""
-"\n"
 "Le Crédit Agricole a changé  sa politique relative aux informations à "
 "fournir pour effectuer un paiement par carte bancaire. De ce fait, si vous "
 "souhaitez payer par carte, vous devez rajouter un numéro de téléphone aux "
@@ -3854,14 +3868,6 @@ msgstr ""
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja
 msgid "Pay with Sith account"
 msgstr "Payer avec un compte AE"
-
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
-msgid "Billing info registration success"
-msgstr "Informations de facturation enregistrées"
-
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
-msgid "Billing info registration failure"
-msgstr "Echec de l'enregistrement des informations de facturation."
 
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja
 msgid "Payment successful"

@@ -1,8 +1,6 @@
-from datetime import datetime, timedelta
 from pathlib import Path
 from typing import final
 
-import requests
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db.models import F, QuerySet
@@ -19,34 +17,7 @@ from core.models import User
 @final
 class IcsCalendar:
     _CACHE_FOLDER: Path = settings.MEDIA_ROOT / "com" / "calendars"
-    _EXTERNAL_CALENDAR = _CACHE_FOLDER / "external.ics"
     _INTERNAL_CALENDAR = _CACHE_FOLDER / "internal.ics"
-
-    @classmethod
-    def get_external(cls, expiration: timedelta = timedelta(hours=1)) -> Path | None:
-        if (
-            cls._EXTERNAL_CALENDAR.exists()
-            and timezone.make_aware(
-                datetime.fromtimestamp(cls._EXTERNAL_CALENDAR.stat().st_mtime)
-            )
-            + expiration
-            > timezone.now()
-        ):
-            return cls._EXTERNAL_CALENDAR
-        return cls.make_external()
-
-    @classmethod
-    def make_external(cls) -> Path | None:
-        calendar = requests.get(
-            "https://calendar.google.com/calendar/ical/ae.utbm%40gmail.com/public/basic.ics"
-        )
-        if not calendar.ok:
-            return None
-
-        cls._CACHE_FOLDER.mkdir(parents=True, exist_ok=True)
-        with open(cls._EXTERNAL_CALENDAR, "wb") as f:
-            _ = f.write(calendar.content)
-        return cls._EXTERNAL_CALENDAR
 
     @classmethod
     def get_internal(cls) -> Path:
