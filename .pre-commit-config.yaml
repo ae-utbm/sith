@@ -9,7 +9,7 @@ repos:
       # Run the formatter.
       - id: ruff-format
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v0.1.0"  # Use the sha / tag you want to point at
+    rev: v0.6.1
     hooks:
       - id: biome-check
         additional_dependencies: ["@biomejs/biome@1.9.4"]

@@ -26,7 +26,9 @@ from cryptography.hazmat.primitives.hashes import SHA1
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+)
 from django.core.exceptions import SuspiciousOperation
 from django.db import DatabaseError, transaction
 from django.http import HttpRequest, HttpResponse
