@@ -1,9 +1,11 @@
 from pathlib import Path
-from typing import final
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib.sites.models import Site
+from django.contrib.syndication.views import add_domain
 from django.db.models import F, QuerySet
+from django.http import HttpRequest
 from django.urls import reverse
 from django.utils import timezone
 from ical.calendar import Calendar
@@ -14,7 +16,14 @@ from com.models import NewsDate
 from core.models import User
 
 
-@final
+def as_absolute_url(url: str, request: HttpRequest | None = None) -> str:
+    return add_domain(
+        Site.objects.get_current(request=request),
+        url,
+        secure=request.is_secure() if request is not None else settings.HTTPS,
+    )
+
+
 class IcsCalendar:
     _CACHE_FOLDER: Path = settings.MEDIA_ROOT / "com" / "calendars"
     _INTERNAL_CALENDAR = _CACHE_FOLDER / "internal.ics"
@@ -58,7 +67,9 @@ class IcsCalendar:
                 summary=news_date.news_title,
                 start=news_date.start_date,
                 end=news_date.end_date,
-                url=reverse("com:news_detail", kwargs={"news_id": news_date.news.id}),
+                url=as_absolute_url(
+                    reverse("com:news_detail", kwargs={"news_id": news_date.news.id})
+                ),
             )
             calendar.events.append(event)
 

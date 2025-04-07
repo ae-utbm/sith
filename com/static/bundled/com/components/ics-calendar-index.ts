@@ -303,10 +303,36 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     this.calendar = new Calendar(this.node, {
       plugins: [dayGridPlugin, iCalendarPlugin, listPlugin],
       locales: [frLocale, enLocale],
+      customButtons: {
+        getCalendarLink: {
+          text: gettext("Copy calendar link"),
+          click: async (event: Event) => {
+            const button = event.target as HTMLButtonElement;
+            button.classList.add("text-copy");
+            button.setAttribute(
+              "tooltip",
+              gettext("Calendar link copied to the clipboard"),
+            );
+            navigator.clipboard.writeText(
+              new URL(
+                await makeUrl(calendarCalendarInternal),
+                window.location.origin,
+              ).toString(),
+            );
+            setTimeout(() => {
+              button.classList.remove("text-copied");
+              button.classList.add("text-copied");
+              button.classList.remove("text-copy");
+              button.removeAttribute("tooltip");
+            }, 700);
+          },
+        },
+      },
       height: "auto",
       locale: this.locale,
       initialView: this.currentView(),
       headerToolbar: this.currentToolbar(),
+      footerToolbar: { start: "getCalendarLink" },
       eventSources: await this.getEventSources(),
       windowResize: () => {
         this.calendar.changeView(this.currentView());
