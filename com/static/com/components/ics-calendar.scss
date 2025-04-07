@@ -22,6 +22,8 @@
 ics-calendar {
   border: none;
   box-shadow: none;
+  overflow: visible;
+  z-index: 1;
 
   #event-details {
     z-index: 10;
@@ -106,7 +108,7 @@ ics-calendar {
   button.text-copy,
   button.text-copy:focus,
   button.text-copy:hover {
-    background-color: green !important;
+    background-color: #67AE6E !important;
     transition: 200ms linear;
   }
 
@@ -114,5 +116,36 @@ ics-calendar {
   button.text-copied:focus,
   button.text-copied:hover {
     transition: 200ms linear;
+  }
+
+
+
+  /* Tooltip styles */
+  button[data-tooltip] {
+    position: relative;
+    cursor: pointer;
+  }
+
+  button[data-tooltip]::after {
+    font-size: 10px;
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 120%; /* Adjust this value to position the tooltip above the button */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 99999;
+  }
+
+  button[data-tooltip]:hover::after,
+  button[data-tooltip]:focus::after {
+    opacity: 1;
   }
 }
