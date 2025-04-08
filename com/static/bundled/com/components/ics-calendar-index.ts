@@ -44,7 +44,18 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     return this.isMobile() ? "listMonth" : "dayGridMonth";
   }
 
-  currentToolbar() {
+  currentFooterToolbar() {
+    if (this.isMobile()) {
+      return {
+        start: "",
+        center: "getCalendarLink",
+        end: "",
+      };
+    }
+    return { start: "getCalendarLink", center: "", end: "" };
+  }
+
+  currentHeaderToolbar() {
     if (this.isMobile()) {
       return {
         left: "prev,next",
@@ -303,14 +314,44 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     this.calendar = new Calendar(this.node, {
       plugins: [dayGridPlugin, iCalendarPlugin, listPlugin],
       locales: [frLocale, enLocale],
+      customButtons: {
+        getCalendarLink: {
+          text: gettext("Copy calendar link"),
+          click: async (event: Event) => {
+            const button = event.target as HTMLButtonElement;
+            button.classList.add("text-copy");
+            if (!button.hasAttribute("position")) {
+              button.setAttribute("tooltip", gettext("Link copied"));
+              button.setAttribute("position", "top");
+              button.setAttribute("no-hover", "");
+            }
+            if (button.classList.contains("text-copied")) {
+              button.classList.remove("text-copied");
+            }
+            navigator.clipboard.writeText(
+              new URL(
+                await makeUrl(calendarCalendarInternal),
+                window.location.origin,
+              ).toString(),
+            );
+            setTimeout(() => {
+              button.classList.remove("text-copied");
+              button.classList.add("text-copied");
+              button.classList.remove("text-copy");
+            }, 1500);
+          },
+        },
+      },
       height: "auto",
       locale: this.locale,
       initialView: this.currentView(),
-      headerToolbar: this.currentToolbar(),
+      headerToolbar: this.currentHeaderToolbar(),
+      footerToolbar: this.currentFooterToolbar(),
       eventSources: await this.getEventSources(),
       windowResize: () => {
         this.calendar.changeView(this.currentView());
-        this.calendar.setOption("headerToolbar", this.currentToolbar());
+        this.calendar.setOption("headerToolbar", this.currentHeaderToolbar());
+        this.calendar.setOption("footerToolbar", this.currentFooterToolbar());
       },
       eventClick: (event) => {
         // Avoid our popup to be deleted because we clicked outside of it

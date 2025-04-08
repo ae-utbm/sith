@@ -51,24 +51,55 @@ body {
 
 [tooltip]::before {
   @include shadow;
-  opacity: 0;
   z-index: 1;
+  pointer-events: none;
   content: attr(tooltip);
-  background: hsl(219.6, 20.8%, 96%);
-  color: $black-color;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
   border: 0.5px solid hsl(0, 0%, 50%);
-  ;
   border-radius: 5px;
-  padding: 5px;
-  top: 1em;
+  padding: 5px 10px;
   position: absolute;
-  margin-top: 5px;
   white-space: nowrap;
+  opacity: 0;
   transition: opacity 500ms ease-out;
+  top: 120%; // Put the tooltip under the element
 }
 
 [tooltip]:hover::before {
   opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+[no-hover][tooltip]::before {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+[position="top"][tooltip]::before {
+  top: initial;
+  bottom: 120%;
+}
+
+[position="bottom"][tooltip]::before {
+  top: 120%;
+  bottom: initial;
+}
+
+[position="left"][tooltip]::before {
+  top: initial;
+  bottom: 0%;
+  left: initial;
+  right: 65%;
+}
+
+[position="right"][tooltip]::before {
+  top: initial;
+  bottom: 0%;
+  left: 150%;
+  right: initial;
 }
 
 .ib {
