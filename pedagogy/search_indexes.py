@@ -25,28 +25,28 @@ from django.db import models
 from haystack import indexes, signals
 
 from core.search_indexes import BigCharFieldIndex
-from pedagogy.models import UV
+from pedagogy.models import UE
 
 
 class IndexSignalProcessor(signals.BaseSignalProcessor):
     """Auto update index on CRUD operations."""
 
     def setup(self):
-        # Listen only to the ``UV`` model.
-        models.signals.post_save.connect(self.handle_save, sender=UV)
-        models.signals.post_delete.connect(self.handle_delete, sender=UV)
+        # Listen only to the ``UE`` model.
+        models.signals.post_save.connect(self.handle_save, sender=UE)
+        models.signals.post_delete.connect(self.handle_delete, sender=UE)
 
     def teardown(self):
-        # Disconnect only to the ``UV`` model.
-        models.signals.post_save.disconnect(self.handle_save, sender=UV)
-        models.signals.post_delete.disconnect(self.handle_delete, sender=UV)
+        # Disconnect only to the ``UE`` model.
+        models.signals.post_save.disconnect(self.handle_save, sender=UE)
+        models.signals.post_delete.disconnect(self.handle_delete, sender=UE)
 
 
-class UVIndex(indexes.SearchIndex, indexes.Indexable):
-    """Indexer class for UVs."""
+class UEIndex(indexes.SearchIndex, indexes.Indexable):
+    """Indexer class for UEs."""
 
     text = BigCharFieldIndex(document=True, use_template=True)
     auto = indexes.EdgeNgramField(use_template=True)
 
     def get_model(self):
-        return UV
+        return UE

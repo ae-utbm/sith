@@ -1,12 +1,12 @@
 import { History, getCurrentUrlParams, updateQueryString } from "#core:utils/history";
-import { uvFetchUvList } from "#openapi";
+import { ueFetchUeList } from "#openapi";
 
 const pageDefault = 1;
 const pageSizeDefault = 100;
 
 document.addEventListener("alpine:init", () => {
-  Alpine.data("uv_search", () => ({
-    uvs: {
+  Alpine.data("ue_search", () => ({
+    ues: {
       count: 0,
       next: null,
       previous: null,
@@ -103,16 +103,12 @@ document.addEventListener("alpine:init", () => {
           args[param] = value;
         }
       }
-      this.uvs = (
-        await uvFetchUvList({
-          query: args,
-        })
-      ).data;
+      this.ues = (await ueFetchUeList({ query: args })).data;
       this.loading = false;
     },
 
     maxPage() {
-      return Math.ceil(this.uvs.count / this.page_size);
+      return Math.ceil(this.ues.count / this.page_size);
     },
   }));
 });

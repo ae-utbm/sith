@@ -36,8 +36,8 @@ from core.models import User
 # Create your models here.
 
 
-class UV(models.Model):
-    """Contains infos about an UV (course)."""
+class UE(models.Model):
+    """Contains infos about an UE (course)."""
 
     code = models.CharField(
         _("code"),
@@ -47,7 +47,7 @@ class UV(models.Model):
             validators.RegexValidator(
                 regex="([A-Z0-9]+)",
                 message=_(
-                    "The code of an UV must only contains "
+                    "The code of an UE must only contains "
                     "uppercase characters without accent and numbers"
                 ),
             )
@@ -55,7 +55,7 @@ class UV(models.Model):
     )
     author = models.ForeignKey(
         User,
-        related_name="uv_created",
+        related_name="ue_created",
         verbose_name=_("author"),
         null=False,
         blank=False,
@@ -64,29 +64,23 @@ class UV(models.Model):
     credit_type = models.CharField(
         _("credit type"),
         max_length=10,
-        choices=settings.SITH_PEDAGOGY_UV_TYPE,
-        default=settings.SITH_PEDAGOGY_UV_TYPE[0][0],
+        choices=settings.SITH_PEDAGOGY_UE_TYPE,
+        default=settings.SITH_PEDAGOGY_UE_TYPE[0][0],
     )
-    manager = models.CharField(_("uv manager"), max_length=300)
+    manager = models.CharField(_("ue manager"), max_length=300)
     semester = models.CharField(
         _("semester"),
         max_length=20,
-        choices=settings.SITH_PEDAGOGY_UV_SEMESTER,
-        default=settings.SITH_PEDAGOGY_UV_SEMESTER[0][0],
+        choices=settings.SITH_PEDAGOGY_UE_SEMESTER,
+        default=settings.SITH_PEDAGOGY_UE_SEMESTER[0][0],
     )
     language = models.CharField(
         _("language"),
         max_length=10,
-        choices=settings.SITH_PEDAGOGY_UV_LANGUAGE,
-        default=settings.SITH_PEDAGOGY_UV_LANGUAGE[0][0],
+        choices=settings.SITH_PEDAGOGY_UE_LANGUAGE,
+        default=settings.SITH_PEDAGOGY_UE_LANGUAGE[0][0],
     )
-    credits = models.IntegerField(
-        _("credits"),
-        validators=[validators.MinValueValidator(0)],
-        blank=False,
-        null=False,
-    )
-    # Double star type not implemented yet
+    credits = models.PositiveIntegerField(_("credits"))
 
     department = models.CharField(
         _("departmenmt"),
@@ -95,9 +89,9 @@ class UV(models.Model):
         default=settings.SITH_PROFILE_DEPARTMENTS[-1][0],
     )
 
-    # All texts about the UV
+    # All texts about the UE
     title = models.CharField(_("title"), max_length=300)
-    manager = models.CharField(_("uv manager"), max_length=300)
+    manager = models.CharField(_("ue manager"), max_length=300)
     objectives = models.TextField(_("objectives"))
     program = models.TextField(_("program"))
     skills = models.TextField(_("skills"))
@@ -105,47 +99,17 @@ class UV(models.Model):
 
     # Hours types CM, TD, TP, THE and TE
     # Kind of dirty but I have nothing else in mind for now
-    hours_CM = models.IntegerField(
-        _("hours CM"),
-        validators=[validators.MinValueValidator(0)],
-        blank=False,
-        null=False,
-        default=0,
-    )
-    hours_TD = models.IntegerField(
-        _("hours TD"),
-        validators=[validators.MinValueValidator(0)],
-        blank=False,
-        null=False,
-        default=0,
-    )
-    hours_TP = models.IntegerField(
-        _("hours TP"),
-        validators=[validators.MinValueValidator(0)],
-        blank=False,
-        null=False,
-        default=0,
-    )
-    hours_THE = models.IntegerField(
-        _("hours THE"),
-        validators=[validators.MinValueValidator(0)],
-        blank=False,
-        null=False,
-        default=0,
-    )
-    hours_TE = models.IntegerField(
-        _("hours TE"),
-        validators=[validators.MinValueValidator(0)],
-        blank=False,
-        null=False,
-        default=0,
-    )
+    hours_CM = models.PositiveIntegerField(_("hours CM"), default=0)
+    hours_TD = models.PositiveIntegerField(_("hours TD"), default=0)
+    hours_TP = models.PositiveIntegerField(_("hours TP"), default=0)
+    hours_THE = models.PositiveIntegerField(_("hours THE"), default=0)
+    hours_TE = models.PositiveIntegerField(_("hours TE"), default=0)
 
     def __str__(self):
         return self.code
 
     def get_absolute_url(self):
-        return reverse("pedagogy:uv_detail", kwargs={"uv_id": self.id})
+        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.id})
 
     def __grade_average_generic(self, field):
         comments = self.comments.filter(**{field + "__gte": 0})
@@ -160,7 +124,7 @@ class UV(models.Model):
         This function checks that no other comment has been posted by a specified user.
 
         Returns:
-            True if the user has already posted a comment on this UV, else False.
+            True if the user has already posted a comment on this UE, else False.
         """
         return self.comments.filter(author=user).exists()
 
@@ -185,78 +149,66 @@ class UV(models.Model):
         return self.__grade_average_generic("grade_work_load")
 
 
-class UVCommentQuerySet(models.QuerySet):
+class UECommentQuerySet(models.QuerySet):
     def viewable_by(self, user: User) -> Self:
-        if user.has_perms(["pedagogy.view_uvcomment", "pedagogy.view_uvcommentreport"]):
-            # the user can view uv comment reports,
+        if user.has_perms(["pedagogy.view_uecomment", "pedagogy.view_uecommentreport"]):
+            # the user can view ue comment reports,
             # so he can view non-moderated comments
             return self
-        if user.has_perm("pedagogy.view_uvcomment"):
+        if user.has_perm("pedagogy.view_uecomment"):
             return self.filter(reports=None)
         return self.filter(author=user)
 
     def annotate_is_reported(self) -> Self:
         return self.annotate(
-            is_reported=Exists(UVCommentReport.objects.filter(comment=OuterRef("pk")))
+            is_reported=Exists(UECommentReport.objects.filter(comment=OuterRef("pk")))
         )
 
 
-class UVComment(models.Model):
-    """A comment about an UV."""
+class UEComment(models.Model):
+    """A comment about an UE."""
 
     author = models.ForeignKey(
         User,
-        related_name="uv_comments",
+        related_name="ue_comments",
         verbose_name=_("author"),
-        null=False,
-        blank=False,
         on_delete=models.CASCADE,
     )
-    uv = models.ForeignKey(
-        UV, related_name="comments", verbose_name=_("uv"), on_delete=models.CASCADE
+    ue = models.ForeignKey(
+        UE, related_name="comments", verbose_name=_("ue"), on_delete=models.CASCADE
     )
-    comment = models.TextField(_("comment"), blank=True)
+    comment = models.TextField(_("comment"), blank=True, default="")
     grade_global = models.IntegerField(
         _("global grade"),
         validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(4)],
-        blank=False,
-        null=False,
         default=-1,
     )
     grade_utility = models.IntegerField(
         _("utility grade"),
         validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(4)],
-        blank=False,
-        null=False,
         default=-1,
     )
     grade_interest = models.IntegerField(
         _("interest grade"),
         validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(4)],
-        blank=False,
-        null=False,
         default=-1,
     )
     grade_teaching = models.IntegerField(
         _("teaching grade"),
         validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(4)],
-        blank=False,
-        null=False,
         default=-1,
     )
     grade_work_load = models.IntegerField(
         _("work load grade"),
         validators=[validators.MinValueValidator(-1), validators.MaxValueValidator(4)],
-        blank=False,
-        null=False,
         default=-1,
     )
     publish_date = models.DateTimeField(_("publish date"), blank=True)
 
-    objects = UVCommentQuerySet.as_manager()
+    objects = UECommentQuerySet.as_manager()
 
     def __str__(self):
-        return f"{self.uv} - {self.author}"
+        return f"{self.ue} - {self.author}"
 
     def save(self, *args, **kwargs):
         if self.publish_date is None:
@@ -268,30 +220,32 @@ class UVComment(models.Model):
 #        to use this model.
 #        However, it seems that the implementation finally didn't happen.
 #        It should be discussed, when possible, of what to do with that :
-#        - go on and finally implement the UV results features ?
+#        - go on and finally implement the UE results features ?
 #        - or fuck go back and remove this model ?
-class UVResult(models.Model):
-    """Results got to an UV.
+class UEResult(models.Model):
+    """Results got to an UE.
 
     Views will be implemented after the first release
-    Will list every UV done by an user
-    Linked to user
-              uv
-    Contains a grade settings.SITH_PEDAGOGY_UV_RESULT_GRADE
+    Will list every UE done by an user
+    Linked to user and ue
+    Contains a grade settings.SITH_PEDAGOGY_UE_RESULT_GRADE
              a semester (P/A)20xx.
     """
 
-    uv = models.ForeignKey(
-        UV, related_name="results", verbose_name=_("uv"), on_delete=models.CASCADE
+    ue = models.ForeignKey(
+        UE, related_name="results", verbose_name=_("ue"), on_delete=models.CASCADE
     )
     user = models.ForeignKey(
-        User, related_name="uv_results", verbose_name=("user"), on_delete=models.CASCADE
+        User,
+        related_name="ue_results",
+        verbose_name=_("user"),
+        on_delete=models.CASCADE,
     )
     grade = models.CharField(
         _("grade"),
         max_length=10,
-        choices=settings.SITH_PEDAGOGY_UV_RESULT_GRADE,
-        default=settings.SITH_PEDAGOGY_UV_RESULT_GRADE[0][0],
+        choices=settings.SITH_PEDAGOGY_UE_RESULT_GRADE,
+        default=settings.SITH_PEDAGOGY_UE_RESULT_GRADE[0][0],
     )
     semester = models.CharField(
         _("semester"),
@@ -300,21 +254,21 @@ class UVResult(models.Model):
     )
 
     def __str__(self):
-        return f"{self.user.username} ; {self.uv.code} ; {self.grade}"
+        return f"{self.user.username} ; {self.ue.code} ; {self.grade}"
 
 
-class UVCommentReport(models.Model):
+class UECommentReport(models.Model):
     """Report an inapropriate comment."""
 
     comment = models.ForeignKey(
-        UVComment,
+        UEComment,
         related_name="reports",
         verbose_name=_("report"),
         on_delete=models.CASCADE,
     )
     reporter = models.ForeignKey(
         User,
-        related_name="reported_uv_comment",
+        related_name="reported_ue_comment",
         verbose_name=_("reporter"),
         on_delete=models.CASCADE,
     )
@@ -324,5 +278,5 @@ class UVCommentReport(models.Model):
         return f"{self.reporter.username} : {self.reason}"
 
     @cached_property
-    def uv(self):
-        return self.comment.uv
+    def ue(self):
+        return self.comment.ue

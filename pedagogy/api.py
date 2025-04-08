@@ -10,23 +10,23 @@ from ninja_extra.pagination import PageNumberPaginationExtra, PaginatedResponseS
 
 from api.auth import ApiKeyAuth
 from api.permissions import HasPerm
-from pedagogy.models import UV
-from pedagogy.schemas import SimpleUvSchema, UvFilterSchema, UvSchema
+from pedagogy.models import UE
+from pedagogy.schemas import SimpleUeSchema, UeFilterSchema, UeSchema
 from pedagogy.utbm_api import UtbmApiClient
 
 
-@api_controller("/uv")
-class UvController(ControllerBase):
+@api_controller("/ue")
+class UeController(ControllerBase):
     @route.get(
         "/{code}",
         auth=[ApiKeyAuth(), SessionAuth()],
         permissions=[
             # this route will almost always be called in the context
-            # of a UV creation/edition
-            HasPerm(["pedagogy.add_uv", "pedagogy.change_uv"], op=operator.or_)
+            # of a UE creation/edition
+            HasPerm(["pedagogy.add_ue", "pedagogy.change_ue"], op=operator.or_)
         ],
-        url_name="fetch_uv_from_utbm",
-        response=UvSchema,
+        url_name="fetch_ue_from_utbm",
+        response=UeSchema,
     )
     def fetch_from_utbm_api(
         self,
@@ -34,20 +34,20 @@ class UvController(ControllerBase):
         lang: Query[str] = "fr",
         year: Query[Annotated[int, Ge(2010)] | None] = None,
     ):
-        """Fetch UV data from the UTBM API and returns it after some parsing."""
+        """Fetch UE data from the UTBM API and returns it after some parsing."""
         with UtbmApiClient() as client:
-            res = client.find_uv(lang, code, year)
+            res = client.find_ue(lang, code, year)
         if res is None:
             raise NotFound
         return res
 
     @route.get(
         "",
-        response=PaginatedResponseSchema[SimpleUvSchema],
-        url_name="fetch_uvs",
+        response=PaginatedResponseSchema[SimpleUeSchema],
+        url_name="fetch_ues",
         auth=[ApiKeyAuth(), SessionAuth()],
-        permissions=[HasPerm("pedagogy.view_uv")],
+        permissions=[HasPerm("pedagogy.view_ue")],
     )
     @paginate(PageNumberPaginationExtra, page_size=100)
-    def fetch_uv_list(self, search: Query[UvFilterSchema]):
-        return search.filter(UV.objects.order_by("code").values())
+    def fetch_ue_list(self, search: Query[UeFilterSchema]):
+        return search.filter(UE.objects.order_by("code").values())

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-17 00:03+0100\n"
+"POT-Creation-Date: 2025-12-19 23:10+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -218,7 +218,7 @@ msgid "You can not make loops in clubs"
 msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 
 #: club/models.py core/models.py counter/models.py eboutic/models.py
-#: election/models.py sas/models.py trombi/models.py
+#: election/models.py pedagogy/models.py sas/models.py trombi/models.py
 msgid "user"
 msgstr "utilisateur"
 
@@ -470,14 +470,15 @@ msgstr "Méthode de paiement"
 #: core/templates/core/file_detail.jinja
 #: core/templates/core/file_moderation.jinja
 #: core/templates/core/group_detail.jinja core/templates/core/group_list.jinja
-#: core/templates/core/macros.jinja core/templates/core/page/prop.jinja
+#: core/templates/core/page/prop.jinja
 #: core/templates/core/user_account_detail.jinja
 #: core/templates/core/user_clubs.jinja core/templates/core/user_edit.jinja
+#: core/templates/core/user_godfathers.jinja
 #: counter/templates/counter/fragments/create_student_card.jinja
 #: counter/templates/counter/last_ops.jinja
 #: election/templates/election/election_detail.jinja
 #: forum/templates/forum/macros.jinja pedagogy/templates/pedagogy/guide.jinja
-#: pedagogy/templates/pedagogy/uv_detail.jinja sas/templates/sas/album.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja sas/templates/sas/album.jinja
 #: sas/templates/sas/moderation.jinja sas/templates/sas/picture.jinja
 #: trombi/templates/trombi/detail.jinja
 #: trombi/templates/trombi/edit_profile.jinja
@@ -672,7 +673,7 @@ msgstr "Outils"
 #: counter/templates/counter/counter_list.jinja
 #: election/templates/election/election_detail.jinja
 #: forum/templates/forum/macros.jinja pedagogy/templates/pedagogy/guide.jinja
-#: pedagogy/templates/pedagogy/uv_detail.jinja sas/templates/sas/album.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja sas/templates/sas/album.jinja
 #: trombi/templates/trombi/detail.jinja
 #: trombi/templates/trombi/edit_profile.jinja
 msgid "Edit"
@@ -1076,9 +1077,9 @@ msgstr "Liens"
 msgid "Our services"
 msgstr "Nos services"
 
-#: com/templates/com/news_list.jinja
-msgid "UV Guide"
-msgstr "Guide des UVs"
+#: com/templates/com/news_list.jinja pedagogy/templates/pedagogy/guide.jinja
+msgid "UE Guide"
+msgstr "Guide des UEs"
 
 #: com/templates/com/news_list.jinja
 msgid "Timetable"
@@ -1214,7 +1215,7 @@ msgstr "Descendre"
 
 #: com/templates/com/weekmail_preview.jinja
 #: core/templates/core/user_account_detail.jinja
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 #: trombi/templates/trombi/comment_moderation.jinja
 #: trombi/templates/trombi/export.jinja
 msgid "Back"
@@ -2062,7 +2063,7 @@ msgstr "Éditer le groupe"
 
 #: core/templates/core/group_edit.jinja core/templates/core/user_edit.jinja
 #: core/templates/core/user_group.jinja
-#: pedagogy/templates/pedagogy/uv_edit.jinja
+#: pedagogy/templates/pedagogy/ue_edit.jinja
 msgid "Update"
 msgstr "Mettre à jour"
 
@@ -2787,8 +2788,8 @@ msgid "Subscription stats"
 msgstr "Statistiques de cotisation"
 
 #: core/templates/core/user_tools.jinja pedagogy/templates/pedagogy/guide.jinja
-msgid "Create UV"
-msgstr "Créer UV"
+msgid "Create UE"
+msgstr "Créer UE"
 
 #: core/templates/core/user_tools.jinja pedagogy/templates/pedagogy/guide.jinja
 #: trombi/templates/trombi/detail.jinja
@@ -2879,10 +2880,6 @@ msgstr "Fillot / Fillote"
 #: core/views/forms.py counter/forms.py trombi/views.py
 msgid "Select user"
 msgstr "Choisir un utilisateur"
-
-#: core/views/forms.py
-msgid "This user does not exist"
-msgstr "Cet utilisateur n'existe pas"
 
 #: core/views/forms.py
 msgid "You cannot be related to yourself"
@@ -3387,7 +3384,7 @@ msgstr "Coffre vidé"
 
 #: counter/templates/counter/cash_summary_list.jinja counter/views/cash.py
 #: pedagogy/templates/pedagogy/moderation.jinja
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 #: trombi/templates/trombi/comment.jinja
 #: trombi/templates/trombi/user_tools.jinja
 msgid "Comment"
@@ -4405,8 +4402,8 @@ msgid "Do not vote"
 msgstr "Ne pas voter"
 
 #: pedagogy/forms.py
-msgid "This user has already commented on this UV"
-msgstr "Cet utilisateur a déjà commenté cette UV"
+msgid "This user has already commented on this UE"
+msgstr "Cet utilisateur a déjà commenté cette UE"
 
 #: pedagogy/forms.py
 msgid "Accepted reports"
@@ -4418,10 +4415,10 @@ msgstr "Signalements refusés"
 
 #: pedagogy/models.py
 msgid ""
-"The code of an UV must only contains uppercase characters without accent and "
+"The code of an UE must only contains uppercase characters without accent and "
 "numbers"
 msgstr ""
-"Le code d'une UV doit seulement contenir des caractères majuscule sans "
+"Le code d'une UE doit seulement contenir des caractères majuscule sans "
 "accents et nombres"
 
 #: pedagogy/models.py
@@ -4429,8 +4426,8 @@ msgid "credit type"
 msgstr "type de crédit"
 
 #: pedagogy/models.py
-msgid "uv manager"
-msgstr "gestionnaire d'uv"
+msgid "ue manager"
+msgstr "gestionnaire d'ue"
 
 #: pedagogy/models.py
 msgid "language"
@@ -4481,7 +4478,7 @@ msgid "hours TE"
 msgstr "heures TE"
 
 #: pedagogy/models.py
-msgid "uv"
+msgid "ue"
 msgstr "UE"
 
 #: pedagogy/models.py
@@ -4521,10 +4518,6 @@ msgid "reporter"
 msgstr "signalant"
 
 #: pedagogy/templates/pedagogy/guide.jinja
-msgid "UE Guide"
-msgstr "Guide des UEs"
-
-#: pedagogy/templates/pedagogy/guide.jinja
 msgid "A guide of courses available at UTBM."
 msgstr "Un guide de tous les cours disponibles à l'UTBM."
 
@@ -4540,7 +4533,7 @@ msgstr "%(credit_type)s"
 
 #: pedagogy/templates/pedagogy/guide.jinja
 #: pedagogy/templates/pedagogy/moderation.jinja
-msgid "UV"
+msgid "UE"
 msgstr "UE"
 
 #: pedagogy/templates/pedagogy/guide.jinja
@@ -4552,16 +4545,16 @@ msgid "Credit type"
 msgstr "Type de crédit"
 
 #: pedagogy/templates/pedagogy/guide.jinja
-msgid "closed uv"
-msgstr "uv fermée"
+msgid "closed ue"
+msgstr "ue fermée"
 
 #: pedagogy/templates/pedagogy/macros.jinja
 msgid " not rated "
 msgstr "non noté"
 
 #: pedagogy/templates/pedagogy/moderation.jinja
-msgid "UV comment moderation"
-msgstr "Modération des commentaires d'UV"
+msgid "UE comment moderation"
+msgstr "Modération des commentaires d'UE"
 
 #: pedagogy/templates/pedagogy/moderation.jinja
 #: rootplace/templates/rootplace/userban.jinja sas/models.py
@@ -4576,96 +4569,96 @@ msgstr "Supprimer commentaire"
 msgid "Delete report"
 msgstr "Supprimer signalement"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
-msgid "UV Details"
-msgstr "Détails d'UV"
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+msgid "UE Details"
+msgstr "Détails d'UE"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "CM: "
 msgstr "CM : "
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "TD: "
 msgstr "TD : "
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "TP: "
 msgstr "TP : "
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "TE: "
 msgstr "TE : "
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "THE: "
 msgstr "THE : "
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Global grade"
 msgstr "Note globale"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Utility"
 msgstr "Utilité"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Interest"
 msgstr "Intérêt"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Teaching"
 msgstr "Enseignement"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Work load"
 msgstr "Charge de travail"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Objectives"
 msgstr "Objectifs"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Program"
 msgstr "Programme"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Earned skills"
 msgstr "Compétences acquises"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Key concepts"
 msgstr "Concepts clefs"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "UE manager: "
 msgstr "Gestionnaire d'UE : "
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja pedagogy/tests/tests.py
+#: pedagogy/templates/pedagogy/ue_detail.jinja pedagogy/tests/tests.py
 msgid ""
-"You already posted a comment on this UV. If you want to comment again, "
+"You already posted a comment on this UE. If you want to comment again, "
 "please modify or delete your previous comment."
 msgstr ""
-"Vous avez déjà commenté cette UV. Si vous voulez de nouveau commenter, "
+"Vous avez déjà commenté cette UE. Si vous voulez de nouveau commenter, "
 "veuillez modifier ou supprimer votre commentaire précédent."
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Leave comment"
 msgstr "Laisser un commentaire"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 #: trombi/templates/trombi/export.jinja
 msgid "Comments"
 msgstr "Commentaires"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "This comment has been reported"
 msgstr "Ce commentaire a été signalé"
 
-#: pedagogy/templates/pedagogy/uv_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Report this comment"
 msgstr "Signaler ce commentaire"
 
-#: pedagogy/templates/pedagogy/uv_edit.jinja
+#: pedagogy/templates/pedagogy/ue_edit.jinja
 msgid "Edit UE"
 msgstr "Éditer l'UE"
 
