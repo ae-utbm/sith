@@ -22,6 +22,7 @@ from typing import Final
 import PIL
 from django.conf import settings
 from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpRequest
 from django.utils.timezone import localdate
 from PIL import ExifTags
@@ -109,6 +110,18 @@ def get_semester_code(d: date | None = None) -> str:
     if (start.month, start.day) == settings.SITH_SEMESTER_START_AUTUMN:
         return "A" + str(start.year)[-2:]
     return "P" + str(start.year)[-2:]
+
+
+def is_image(file: UploadedFile):
+    try:
+        im = PIL.Image.open(file.file)
+        im.verify()
+        # go back to the start of the file, without closing it.
+        # Otherwise, further checks on django side will fail
+        file.seek(0)
+    except PIL.UnidentifiedImageError:
+        return False
+    return True
 
 
 def resize_image(

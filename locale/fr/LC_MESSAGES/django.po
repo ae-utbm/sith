@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-06 15:54+0200\n"
+"POT-Creation-Date: 2025-04-08 16:20+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -116,7 +116,7 @@ msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 msgid "You should specify a role"
 msgstr "Vous devez choisir un rôle"
 
-#: club/forms.py sas/views.py
+#: club/forms.py sas/forms.py
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
 
@@ -1047,7 +1047,7 @@ msgid "Posters - edit"
 msgstr "Affiche - modifier"
 
 #: com/templates/com/poster_list.jinja com/templates/com/screen_list.jinja
-#: sas/templates/sas/main.jinja
+#: sas/templates/sas/fragments/album_create_form.jinja
 msgid "Create"
 msgstr "Créer"
 
@@ -1643,6 +1643,10 @@ msgstr "étiquette"
 #: core/models.py
 msgid "operation type"
 msgstr "type d'opération"
+
+#: core/schemas.py
+msgid "This file is not a valid image"
+msgstr "Ce fichier n'est pas une image valide"
 
 #: core/templates/core/403.jinja
 msgid "403, Forbidden"
@@ -2729,7 +2733,7 @@ msgstr "Ajouter un nouveau dossier"
 msgid "Error creating folder %(folder_name)s: %(msg)s"
 msgstr "Erreur de création du dossier %(folder_name)s : %(msg)s"
 
-#: core/views/files.py core/views/forms.py sas/forms.py
+#: core/views/files.py core/views/forms.py
 #, python-format
 msgid "Error uploading file %(file_name)s: %(msg)s"
 msgstr "Erreur d'envoi du fichier %(file_name)s : %(msg)s"
@@ -4714,11 +4718,6 @@ msgstr "Ajouter un nouvel album"
 #: sas/forms.py
 msgid "Upload images"
 msgstr "Envoyer les images"
-
-#: sas/forms.py
-#, python-format
-msgid "Error creating album %(album)s: %(msg)s"
-msgstr "Erreur de création de l'album %(album)s : %(msg)s"
 
 #: sas/forms.py
 msgid "You already requested moderation for this picture."

@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import F
 from django.urls import reverse
-from ninja import Body, Query, UploadedFile
+from ninja import Body, File, Query
 from ninja.errors import HttpError
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import NotFound, PermissionDenied
@@ -19,6 +19,7 @@ from core.auth.api_permissions import (
     IsRoot,
 )
 from core.models import Notification, User
+from core.schemas import UploadedImage
 from sas.models import Album, PeoplePictureRelation, Picture
 from sas.schemas import (
     AlbumAutocompleteSchema,
@@ -106,7 +107,7 @@ class PicturesController(ControllerBase):
         response={200: None, 409: dict[str, list[str]]},
         url_name="upload_picture",
     )
-    def upload_picture(self, album_id: Body[int], picture: UploadedFile):
+    def upload_picture(self, album_id: Body[int], picture: File[UploadedImage]):
         album = self.get_object_or_exception(Album, pk=album_id)
         user = self.context.request.user
         self_moderate = user.has_perm("sas.moderate_sasfile")
