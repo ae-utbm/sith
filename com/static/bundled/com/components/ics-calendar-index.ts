@@ -310,9 +310,10 @@ export class IcsCalendar extends inheritHtmlElement("div") {
             const button = event.target as HTMLButtonElement;
             button.classList.add("text-copy");
             button.setAttribute(
-              "data-tooltip",
+              "tooltip",
               gettext("Calendar link copied to the clipboard"),
             );
+            button.setAttribute("position", "top");
             navigator.clipboard.writeText(
               new URL(
                 await makeUrl(calendarCalendarInternal),
@@ -323,7 +324,8 @@ export class IcsCalendar extends inheritHtmlElement("div") {
               button.classList.remove("text-copied");
               button.classList.add("text-copied");
               button.classList.remove("text-copy");
-              button.removeAttribute("data-tooltip");
+              button.removeAttribute("tooltip");
+              button.removeAttribute("position");
             }, 700);
           },
         },
