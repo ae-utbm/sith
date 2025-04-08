@@ -70,6 +70,12 @@ body {
 
 [tooltip]:hover::before {
   opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+[no-hover][tooltip]::before {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
 }
 
 [position="top"][tooltip]::before {

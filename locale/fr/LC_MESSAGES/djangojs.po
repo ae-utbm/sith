@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-07 13:56+0200\n"
+"POT-Creation-Date: 2025-04-08 11:42+0200\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -38,8 +38,8 @@ msgid "Copy calendar link"
 msgstr "Copier le lien du calendrier"
 
 #: com/static/bundled/com/components/ics-calendar-index.ts
-msgid "Calendar link copied to the clipboard"
-msgstr "Lien du calendrier copié dans le presse papier"
+msgid "Link copied"
+msgstr "Lien copié"
 
 #: com/static/bundled/com/components/moderation-alert-index.ts
 #, javascript-format

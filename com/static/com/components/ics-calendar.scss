@@ -107,16 +107,17 @@ ics-calendar {
   button.text-copy:focus,
   button.text-copy:hover {
     background-color: #67AE6E !important;
-    transition: 200ms linear;
+    transition: 500ms ease-in;
   }
 
   button.text-copied,
   button.text-copied:focus,
   button.text-copied:hover {
-    transition: 200ms linear;
+    transition: 500ms ease-out;
   }
 
-  [tooltip]::before {
-    font-size: 10px; // this will overflow otherwise
+  button.text-copied[tooltip]::before {
+    opacity: 0;
+    transition: opacity 500ms ease-out;
   }
 }
