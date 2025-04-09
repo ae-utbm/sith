@@ -2,7 +2,7 @@ import pathlib
 
 from django.apps import apps
 from django.core.management.base import BaseCommand
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 
 
 class Command(BaseCommand):
@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, number: int, path: pathlib.Path, force: int, *args, **options):
         if not path.exists() or path.is_dir():
-            self.stdout.write("input file does not exist.")
+            self.stderr.write(f"{path} is not a file or does not exist")
             return
 
         dest_path = (
@@ -27,13 +27,23 @@ class Command(BaseCommand):
         if dest_path.exists() and not force:
             over = input("File already exists, do you want to overwrite it? (y/N):")
             if over.lower() != "y":
+                self.stdout.write("exiting")
                 return
         try:
-            with Image.open(path) as im:
+            im = Image.open(path)
+            try:
                 im.resize((120, 120)).save(dest_path, format="PNG")
+                self.stdout.write(
+                    f"Promo logo moved and resized successfully at {dest_path}"
+                )
+            except IOError as ioe:
+                self.stderr.write(ioe)
 
-            self.stdout.write(
-                f"Promo logo moved and resized successfully at {dest_path}"
-            )
-        except IOError as ioe:
-            self.stderr.write(ioe)
+        except FileNotFoundError:
+            self.stderr.write("image file not found")
+        except TypeError:
+            self.stderr.write("wrong image format")
+        except ValueError:
+            self.stderr.write("wrong mode or fp")
+        except UnidentifiedImageError:
+            self.stderr.write("image cannot be opened and identified.")
