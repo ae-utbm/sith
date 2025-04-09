@@ -1,16 +1,29 @@
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 from annotated_types import MinLen
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.db.models import Q
 from django.urls import reverse
 from django.utils.text import slugify
+from django.utils.translation import gettext as _
 from haystack.query import SearchQuerySet
-from ninja import FilterSchema, ModelSchema, Schema
+from ninja import FilterSchema, ModelSchema, Schema, UploadedFile
 from pydantic import AliasChoices, Field
+from pydantic_core.core_schema import ValidationInfo
 
 from core.models import Group, SithFile, User
+from core.utils import is_image
+
+
+class UploadedImage(UploadedFile):
+    @classmethod
+    def _validate(cls, v: Any, info: ValidationInfo) -> Any:
+        super()._validate(v, info)
+        if not is_image(v):
+            msg = _("This file is not a valid image")
+            raise ValueError(msg)
+        return v
 
 
 class SimpleUserSchema(ModelSchema):
