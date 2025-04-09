@@ -13,7 +13,7 @@ class Command(BaseCommand):
         parser.add_argument("-f", "--force", action="store_true")
 
     def handle(self, number: int, path: pathlib.Path, force: int, *args, **options):
-        if not path.exists():
+        if path.exists():
             dest_path = pathlib.Path(
                 BASE_DIR / "core" / "static" / "core" / "img" / f"promo_{number}.png"
             )
