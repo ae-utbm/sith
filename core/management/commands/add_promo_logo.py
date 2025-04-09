@@ -16,12 +16,12 @@ class Command(BaseCommand):
             self.stdout.write("input file does not exist.")
             return
 
-        dest_path = pathlib.Path(
+        dest_path = (
             pathlib.Path(apps.get_app_config("core").path)
             / "static"
             / "core"
             / "img"
-            / f"promo_{number}.png"
+            / "promo_{number}.png"
         )
 
         if dest_path.exists() and not force:
