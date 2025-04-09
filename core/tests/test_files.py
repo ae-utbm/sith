@@ -306,19 +306,19 @@ def test_apply_rights_recursively():
             SimpleUploadedFile(
                 "test.jpg", content=b"invalid", content_type="image/jpg"
             ),
-            415,
+            422,
         ),
         (
             lambda: old_subscriber_user.make(),
             SimpleUploadedFile(
                 "test.jpg", content=RED_PIXEL_PNG, content_type="invalid"
             ),
-            415,
+            200,  # PIL can guess
         ),
         (
             lambda: old_subscriber_user.make(),
             SimpleUploadedFile("test.jpg", content=b"invalid", content_type="invalid"),
-            415,
+            422,
         ),
     ],
 )

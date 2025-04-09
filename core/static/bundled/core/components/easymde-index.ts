@@ -6,7 +6,11 @@ import { inheritHtmlElement, registerComponent } from "#core:utils/web-component
 import type CodeMirror from "codemirror";
 // biome-ignore lint/style/useNamingConvention: This is how they called their namespace
 import EasyMDE from "easymde";
-import { markdownRenderMarkdown, uploadUploadImage } from "#openapi";
+import {
+  type UploadUploadImageErrors,
+  markdownRenderMarkdown,
+  uploadUploadImage,
+} from "#openapi";
 
 const loadEasyMde = (textarea: HTMLTextAreaElement) => {
   const easymde = new EasyMDE({
@@ -21,8 +25,18 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
           file: file,
         },
       });
-      if (response.response.status !== 200) {
-        onError(gettext("Invalid file"));
+      if (!response.response.ok) {
+        if (response.response.status === 422) {
+          onError(
+            (response.error as UploadUploadImageErrors[422]).detail
+              .map((err: Record<"ctx", Record<"error", string>>) => err.ctx.error)
+              .join(" ; "),
+          );
+        } else if (response.response.status === 403) {
+          onError(gettext("Not authorized, you need to have subscribed at least once"));
+        } else {
+          onError(gettext("Could not upload image"));
+        }
         return;
       }
       onSuccess(response.data.href);

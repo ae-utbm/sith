@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-08 11:42+0200\n"
+"POT-Creation-Date: 2025-04-09 22:12+0200\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -64,12 +64,18 @@ msgid "No results found"
 msgstr "Aucun résultat trouvé"
 
 #: core/static/bundled/core/components/easymde-index.ts
-msgid "Invalid file"
-msgstr "Fichier invalide"
+msgid "Not authorized, you need to have subscribed at least once"
+msgstr ""
+
+#: core/static/bundled/core/components/easymde-index.ts
+msgid "Could not upload image"
+msgstr "L'image n'a pas pu être téléversée"
 
 #: core/static/bundled/core/components/easymde-index.ts
 msgid "Attach files by drag and dropping or pasting from clipboard."
-msgstr "Ajoutez des fichiez en glissant déposant ou collant depuis votre presse papier."
+msgstr ""
+"Ajoutez des fichiez en glissant déposant ou collant depuis votre presse "
+"papier."
 
 #: core/static/bundled/core/components/easymde-index.ts
 msgid "Drop image to upload it."

@@ -1,15 +1,14 @@
-from typing import Annotated
+from typing import Annotated, Any, Literal
 
 import annotated_types
 from django.conf import settings
 from django.db.models import F
 from django.http import HttpResponse
-from ninja import Query, UploadedFile
+from ninja import File, Query
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import PermissionDenied
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
-from PIL import UnidentifiedImageError
 
 from club.models import Mailing
 from core.auth.api_permissions import CanAccessLookup, CanView, IsOldSubscriber
@@ -20,6 +19,7 @@ from core.schemas import (
     MarkdownSchema,
     SithFileSchema,
     UploadedFileSchema,
+    UploadedImage,
     UserFamilySchema,
     UserFilterSchema,
     UserProfileSchema,
@@ -39,25 +39,18 @@ class MarkdownController(ControllerBase):
 class UploadController(ControllerBase):
     @route.post(
         "/image",
-        response=UploadedFileSchema,
+        response={
+            200: UploadedFileSchema,
+            422: dict[Literal["detail"], list[dict[str, Any]]],
+            403: dict[Literal["detail"], str],
+        },
         permissions=[IsOldSubscriber],
         url_name="quick_upload_image",
     )
-    def upload_image(self, file: UploadedFile):
-        if file.content_type.split("/")[0] != "image":
-            return self.create_response(
-                message=f"{file.name} isn't a file image", status_code=415
-            )
-
-        try:
-            image = QuickUploadImage.create_from_uploaded(
-                file, uploader=self.context.request.user
-            )
-        except UnidentifiedImageError:
-            return self.create_response(
-                message=f"{file.name} can't be processed", status_code=415
-            )
-
+    def upload_image(self, file: File[UploadedImage]):
+        image = QuickUploadImage.create_from_uploaded(
+            file, uploader=self.context.request.user
+        )
         return image
 
 
