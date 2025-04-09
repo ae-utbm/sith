@@ -54,7 +54,7 @@ from django.utils.html import escape
 from django.utils.timezone import localdate, now
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
-from PIL import Image
+from PIL import Image, ImageOps
 
 if TYPE_CHECKING:
     from django.core.files.uploadedfile import UploadedFile
@@ -1110,6 +1110,7 @@ class QuickUploadImage(models.Model):
     """Images uploaded by user outside of the SithFile mechanism"""
 
     IMAGE_NAME_SIZE = 100
+    MAX_IMAGE_SIZE = 600  # Maximum px on width / length
 
     uuid = models.UUIDField(unique=True, db_index=True)
     name = models.CharField(max_length=IMAGE_NAME_SIZE, blank=False)
@@ -1138,9 +1139,10 @@ class QuickUploadImage(models.Model):
     ) -> Self:
         def convert_image(file: UploadedFile) -> ContentFile:
             content = BytesIO()
-            Image.open(BytesIO(file.read())).save(
-                fp=content, format="webp", optimize=True
-            )
+            image = Image.open(BytesIO(file.read()))
+            if image.width > cls.MAX_IMAGE_SIZE or image.height > cls.MAX_IMAGE_SIZE:
+                image = ImageOps.contain(image, (600, 600))
+            image.save(fp=content, format="webp", optimize=True)
             return ContentFile(content.getvalue())
 
         identifier = str(uuid4())
