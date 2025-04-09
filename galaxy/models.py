@@ -370,7 +370,7 @@ class Galaxy(models.Model):
                         (earliest_end - latest_start).days,
                     )
                 )
-                score += cls.CLUBS_POINTS * (earliest_end - latest_start).days
+                score += cls.CLUBS_POINTS * abs((earliest_end - latest_start).days)
         return score
 
     ###################
