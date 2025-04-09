@@ -21,7 +21,7 @@ class Command(BaseCommand):
             / "static"
             / "core"
             / "img"
-            / "promo_{number}.png"
+            / f"promo_{number}.png"
         )
 
         if dest_path.exists() and not force:
