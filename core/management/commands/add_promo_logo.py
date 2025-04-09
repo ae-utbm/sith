@@ -8,24 +8,26 @@ from sith.settings import BASE_DIR
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument("numero", type=int)
+        parser.add_argument("number", type=int)
         parser.add_argument("path", type=pathlib.Path)
         parser.add_argument("-f", "--force", action="store_true")
 
-    def handle(self, *args, **options):
-        if options["path"].exists():
+    def handle(self, number: int, path: pathlib.Path, force: int, *args, **options):
+        if not path.exists():
             dest_path = pathlib.Path(
-                f"{BASE_DIR}/core/static/core/img/promo_{options['numero']}.png"
+                BASE_DIR / "core" / "static" / "core" / "img" / f"promo_{number}.png"
             )
-            if dest_path.exists() and not options["force"]:
-                over = input("File already exists, do you want to overwrite it? (Y/n):")
+            if dest_path.exists() and not force:
+                over = input("File already exists, do you want to overwrite it? (y/N):")
                 if over.lower() != "y":
-                    exit(0)
+                    return
             try:
                 with Image.open(options["path"]) as im:
                     im.resize((120, 120)).save(dest_path, format="PNG")
 
-                self.stdout.write("Promo logo moved and resized successfully")
+                self.stdout.write(
+                    f"Promo logo moved and resized successfully at {dest_path}"
+                )
             except IOError as ioe:
                 self.stderr.write(ioe)
         else:
