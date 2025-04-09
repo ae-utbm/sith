@@ -18,10 +18,10 @@ import logging
 import os
 import sys
 
+from django.conf import settings
 from django.utils.autoreload import DJANGO_AUTORELOAD_ENV
 
 from sith.composer import start_composer, stop_composer
-from sith.settings import PROCFILE_SERVICE
 
 if __name__ == "__main__":
     logging.basicConfig(encoding="utf-8", level=logging.INFO)
@@ -30,8 +30,11 @@ if __name__ == "__main__":
 
     from django.core.management import execute_from_command_line
 
-    if os.environ.get(DJANGO_AUTORELOAD_ENV) is None and PROCFILE_SERVICE is not None:
-        start_composer(PROCFILE_SERVICE)
-        _ = atexit.register(stop_composer, procfile=PROCFILE_SERVICE)
+    if (
+        os.environ.get(DJANGO_AUTORELOAD_ENV) is None
+        and settings.PROCFILE_SERVICE is not None
+    ):
+        start_composer(settings.PROCFILE_SERVICE)
+        _ = atexit.register(stop_composer, procfile=settings.PROCFILE_SERVICE)
 
     execute_from_command_line(sys.argv)
