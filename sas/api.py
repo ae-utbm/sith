@@ -1,9 +1,10 @@
+from typing import Any, Literal
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import F
 from django.urls import reverse
 from ninja import Body, File, Query
-from ninja.errors import HttpError
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import NotFound, PermissionDenied
 from ninja_extra.pagination import PageNumberPaginationExtra
@@ -104,7 +105,11 @@ class PicturesController(ControllerBase):
     @route.post(
         "",
         permissions=[CanEdit],
-        response={200: None, 409: dict[str, list[str]]},
+        response={
+            200: None,
+            409: dict[Literal["detail"], dict[str, list[str]]],
+            422: dict[Literal["detail"], list[dict[str, Any]]],
+        },
         url_name="upload_picture",
     )
     def upload_picture(self, album_id: Body[int], picture: File[UploadedImage]):
@@ -127,7 +132,7 @@ class PicturesController(ControllerBase):
             new.full_clean()
             new.save()
         except ValidationError as e:
-            raise HttpError(status_code=409, message=str(e)) from e
+            return self.create_response({"detail": dict(e)}, status_code=409)
 
     @route.get(
         "/{picture_id}/identified",

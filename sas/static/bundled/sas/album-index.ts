@@ -5,6 +5,7 @@ import {
   type AlbumSchema,
   type PictureSchema,
   type PicturesFetchPicturesData,
+  type PicturesUploadPictureErrors,
   albumFetchAlbum,
   picturesFetchPictures,
   picturesUploadPicture,
@@ -93,6 +94,7 @@ document.addEventListener("alpine:init", () => {
     async sendPictures() {
       const input = this.$refs.pictures as HTMLInputElement;
       const files = input.files;
+      this.errors = [];
       this.progress.value = 0;
       this.progress.max = files.length;
       this.sending = true;
@@ -110,7 +112,15 @@ document.addEventListener("alpine:init", () => {
         body: { album_id: albumId, picture: file },
       });
       if (!res.response.ok) {
-        this.errors.push(`${file.name} : ${res.error.detail}`);
+        let msg = "";
+        if (res.response.status === 422) {
+          msg = (res.error as PicturesUploadPictureErrors[422]).detail
+            .map((err: Record<"ctx", Record<"error", string>>) => err.ctx.error)
+            .join(" ; ");
+        } else {
+          msg = Object.values(res.error.detail).join(" ; ");
+        }
+        this.errors.push(`${file.name} : ${msg}`);
       }
       this.progress.value += 1;
     },
