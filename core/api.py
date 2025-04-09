@@ -11,7 +11,7 @@ from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
 from club.models import Mailing
-from core.auth.api_permissions import CanAccessLookup, CanView, IsOldSubscriber
+from core.auth.api_permissions import CanAccessLookup, CanView, HasPerm
 from core.models import Group, QuickUploadImage, SithFile, User
 from core.schemas import (
     FamilyGodfatherSchema,
@@ -44,7 +44,7 @@ class UploadController(ControllerBase):
             422: dict[Literal["detail"], list[dict[str, Any]]],
             403: dict[Literal["detail"], str],
         },
-        permissions=[IsOldSubscriber],
+        permissions=[HasPerm("core.add_quickuploadimage")],
         url_name="quick_upload_image",
     )
     def upload_image(self, file: File[UploadedImage]):

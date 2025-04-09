@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-09 22:12+0200\n"
+"POT-Creation-Date: 2025-04-09 23:23+0200\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -64,8 +64,8 @@ msgid "No results found"
 msgstr "Aucun résultat trouvé"
 
 #: core/static/bundled/core/components/easymde-index.ts
-msgid "Not authorized, you need to have subscribed at least once"
-msgstr ""
+msgid "You are not authorized to use this feature"
+msgstr "Vous n'êtes pas autorisé à utilisé cette fonctionalité"
 
 #: core/static/bundled/core/components/easymde-index.ts
 msgid "Could not upload image"

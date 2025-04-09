@@ -33,7 +33,7 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
               .join(" ; "),
           );
         } else if (response.response.status === 403) {
-          onError(gettext("Not authorized, you need to have subscribed at least once"));
+          onError(gettext("You are not authorized to use this feature"));
         } else {
           onError(gettext("Could not upload image"));
         }

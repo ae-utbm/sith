@@ -1148,15 +1148,15 @@ class QuickUploadImage(models.Model):
         identifier = str(uuid4())
         name = Path(image.name).stem[: cls.IMAGE_NAME_SIZE - 1]
         file = File(convert_image(image), name=f"{identifier}.webp")
-        image = Image.open(file)
+        width, height = Image.open(file).size
 
         return cls.objects.create(
             uuid=identifier,
             name=name,
             image=file,
             uploader=uploader,
-            width=image.width,
-            height=image.height,
+            width=width,
+            height=height,
             size=file.size,
         )
 
