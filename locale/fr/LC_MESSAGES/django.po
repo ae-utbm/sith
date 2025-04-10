@@ -1573,6 +1573,14 @@ msgid "You must provide a file"
 msgstr "Vous devez fournir un fichier"
 
 #: core/models.py
+msgid "width"
+msgstr "largeur"
+
+#: core/models.py
+msgid "height"
+msgstr "hauteur"
+
+#: core/models.py
 msgid "page unix name"
 msgstr "nom unix de la page"
 

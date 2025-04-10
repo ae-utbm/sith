@@ -6,13 +6,58 @@ import { inheritHtmlElement, registerComponent } from "#core:utils/web-component
 import type CodeMirror from "codemirror";
 // biome-ignore lint/style/useNamingConvention: This is how they called their namespace
 import EasyMDE from "easymde";
-import { markdownRenderMarkdown } from "#openapi";
+import {
+  type UploadUploadImageErrors,
+  markdownRenderMarkdown,
+  uploadUploadImage,
+} from "#openapi";
 
 const loadEasyMde = (textarea: HTMLTextAreaElement) => {
-  new EasyMDE({
+  const easymde = new EasyMDE({
     element: textarea,
     spellChecker: false,
     autoDownloadFontAwesome: false,
+    uploadImage: true,
+    imagePathAbsolute: false,
+    imageUploadFunction: async (file, onSuccess, onError) => {
+      const response = await uploadUploadImage({
+        body: {
+          file: file,
+        },
+      });
+      if (!response.response.ok) {
+        if (response.response.status === 422) {
+          onError(
+            (response.error as UploadUploadImageErrors[422]).detail
+              .map((err: Record<"ctx", Record<"error", string>>) => err.ctx.error)
+              .join(" ; "),
+          );
+        } else if (response.response.status === 403) {
+          onError(gettext("You are not authorized to use this feature"));
+        } else {
+          onError(gettext("Could not upload image"));
+        }
+        return;
+      }
+      onSuccess(response.data.href);
+      // Workaround function to add an image name to uploaded image
+      // Without this, you get ![](url) instead of ![name](url)
+      let cursor = easymde.codemirror.getCursor();
+
+      easymde.codemirror.setSelection({
+        line: cursor.line,
+        ch: cursor.ch - response.data.href.length - 3,
+      });
+      easymde.codemirror.replaceSelection(response.data.name);
+
+      // Move cursor at the end of the url and add a new line
+      cursor = easymde.codemirror.getCursor();
+      easymde.codemirror.setSelection({
+        line: cursor.line,
+        ch: cursor.ch + response.data.href.length + 3,
+      });
+      easymde.codemirror.replaceSelection("\n");
+    },
     previewRender: (plainText: string, preview: MarkdownInput) => {
       /* This is wrapped this way to allow time for Alpine to be loaded on the page */
       return Alpine.debounce((plainText: string, preview: MarkdownInput) => {
@@ -30,6 +75,14 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
       }, 300)(plainText, preview);
     },
     forceSync: true, // Avoid validation error on generic create view
+    imageTexts: {
+      sbInit: gettext("Attach files by drag and dropping or pasting from clipboard."),
+      sbOnDragEnter: gettext("Drop image to upload it."),
+      sbOnDrop: gettext("Uploading image #images_names# …"),
+      sbProgress: gettext("Uploading #file_name#: #progress#%"),
+      sbOnUploaded: gettext("Uploaded #image_name#"),
+      sizeUnits: gettext(" B, KB, MB"),
+    },
     toolbar: [
       {
         name: "heading-smaller",
@@ -119,6 +172,12 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
         action: EasyMDE.drawImage,
         className: "fa-regular fa-image",
         title: gettext("Insert image"),
+      },
+      {
+        name: "upload-image",
+        action: EasyMDE.drawUploadedImage,
+        className: "fa-solid fa-file-arrow-up",
+        title: gettext("Upload image"),
       },
       {
         name: "table",

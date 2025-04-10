@@ -828,6 +828,7 @@ Welcome to the wiki page!
                         "view_peoplepicturerelation",
                         "add_peoplepicturerelation",
                         "add_page",
+                        "add_quickuploadimage",
                     ]
                 )
             )

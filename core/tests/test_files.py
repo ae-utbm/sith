@@ -1,11 +1,12 @@
 from io import BytesIO
 from itertools import cycle
+from pathlib import Path
 from typing import Callable
 from uuid import uuid4
 
 import pytest
 from django.core.cache import cache
-from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
 from model_bakery import baker
@@ -14,7 +15,8 @@ from PIL import Image
 from pytest_django.asserts import assertNumQueries
 
 from core.baker_recipes import board_user, old_subscriber_user, subscriber_user
-from core.models import Group, SithFile, User
+from core.models import Group, QuickUploadImage, SithFile, User
+from core.utils import RED_PIXEL_PNG
 from sas.models import Picture
 from sith import settings
 
@@ -256,3 +258,89 @@ def test_apply_rights_recursively():
     ):
         assert set(file.view_groups.all()) == set(groups[:3])
         assert set(file.edit_groups.all()) == set(groups[2:6])
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("user_receipe", "file", "expected_status"),
+    [
+        (
+            lambda: None,
+            SimpleUploadedFile(
+                "test.jpg", content=RED_PIXEL_PNG, content_type="image/jpg"
+            ),
+            403,
+        ),
+        (
+            lambda: baker.make(User),
+            SimpleUploadedFile(
+                "test.jpg", content=RED_PIXEL_PNG, content_type="image/jpg"
+            ),
+            403,
+        ),
+        (
+            lambda: subscriber_user.make(),
+            SimpleUploadedFile(
+                "test.jpg", content=RED_PIXEL_PNG, content_type="image/jpg"
+            ),
+            200,
+        ),
+        (
+            lambda: old_subscriber_user.make(),
+            SimpleUploadedFile(
+                "test.jpg", content=RED_PIXEL_PNG, content_type="image/jpg"
+            ),
+            200,
+        ),
+        (
+            lambda: old_subscriber_user.make(),
+            SimpleUploadedFile(
+                "ttesttesttesttesttesttesttesttesttesttesttesttesttesttesttestesttesttesttesttesttesttesttesttesttesttesttest.jpg",
+                content=RED_PIXEL_PNG,
+                content_type="image/jpg",
+            ),
+            200,
+        ),  # very long file name
+        (
+            lambda: old_subscriber_user.make(),
+            SimpleUploadedFile(
+                "test.jpg", content=b"invalid", content_type="image/jpg"
+            ),
+            422,
+        ),
+        (
+            lambda: old_subscriber_user.make(),
+            SimpleUploadedFile(
+                "test.jpg", content=RED_PIXEL_PNG, content_type="invalid"
+            ),
+            200,  # PIL can guess
+        ),
+        (
+            lambda: old_subscriber_user.make(),
+            SimpleUploadedFile("test.jpg", content=b"invalid", content_type="invalid"),
+            422,
+        ),
+    ],
+)
+def test_quick_upload_image(
+    client: Client,
+    user_receipe: Callable[[], User | None],
+    file: UploadedFile | None,
+    expected_status: int,
+):
+    if (user := user_receipe()) is not None:
+        client.force_login(user)
+    resp = client.post(
+        reverse("api:quick_upload_image"), {"file": file} if file is not None else {}
+    )
+
+    assert resp.status_code == expected_status
+
+    if expected_status != 200:
+        return
+
+    parsed = resp.json()
+    assert QuickUploadImage.objects.filter(uuid=parsed["uuid"]).exists()
+    assert (
+        parsed["name"] == Path(file.name).stem[: QuickUploadImage.IMAGE_NAME_SIZE - 1]
+    )
