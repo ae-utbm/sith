@@ -1,0 +1,50 @@
+<span>
+  <div
+    class="collapse"
+    :class="{'shadow': collapsed}"
+    x-data="{collapsed: !{{ "true" if billing_infos_state == BillingInfoState.VALID and not form.errors else "false" }}}"
+  >
+    <div class="collapse-header clickable" @click="collapsed = !collapsed">
+      <span class="collapse-header-text">
+        {% trans %}Billing information{% endtrans %}
+      </span>
+      <span class="collapse-header-icon" :class="{'reverse': collapsed}">
+        <i class="fa fa-caret-down"></i>
+      </span>
+    </div>
+    <form
+      class="collapse-body"
+      hx-trigger="submit"
+      hx-post="{{ action }}"
+      hx-swap="outerHTML settle:100"
+      hx-target="closest span"
+      x-show="collapsed"
+    >
+      {% csrf_token %}
+      {{ form.as_p() }}
+      <input
+        type="submit" class="btn btn-blue clickable"
+        value="{% trans %}Validate{% endtrans %}"
+      >
+    </form>
+  </div>
+
+  <br>
+
+  {% if billing_infos_state == BillingInfoState.EMPTY %}
+    <div class="alert alert-yellow">
+      {% trans trimmed %}
+        You must fill your billing infos if you want to pay with your credit card
+      {% endtrans %}
+    </div>
+  {% elif billing_infos_state == BillingInfoState.MISSING_PHONE_NUMBER %}
+    <div class="alert alert-yellow">
+      {% trans trimmed %}
+        The Crédit Agricole changed its policy related to the billing
+        information that must be provided in order to pay with a credit card.
+        If you want to pay with your credit card, you must add a phone number
+        to the data you already provided.
+      {% endtrans %}
+    </div>
+  {% endif %}
+</span>

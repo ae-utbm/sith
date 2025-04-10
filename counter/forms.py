@@ -43,6 +43,7 @@ class BillingInfoForm(forms.ModelForm):
         ]
         widgets = {
             "phone_number": RegionalPhoneNumberWidget,
+            "country": AutoCompleteSelect,
         }
 
 

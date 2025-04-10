@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import hmac
 from datetime import datetime
+from enum import Enum
 from typing import Any, Self
 
 from dict2xml import dict2xml
@@ -42,6 +43,28 @@ def get_eboutic_products(user: User) -> list[Product]:
         .prefetch_related("buying_groups")  # <-- used in `Product.can_be_sold_to`
     )
     return [p for p in products if p.can_be_sold_to(user)]
+
+
+class BillingInfoState(Enum):
+    VALID = 1
+    EMPTY = 2
+    MISSING_PHONE_NUMBER = 3
+
+    @classmethod
+    def from_model(cls, info: BillingInfo) -> BillingInfoState:
+        for attr in [
+            "first_name",
+            "last_name",
+            "address_1",
+            "zip_code",
+            "city",
+            "country",
+        ]:
+            if getattr(info, attr) == "":
+                return cls.EMPTY
+        if info.phone_number is None:
+            return cls.MISSING_PHONE_NUMBER
+        return cls.VALID
 
 
 class Basket(models.Model):
@@ -127,7 +150,11 @@ class Basket(models.Model):
         if not hasattr(user, "customer"):
             raise Customer.DoesNotExist
         customer = user.customer
-        if not hasattr(user.customer, "billing_infos"):
+        if (
+            not hasattr(user.customer, "billing_infos")
+            or BillingInfoState.from_model(user.customer.billing_infos)
+            != BillingInfoState.VALID
+        ):
             raise BillingInfo.DoesNotExist
         cart = {
             "shoppingcart": {"total": {"totalQuantity": min(self.items.count(), 99)}}
