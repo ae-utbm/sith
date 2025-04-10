@@ -66,7 +66,6 @@ from core.views.forms import (
 )
 from core.views.mixins import QuickNotifMixin, TabedViewMixin, UseFragmentsMixin
 from counter.models import Counter, Refilling, Selling
-from counter.views.student_card import StudentCardFormFragment
 from eboutic.models import Invoice
 from subscription.models import Subscription
 from trombi.views import UserTrombiForm
@@ -529,6 +528,9 @@ class UserPreferencesView(UserTabsMixin, UseFragmentsMixin, CanEditMixin, Update
         return kwargs
 
     def get_fragment_context_data(self) -> dict[str, SafeString]:
+        # Avoid cyclic import error
+        from counter.views.student_card import StudentCardFormFragment
+
         res = super().get_fragment_context_data()
         if hasattr(self.object, "customer"):
             res["student_card_fragment"] = StudentCardFormFragment.as_fragment()(
