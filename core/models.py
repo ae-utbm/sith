@@ -1115,7 +1115,10 @@ class QuickUploadImage(models.Model):
     uuid = models.UUIDField(unique=True, db_index=True)
     name = models.CharField(max_length=IMAGE_NAME_SIZE, blank=False)
     image = models.ImageField(
-        upload_to="upload/%Y/%m/%d", width_field="width", height_field="height"
+        upload_to="upload/%Y/%m/%d",
+        width_field="width",
+        height_field="height",
+        unique=True,
     )
     uploader = models.ForeignKey(
         "User",
