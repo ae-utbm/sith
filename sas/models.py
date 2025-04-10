@@ -134,7 +134,6 @@ class Picture(SasFile):
         self.thumbnail.name = new_extension_name
         self.compressed = compressed
         self.compressed.name = new_extension_name
-        self.save()
 
     def rotate(self, degree):
         for attr in ["file", "compressed", "thumbnail"]:
@@ -235,6 +234,8 @@ class Album(SasFile):
         return Album.objects.filter(parent=self)
 
     def get_absolute_url(self):
+        if self.id == settings.SITH_SAS_ROOT_DIR_ID:
+            return reverse("sas:main")
         return reverse("sas:album", kwargs={"album_id": self.id})
 
     def get_download_url(self):

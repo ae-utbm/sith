@@ -5,8 +5,10 @@ import {
   type AlbumSchema,
   type PictureSchema,
   type PicturesFetchPicturesData,
+  type PicturesUploadPictureErrors,
   albumFetchAlbum,
   picturesFetchPictures,
+  picturesUploadPicture,
 } from "#openapi";
 
 interface AlbumPicturesConfig {
@@ -76,6 +78,51 @@ document.addEventListener("alpine:init", () => {
         query: { parent_id: config.parentId },
       } as AlbumFetchAlbumData);
       this.loading = false;
+    },
+  }));
+
+  Alpine.data("pictureUpload", (albumId: number) => ({
+    errors: [] as string[],
+    pictures: [],
+    sending: false,
+    progress: null as HTMLProgressElement,
+
+    init() {
+      this.progress = this.$refs.progress;
+    },
+
+    async sendPictures() {
+      const input = this.$refs.pictures as HTMLInputElement;
+      const files = input.files;
+      this.errors = [];
+      this.progress.value = 0;
+      this.progress.max = files.length;
+      this.sending = true;
+      for (const file of files) {
+        await this.sendPicture(file);
+      }
+      this.sending = false;
+      // This should trigger a reload of the pictures of the `picture` Alpine data
+      this.$dispatch("pictures-upload-done");
+    },
+
+    async sendPicture(file: File) {
+      const res = await picturesUploadPicture({
+        // biome-ignore lint/style/useNamingConvention: api is snake_case
+        body: { album_id: albumId, picture: file },
+      });
+      if (!res.response.ok) {
+        let msg = "";
+        if (res.response.status === 422) {
+          msg = (res.error as PicturesUploadPictureErrors[422]).detail
+            .map((err: Record<"ctx", Record<"error", string>>) => err.ctx.error)
+            .join(" ; ");
+        } else {
+          msg = Object.values(res.error.detail).join(" ; ");
+        }
+        this.errors.push(`${file.name} : ${msg}`);
+      }
+      this.progress.value += 1;
     },
   }));
 });

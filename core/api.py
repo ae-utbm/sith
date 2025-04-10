@@ -1,23 +1,25 @@
-from typing import Annotated
+from typing import Annotated, Any, Literal
 
 import annotated_types
 from django.conf import settings
 from django.db.models import F
 from django.http import HttpResponse
-from ninja import Query
+from ninja import File, Query
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import PermissionDenied
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
 from club.models import Mailing
-from core.auth.api_permissions import CanAccessLookup, CanView
-from core.models import Group, SithFile, User
+from core.auth.api_permissions import CanAccessLookup, CanView, HasPerm
+from core.models import Group, QuickUploadImage, SithFile, User
 from core.schemas import (
     FamilyGodfatherSchema,
     GroupSchema,
     MarkdownSchema,
     SithFileSchema,
+    UploadedFileSchema,
+    UploadedImage,
     UserFamilySchema,
     UserFilterSchema,
     UserProfileSchema,
@@ -31,6 +33,25 @@ class MarkdownController(ControllerBase):
     def render_markdown(self, body: MarkdownSchema):
         """Convert the markdown text into html."""
         return HttpResponse(markdown(body.text), content_type="text/html")
+
+
+@api_controller("/upload")
+class UploadController(ControllerBase):
+    @route.post(
+        "/image",
+        response={
+            200: UploadedFileSchema,
+            422: dict[Literal["detail"], list[dict[str, Any]]],
+            403: dict[Literal["detail"], str],
+        },
+        permissions=[HasPerm("core.add_quickuploadimage")],
+        url_name="quick_upload_image",
+    )
+    def upload_image(self, file: File[UploadedImage]):
+        image = QuickUploadImage.create_from_uploaded(
+            file, uploader=self.context.request.user
+        )
+        return image
 
 
 @api_controller("/mailings")

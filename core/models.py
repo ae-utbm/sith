@@ -17,7 +17,7 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
@@ -32,6 +32,7 @@ from datetime import timedelta
 from io import BytesIO
 from pathlib import Path
 from typing import TYPE_CHECKING, Optional, Self
+from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
@@ -41,6 +42,8 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core import validators
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.files import File
+from django.core.files.base import ContentFile
 from django.core.mail import send_mail
 from django.db import models, transaction
 from django.db.models import Exists, F, OuterRef, Q
@@ -51,9 +54,10 @@ from django.utils.html import escape
 from django.utils.timezone import localdate, now
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
-from PIL import Image
+from PIL import Image, ImageOps
 
 if TYPE_CHECKING:
+    from django.core.files.uploadedfile import UploadedFile
     from pydantic import NonNegativeInt
 
     from club.models import Club
@@ -1100,6 +1104,68 @@ class SithFile(models.Model):
 
     def get_download_url(self):
         return reverse("core:download", kwargs={"file_id": self.id})
+
+
+class QuickUploadImage(models.Model):
+    """Images uploaded by user outside of the SithFile mechanism"""
+
+    IMAGE_NAME_SIZE = 100
+    MAX_IMAGE_SIZE = 600  # Maximum px on width / length
+
+    uuid = models.UUIDField(unique=True, db_index=True)
+    name = models.CharField(max_length=IMAGE_NAME_SIZE, blank=False)
+    image = models.ImageField(
+        upload_to="upload/%Y/%m/%d",
+        width_field="width",
+        height_field="height",
+        unique=True,
+    )
+    uploader = models.ForeignKey(
+        "User",
+        related_name="quick_uploads",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    width = models.PositiveIntegerField(_("width"))
+    height = models.PositiveIntegerField(_("height"))
+    size = models.PositiveIntegerField(_("size"))
+
+    def __str__(self) -> str:
+        return str(self.image.path)
+
+    def get_absolute_url(self):
+        return self.image.url
+
+    @classmethod
+    def create_from_uploaded(
+        cls, image: UploadedFile, uploader: User | None = None
+    ) -> Self:
+        def convert_image(file: UploadedFile) -> ContentFile:
+            content = BytesIO()
+            image = Image.open(BytesIO(file.read()))
+            if image.width > cls.MAX_IMAGE_SIZE or image.height > cls.MAX_IMAGE_SIZE:
+                image = ImageOps.contain(image, (600, 600))
+            image.save(fp=content, format="webp", optimize=True)
+            return ContentFile(content.getvalue())
+
+        identifier = str(uuid4())
+        name = Path(image.name).stem[: cls.IMAGE_NAME_SIZE - 1]
+        file = File(convert_image(image), name=f"{identifier}.webp")
+        width, height = Image.open(file).size
+
+        return cls.objects.create(
+            uuid=identifier,
+            name=name,
+            image=file,
+            uploader=uploader,
+            size=file.size,
+        )
+
+    def delete(self, *args, **kwargs):
+        self.image.delete(save=False)
+        return super().delete(*args, **kwargs)
 
 
 class LockError(Exception):

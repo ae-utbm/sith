@@ -86,7 +86,7 @@ def send_raw_file(path: Path) -> HttpResponse:
 
 def send_file(
     request: HttpRequest,
-    file_id: int,
+    file_id: int | str,
     file_class: type[SithFile] = SithFile,
     file_attr: str = "file",
 ) -> HttpResponse:
@@ -97,7 +97,7 @@ def send_file(
     deal with it.
     In debug mode, the server will directly send the file.
     """
-    f = get_object_or_404(file_class, id=file_id)
+    f = get_object_or_404(file_class, pk=file_id)
     if not can_view(f, request.user) and not is_logged_in_counter(request):
         raise PermissionDenied
     name = getattr(f, file_attr).name

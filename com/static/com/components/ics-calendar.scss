@@ -98,4 +98,26 @@ ics-calendar {
       background: white;
     }
   }
+
+  .fc .fc-toolbar.fc-footer-toolbar {
+    margin-bottom: 0.5em;
+  }
+
+  button.text-copy,
+  button.text-copy:focus,
+  button.text-copy:hover {
+    background-color: #67AE6E !important;
+    transition: 500ms ease-in;
+  }
+
+  button.text-copied,
+  button.text-copied:focus,
+  button.text-copied:hover {
+    transition: 500ms ease-out;
+  }
+
+  button.text-copied[tooltip]::before {
+    opacity: 0;
+    transition: opacity 500ms ease-out;
+  }
 }

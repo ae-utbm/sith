@@ -1,13 +1,16 @@
+import pytest
 from django.conf import settings
 from django.core.cache import cache
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import Group, SithFile, User
+from core.utils import RED_PIXEL_PNG
 from sas.baker_recipes import picture_recipe
 from sas.models import Album, PeoplePictureRelation, Picture, PictureModerationRequest
 
@@ -241,3 +244,45 @@ class TestAlbumSearch(TestSas):
             # - 1 for pagination
             # - 1 for the actual results
             self.client.get(reverse("api:search-album"))
+
+
+@pytest.mark.django_db
+def test_upload_picture(client: Client):
+    sas = SithFile.objects.get(pk=settings.SITH_SAS_ROOT_DIR_ID)
+    album = baker.make(Album, is_in_sas=True, parent=sas, name="test album")
+    user = baker.make(User, is_superuser=True)
+    client.force_login(user)
+    img = SimpleUploadedFile(
+        name="img.png", content=RED_PIXEL_PNG, content_type="image/png"
+    )
+    res = client.post(
+        reverse("api:upload_picture"), {"album_id": album.id, "picture": img}
+    )
+    assert res.status_code == 200
+    picture = Picture.objects.filter(parent_id=album.id).first()
+    assert picture is not None
+    assert picture.name == "img.png"
+    assert picture.owner == user
+    assert picture.file.name == "SAS/test album/img.png"
+    assert picture.compressed.name == ".compressed/SAS/test album/img.webp"
+    assert picture.thumbnail.name == ".thumbnails/SAS/test album/img.webp"
+
+
+@pytest.mark.django_db
+def test_upload_invalid_picture(client: Client):
+    sas = SithFile.objects.get(pk=settings.SITH_SAS_ROOT_DIR_ID)
+    album = baker.make(Album, is_in_sas=True, parent=sas, name="test album")
+    user = baker.make(User, is_superuser=True)
+    client.force_login(user)
+    file = SimpleUploadedFile(
+        name="file.txt",
+        content=b"azerty",
+        content_type="image/png",  # the server shouldn't blindly trust the content_type
+    )
+    res = client.post(
+        reverse("api:upload_picture"), {"album_id": album.id, "picture": file}
+    )
+    assert res.status_code == 422
+    assert res.json()["detail"][0]["ctx"]["error"] == (
+        "Ce fichier n'est pas une image valide"
+    )

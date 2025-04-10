@@ -15,6 +15,7 @@
   ol,
   p {
     line-height: 22px;
+    word-break: break-word;
   }
 
   code {
@@ -71,6 +72,7 @@
   a:hover {
     text-decoration: underline;
   }
+
   .footnotes {
     font-size: 85%;
   }

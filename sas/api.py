@@ -1,7 +1,10 @@
+from typing import Any, Literal
+
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db.models import F
 from django.urls import reverse
-from ninja import Query
+from ninja import Body, File, Query
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import NotFound, PermissionDenied
 from ninja_extra.pagination import PageNumberPaginationExtra
@@ -9,8 +12,15 @@ from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 from pydantic import NonNegativeInt
 
-from core.auth.api_permissions import CanAccessLookup, CanView, IsInGroup, IsRoot
+from core.auth.api_permissions import (
+    CanAccessLookup,
+    CanEdit,
+    CanView,
+    IsInGroup,
+    IsRoot,
+)
 from core.models import Notification, User
+from core.schemas import UploadedImage
 from sas.models import Album, PeoplePictureRelation, Picture
 from sas.schemas import (
     AlbumAutocompleteSchema,
@@ -91,6 +101,38 @@ class PicturesController(ControllerBase):
             .select_related("owner")
             .annotate(album=F("parent__name"))
         )
+
+    @route.post(
+        "",
+        permissions=[CanEdit],
+        response={
+            200: None,
+            409: dict[Literal["detail"], dict[str, list[str]]],
+            422: dict[Literal["detail"], list[dict[str, Any]]],
+        },
+        url_name="upload_picture",
+    )
+    def upload_picture(self, album_id: Body[int], picture: File[UploadedImage]):
+        album = self.get_object_or_exception(Album, pk=album_id)
+        user = self.context.request.user
+        self_moderate = user.has_perm("sas.moderate_sasfile")
+        new = Picture(
+            parent=album,
+            name=picture.name,
+            file=picture,
+            owner=user,
+            is_moderated=self_moderate,
+            is_folder=False,
+            mime_type=picture.content_type,
+        )
+        if self_moderate:
+            new.moderator = user
+        try:
+            new.generate_thumbnails()
+            new.full_clean()
+            new.save()
+        except ValidationError as e:
+            return self.create_response({"detail": dict(e)}, status_code=409)
 
     @route.get(
         "/{picture_id}/identified",

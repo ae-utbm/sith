@@ -1,6 +1,7 @@
 from typing import Any
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from core.models import User
@@ -11,55 +12,28 @@ from sas.models import Album, Picture, PictureModerationRequest
 from sas.widgets.ajax_select import AutoCompleteSelectAlbum
 
 
-class SASForm(forms.Form):
-    album_name = forms.CharField(
-        label=_("Add a new album"), max_length=Album.NAME_MAX_LENGTH, required=False
-    )
-    images = MultipleImageField(
-        label=_("Upload images"),
-        required=False,
-    )
+class AlbumCreateForm(forms.ModelForm):
+    class Meta:
+        model = Album
+        fields = ["name", "parent"]
+        labels = {"name": _("Add a new album")}
+        widgets = {"parent": forms.HiddenInput}
 
-    def process(self, parent, owner, files, *, automodere=False):
-        try:
-            if self.cleaned_data["album_name"] != "":
-                album = Album(
-                    parent=parent,
-                    name=self.cleaned_data["album_name"],
-                    owner=owner,
-                    is_moderated=automodere,
-                )
-                album.clean()
-                album.save()
-        except Exception as e:
-            self.add_error(
-                None,
-                _("Error creating album %(album)s: %(msg)s")
-                % {"album": self.cleaned_data["album_name"], "msg": repr(e)},
-            )
-        for f in files:
-            new_file = Picture(
-                parent=parent,
-                name=f.name,
-                file=f,
-                owner=owner,
-                mime_type=f.content_type,
-                size=f.size,
-                is_folder=False,
-                is_moderated=automodere,
-            )
-            if automodere:
-                new_file.moderator = owner
-            try:
-                new_file.clean()
-                new_file.generate_thumbnails()
-                new_file.save()
-            except Exception as e:
-                self.add_error(
-                    None,
-                    _("Error uploading file %(file_name)s: %(msg)s")
-                    % {"file_name": f, "msg": repr(e)},
-                )
+    def __init__(self, *args, owner: User, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.instance.owner = owner
+        if owner.has_perm("sas.moderate_sasfile"):
+            self.instance.is_moderated = True
+            self.instance.moderator = owner
+
+    def clean(self):
+        if not self.instance.owner.can_edit(self.instance.parent):
+            raise ValidationError(_("You do not have the permission to do that"))
+        return super().clean()
+
+
+class PictureUploadForm(forms.Form):
+    images = MultipleImageField(label=_("Upload images"), required=False)
 
 
 class PictureEditForm(forms.ModelForm):

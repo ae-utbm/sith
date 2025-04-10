@@ -41,6 +41,7 @@ from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
+from django.utils.safestring import SafeString
 from django.utils.translation import gettext as _
 from django.views.generic import (
     CreateView,
@@ -63,7 +64,7 @@ from core.views.forms import (
     UserGroupsForm,
     UserProfileForm,
 )
-from core.views.mixins import QuickNotifMixin, TabedViewMixin
+from core.views.mixins import QuickNotifMixin, TabedViewMixin, UseFragmentsMixin
 from counter.models import Counter, Refilling, Selling
 from eboutic.models import Invoice
 from subscription.models import Subscription
@@ -508,7 +509,7 @@ class UserClubView(UserTabsMixin, CanViewMixin, DetailView):
     current_tab = "clubs"
 
 
-class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
+class UserPreferencesView(UserTabsMixin, UseFragmentsMixin, CanEditMixin, UpdateView):
     """Edit a user's preferences."""
 
     model = User
@@ -526,17 +527,21 @@ class UserPreferencesView(UserTabsMixin, CanEditMixin, UpdateView):
         kwargs.update({"instance": pref})
         return kwargs
 
+    def get_fragment_context_data(self) -> dict[str, SafeString]:
+        # Avoid cyclic import error
+        from counter.views.student_card import StudentCardFormFragment
+
+        res = super().get_fragment_context_data()
+        if hasattr(self.object, "customer"):
+            res["student_card_fragment"] = StudentCardFormFragment.as_fragment()(
+                self.request, customer=self.object.customer
+            )
+        return res
+
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-
         if not hasattr(self.object, "trombi_user"):
             kwargs["trombi_form"] = UserTrombiForm()
-        if hasattr(self.object, "customer"):
-            from counter.views.student_card import StudentCardFormView
-
-            kwargs["student_card_fragment"] = StudentCardFormView.get_template_data(
-                self.object.customer
-            ).render(self.request)
         return kwargs
 
 
