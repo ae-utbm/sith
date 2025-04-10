@@ -1114,7 +1114,9 @@ class QuickUploadImage(models.Model):
 
     uuid = models.UUIDField(unique=True, db_index=True)
     name = models.CharField(max_length=IMAGE_NAME_SIZE, blank=False)
-    image = models.ImageField(upload_to="upload/%Y/%m/%d")
+    image = models.ImageField(
+        upload_to="upload/%Y/%m/%d", width_field="width", height_field="height"
+    )
     uploader = models.ForeignKey(
         "User",
         related_name="quick_uploads",
@@ -1155,10 +1157,12 @@ class QuickUploadImage(models.Model):
             name=name,
             image=file,
             uploader=uploader,
-            width=width,
-            height=height,
             size=file.size,
         )
+
+    def delete(self, *args, **kwargs):
+        self.image.delete(save=False)
+        return super().delete(*args, **kwargs)
 
 
 class LockError(Exception):
