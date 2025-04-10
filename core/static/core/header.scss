@@ -33,8 +33,8 @@ $hovered-red-text-color: #ff4d4d;
     flex-direction: row;
     gap: 10px;
 
-    > a {
-      color: $text-color!important;
+    >a {
+      color: $text-color !important;
     }
 
     &:hover>a {
@@ -207,7 +207,7 @@ $hovered-red-text-color: #ff4d4d;
           justify-content: flex-end;
         }
 
-        > a {
+        >a {
           display: block;
           min-width: 40px;
           height: 40px;
@@ -251,11 +251,13 @@ $hovered-red-text-color: #ff4d4d;
               justify-content: flex-start;
             }
 
-            a, button {
+            a,
+            button {
               font-size: 100%;
               margin: 0;
               text-align: right;
               color: $text-color;
+              margin-top: auto;
 
               &:hover {
                 color: $hovered-text-color;
@@ -266,12 +268,14 @@ $hovered-red-text-color: #ff4d4d;
               margin: 0;
               display: inline;
             }
+
             #logout-form button {
               color: $red-text-color;
 
               &:hover {
                 color: $hovered-red-text-color;
               }
+
               background: none;
               border: none;
               cursor: pointer;
