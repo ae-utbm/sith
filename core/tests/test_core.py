@@ -257,7 +257,7 @@ class TestPageHandling(TestCase):
         parent = baker.prepare(Page)
         parent.save(force_lock=True)
         response = self.client.get(
-            reverse("core:page_new") + f"?page={parent._full_name}/new"
+            reverse("core:page_new", query={"page": f"{parent._full_name}/new"})
         )
 
         assert response.status_code == 200
@@ -341,7 +341,9 @@ class TestUserTools:
         """An anonymous user shouldn't have access to the tools page."""
         url = reverse("core:user_tools")
         response = client.get(url)
-        assertRedirects(response, expected_url=reverse("core:login") + f"?next={url}")
+        assertRedirects(
+            response, expected_url=reverse("core:login", query={"next": url})
+        )
 
     @pytest.mark.parametrize("username", ["guy", "root", "skia", "comunity"])
     def test_page_is_working(self, client, username):
