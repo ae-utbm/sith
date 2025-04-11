@@ -4,6 +4,7 @@ import pytest
 from django.test import Client
 from django.urls import reverse
 from model_bakery import baker
+from pytest_django.asserts import assertRedirects
 
 from core.baker_recipes import subscriber_user
 from core.models import User
@@ -29,8 +30,10 @@ class TestBillingInfo:
             reverse("eboutic:billing_infos"),
             payload,
         )
-        assert response.status_code == 302
-        assert response["Location"].startswith(reverse("core:login"))
+        assertRedirects(
+            response,
+            reverse("core:login", query={"next": reverse("eboutic:billing_infos")}),
+        )
 
     def test_edit_infos(self, client: Client, payload: dict[str, str]):
         user = subscriber_user.make()
