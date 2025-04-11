@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from datetime import timedelta
 from pathlib import Path
-from urllib.parse import quote
 
 import pytest
 from django.conf import settings
@@ -166,9 +165,9 @@ class TestFetchNewsDates(TestCase):
         assert dates[1]["news"]["summary"] == markdown(summary_2)
 
     def test_fetch(self):
-        after = quote((now() + timedelta(days=1)).isoformat())
+        after = (now() + timedelta(days=1)).isoformat()
         response = self.client.get(
-            reverse("api:fetch_news_dates") + f"?page_size=3&after={after}"
+            reverse("api:fetch_news_dates", query={"page_size": 3, "after": after})
         )
         assert response.status_code == 200
         dates = response.json()["results"]

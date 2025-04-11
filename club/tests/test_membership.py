@@ -1,9 +1,12 @@
+from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.cache import cache
+from django.db.models import Max
 from django.urls import reverse
 from django.utils.timezone import localdate, localtime, now
 from model_bakery import baker
 
+from club.forms import ClubMemberForm
 from club.models import Membership
 from club.tests.base import TestClub
 from core.baker_recipes import subscriber_user
@@ -17,8 +20,8 @@ class TestMembershipQuerySet(TestClub):
         """
         current_members = list(self.club.members.ongoing().order_by("id"))
         expected = [
-            self.skia.memberships.get(club=self.club),
-            self.comptable.memberships.get(club=self.club),
+            self.simple_board_member.memberships.get(club=self.club),
+            self.president.memberships.get(club=self.club),
             self.richard.memberships.get(club=self.club),
         ]
         expected.sort(key=lambda i: i.id)
@@ -30,8 +33,8 @@ class TestMembershipQuerySet(TestClub):
         self.richard.memberships.filter(club=self.club).update(end_date=today)
         current_members = list(self.club.members.ongoing().order_by("id"))
         expected = [
-            self.skia.memberships.get(club=self.club),
-            self.comptable.memberships.get(club=self.club),
+            self.simple_board_member.memberships.get(club=self.club),
+            self.president.memberships.get(club=self.club),
         ]
         expected.sort(key=lambda i: i.id)
         assert current_members == expected
@@ -42,8 +45,8 @@ class TestMembershipQuerySet(TestClub):
         """
         board_members = list(self.club.members.board().order_by("id"))
         expected = [
-            self.skia.memberships.get(club=self.club),
-            self.comptable.memberships.get(club=self.club),
+            self.simple_board_member.memberships.get(club=self.club),
+            self.president.memberships.get(club=self.club),
             # sli is no more member, but he was in the board
             self.sli.memberships.get(club=self.club),
         ]
@@ -56,17 +59,17 @@ class TestMembershipQuerySet(TestClub):
         """
         members = list(self.club.members.ongoing().board().order_by("id"))
         expected = [
-            self.skia.memberships.get(club=self.club),
-            self.comptable.memberships.get(club=self.club),
+            self.simple_board_member.memberships.get(club=self.club),
+            self.president.memberships.get(club=self.club),
         ]
         expected.sort(key=lambda i: i.id)
         assert members == expected
 
     def test_update_invalidate_cache(self):
         """Test that the `update` queryset method properly invalidate cache."""
-        mem_skia = self.skia.memberships.get(club=self.club)
+        mem_skia = self.simple_board_member.memberships.get(club=self.club)
         cache.set(f"membership_{mem_skia.club_id}_{mem_skia.user_id}", mem_skia)
-        self.skia.memberships.update(end_date=localtime(now()).date())
+        self.simple_board_member.memberships.update(end_date=localtime(now()).date())
         assert (
             cache.get(f"membership_{mem_skia.club_id}_{mem_skia.user_id}")
             == "not_member"
@@ -104,14 +107,14 @@ class TestMembershipQuerySet(TestClub):
 
     def test_delete_invalidate_cache(self):
         """Test that the `delete` queryset properly invalidate cache."""
-        mem_skia = self.skia.memberships.get(club=self.club)
-        mem_comptable = self.comptable.memberships.get(club=self.club)
+        mem_skia = self.simple_board_member.memberships.get(club=self.club)
+        mem_comptable = self.president.memberships.get(club=self.club)
         cache.set(f"membership_{mem_skia.club_id}_{mem_skia.user_id}", mem_skia)
         cache.set(
             f"membership_{mem_comptable.club_id}_{mem_comptable.user_id}", mem_comptable
         )
 
-        # should delete the subscriptions of skia and comptable
+        # should delete the subscriptions of simple_board_member and president
         self.club.members.ongoing().board().delete()
 
         for membership in (mem_skia, mem_comptable):
@@ -167,36 +170,43 @@ class TestMembership(TestClub):
         """Test that a GET request return a page where the requested
         information are displayed.
         """
-        self.client.force_login(self.skia)
+        self.client.force_login(self.simple_board_member)
         response = self.client.get(self.members_url)
         assert response.status_code == 200
-        expected_html = (
-            "<table><thead><tr>"
-            "<td>Utilisateur</td><td>Rôle</td><td>Description</td>"
-            "<td>Depuis</td><td>Marquer comme ancien</td>"
-            "</tr></thead><tbody>"
-        )
+        soup = BeautifulSoup(response.text, "lxml")
+        table = soup.find("table", id="club_members_table")
+        assert [r.text for r in table.find("thead").find_all("td")] == [
+            "Utilisateur",
+            "Rôle",
+            "Description",
+            "Depuis",
+            "Marquer comme ancien",
+        ]
+        rows = table.find("tbody").find_all("tr")
         memberships = self.club.members.ongoing().order_by("-role")
-        input_id = 0
-        for membership in memberships.select_related("user"):
+        for row, membership in zip(
+            rows, memberships.select_related("user"), strict=False
+        ):
             user = membership.user
-            expected_html += (
-                f'<tr><td><a href="{reverse("core:user_profile", args=[user.id])}">'
-                f"{user.get_display_name()}</a></td>"
-                f"<td>{settings.SITH_CLUB_ROLES[membership.role]}</td>"
-                f"<td>{membership.description}</td>"
-                f"<td>{membership.start_date}</td><td>"
-            )
-            if membership.role <= 3:  # 3 is the role of skia
-                expected_html += (
-                    '<input type="checkbox" name="users_old" '
-                    f'value="{user.id}" '
-                    f'id="id_users_old_{input_id}">'
-                )
-                input_id += 1
-            expected_html += "</td></tr>"
-        expected_html += "</tbody></table>"
-        self.assertInHTML(expected_html, response.content.decode())
+            user_url = reverse("core:user_profile", args=[user.id])
+            cols = row.find_all("td")
+            user_link = cols[0].find("a")
+            assert user_link.attrs["href"] == user_url
+            assert user_link.text == user.get_display_name()
+            assert cols[1].text == settings.SITH_CLUB_ROLES[membership.role]
+            assert cols[2].text == membership.description
+            assert cols[3].text == str(membership.start_date)
+
+            if membership.role <= 3:  # 3 is the role of simple_board_member
+                form_input = cols[4].find("input")
+                expected_attrs = {
+                    "type": "checkbox",
+                    "name": "users_old",
+                    "value": str(user.id),
+                }
+                assert form_input.attrs.items() >= expected_attrs.items()
+            else:
+                assert cols[4].find_all() == []
 
     def test_root_add_one_club_member(self):
         """Test that root users can add members to clubs, one at a time."""
@@ -228,64 +238,61 @@ class TestMembership(TestClub):
         """Test that users who are not currently subscribed
         cannot be members of clubs.
         """
-        self.client.force_login(self.root)
-        response = self.client.post(
-            self.members_url,
-            {"users": self.public.id, "role": 1},
-        )
-        assert not self.public.memberships.filter(club=self.club).exists()
-        assert '<ul class="errorlist"><li>' in response.content.decode()
+        for user in self.public, self.old_subscriber:
+            form = ClubMemberForm(
+                data={"users": [user.id], "role": 1},
+                request_user=self.root,
+                club=self.club,
+            )
 
-        response = self.client.post(
-            self.members_url,
-            {"users": self.old_subscriber.id, "role": 1},
-        )
-        assert not self.public.memberships.filter(club=self.club).exists()
-        assert self.club.get_membership_for(self.public) is None
-        assert '<ul class="errorlist"><li>' in response.content.decode()
+            assert not form.is_valid()
+            assert form.errors == {
+                "users": [
+                    "L'utilisateur doit être cotisant pour faire partie d'un club"
+                ]
+            }
 
     def test_add_members_already_members(self):
         """Test that users who are already members of a club
         cannot be added again to this club.
         """
         self.client.force_login(self.root)
-        current_membership = self.skia.memberships.ongoing().get(club=self.club)
-        nb_memberships = self.skia.memberships.count()
+        current_membership = self.simple_board_member.memberships.ongoing().get(
+            club=self.club
+        )
+        nb_memberships = self.simple_board_member.memberships.count()
         self.client.post(
             self.members_url,
-            {"users": self.skia.id, "role": current_membership.role + 1},
+            {"users": self.simple_board_member.id, "role": current_membership.role + 1},
         )
-        self.skia.refresh_from_db()
-        assert nb_memberships == self.skia.memberships.count()
-        new_membership = self.skia.memberships.ongoing().get(club=self.club)
+        self.simple_board_member.refresh_from_db()
+        assert nb_memberships == self.simple_board_member.memberships.count()
+        new_membership = self.simple_board_member.memberships.ongoing().get(
+            club=self.club
+        )
         assert current_membership == new_membership
-        assert self.club.get_membership_for(self.skia) == new_membership
+        assert self.club.get_membership_for(self.simple_board_member) == new_membership
 
     def test_add_not_existing_users(self):
         """Test that not existing users cannot be added in clubs.
         If one user in the request is invalid, no membership creation at all
         can take place.
         """
-        self.client.force_login(self.root)
         nb_memberships = self.club.members.count()
-        response = self.client.post(
-            self.members_url,
-            {"users": [9999], "role": 1},
-        )
-        assert response.status_code == 200
-        assert '<ul class="errorlist"><li>' in response.content.decode()
-        self.club.refresh_from_db()
-        assert self.club.members.count() == nb_memberships
-        response = self.client.post(
-            self.members_url,
-            {
-                "users": (self.subscriber.id, 9999),
-                "start_date": "12/06/2016",
-                "role": 3,
-            },
-        )
-        assert response.status_code == 200
-        assert '<ul class="errorlist"><li>' in response.content.decode()
+        max_id = User.objects.aggregate(id=Max("id"))["id"]
+        for members in [max_id + 1], [max_id + 1, self.subscriber.id]:
+            form = ClubMemberForm(
+                data={"users": members, "role": 1},
+                request_user=self.root,
+                club=self.club,
+            )
+            assert not form.is_valid()
+            assert form.errors == {
+                "users": [
+                    "Sélectionnez un choix valide. "
+                    f"{max_id + 1} n\u2019en fait pas partie."
+                ]
+            }
         self.club.refresh_from_db()
         assert self.club.members.count() == nb_memberships
 
@@ -310,17 +317,17 @@ class TestMembership(TestClub):
         """Test that a member of the club member cannot create
         a membership with a greater role than its own.
         """
-        self.client.force_login(self.skia)
+        form = ClubMemberForm(
+            data={"users": [self.subscriber.id], "role": 10},
+            request_user=self.simple_board_member,
+            club=self.club,
+        )
         nb_memberships = self.club.members.count()
-        response = self.client.post(
-            self.members_url,
-            {"users": self.subscriber.id, "role": 10},
-        )
-        assert response.status_code == 200
-        self.assertInHTML(
-            "<li>Vous n'avez pas la permission de faire cela</li>",
-            response.content.decode(),
-        )
+
+        assert not form.is_valid()
+        assert form.errors == {
+            "__all__": ["Vous n'avez pas la permission de faire cela"]
+        }
         self.club.refresh_from_db()
         assert nb_memberships == self.club.members.count()
         assert not self.subscriber.memberships.filter(club=self.club).exists()
@@ -328,31 +335,31 @@ class TestMembership(TestClub):
     def test_add_member_without_role(self):
         """Test that trying to add members without specifying their role fails."""
         self.client.force_login(self.root)
-        response = self.client.post(
-            self.members_url,
-            {"users": self.subscriber.id, "start_date": "12/06/2016"},
+        form = ClubMemberForm(
+            data={"users": [self.subscriber.id]},
+            request_user=self.simple_board_member,
+            club=self.club,
         )
-        assert (
-            '<ul class="errorlist"><li>Vous devez choisir un r'
-            in response.content.decode()
-        )
+
+        assert not form.is_valid()
+        assert form.errors == {"role": ["Vous devez choisir un rôle"]}
 
     def test_end_membership_self(self):
         """Test that a member can end its own membership."""
-        self.client.force_login(self.skia)
+        self.client.force_login(self.simple_board_member)
         self.client.post(
             self.members_url,
-            {"users_old": self.skia.id},
+            {"users_old": self.simple_board_member.id},
         )
-        self.skia.refresh_from_db()
-        self.assert_membership_ended_today(self.skia)
+        self.simple_board_member.refresh_from_db()
+        self.assert_membership_ended_today(self.simple_board_member)
 
     def test_end_membership_lower_role(self):
         """Test that board members of the club can end memberships
         of users with lower roles.
         """
-        # remainder : skia has role 3, comptable has role 10, richard has role 1
-        self.client.force_login(self.skia)
+        # remainder : simple_board_member has role 3, president has role 10, richard has role 1
+        self.client.force_login(self.simple_board_member)
         response = self.client.post(
             self.members_url,
             {"users_old": self.richard.id},
@@ -365,18 +372,18 @@ class TestMembership(TestClub):
         """Test that board members of the club cannot end memberships
         of users with higher roles.
         """
-        membership = self.comptable.memberships.filter(club=self.club).first()
-        self.client.force_login(self.skia)
+        membership = self.president.memberships.filter(club=self.club).first()
+        self.client.force_login(self.simple_board_member)
         self.client.post(
             self.members_url,
-            {"users_old": self.comptable.id},
+            {"users_old": self.president.id},
         )
         self.club.refresh_from_db()
-        new_membership = self.club.get_membership_for(self.comptable)
+        new_membership = self.club.get_membership_for(self.president)
         assert new_membership is not None
         assert new_membership == membership
 
-        membership = self.comptable.memberships.filter(club=self.club).first()
+        membership = self.president.memberships.filter(club=self.club).first()
         assert membership.end_date is None
 
     def test_end_membership_as_main_club_board(self):
@@ -391,10 +398,10 @@ class TestMembership(TestClub):
         self.client.force_login(subscriber)
         response = self.client.post(
             self.members_url,
-            {"users_old": self.comptable.id},
+            {"users_old": self.president.id},
         )
         self.assertRedirects(response, self.members_url)
-        self.assert_membership_ended_today(self.comptable)
+        self.assert_membership_ended_today(self.president)
         assert self.club.members.ongoing().count() == nb_memberships - 1
 
     def test_end_membership_as_root(self):
@@ -403,10 +410,10 @@ class TestMembership(TestClub):
         self.client.force_login(self.root)
         response = self.client.post(
             self.members_url,
-            {"users_old": [self.comptable.id]},
+            {"users_old": [self.president.id]},
         )
         self.assertRedirects(response, self.members_url)
-        self.assert_membership_ended_today(self.comptable)
+        self.assert_membership_ended_today(self.president)
         assert self.club.members.ongoing().count() == nb_memberships - 1
 
     def test_end_membership_as_foreigner(self):
