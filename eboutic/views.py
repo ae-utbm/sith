@@ -13,10 +13,11 @@
 #
 #
 
+from __future__ import annotations
+
 import base64
-import json
+import contextlib
 from datetime import datetime
-from enum import Enum
 from typing import TYPE_CHECKING
 
 import sentry_sdk
@@ -33,16 +34,20 @@ from django.core.exceptions import SuspiciousOperation
 from django.db import DatabaseError, transaction
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET, require_POST
-from django.views.generic import TemplateView, View
+from django.views.generic import TemplateView, UpdateView, View
+from django_countries.fields import Country
 
+from core.views.mixins import FragmentMixin, UseFragmentsMixin
 from counter.forms import BillingInfoForm
-from counter.models import Counter, Customer, Product
+from counter.models import BillingInfo, Counter, Customer, Product
 from eboutic.forms import BasketForm
 from eboutic.models import (
     Basket,
     BasketItem,
+    BillingInfoState,
     Invoice,
     InvoiceItem,
     get_eboutic_products,
@@ -51,6 +56,7 @@ from eboutic.schemas import PurchaseItemList, PurchaseItemSchema
 
 if TYPE_CHECKING:
     from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
+    from django.utils.html import SafeString
 
 
 @login_required
@@ -88,15 +94,51 @@ def payment_result(request, result: str) -> HttpResponse:
     return render(request, "eboutic/eboutic_payment_result.jinja", context)
 
 
-class BillingInfoState(Enum):
-    VALID = 1
-    EMPTY = 2
-    MISSING_PHONE_NUMBER = 3
+class BillingInfoFormFragment(LoginRequiredMixin, FragmentMixin, UpdateView):
+    """Update billing info"""
+
+    model = BillingInfo
+    form_class = BillingInfoForm
+    template_name = "eboutic/eboutic_billing_info.jinja"
+
+    def get_initial(self):
+        if self.object is None:
+            return {
+                "country": Country(code="FR"),
+            }
+        return {}
+
+    def render_fragment(self, request, **kwargs) -> SafeString:
+        self.object = self.get_object()
+        return super().render_fragment(request, **kwargs)
+
+    def get_customer(self) -> Customer:
+        return Customer.get_or_create(self.request.user)[0]
+
+    def form_valid(self, form: BillingInfoForm):
+        form.instance.customer = self.get_customer()
+        return super().form_valid(form)
+
+    def get_object(self, *args, **kwargs):
+        return getattr(self.get_customer(), "billing_infos", None)
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs["action"] = reverse("eboutic:billing_infos")
+        kwargs["BillingInfoState"] = BillingInfoState
+        kwargs["billing_infos_state"] = BillingInfoState.from_model(self.object)
+        return kwargs
+
+    def get_success_url(self, **kwargs):
+        return self.request.path
 
 
-class EbouticCommand(LoginRequiredMixin, TemplateView):
+class EbouticCommand(LoginRequiredMixin, UseFragmentsMixin, TemplateView):
     template_name = "eboutic/eboutic_makecommand.jinja"
     basket: Basket
+    fragments = {
+        "billing_infos_form": BillingInfoFormFragment,
+    }
 
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
@@ -134,6 +176,7 @@ class EbouticCommand(LoginRequiredMixin, TemplateView):
         return super().get(request)
 
     def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
         default_billing_info = None
         if hasattr(self.request.user, "customer"):
             customer = self.request.user.customer
@@ -142,32 +185,12 @@ class EbouticCommand(LoginRequiredMixin, TemplateView):
                 default_billing_info = customer.billing_infos
         else:
             kwargs["customer_amount"] = None
-        # make the enum available in the template
-        kwargs["BillingInfoState"] = BillingInfoState
-        if default_billing_info is None:
-            kwargs["billing_infos_state"] = BillingInfoState.EMPTY
-        elif default_billing_info.phone_number is None:
-            kwargs["billing_infos_state"] = BillingInfoState.MISSING_PHONE_NUMBER
-        else:
-            kwargs["billing_infos_state"] = BillingInfoState.VALID
-        if kwargs["billing_infos_state"] == BillingInfoState.VALID:
-            # the user has already filled all of its billing_infos, thus we can
-            # get it without expecting an error
-            kwargs["billing_infos"] = dict(self.basket.get_e_transaction_data())
         kwargs["basket"] = self.basket
         kwargs["billing_form"] = BillingInfoForm(instance=default_billing_info)
+        kwargs["billing_infos"] = {}
+        with contextlib.suppress(BillingInfo.DoesNotExist):
+            kwargs["billing_infos"] = dict(self.basket.get_e_transaction_data())
         return kwargs
-
-
-@login_required
-@require_GET
-def e_transaction_data(request):
-    basket = Basket.from_session(request.session)
-    if basket is None:
-        return HttpResponse(status=404, content=json.dumps({"data": []}))
-    data = basket.get_e_transaction_data()
-    data = {"data": [{"key": key, "value": val} for key, val in data]}
-    return HttpResponse(status=200, content=json.dumps(data))
 
 
 @login_required

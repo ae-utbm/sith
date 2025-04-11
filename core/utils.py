@@ -18,6 +18,7 @@ from datetime import date, timedelta
 # Image utils
 from io import BytesIO
 from typing import Final
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 import PIL
 from django.conf import settings
@@ -39,7 +40,22 @@ RED_PIXEL_PNG: Final[bytes] = (
 
 Can be used in tests and in dev, when there is a need
 to generate a dummy image that is considered valid nonetheless
+
 """
+
+
+def normalize_url(url):
+    """
+    Copied from django testcases.py
+    Normalize urls so they can be compared
+
+    For example, /path/?x=1&y=2 is equal to /path/?y=2&x=1, but
+    /path/?a=1&a=2 isn't equal to /path/?a=2&a=1.
+    """
+    url = str(url)  # Coerce reverse_lazy() URLs.
+    scheme, netloc, path, query, fragment = urlsplit(url)
+    query_parts = sorted(parse_qsl(query))
+    return urlunsplit((scheme, netloc, path, urlencode(query_parts), fragment))
 
 
 def get_start_of_semester(today: date | None = None) -> date:
