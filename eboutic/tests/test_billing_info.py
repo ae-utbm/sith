@@ -7,6 +7,7 @@ from model_bakery import baker
 
 from core.baker_recipes import subscriber_user
 from core.models import User
+from core.utils import normalize_url
 from counter.models import BillingInfo
 
 
@@ -30,7 +31,9 @@ class TestBillingInfo:
             payload,
         )
         assert response.status_code == 302
-        assert response["Location"].startswith(reverse("core:login"))
+        assert normalize_url(response["Location"]) == normalize_url(
+            reverse("core:login", query={"next": reverse("eboutic:billing_infos")})
+        )
 
     def test_edit_infos(self, client: Client, payload: dict[str, str]):
         user = subscriber_user.make()
