@@ -100,8 +100,9 @@ class TestUserRegistration:
         payload = valid_payload | payload_edit
         response = client.post(reverse("core:register"), payload)
         assert response.status_code == 200
-        error_html = f'<ul class="errorlist"><li>{expected_error}</li></ul>'
-        assertInHTML(error_html, str(response.content.decode()))
+        errors = BeautifulSoup(response.text, "lxml").find_all(class_="errorlist")
+        assert len(errors) == 1
+        assert errors[0].text == expected_error
         assert not User.objects.filter(email=payload["email"]).exists()
 
     def test_register_honeypot_fail(self, client: Client, valid_payload):
