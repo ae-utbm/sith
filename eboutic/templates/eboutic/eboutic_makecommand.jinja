@@ -72,6 +72,7 @@
           type="submit"
           id="bank-submit-button"
           :disabled="!isCbAvailable"
+          class="btn btn-blue"
           value="{% trans %}Pay with credit card{% endtrans %}"
         />
       </form>
@@ -84,7 +85,7 @@
       <form method="post" action="{{ url('eboutic:pay_with_sith') }}" name="sith-pay-form">
         {% csrf_token %}
         <input type="hidden" name="action" value="pay_with_sith_account">
-        <input type="submit" value="{% trans %}Pay with Sith account{% endtrans %}"/>
+        <input class="btn btn-blue" type="submit" value="{% trans %}Pay with Sith account{% endtrans %}"/>
       </form>
     {% endif %}
   </div>

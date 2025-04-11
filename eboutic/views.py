@@ -38,6 +38,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView, UpdateView, View
+from django_countries.fields import Country
 
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
 from counter.forms import BillingInfoForm
@@ -55,6 +56,7 @@ from eboutic.schemas import PurchaseItemList, PurchaseItemSchema
 
 if TYPE_CHECKING:
     from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
+    from django.utils.html import SafeString
 
 
 @login_required
@@ -99,15 +101,28 @@ class BillingInfoFormFragment(LoginRequiredMixin, FragmentMixin, UpdateView):
     form_class = BillingInfoForm
     template_name = "eboutic/eboutic_billing_info.jinja"
 
+    def get_initial(self):
+        if self.object is None:
+            return {
+                "country": Country(code="FR"),
+            }
+        return {}
+
+    def render_fragment(self, request, **kwargs) -> SafeString:
+        self.object = self.get_object()
+        return super().render_fragment(request, **kwargs)
+
+    def get_customer(self) -> Customer:
+        return Customer.get_or_create(self.request.user)[0]
+
+    def form_valid(self, form: BillingInfoForm):
+        form.instance.customer = self.get_customer()
+        return super().form_valid(form)
+
     def get_object(self, *args, **kwargs):
-        customer, _ = Customer.get_or_create(self.request.user)
-        if not hasattr(customer, "billing_infos"):
-            customer.billing_infos = BillingInfo()
-        return customer.billing_infos
+        return getattr(self.get_customer(), "billing_infos", None)
 
     def get_context_data(self, **kwargs):
-        if not hasattr(self, "object"):
-            self.object = self.get_object()
         kwargs = super().get_context_data(**kwargs)
         kwargs["action"] = reverse("eboutic:billing_infos")
         kwargs["BillingInfoState"] = BillingInfoState

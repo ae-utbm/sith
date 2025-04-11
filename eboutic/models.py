@@ -51,7 +51,9 @@ class BillingInfoState(Enum):
     MISSING_PHONE_NUMBER = 3
 
     @classmethod
-    def from_model(cls, info: BillingInfo) -> BillingInfoState:
+    def from_model(cls, info: BillingInfo | None) -> BillingInfoState:
+        if info is None:
+            return cls.EMPTY
         for attr in [
             "first_name",
             "last_name",

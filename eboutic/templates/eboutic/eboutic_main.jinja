@@ -66,7 +66,6 @@
           {% trans %}Clear{% endtrans %}
         </button>
         <form method="get" action="{{ url('eboutic:command') }}">
-          {% csrf_token %}
           <button class="btn btn-blue">
             <i class="fa fa-check"></i>
             <input type="submit" value="{% trans %}Validate{% endtrans %}"/>
