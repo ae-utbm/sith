@@ -196,9 +196,7 @@ class ClubMemberForm(forms.Form):
         self.request_user = kwargs.pop("request_user")
         self.club_members = kwargs.pop("club_members", None)
         if not self.club_members:
-            self.club_members = (
-                self.club.members.filter(end_date=None).order_by("-role").all()
-            )
+            self.club_members = self.club.members.ongoing().order_by("-role").all()
         self.request_user_membership = self.club.get_membership_for(self.request_user)
         super().__init__(*args, **kwargs)
 
