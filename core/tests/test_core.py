@@ -125,7 +125,7 @@ class TestUserRegistration:
         error_html = (
             "<li>Un objet Utilisateur avec ce champ Adresse email existe déjà.</li>"
         )
-        assertInHTML(error_html, str(response.content.decode()))
+        assertInHTML(error_html, str(response.text))
 
     def test_register_fail_with_not_existing_email(
         self, client: Client, valid_payload, monkeypatch
@@ -142,7 +142,7 @@ class TestUserRegistration:
         error_html = (
             "<li>Nous n'avons pas réussi à vérifier que cette adresse mail existe.</li>"
         )
-        assertInHTML(error_html, str(response.content.decode()))
+        assertInHTML(error_html, str(response.text))
 
 
 @pytest.mark.django_db
@@ -161,7 +161,7 @@ class TestUserLogin:
         assert (
             '<p class="alert alert-red">Votre nom d\'utilisateur '
             "et votre mot de passe ne correspondent pas. Merci de réessayer.</p>"
-        ) in str(response.content.decode())
+        ) in response.text
         assert response.wsgi_request.user.is_anonymous
 
     def test_login_success(self, client, user):
@@ -247,7 +247,7 @@ class TestPageHandling(TestCase):
 
         response = self.client.get(reverse("core:page", kwargs={"page_name": "guy"}))
         assert response.status_code == 200
-        html = response.content.decode()
+        html = response.text
         assert '<a href="/page/guy/hist/">' in html
         assert '<a href="/page/guy/edit/">' in html
         assert '<a href="/page/guy/prop/">' in html
@@ -262,7 +262,7 @@ class TestPageHandling(TestCase):
 
         assert response.status_code == 200
         # The name and parent inputs should be already filled
-        soup = BeautifulSoup(response.content.decode(), "lxml")
+        soup = BeautifulSoup(response.text, "lxml")
         assert soup.find("input", {"name": "name"})["value"] == "new"
         select = soup.find("autocomplete-select", {"name": "parent"})
         assert select.find("option", {"selected": True})["value"] == str(parent.id)
@@ -279,7 +279,7 @@ class TestPageHandling(TestCase):
         assertRedirects(response, new_url, fetch_redirect_response=False)
         response = self.client.get(new_url)
         assert response.status_code == 200
-        assert f'<a href="/page/{parent._full_name}/new/">' in response.content.decode()
+        assert f'<a href="/page/{parent._full_name}/new/">' in response.text
 
     def test_access_child_page_ok(self):
         """Should display a page correctly."""
@@ -291,14 +291,14 @@ class TestPageHandling(TestCase):
             reverse("core:page", kwargs={"page_name": "guy/bibou"})
         )
         assert response.status_code == 200
-        html = response.content.decode()
+        html = response.text
         self.assertIn('<a href="/page/guy/bibou/edit/">', html)
 
     def test_access_page_not_found(self):
         """Should not display a page correctly."""
         response = self.client.get(reverse("core:page", kwargs={"page_name": "swagg"}))
         assert response.status_code == 200
-        html = response.content.decode()
+        html = response.text
         self.assertIn('<a href="/page/create/?page=swagg">', html)
 
     def test_create_page_markdown_safe(self):
@@ -332,7 +332,7 @@ http://git.an
             <p>&lt;guy&gt;Bibou&lt;/guy&gt;</p>
             <p>&lt;script&gt;alert('Guy');&lt;/script&gt;</p>
             """
-        assertInHTML(expected, response.content.decode())
+        assertInHTML(expected, response.text)
 
 
 @pytest.mark.django_db

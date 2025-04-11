@@ -123,11 +123,11 @@ class TestEboutic(TestCase):
         assert response.status_code == 200
         self.assertInHTML(
             "<tr><td>Cotis 2 semestres</td><td>1</td><td>28.00 €</td></tr>",
-            response.content.decode(),
+            response.text,
         )
         self.assertInHTML(
             "<tr><td>Barbar</td><td>3</td><td>1.70 €</td></tr>",
-            response.content.decode(),
+            response.text,
         )
         assert "basket_id" in self.client.session
         basket = Basket.objects.get(id=self.client.session["basket_id"])
@@ -178,7 +178,7 @@ class TestEboutic(TestCase):
         response = self.client.get(reverse("eboutic:command"))
         self.assertInHTML(
             "<tr><td>Cotis 2 semestres</td><td>1</td><td>28.00 €</td></tr>",
-            response.content.decode(),
+            response.text,
         )
         basket = Basket.objects.get(id=self.client.session["basket_id"])
         assert basket.items.count() == 1
@@ -206,7 +206,7 @@ class TestEboutic(TestCase):
         url = self.generate_bank_valid_answer()
         response = self.client.get(url)
         assert response.status_code == 200
-        assert response.content.decode() == "Payment successful"
+        assert response.text == "Payment successful"
         new_balance = Customer.objects.get(user=self.subscriber).amount
         assert new_balance == initial_balance + 15
 
