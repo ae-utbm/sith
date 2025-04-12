@@ -32,6 +32,7 @@ from django.contrib.auth.mixins import (
 )
 from django.core.exceptions import SuspiciousOperation
 from django.db import DatabaseError, transaction
+from django.db.utils import cached_property
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -112,15 +113,18 @@ class BillingInfoFormFragment(LoginRequiredMixin, FragmentMixin, UpdateView):
         self.object = self.get_object()
         return super().render_fragment(request, **kwargs)
 
-    def get_customer(self) -> Customer:
+    @cached_property
+    def customer(self) -> Customer:
         return Customer.get_or_create(self.request.user)[0]
 
     def form_valid(self, form: BillingInfoForm):
-        form.instance.customer = self.get_customer()
+        form.instance.customer = self.customer
         return super().form_valid(form)
 
     def get_object(self, *args, **kwargs):
-        return getattr(self.get_customer(), "billing_infos", None)
+        # if a BillingInfo already exists, this view will behave like an UpdateView
+        # otherwise, it will behave like a CreateView.
+        return getattr(self.customer, "billing_infos", None)
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
@@ -177,16 +181,12 @@ class EbouticCommand(LoginRequiredMixin, UseFragmentsMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        default_billing_info = None
         if hasattr(self.request.user, "customer"):
             customer = self.request.user.customer
             kwargs["customer_amount"] = customer.amount
-            if hasattr(customer, "billing_infos"):
-                default_billing_info = customer.billing_infos
         else:
             kwargs["customer_amount"] = None
         kwargs["basket"] = self.basket
-        kwargs["billing_form"] = BillingInfoForm(instance=default_billing_info)
         kwargs["billing_infos"] = {}
         with contextlib.suppress(BillingInfo.DoesNotExist):
             kwargs["billing_infos"] = dict(self.basket.get_e_transaction_data())
