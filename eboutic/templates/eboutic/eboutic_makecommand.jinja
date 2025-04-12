@@ -16,7 +16,7 @@
   <h3>{% trans %}Eboutic{% endtrans %}</h3>
 
   <script type="text/javascript">
-    let billingInfos = {{ billing_infos|tojson }};
+    let billingInfos = {{ billing_infos|safe }};
   </script>
 
   <div x-data="etransaction(billingInfos)">

@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import base64
 import contextlib
+import json
 from datetime import datetime
 from typing import TYPE_CHECKING
 
@@ -26,10 +27,12 @@ from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
 from cryptography.hazmat.primitives.hashes import SHA1
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
 )
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import SuspiciousOperation
 from django.db import DatabaseError, transaction
 from django.db.utils import cached_property
@@ -37,6 +40,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView, UpdateView, View
 from django_countries.fields import Country
@@ -95,12 +99,15 @@ def payment_result(request, result: str) -> HttpResponse:
     return render(request, "eboutic/eboutic_payment_result.jinja", context)
 
 
-class BillingInfoFormFragment(LoginRequiredMixin, FragmentMixin, UpdateView):
+class BillingInfoFormFragment(
+    LoginRequiredMixin, FragmentMixin, SuccessMessageMixin, UpdateView
+):
     """Update billing info"""
 
     model = BillingInfo
     form_class = BillingInfoForm
     template_name = "eboutic/eboutic_billing_info.jinja"
+    success_message = _("Billing info registration success")
 
     def get_initial(self):
         if self.object is None:
@@ -128,9 +135,26 @@ class BillingInfoFormFragment(LoginRequiredMixin, FragmentMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["action"] = reverse("eboutic:billing_infos")
-        kwargs["BillingInfoState"] = BillingInfoState
         kwargs["billing_infos_state"] = BillingInfoState.from_model(self.object)
+        kwargs["action"] = reverse("eboutic:billing_infos")
+        match BillingInfoState.from_model(self.object):
+            case BillingInfoState.EMPTY:
+                messages.warning(
+                    self.request,
+                    _(
+                        "You must fill your billing infos if you want to pay with your credit card"
+                    ),
+                )
+            case BillingInfoState.MISSING_PHONE_NUMBER:
+                messages.warning(
+                    self.request,
+                    _(
+                        "The Crédit Agricole changed its policy related to the billing "
+                        + "information that must be provided in order to pay with a credit card. "
+                        + "If you want to pay with your credit card, you must add a phone number "
+                        + "to the data you already provided.",
+                    ),
+                )
         return kwargs
 
     def get_success_url(self, **kwargs):
@@ -188,8 +212,11 @@ class EbouticCommand(LoginRequiredMixin, UseFragmentsMixin, TemplateView):
             kwargs["customer_amount"] = None
         kwargs["basket"] = self.basket
         kwargs["billing_infos"] = {}
+
         with contextlib.suppress(BillingInfo.DoesNotExist):
-            kwargs["billing_infos"] = dict(self.basket.get_e_transaction_data())
+            kwargs["billing_infos"] = json.dumps(
+                dict(self.basket.get_e_transaction_data())
+            )
         return kwargs
 
 
