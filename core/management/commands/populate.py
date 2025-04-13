@@ -839,8 +839,7 @@ Welcome to the wiki page!
         accounting_admin.permissions.add(
             *list(
                 perms.filter(
-                    Q(content_type__app_label="accounting")
-                    | Q(
+                    Q(
                         codename__in=[
                             "view_customer",
                             "view_product",

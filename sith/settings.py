@@ -110,7 +110,6 @@ INSTALLED_APPS = (
     "core",
     "club",
     "subscription",
-    "accounting",
     "counter",
     "eboutic",
     "launderette",
