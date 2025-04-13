@@ -526,33 +526,6 @@ body {
   }
 }
 
-/*---------------------------ACCOUNTING----------------------------*/
-#accounting {
-  .journal-table {
-    tbody {
-      .neg-amount {
-        color: red;
-
-        &:before {
-          font-family: FontAwesome;
-          font-size: 1em;
-          content: "\f063";
-        }
-      }
-
-      .pos-amount {
-        color: green;
-
-        &:before {
-          font-family: FontAwesome;
-          font-size: 1em;
-          content: "\f062";
-        }
-      }
-    }
-  }
-}
-
 /*-----------------------------GENERAL-----------------------------*/
 h1,
 h2,
