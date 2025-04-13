@@ -122,6 +122,7 @@ INSTALLED_APPS = (
     "trombi",
     "matmat",
     "pedagogy",
+    "reservation",
     "galaxy",
     "antispam",
     "api",

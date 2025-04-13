@@ -788,7 +788,16 @@ class Command(BaseCommand):
 
         subscribers = Group.objects.create(name="Subscribers")
         subscribers.permissions.add(
-            *list(perms.filter(codename__in=["add_news", "add_uvcomment"]))
+            *list(
+                perms.filter(
+                    codename__in=[
+                        "add_news",
+                        "add_uvcomment",
+                        "add_reservationslot",
+                        "view_reservationslot",
+                    ]
+                )
+            )
         )
         old_subscribers = Group.objects.create(name="Old subscribers")
         old_subscribers.permissions.add(
