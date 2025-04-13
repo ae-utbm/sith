@@ -45,6 +45,7 @@ from django.views.decorators.http import require_GET, require_POST
 from django.views.generic import TemplateView, UpdateView, View
 from django_countries.fields import Country
 
+from core.auth.mixins import IsSubscriberMixin
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
 from counter.forms import BillingInfoForm
 from counter.models import BillingInfo, Counter, Customer, Product
@@ -97,6 +98,10 @@ def eboutic_main(request: HttpRequest) -> HttpResponse:
 def payment_result(request, result: str) -> HttpResponse:
     context = {"success": result == "success"}
     return render(request, "eboutic/eboutic_payment_result.jinja", context)
+
+
+class EurokPartnerFragment(IsSubscriberMixin, TemplateView):
+    template_name = "eboutic/eurok_fragment.jinja"
 
 
 class BillingInfoFormFragment(

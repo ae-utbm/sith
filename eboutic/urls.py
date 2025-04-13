@@ -29,6 +29,7 @@ from eboutic.views import (
     BillingInfoFormFragment,
     EbouticCommand,
     EtransactionAutoAnswer,
+    EurokPartnerFragment,
     eboutic_main,
     pay_with_sith,
     payment_result,
@@ -43,6 +44,7 @@ urlpatterns = [
     path("billing-infos/", BillingInfoFormFragment.as_view(), name="billing_infos"),
     path("pay/sith/", pay_with_sith, name="pay_with_sith"),
     path("pay/<res:result>/", payment_result, name="payment_result"),
+    path("eurok/", EurokPartnerFragment.as_view(), name="eurok"),
     path(
         "et_autoanswer",
         EtransactionAutoAnswer.as_view(),

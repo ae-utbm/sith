@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-13 00:18+0200\n"
+"POT-Creation-Date: 2025-04-14 01:16+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3814,6 +3814,25 @@ msgstr "Partenariat Eurockéennes 2025"
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
 msgid ""
+"Our partner uses Weezevent to sell tickets. Weezevent may collect user info "
+"according to it's own privacy policy. By clicking the accept button you "
+"consent to their terms of services."
+msgstr ""
+"Notre partenaire utilises Wezevent pour vendre ses billets. Weezevent peut collecter des informatinos utilisateur "
+"conformément à sa propre politique de confidentialité. En cliquant sur le bouton d'acceptation vous "
+"consentez à leurs termes de service."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "Privacy policy"
+msgstr "Politique de confidentialité"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+#: trombi/templates/trombi/comment_moderation.jinja
+msgid "Accept"
+msgstr "Accepter"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid ""
 "You must be subscribed to benefit from the partnership with the Eurockéennes."
 msgstr ""
 "Vous devez être cotisant pour bénéficier du partenariat avec les "
@@ -5385,10 +5404,6 @@ msgstr "fin"
 #: trombi/templates/trombi/comment_moderation.jinja
 msgid "Moderate Trombi comments"
 msgstr "Modérer les commentaires du Trombi"
-
-#: trombi/templates/trombi/comment_moderation.jinja
-msgid "Accept"
-msgstr "Accepter"
 
 #: trombi/templates/trombi/comment_moderation.jinja
 msgid "Reject"

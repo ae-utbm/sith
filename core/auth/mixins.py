@@ -227,6 +227,19 @@ class FormerSubscriberMixin(AccessMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
+class IsSubscriberMixin(AccessMixin):
+    """Check if the user is a subscriber.
+
+    Raises:
+        PermissionDenied: if the user isn't subscribed.
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_subscribed:
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
+
 class PermissionOrAuthorRequiredMixin(PermissionRequiredMixin):
     """Require that the user has the required perm or is the object author.
 
