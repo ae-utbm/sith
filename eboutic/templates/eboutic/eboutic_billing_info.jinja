@@ -1,0 +1,42 @@
+<div id=billing-infos-fragment>
+  <div
+    class="collapse"
+    :class="{'shadow': collapsed}"
+    x-data="{collapsed: {{ "true" if messages or form.errors else "false" }}}"
+  >
+    <div class="collapse-header clickable" @click="collapsed = !collapsed">
+      <span class="collapse-header-text">
+        {% trans %}Billing information{% endtrans %}
+      </span>
+      <span class="collapse-header-icon" :class="{'reverse': collapsed}">
+        <i class="fa fa-caret-down"></i>
+      </span>
+    </div>
+    <form
+      class="collapse-body"
+      hx-trigger="submit"
+      hx-post="{{ action }}"
+      hx-swap="outerHTML"
+      hx-target="#billing-infos-fragment"
+      x-show="collapsed"
+    >
+      {% csrf_token %}
+      {{ form.as_p() }}
+      <br>
+      <input
+        type="submit" class="btn btn-blue clickable"
+        value="{% trans %}Validate{% endtrans %}"
+      >
+    </form>
+  </div>
+
+  <br>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
