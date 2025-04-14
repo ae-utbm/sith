@@ -14,7 +14,7 @@ nouveau logo d'une promo. C'est un processus manuel.
 
 ### avec une commande django
 ```bash
-$ ./manage.py add_promo_logo numero_de_promo chemin_dacces_du_logo
+./manage.py add_promo_logo numero_de_promo chemin_dacces_du_logo
 ```
 options:
 - --force/-f pour automatiquement écraser les logos de promo avec le même nom.
