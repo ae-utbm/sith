@@ -72,7 +72,9 @@ class TestSearchUsersAPI(TestSearchUsers):
 
         expected = [u.id for u in self.users[::-1]]
         for term in ["first", "First", "FIRST"]:
-            response = self.client.get(reverse("api:search_users") + f"?search={term}")
+            response = self.client.get(
+                reverse("api:search_users", query={"search": term})
+            )
             assert response.status_code == 200
             assert response.json()["count"] == 11
             assert [r["id"] for r in response.json()["results"]] == expected

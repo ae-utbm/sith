@@ -34,7 +34,7 @@ class Command(BaseCommand):
                     f"Source {provider} responded with code {res.status_code}"
                 )
                 continue
-            domains |= set(res.content.decode().splitlines())
+            domains |= set(res.text.splitlines())
         return domains
 
     def _update_domains(self, domains: set[str]):

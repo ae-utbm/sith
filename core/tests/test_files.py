@@ -147,8 +147,8 @@ class TestUserProfilePicture:
             reverse(
                 "core:file_delete",
                 kwargs={"file_id": user.profile_pict.pk, "popup": ""},
-            )
-            + f"?next={user.get_absolute_url()}"
+                query={"next": user.get_absolute_url()},
+            ),
         )
 
     @pytest.mark.parametrize(

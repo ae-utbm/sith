@@ -20,7 +20,7 @@ def test_page_display_on_club_main_page(client: Client):
     res = client.get(reverse("club:club_view", kwargs={"club_id": club.id}))
 
     assert res.status_code == 200
-    soup = BeautifulSoup(res.content.decode(), "lxml")
+    soup = BeautifulSoup(res.text, "lxml")
     detail_html = soup.find(id="club_detail").find(class_="markdown")
     assertHTMLEqual(detail_html.decode_contents(), markdown(content))
 
@@ -34,6 +34,6 @@ def test_club_main_page_without_content(client: Client):
     res = client.get(reverse("club:club_view", kwargs={"club_id": club.id}))
 
     assert res.status_code == 200
-    soup = BeautifulSoup(res.content.decode(), "lxml")
+    soup = BeautifulSoup(res.text, "lxml")
     detail_html = soup.find(id="club_detail")
     assert detail_html.find_all("markdown") == []

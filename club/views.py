@@ -37,6 +37,7 @@ from django.http import (
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext as _t
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, View
@@ -250,6 +251,10 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
     template_name = "club/club_members.jinja"
     current_tab = "members"
 
+    @cached_property
+    def members(self) -> list[Membership]:
+        return list(self.object.members.ongoing().order_by("-role"))
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["request_user"] = self.request.user
@@ -257,8 +262,8 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
         kwargs["club_members"] = self.members
         return kwargs
 
-    def get_context_data(self, *args, **kwargs):
-        kwargs = super().get_context_data(*args, **kwargs)
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
         kwargs["members"] = self.members
         return kwargs
 
@@ -277,12 +282,8 @@ class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
             membership.save()
         return resp
 
-    def dispatch(self, request, *args, **kwargs):
-        self.members = self.get_object().members.ongoing().order_by("-role")
-        return super().dispatch(request, *args, **kwargs)
-
     def get_success_url(self, **kwargs):
-        return reverse_lazy("club:club_members", kwargs={"club_id": self.object.id})
+        return self.request.path
 
 
 class ClubOldMembersView(ClubTabsMixin, CanViewMixin, DetailView):

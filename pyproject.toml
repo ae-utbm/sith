@@ -4,30 +4,30 @@ version = "3"
 description = "Le web Sith de l'AE"
 readme = "README.md"
 authors = [
-    {name = "Skia", email = "skia@hya.sk"},
-    {name = "klmp200", email = "antoine@bartuccio.fr"},
-    {name = "Krophil", email = "pierre.brunet@krophil.fr"},
-    {name = "Maréchal", email = "thgirod@hotmail.com"},
-    {name = "Och", email = "francescowitz68@gmail.com"},
-    {name = "tleb", email = "tleb@openmailbox.org"},
-    {name = "Soldat", email = "ryan-68@live.fr"},
-    {name = "Nabos", email = "gnikwo@hotmail.com"},
-    {name = "Terre", email = "jbaptiste.lenglet+git@gmail.com"},
-    {name = "Lo-J", email = "renaudg779@gmail.com"},
-    {name = "Vial", email = "robin.trioux@utbm.fr"},
+    { name = "Skia", email = "skia@hya.sk" },
+    { name = "klmp200", email = "antoine@bartuccio.fr" },
+    { name = "Krophil", email = "pierre.brunet@krophil.fr" },
+    { name = "Maréchal", email = "thgirod@hotmail.com" },
+    { name = "Och", email = "francescowitz68@gmail.com" },
+    { name = "tleb", email = "tleb@openmailbox.org" },
+    { name = "Soldat", email = "ryan-68@live.fr" },
+    { name = "Nabos", email = "gnikwo@hotmail.com" },
+    { name = "Terre", email = "jbaptiste.lenglet+git@gmail.com" },
+    { name = "Lo-J", email = "renaudg779@gmail.com" },
+    { name = "Vial", email = "robin.trioux@utbm.fr" },
 ]
-license = {text = "GPL-3.0-only"}
+license = { text = "GPL-3.0-only" }
 requires-python = "<4.0,>=3.12"
 dependencies = [
-    "django<5.0.0,>=4.2.20",
-    "django-ninja<2.0.0,>=1.3.0",
-    "django-ninja-extra<1.0.0,>=0.22.4",
+    "django<6.0.0,>=5.2.0",
+    "django-ninja<2.0.0,>=1.4.0",
+    "django-ninja-extra<1.0.0,>=0.22.9",
     "Pillow<12.0.0,>=11.1.0",
-    "mistune<4.0.0,>=3.1.2",
+    "mistune<4.0.0,>=3.1.3",
     "django-jinja<3.0.0,>=2.11.0",
     "cryptography<45.0.0,>=44.0.2",
-    "django-phonenumber-field<9.0.0,>=8.0.0",
-    "phonenumbers>=9.0.0,<10.0.0",
+    "django-phonenumber-field<9.0.0,>=8.1.0",
+    "phonenumbers>=9.0.2,<10.0.0",
     "reportlab<5.0.0,>=4.3.1",
     "django-haystack<4.0.0,>=3.3.0",
     "xapian-haystack<4.0.0,>=3.1.0",
@@ -35,17 +35,17 @@ dependencies = [
     "django-ordered-model<4.0.0,>=3.7.4",
     "django-simple-captcha<1.0.0,>=0.6.2",
     "python-dateutil<3.0.0.0,>=2.9.0.post0",
-    "sentry-sdk<3.0.0,>=2.22.0",
+    "sentry-sdk<3.0.0,>=2.25.1",
     "jinja2<4.0.0,>=3.1.6",
     "django-countries<8.0.0,>=7.6.1",
     "dict2xml<2.0.0,>=1.7.6",
     "Sphinx<6,>=5",
     "tomli<3.0.0,>=2.2.1",
-    "django-honeypot<2.0.0,>=1.2.1",
-    "pydantic-extra-types<3.0.0,>=2.10.2",
+    "django-honeypot",
+    "pydantic-extra-types<3.0.0,>=2.10.3",
     "ical<10.0.0,>=9.1.0",
-    "redis[hiredis]<6.0.0,>=5.2.0",
-    "environs[django]<15.0.0,>=14.1.0",
+    "redis[hiredis]<6.0.0,>=5.2.1",
+    "environs[django]<15.0.0,>=14.1.1",
     "requests>=2.32.3",
     "honcho>=2.0.0",
     "psutil>=7.0.0",
@@ -57,13 +57,13 @@ documentation = "https://sith-ae.readthedocs.io/"
 
 [dependency-groups]
 prod = [
-    "psycopg[c]<4.0.0,>=3.2.3",
+    "psycopg[c]<4.0.0,>=3.2.6",
 ]
 dev = [
     "django-debug-toolbar<5.0.0,>=4.4.6",
     "ipython<10.0.0,>=9.0.2",
     "pre-commit<5.0.0,>=4.1.0",
-    "ruff<1.0.0,>=0.9.10",
+    "ruff<1.0.0,>=0.11.1",
     "djhtml<4.0.0,>=3.0.7",
     "faker<38.0.0,>=37.0.0",
     "rjsmin<2.0.0,>=1.2.4",
@@ -88,6 +88,9 @@ docs = [
 [tool.uv]
 default-groups = ["dev", "tests", "docs"]
 
+[tool.uv.sources]
+django-honeypot = { git = "https://github.com/jamesturk/django-honeypot.git", rev = "3986228" }
+
 [tool.xapian]
 version = "1.4.25"
 
@@ -96,33 +99,33 @@ output-format = "concise" # makes ruff error logs easier to read
 
 [tool.ruff.lint]
 select = [
-	"A",  # shadowing of Python builtins
-	"B",
-	"C4",  # use comprehensions when possible
-	"DJ",  # django-specific rules,
-	"E",  # pycodestyle (https://docs.astral.sh/ruff/rules/#pycodestyle-e-w)
-	"ERA",  # commented code
-	"F",  # pyflakes (https://docs.astral.sh/ruff/rules/#pyflakes-f)
-	"FBT",  # boolean trap
-	"FLY",  # f-string instead of str.join
-	"FURB",  # https://docs.astral.sh/ruff/rules/#refurb-furb
-	"I",  # isort
-	"INT",  # gettext
-	"PERF",  # performance
-	"PLW",  # pylint warnings (https://docs.astral.sh/ruff/rules/#pylint-pl)
-	"RUF",  # Ruff specific rules
-	"SIM",  # simplify (https://docs.astral.sh/ruff/rules/#flake8-simplify-sim)
-	"T100", # breakpoint()
-	"T2",  # print statements
-	"TCH",  # type-checking block
-    "UP008",  # Use super() instead of super(__class__, self)
-    "UP009",  # utf-8 encoding declaration is unnecessary
+    "A", # shadowing of Python builtins
+    "B",
+    "C4", # use comprehensions when possible
+    "DJ", # django-specific rules,
+    "E", # pycodestyle (https://docs.astral.sh/ruff/rules/#pycodestyle-e-w)
+    "ERA", # commented code
+    "F", # pyflakes (https://docs.astral.sh/ruff/rules/#pyflakes-f)
+    "FBT", # boolean trap
+    "FLY", # f-string instead of str.join
+    "FURB", # https://docs.astral.sh/ruff/rules/#refurb-furb
+    "I", # isort
+    "INT", # gettext
+    "PERF", # performance
+    "PLW", # pylint warnings (https://docs.astral.sh/ruff/rules/#pylint-pl)
+    "RUF", # Ruff specific rules
+    "SIM", # simplify (https://docs.astral.sh/ruff/rules/#flake8-simplify-sim)
+    "T100", # breakpoint()
+    "T2", # print statements
+    "TCH", # type-checking block
+    "UP008", # Use super() instead of super(__class__, self)
+    "UP009", # utf-8 encoding declaration is unnecessary
 ]
 
 ignore = [
-	"DJ001",  # null=True in CharField/TextField. this one would require a migration
-	"E501",  # line too long. The rule is too harsh, and the formatter deals with it in most cases
-	"RUF012"  # mutable class attributes. This rule doesn't integrate well with django
+    "DJ001", # null=True in CharField/TextField. this one would require a migration
+    "E501", # line too long. The rule is too harsh, and the formatter deals with it in most cases
+    "RUF012"  # mutable class attributes. This rule doesn't integrate well with django
 ]
 
 [tool.ruff.lint.pydocstyle]

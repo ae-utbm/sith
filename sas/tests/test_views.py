@@ -169,7 +169,7 @@ class TestSasModeration(TestCase):
         assertInHTML(
             '<ul class="errorlist nonfield"><li>'
             "Vous avez déjà déposé une demande de retrait pour cette photo.</li></ul>",
-            res.content.decode(),
+            res.text,
         )
 
 

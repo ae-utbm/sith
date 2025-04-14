@@ -633,7 +633,7 @@ class TestCounterStats(TestCase):
     def test_not_authenticated_access_fail(self):
         url = reverse("counter:stats", args=[self.counter.id])
         response = self.client.get(url)
-        assertRedirects(response, reverse("core:login") + f"?next={url}")
+        assertRedirects(response, reverse("core:login", query={"next": url}))
 
     def test_unauthorized_user_fails(self):
         self.client.force_login(baker.make(User))
