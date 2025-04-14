@@ -95,23 +95,36 @@
         <div class="category-header">
           <h3 class="margin-bottom">{% trans %}Eurockéennes 2025 partnership{% endtrans %}</h3>
           {% if user.is_subscribed %}
-            <a
-              title="Logiciel billetterie en ligne"
-              href="https://widget.weezevent.com/ticket/6ef65533-f5b0-4571-9d21-1f1bc63921f0?id_evenement=1211855&locale=fr-FR&code=34146"
-              class="weezevent-widget-integration"
-              target="_blank"
-              data-src="https://widget.weezevent.com/ticket/6ef65533-f5b0-4571-9d21-1f1bc63921f0?id_evenement=1211855&locale=fr-FR&code=34146"
-              data-width="650"
-              data-height="600"
-              data-resize="1"
-              data-nopb="0"
-              data-type="neo"
-              data-width_auto="1"
-              data-noscroll="0"
-              data-id="1211855">
-              Billetterie Weezevent
-            </a>
-            <script type="text/javascript" src="https://widget.weezevent.com/weez.js" async defer></script>
+            <div id="eurok-partner" style="
+                                           min-height: 600px;
+                                           background-color: lightgrey;
+                                           display: flex;
+                                           justify-content: center;
+                                           align-items: center;
+                                           flex-direction: column;
+                                           gap: 10px;
+                                          ">
+              <p style="text-align: center;">
+                {% trans trimmed %}
+                  Our partner uses Weezevent to sell tickets.
+                  Weezevent may collect user info according to
+                  it's own privacy policy.
+                  By clicking the accept button you consent to
+                  their terms of services.
+                {% endtrans %}
+              </p>
+
+              <a href="https://weezevent.com/fr/politique-de-confidentialite/">{% trans %}Privacy policy{% endtrans %}</a>
+
+              <button
+                hx-get="{{ url("eboutic:eurok") }}"
+                hx-target="#eurok-partner"
+                hx-swap="outerHTML"
+                hx-trigger="click, load[document.cookie.includes('weezevent_accept=true')]"
+                @htmx:after-request="document.cookie = 'weezevent_accept=true'"
+              >{% trans %}Accept{% endtrans %}
+              </button>
+            </div>
           {% else %}
             <p>
               {%- trans trimmed %}
