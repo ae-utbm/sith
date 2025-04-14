@@ -82,9 +82,8 @@
     {% elif basket.total > user.account_balance %}
       <p>{% trans %}AE account payment disabled because you do not have enough money remaining.{% endtrans %}</p>
     {% else %}
-      <form method="post" action="{{ url('eboutic:pay_with_sith') }}" name="sith-pay-form">
+      <form method="post" action="{{ url('eboutic:pay_with_sith', basket_id=basket.id) }}" name="sith-pay-form">
         {% csrf_token %}
-        <input type="hidden" name="action" value="pay_with_sith_account">
         <input class="btn btn-blue" type="submit" value="{% trans %}Pay with Sith account{% endtrans %}"/>
       </form>
     {% endif %}

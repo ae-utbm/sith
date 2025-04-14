@@ -1,4 +1,7 @@
+import math
+
 from django import forms
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
@@ -261,3 +264,112 @@ class CloseCustomerAccountForm(forms.Form):
         widget=AutoCompleteSelectUser,
         queryset=User.objects.all(),
     )
+
+
+class ProductForm(forms.Form):
+    quantity = forms.IntegerField(min_value=1, required=True)
+    id = forms.IntegerField(min_value=0, required=True)
+
+    def __init__(
+        self,
+        customer: Customer,
+        counter: Counter,
+        allowed_products: dict[int, Product],
+        *args,
+        **kwargs,
+    ):
+        self.customer = customer  # Used by formset
+        self.counter = counter  # Used by formset
+        self.allowed_products = allowed_products
+        super().__init__(*args, **kwargs)
+
+    def clean_id(self):
+        data = self.cleaned_data["id"]
+
+        # We store self.product so we can use it later on the formset validation
+        # And also in the global clean
+        self.product = self.allowed_products.get(data, None)
+        if self.product is None:
+            raise forms.ValidationError(
+                _("The selected product isn't available for this user")
+            )
+
+        return data
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if len(self.errors) > 0:
+            return
+
+        # Compute prices
+        cleaned_data["bonus_quantity"] = 0
+        if self.product.tray:
+            cleaned_data["bonus_quantity"] = math.floor(
+                cleaned_data["quantity"] / Product.QUANTITY_FOR_TRAY_PRICE
+            )
+        cleaned_data["total_price"] = self.product.price * (
+            cleaned_data["quantity"] - cleaned_data["bonus_quantity"]
+        )
+
+        return cleaned_data
+
+
+class BaseBasketForm(forms.BaseFormSet):
+    def clean(self):
+        self.forms = [form for form in self.forms if form.cleaned_data != {}]
+
+        if len(self.forms) == 0:
+            return
+
+        self._check_forms_have_errors()
+        self._check_product_are_unique()
+        self._check_recorded_products(self[0].customer)
+        self._check_enough_money(self[0].counter, self[0].customer)
+
+    def _check_forms_have_errors(self):
+        if any(len(form.errors) > 0 for form in self):
+            raise forms.ValidationError(_("Submitted basket is invalid"))
+
+    def _check_product_are_unique(self):
+        product_ids = {form.cleaned_data["id"] for form in self.forms}
+        if len(product_ids) != len(self.forms):
+            raise forms.ValidationError(_("Duplicated product entries."))
+
+    def _check_enough_money(self, counter: Counter, customer: Customer):
+        self.total_price = sum([data["total_price"] for data in self.cleaned_data])
+        if self.total_price > customer.amount:
+            raise forms.ValidationError(_("Not enough money"))
+
+    def _check_recorded_products(self, customer: Customer):
+        """Check for, among other things, ecocups and pitchers"""
+        items = {
+            form.cleaned_data["id"]: form.cleaned_data["quantity"]
+            for form in self.forms
+        }
+        ids = list(items.keys())
+        returnables = list(
+            ReturnableProduct.objects.filter(
+                Q(product_id__in=ids) | Q(returned_product_id__in=ids)
+            ).annotate_balance_for(customer)
+        )
+        limit_reached = []
+        for returnable in returnables:
+            returnable.balance += items.get(returnable.product_id, 0)
+        for returnable in returnables:
+            dcons = items.get(returnable.returned_product_id, 0)
+            returnable.balance -= dcons
+            if dcons and returnable.balance < -returnable.max_return:
+                limit_reached.append(returnable.returned_product)
+        if limit_reached:
+            raise forms.ValidationError(
+                _(
+                    "This user have reached his recording limit "
+                    "for the following products : %s"
+                )
+                % ", ".join([str(p) for p in limit_reached])
+            )
+
+
+BasketForm = forms.formset_factory(
+    ProductForm, formset=BaseBasketForm, absolute_max=None, min_num=1
+)
