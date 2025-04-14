@@ -38,7 +38,7 @@ class TestMailingForm(TestCase):
         self.assertRedirects(response, self.mail_url)
         response = self.client.get(self.mail_url)
         assert response.status_code == 200
-        assert "Liste de diffusion foyer@utbm.fr" in response.content.decode()
+        assert "Liste de diffusion foyer@utbm.fr" in response.text
 
         # Test with Root
         self.client.force_login(self.root)
@@ -48,7 +48,7 @@ class TestMailingForm(TestCase):
         )
         response = self.client.get(self.mail_url)
         assert response.status_code == 200
-        assert "Liste de diffusion mde@utbm.fr" in response.content.decode()
+        assert "Liste de diffusion mde@utbm.fr" in response.text
 
     def test_mailing_list_add_moderation(self):
         self.client.force_login(self.rbatsbak)
@@ -58,7 +58,7 @@ class TestMailingForm(TestCase):
         )
         response = self.client.get(self.mail_url)
         assert response.status_code == 200
-        content = response.content.decode()
+        content = response.text
         assert "Liste de diffusion mde@utbm.fr" not in content
         assert "<p>Listes de diffusions en attente de modération</p>" in content
         assert "<li>mde@utbm.fr" in content
@@ -90,7 +90,7 @@ class TestMailingForm(TestCase):
         )
         response = self.client.get(self.mail_url)
         assert response.status_code == 200
-        assert "skia@git.an" not in response.content.decode()
+        assert "skia@git.an" not in response.text
 
     def test_add_new_subscription_success(self):
         # Prepare mailing list
@@ -111,7 +111,7 @@ class TestMailingForm(TestCase):
         )
         response = self.client.get(self.mail_url)
         assert response.status_code == 200
-        assert "skia@git.an" in response.content.decode()
+        assert "skia@git.an" in response.text
 
         # Add multiple users
         self.client.post(
@@ -124,7 +124,7 @@ class TestMailingForm(TestCase):
         )
         response = self.client.get(self.mail_url)
         assert response.status_code == 200
-        content = response.content.decode()
+        content = response.text
         assert "richard@git.an" in content
         assert "comunity@git.an" in content
         assert "skia@git.an" in content
@@ -140,7 +140,7 @@ class TestMailingForm(TestCase):
         )
         response = self.client.get(self.mail_url)
         assert response.status_code == 200
-        content = response.content.decode()
+        content = response.text
         assert "richard@git.an" in content
         assert "comunity@git.an" in content
         assert "skia@git.an" in content
@@ -158,7 +158,7 @@ class TestMailingForm(TestCase):
         )
         response = self.client.get(self.mail_url)
         assert response.status_code == 200
-        content = response.content.decode()
+        content = response.text
         assert "richard@git.an" in content
         assert "comunity@git.an" in content
         assert "skia@git.an" in content
@@ -185,7 +185,7 @@ class TestMailingForm(TestCase):
         assert response.status_code
         self.assertInHTML(
             _("You must specify at least an user or an email address"),
-            response.content.decode(),
+            response.text,
         )
 
         # No mailing specified
@@ -197,7 +197,7 @@ class TestMailingForm(TestCase):
             },
         )
         assert response.status_code == 200
-        assert _("This field is required") in response.content.decode()
+        assert _("This field is required") in response.text
 
         # One of the selected users doesn't exist
         response = self.client.post(
@@ -211,7 +211,7 @@ class TestMailingForm(TestCase):
         assert response.status_code == 200
         self.assertInHTML(
             _("You must specify at least an user or an email address"),
-            response.content.decode(),
+            response.text,
         )
 
         # An user has no email address
@@ -229,7 +229,7 @@ class TestMailingForm(TestCase):
         assert response.status_code == 200
         self.assertInHTML(
             _("One of the selected users doesn't have an email address"),
-            response.content.decode(),
+            response.text,
         )
 
         self.krophil.email = "krophil@git.an"
@@ -257,7 +257,7 @@ class TestMailingForm(TestCase):
         assert response.status_code == 200
         self.assertInHTML(
             _("This email is already suscribed in this mailing"),
-            response.content.decode(),
+            response.text,
         )
 
     def test_remove_subscription_success(self):
@@ -283,7 +283,7 @@ class TestMailingForm(TestCase):
 
         response = self.client.get(self.mail_url)
         assert response.status_code == 200
-        content = response.content.decode()
+        content = response.text
 
         assert "comunity@git.an" in content
         assert "richard@git.an" in content
@@ -299,7 +299,7 @@ class TestMailingForm(TestCase):
         )
         response = self.client.get(self.mail_url)
         assert response.status_code == 200
-        content = response.content.decode()
+        content = response.text
 
         assert "comunity@git.an" in content
         assert "richard@git.an" in content
@@ -320,7 +320,7 @@ class TestMailingForm(TestCase):
         )
         response = self.client.get(self.mail_url)
         assert response.status_code == 200
-        content = response.content.decode()
+        content = response.text
 
         assert "comunity@git.an" not in content
         assert "richard@git.an" not in content

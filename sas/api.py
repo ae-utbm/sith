@@ -46,7 +46,9 @@ class AlbumController(ControllerBase):
     @paginate(PageNumberPaginationExtra, page_size=50)
     def fetch_album(self, filters: Query[AlbumFilterSchema]):
         """General-purpose album search."""
-        return filters.filter(Album.objects.viewable_by(self.context.request.user))
+        return filters.filter(
+            Album.objects.viewable_by(self.context.request.user).order_by("-date")
+        )
 
     @route.get(
         "/autocomplete-search",
@@ -63,7 +65,9 @@ class AlbumController(ControllerBase):
         If you don't need the path of the albums,
         do NOT use this route.
         """
-        return filters.filter(Album.objects.viewable_by(self.context.request.user))
+        return filters.filter(
+            Album.objects.viewable_by(self.context.request.user).order_by("-date")
+        )
 
 
 @api_controller("/sas/picture")

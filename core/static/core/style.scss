@@ -361,19 +361,22 @@ body {
     align-items: center;
     text-align: justify;
 
-    &.alert-yellow {
+    &.alert-yellow,
+    &.alert-warning {
       background-color: rgb(255, 255, 240);
       color: rgb(99, 87, 6);
       border: rgb(192, 180, 16) 1px solid;
     }
 
-    &.alert-green {
+    &.alert-green,
+    &.alert-success {
       background-color: rgb(245, 255, 245);
       color: rgb(3, 84, 63);
       border: rgb(14, 159, 110) 1px solid;
     }
 
-    &.alert-red {
+    &.alert-red,
+    &.alert-error {
       background-color: rgb(255, 245, 245);
       color: #c53030;
       border: #fc8181 1px solid;
@@ -520,33 +523,6 @@ body {
 @media screen and (max-width: $small-devices) {
   #page {
     width: 98%;
-  }
-}
-
-/*---------------------------ACCOUNTING----------------------------*/
-#accounting {
-  .journal-table {
-    tbody {
-      .neg-amount {
-        color: red;
-
-        &:before {
-          font-family: FontAwesome;
-          font-size: 1em;
-          content: "\f063";
-        }
-      }
-
-      .pos-amount {
-        color: green;
-
-        &:before {
-          font-family: FontAwesome;
-          font-size: 1em;
-          content: "\f062";
-        }
-      }
-    }
   }
 }
 

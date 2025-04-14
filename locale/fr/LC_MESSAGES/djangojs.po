@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-09 23:23+0200\n"
+"POT-Creation-Date: 2025-04-13 00:18+0200\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -246,18 +246,6 @@ msgstr "Types de produits réordonnés !"
 #, javascript-format
 msgid "Product type reorganisation failed with status code : %d"
 msgstr "La réorganisation des types de produit a échoué avec le code : %d"
-
-#: eboutic/static/bundled/eboutic/makecommand-index.ts
-msgid "Incorrect value"
-msgstr "Valeur incorrecte"
-
-#: eboutic/static/bundled/eboutic/makecommand-index.ts
-msgid "Billing info registration success"
-msgstr "Informations de facturation enregistrées"
-
-#: eboutic/static/bundled/eboutic/makecommand-index.ts
-msgid "Billing info registration failure"
-msgstr "Echec de l'enregistrement des informations de facturation."
 
 #: sas/static/bundled/sas/pictures-download-index.ts
 msgid "pictures.%(extension)s"

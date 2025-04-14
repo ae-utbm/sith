@@ -17,7 +17,7 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
@@ -26,9 +26,10 @@ from django.urls import path, register_converter
 
 from eboutic.converters import PaymentResultConverter
 from eboutic.views import (
+    BillingInfoFormFragment,
     EbouticCommand,
     EtransactionAutoAnswer,
-    e_transaction_data,
+    EurokPartnerFragment,
     eboutic_main,
     pay_with_sith,
     payment_result,
@@ -40,9 +41,10 @@ urlpatterns = [
     # Subscription views
     path("", eboutic_main, name="main"),
     path("command/", EbouticCommand.as_view(), name="command"),
+    path("billing-infos/", BillingInfoFormFragment.as_view(), name="billing_infos"),
     path("pay/sith/", pay_with_sith, name="pay_with_sith"),
     path("pay/<res:result>/", payment_result, name="payment_result"),
-    path("et_data/", e_transaction_data, name="et_data"),
+    path("eurok/", EurokPartnerFragment.as_view(), name="eurok"),
     path(
         "et_autoanswer",
         EtransactionAutoAnswer.as_view(),

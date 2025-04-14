@@ -24,66 +24,64 @@ sith/
 ├── .github/
 │   ├── actions/ (1)
 │   └── workflows/ (2)
-├── accounting/ (3)
+├── club/ (3)
 │   └── ...
-├── club/ (4)
+├── com/ (4)
 │   └── ...
-├── com/ (5)
+├── core/ (5)
 │   └── ...
-├── core/ (6)
+├── counter/ (6)
 │   └── ...
-├── counter/ (7)
+├── docs/ (7)
 │   └── ...
-├── docs/ (8)
+├── eboutic/ (8)
 │   └── ...
-├── eboutic/ (9)
+├── election/ (9)
 │   └── ...
-├── election/ (10)
+├── forum/ (10)
 │   └── ...
-├── forum/ (11)
+├── galaxy/ (11)
 │   └── ...
-├── galaxy/ (12)
+├── launderette/ (12)
 │   └── ...
-├── launderette/ (13)
+├── locale/ (13)
 │   └── ...
-├── locale/ (14)
+├── matmat/ (14)
 │   └── ...
-├── matmat/ (15)
+├── pedagogy/ (15)
 │   └── ...
-├── pedagogy/ (16)
+├── rootplace/ (16)
 │   └── ...
-├── rootplace/ (17)
+├── sas/ (17)
 │   └── ...
-├── sas/ (18)
+├── sith/ (18)
 │   └── ...
-├── sith/ (19)
+├── subscription/ (19)
 │   └── ...
-├── subscription/ (20)
+├── trombi/ (20)
 │   └── ...
-├── trombi/ (21)
+├── antispam/ (21)
 │   └── ...
-├── antispam/ (22)
+├── staticfiles/ (22)
 │   └── ...
-├── staticfiles/ (23)
-│   └── ...
-├── processes/ (24)
+├── processes/ (23)
 │   └── ...
 │
-├── .coveragerc (25)
-├── .envrc (26)
+├── .coveragerc (24)
+├── .envrc (25)
 ├── .gitattributes
 ├── .gitignore
 ├── .mailmap
-├── .env (27)
-├── .env.example (28)
-├── manage.py (29)
-├── mkdocs.yml (30)
+├── .env (26)
+├── .env.example (27)
+├── manage.py (28)
+├── mkdocs.yml (29)
 ├── uv.lock
-├── pyproject.toml (31)
-├── .venv/ (32)
-├── .python-version (33)
-├── Procfile.static (34)
-├── Procfile.service (35)
+├── pyproject.toml (30)
+├── .venv/ (31)
+├── .python-version (32)
+├── Procfile.static (33)
+├── Procfile.service (34)
 └── README.md
 ```
 </div>
@@ -96,55 +94,54 @@ sith/
    des workflows Github. 
    Par exemple, le workflow `docs.yml` compile
    et publie la documentation à chaque push sur la branche `master`.
-3. Application de gestion de la comptabilité.
-4. Application de gestion des clubs et de leurs membres.
-5. Application contenant les fonctionnalités 
+3. Application de gestion des clubs et de leurs membres.
+4. Application contenant les fonctionnalités 
    destinées aux responsables communication de l'AE.
-6. Application contenant la modélisation centrale du site.
+5. Application contenant la modélisation centrale du site.
    On en reparle plus loin sur cette page.
-7. Application de gestion des comptoirs, des permanences
+6. Application de gestion des comptoirs, des permanences
    sur ces comptoirs et des transactions qui y sont effectuées.
-8. Dossier contenant la documentation.
-9. Application de gestion de la boutique en ligne.
-10. Application de gestion des élections.
-11. Application de gestion du forum
-12. Application de gestion de la galaxie ; la galaxie
+7. Dossier contenant la documentation.
+8. Application de gestion de la boutique en ligne.
+9. Application de gestion des élections.
+10. Application de gestion du forum
+11. Application de gestion de la galaxie ; la galaxie
     est un graphe des niveaux de proximité entre les différents
     étudiants.
-13. Gestion des machines à laver de l'AE
-14. Dossier contenant les fichiers de traduction.
-15. Fonctionnalités de recherche d'utilisateurs.
-16. Le guide des UEs du site, sur lequel les utilisateurs
+12. Gestion des machines à laver de l'AE
+13. Dossier contenant les fichiers de traduction.
+14. Fonctionnalités de recherche d'utilisateurs.
+15. Le guide des UEs du site, sur lequel les utilisateurs
     peuvent également laisser leurs avis.
-17. Fonctionnalités utiles aux utilisateurs root.
-18. Le SAS, où l'on trouve toutes les photos de l'AE.
-19. Application principale du projet, contenant sa configuration. 
-20. Gestion des cotisations des utilisateurs du site. 
-21. Outil pour faciliter la fabrication des trombinoscopes de promo. 
-22. Fonctionnalités pour gérer le spam. 
-23. Gestion des statics du site. Override le système de statics de Django.
+16. Fonctionnalités utiles aux utilisateurs root.
+17. Le SAS, où l'on trouve toutes les photos de l'AE.
+18. Application principale du projet, contenant sa configuration. 
+19. Gestion des cotisations des utilisateurs du site. 
+20. Outil pour faciliter la fabrication des trombinoscopes de promo. 
+21. Fonctionnalités pour gérer le spam. 
+22. Gestion des statics du site. Override le système de statics de Django.
     Ajoute l'intégration du scss et du bundler js
     de manière transparente pour l'utilisateur. 
-24. Module de gestion des services externes.
+23. Module de gestion des services externes.
     Offre une API simple pour utiliser les fichiers `Procfile.*`.
-25. Fichier de configuration de coverage. 
-26. Fichier de configuration de direnv. 
-27. Contient les variables d'environnement, qui sont susceptibles
+24. Fichier de configuration de coverage. 
+25. Fichier de configuration de direnv. 
+26. Contient les variables d'environnement, qui sont susceptibles
     de varier d'une machine à l'autre.
-28. Contient des valeurs par défaut pour le `.env`
+27. Contient des valeurs par défaut pour le `.env`
     pouvant convenir à un environnment de développement local
-29. Fichier généré automatiquement par Django. C'est lui
+28. Fichier généré automatiquement par Django. C'est lui
     qui permet d'appeler des commandes de gestion du projet
     avec la syntaxe `python ./manage.py <nom de la commande>`
-30. Le fichier de configuration de la documentation,
+29. Le fichier de configuration de la documentation,
     avec ses plugins et sa table des matières. 
-31. Le fichier où sont déclarés les dépendances et la configuration
+30. Le fichier où sont déclarés les dépendances et la configuration
     de certaines d'entre elles.
-32. Dossier d'environnement virtuel généré par uv
-33. Fichier qui contrôle quelle version de python utiliser pour le projet
-34. Fichier qui contrôle les commandes à lancer pour gérer la compilation
+31. Dossier d'environnement virtuel généré par uv
+32. Fichier qui contrôle quelle version de python utiliser pour le projet
+33. Fichier qui contrôle les commandes à lancer pour gérer la compilation
     automatique des static et autres services nécessaires à la command runserver.
-35. Fichier qui contrôle les services tiers nécessaires au fonctionnement
+34. Fichier qui contrôle les services tiers nécessaires au fonctionnement
     du Sith tel que redis.
 
 ## L'application principale

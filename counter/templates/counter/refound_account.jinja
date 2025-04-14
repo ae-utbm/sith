@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block content %}
-  <div id="accounting">
+  <main>
     <h3>{% trans %}Refound account{% endtrans %}</h3>
     <form action="" method="post">
       {% csrf_token %}
       {{ form.as_p() }}
       <p><input type="submit" value="{% trans %}Refound{% endtrans %}" /></p>
     </form>
-  </div>
+  </main>
 {% endblock %}

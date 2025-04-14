@@ -111,7 +111,9 @@ class TestUVCreation(TestCase):
     def test_create_uv_unauthorized_fail(self):
         # Test with anonymous user
         response = self.client.post(self.create_uv_url, create_uv_template(0))
-        assertRedirects(response, reverse("core:login") + f"?next={self.create_uv_url}")
+        assertRedirects(
+            response, reverse("core:login", query={"next": self.create_uv_url})
+        )
 
         # Test with subscribed user
         self.client.force_login(self.sli)
@@ -194,7 +196,9 @@ class TestUVDelete(TestCase):
     def test_uv_delete_pedagogy_unauthorized_fail(self):
         # Anonymous user
         response = self.client.post(self.delete_uv_url)
-        assertRedirects(response, reverse("core:login") + f"?next={self.delete_uv_url}")
+        assertRedirects(
+            response, reverse("core:login", query={"next": self.delete_uv_url})
+        )
         assert UV.objects.filter(pk=self.uv.pk).exists()
 
         for user in baker.make(User), subscriber_user.make():
@@ -248,7 +252,9 @@ class TestUVUpdate(TestCase):
         response = self.client.post(
             self.update_uv_url, create_uv_template(self.bibou.id, code="PA00")
         )
-        assertRedirects(response, reverse("core:login") + f"?next={self.update_uv_url}")
+        assertRedirects(
+            response, reverse("core:login", query={"next": self.update_uv_url})
+        )
 
         # Not subscribed user
         self.client.force_login(self.guy)
@@ -337,7 +343,7 @@ class TestUVCommentCreationAndDisplay(TestCase):
         nb_comments = self.uv.comments.count()
         # Test with anonymous user
         response = self.client.post(self.uv_url, create_uv_comment_template(0))
-        assertRedirects(response, reverse("core:login") + f"?next={self.uv_url}")
+        assertRedirects(response, reverse("core:login", query={"next": self.uv_url}))
 
         # Test with non subscribed user
         self.client.force_login(self.guy)
@@ -425,7 +431,7 @@ class TestUVCommentDelete(TestCase):
 
         # Anonymous user
         response = self.client.post(url)
-        assertRedirects(response, reverse("core:login") + f"?next={url}")
+        assertRedirects(response, reverse("core:login", query={"next": url}))
 
         # Unsbscribed user
         for user in baker.make(User), subscriber_user.make():
@@ -485,7 +491,7 @@ class TestUVCommentUpdate(TestCase):
         url = reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id})
         # Anonymous user
         response = self.client.post(url, self.comment_edit)
-        assertRedirects(response, reverse("core:login") + f"?next={url}")
+        assertRedirects(response, reverse("core:login", query={"next": url}))
 
         # Unsbscribed user
         self.client.force_login(baker.make(User))
@@ -569,7 +575,7 @@ class TestUVModerationForm(TestCase):
         url = reverse("pedagogy:moderation")
         # Test with anonymous user
         response = self.client.get(url)
-        assertRedirects(response, reverse("core:login") + f"?next={url}")
+        assertRedirects(response, reverse("core:login", query={"next": url}))
 
         # Test with unsubscribed user
         self.client.force_login(self.guy)
@@ -776,7 +782,7 @@ class TestUVCommentReportCreate(TestCase):
         response = self.client.post(
             url, {"comment": self.comment.id, "reporter": 0, "reason": "C'est moche"}
         )
-        assertRedirects(response, reverse("core:login") + f"?next={url}")
+        assertRedirects(response, reverse("core:login", query={"next": url}))
         assert not UVCommentReport.objects.all().exists()
 
     def test_notifications(self):

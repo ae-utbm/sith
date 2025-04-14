@@ -15,7 +15,11 @@
 {% block content %}
   <h3>{% trans %}Eboutic{% endtrans %}</h3>
 
-  <div>
+  <script type="text/javascript">
+    let billingInfos = {{ billing_infos|safe }};
+  </script>
+
+  <div x-data="etransaction(billingInfos)">
     <p>{% trans %}Basket: {% endtrans %}</p>
     <table>
       <thead>
@@ -53,80 +57,22 @@
     </p>
     <br>
     {% if settings.SITH_EBOUTIC_CB_ENABLED %}
-      <div
-        class="collapse"
-        :class="{'shadow': collapsed}"
-        x-data="{collapsed: !{{ "true" if billing_infos else "false" }}}"
-        x-cloak
-      >
-        <div class="collapse-header clickable" @click="collapsed = !collapsed">
-          <span class="collapse-header-text">
-            {% trans %}Billing information{% endtrans %}
-          </span>
-          <span class="collapse-header-icon" :class="{'reverse': collapsed}">
-            <i class="fa fa-caret-down"></i>
-          </span>
-        </div>
-        <form
-          class="collapse-body"
-          id="billing_info_form"
-          x-data="billing_infos({{ user.id }})"
-          x-show="collapsed"
-          x-transition.scale.origin.top
-          @submit.prevent="await sendForm()"
-        >
-          {% csrf_token %}
-          {{ billing_form }}
-          <br />
-          <div
-            x-show="[BillingInfoReqState.Success, BillingInfoReqState.Failure].includes(reqState)"
-            class="alert"
-            :class="'alert-' + getAlertColor()"
-            x-transition
-          >
-            <div class="alert-main" x-text="getAlertMessage()"></div>
-            <div class="clickable" @click="reqState = null">
-              <i class="fa fa-close"></i>
-            </div>
-          </div>
-          <input
-            type="submit" class="btn btn-blue clickable"
-            value="{% trans %}Validate{% endtrans %}"
-            :disabled="reqState === BillingInfoReqState.Sending"
-          >
-        </form>
+      <div @htmx:after-request="fill">
+        {{ billing_infos_form }}
       </div>
-      <br>
-      {% if billing_infos_state == BillingInfoState.EMPTY %}
-        <div class="alert alert-yellow">
-          {% trans trimmed %}
-            You must fill your billing infos if you want to pay with your credit card
-          {% endtrans %}
-        </div>
-      {% elif billing_infos_state == BillingInfoState.MISSING_PHONE_NUMBER %}
-        <div class="alert alert-yellow">
-          {% trans trimmed %}
-            The Crédit Agricole changed its policy related to the billing
-            information that must be provided in order to pay with a credit card.
-            If you want to pay with your credit card, you must add a phone number
-            to the data you already provided.
-          {% endtrans %}
-        </div>
-      {% endif %}
       <form
         method="post"
         action="{{ settings.SITH_EBOUTIC_ET_URL }}"
-        name="bank-pay-form"
-        x-data="etransactionData(initialEtData)"
-        @billing-infos-filled.window="await fill()"
       >
         <template x-for="[key, value] in Object.entries(data)" :key="key">
           <input type="hidden" :name="key" :value="value">
         </template>
         <input
+          x-cloak
           type="submit"
           id="bank-submit-button"
-          {% if billing_infos_state != BillingInfoState.VALID %}disabled="disabled"{% endif %}
+          :disabled="!isCbAvailable"
+          class="btn btn-blue"
           value="{% trans %}Pay with credit card{% endtrans %}"
         />
       </form>
@@ -139,20 +85,8 @@
       <form method="post" action="{{ url('eboutic:pay_with_sith') }}" name="sith-pay-form">
         {% csrf_token %}
         <input type="hidden" name="action" value="pay_with_sith_account">
-        <input type="submit" value="{% trans %}Pay with Sith account{% endtrans %}"/>
+        <input class="btn btn-blue" type="submit" value="{% trans %}Pay with Sith account{% endtrans %}"/>
       </form>
     {% endif %}
   </div>
 {% endblock %}
-
-{% block script %}
-  <script>
-    {% if billing_infos -%}
-      const initialEtData = {{ billing_infos|safe }}
-    {%- else -%}
-      const initialEtData = {}
-    {%- endif %}
-  </script>
-  {{ super() }}
-{% endblock %}
-

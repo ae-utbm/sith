@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-08 16:20+0200\n"
+"POT-Creation-Date: 2025-04-14 01:16+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3770,6 +3770,15 @@ msgstr "panier"
 msgid "invoice"
 msgstr "facture"
 
+#: eboutic/templates/eboutic/eboutic_billing_info.jinja
+msgid "Billing information"
+msgstr "Informations de facturation"
+
+#: eboutic/templates/eboutic/eboutic_billing_info.jinja
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "Validate"
+msgstr "Valider"
+
 #: eboutic/templates/eboutic/eboutic_main.jinja
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja
 msgid "Current account amount: "
@@ -3783,11 +3792,6 @@ msgstr "Valeur du panier : "
 #: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "Clear"
 msgstr "Vider"
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
-msgid "Validate"
-msgstr "Valider"
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
 msgid ""
@@ -3807,6 +3811,25 @@ msgstr "cette page"
 #: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "Eurockéennes 2025 partnership"
 msgstr "Partenariat Eurockéennes 2025"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid ""
+"Our partner uses Weezevent to sell tickets. Weezevent may collect user info "
+"according to it's own privacy policy. By clicking the accept button you "
+"consent to their terms of services."
+msgstr ""
+"Notre partenaire utilises Wezevent pour vendre ses billets. Weezevent peut collecter des informatinos utilisateur "
+"conformément à sa propre politique de confidentialité. En cliquant sur le bouton d'acceptation vous "
+"consentez à leurs termes de service."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "Privacy policy"
+msgstr "Politique de confidentialité"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+#: trombi/templates/trombi/comment_moderation.jinja
+msgid "Accept"
+msgstr "Accepter"
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
 msgid ""
@@ -3836,29 +3859,6 @@ msgstr "État du panier"
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja
 msgid "Remaining account amount: "
 msgstr "Solde restant : "
-
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
-msgid "Billing information"
-msgstr "Informations de facturation"
-
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
-msgid ""
-"You must fill your billing infos if you want to pay with your credit card"
-msgstr ""
-"Vous devez renseigner vos coordonnées de facturation si vous voulez payer "
-"par carte bancaire"
-
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
-msgid ""
-"The Crédit Agricole changed its policy related to the billing information "
-"that must be provided in order to pay with a credit card. If you want to pay "
-"with your credit card, you must add a phone number to the data you already "
-"provided."
-msgstr ""
-"Le Crédit Agricole a changé  sa politique relative aux informations à "
-"fournir pour effectuer un paiement par carte bancaire. De ce fait, si vous "
-"souhaitez payer par carte, vous devez rajouter un numéro de téléphone aux "
-"données que vous aviez déjà fourni."
 
 #: eboutic/templates/eboutic/eboutic_makecommand.jinja
 msgid "Pay with credit card"
@@ -3892,6 +3892,29 @@ msgstr "Le paiement a échoué"
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja
 msgid "Return to eboutic"
 msgstr "Retourner à l'eboutic"
+
+#: eboutic/views.py
+msgid "Billing info registration success"
+msgstr "Informations de facturation enregistrées"
+
+#: eboutic/views.py
+msgid ""
+"You must fill your billing infos if you want to pay with your credit card"
+msgstr ""
+"Vous devez renseigner vos coordonnées de facturation si vous voulez payer "
+"par carte bancaire"
+
+#: eboutic/views.py
+msgid ""
+"The Crédit Agricole changed its policy related to the billing information "
+"that must be provided in order to pay with a credit card. If you want to pay "
+"with your credit card, you must add a phone number to the data you already "
+"provided."
+msgstr ""
+"Le Crédit Agricole a changé  sa politique relative aux informations à "
+"fournir pour effectuer un paiement par carte bancaire. De ce fait, si vous "
+"souhaitez payer par carte, vous devez rajouter un numéro de téléphone aux "
+"données que vous aviez déjà fourni."
 
 #: election/models.py
 msgid "start candidature"
@@ -5381,10 +5404,6 @@ msgstr "fin"
 #: trombi/templates/trombi/comment_moderation.jinja
 msgid "Moderate Trombi comments"
 msgstr "Modérer les commentaires du Trombi"
-
-#: trombi/templates/trombi/comment_moderation.jinja
-msgid "Accept"
-msgstr "Accepter"
 
 #: trombi/templates/trombi/comment_moderation.jinja
 msgid "Reject"
