@@ -21,7 +21,7 @@
 
 {% block content %}
   <h1 id="eboutic-title">{% trans %}Eboutic{% endtrans %}</h1>
-  <div id="eboutic" x-data="basket">
+  <div id="eboutic" x-data="basket({{ last_purchase_time }})">
     <div id="basket">
       <h3>Panier</h3>
       <form method="post" action="">

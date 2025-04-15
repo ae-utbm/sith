@@ -48,7 +48,7 @@ from django_countries.fields import Country
 from core.auth.mixins import CanViewMixin, IsSubscriberMixin
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
 from counter.forms import BaseBasketForm, BillingInfoForm, ProductForm
-from counter.models import BillingInfo, Counter, Customer, Product
+from counter.models import BillingInfo, Counter, Customer, Product, Selling
 from eboutic.models import (
     Basket,
     BasketItem,
@@ -89,7 +89,7 @@ class EbouticMainView(LoginRequiredMixin, FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["form_kwargs"] = {
-            "customer": Customer.get_or_create(self.request.user)[0],
+            "customer": self.customer,
             "counter": Counter.objects.get(type="EBOUTIC"),
             "allowed_products": {product.id: product for product in self.products},
         }
@@ -116,10 +116,22 @@ class EbouticMainView(LoginRequiredMixin, FormView):
     def products(self) -> list[Product]:
         return get_eboutic_products(self.request.user)
 
+    @cached_property
+    def customer(self) -> Customer:
+        return Customer.get_or_create(self.request.user)[0]
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["products"] = self.products
         context["customer_amount"] = self.request.user.account_balance
+        last_purchase: Selling | None = (
+            self.customer.buyings.filter(counter__type="EBOUTIC")
+            .order_by("-date")
+            .first()
+        )
+        context["last_purchase_time"] = (
+            int(last_purchase.date.timestamp() * 1000) if last_purchase else "null"
+        )
         return context
 
 

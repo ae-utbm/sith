@@ -9,7 +9,7 @@ interface BasketItem {
 }
 
 document.addEventListener("alpine:init", () => {
-  Alpine.data("basket", () => ({
+  Alpine.data("basket", (lastPurchaseTime?: number) => ({
     basket: [] as BasketItem[],
 
     init() {
@@ -17,6 +17,16 @@ document.addEventListener("alpine:init", () => {
       this.$watch("basket", () => {
         this.saveBasket();
       });
+
+      // Invalidate basket if a purchase was made
+      if (lastPurchaseTime !== null && localStorage.basketTimestamp !== undefined) {
+        if (
+          new Date(lastPurchaseTime) >=
+          new Date(Number.parseInt(localStorage.basketTimestamp))
+        ) {
+          this.basket = [];
+        }
+      }
 
       // It's quite tricky to manually apply attributes to the management part
       // of a formset so we dynamically apply it here
@@ -38,6 +48,7 @@ document.addEventListener("alpine:init", () => {
 
     saveBasket() {
       localStorage.basket = JSON.stringify(this.basket);
+      localStorage.basketTimestamp = Date.now();
     },
 
     /**
