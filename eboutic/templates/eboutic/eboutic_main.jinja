@@ -30,10 +30,10 @@
           {{ form.management_form }}
         </div>
 
-        {% if form.non_form_errors() %}
+        {% if form.non_form_errors() or form.errors %}
           <div class="alert alert-red">
             <div class="alert-main">
-              {% for error in form.non_form_errors() %}
+              {% for error in form.non_form_errors() + form.errors %}
                 <p style="margin: 0">{{ error }}</p>
               {% endfor %}
             </div>
@@ -50,7 +50,7 @@
             </span>
           </li>
 
-          <template x-for="(item, index) in Object.values(basket)">
+          <template x-for="(item, index) in Object.values(basket)" :key="item.id">
             <li class="item-row" x-show="item.quantity > 0">
               <div class="item-quantity">
                 <i class="fa fa-minus fa-xs" @click="remove(item.id)"></i>
@@ -94,8 +94,8 @@
             <i class="fa fa-check"></i>
             <input type="submit" value="{% trans %}Validate{% endtrans %}"/>
           </button>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
     <div id="catalog">
       {% if not request.user.date_of_birth %}

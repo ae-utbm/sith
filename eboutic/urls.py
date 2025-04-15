@@ -27,8 +27,8 @@ from django.urls import path, register_converter
 from eboutic.converters import PaymentResultConverter
 from eboutic.views import (
     BillingInfoFormFragment,
-    EbouticCommand,
-    EbouticCreateBasket,
+    EbouticCheckout,
+    EbouticMainView,
     EbouticPayWithSith,
     EtransactionAutoAnswer,
     EurokPartnerFragment,
@@ -39,8 +39,8 @@ register_converter(PaymentResultConverter, "res")
 
 urlpatterns = [
     # Subscription views
-    path("", EbouticCreateBasket.as_view(), name="main"),
-    path("command/<int:basket_id>", EbouticCommand.as_view(), name="command"),
+    path("", EbouticMainView.as_view(), name="main"),
+    path("checkout/<int:basket_id>", EbouticCheckout.as_view(), name="checkout"),
     path("billing-infos/", BillingInfoFormFragment.as_view(), name="billing_infos"),
     path(
         "pay/sith/<int:basket_id>", EbouticPayWithSith.as_view(), name="pay_with_sith"

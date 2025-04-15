@@ -18,7 +18,6 @@ from __future__ import annotations
 import base64
 import contextlib
 import json
-from datetime import datetime
 from typing import TYPE_CHECKING
 
 import sentry_sdk
@@ -75,7 +74,7 @@ EbouticBasketForm = forms.formset_factory(
 )
 
 
-class EbouticCreateBasket(LoginRequiredMixin, FormView):
+class EbouticMainView(LoginRequiredMixin, FormView):
     """Main view of the eboutic application.
 
     The purchasable products are those of the eboutic which
@@ -98,6 +97,7 @@ class EbouticCreateBasket(LoginRequiredMixin, FormView):
 
     def form_valid(self, formset):
         if len(formset) == 0:
+            formset.errors.append(_("Your basket is empty"))
             return self.form_invalid(formset)
 
         with transaction.atomic():
@@ -110,7 +110,7 @@ class EbouticCreateBasket(LoginRequiredMixin, FormView):
         return super().form_valid(formset)
 
     def get_success_url(self):
-        return reverse("eboutic:command", kwargs={"basket_id": self.basket.id})
+        return reverse("eboutic:checkout", kwargs={"basket_id": self.basket.id})
 
     @cached_property
     def products(self) -> list[Product]:
@@ -196,11 +196,11 @@ class BillingInfoFormFragment(
         return self.request.path
 
 
-class EbouticCommand(CanViewMixin, UseFragmentsMixin, DetailView):
+class EbouticCheckout(CanViewMixin, UseFragmentsMixin, DetailView):
     model = Basket
     pk_url_kwarg = "basket_id"
     context_object_name = "basket"
-    template_name = "eboutic/eboutic_makecommand.jinja"
+    template_name = "eboutic/eboutic_checkout.jinja"
     fragments = {
         "billing_infos_form": BillingInfoFormFragment,
     }
@@ -247,13 +247,8 @@ class EbouticPayWithSith(CanViewMixin, SingleObjectMixin, View):
                 basket.delete()
             return redirect("eboutic:payment_result", "success")
         except DatabaseError as e:
-            with sentry_sdk.push_scope() as scope:
-                scope.user = {"username": request.user.username}
-                scope.set_extra("someVariable", e.__repr__())
-                sentry_sdk.capture_message(
-                    f"Erreur le {datetime.now()} dans eboutic.pay_with_sith"
-                )
-            return redirect("eboutic:payment_result", "failure")
+            sentry_sdk.capture_exception(e)
+        return redirect("eboutic:payment_result", "failure")
 
 
 class EtransactionAutoAnswer(View):
