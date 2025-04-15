@@ -21,57 +21,90 @@
 
 {% block content %}
   <h1 id="eboutic-title">{% trans %}Eboutic{% endtrans %}</h1>
-  <div id="eboutic" x-data="basket">
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div id="eboutic" x-data="basket({{ last_purchase_time }})">
     <div id="basket">
       <h3>Panier</h3>
-      {% if errors %}
-        <div class="alert alert-red">
-          <div class="alert-main">
-            {% for error in errors %}
-              <p style="margin: 0">{{ error }}</p>
-            {% endfor %}
-          </div>
+      <form method="post" action="">
+        {% csrf_token %}
+        <div x-ref="basketManagementForm">
+          {{ form.management_form }}
         </div>
-      {% endif %}
-      <ul class="item-list">
-                {# Starting money #}
-        <li>
-          <span class="item-name">
-            <strong>{% trans %}Current account amount: {% endtrans %}</strong>
-          </span>
-          <span class="item-price">
-            <strong>{{ "%0.2f"|format(customer_amount) }} €</strong>
-          </span>
-        </li>
-        <template x-for="item in items" :key="item.id">
-          <li class="item-row" x-show="item.quantity > 0">
-            <div class="item-quantity">
-              <i class="fa fa-minus fa-xs" @click="remove(item.id)"></i>
-              <span x-text="item.quantity"></span>
-              <i class="fa fa-plus" @click="add(item)"></i>
+
+        {% if form.non_form_errors() or form.errors %}
+          <div class="alert alert-red">
+            <div class="alert-main">
+              {% for error in form.non_form_errors() + form.errors %}
+                <p style="margin: 0">{{ error }}</p>
+              {% endfor %}
             </div>
-            <span class="item-name" x-text="item.name"></span>
-            <span class="item-price" x-text="(item.unit_price * item.quantity).toFixed(2) + ' €'"></span>
+          </div>
+        {% endif %}
+        <ul class="item-list">
+                  {# Starting money #}
+          <li>
+            <span class="item-name">
+              <strong>{% trans %}Current account amount: {% endtrans %}</strong>
+            </span>
+            <span class="item-price">
+              <strong>{{ "%0.2f"|format(customer_amount) }} €</strong>
+            </span>
           </li>
-        </template>
-                {# Total price #}
-        <li style="margin-top: 20px">
-          <span class="item-name"><strong>{% trans %}Basket amount: {% endtrans %}</strong></span>
-          <span x-text="getTotal().toFixed(2) + ' €'" class="item-price"></span>
-        </li>
-      </ul>
-      <div class="catalog-buttons">
-        <button @click="clearBasket()" class="btn btn-grey">
-          <i class="fa fa-trash"></i>
-          {% trans %}Clear{% endtrans %}
-        </button>
-        <form method="get" action="{{ url('eboutic:command') }}">
+
+          <template x-for="(item, index) in Object.values(basket)" :key="item.id">
+            <li class="item-row" x-show="item.quantity > 0">
+              <div class="item-quantity">
+                <i class="fa fa-minus fa-xs" @click="remove(item.id)"></i>
+                <span x-text="item.quantity"></span>
+                <i class="fa fa-plus" @click="add(item)"></i>
+              </div>
+              <span class="item-name" x-text="item.name"></span>
+              <span class="item-price" x-text="(item.unit_price * item.quantity).toFixed(2) + ' €'"></span>
+
+              <input
+                type="hidden"
+                :value="item.quantity"
+                :id="`id_form-${index}-quantity`"
+                :name="`form-${index}-quantity`"
+                required
+                readonly
+              >
+              <input
+                type="hidden"
+                :value="item.id"
+                :id="`id_form-${index}-id`"
+                :name="`form-${index}-id`"
+                required
+                readonly
+              >
+
+            </li>
+          </template>
+                  {# Total price #}
+          <li style="margin-top: 20px">
+            <span class="item-name"><strong>{% trans %}Basket amount: {% endtrans %}</strong></span>
+            <span x-text="getTotal().toFixed(2) + ' €'" class="item-price"></span>
+          </li>
+        </ul>
+        <div class="catalog-buttons">
+          <button @click.prevent="clearBasket()" class="btn btn-grey">
+            <i class="fa fa-trash"></i>
+            {% trans %}Clear{% endtrans %}
+          </button>
           <button class="btn btn-blue">
             <i class="fa fa-check"></i>
             <input type="submit" value="{% trans %}Validate{% endtrans %}"/>
           </button>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
     <div id="catalog">
       {% if not request.user.date_of_birth %}
@@ -108,7 +141,7 @@
                 {% trans trimmed %}
                   Our partner uses Weezevent to sell tickets.
                   Weezevent may collect user info according to
-                  it's own privacy policy.
+                  its own privacy policy.
                   By clicking the accept button you consent to
                   their terms of services.
                 {% endtrans %}
@@ -158,7 +191,7 @@
                   <button
                     id="{{ p.id }}"
                     class="card product-button clickable shadow"
-                    :class="{selected: items.some((i) => i.id === {{ p.id }})}"
+                    :class="{selected: basket.some((i) => i.id === {{ p.id }})}"
                     @click='addFromCatalog({{ p.id }}, {{ p.name|tojson }}, {{ p.selling_price }})'
                   >
                     {% if p.icon %}
