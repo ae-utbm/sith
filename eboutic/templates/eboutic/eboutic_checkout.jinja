@@ -19,7 +19,7 @@
     let billingInfos = {{ billing_infos|safe }};
   </script>
 
-  <div x-data="etransaction(billingInfos)">
+  <div x-data="etransaction(billingInfos, {{ basket.id }})">
     <p>{% trans %}Basket: {% endtrans %}</p>
     <table>
       <thead>
