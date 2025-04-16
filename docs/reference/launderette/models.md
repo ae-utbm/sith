@@ -1,1 +1,0 @@
-::: launderette.models

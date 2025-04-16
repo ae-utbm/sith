@@ -564,10 +564,8 @@ class UserToolsView(LoginRequiredMixin, QuickNotifMixin, UserTabsMixin, Template
 
     def get_context_data(self, **kwargs):
         self.object = self.request.user
-        from launderette.models import Launderette
 
         kwargs = super().get_context_data(**kwargs)
-        kwargs["launderettes"] = Launderette.objects.all()
         kwargs["profile"] = self.request.user
         kwargs["object"] = self.request.user
         return kwargs

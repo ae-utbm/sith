@@ -42,10 +42,6 @@ urlpatterns = [
     path("club/", include(("club.urls", "club"), namespace="club")),
     path("counter/", include(("counter.urls", "counter"), namespace="counter")),
     path("eboutic/", include(("eboutic.urls", "eboutic"), namespace="eboutic")),
-    path(
-        "launderette/",
-        include(("launderette.urls", "launderette"), namespace="launderette"),
-    ),
     path("sas/", include(("sas.urls", "sas"), namespace="sas")),
     path("election/", include(("election.urls", "election"), namespace="election")),
     path("forum/", include(("forum.urls", "forum"), namespace="forum")),
