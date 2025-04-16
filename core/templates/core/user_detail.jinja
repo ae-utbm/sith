@@ -141,12 +141,6 @@
             {{ user_subscription(profile) }}
           </div>
         {% endif %}
-        {% if user == profile or user.is_root or user.is_board_member or user.is_launderette_manager %}
-          <div>
-            {{ show_tokens(profile) }}
-            {{ show_slots(profile) }}
-          </div>
-        {% endif %}
       {% else %}
         <div>
           {% trans %}Not subscribed{% endtrans %}

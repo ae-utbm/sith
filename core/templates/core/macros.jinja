@@ -86,19 +86,6 @@
   {% trans %}Account number: {% endtrans %}{{ user.customer.account_id }}<br/>
 {%- endmacro %}
 
-{% macro show_slots(user) %}
-  {% if user.slots.filter(start_date__gte=timezone.now()).exists() %}
-    <h5>{% trans %}Slot{% endtrans %}</h5>
-    <ul>
-      {% for i in user.slots.filter(start_date__gte=timezone.now().replace(tzinfo=None)).all() %}
-        <li>{{ i.get_type_display() }} - {{i.machine.launderette }}, {{ i.start_date|date("l j") }} :
-          {{ i.start_date|time(DATETIME_FORMAT) }} |
-          <a href="{{ url('launderette:delete_slot', slot_id=i.id) }}">{% trans %}Delete{% endtrans %}</a></li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-{% endmacro %}
-
 {% macro show_tokens(user) %}
   {% if user.tokens.exists() %}
     <h5>{% trans %}Tokens{% endtrans %}</h5>

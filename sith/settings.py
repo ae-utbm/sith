@@ -184,7 +184,6 @@ TEMPLATES = [
                 "can_edit": "core.auth.mixins.can_edit",
                 "can_view": "core.auth.mixins.can_view",
                 "settings": "sith.settings",
-                "Launderette": "launderette.models.Launderette",
                 "Counter": "counter.models.Counter",
                 "timezone": "django.utils.timezone",
                 "get_sith": "com.views.sith",
@@ -667,10 +666,6 @@ with open(
     env.path("SITH_EBOUTIC_PUB_KEY_PATH", default=BASE_DIR / "sith/et_keys/pubkey.pem")
 ) as f:
     SITH_EBOUTIC_PUB_KEY = f.read()
-
-# Launderette variables
-SITH_LAUNDERETTE_MACHINE_TYPES = [("WASHING", _("Washing")), ("DRYING", _("Drying"))]
-SITH_LAUNDERETTE_PRICES = {"WASHING": 1.0, "DRYING": 0.75}
 
 SITH_NOTIFICATIONS = [
     ("POSTER_MODERATION", _("A new poster needs to be moderated")),
