@@ -49,6 +49,9 @@ dependencies = [
     "requests>=2.32.3",
     "honcho>=2.0.0",
     "psutil>=7.0.0",
+    "celery[redis]>=5.5.1",
+    "django-celery-results>=2.5.1",
+    "django-celery-beat>=2.7.0",
 ]
 
 [project.urls]
