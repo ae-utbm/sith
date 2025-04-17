@@ -18,7 +18,7 @@
   <form action="{{ url('core:register') }}" method="post">
     {% csrf_token %}
     {% render_honeypot_field %}
-    {{ form }}
+    {{ form.as_p() }}
     <input type="submit" value="{% trans %}Register{% endtrans %}" />
   </form>
 {% endblock %}
