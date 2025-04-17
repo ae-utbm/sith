@@ -65,12 +65,16 @@ class SASMainView(UseFragmentsMixin, TemplateView):
     template_name = "sas/main.jinja"
 
     def get_fragments(self) -> dict[str, FragmentRenderer]:
+        if not self.request.user.has_perm("sas.add_album"):
+            return {}
         form_init = {"parent": SithFile.objects.get(id=settings.SITH_SAS_ROOT_DIR_ID)}
         return {
             "album_create_fragment": AlbumCreateFragment.as_fragment(initial=form_init)
         }
 
     def get_fragment_data(self) -> dict[str, dict[str, Any]]:
+        if not self.request.user.has_perm("sas.add_album"):
+            return {}
         root_user = User.objects.get(pk=settings.SITH_ROOT_USER_ID)
         return {"album_create_fragment": {"owner": root_user}}
 
