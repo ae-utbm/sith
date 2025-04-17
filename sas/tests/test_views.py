@@ -15,12 +15,13 @@
 from typing import Callable
 
 import pytest
+from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
 from model_bakery import baker
-from pytest_django.asserts import assertInHTML, assertRedirects
+from pytest_django.asserts import assertHTMLEqual, assertInHTML, assertRedirects
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import Group, User
@@ -41,14 +42,35 @@ from sas.models import Album, Picture
             User, groups=[Group.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
         ),
         lambda: baker.make(User),
+        lambda: None,
     ],
 )
 def test_load_main_page(client: Client, user_factory: Callable[[], User]):
     """Just check that the SAS doesn't crash."""
     user = user_factory()
-    client.force_login(user)
+    if user is not None:
+        client.force_login(user)
     res = client.get(reverse("sas:main"))
     assert res.status_code == 200
+
+
+@pytest.mark.django_db
+def test_main_page_no_form_for_regular_users(client: Client):
+    """Test that subscribed users see no form on the sas main page"""
+    client.force_login(subscriber_user.make())
+    res = client.get(reverse("sas:main"))
+    soup = BeautifulSoup(res.text, "lxml")
+    forms = soup.find("main").find_all("form")
+    assert len(forms) == 0
+
+
+@pytest.mark.django_db
+def test_main_page_content_anonymous(client: Client):
+    """Test that public users see only an incentive to login"""
+    res = client.get(reverse("sas:main"))
+    soup = BeautifulSoup(res.text, "lxml")
+    expected = "<h3>SAS</h3><p>Vous devez être connecté pour voir les photos.</p>"
+    assertHTMLEqual(soup.find("main").decode_contents(), expected)
 
 
 @pytest.mark.django_db
