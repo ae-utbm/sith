@@ -89,6 +89,50 @@ def test_album_access_non_subscriber(client: Client):
     assert res.status_code == 200
 
 
+@pytest.mark.django_db
+class TestAlbumUpload:
+    @staticmethod
+    def assert_album_created(response, name, parent):
+        assert response.headers.get("HX-Redirect", "") == parent.get_absolute_url()
+        children = list(Album.objects.filter(parent=parent))
+        assert len(children) == 1
+        assert children[0].name == name
+
+    def test_sas_admin(self, client: Client):
+        user = baker.make(
+            User, groups=[Group.objects.get(id=settings.SITH_GROUP_SAS_ADMIN_ID)]
+        )
+        album = baker.make(Album, parent_id=settings.SITH_SAS_ROOT_DIR_ID)
+        client.force_login(user)
+        response = client.post(
+            reverse("sas:album_create"), {"name": "new", "parent": album.id}
+        )
+        self.assert_album_created(response, "new", album)
+
+    def test_non_admin_user_with_edit_rights_on_parent(self, client: Client):
+        group = baker.make(Group)
+        user = subscriber_user.make(groups=[group])
+        album = baker.make(
+            Album, parent_id=settings.SITH_SAS_ROOT_DIR_ID, edit_groups=[group]
+        )
+        client.force_login(user)
+        response = client.post(
+            reverse("sas:album_create"), {"name": "new", "parent": album.id}
+        )
+        self.assert_album_created(response, "new", album)
+
+    def test_permission_denied(self, client: Client):
+        album = baker.make(Album, parent_id=settings.SITH_SAS_ROOT_DIR_ID)
+        client.force_login(subscriber_user.make())
+        response = client.post(
+            reverse("sas:album_create"), {"name": "new", "parent": album.id}
+        )
+        errors = BeautifulSoup(response.text, "lxml").find_all(class_="errorlist")
+        assert len(errors) == 1
+        assert errors[0].text == "Vous n'avez pas la permission de faire cela"
+        assert not album.children.exists()
+
+
 class TestSasModeration(TestCase):
     @classmethod
     def setUpTestData(cls):

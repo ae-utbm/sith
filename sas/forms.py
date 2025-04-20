@@ -27,7 +27,9 @@ class AlbumCreateForm(forms.ModelForm):
             self.instance.moderator = owner
 
     def clean(self):
-        if not self.instance.owner.can_edit(self.instance.parent):
+        parent = self.cleaned_data["parent"]
+        parent.__class__ = Album  # by default, parent is a SithFile
+        if not self.instance.owner.can_edit(parent):
             raise ValidationError(_("You do not have the permission to do that"))
         return super().clean()
 
