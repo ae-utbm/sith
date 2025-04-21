@@ -894,12 +894,7 @@ class Command(BaseCommand):
         subscribers.permissions.add(
             *list(
                 perms.filter(
-                    codename__in=[
-                        "add_news",
-                        "add_uecomment",
-                        "add_reservationslot",
-                        "view_reservationslot",
-                    ]
+                    codename__in=["add_news", "add_uecomment", "view_reservationslot"]
                 )
             )
         )
