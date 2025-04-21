@@ -5,6 +5,7 @@ from typing import Callable
 from uuid import uuid4
 
 import pytest
+from django.conf import settings
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
 from django.test import Client, TestCase
@@ -17,8 +18,8 @@ from pytest_django.asserts import assertNumQueries
 from core.baker_recipes import board_user, old_subscriber_user, subscriber_user
 from core.models import Group, QuickUploadImage, SithFile, User
 from core.utils import RED_PIXEL_PNG
+from sas.baker_recipes import picture_recipe
 from sas.models import Picture
-from sith import settings
 
 
 @pytest.mark.django_db
@@ -30,24 +31,19 @@ class TestImageAccess:
             lambda: baker.make(
                 User, groups=[Group.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
             ),
-            lambda: baker.make(
-                User, groups=[Group.objects.get(pk=settings.SITH_GROUP_COM_ADMIN_ID)]
-            ),
         ],
     )
     def test_sas_image_access(self, user_factory: Callable[[], User]):
         """Test that only authorized users can access the sas image."""
         user = user_factory()
-        picture: SithFile = baker.make(
-            Picture, parent=SithFile.objects.get(pk=settings.SITH_SAS_ROOT_DIR_ID)
-        )
-        assert picture.is_owned_by(user)
+        picture = picture_recipe.make()
+        assert user.can_edit(picture)
 
     def test_sas_image_access_owner(self):
         """Test that the owner of the image can access it."""
         user = baker.make(User)
-        picture: Picture = baker.make(Picture, owner=user)
-        assert picture.is_owned_by(user)
+        picture = picture_recipe.make(owner=user)
+        assert user.can_edit(picture)
 
     @pytest.mark.parametrize(
         "user_factory",
@@ -63,7 +59,7 @@ class TestImageAccess:
         user = user_factory()
         owner = baker.make(User)
         picture: Picture = baker.make(Picture, owner=owner)
-        assert not picture.is_owned_by(user)
+        assert not user.can_edit(picture)
 
 
 @pytest.mark.django_db
