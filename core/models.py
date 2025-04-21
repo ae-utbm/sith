@@ -883,8 +883,6 @@ class SithFile(models.Model):
         super().clean()
         if "/" in self.name:
             raise ValidationError(_("Character '/' not authorized in name"))
-        if self == self.parent:
-            raise ValidationError(_("Loop in folder tree"), code="loop")
         if self == self.parent or (
             self.parent is not None and self in self.get_parent_list()
         ):
