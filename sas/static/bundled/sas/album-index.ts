@@ -128,3 +128,108 @@ document.addEventListener("alpine:init", () => {
     },
   }));
 });
+
+// Todo: migrate to alpine.js if we have some time
+// $("form#upload_form").submit(function (event) {
+//   const formData = new FormData($(this)[0]);
+//
+//   if (!formData.get("album_name") && !formData.get("images").name) return false;
+//
+//   if (!formData.get("images").name) {
+//     return true;
+//   }
+//
+//   event.preventDefault();
+//
+//   let errorList = this.querySelector("#upload_form ul.errorlist.nonfield");
+//   if (errorList === null) {
+//     errorList = document.createElement("ul");
+//     errorList.classList.add("errorlist", "nonfield");
+//     this.insertBefore(errorList, this.firstElementChild);
+//   }
+//
+//   while (errorList.childElementCount > 0)
+//     errorList.removeChild(errorList.firstElementChild);
+//
+//   let progress = this.querySelector("progress");
+//   if (progress === null) {
+//     progress = document.createElement("progress");
+//     progress.value = 0;
+//     const p = document.createElement("p");
+//     p.appendChild(progress);
+//     this.insertBefore(p, this.lastElementChild);
+//   }
+//
+//   let dataHolder;
+//
+//   if (formData.get("album_name")) {
+//     dataHolder = new FormData();
+//     dataHolder.set("csrfmiddlewaretoken", "{{ csrf_token }}");
+//     dataHolder.set("album_name", formData.get("album_name"));
+//     $.ajax({
+//       method: "POST",
+//       url: "{{ url('sas:album_upload', album_id=object.id) }}",
+//       data: dataHolder,
+//       processData: false,
+//       contentType: false,
+//       success: onSuccess,
+//     });
+//   }
+//
+//   const images = formData.getAll("images");
+//   const imagesCount = images.length;
+//   let completeCount = 0;
+//
+//   const poolSize = 1;
+//   const imagePool = [];
+//
+//   while (images.length > 0 && imagePool.length < poolSize) {
+//     const image = images.shift();
+//     imagePool.push(image);
+//     sendImage(image);
+//   }
+//
+//   function sendImage(image) {
+//     dataHolder = new FormData();
+//     dataHolder.set("csrfmiddlewaretoken", "{{ csrf_token }}");
+//     dataHolder.set("images", image);
+//
+//     $.ajax({
+//       method: "POST",
+//       url: "{{ url('sas:album_upload', album_id=object.id) }}",
+//       data: dataHolder,
+//       processData: false,
+//       contentType: false,
+//     })
+//       .fail(onSuccess.bind(undefined, image))
+//       .done(onSuccess.bind(undefined, image))
+//       .always(next.bind(undefined, image));
+//   }
+//
+//   function next(image, _, __) {
+//     const index = imagePool.indexOf(image);
+//     const nextImage = images.shift();
+//
+//     if (index !== -1) {
+//       imagePool.splice(index, 1);
+//     }
+//
+//     if (nextImage) {
+//       imagePool.push(nextImage);
+//       sendImage(nextImage);
+//     }
+//   }
+//
+//   function onSuccess(image, data, _, __) {
+//     let errors = [];
+//
+//     if ($(data.responseText).find(".errorlist.nonfield")[0])
+//       errors = Array.from($(data.responseText).find(".errorlist.nonfield")[0].children);
+//
+//     while (errors.length > 0) errorList.appendChild(errors.shift());
+//
+//     progress.value = ++completeCount / imagesCount;
+//     if (progress.value === 1 && errorList.children.length === 0)
+//       document.location.reload();
+//   }
+// });

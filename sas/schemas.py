@@ -55,7 +55,12 @@ class AlbumAutocompleteSchema(ModelSchema):
 
     @staticmethod
     def resolve_path(obj: Album) -> str:
-        return str(Path(obj.get_parent_path()) / obj.name)
+        return str(Path(obj.parent_path) / obj.name)
+
+
+class MoveAlbumSchema(Schema):
+    id: int
+    new_parent_id: int
 
 
 class PictureFilterSchema(FilterSchema):

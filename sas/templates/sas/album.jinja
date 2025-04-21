@@ -40,17 +40,17 @@
         </div>
       </div>
 
-      {% if clipboard %}
-        <div class="clipboard">
-          {% trans %}Clipboard: {% endtrans %}
-          <ul>
-            {% for f in clipboard %}
-              <li>{{ f.get_full_path() }}</li>
-            {% endfor %}
-          </ul>
-          <input name="clear" type="submit" value="{% trans %}Clear clipboard{% endtrans %}">
-        </div>
-      {% endif %}
+{#      {% if clipboard %}#}
+{#        <div class="clipboard">#}
+{#          {% trans %}Clipboard: {% endtrans %}#}
+{#          <ul>#}
+{#            {% for f in clipboard["albums"] %}#}
+{#              <li>{{ f.get_full_path() }}</li>#}
+{#            {% endfor %}#}
+{#          </ul>#}
+{#          <input name="clear" type="submit" value="{% trans %}Clear clipboard{% endtrans %}">#}
+{#        </div>#}
+{#      {% endif %}#}
   {% endif %}
 
   {% if show_albums %}
@@ -73,8 +73,8 @@
                 <div class="text">{% trans %}To be moderated{% endtrans %}</div>
               </template>
             </div>
-            {% if is_sas_admin %}
-              <input type="checkbox" name="file_list" :value="album.id">
+            {% if edit_mode %}
+              <input type="checkbox" name="album_list" :value="album.id">
             {% endif %}
           </a>
         </template>
@@ -100,7 +100,7 @@
             </template>
           </div>
           {% if is_sas_admin %}
-            <input type="checkbox" name="file_list" :value="picture.id">
+            <input type="checkbox" name="picture_list" :value="picture.id">
           {% endif %}
         </a>
       </template>
@@ -120,9 +120,9 @@
       {% csrf_token %}
       <div class="inputs">
         <p>
-          <label for="{{ upload_form.images.id_for_label }}">{{ upload_form.images.label }} :</label>
-          {{ upload_form.images|add_attr("x-ref=pictures") }}
-          <span class="helptext">{{ upload_form.images.help_text }}</span>
+          <label for="{{ form.images.id_for_label }}">{{ form.images.label }} :</label>
+          {{ form.images|add_attr("x-ref=pictures") }}
+          <span class="helptext">{{ form.images.help_text }}</span>
         </p>
         <input type="submit" value="{% trans %}Upload{% endtrans %}" />
         <progress x-ref="progress" x-show="sending"></progress>

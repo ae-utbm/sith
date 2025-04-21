@@ -11,9 +11,7 @@
       {% set img = static('core/img/sas.jpg') %}
       {% set alt = "sas.jpg" %}
     {% endif %}
-    <div
-      class="album{% if not a.is_moderated %} not_moderated{% endif %}"
-    >
+    <div class="album{% if not a.is_moderated %} not_moderated{% endif %}">
       <img src="{{ img }}" alt="{{ alt }}" loading="lazy" />
       {% if not a.is_moderated %}
         <div class="overlay">&nbsp;</div>
