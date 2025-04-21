@@ -59,24 +59,22 @@
         {% endfor %}
       </div>
 
-      {% if is_sas_admin %}
+      {% if form %}
         </form>
 
         <br>
 
-        <form class="add-files" action="" method="post" enctype="multipart/form-data">
+        <form class="add-files" action="" method="post">
           {% csrf_token %}
-
           <div class="inputs">
             <div>
-              <label for="{{ form.album_name.name }}">{{ form.album_name.label }}</label>
-              {{ form.album_name }}
+              {{ form.name.errors }}
+              <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+              {{ form.name }}
             </div>
             <input type="submit" value="{% trans %}Create{% endtrans %}" />
           </div>
-
           {{ form.non_field_errors() }}
-          {{ form.album_name.errors }}
         </form>
       {% endif %}
     {% endif %}

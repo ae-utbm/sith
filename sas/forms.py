@@ -1,6 +1,7 @@
 from typing import Any
 
 from django import forms
+from django.core.files.uploadedfile import UploadedFile
 from django.utils.translation import gettext_lazy as _
 
 from core.models import User
@@ -11,19 +12,47 @@ from sas.models import Album, Picture, PictureModerationRequest
 from sas.widgets.ajax_select import AutoCompleteSelectAlbum
 
 
+class AlbumCreateForm(forms.ModelForm):
+    class Meta:
+        model = Album
+        fields = ["name"]
+        labels = {"name": _("Add a new album")}
+
+    def __init__(self, *args, parent: Album | None, owner: User, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.instance.parent = parent
+        self.instance.owner = owner
+        if owner.has_perm("sas.moderate_sasfile"):
+            self.instance.is_moderated = True
+            self.instance.moderator = owner
+
+
+class PictureUploadForm(forms.Form):
+    images = MultipleImageField(label=_("Upload images"), required=False)
+
+
+
 class SASForm(forms.Form):
     album_name = forms.CharField(
         label=_("Add a new album"), max_length=Album.NAME_MAX_LENGTH, required=False
     )
-    images = MultipleImageField(
-        label=_("Upload images"),
-        required=False,
-    )
+    images = MultipleImageField(label=_("Upload images"), required=False)
 
-    def process(self, parent, owner, files, *, automodere=False):
+    def process(
+        self,
+        parent: Album,
+        owner: User,
+        files: list[UploadedFile],
+        *,
+        automodere: bool = False,
+    ):
         try:
             if self.cleaned_data["album_name"] != "":
-                album = Album(parent=parent, name=self.cleaned_data["album_name"])
+                album = Album(
+                    parent=parent,
+                    name=self.cleaned_data["album_name"],
+                    is_moderated=automodere,
+                )
                 album.clean()
                 album.save()
         except Exception as e:

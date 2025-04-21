@@ -808,9 +808,7 @@ Welcome to the wiki page!
         # SAS
         for f in self.SAS_FIXTURE_PATH.glob("*"):
             if f.is_dir():
-                album = Album(name=f.name)
-                album.clean()
-                album.save()
+                album = Album.objects.create(name=f.name, is_moderated=True)
                 for p in f.iterdir():
                     file = resize_image(Image.open(p), 1000, "WEBP")
                     pict = Picture(
@@ -823,6 +821,7 @@ Welcome to the wiki page!
                     pict.original.name = pict.name
                     pict.generate_thumbnails()
                     pict.save()
+                album.generate_thumbnail()
 
         img_skia = Picture.objects.get(name="skia.jpg")
         img_sli = Picture.objects.get(name="sli.jpg")

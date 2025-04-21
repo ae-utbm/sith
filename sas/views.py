@@ -21,44 +21,48 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, TemplateView
-from django.views.generic.edit import FormMixin, FormView, UpdateView
+from django.views.generic import CreateView, DetailView, TemplateView
+from django.views.generic.edit import FormMixin, FormView, ModelFormMixin, UpdateView
 
 from core.auth.mixins import CanEditMixin, CanViewMixin
-from core.models import SithFile, User
-from core.views.files import FileView, send_raw_file
+from core.models import User, SithFile
+from core.views import FileView
+from core.views.files import send_raw_file
 from core.views.user import UserTabsMixin
 from sas.forms import (
+    AlbumCreateForm,
     AlbumEditForm,
     PictureEditForm,
     PictureModerationRequestForm,
-    SASForm,
+    SASForm, PictureUploadForm,
 )
 from sas.models import Album, Picture
 
 
-class SASMainView(FormView):
-    form_class = SASForm
+class SASMainView(CreateView):
+    form_class = AlbumCreateForm
     template_name = "sas/main.jinja"
     success_url = reverse_lazy("sas:main")
 
-    def post(self, request, *args, **kwargs):
-        self.form = self.get_form()
-        root = User.objects.filter(username="root").first()
-        if request.user.is_authenticated and request.user.is_in_group(
-            pk=settings.SITH_GROUP_SAS_ADMIN_ID
-        ):
-            if self.form.is_valid():
-                self.form.process(parent=None, owner=root, files=[], automodere=True)
-                if self.form.is_valid():
-                    return super().form_valid(self.form)
-        else:
-            self.form.add_error(None, _("You do not have the permission to do that"))
-        return self.form_invalid(self.form)
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == "POST" and not self.request.user.has_perm("sas.add_album"):
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+        if not self.request.user.has_perm("sas.add_album"):
+            return None
+        return super().get_form(form_class)
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {
+            "owner": User.objects.get(pk=settings.SITH_ROOT_USER_ID),
+            "parent": None,
+        }
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        albums_qs = Album.objects.annotate_is_moderated().viewable_by(self.request.user)
+        albums_qs = Album.objects.viewable_by(self.request.user)
         kwargs["categories"] = list(albums_qs.filter(parent=None).order_by("id"))
         kwargs["latest"] = list(albums_qs.order_by("-id")[:5])
         return kwargs
@@ -114,7 +118,7 @@ def send_thumb(request, picture_id):
 
 class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
     model = Album
-    form_class = SASForm
+    form_class = PictureUploadForm
     pk_url_kwarg = "album_id"
 
     def post(self, request, *args, **kwargs):
@@ -128,68 +132,56 @@ class AlbumUploadView(CanViewMixin, DetailView, FormMixin):
                 parent=self.object,
                 owner=request.user,
                 files=files,
-                automodere=(
-                    request.user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
-                    or request.user.is_root
-                ),
+                automodere=request.user.has_perm("sas.moderate_sasfile"),
             )
-            if self.form.is_valid():
-                return HttpResponse(str(self.form.errors), status=200)
+            return HttpResponse(str(self.form.errors), status=200)
         return HttpResponse(str(self.form.errors), status=500)
 
 
-class AlbumView(CanViewMixin, DetailView, FormMixin):
+class AlbumView(CanViewMixin, DetailView, ModelFormMixin):
     model = Album
-    form_class = SASForm
+    form_class = AlbumCreateForm
     pk_url_kwarg = "album_id"
     template_name = "sas/album.jinja"
 
     def dispatch(self, request, *args, **kwargs):
-        try:
-            self.asked_page = int(request.GET.get("page", 1))
-        except ValueError as e:
-            raise Http404 from e
+        if "clipboard" not in request.session:
+            request.session["clipboard"] = {"albums": [], "pictures": []}
         return super().dispatch(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
-        self.form = self.get_form()
-        if "clipboard" not in request.session:
-            request.session["clipboard"] = []
-        return super().get(request, *args, **kwargs)
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {
+            "owner": self.request.user,
+            "parent": self.object,
+        }
+
+    def get_form(self, *args, **kwargs):
+        if not self.request.user.can_edit(self.object):
+            return None
+        return super().get_form(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if not self.object.file:
-            self.object.generate_thumbnail()
-        self.form = self.get_form()
-        if "clipboard" not in request.session:
-            request.session["clipboard"] = []
-        if request.user.can_edit(self.object):  # Handle the copy-paste functions
-            FileView.handle_clipboard(request, self.object)
-        parent = SithFile.objects.filter(id=self.object.id).first()
-        files = request.FILES.getlist("images")
-        if request.user.is_authenticated and request.user.is_subscribed:
-            if self.form.is_valid():
-                self.form.process(
-                    parent=parent,
-                    owner=request.user,
-                    files=files,
-                    automodere=request.user.is_in_group(
-                        pk=settings.SITH_GROUP_SAS_ADMIN_ID
-                    ),
-                )
-                if self.form.is_valid():
-                    return super().form_valid(self.form)
-        else:
-            self.form.add_error(None, _("You do not have the permission to do that"))
-        return self.form_invalid(self.form)
+        form = self.get_form()
+        if not form:
+            # the form is reserved for users that can edit this album.
+            # If there is no form, it means the user has no right to do a POST
+            raise PermissionDenied
+        FileView.handle_clipboard(self.request, self.object)
+        if not form.is_valid():
+            return self.form_invalid(form)
+        return self.form_valid(form)
 
     def get_success_url(self):
         return reverse("sas:album", kwargs={"album_id": self.object.id})
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["form"] = self.form
+        if kwargs["form"]:
+            # There are two forms on the page : one for creating
+            # sub-albums, and the other to upload pictures.
+            # Both forms require the same permissions.
+            kwargs["picture_upload_form"] = PictureUploadForm()
         kwargs["clipboard"] = SithFile.objects.filter(
             id__in=self.request.session["clipboard"]
         )

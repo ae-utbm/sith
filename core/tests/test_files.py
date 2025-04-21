@@ -4,6 +4,7 @@ from typing import Callable
 from uuid import uuid4
 
 import pytest
+from django.conf import settings
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
@@ -15,8 +16,8 @@ from pytest_django.asserts import assertNumQueries
 
 from core.baker_recipes import board_user, old_subscriber_user, subscriber_user
 from core.models import Group, SithFile, User
+from sas.baker_recipes import picture_recipe
 from sas.models import Picture
-from sith import settings
 
 
 @pytest.mark.django_db
@@ -36,15 +37,13 @@ class TestImageAccess:
     def test_sas_image_access(self, user_factory: Callable[[], User]):
         """Test that only authorized users can access the sas image."""
         user = user_factory()
-        picture: SithFile = baker.make(
-            Picture, parent=SithFile.objects.get(pk=settings.SITH_SAS_ROOT_DIR_ID)
-        )
+        picture = picture_recipe.make()
         assert picture.is_owned_by(user)
 
     def test_sas_image_access_owner(self):
         """Test that the owner of the image can access it."""
         user = baker.make(User)
-        picture: Picture = baker.make(Picture, owner=user)
+        picture = picture_recipe.make(owner=user)
         assert picture.is_owned_by(user)
 
     @pytest.mark.parametrize(
