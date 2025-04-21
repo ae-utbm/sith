@@ -12,20 +12,23 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-
+from dataclasses import dataclass
 from datetime import date, timedelta
 
 # Image utils
 from io import BytesIO
-from typing import Final, Unpack
+from typing import Any, Final, Unpack
 
 import PIL
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import UploadedFile
 from django.db import models
+from django.forms import BaseForm
 from django.http import Http404, HttpRequest
 from django.shortcuts import get_list_or_404
+from django.template.loader import render_to_string
+from django.utils.safestring import SafeString
 from django.utils.timezone import localdate
 from PIL import ExifTags
 from PIL.Image import Image, Resampling
@@ -42,6 +45,21 @@ RED_PIXEL_PNG: Final[bytes] = (
 Can be used in tests and in dev, when there is a need
 to generate a dummy image that is considered valid nonetheless
 """
+
+
+@dataclass
+class FormFragmentTemplateData[T: BaseForm]:
+    """Dataclass used to pre-render form fragments"""
+
+    form: T
+    template: str
+    context: dict[str, Any]
+
+    def render(self, request: HttpRequest) -> SafeString:
+        # Request is needed for csrf_tokens
+        return render_to_string(
+            self.template, context={"form": self.form, **self.context}, request=request
+        )
 
 
 def get_start_of_semester(today: date | None = None) -> date:

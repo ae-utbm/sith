@@ -17,12 +17,16 @@ from __future__ import annotations
 
 import contextlib
 from io import BytesIO
-from typing import ClassVar, Self
+from pathlib import Path
+from typing import TYPE_CHECKING, ClassVar, Self
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.db import models
 from django.db.models import Exists, OuterRef, Q
+from django.db.models.deletion import Collector
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -31,6 +35,9 @@ from PIL import Image
 
 from core.models import Group, Notification, User
 from core.utils import exif_auto_rotate, resize_image
+
+if TYPE_CHECKING:
+    from django.db.models.fields.files import FieldFile
 
 
 def get_directory(instance: SasFile, filename: str):
@@ -43,8 +50,8 @@ def get_compressed_directory(instance: SasFile, filename: str):
 
 def get_thumbnail_directory(instance: SasFile, filename: str):
     if isinstance(instance, Album):
-        name, extension = filename.rsplit(".", 1)
-        filename = f"{name}/thumb.{extension}"
+        _, extension = filename.rsplit(".", 1)
+        filename = f"{instance.name}/thumb.{extension}"
     return f"./.thumbnails/{instance.parent_path}/{filename}"
 
 
@@ -83,10 +90,15 @@ class SasFile(models.Model):
 
     @cached_property
     def parent_path(self) -> str:
+        """The parent location in the SAS album tree (e.g. `SAS/foo/bar`)."""
         return "/".join(["SAS", *[p.name for p in self.parent_list]])
 
     @cached_property
-    def parent_list(self) -> list[Self]:
+    def parent_list(self) -> list[Album]:
+        """The ancestors of this SAS object.
+
+        The result is ordered from the direct parent to the farthest one.
+        """
         parents = []
         current = self.parent
         while current is not None:
@@ -118,17 +130,6 @@ class AlbumQuerySet(models.QuerySet):
             Exists(Picture.objects.filter(parent_id=OuterRef("pk")).viewable_by(user))
         )
 
-    def annotate_is_moderated(self) -> Self:
-        # an album is moderated if it has at least one moderated photo
-        # if there is no photo at all, the album isn't considered as non-moderated
-        # (it's just empty)
-        return self.annotate(
-            is_moderated=Exists(
-                Picture.objects.filter(parent=OuterRef("pk"), is_moderated=True)
-            )
-            | ~Exists(Picture.objects.filter(parent=OuterRef("pk")))
-        )
-
 
 class Album(SasFile):
     NAME_MAX_LENGTH: ClassVar[int] = 50
@@ -143,18 +144,22 @@ class Album(SasFile):
         on_delete=models.CASCADE,
     )
     thumbnail = models.FileField(
-        upload_to=get_thumbnail_directory, verbose_name=_("thumbnail"), max_length=256
+        upload_to=get_thumbnail_directory,
+        verbose_name=_("thumbnail"),
+        max_length=256,
+        blank=True,
     )
     view_groups = models.ManyToManyField(
-        Group, related_name="viewable_albums", verbose_name=_("view groups")
+        Group, related_name="viewable_albums", verbose_name=_("view groups"), blank=True
     )
     edit_groups = models.ManyToManyField(
-        Group, related_name="editable_albums", verbose_name=_("edit groups")
+        Group, related_name="editable_albums", verbose_name=_("edit groups"), blank=True
     )
     event_date = models.DateField(
         _("event date"),
         help_text=_("The date on which the photos in this album were taken"),
         default=timezone.localdate,
+        blank=True,
     )
     is_moderated = models.BooleanField(_("is moderated"), default=False)
 
@@ -164,7 +169,9 @@ class Album(SasFile):
         verbose_name = _("album")
         constraints = [
             models.UniqueConstraint(
-                fields=["name", "parent"], name="unique_album_name_if_same_parent"
+                fields=["name", "parent"],
+                name="unique_album_name_if_same_parent",
+                # TODO : add `nulls_distinct=True` after upgrading to django>=5.0
             )
         ]
 
@@ -186,14 +193,62 @@ class Album(SasFile):
     def get_absolute_url(self):
         return reverse("sas:album", kwargs={"album_id": self.id})
 
+    def clean(self):
+        super().clean()
+        if "/" in self.name:
+            raise ValidationError(_("Character '/' not authorized in name"))
+        if self.parent_id is not None and (
+            self.id == self.parent_id or self in self.parent_list
+        ):
+            raise ValidationError(_("Loop in album tree"), code="loop")
+        if self.thumbnail:
+            try:
+                Image.open(BytesIO(self.thumbnail.read()))
+            except Image.UnidentifiedImageError as e:
+                raise ValidationError(_("This is not a valid album thumbnail")) from e
+
+    def delete(self, *args, **kwargs):
+        """Delete the album, all of its children and all linked disk files"""
+        collector = Collector(using="default")
+        collector.collect([self])
+        albums: set[Album] = collector.data[Album]
+        pictures: set[Picture] = collector.data[Picture]
+        files: list[FieldFile] = [
+            *[a.thumbnail for a in albums],
+            *[p.thumbnail for p in pictures],
+            *[p.compressed for p in pictures],
+            *[p.original for p in pictures],
+        ]
+        # `bool(f)` checks that the file actually exists on the disk
+        files = [f for f in files if bool(f)]
+        folders = {Path(f.path).parent for f in files}
+        res = super().delete(*args, **kwargs)
+        # once the model instances have been deleted,
+        # delete the actual files.
+        for file in files:
+            # save=False ensures that django doesn't recreate the db record,
+            # which would make the whole deletion pointless
+            # cf. https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.fields.files.FieldFile.delete
+            file.delete(save=False)
+        for folder in folders:
+            # now that the files are deleted, remove the empty folders
+            if folder.is_dir() and next(folder.iterdir(), None) is None:
+                folder.rmdir()
+        return res
+
     def get_download_url(self):
         return reverse("sas:album_preview", kwargs={"album_id": self.id})
 
     def generate_thumbnail(self):
-        p = self.pictures.order_by("?").first() or self.children.order_by("?").first()
-        if p and p.thumbnail:
-            self.thumbnail = p.thumbnail
-            self.thumbnail.name = f"{self.name}/thumb.webp"
+        p = (
+            self.pictures.exclude(thumbnail="").order_by("?").first()
+            or self.children.exclude(thumbnail="").order_by("?").first()
+        )
+        if p:
+            # The file is loaded into memory to duplicate it.
+            # It may not be the most efficient way, but thumbnails are
+            # usually quite small, so it's still ok
+            self.thumbnail = ContentFile(p.thumbnail.read(), name="thumb.webp")
             self.save()
 
 
@@ -222,8 +277,8 @@ class Picture(SasFile):
     thumbnail = models.FileField(
         upload_to=get_thumbnail_directory,
         verbose_name=_("thumbnail"),
-        unique=True,
         max_length=256,
+        unique=True,
     )
     original = models.FileField(
         upload_to=get_directory,
@@ -257,13 +312,16 @@ class Picture(SasFile):
 
     objects = PictureQuerySet.as_manager()
 
+    class Meta:
+        verbose_name = _("picture")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "parent"], name="sas_picture_unique_per_album"
+            )
+        ]
+
     def __str__(self):
         return self.name
-
-    def save(self, *args, **kwargs):
-        if self._state.adding:
-            self.generate_thumbnails()
-        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse("sas:picture", kwargs={"picture_id": self.id})
@@ -296,10 +354,11 @@ class Picture(SasFile):
         # - photographers usually already optimize their images
         thumb = resize_image(im, 200, "webp")
         compressed = resize_image(im, 1200, "webp")
+        new_extension_name = str(Path(self.original.name).with_suffix(".webp"))
         self.thumbnail = thumb
-        self.thumbnail.name = self.name
+        self.thumbnail.name = new_extension_name
         self.compressed = compressed
-        self.compressed.name = self.name
+        self.compressed.name = new_extension_name
 
     def rotate(self, degree):
         for field in self.original, self.compressed, self.thumbnail:
