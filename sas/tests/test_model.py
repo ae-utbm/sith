@@ -4,8 +4,8 @@ from model_bakery import baker
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import User
-from sas.baker_recipes import picture_recipe
-from sas.models import PeoplePictureRelation, Picture
+from sas.baker_recipes import album_recipe, picture_recipe
+from sas.models import Album, PeoplePictureRelation, Picture
 
 
 class TestPictureQuerySet(TestCase):
@@ -67,3 +67,22 @@ def test_identifications_viewable_by_user():
     assert list(picture.people.viewable_by(identifications[1].user)) == [
         identifications[1]
     ]
+
+
+class TestDeleteAlbum(TestCase):
+    def setUp(cls):
+        cls.album: Album = album_recipe.make()
+        cls.album_pictures = picture_recipe.make(parent=cls.album, _quantity=5)
+        cls.sub_album = album_recipe.make(parent=cls.album)
+        cls.sub_album_pictures = picture_recipe.make(parent=cls.sub_album, _quantity=5)
+
+    def test_delete(self):
+        album_ids = [self.album.id, self.sub_album.id]
+        picture_ids = [
+            *[p.id for p in self.album_pictures],
+            *[p.id for p in self.sub_album_pictures],
+        ]
+        self.album.delete()
+        # assert not p.exists()
+        assert not Album.objects.filter(id__in=album_ids).exists()
+        assert not Picture.objects.filter(id__in=picture_ids).exists()
