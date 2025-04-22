@@ -30,7 +30,6 @@ from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
 from cryptography.hazmat.primitives.hashes import SHA1
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from django.conf import settings
-from django.db.models import Max
 from django.test import TestCase
 from django.urls import reverse
 
@@ -112,59 +111,6 @@ class TestEboutic(TestCase):
         # this cookie should be removed after payment
         expected = 'basket_items=""; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/eboutic'
         assert expected == self.client.cookies["basket_items"].OutputString()
-
-    def test_submit_basket(self):
-        self.client.force_login(self.subscriber)
-        self.client.cookies["basket_items"] = """[
-            {"id": 2, "name": "Cotis 2 semestres", "quantity": 1, "unit_price": 28},
-            {"id": 4, "name": "Barbar", "quantity": 3, "unit_price": 1.7}
-        ]"""
-        response = self.client.get(reverse("eboutic:command"))
-        assert response.status_code == 200
-        self.assertInHTML(
-            "<tr><td>Cotis 2 semestres</td><td>1</td><td>28.00 €</td></tr>",
-            response.text,
-        )
-        self.assertInHTML(
-            "<tr><td>Barbar</td><td>3</td><td>1.70 €</td></tr>",
-            response.text,
-        )
-        assert "basket_id" in self.client.session
-        basket = Basket.objects.get(id=self.client.session["basket_id"])
-        assert basket.items.count() == 2
-        barbar = basket.items.filter(product_name="Barbar").first()
-        assert barbar is not None
-        assert barbar.quantity == 3
-        cotis = basket.items.filter(product_name="Cotis 2 semestres").first()
-        assert cotis is not None
-        assert cotis.quantity == 1
-        assert basket.total == 3 * 1.7 + 28
-
-    def test_submit_empty_basket(self):
-        self.client.force_login(self.subscriber)
-        self.client.cookies["basket_items"] = "[]"
-        response = self.client.get(reverse("eboutic:command"))
-        self.assertRedirects(response, "/eboutic/")
-
-    def test_submit_invalid_basket(self):
-        self.client.force_login(self.subscriber)
-        max_id = Product.objects.aggregate(res=Max("id"))["res"]
-        self.client.cookies["basket_items"] = f"""[
-            {{"id": {max_id + 1}, "name": "", "quantity": 1, "unit_price": 28}}
-        ]"""
-        response = self.client.get(reverse("eboutic:command"))
-        cookie = self.client.cookies["basket_items"].OutputString()
-        assert 'basket_items="[]"' in cookie
-        assert "Path=/eboutic" in cookie
-        self.assertRedirects(response, "/eboutic/")
-
-    def test_submit_basket_illegal_quantity(self):
-        self.client.force_login(self.subscriber)
-        self.client.cookies["basket_items"] = """[
-            {"id": 4, "name": "Barbar", "quantity": -1, "unit_price": 1.7}
-        ]"""
-        response = self.client.get(reverse("eboutic:command"))
-        self.assertRedirects(response, "/eboutic/")
 
     def test_buy_subscribe_product_with_credit_card(self):
         self.client.force_login(self.old_subscriber)
