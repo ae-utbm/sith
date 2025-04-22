@@ -1,5 +1,13 @@
+import base64
+import urllib
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
+from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
+from cryptography.hazmat.primitives.hashes import SHA1
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
+from django.conf import settings
 from django.contrib.messages import get_messages
 from django.contrib.messages.constants import DEFAULT_LEVELS
 from django.test import TestCase
@@ -7,11 +15,14 @@ from django.urls import reverse
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
-from core.baker_recipes import subscriber_user
+from core.baker_recipes import old_subscriber_user, subscriber_user
 from counter.baker_recipes import product_recipe
-from counter.models import Product, ProductType
+from counter.models import Product, ProductType, Selling
 from counter.tests.test_counter import force_refill_user
 from eboutic.models import Basket, BasketItem
+
+if TYPE_CHECKING:
+    from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 
 
 class TestPaymentBase(TestCase):
@@ -82,6 +93,22 @@ class TestPaymentSith(TestPaymentBase):
         self.customer.customer.refresh_from_db()
         assert self.customer.customer.amount == Decimal("1")
 
+        sellings = Selling.objects.filter(customer=self.customer.customer).order_by(
+            "quantity"
+        )
+        assert len(sellings) == 2
+        assert sellings[0].payment_method == "SITH_ACCOUNT"
+        assert sellings[0].quantity == 1
+        assert sellings[0].unit_price == self.snack.selling_price
+        assert sellings[0].counter.type == "EBOUTIC"
+        assert sellings[0].product == self.snack
+
+        assert sellings[1].payment_method == "SITH_ACCOUNT"
+        assert sellings[1].quantity == 2
+        assert sellings[1].unit_price == self.beer.selling_price
+        assert sellings[1].counter.type == "EBOUTIC"
+        assert sellings[1].product == self.beer
+
     def test_not_enough_money(self):
         self.client.force_login(self.customer)
         response = self.client.post(
@@ -120,3 +147,103 @@ class TestPaymentSith(TestPaymentBase):
         )
         self.customer.customer.refresh_from_db()
         assert self.customer.customer.amount == self.basket.total
+
+
+class TestPaymentCard(TestPaymentBase):
+    def generate_bank_valid_answer(self, basket: Basket):
+        query = (
+            f"Amount={int(basket.total * 100)}&BasketID={basket.id}&Auto=42&Error=00000"
+        )
+        with open("./eboutic/tests/private_key.pem", "br") as f:
+            PRIVKEY = f.read()
+        with open("./eboutic/tests/public_key.pem") as f:
+            settings.SITH_EBOUTIC_PUB_KEY = f.read()
+        key: RSAPrivateKey = load_pem_private_key(PRIVKEY, None)
+        sig = key.sign(query.encode("utf-8"), PKCS1v15(), SHA1())
+        b64sig = base64.b64encode(sig).decode("ascii")
+
+        url = reverse("eboutic:etransation_autoanswer") + "?%s&Sig=%s" % (
+            query,
+            urllib.parse.quote_plus(b64sig),
+        )
+        return url
+
+    def test_buy_success(self):
+        response = self.client.get(self.generate_bank_valid_answer(self.basket))
+        assert response.status_code == 200
+        assert response.content.decode("utf-8") == "Payment successful"
+        assert Basket.objects.filter(id=self.basket.id).first() is None
+
+        sellings = Selling.objects.filter(customer=self.customer.customer).order_by(
+            "quantity"
+        )
+        assert len(sellings) == 2
+        assert sellings[0].payment_method == "CARD"
+        assert sellings[0].quantity == 1
+        assert sellings[0].unit_price == self.snack.selling_price
+        assert sellings[0].counter.type == "EBOUTIC"
+        assert sellings[0].product == self.snack
+
+        assert sellings[1].payment_method == "CARD"
+        assert sellings[1].quantity == 2
+        assert sellings[1].unit_price == self.beer.selling_price
+        assert sellings[1].counter.type == "EBOUTIC"
+        assert sellings[1].product == self.beer
+
+    def test_buy_subscribe_product(self):
+        customer = old_subscriber_user.make()
+        assert customer.subscriptions.count() == 1
+        assert not customer.subscriptions.first().is_valid_now()
+
+        basket = baker.make(Basket, user=customer)
+        BasketItem.from_product(Product.objects.get(code="2SCOTIZ"), 1, basket).save()
+        assert (
+            self.client.get(self.generate_bank_valid_answer(basket)).status_code == 200
+        )
+
+        assert customer.subscriptions.count() == 2
+
+        subscription = customer.subscriptions.order_by("-subscription_end").first()
+        assert subscription.is_valid_now()
+        assert subscription.subscription_type == "deux-semestres"
+        assert subscription.location == "EBOUTIC"
+
+    def test_buy_refilling(self):
+        BasketItem.from_product(self.refilling, 2, self.basket).save()
+        assert (
+            self.client.get(self.generate_bank_valid_answer(self.basket)).status_code
+            == 200
+        )
+
+        self.customer.customer.refresh_from_db()
+        assert self.customer.customer.amount == self.refilling.selling_price * 2
+
+    def test_multiple_responses(self):
+        bank_response = self.generate_bank_valid_answer(self.basket)
+        assert self.client.get(bank_response).status_code == 200
+        response = self.client.get(bank_response)
+        assert response.status_code == 500
+        assert (
+            response.text
+            == "Basket processing failed with error: SuspiciousOperation('Basket does not exists')"
+        )
+
+    def test_unknown_basket(self):
+        bank_response = self.generate_bank_valid_answer(self.basket)
+        self.basket.delete()
+        response = self.client.get(bank_response)
+        assert response.status_code == 500
+        assert (
+            response.text
+            == "Basket processing failed with error: SuspiciousOperation('Basket does not exists')"
+        )
+
+    def test_altered_basket(self):
+        bank_response = self.generate_bank_valid_answer(self.basket)
+        BasketItem.from_product(self.snack, 1, self.basket).save()
+        response = self.client.get(bank_response)
+        assert response.status_code == 500
+        assert (
+            response.text == "Basket processing failed with error: "
+            "SuspiciousOperation('Basket total and amount do not match')"
+        )
