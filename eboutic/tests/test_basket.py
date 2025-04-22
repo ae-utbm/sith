@@ -1,3 +1,4 @@
+import pytest
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import Client
@@ -9,9 +10,18 @@ from pytest_django.asserts import assertRedirects
 from core.baker_recipes import subscriber_user
 from core.models import Group, User
 from counter.baker_recipes import product_recipe
-from counter.models import Counter, ProductType
+from counter.models import Counter, ProductType, get_eboutic
 from counter.tests.test_counter import BasketItem
 from eboutic.models import Basket
+
+
+@pytest.mark.django_db
+def test_get_eboutic():
+    assert Counter.objects.get(name="Eboutic") == get_eboutic()
+
+    baker.make(Counter, type="EBOUTIC")
+
+    assert Counter.objects.get(name="Eboutic") == get_eboutic()
 
 
 class TestEboutic(TestCase):
@@ -51,7 +61,7 @@ class TestEboutic(TestCase):
         cls.new_customer.groups.add(cls.group_public)
         cls.new_customer_adult.groups.add(cls.group_public)
 
-        cls.eboutic = Counter.objects.get(name="Eboutic")
+        cls.eboutic = get_eboutic()
         cls.eboutic.products.add(cls.cotiz, cls.beer, cls.snack)
 
     @classmethod

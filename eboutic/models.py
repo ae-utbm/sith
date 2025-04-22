@@ -28,12 +28,20 @@ from django.utils.translation import gettext_lazy as _
 
 from core.models import User
 from counter.fields import CurrencyField
-from counter.models import BillingInfo, Counter, Customer, Product, Refilling, Selling
+from counter.models import (
+    BillingInfo,
+    Counter,
+    Customer,
+    Product,
+    Refilling,
+    Selling,
+    get_eboutic,
+)
 
 
 def get_eboutic_products(user: User) -> list[Product]:
     products = (
-        Counter.objects.get(type="EBOUTIC")
+        get_eboutic()
         .products.filter(product_type__isnull=False)
         .filter(archived=False)
         .filter(limit_age__lte=user.age)
@@ -101,13 +109,6 @@ class Basket(models.Model):
                 total=Sum(F("quantity") * F("product_unit_price"), default=0)
             )["total"]
         )
-
-    @classmethod
-    def from_session(cls, session) -> Basket | None:
-        """The basket stored in the session object, if it exists."""
-        if "basket_id" in session:
-            return cls.objects.filter(id=session["basket_id"]).first()
-        return None
 
     def generate_sales(self, counter, seller: User, payment_method: str):
         """Generate a list of sold items corresponding to the items

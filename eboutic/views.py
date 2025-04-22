@@ -32,7 +32,7 @@ from django.contrib.auth.mixins import (
     LoginRequiredMixin,
 )
 from django.contrib.messages.views import SuccessMessageMixin
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.db import DatabaseError, transaction
 from django.db.models.fields import forms
 from django.db.utils import cached_property
@@ -48,7 +48,7 @@ from django_countries.fields import Country
 from core.auth.mixins import CanViewMixin, IsSubscriberMixin
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
 from counter.forms import BaseBasketForm, BillingInfoForm, ProductForm
-from counter.models import BillingInfo, Counter, Customer, Product, Selling
+from counter.models import BillingInfo, Customer, Product, Selling, get_eboutic
 from eboutic.models import (
     Basket,
     BasketItem,
@@ -90,7 +90,7 @@ class EbouticMainView(LoginRequiredMixin, FormView):
         kwargs = super().get_form_kwargs()
         kwargs["form_kwargs"] = {
             "customer": self.customer,
-            "counter": Counter.objects.get(type="EBOUTIC"),
+            "counter": get_eboutic(),
             "allowed_products": {product.id: product for product in self.products},
         }
         return kwargs
@@ -246,9 +246,9 @@ class EbouticPayWithSith(CanViewMixin, SingleObjectMixin, View):
                 self.request,
                 _("You can't buy a refilling with sith money"),
             )
-            return redirect("eboutic:main")
+            return redirect("eboutic:payment_result", "failure")
 
-        eboutic = Counter.objects.get(type="EBOUTIC")
+        eboutic = get_eboutic()
         sales = basket.generate_sales(eboutic, basket.user, "SITH_ACCOUNT")
         try:
             with transaction.atomic():
@@ -260,6 +260,8 @@ class EbouticPayWithSith(CanViewMixin, SingleObjectMixin, View):
             return redirect("eboutic:payment_result", "success")
         except DatabaseError as e:
             sentry_sdk.capture_exception(e)
+        except ValidationError as e:
+            messages.error(self.request, e.message)
         return redirect("eboutic:payment_result", "failure")
 
 

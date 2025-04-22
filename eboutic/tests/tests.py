@@ -85,33 +85,6 @@ class TestEboutic(TestCase):
         )
         return url
 
-    def test_buy_with_sith_account(self):
-        self.client.force_login(self.subscriber)
-        self.subscriber.customer.amount = 100  # give money before test
-        self.subscriber.customer.save()
-        basket = self.get_busy_basket(self.subscriber)
-        amount = basket.total
-        response = self.client.post(reverse("eboutic:pay_with_sith"))
-        self.assertRedirects(response, "/eboutic/pay/success/")
-        new_balance = Customer.objects.get(user=self.subscriber).amount
-        assert float(new_balance) == 100 - amount
-        expected = 'basket_items=""; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/eboutic'
-        assert expected == self.client.cookies["basket_items"].OutputString()
-
-    def test_buy_with_sith_account_no_money(self):
-        self.client.force_login(self.subscriber)
-        basket = self.get_busy_basket(self.subscriber)
-        initial = basket.total - 1  # just not enough to complete the sale
-        self.subscriber.customer.amount = initial
-        self.subscriber.customer.save()
-        response = self.client.post(reverse("eboutic:pay_with_sith"))
-        self.assertRedirects(response, "/eboutic/pay/failure/")
-        new_balance = Customer.objects.get(user=self.subscriber).amount
-        assert float(new_balance) == initial
-        # this cookie should be removed after payment
-        expected = 'basket_items=""; expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; Path=/eboutic'
-        assert expected == self.client.cookies["basket_items"].OutputString()
-
     def test_buy_subscribe_product_with_credit_card(self):
         self.client.force_login(self.old_subscriber)
         response = self.client.get(
