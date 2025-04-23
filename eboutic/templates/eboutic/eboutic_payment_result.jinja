@@ -4,6 +4,14 @@
   <h3>{% trans %}Eboutic{% endtrans %}</h3>
 
   <div>
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
     {% if success %}
       {% trans %}Payment successful{% endtrans %}
     {% else %}

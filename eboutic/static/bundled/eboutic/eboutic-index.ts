@@ -8,55 +8,55 @@ interface BasketItem {
   unit_price: number;
 }
 
-const BASKET_ITEMS_COOKIE_NAME: string = "basket_items";
-
-/**
- * Search for a cookie by name
- * @param name Name of the cookie to get
- * @returns the value of the cookie or null if it does not exist, undefined if not found
- */
-function getCookie(name: string): string | null | undefined {
-  if (!document.cookie || document.cookie.length === 0) {
-    return null;
-  }
-
-  const found = document.cookie
-    .split(";")
-    .map((c) => c.trim())
-    .find((c) => c.startsWith(`${name}=`));
-
-  return found === undefined ? undefined : decodeURIComponent(found.split("=")[1]);
-}
-
-/**
- * Fetch the basket items from the associated cookie
- * @returns the items in the basket
- */
-function getStartingItems(): BasketItem[] {
-  const cookie = getCookie(BASKET_ITEMS_COOKIE_NAME);
-  if (!cookie) {
-    return [];
-  }
-  // Django cookie backend converts `,` to `\054`
-  let parsed = JSON.parse(cookie.replace(/\\054/g, ","));
-  if (typeof parsed === "string") {
-    // In some conditions, a second parsing is needed
-    parsed = JSON.parse(parsed);
-  }
-  const res = Array.isArray(parsed) ? parsed : [];
-  return res.filter((i) => !!document.getElementById(i.id));
-}
-
 document.addEventListener("alpine:init", () => {
-  Alpine.data("basket", () => ({
-    items: getStartingItems() as BasketItem[],
+  Alpine.data("basket", (lastPurchaseTime?: number) => ({
+    basket: [] as BasketItem[],
+
+    init() {
+      this.basket = this.loadBasket();
+      this.$watch("basket", () => {
+        this.saveBasket();
+      });
+
+      // Invalidate basket if a purchase was made
+      if (lastPurchaseTime !== null && localStorage.basketTimestamp !== undefined) {
+        if (
+          new Date(lastPurchaseTime) >=
+          new Date(Number.parseInt(localStorage.basketTimestamp))
+        ) {
+          this.basket = [];
+        }
+      }
+
+      // It's quite tricky to manually apply attributes to the management part
+      // of a formset so we dynamically apply it here
+      this.$refs.basketManagementForm
+        .querySelector("#id_form-TOTAL_FORMS")
+        .setAttribute(":value", "basket.length");
+    },
+
+    loadBasket(): BasketItem[] {
+      if (localStorage.basket === undefined) {
+        return [];
+      }
+      try {
+        return JSON.parse(localStorage.basket);
+      } catch (_err) {
+        return [];
+      }
+    },
+
+    saveBasket() {
+      localStorage.basket = JSON.stringify(this.basket);
+      localStorage.basketTimestamp = Date.now();
+    },
 
     /**
      * Get the total price of the basket
      * @returns {number} The total price of the basket
      */
     getTotal() {
-      return this.items.reduce(
+      return this.basket.reduce(
         (acc: number, item: BasketItem) => acc + item.quantity * item.unit_price,
         0,
       );
@@ -68,7 +68,6 @@ document.addEventListener("alpine:init", () => {
      */
     add(item: BasketItem) {
       item.quantity++;
-      this.setCookies();
     },
 
     /**
@@ -76,39 +75,25 @@ document.addEventListener("alpine:init", () => {
      * @param itemId the id of the item to remove
      */
     remove(itemId: number) {
-      const index = this.items.findIndex((e: BasketItem) => e.id === itemId);
+      const index = this.basket.findIndex((e: BasketItem) => e.id === itemId);
 
       if (index < 0) {
         return;
       }
-      this.items[index].quantity -= 1;
+      this.basket[index].quantity -= 1;
 
-      if (this.items[index].quantity === 0) {
-        this.items = this.items.filter(
-          (e: BasketItem) => e.id !== this.items[index].id,
+      if (this.basket[index].quantity === 0) {
+        this.basket = this.basket.filter(
+          (e: BasketItem) => e.id !== this.basket[index].id,
         );
       }
-      this.setCookies();
     },
 
     /**
      * Remove all the items from the basket & cleans the catalog CSS classes
      */
     clearBasket() {
-      this.items = [];
-      this.setCookies();
-    },
-
-    /**
-     * Set the cookie in the browser with the basket items
-     * ! the cookie survives an hour
-     */
-    setCookies() {
-      if (this.items.length === 0) {
-        document.cookie = `${BASKET_ITEMS_COOKIE_NAME}=;Max-Age=0`;
-      } else {
-        document.cookie = `${BASKET_ITEMS_COOKIE_NAME}=${encodeURIComponent(JSON.stringify(this.items))};Max-Age=3600`;
-      }
+      this.basket = [];
     },
 
     /**
@@ -127,7 +112,7 @@ document.addEventListener("alpine:init", () => {
         unit_price: price,
       } as BasketItem;
 
-      this.items.push(newItem);
+      this.basket.push(newItem);
       this.add(newItem);
 
       return newItem;
@@ -141,7 +126,7 @@ document.addEventListener("alpine:init", () => {
      * @param price The unit price of the product
      */
     addFromCatalog(id: number, name: string, price: number) {
-      let item = this.items.find((e: BasketItem) => e.id === id);
+      let item = this.basket.find((e: BasketItem) => e.id === id);
 
       // if the item is not in the basket, we create it
       // else we add + 1 to it

@@ -18,7 +18,6 @@ from __future__ import annotations
 import base64
 import contextlib
 import json
-from datetime import datetime
 from typing import TYPE_CHECKING
 
 import sentry_sdk
@@ -33,23 +32,23 @@ from django.contrib.auth.mixins import (
     LoginRequiredMixin,
 )
 from django.contrib.messages.views import SuccessMessageMixin
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.db import DatabaseError, transaction
+from django.db.models.fields import forms
 from django.db.utils import cached_property
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.http import require_GET, require_POST
-from django.views.generic import TemplateView, UpdateView, View
+from django.views.decorators.http import require_GET
+from django.views.generic import DetailView, FormView, TemplateView, UpdateView, View
+from django.views.generic.edit import SingleObjectMixin
 from django_countries.fields import Country
 
-from core.auth.mixins import IsSubscriberMixin
+from core.auth.mixins import CanViewMixin, IsSubscriberMixin
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
-from counter.forms import BillingInfoForm
-from counter.models import BillingInfo, Counter, Customer, Product
-from eboutic.forms import BasketForm
+from counter.forms import BaseBasketForm, BillingInfoForm, ProductForm
+from counter.models import BillingInfo, Customer, Product, Selling, get_eboutic
 from eboutic.models import (
     Basket,
     BasketItem,
@@ -58,39 +57,82 @@ from eboutic.models import (
     InvoiceItem,
     get_eboutic_products,
 )
-from eboutic.schemas import PurchaseItemList, PurchaseItemSchema
 
 if TYPE_CHECKING:
     from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
     from django.utils.html import SafeString
 
 
-@login_required
-@require_GET
-def eboutic_main(request: HttpRequest) -> HttpResponse:
-    """Main view of the eboutic application.
+class BaseEbouticBasketForm(BaseBasketForm):
+    def _check_enough_money(self, *args, **kwargs):
+        # Disable money check
+        ...
 
-    Return an Http response whose content is of type text/html.
-    The latter represents the page from which a user can see
-    the catalogue of products that he can buy and fill
-    his shopping cart.
+
+EbouticBasketForm = forms.formset_factory(
+    ProductForm, formset=BaseEbouticBasketForm, absolute_max=None, min_num=1
+)
+
+
+class EbouticMainView(LoginRequiredMixin, FormView):
+    """Main view of the eboutic application.
 
     The purchasable products are those of the eboutic which
     belong to a category of products of a product category
     (orphan products are inaccessible).
 
-    If the session contains a key-value pair that associates "errors"
-    with a list of strings, this pair is removed from the session
-    and its value displayed to the user when the page is rendered.
     """
-    errors = request.session.pop("errors", None)
-    products = get_eboutic_products(request.user)
-    context = {
-        "errors": errors,
-        "products": products,
-        "customer_amount": request.user.account_balance,
-    }
-    return render(request, "eboutic/eboutic_main.jinja", context)
+
+    template_name = "eboutic/eboutic_main.jinja"
+    form_class = EbouticBasketForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["form_kwargs"] = {
+            "customer": self.customer,
+            "counter": get_eboutic(),
+            "allowed_products": {product.id: product for product in self.products},
+        }
+        return kwargs
+
+    def form_valid(self, formset):
+        if len(formset) == 0:
+            formset.errors.append(_("Your basket is empty"))
+            return self.form_invalid(formset)
+
+        with transaction.atomic():
+            self.basket = Basket.objects.create(user=self.request.user)
+            for form in formset:
+                BasketItem.from_product(
+                    form.product, form.cleaned_data["quantity"], self.basket
+                ).save()
+            self.basket.save()
+        return super().form_valid(formset)
+
+    def get_success_url(self):
+        return reverse("eboutic:checkout", kwargs={"basket_id": self.basket.id})
+
+    @cached_property
+    def products(self) -> list[Product]:
+        return get_eboutic_products(self.request.user)
+
+    @cached_property
+    def customer(self) -> Customer:
+        return Customer.get_or_create(self.request.user)[0]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["products"] = self.products
+        context["customer_amount"] = self.request.user.account_balance
+        last_purchase: Selling | None = (
+            self.customer.buyings.filter(counter__type="EBOUTIC")
+            .order_by("-date")
+            .first()
+        )
+        context["last_purchase_time"] = (
+            int(last_purchase.date.timestamp() * 1000) if last_purchase else "null"
+        )
+        return context
 
 
 @require_GET
@@ -166,47 +208,14 @@ class BillingInfoFormFragment(
         return self.request.path
 
 
-class EbouticCommand(LoginRequiredMixin, UseFragmentsMixin, TemplateView):
-    template_name = "eboutic/eboutic_makecommand.jinja"
-    basket: Basket
+class EbouticCheckout(CanViewMixin, UseFragmentsMixin, DetailView):
+    model = Basket
+    pk_url_kwarg = "basket_id"
+    context_object_name = "basket"
+    template_name = "eboutic/eboutic_checkout.jinja"
     fragments = {
         "billing_infos_form": BillingInfoFormFragment,
     }
-
-    @method_decorator(login_required)
-    def post(self, request, *args, **kwargs):
-        return redirect("eboutic:main")
-
-    def get(self, request: HttpRequest, *args, **kwargs):
-        form = BasketForm(request)
-        if not form.is_valid():
-            request.session["errors"] = form.errors
-            request.session.modified = True
-            res = redirect("eboutic:main")
-            res.set_cookie(
-                "basket_items",
-                PurchaseItemList.dump_json(form.cleaned_data, by_alias=True).decode(),
-                path="/eboutic",
-            )
-            return res
-        basket = Basket.from_session(request.session)
-        if basket is not None:
-            basket.items.all().delete()
-        else:
-            basket = Basket.objects.create(user=request.user)
-            request.session["basket_id"] = basket.id
-            request.session.modified = True
-
-        items: list[PurchaseItemSchema] = form.cleaned_data
-        pks = {item.product_id for item in items}
-        products = {p.pk: p for p in Product.objects.filter(pk__in=pks)}
-        db_items = []
-        for pk in pks:
-            quantity = sum(i.quantity for i in items if i.product_id == pk)
-            db_items.append(BasketItem.from_product(products[pk], quantity, basket))
-        BasketItem.objects.bulk_create(db_items)
-        self.basket = basket
-        return super().get(request)
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
@@ -215,51 +224,44 @@ class EbouticCommand(LoginRequiredMixin, UseFragmentsMixin, TemplateView):
             kwargs["customer_amount"] = customer.amount
         else:
             kwargs["customer_amount"] = None
-        kwargs["basket"] = self.basket
         kwargs["billing_infos"] = {}
 
         with contextlib.suppress(BillingInfo.DoesNotExist):
             kwargs["billing_infos"] = json.dumps(
-                dict(self.basket.get_e_transaction_data())
+                dict(self.object.get_e_transaction_data())
             )
         return kwargs
 
 
-@login_required
-@require_POST
-def pay_with_sith(request):
-    basket = Basket.from_session(request.session)
-    refilling = settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
-    if basket is None or basket.items.filter(type_id=refilling).exists():
-        return redirect("eboutic:main")
-    c = Customer.objects.filter(user__id=basket.user_id).first()
-    if c is None:
-        return redirect("eboutic:main")
-    if c.amount < basket.total:
-        res = redirect("eboutic:payment_result", "failure")
-        res.delete_cookie("basket_items", "/eboutic")
-        return res
-    eboutic = Counter.objects.get(type="EBOUTIC")
-    sales = basket.generate_sales(eboutic, c.user, "SITH_ACCOUNT")
-    try:
-        with transaction.atomic():
-            # Selling.save has some important business logic in it.
-            # Do not bulk_create this
-            for sale in sales:
-                sale.save()
-            basket.delete()
-        request.session.pop("basket_id", None)
-        res = redirect("eboutic:payment_result", "success")
-    except DatabaseError as e:
-        with sentry_sdk.push_scope() as scope:
-            scope.user = {"username": request.user.username}
-            scope.set_extra("someVariable", e.__repr__())
-            sentry_sdk.capture_message(
-                f"Erreur le {datetime.now()} dans eboutic.pay_with_sith"
+class EbouticPayWithSith(CanViewMixin, SingleObjectMixin, View):
+    model = Basket
+    pk_url_kwarg = "basket_id"
+
+    def post(self, request, *args, **kwargs):
+        basket = self.get_object()
+        refilling = settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
+        if basket.items.filter(type_id=refilling).exists():
+            messages.error(
+                self.request,
+                _("You can't buy a refilling with sith money"),
             )
-        res = redirect("eboutic:payment_result", "failure")
-    res.delete_cookie("basket_items", "/eboutic")
-    return res
+            return redirect("eboutic:payment_result", "failure")
+
+        eboutic = get_eboutic()
+        sales = basket.generate_sales(eboutic, basket.user, "SITH_ACCOUNT")
+        try:
+            with transaction.atomic():
+                # Selling.save has some important business logic in it.
+                # Do not bulk_create this
+                for sale in sales:
+                    sale.save()
+                basket.delete()
+            return redirect("eboutic:payment_result", "success")
+        except DatabaseError as e:
+            sentry_sdk.capture_exception(e)
+        except ValidationError as e:
+            messages.error(self.request, e.message)
+        return redirect("eboutic:payment_result", "failure")
 
 
 class EtransactionAutoAnswer(View):
