@@ -48,7 +48,7 @@ def get_eboutic_products(user: User) -> list[Product]:
         .annotate(order=F("product_type__order"))
         .annotate(category=F("product_type__name"))
         .annotate(category_comment=F("product_type__comment"))
-        .annotate(price=F("selling_price"))
+        .annotate(price=F("selling_price"))  # <-- selected price for basket validation
         .prefetch_related("buying_groups")  # <-- used in `Product.can_be_sold_to`
     )
     return [p for p in products if p.can_be_sold_to(user)]

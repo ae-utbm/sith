@@ -234,7 +234,6 @@ class EbouticCheckout(CanViewMixin, UseFragmentsMixin, DetailView):
 
 
 class EbouticPayWithSith(CanViewMixin, SingleObjectMixin, View):
-    http_method_names = ["post"]
     model = Basket
     pk_url_kwarg = "basket_id"
 

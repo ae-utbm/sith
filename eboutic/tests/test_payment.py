@@ -30,7 +30,10 @@ class TestPaymentBase(TestCase):
     def setUpTestData(cls):
         cls.customer = subscriber_user.make()
         cls.basket = baker.make(Basket, user=cls.customer)
-        cls.refilling = Product.objects.get(code="15REFILL")
+        cls.refilling = product_recipe.make(
+            product_type_id=settings.SITH_COUNTER_PRODUCTTYPE_REFILLING,
+            selling_price=15,
+        )
 
         product_type = baker.make(ProductType)
 
@@ -50,35 +53,49 @@ class TestPaymentBase(TestCase):
 
 class TestPaymentSith(TestPaymentBase):
     def test_anonymous(self):
-        assert (
-            self.client.post(
-                reverse("eboutic:pay_with_sith", kwargs={"basket_id": self.basket.id}),
-            ).status_code
-            == 403
+        response = self.client.post(
+            reverse("eboutic:pay_with_sith", kwargs={"basket_id": self.basket.id})
         )
-        assert Basket.objects.filter(id=self.basket.id).first() is not None
+        assert response.status_code == 403
+        assert Basket.objects.contains(self.basket), (
+            "After an unsuccessful request, the basket should be kept"
+        )
 
     def test_unauthorized(self):
         self.client.force_login(subscriber_user.make())
-        assert (
-            self.client.post(
-                reverse("eboutic:pay_with_sith", kwargs={"basket_id": self.basket.id}),
-            ).status_code
-            == 403
+        response = self.client.post(
+            reverse("eboutic:pay_with_sith", kwargs={"basket_id": self.basket.id})
         )
-        assert Basket.objects.filter(id=self.basket.id).first() is not None
+        assert response.status_code == 403
+        assert Basket.objects.contains(self.basket), (
+            "After an unsuccessful request, the basket should be kept"
+        )
 
     def test_not_found(self):
         self.client.force_login(self.customer)
-        assert (
-            self.client.post(
-                reverse(
-                    "eboutic:pay_with_sith", kwargs={"basket_id": self.basket.id + 1}
-                ),
-            ).status_code
-            == 404
+        response = self.client.post(
+            reverse("eboutic:pay_with_sith", kwargs={"basket_id": self.basket.id + 1})
         )
-        assert Basket.objects.filter(id=self.basket.id).first() is not None
+        assert response.status_code == 404
+        assert Basket.objects.contains(self.basket), (
+            "After an unsuccessful request, the basket should be kept"
+        )
+
+    def test_only_post_allowed(self):
+        self.client.force_login(self.customer)
+        force_refill_user(self.customer, self.basket.total + 1)
+        response = self.client.get(
+            reverse("eboutic:pay_with_sith", kwargs={"basket_id": self.basket.id})
+        )
+
+        assert response.status_code == 405
+
+        assert Basket.objects.contains(self.basket), (
+            "After an unsuccessful request, the basket should be kept"
+        )
+
+        self.customer.customer.refresh_from_db()
+        assert self.customer.customer.amount == self.basket.total + 1
 
     def test_buy_success(self):
         self.client.force_login(self.customer)
@@ -112,7 +129,7 @@ class TestPaymentSith(TestPaymentBase):
     def test_not_enough_money(self):
         self.client.force_login(self.customer)
         response = self.client.post(
-            reverse("eboutic:pay_with_sith", kwargs={"basket_id": self.basket.id}),
+            reverse("eboutic:pay_with_sith", kwargs={"basket_id": self.basket.id})
         )
         assertRedirects(
             response,
@@ -124,20 +141,23 @@ class TestPaymentSith(TestPaymentBase):
         assert messages[0].level == DEFAULT_LEVELS["ERROR"]
         assert messages[0].message == "Solde insuffisant"
 
-        assert Basket.objects.filter(id=self.basket.id).first() is not None
+        assert Basket.objects.contains(self.basket), (
+            "After an unsuccessful request, the basket should be kept"
+        )
 
     def test_refilling_in_basket(self):
         BasketItem.from_product(self.refilling, 1, self.basket).save()
         self.client.force_login(self.customer)
-        force_refill_user(self.customer, self.basket.total)
+        force_refill_user(self.customer, self.basket.total + 1)
+        self.customer.customer.refresh_from_db()
+        initial_account_balance = self.customer.customer.amount
         response = self.client.post(
-            reverse("eboutic:pay_with_sith", kwargs={"basket_id": self.basket.id}),
+            reverse("eboutic:pay_with_sith", kwargs={"basket_id": self.basket.id})
         )
         assertRedirects(
             response,
             reverse("eboutic:payment_result", kwargs={"result": "failure"}),
         )
-
         assert Basket.objects.filter(id=self.basket.id).first() is not None
         messages = list(get_messages(response.wsgi_request))
         assert messages[0].level == DEFAULT_LEVELS["ERROR"]
@@ -146,7 +166,7 @@ class TestPaymentSith(TestPaymentBase):
             == "Vous ne pouvez pas acheter un rechargement avec de l'argent du sith"
         )
         self.customer.customer.refresh_from_db()
-        assert self.customer.customer.amount == self.basket.total
+        assert self.customer.customer.amount == initial_account_balance
 
 
 class TestPaymentCard(TestPaymentBase):
@@ -197,9 +217,8 @@ class TestPaymentCard(TestPaymentBase):
 
         basket = baker.make(Basket, user=customer)
         BasketItem.from_product(Product.objects.get(code="2SCOTIZ"), 1, basket).save()
-        assert (
-            self.client.get(self.generate_bank_valid_answer(basket)).status_code == 200
-        )
+        response = self.client.get(self.generate_bank_valid_answer(basket))
+        assert response.status_code == 200
 
         assert customer.subscriptions.count() == 2
 
@@ -210,17 +229,18 @@ class TestPaymentCard(TestPaymentBase):
 
     def test_buy_refilling(self):
         BasketItem.from_product(self.refilling, 2, self.basket).save()
-        assert (
-            self.client.get(self.generate_bank_valid_answer(self.basket)).status_code
-            == 200
-        )
+        response = self.client.get(self.generate_bank_valid_answer(self.basket))
+        assert response.status_code == 200
 
         self.customer.customer.refresh_from_db()
         assert self.customer.customer.amount == self.refilling.selling_price * 2
 
     def test_multiple_responses(self):
         bank_response = self.generate_bank_valid_answer(self.basket)
-        assert self.client.get(bank_response).status_code == 200
+
+        response = self.client.get(bank_response)
+        assert response.status_code == 200
+
         response = self.client.get(bank_response)
         assert response.status_code == 500
         assert (

@@ -100,7 +100,8 @@ class TestEboutic(TestCase):
             BasketItem(None, 1),
             BasketItem(self.snack.id, None),
         ]:
-            assert self.submit_basket([item]).status_code == 200
+            response = self.submit_basket([item])
+            assert response.status_code == 200
 
     def test_anonymous(self):
         assertRedirects(
@@ -118,26 +119,25 @@ class TestEboutic(TestCase):
 
     def test_add_forbidden_product(self):
         self.client.force_login(self.new_customer)
-        assert self.submit_basket([BasketItem(self.beer.id, 1)]).status_code == 200
+        response = self.submit_basket([BasketItem(self.beer.id, 1)])
+        assert response.status_code == 200
         assert Basket.objects.first() is None
 
-        assert self.submit_basket([BasketItem(self.cotiz.id, 1)]).status_code == 200
+        response = self.submit_basket([BasketItem(self.cotiz.id, 1)])
+        assert response.status_code == 200
         assert Basket.objects.first() is None
 
-        assert (
-            self.submit_basket([BasketItem(self.not_in_counter.id, 1)]).status_code
-            == 200
-        )
+        response = self.submit_basket([BasketItem(self.not_in_counter.id, 1)])
+        assert response.status_code == 200
         assert Basket.objects.first() is None
 
         self.client.force_login(self.new_customer)
-        assert self.submit_basket([BasketItem(self.cotiz.id, 1)]).status_code == 200
+        response = self.submit_basket([BasketItem(self.cotiz.id, 1)])
+        assert response.status_code == 200
         assert Basket.objects.first() is None
 
-        assert (
-            self.submit_basket([BasketItem(self.not_in_counter.id, 1)]).status_code
-            == 200
-        )
+        response = self.submit_basket([BasketItem(self.not_in_counter.id, 1)])
+        assert response.status_code == 200
         assert Basket.objects.first() is None
 
     def test_create_basket(self):

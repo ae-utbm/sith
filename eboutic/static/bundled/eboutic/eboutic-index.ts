@@ -90,7 +90,7 @@ document.addEventListener("alpine:init", () => {
     },
 
     /**
-     * Remove all the basket from the basket & cleans the catalog CSS classes
+     * Remove all the items from the basket & cleans the catalog CSS classes
      */
     clearBasket() {
       this.basket = [];
