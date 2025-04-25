@@ -87,15 +87,8 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     );
   }
 
-  async refreshEvents() {
+  refreshEvents() {
     this.click(); // Remove focus from popup
-    // We can't just refresh events because some ics files are in
-    // local browser cache (especially internal.ics)
-    // To invalidate the cache, we need to remove the source and add it again
-    this.calendar.removeAllEventSources();
-    for (const source of await this.getEventSources()) {
-      this.calendar.addEventSource(source);
-    }
     this.calendar.refetchEvents();
   }
 
@@ -114,7 +107,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         },
       }),
     );
-    await this.refreshEvents();
+    this.refreshEvents();
   }
 
   async unpublishNews(id: number) {
@@ -132,7 +125,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         },
       }),
     );
-    await this.refreshEvents();
+    this.refreshEvents();
   }
 
   async deleteNews(id: number) {
@@ -150,22 +143,23 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         },
       }),
     );
-    await this.refreshEvents();
+    this.refreshEvents();
   }
 
   async getEventSources() {
-    const cacheInvalidate = `?invalidate=${Date.now()}`;
     return [
       {
-        url: `${await makeUrl(calendarCalendarInternal)}${cacheInvalidate}`,
+        url: `${await makeUrl(calendarCalendarInternal)}`,
         format: "ics",
         className: "internal",
+        cache: false,
       },
       {
-        url: `${await makeUrl(calendarCalendarUnpublished)}${cacheInvalidate}`,
+        url: `${await makeUrl(calendarCalendarUnpublished)}`,
         format: "ics",
         color: "red",
         className: "unpublished",
+        cache: false,
       },
     ];
   }
@@ -348,6 +342,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       headerToolbar: this.currentHeaderToolbar(),
       footerToolbar: this.currentFooterToolbar(),
       eventSources: await this.getEventSources(),
+      lazyFetching: false,
       windowResize: () => {
         this.calendar.changeView(this.currentView());
         this.calendar.setOption("headerToolbar", this.currentHeaderToolbar());
