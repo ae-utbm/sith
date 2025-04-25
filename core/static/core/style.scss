@@ -45,7 +45,7 @@ body {
   }
 }
 
-.tooltip {
+@mixin tooltip {
   @include shadow;
   z-index: 1;
   pointer-events: none;
@@ -58,7 +58,10 @@ body {
   white-space: nowrap;
   opacity: 0;
   transition: opacity 500ms ease-in;
+}
 
+.tooltip {
+  @include tooltip;
   position: absolute;
   width: max-content;
 

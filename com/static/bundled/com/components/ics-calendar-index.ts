@@ -320,13 +320,13 @@ export class IcsCalendar extends inheritHtmlElement("div") {
             const button = event.target as HTMLButtonElement;
             button.classList.add("text-copy");
             if (!button.hasAttribute("position")) {
-              button.setAttribute("tooltip", gettext("Link copied"));
               button.setAttribute("position", "top");
-              button.setAttribute("no-hover", "");
             }
             if (button.classList.contains("text-copied")) {
               button.classList.remove("text-copied");
             }
+            button.setAttribute("tooltip", gettext("Link copied"));
+            button.dispatchEvent(new Event("mouseover", { bubbles: true }));
             navigator.clipboard.writeText(
               new URL(
                 await makeUrl(calendarCalendarInternal),
@@ -337,6 +337,8 @@ export class IcsCalendar extends inheritHtmlElement("div") {
               button.classList.remove("text-copied");
               button.classList.add("text-copied");
               button.classList.remove("text-copy");
+              button.dispatchEvent(new Event("mouseout", { bubbles: true }));
+              button.removeAttribute("tooltip");
             }, 1500);
           },
         },
