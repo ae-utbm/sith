@@ -116,5 +116,8 @@ ics-calendar {
   button.text-copied:hover {
     transition: 500ms ease-out;
   }
+}
 
+.tooltip.text-copy {
+  opacity: 1;
 }
