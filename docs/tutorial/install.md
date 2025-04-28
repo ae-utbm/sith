@@ -101,6 +101,15 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
     installé par uv.
 
 
+Parmi les dépendances installées se trouve redis (que nous utilisons comme cache).
+Redis est un service qui doit être activé pour être utilisé.
+Pour cela, effectuez les commandes :
+
+```bash
+sudo systemctl start redis
+sudo systemctl enable redis  # si vous voulez que redis démarre automatiquement au boot
+```
+
 ## Finaliser l'installation
 
 Clonez le projet (depuis votre console WSL, si vous utilisez WSL)
