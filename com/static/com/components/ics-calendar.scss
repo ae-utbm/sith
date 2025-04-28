@@ -117,6 +117,7 @@ ics-calendar {
     transition: 500ms ease-out;
     margin-right: 0.5rem;
   }
+}
 
   .fc .fc-helpButton-button {
     border-radius: 70%;
@@ -133,4 +134,8 @@ ics-calendar {
   .fc .fc-helpButton-button:hover {
     background-color: rgba(20, 20, 20, 0.6);
   }
+}
+
+.tooltip.text-copy {
+  opacity: 1;
 }
