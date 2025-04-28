@@ -1,7 +1,8 @@
-import { type Placement, computePosition } from "@floating-ui/dom";
+import { type Placement, computePosition, offset } from "@floating-ui/dom";
 
 /**
  * Library usage:
+ *
  * Add a `tooltip` attribute to any html element with it's tooltip text
  * You can control the position of the tooltp with the `tooltip-position` attribute
  * Allowed placements are `top`, `right`, `bottom`, `left`
@@ -10,6 +11,13 @@ import { type Placement, computePosition } from "@floating-ui/dom";
  * You can customize your tooltip by passing additionnal classes or ids to it
  * You can use `tooltip-class` and `tooltip-id` to add additional elements to the
  * `class` and `id` attribute of the generated tooltip
+ *
+ * @example
+ * ```html
+ * <p tooltip="tooltip text"></p>
+ * <p tooltip="tooltip left" tooltip-position="left"></p>
+ * <div tooltip="tooltip custom class" tooltip-class="custom custom-class"></div>
+ * ```
  **/
 
 type Status = "open" | "close";
@@ -68,6 +76,7 @@ addEventListener("mouseover", (event: MouseEvent) => {
 
   computePosition(target, tooltip, {
     placement: getPlacement(target),
+    middleware: [offset(6)],
   }).then(({ x, y }) => {
     Object.assign(tooltip.style, {
       left: `${x}px`,
