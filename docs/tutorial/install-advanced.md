@@ -120,7 +120,7 @@ les conflits avec les instances de redis déjà en fonctionnement.
 
 ```dotenv
 REDIS_PORT=6379
-CACHE_URL=redis://127.0.0.1:${REDIS_PORT}/0
+CACHE_URL=redis://127.0.0.1:6379/0
 ```
 
 Si on souhaite configurer redis pour communiquer via un socket :
@@ -151,7 +151,7 @@ ALTER ROLE sith SET client_encoding TO 'utf8';
 ALTER ROLE sith SET default_transaction_isolation TO 'read committed';
 ALTER ROLE sith SET timezone TO 'UTC';
 
-GRANT ALL PRIVILEGES ON DATABASE sith TO SITH;
+GRANT ALL PRIVILEGES ON DATABASE sith TO sith;
 \q
 ```
 
@@ -290,9 +290,15 @@ Pour faire tourner Celery, faites la commande suivante dans
 un terminal à part :
 
 ```bash
-poetry run celery -A sith worker --beat -l INFO 
+uv run celery -A sith worker --beat -l INFO 
 ```
 
+!!!note
+
+    Nous utilisons Redis comme broker pour Celery,
+    donc vous devez aussi configurer l'URL du broker,
+    de la même manière que ce qui est décrit plus haut
+    pour Redis.
 
 ## Mettre à jour la base de données antispam
 

@@ -47,7 +47,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 from .honeypot import custom_honeypot_error
 
-env = Env()
+env = Env(expand_vars=True)
 env.read_env()
 
 
@@ -342,7 +342,7 @@ EMAIL_PORT = env.int("EMAIL_PORT", default=25)
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
-CElERY_BROKER_URL = env.str("CELERY_BROKER_URL", default="redis://localhost:6379/1")
+CELERY_BROKER_URL = env.str("TASK_BROKER_URL")
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
