@@ -8,6 +8,8 @@ import { type Placement, computePosition } from "@floating-ui/dom";
  * You can add `-start` and `-end` to all allowed placement values
  **/
 
+const tooltips = new Map();
+
 function getPlacement(element: HTMLElement): Placement {
   const position = element.getAttribute("position");
   if (position) {
@@ -16,17 +18,20 @@ function getPlacement(element: HTMLElement): Placement {
   return "bottom";
 }
 
-function getTooltip(element: HTMLElement) {
-  for (const tooltip of document.body.getElementsByClassName("tooltip")) {
-    if (tooltip.textContent === element.getAttribute("tooltip")) {
-      return tooltip as HTMLElement;
-    }
-  }
-
+function createTooltip(element: HTMLElement) {
   const tooltip = document.createElement("div");
   document.body.append(tooltip);
   tooltip.classList.add("tooltip");
   tooltip.innerText = element.getAttribute("tooltip");
+  tooltips.set(element, tooltip);
+  return tooltip;
+}
+
+function getTooltip(element: HTMLElement) {
+  const tooltip = tooltips.get(element);
+  if (tooltip === undefined) {
+    return createTooltip(element);
+  }
 
   return tooltip;
 }
