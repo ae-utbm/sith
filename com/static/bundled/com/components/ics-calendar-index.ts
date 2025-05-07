@@ -48,11 +48,11 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     if (this.isMobile()) {
       return {
         start: "",
-        center: "getCalendarLink",
+        center: "getCalendarLink helpButton",
         end: "",
       };
     }
-    return { start: "getCalendarLink", center: "", end: "" };
+    return { start: "getCalendarLink helpButton", center: "", end: "" };
   }
 
   currentHeaderToolbar() {
@@ -335,6 +335,16 @@ export class IcsCalendar extends inheritHtmlElement("div") {
             }, 1500);
           },
         },
+        helpButton: {
+          text: "?",
+          click: () => {
+            const helpUrl = this.getAttribute("data-help-url");
+
+            if (helpUrl) {
+              window.open(helpUrl, "_blank");
+            }
+          },
+        },
       },
       height: "auto",
       locale: this.locale,
@@ -347,6 +357,13 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         this.calendar.changeView(this.currentView());
         this.calendar.setOption("headerToolbar", this.currentHeaderToolbar());
         this.calendar.setOption("footerToolbar", this.currentFooterToolbar());
+
+        setTimeout(() => {
+          const button = this.node.querySelector(".fc-helpButton-button");
+          if (button) {
+            button.classList.add("help-button");
+          }
+        }, 10);
       },
       eventClick: (event) => {
         // Avoid our popup to be deleted because we clicked outside of it
@@ -357,6 +374,13 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       },
     });
     this.calendar.render();
+
+    setTimeout(() => {
+      const button = this.node.querySelector(".fc-helpButton-button");
+      if (button) {
+        button.classList.add("help-button");
+      }
+    }, 0);
 
     window.addEventListener("click", (event: MouseEvent) => {
       // Auto close popups when clicking outside of it
