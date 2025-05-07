@@ -47,7 +47,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 from .honeypot import custom_honeypot_error
 
-env = Env()
+env = Env(expand_vars=True)
 env.read_env()
 
 
@@ -106,6 +106,8 @@ INSTALLED_APPS = (
     "django_jinja",
     "ninja_extra",
     "haystack",
+    "django_celery_results",
+    "django_celery_beat",
     "captcha",
     "core",
     "club",
@@ -335,6 +337,14 @@ EMAIL_BACKEND = env.str(
 )
 EMAIL_HOST = env.str("EMAIL_HOST", default="localhost")
 EMAIL_PORT = env.int("EMAIL_PORT", default=25)
+
+# Celery
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_BROKER_URL = env.str("TASK_BROKER_URL")
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 # Below this line, only Sith-specific variables are defined
 

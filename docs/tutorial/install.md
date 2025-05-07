@@ -100,7 +100,6 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
     Python ne fait pas parti des dépendances puisqu'il est automatiquement
     installé par uv.
 
-
 ## Finaliser l'installation
 
 Clonez le projet (depuis votre console WSL, si vous utilisez WSL)
