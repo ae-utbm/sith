@@ -53,11 +53,11 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     if (this.isMobile()) {
       return {
         start: "",
-        center: "getCalendarLink",
+        center: "getCalendarLink helpButton",
         end: "",
       };
     }
-    return { start: "getCalendarLink", center: "", end: "" };
+    return { start: "getCalendarLink helpButton", center: "", end: "" };
   }
 
   currentHeaderToolbar() {
@@ -342,6 +342,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         },
         helpButton: {
           text: "?",
+          hint: gettext("how to use calendar link"),
           click: () => {
             if (this.helpUrl) {
               window.open(this.helpUrl, "_blank");
