@@ -192,6 +192,7 @@
         @calendar-delete="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.DELETED})"
         @calendar-unpublish="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.PENDING})"
         @calendar-publish="$dispatch('news-moderated', {newsId: $event.detail.id, state: AlertState.PUBLISHED})"
+        ics-help-url="{{ url('core:page', page_name='Index/calendrier')}}"
         locale="{{ get_language() }}"
         can_moderate="{{ user.has_perm("com.moderate_news") }}"
         can_delete="{{ user.has_perm("com.delete_news") }}"

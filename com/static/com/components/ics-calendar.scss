@@ -114,10 +114,28 @@ ics-calendar {
   button.text-copied:focus,
   button.text-copied:hover {
     transition: 500ms ease-out;
+    margin-right: 0.5rem;
   }
 
   button.text-copied[tooltip]::before {
     opacity: 0;
     transition: opacity 500ms ease-out;
+  }
+
+  .fc .fc-helpButton-button {
+    border-radius: 70%;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.8);
+    transition: 100ms ease-out;
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
+  }
+
+
+  .fc .fc-helpButton-button:hover,
+  .fc .fc-helpButton-button:focus {
+    background-color: rgba(20, 20, 20, 0.6);
   }
 }

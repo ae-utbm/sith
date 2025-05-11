@@ -17,11 +17,12 @@ import {
 
 @registerComponent("ics-calendar")
 export class IcsCalendar extends inheritHtmlElement("div") {
-  static observedAttributes = ["locale", "can_moderate", "can_delete"];
+  static observedAttributes = ["locale", "can_moderate", "can_delete", "ics-help-url"];
   private calendar: Calendar;
   private locale = "en";
   private canModerate = false;
   private canDelete = false;
+  private helpUrl = "";
 
   attributeChangedCallback(name: string, _oldValue?: string, newValue?: string) {
     if (name === "locale") {
@@ -32,6 +33,10 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     }
     if (name === "can_delete") {
       this.canDelete = newValue.toLowerCase() === "true";
+    }
+
+    if (name === "ics-help-url") {
+      this.helpUrl = newValue;
     }
   }
 
@@ -333,6 +338,14 @@ export class IcsCalendar extends inheritHtmlElement("div") {
               button.classList.add("text-copied");
               button.classList.remove("text-copy");
             }, 1500);
+          },
+        },
+        helpButton: {
+          text: "?",
+          click: () => {
+            if (this.helpUrl) {
+              window.open(this.helpUrl, "_blank");
+            }
           },
         },
       },
