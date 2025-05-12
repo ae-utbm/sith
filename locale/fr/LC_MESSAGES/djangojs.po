@@ -38,8 +38,8 @@ msgid "Copy calendar link"
 msgstr "Copier le lien du calendrier"
 
 #: com/static/bundled/com/components/ics-calendar-index.ts
-msgid "how to use calendar link"
-msgstr "comment utiliser le lien du calendrier"
+msgid "How to use calendar link"
+msgstr "Comment utiliser le lien du calendrier"
 
 #: com/static/bundled/com/components/ics-calendar-index.ts
 msgid "Link copied"

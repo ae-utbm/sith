@@ -342,7 +342,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         },
         helpButton: {
           text: "?",
-          hint: gettext("how to use calendar link"),
+          hint: gettext("How to use calendar link"),
           click: () => {
             if (this.helpUrl) {
               window.open(this.helpUrl, "_blank");
