@@ -136,6 +136,13 @@ new MutationObserver((mutations: MutationRecord[]) => {
     if (target.hasAttribute("tooltip")) {
       target.addEventListener("mouseover", tooltipMouseover);
       target.addEventListener("mouseout", tooltipMouseout);
+      if (target.matches(":hover")) {
+        target.dispatchEvent(new Event("mouseover", { bubbles: true }));
+      }
+    } else if (tooltips.has(target)) {
+      // Remove corresponding tooltip
+      tooltips.get(target).remove();
+      tooltips.delete(target);
     }
   }
 }).observe(document.body, {
