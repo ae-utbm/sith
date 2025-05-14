@@ -115,6 +115,9 @@ ics-calendar {
   button.text-copied:focus,
   button.text-copied:hover {
     transition: 500ms ease-out;
+  }
+
+  .fc .fc-getCalendarLink-button {
     margin-right: 0.5rem;
   }
 
