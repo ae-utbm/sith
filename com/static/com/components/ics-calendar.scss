@@ -117,7 +117,6 @@ ics-calendar {
     transition: 500ms ease-out;
     margin-right: 0.5rem;
   }
-}
 
   .fc .fc-helpButton-button {
     border-radius: 70%;
@@ -136,6 +135,12 @@ ics-calendar {
   }
 }
 
-.tooltip.text-copy {
+.tooltip.calendar-copy-tooltip {
   opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.tooltip.calendar-copy-tooltip.text-copied {
+  opacity: 0;
+  transition: opacity 500ms ease-out;
 }

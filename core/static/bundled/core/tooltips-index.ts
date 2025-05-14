@@ -110,7 +110,9 @@ function tooltipMouseover(event: MouseEvent) {
     });
   });
 
-  document.body.append(tooltip);
+  if (!tooltip.isConnected) {
+    document.body.append(tooltip);
+  }
 }
 
 function tooltipMouseout(event: MouseEvent) {
@@ -138,6 +140,8 @@ new MutationObserver((mutations: MutationRecord[]) => {
       target.addEventListener("mouseout", tooltipMouseout);
       if (target.matches(":hover")) {
         target.dispatchEvent(new Event("mouseover", { bubbles: true }));
+      } else {
+        target.dispatchEvent(new Event("mouseout", { bubbles: true }));
       }
     } else if (tooltips.has(target)) {
       // Remove corresponding tooltip
@@ -147,7 +151,7 @@ new MutationObserver((mutations: MutationRecord[]) => {
   }
 }).observe(document.body, {
   attributes: true,
-  attributeFilter: ["tooltip"],
+  attributeFilter: ["tooltip", "tooltip-class", "toolitp-position"],
   subtree: true,
 });
 

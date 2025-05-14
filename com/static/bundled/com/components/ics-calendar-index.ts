@@ -319,7 +319,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
           click: async (event: Event) => {
             const button = event.target as HTMLButtonElement;
             button.classList.add("text-copy");
-            button.setAttribute("tooltip-class", "text-copy");
+            button.setAttribute("tooltip-class", "calendar-copy-tooltip");
             if (!button.hasAttribute("tooltip-position")) {
               button.setAttribute("tooltip-position", "top");
             }
@@ -334,11 +334,10 @@ export class IcsCalendar extends inheritHtmlElement("div") {
               ).toString(),
             );
             setTimeout(() => {
-              button.setAttribute("tooltip-class", "text-copied");
+              button.setAttribute("tooltip-class", "calendar-copy-tooltip text-copied");
               button.classList.remove("text-copied");
               button.classList.add("text-copied");
               button.classList.remove("text-copy");
-              button.removeAttribute("tooltip");
             }, 1500);
           },
         },
