@@ -18,7 +18,7 @@ import {
  * Note: placement are suggestions and the position could change if the popup gets
  *       outside of the screen.
  *
- * You can customize your tooltip by passing additionnal classes or ids to it
+ * You can customize your tooltip by passing additional classes or ids to it
  * You can use `tooltip-class` and `tooltip-id` to add additional elements to the
  * `class` and `id` attribute of the generated tooltip
  *
@@ -32,7 +32,7 @@ import {
 
 type Status = "open" | "close";
 
-const tooltips = new Map();
+const tooltips: Map<HTMLElement, HTMLElement> = new Map();
 
 function getPosition(element: HTMLElement): Placement | "auto" {
   const position = element.getAttribute("tooltip-position");
@@ -93,12 +93,10 @@ function getTooltip(element: HTMLElement) {
   return tooltip;
 }
 
-addEventListener("mouseover", (event: MouseEvent) => {
-  const target = event.target as HTMLElement;
-  if (!target.hasAttribute("tooltip")) {
-    return;
-  }
-
+function tooltipMouseover(event: MouseEvent) {
+  // We get the closest tooltip to have a consistent behavior
+  // when hovering over a child element of a tooltip marked element
+  const target = (event.target as HTMLElement).closest("[tooltip]") as HTMLElement;
   const tooltip = getTooltip(target);
   updateTooltip(target, tooltip, "open");
 
@@ -113,13 +111,57 @@ addEventListener("mouseover", (event: MouseEvent) => {
   });
 
   document.body.append(tooltip);
+}
+
+function tooltipMouseout(event: MouseEvent) {
+  // We get the closest tooltip to have a consistent behavior
+  // when hovering over a child element of a tooltip marked element
+  const target = (event.target as HTMLElement).closest("[tooltip]") as HTMLElement;
+  updateTooltip(target, getTooltip(target), "close");
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  for (const el of document.querySelectorAll("[tooltip]")) {
+    el.addEventListener("mouseover", tooltipMouseover);
+    el.addEventListener("mouseout", tooltipMouseout);
+  }
 });
 
-addEventListener("mouseout", (event: MouseEvent) => {
-  const target = event.target as HTMLElement;
-  if (!target.hasAttribute("tooltip")) {
-    return;
+// Add / remove callback when tooltip attribute is added / removed
+new MutationObserver((mutations: MutationRecord[]) => {
+  for (const mutation of mutations) {
+    const target = mutation.target as HTMLElement;
+    target.removeEventListener("mouseover", tooltipMouseover);
+    target.removeEventListener("mouseout", tooltipMouseout);
+    if (target.hasAttribute("tooltip")) {
+      target.addEventListener("mouseover", tooltipMouseover);
+      target.addEventListener("mouseout", tooltipMouseout);
+    }
   }
+}).observe(document.body, {
+  attributes: true,
+  attributeFilter: ["tooltip"],
+  subtree: true,
+});
 
-  updateTooltip(target, getTooltip(target), "close");
+// Remove orphan tooltips
+new MutationObserver((mutations: MutationRecord[]) => {
+  for (const mutation of mutations) {
+    for (const node of mutation.removedNodes) {
+      if (node.nodeType !== node.ELEMENT_NODE) {
+        continue;
+      }
+      const target = node as HTMLElement;
+      if (!target.hasAttribute("tooltip")) {
+        continue;
+      }
+      if (tooltips.has(target)) {
+        tooltips.get(target).remove();
+        tooltips.delete(target);
+      }
+    }
+  }
+}).observe(document.body, {
+  subtree: true,
+  childList: true,
 });
