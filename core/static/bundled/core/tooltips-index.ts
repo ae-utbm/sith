@@ -109,10 +109,6 @@ function tooltipMouseover(event: MouseEvent) {
       top: `${y}px`,
     });
   });
-
-  if (!tooltip.isConnected) {
-    document.body.append(tooltip);
-  }
 }
 
 function tooltipMouseout(event: MouseEvent) {
@@ -151,7 +147,7 @@ new MutationObserver((mutations: MutationRecord[]) => {
   }
 }).observe(document.body, {
   attributes: true,
-  attributeFilter: ["tooltip", "tooltip-class", "toolitp-position"],
+  attributeFilter: ["tooltip", "tooltip-class", "toolitp-position", "tooltip-id"],
   subtree: true,
 });
 
