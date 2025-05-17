@@ -1,4 +1,5 @@
 @import "core/static/core/colors";
+@import "core/static/core/tooltips";
 
 
 :root {
@@ -114,12 +115,10 @@ ics-calendar {
   button.text-copied:focus,
   button.text-copied:hover {
     transition: 500ms ease-out;
-    margin-right: 0.5rem;
   }
 
-  button.text-copied[tooltip]::before {
-    opacity: 0;
-    transition: opacity 500ms ease-out;
+  .fc .fc-getCalendarLink-button {
+    margin-right: 0.5rem;
   }
 
   .fc .fc-helpButton-button {
@@ -137,4 +136,14 @@ ics-calendar {
   .fc .fc-helpButton-button:hover {
     background-color: rgba(20, 20, 20, 0.6);
   }
+}
+
+.tooltip.calendar-copy-tooltip {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.tooltip.calendar-copy-tooltip.text-copied {
+  opacity: 0;
+  transition: opacity 500ms ease-out;
 }
