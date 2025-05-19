@@ -35,6 +35,69 @@ msgstr ""
 "True si gardé à jour par le biais d'un fournisseur externe de domains "
 "toxics, False sinon"
 
+#: apikey/admin.py
+#, python-format
+msgid ""
+"The API key for %(name)s is: %(key)s. Please store it somewhere safe: you "
+"will not be able to see it again."
+msgstr ""
+"La clef d'API pour %(name)s est : %(key)s. Gardez-là dans un emplacement "
+"sûr : vous ne pourrez pas la revoir à nouveau."
+
+#: apikey/admin.py
+msgid "Revoke selected API keys"
+msgstr "Révoquer les clefs d'API sélectionnées"
+
+#: apikey/models.py club/models.py com/models.py counter/models.py
+#: forum/models.py launderette/models.py
+msgid "name"
+msgstr "nom"
+
+#: apikey/models.py core/models.py
+msgid "owner"
+msgstr "propriétaire"
+
+#: apikey/models.py core/models.py
+msgid "groups"
+msgstr "groupes"
+
+#: apikey/models.py
+msgid "client permissions"
+msgstr "permissions du client"
+
+#: apikey/models.py
+msgid "Specific permissions for this api client."
+msgstr "Permissions spécifiques pour ce client d'API"
+
+#: apikey/models.py
+msgid "api client"
+msgstr "client d'api"
+
+#: apikey/models.py
+msgid "api clients"
+msgstr "clients d'api"
+
+#: apikey/models.py
+msgid "prefix"
+msgstr "préfixe"
+
+#: apikey/models.py
+msgid "hashed key"
+msgstr "hash de la clef"
+
+#: apikey/models.py
+msgctxt "api key"
+msgid "revoked"
+msgstr "révoquée"
+
+#: apikey/models.py
+msgid "api key"
+msgstr "clef d'api"
+
+#: apikey/models.py
+msgid "api keys"
+msgstr "clefs d'api"
+
 #: club/forms.py
 msgid "Users to add"
 msgstr "Utilisateurs à ajouter"
@@ -1258,10 +1321,6 @@ msgid "last update"
 msgstr "dernière mise à jour"
 
 #: core/models.py
-msgid "groups"
-msgstr "groupes"
-
-#: core/models.py
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
@@ -1496,10 +1555,6 @@ msgstr "version allégée"
 #: core/models.py
 msgid "thumbnail"
 msgstr "miniature"
-
-#: core/models.py
-msgid "owner"
-msgstr "propriétaire"
 
 #: core/models.py
 msgid "edit group"
