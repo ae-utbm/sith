@@ -189,4 +189,4 @@ class IsLoggedInCounter(BasePermission):
         return Counter.objects.filter(token=token).exists()
 
 
-CanAccessLookup = IsOldSubscriber | IsRoot | IsLoggedInCounter
+CanAccessLookup = IsLoggedInCounter | HasPerm("core.access_lookup")
