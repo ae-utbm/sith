@@ -8,7 +8,7 @@ from ninja_extra.schemas import PaginatedResponseSchema
 
 from apikey.auth import ApiKeyAuth
 from club.models import Club
-from club.schemas import ClubSchema
+from club.schemas import ClubSchema, SimpleClubSchema
 from core.auth.api_permissions import CanAccessLookup, HasPerm
 
 
@@ -16,8 +16,10 @@ from core.auth.api_permissions import CanAccessLookup, HasPerm
 class ClubController(ControllerBase):
     @route.get(
         "/search",
-        response=PaginatedResponseSchema[ClubSchema],
+        response=PaginatedResponseSchema[SimpleClubSchema],
+        auth=[SessionAuth(), ApiKeyAuth()],
         permissions=[CanAccessLookup],
+        url_name="search_club",
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
     def search_club(self, search: Annotated[str, MinLen(1)]):
@@ -28,6 +30,7 @@ class ClubController(ControllerBase):
         response=ClubSchema,
         auth=[SessionAuth(), ApiKeyAuth()],
         permissions=[HasPerm("club.view_club")],
+        url_name="fetch_club",
     )
     def fetch_club(self, club_id: int):
         return self.get_object_or_exception(
