@@ -45,7 +45,6 @@ plugins:
             members: true
             members_order: source
             show_source: true
-            show_inherited_members: true
             merge_init_into_class: true
             show_root_toc_entry: false
   - include-markdown:
@@ -67,6 +66,7 @@ nav:
     - Gestion des permissions: tutorial/perms.md
     - Gestion des groupes: tutorial/groups.md
     - Les fragments: tutorial/fragments.md
+    - Connexion à l'API: tutorial/connect-api.md
     - Etransactions: tutorial/etransaction.md
   - How-to:
     - L'ORM de Django: howto/querysets.md
@@ -157,6 +157,7 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.inlinehilite
   - pymdownx.keys
+  - pymdownx.blocks.caption
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
