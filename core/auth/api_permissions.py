@@ -96,7 +96,14 @@ class HasPerm(BasePermission):
         self._perms = perms
 
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
-        return reduce(self._operator, (request.user.has_perm(p) for p in self._perms))
+        # if the request has the `auth` property,
+        # it means that the user has been explicitly authenticated
+        # using a django-ninja authentication backend
+        # (whether it is SessionAuth or ApiKeyAuth).
+        # If not, this authentication has not been done, but the user may
+        # still be implicitly authenticated through AuthenticationMiddleware
+        user = request.auth if hasattr(request, "auth") else request.user
+        return reduce(self._operator, (user.has_perm(p) for p in self._perms))
 
 
 class IsRoot(BasePermission):
