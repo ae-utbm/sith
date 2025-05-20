@@ -66,7 +66,9 @@ nav:
     - Gestion des permissions: tutorial/perms.md
     - Gestion des groupes: tutorial/groups.md
     - Les fragments: tutorial/fragments.md
-    - Connexion à l'API: tutorial/connect-api.md
+    - API:
+      - Développement: tutorial/api/dev.md
+      - Connexion à l'API: tutorial/api/connect.md
     - Etransactions: tutorial/etransaction.md
   - How-to:
     - L'ORM de Django: howto/querysets.md

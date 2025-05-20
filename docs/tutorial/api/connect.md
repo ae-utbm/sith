@@ -41,7 +41,7 @@ et de la méthode d'authentification.
 Vous pouvez vous connecter directement sur l'interface Swagger,
 en cliquant sur ce bouton, en haut à droite :
 
-![Swagger auth (1)](../img/api_key_authorize_1.png)
+![Swagger auth (1)](../../img/api_key_authorize_1.png)
 /// caption
 Bouton d'autorisation sur Swagger
 ///
@@ -50,7 +50,7 @@ Puis rentrez votre clef d'API dans le champ prévu à cet effet,
 et cliquez sur authorize :
 
 
-![Swagger auth (2)](../img/api_key_authorize_2.png)
+![Swagger auth (2)](../../img/api_key_authorize_2.png)
 /// caption
 Saisie de la clef d'API
 ///
