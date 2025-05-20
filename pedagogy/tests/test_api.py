@@ -68,7 +68,7 @@ class TestUVSearch(TestCase):
     def test_permissions(self):
         # Test with anonymous user
         response = self.client.get(self.url)
-        assert response.status_code == 403
+        assert response.status_code == 401
 
         # Test with not subscribed user
         self.client.force_login(baker.make(User))

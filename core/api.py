@@ -5,11 +5,13 @@ from django.conf import settings
 from django.db.models import F
 from django.http import HttpResponse
 from ninja import File, Query
+from ninja.security import SessionAuth
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import PermissionDenied
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
+from apikey.auth import ApiKeyAuth
 from club.models import Mailing
 from core.auth.api_permissions import CanAccessLookup, CanView, HasPerm
 from core.models import Group, QuickUploadImage, SithFile, User
@@ -90,6 +92,7 @@ class SithFileController(ControllerBase):
     @route.get(
         "/search",
         response=PaginatedResponseSchema[SithFileSchema],
+        auth=[SessionAuth(), ApiKeyAuth()],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
@@ -102,6 +105,7 @@ class GroupController(ControllerBase):
     @route.get(
         "/search",
         response=PaginatedResponseSchema[GroupSchema],
+        auth=[SessionAuth(), ApiKeyAuth()],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
