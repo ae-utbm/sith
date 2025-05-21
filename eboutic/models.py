@@ -28,18 +28,27 @@ from django.utils.translation import gettext_lazy as _
 
 from core.models import User
 from counter.fields import CurrencyField
-from counter.models import BillingInfo, Counter, Customer, Product, Refilling, Selling
+from counter.models import (
+    BillingInfo,
+    Counter,
+    Customer,
+    Product,
+    Refilling,
+    Selling,
+    get_eboutic,
+)
 
 
 def get_eboutic_products(user: User) -> list[Product]:
     products = (
-        Counter.objects.get(type="EBOUTIC")
+        get_eboutic()
         .products.filter(product_type__isnull=False)
         .filter(archived=False)
         .filter(limit_age__lte=user.age)
         .annotate(order=F("product_type__order"))
         .annotate(category=F("product_type__name"))
         .annotate(category_comment=F("product_type__comment"))
+        .annotate(price=F("selling_price"))  # <-- selected price for basket validation
         .prefetch_related("buying_groups")  # <-- used in `Product.can_be_sold_to`
     )
     return [p for p in products if p.can_be_sold_to(user)]
@@ -84,6 +93,9 @@ class Basket(models.Model):
     def __str__(self):
         return f"{self.user}'s basket ({self.items.all().count()} items)"
 
+    def can_be_viewed_by(self, user):
+        return self.user == user
+
     @cached_property
     def contains_refilling_item(self) -> bool:
         return self.items.filter(
@@ -97,13 +109,6 @@ class Basket(models.Model):
                 total=Sum(F("quantity") * F("product_unit_price"), default=0)
             )["total"]
         )
-
-    @classmethod
-    def from_session(cls, session) -> Basket | None:
-        """The basket stored in the session object, if it exists."""
-        if "basket_id" in session:
-            return cls.objects.filter(id=session["basket_id"]).first()
-        return None
 
     def generate_sales(self, counter, seller: User, payment_method: str):
         """Generate a list of sold items corresponding to the items
@@ -139,7 +144,7 @@ class Basket(models.Model):
                     club=product.club,
                     product=product,
                     seller=seller,
-                    customer=self.user.customer,
+                    customer=Customer.get_or_create(self.user)[0],
                     unit_price=item.product_unit_price,
                     quantity=item.quantity,
                     payment_method=payment_method,

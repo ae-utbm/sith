@@ -24,13 +24,21 @@ body {
     background-color: white;
     margin: 0;
 
-    > .title {
+    .alert {
+      word-wrap: break-word;
+      white-space: normal;
+      text-align: center;
+      display: block;
+      width: fit-content;
+    }
+
+    >.title {
       text-align: center;
       margin: 0;
     }
 
-    > div,
-    > form {
+    >div,
+    >form {
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
@@ -41,8 +49,8 @@ body {
       max-width: 500px;
       margin-top: 20px;
 
-      > p,
-      > div {
+      >p,
+      >div {
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -50,7 +58,7 @@ body {
         width: 100%;
         margin: 0;
 
-        > label {
+        >label {
           width: 100%;
 
           @media (min-width: 500px) {
@@ -59,9 +67,9 @@ body {
         }
       }
 
-      > input,
-      > p > input,
-      > div > input {
+      >input,
+      >p>input,
+      >div>input {
         box-sizing: border-box;
         width: 100%;
         max-width: 500px;
@@ -71,35 +79,35 @@ body {
         }
       }
 
-      > .errorlist {
+      >.errorlist {
         color: red;
         text-align: center;
         margin: 10px 0 0 0;
         list-style-type: none;
       }
 
-      > .required > .helptext {
+      >.required>.helptext {
         text-align: center;
         font-style: italic;
       }
 
-      > .required:last-of-type {
+      >.required:last-of-type {
         box-sizing: border-box;
         max-width: 300px;
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: space-between;
 
-        > label {
+        >label {
           width: 100%;
         }
 
-        > img {
+        >img {
           width: 70px;
           object-fit: contain;
         }
 
-        > input {
+        >input {
           width: 200px;
         }
       }

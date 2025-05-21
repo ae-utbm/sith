@@ -100,7 +100,6 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
     Python ne fait pas parti des dépendances puisqu'il est automatiquement
     installé par uv.
 
-
 ## Finaliser l'installation
 
 Clonez le projet (depuis votre console WSL, si vous utilisez WSL)
@@ -113,6 +112,7 @@ cd sith
 # Création de l'environnement et installation des dépendances
 uv sync
 npm install # Dépendances frontend
+cp .env.example .env # Configuration par défaut
 uv run ./manage.py install_xapian
 ```
 
@@ -122,17 +122,12 @@ uv run ./manage.py install_xapian
     de texte à l'écran.
     C'est normal, il ne faut pas avoir peur.
 
-Une fois les dépendances installées, il faut encore
-mettre en place quelques éléments de configuration,
-qui peuvent varier d'un environnement à l'autre.
+
+La modification de la configuration passe par la modification de variables
+d'environnement.
 Ces variables sont stockées dans un fichier `.env`.
-Pour le créer, vous pouvez copier le fichier `.env.example` :
 
-```bash
-cp .env.example .env
-```
-
-Les variables par défaut contenues dans le fichier `.env`
+Les variables par défaut contenues dans le fichier `.env.example`
 devraient convenir pour le développement, sans modification.
 
 Maintenant que les dépendances sont installées

@@ -1,1 +1,2 @@
 redis: redis-server --port $REDIS_PORT
+celery: uv run celery -A sith worker --beat -l INFO

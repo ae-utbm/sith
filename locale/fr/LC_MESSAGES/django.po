@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-14 01:16+0200\n"
+"POT-Creation-Date: 2025-04-15 23:39+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1764,8 +1764,8 @@ msgstr "Photos"
 
 #: core/templates/core/base/navbar.jinja counter/models.py
 #: counter/templates/counter/counter_list.jinja
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
 #: eboutic/templates/eboutic/eboutic_main.jinja
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja sith/settings.py
 msgid "Eboutic"
 msgstr "Eboutic"
@@ -2882,6 +2882,30 @@ msgstr ""
 msgid "Refound this account"
 msgstr "Rembourser ce compte"
 
+#: counter/forms.py
+msgid "The selected product isn't available for this user"
+msgstr "Le produit sélectionné n'est pas disponnible pour cet utilisateur"
+
+#: counter/forms.py
+msgid "Submitted basket is invalid"
+msgstr "Le panier envoyé est invalide"
+
+#: counter/forms.py
+msgid "Duplicated product entries."
+msgstr "Saisie de produit dupliquée"
+
+#: counter/forms.py counter/models.py
+msgid "Not enough money"
+msgstr "Solde insuffisant"
+
+#: counter/forms.py
+#, python-format
+msgid ""
+"This user have reached his recording limit for the following products : %s"
+msgstr ""
+"Cet utilisateur a atteint sa limite de déconsigne pour les produits "
+"suivants : %s"
+
 #: counter/management/commands/dump_accounts.py
 msgid "Your AE account has been emptied"
 msgstr "Votre compte AE a été vidé"
@@ -2905,10 +2929,6 @@ msgstr "client"
 #: counter/models.py
 msgid "customers"
 msgstr "clients"
-
-#: counter/models.py counter/views/click.py
-msgid "Not enough money"
-msgstr "Solde insuffisant"
 
 #: counter/models.py
 msgid "First name"
@@ -3278,7 +3298,7 @@ msgid "Go"
 msgstr "Valider"
 
 #: counter/templates/counter/counter_click.jinja
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
 msgid "Basket: "
 msgstr "Panier : "
 
@@ -3672,26 +3692,6 @@ msgstr "Montant du chèque"
 msgid "Check quantity"
 msgstr "Nombre de chèque"
 
-#: counter/views/click.py
-msgid "The selected product isn't available for this user"
-msgstr "Le produit sélectionné n'est pas disponnible pour cet utilisateur"
-
-#: counter/views/click.py
-msgid "Submitted basket is invalid"
-msgstr "Le panier envoyé est invalide"
-
-#: counter/views/click.py
-msgid "Duplicated product entries."
-msgstr "Saisie de produit dupliquée"
-
-#: counter/views/click.py
-#, python-format
-msgid ""
-"This user have reached his recording limit for the following products : %s"
-msgstr ""
-"Cet utilisateur a atteint sa limite de déconsigne pour les produits "
-"suivants : %s"
-
 #: counter/views/eticket.py
 msgid "people(s)"
 msgstr "personne(s)"
@@ -3728,19 +3728,6 @@ msgstr "Types de produit"
 #, python-format
 msgid "%(name)s has no registered student card"
 msgstr "%(name)s n'a pas de carte étudiante enregistrée"
-
-#: eboutic/forms.py
-msgid "The request was badly formatted."
-msgstr "La requête a été mal formatée."
-
-#: eboutic/forms.py
-msgid "Your basket is empty."
-msgstr "Votre panier est vide"
-
-#: eboutic/forms.py
-#, python-format
-msgid "%(name)s : this product does not exist or may no longer be available."
-msgstr "%(name)s : ce produit n'existe pas ou n'est peut-être plus disponible."
 
 #: eboutic/models.py
 msgid "validated"
@@ -3779,15 +3766,44 @@ msgstr "Informations de facturation"
 msgid "Validate"
 msgstr "Valider"
 
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
+msgid "Basket state"
+msgstr "État du panier"
+
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
 #: eboutic/templates/eboutic/eboutic_main.jinja
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
+msgid "Basket amount: "
+msgstr "Valeur du panier : "
+
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
+#: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "Current account amount: "
 msgstr "Solde actuel : "
 
-#: eboutic/templates/eboutic/eboutic_main.jinja
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
-msgid "Basket amount: "
-msgstr "Valeur du panier : "
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
+msgid "Remaining account amount: "
+msgstr "Solde restant : "
+
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
+msgid "Pay with credit card"
+msgstr "Payer avec une carte bancaire"
+
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
+msgid ""
+"AE account payment disabled because your basket contains refilling items."
+msgstr ""
+"Paiement par compte AE désactivé parce que votre panier contient des bons de "
+"rechargement."
+
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
+msgid ""
+"AE account payment disabled because you do not have enough money remaining."
+msgstr ""
+"Paiement par compte AE désactivé parce que votre solde est insuffisant."
+
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
+msgid "Pay with Sith account"
+msgstr "Payer avec un compte AE"
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "Clear"
@@ -3815,12 +3831,13 @@ msgstr "Partenariat Eurockéennes 2025"
 #: eboutic/templates/eboutic/eboutic_main.jinja
 msgid ""
 "Our partner uses Weezevent to sell tickets. Weezevent may collect user info "
-"according to it's own privacy policy. By clicking the accept button you "
+"according to its own privacy policy. By clicking the accept button you "
 "consent to their terms of services."
 msgstr ""
-"Notre partenaire utilises Wezevent pour vendre ses billets. Weezevent peut collecter des informatinos utilisateur "
-"conformément à sa propre politique de confidentialité. En cliquant sur le bouton d'acceptation vous "
-"consentez à leurs termes de service."
+"Notre partenaire utilises Wezevent pour vendre ses billets. Weezevent peut "
+"collecter des informations utilisateur conformément à sa propre politique de "
+"confidentialité. En cliquant sur le bouton d'acceptation vous consentez à "
+"leurs termes de service."
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "Privacy policy"
@@ -3852,35 +3869,6 @@ msgstr ""
 msgid "There are no items available for sale"
 msgstr "Aucun article n'est disponible à la vente"
 
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
-msgid "Basket state"
-msgstr "État du panier"
-
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
-msgid "Remaining account amount: "
-msgstr "Solde restant : "
-
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
-msgid "Pay with credit card"
-msgstr "Payer avec une carte bancaire"
-
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
-msgid ""
-"AE account payment disabled because your basket contains refilling items."
-msgstr ""
-"Paiement par compte AE désactivé parce que votre panier contient des bons de "
-"rechargement."
-
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
-msgid ""
-"AE account payment disabled because you do not have enough money remaining."
-msgstr ""
-"Paiement par compte AE désactivé parce que votre solde est insuffisant."
-
-#: eboutic/templates/eboutic/eboutic_makecommand.jinja
-msgid "Pay with Sith account"
-msgstr "Payer avec un compte AE"
-
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja
 msgid "Payment successful"
 msgstr "Le paiement a été effectué"
@@ -3892,6 +3880,10 @@ msgstr "Le paiement a échoué"
 #: eboutic/templates/eboutic/eboutic_payment_result.jinja
 msgid "Return to eboutic"
 msgstr "Retourner à l'eboutic"
+
+#: eboutic/views.py
+msgid "Your basket is empty"
+msgstr "Votre panier est vide"
 
 #: eboutic/views.py
 msgid "Billing info registration success"
@@ -3915,6 +3907,10 @@ msgstr ""
 "fournir pour effectuer un paiement par carte bancaire. De ce fait, si vous "
 "souhaitez payer par carte, vous devez rajouter un numéro de téléphone aux "
 "données que vous aviez déjà fourni."
+
+#: eboutic/views.py
+msgid "You can't buy a refilling with sith money"
+msgstr "Vous ne pouvez pas acheter un rechargement avec de l'argent du sith"
 
 #: election/models.py
 msgid "start candidature"

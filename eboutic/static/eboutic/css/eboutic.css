@@ -61,6 +61,7 @@
   word-break: break-word;
   width: 100%;
   line-height: 100%;
+  white-space: normal;
 }
 
 #eboutic .fa-plus,

@@ -47,6 +47,10 @@ from counter.fields import CurrencyField
 from subscription.models import Subscription
 
 
+def get_eboutic() -> Counter:
+    return Counter.objects.filter(type="EBOUTIC").order_by("id").first()
+
+
 class CustomerQuerySet(models.QuerySet):
     def update_amount(self) -> int:
         """Update the amount of all customers selected by this queryset.
