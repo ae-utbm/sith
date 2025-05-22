@@ -396,19 +396,10 @@ class User(AbstractUser):
             return self.is_root
         return group in self.cached_groups
 
-    @property
+    @cached_property
     def cached_groups(self) -> list[Group]:
-        """Get the list of groups this user is in.
-
-        The result is cached for the default duration (should be 5 minutes)
-
-        Returns: A list of all the groups this user is in.
-        """
-        groups = cache.get(f"user_{self.id}_groups")
-        if groups is None:
-            groups = list(self.groups.all())
-            cache.set(f"user_{self.id}_groups", groups)
-        return groups
+        """Get the list of groups this user is in."""
+        return list(self.groups.all())
 
     @cached_property
     def is_root(self) -> bool:
