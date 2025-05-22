@@ -15,11 +15,12 @@
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
 from core.views.mixins import TabedViewMixin
+from counter.utils import is_logged_in_counter
 
 
 class CounterAdminMixin(View):
@@ -49,34 +50,40 @@ class CounterTabsMixin(TabedViewMixin):
         return self.object
 
     def get_list_of_tabs(self):
+        if self.object.type != "BAR":
+            return []
         tab_list = [
             {
-                "url": reverse_lazy(
+                "url": reverse(
                     "counter:details", kwargs={"counter_id": self.object.id}
                 ),
                 "slug": "counter",
                 "name": _("Counter"),
             }
         ]
-        if self.object.type == "BAR":
+        if self.request.user.has_perm("counter.add_cashregistersummary"):
             tab_list.append(
                 {
-                    "url": reverse_lazy(
+                    "url": reverse(
                         "counter:cash_summary", kwargs={"counter_id": self.object.id}
                     ),
                     "slug": "cash_summary",
                     "name": _("Cash summary"),
                 }
             )
+        if is_logged_in_counter(self.request):
             tab_list.append(
                 {
-                    "url": reverse_lazy(
+                    "url": reverse(
                         "counter:last_ops", kwargs={"counter_id": self.object.id}
                     ),
                     "slug": "last_ops",
                     "name": _("Last operations"),
                 }
             )
+        if len(tab_list) <= 1:
+            # It would be strange to show only one tab
+            return []
         return tab_list
 
 

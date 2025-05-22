@@ -12,18 +12,17 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from datetime import datetime
-from datetime import timezone as tz
 
 from django import forms
 from django.conf import settings
-from django.http import HttpResponseRedirect
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.http import Http404
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import BaseFormView, UpdateView
 
-from core.auth.mixins import CanViewMixin
+from core.models import User
 from counter.forms import CashSummaryFormBase
 from counter.models import (
     CashRegisterSummary,
@@ -31,9 +30,7 @@ from counter.models import (
     Counter,
     Refilling,
 )
-from counter.utils import is_logged_in_counter
 from counter.views.mixins import (
-    CounterAdminMixin,
     CounterAdminTabsMixin,
     CounterTabsMixin,
 )
@@ -157,11 +154,9 @@ class CashRegisterSummaryForm(forms.Form):
         else:
             self.instance = None
 
-    def save(self, counter=None):
+    def save(self, counter: Counter | None = None, user: User | None = None):
         cd = self.cleaned_data
-        summary = self.instance or CashRegisterSummary(
-            counter=counter, user=counter.get_random_barman()
-        )
+        summary = self.instance or CashRegisterSummary(counter=counter, user=user)
         summary.comment = cd["comment"]
         summary.emptied = cd["emptied"]
         summary.save()
@@ -247,48 +242,33 @@ class CashRegisterSummaryForm(forms.Form):
             summary.delete()
 
 
-class CounterCashSummaryView(CounterTabsMixin, CanViewMixin, DetailView):
+class CounterCashSummaryView(
+    CounterTabsMixin, PermissionRequiredMixin, BaseFormView, DetailView
+):
     """Provide the cash summary form."""
 
     model = Counter
     pk_url_kwarg = "counter_id"
     template_name = "counter/cash_register_summary.jinja"
     current_tab = "cash_summary"
+    permission_required = "counter.add_cashregistersummary"
+    form_class = CashRegisterSummaryForm
 
     def dispatch(self, request, *args, **kwargs):
-        """We have here again a very particular right handling."""
         self.object = self.get_object()
-        if is_logged_in_counter(request) and self.object.barmen_list:
-            return super().dispatch(request, *args, **kwargs)
-        return HttpResponseRedirect(
-            reverse("counter:details", kwargs={"counter_id": self.object.id})
-            + "?bad_location"
-        )
+        if self.object.type != "BAR":
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.form = CashRegisterSummaryForm()
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.form = CashRegisterSummaryForm(request.POST)
-        if self.form.is_valid():
-            self.form.save(self.object)
-            return HttpResponseRedirect(self.get_success_url())
-        return super().get(request, *args, **kwargs)
+    def form_valid(self, form):
+        form.save(counter=self.object, user=self.request.user)
+        return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy("counter:details", kwargs={"counter_id": self.object.id})
-
-    def get_context_data(self, **kwargs):
-        """Add form to the context."""
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["form"] = self.form
-        return kwargs
+        return reverse("counter:details", kwargs={"counter_id": self.object.id})
 
 
-class CashSummaryEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
+class CashSummaryEditView(CounterAdminTabsMixin, PermissionRequiredMixin, UpdateView):
     """Edit cash summaries."""
 
     model = CashRegisterSummary
@@ -297,12 +277,11 @@ class CashSummaryEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     pk_url_kwarg = "cashsummary_id"
     form_class = CashRegisterSummaryForm
     current_tab = "cash_summary"
+    permission_required = "counter.change_cashregistersummary"
+    success_url = reverse_lazy("counter:cash_summary_list")
 
-    def get_success_url(self):
-        return reverse("counter:cash_summary_list")
 
-
-class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
+class CashSummaryListView(CounterAdminTabsMixin, PermissionRequiredMixin, ListView):
     """Display a list of cash summaries."""
 
     model = CashRegisterSummary
@@ -311,6 +290,7 @@ class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
     current_tab = "cash_summary"
     queryset = CashRegisterSummary.objects.all().order_by("-date")
     paginate_by = settings.SITH_COUNTER_CASH_SUMMARY_LENGTH
+    permission_required = "counter.view_cashregistersummary"
 
     def get_context_data(self, **kwargs):
         """Add sums to the context."""
@@ -321,12 +301,12 @@ class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
         kwargs["refilling_sums"] = {}
         for c in Counter.objects.filter(type="BAR").all():
             refillings = Refilling.objects.filter(counter=c)
-            cashredistersummaries = CashRegisterSummary.objects.filter(counter=c)
+            cash_register_summaries = CashRegisterSummary.objects.filter(counter=c)
             if form.is_valid() and form.cleaned_data["begin_date"]:
                 refillings = refillings.filter(
                     date__gte=form.cleaned_data["begin_date"]
                 )
-                cashredistersummaries = cashredistersummaries.filter(
+                cash_register_summaries = cash_register_summaries.filter(
                     date__gte=form.cleaned_data["begin_date"]
                 )
             else:
@@ -337,23 +317,16 @@ class CashSummaryListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
                 )
                 if last_summary:
                     refillings = refillings.filter(date__gt=last_summary.date)
-                    cashredistersummaries = cashredistersummaries.filter(
+                    cash_register_summaries = cash_register_summaries.filter(
                         date__gt=last_summary.date
-                    )
-                else:
-                    refillings = refillings.filter(
-                        date__gte=datetime(year=1994, month=5, day=17, tzinfo=tz.utc)
-                    )  # My birth date should be old enough
-                    cashredistersummaries = cashredistersummaries.filter(
-                        date__gte=datetime(year=1994, month=5, day=17, tzinfo=tz.utc)
                     )
             if form.is_valid() and form.cleaned_data["end_date"]:
                 refillings = refillings.filter(date__lte=form.cleaned_data["end_date"])
-                cashredistersummaries = cashredistersummaries.filter(
+                cash_register_summaries = cash_register_summaries.filter(
                     date__lte=form.cleaned_data["end_date"]
                 )
             kwargs["summaries_sums"][c.name] = sum(
-                [s.get_total() for s in cashredistersummaries.all()]
+                [s.get_total() for s in cash_register_summaries.all()]
             )
             kwargs["refilling_sums"][c.name] = sum([s.amount for s in refillings.all()])
         return kwargs
