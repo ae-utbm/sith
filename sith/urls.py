@@ -12,7 +12,6 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -26,8 +25,7 @@ js_info_dict = {"packages": ("sith",)}
 handler403 = "core.views.forbidden"
 handler404 = "core.views.not_found"
 handler500 = "core.views.internal_servor_error"
-
-api = NinjaExtraAPI(version="0.2.0", urls_namespace="api", csrf=True)
+api = NinjaExtraAPI(title="Sith API", version="0.2.0", urls_namespace="api", csrf=True)
 api.auto_discover_controllers()
 
 urlpatterns = [
