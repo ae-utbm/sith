@@ -24,13 +24,15 @@
 
 from django import forms
 from django.conf import settings
+from django.db.models import Exists, OuterRef, Q
+from django.db.models.functions import Lower
 from django.utils.translation import gettext_lazy as _
 
 from club.models import Club, Mailing, MailingSubscription, Membership
 from core.models import User
 from core.views.forms import SelectDate, SelectDateTime
 from core.views.widgets.ajax_select import AutoCompleteSelectMultipleUser
-from counter.models import Counter
+from counter.models import Counter, Selling
 
 
 class ClubEditForm(forms.ModelForm):
@@ -159,12 +161,20 @@ class SellingsForm(forms.Form):
         label=_("End date"), widget=SelectDateTime, required=False
     )
 
-    counters = forms.ModelMultipleChoiceField(
-        Counter.objects.order_by("name").all(), label=_("Counter"), required=False
-    )
-
     def __init__(self, club, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        counters_qs = (
+            Counter.objects.filter(
+                Q(club=club)
+                | Q(products__club=club)
+                | Exists(Selling.objects.filter(counter=OuterRef("pk"), club=club))
+            )
+            .distinct()
+            .order_by(Lower("name"))
+        )
+        self.fields["counters"] = forms.ModelMultipleChoiceField(
+            counters_qs, label=_("Counter"), required=False
+        )
         self.fields["products"] = forms.ModelMultipleChoiceField(
             club.products.order_by("name").filter(archived=False).all(),
             label=_("Products"),
