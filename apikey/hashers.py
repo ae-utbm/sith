@@ -1,12 +1,12 @@
 import functools
 import hashlib
-import uuid
+import secrets
 
 from django.contrib.auth.hashers import BasePasswordHasher
 from django.utils.crypto import constant_time_compare
 
 
-class Sha256ApiKeyHasher(BasePasswordHasher):
+class Sha512ApiKeyHasher(BasePasswordHasher):
     """
     An API key hasher using the sha256 algorithm.
 
@@ -15,14 +15,14 @@ class Sha256ApiKeyHasher(BasePasswordHasher):
     high entropy, randomly generated API keys.
     """
 
-    algorithm = "sha256"
+    algorithm = "sha512"
 
     def salt(self) -> str:
         # No need for a salt on a high entropy key.
         return ""
 
     def encode(self, password: str, salt: str = "") -> str:
-        hashed = hashlib.sha256(password.encode()).hexdigest()
+        hashed = hashlib.sha512(password.encode()).hexdigest()
         return f"{self.algorithm}$${hashed}"
 
     def verify(self, password: str, encoded: str) -> bool:
@@ -32,11 +32,12 @@ class Sha256ApiKeyHasher(BasePasswordHasher):
 
 @functools.cache
 def get_hasher():
-    return Sha256ApiKeyHasher()
+    return Sha512ApiKeyHasher()
 
 
 def generate_key() -> tuple[str, str]:
     """Generate a [key, hash] couple."""
-    key = str(uuid.uuid4())
+    # this will result in key with a length of 72
+    key = str(secrets.token_urlsafe(54))
     hasher = get_hasher()
     return key, hasher.encode(key)
