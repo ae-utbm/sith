@@ -88,7 +88,7 @@ class Migration(migrations.Migration):
                     models.CharField(
                         db_index=True,
                         editable=False,
-                        max_length=150,
+                        max_length=136,
                         verbose_name="hashed key",
                     ),
                 ),

@@ -17,9 +17,7 @@ class ApiClient(models.Model):
         on_delete=models.CASCADE,
     )
     groups = models.ManyToManyField(
-        Group,
-        verbose_name=_("groups"),
-        related_name="api_clients",
+        Group, verbose_name=_("groups"), related_name="api_clients", blank=True
     )
     client_permissions = models.ManyToManyField(
         Permission,
@@ -70,11 +68,13 @@ class ApiClient(models.Model):
 
 class ApiKey(models.Model):
     PREFIX_LENGTH = 5
+    KEY_LENGTH = 72
+    HASHED_KEY_LENGTH = 136
 
     name = models.CharField(_("name"), blank=True, default="")
     prefix = models.CharField(_("prefix"), max_length=PREFIX_LENGTH, editable=False)
     hashed_key = models.CharField(
-        _("hashed key"), max_length=150, db_index=True, editable=False
+        _("hashed key"), max_length=HASHED_KEY_LENGTH, db_index=True, editable=False
     )
     client = models.ForeignKey(
         ApiClient,
