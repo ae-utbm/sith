@@ -14,7 +14,7 @@ class ApiKeyAuth(APIKeyHeader):
         hasher = get_hasher()
         hashed_key = hasher.encode(key)
         try:
-            key_obj = ApiKey.objects.get(hashed_key=hashed_key)
+            key_obj = ApiKey.objects.get(revoked=False, hashed_key=hashed_key)
         except ApiKey.DoesNotExist:
             return None
         return key_obj.client
