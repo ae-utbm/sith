@@ -413,14 +413,6 @@ class User(AbstractUser):
         return self.groups.filter(club_board=settings.SITH_MAIN_CLUB_ID).exists()
 
     @cached_property
-    def is_launderette_manager(self):
-        from club.models import Club
-
-        return Club.objects.get(
-            id=settings.SITH_LAUNDERETTE_CLUB_ID
-        ).get_membership_for(self)
-
-    @cached_property
     def is_banned_alcohol(self) -> bool:
         return self.ban_groups.filter(id=settings.SITH_GROUP_BANNED_ALCOHOL_ID).exists()
 
@@ -665,10 +657,6 @@ class AnonymousUser(AuthAnonymousUser):
 
     @property
     def is_board_member(self):
-        return False
-
-    @property
-    def is_launderette_manager(self):
         return False
 
     @property
