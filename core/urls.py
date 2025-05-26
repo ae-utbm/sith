@@ -21,7 +21,6 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-
 from django.urls import path, re_path, register_converter
 from django.views.generic import RedirectView
 
@@ -68,6 +67,7 @@ from core.views import (
     UserGodfathersTreeView,
     UserGodfathersView,
     UserListView,
+    UserMeRedirect,
     UserMiniView,
     UserPreferencesView,
     UserStatsView,
@@ -141,6 +141,12 @@ urlpatterns = [
     ),
     # User views
     path("user/", UserListView.as_view(), name="user_list"),
+    path(
+        "user/me/<path:remaining_path>/",
+        UserMeRedirect.as_view(),
+        name="user_me_redirect_with_path",
+    ),
+    path("user/me/", UserMeRedirect.as_view(), name="user_me_redirect"),
     path("user/<int:user_id>/mini/", UserMiniView.as_view(), name="user_profile_mini"),
     path("user/<int:user_id>/", UserView.as_view(), name="user_profile"),
     path(
