@@ -5,7 +5,7 @@ from django.urls import reverse
 from ninja import Field, FilterSchema, ModelSchema, Schema
 from pydantic import model_validator
 
-from club.schemas import ClubSchema
+from club.schemas import SimpleClubSchema
 from core.schemas import GroupSchema, SimpleUserSchema
 from counter.models import Counter, Product, ProductType
 
@@ -82,7 +82,7 @@ class ProductSchema(ModelSchema):
         ]
 
     buying_groups: list[GroupSchema]
-    club: ClubSchema
+    club: SimpleClubSchema
     product_type: SimpleProductTypeSchema | None
     url: str
 
