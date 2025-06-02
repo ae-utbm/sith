@@ -126,9 +126,12 @@ nav.navbar {
 
       ul.content {
         list-style-type: none;
-        box-shadow: 3px 3px 3px 0 #dfdfdf;
         background: white;
         margin: 0;
+
+        @media (min-width: 500px) {
+          box-shadow: 3px 3px 3px 0 #dfdfdf;
+        }
 
         >li>a {
           display: flex;
