@@ -20,7 +20,7 @@ from django.utils import timezone
 from django.views.generic import TemplateView
 
 from counter.fields import CurrencyField
-from counter.models import Refilling, Selling
+from counter.models import Club, InvoiceCall, Refilling, Selling
 from counter.views.mixins import CounterAdminMixin, CounterAdminTabsMixin
 
 
@@ -79,4 +79,58 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
             .exclude(selling_sum=None)
             .order_by("-selling_sum")
         )
+
+        # une query pour tous les clubs qu'on met dans un dico dont la clé est le nom du club
+        club_names = [i["club__name"] for i in kwargs["sums"]]
+        clubs = Club.objects.filter(name__in=club_names)
+
+        # et une query pour les factures
+        invoice_calls = InvoiceCall.objects.filter(
+            month=start_date.month, year=start_date.year, club__in=clubs
+        )
+
+        invoice_statuses = {ic.club.name: ic.validated for ic in invoice_calls}
+
+        kwargs["validated"] = invoice_statuses
         return kwargs
+
+    def post(self, request, *args, **kwargs):
+        if request.POST["month"]:
+            start_date = datetime.strptime(request.POST["month"], "%Y-%m")
+
+        year = start_date.year
+        month = start_date.month
+
+        club_names = list(
+            Selling.objects.filter(date__year=year, date__month=month)
+            .values_list("club__name", flat=True)
+            .distinct()
+        )
+
+        clubs = Club.objects.filter(name__in=club_names)
+        club_map = {club.name: club for club in clubs}
+
+        invoice_calls = InvoiceCall.objects.filter(
+            year=year, month=month, club__in=clubs
+        )
+        invoice_statuses = {ic.club.name: ic for ic in invoice_calls}
+
+        for club_name in club_names:
+            is_checked = f"validate_{club_name}" in request.POST
+            invoice_call = invoice_statuses[club_name]
+
+            if invoice_call:
+                if invoice_call.validated != is_checked:
+                    invoice_call.validated = is_checked
+                    invoice_call.save()
+            else:
+                InvoiceCall.objects.create(
+                    year=year,
+                    month=month,
+                    club=club_map[club_name],
+                    validated=is_checked,
+                )
+
+        from django.shortcuts import redirect
+
+        return redirect(f"{request.path}?month={request.POST.get('month', '')}")
