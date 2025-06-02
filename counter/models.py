@@ -1362,3 +1362,46 @@ class ReturnableProductBalance(models.Model):
             f"return balance of {self.customer} "
             f"for {self.returnable.product_id} : {self.balance}"
         )
+
+
+class MonthField(models.DateField):
+    description = _("Year + month field")
+
+    def __init__(self, *args, **kwargs):
+        kwargs["max_length"] = 7
+        super().__init__(*args, **kwargs)
+
+    def db_type(self, connection):
+        return "char(7)"
+
+    def from_db_value(self, value, expression, connection):
+        if value is None:
+            return value
+        year, month = map(value.split("-"))
+        return date(year, month, 1)
+
+    def get_prep_value(self, value):
+        if isinstance(value, date):
+            return value.strftime("%Y-%m")
+        elif isinstance(value, str):
+            try:
+                datetime.strptime(value, "%Y-%m")
+            except ValueError:
+                raise ValueError("invalid format for date (use YYYY-mm)") from None
+        elif value is None:
+            return value
+        else:
+            raise TypeError("Invalid type for MonthField")
+
+
+class InvoiceCall(models.Model):
+    validated = models.BooleanField(verbose_name=_("is validated"))
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    month = MonthField(verbose_name=_("invoice date"))
+
+    class Meta:
+        verbose_name = _("Invoice call")
+        verbose_name_plural = _("Invoice calls")
+
+    def __str__(self):
+        return f"invoice call of {self.month}/{self.year} made by {self.club}"
