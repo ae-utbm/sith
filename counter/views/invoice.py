@@ -46,30 +46,23 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
         )
         from django.db.models import Case, Sum, When
 
-        kwargs["sum_cb"] = sum(
-            [
-                r.amount
-                for r in Refilling.objects.filter(
-                    payment_method="CARD",
-                    is_validated=True,
-                    date__gte=start_date,
-                    date__lte=end_date,
-                )
-            ]
-        )
-        kwargs["sum_cb"] += sum(
-            [
-                s.quantity * s.unit_price
-                for s in Selling.objects.filter(
-                    payment_method="CARD",
-                    is_validated=True,
-                    date__gte=start_date,
-                    date__lte=end_date,
-                )
-            ]
-        )
+        kwargs["sum_cb"] = Refilling.objects.filter(
+            payment_method="CARD",
+            is_validated=True,
+            date__gte=start_date,
+            date__lte=end_date,
+        ).aggregate(amount=Sum(F("amount"), default=0))["amount"]
+
+        kwargs["sum_cb"] += Selling.objects.filter(
+            payment_method="CARD",
+            is_validated=True,
+            date__gte=start_date,
+            date__lte=end_date,
+        ).aggregate(amount=Sum(F("quantity") * F("unit_price"), default=0))["amount"]
+
         kwargs["start_date"] = start_date
-        kwargs["sums"] = (
+
+        kwargs["sums"] = list(
             Selling.objects.values("club__name")
             .annotate(
                 selling_sum=Sum(
