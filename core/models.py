@@ -396,19 +396,10 @@ class User(AbstractUser):
             return self.is_root
         return group in self.cached_groups
 
-    @property
+    @cached_property
     def cached_groups(self) -> list[Group]:
-        """Get the list of groups this user is in.
-
-        The result is cached for the default duration (should be 5 minutes)
-
-        Returns: A list of all the groups this user is in.
-        """
-        groups = cache.get(f"user_{self.id}_groups")
-        if groups is None:
-            groups = list(self.groups.all())
-            cache.set(f"user_{self.id}_groups", groups)
-        return groups
+        """Get the list of groups this user is in."""
+        return list(self.groups.all())
 
     @cached_property
     def is_root(self) -> bool:
@@ -420,14 +411,6 @@ class User(AbstractUser):
     @cached_property
     def is_board_member(self) -> bool:
         return self.groups.filter(club_board=settings.SITH_MAIN_CLUB_ID).exists()
-
-    @cached_property
-    def is_launderette_manager(self):
-        from club.models import Club
-
-        return Club.objects.get(
-            id=settings.SITH_LAUNDERETTE_CLUB_ID
-        ).get_membership_for(self)
 
     @cached_property
     def is_banned_alcohol(self) -> bool:
@@ -674,10 +657,6 @@ class AnonymousUser(AuthAnonymousUser):
 
     @property
     def is_board_member(self):
-        return False
-
-    @property
-    def is_launderette_manager(self):
         return False
 
     @property

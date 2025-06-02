@@ -113,9 +113,6 @@ nav:
     - galaxy:
       - reference/galaxy/models.md
       - reference/galaxy/views.md
-    - launderette:
-      - reference/launderette/models.md
-      - reference/launderette/views.md
     - matmat:
       - reference/matmat/models.md
       - reference/matmat/views.md

@@ -123,11 +123,6 @@ class Command(BaseCommand):
             name="PdF",
             address="6 Boulevard Anatole France, 90000 Belfort",
         )
-        Club.objects.create(
-            id=settings.SITH_LAUNDERETTE_CLUB_ID,
-            name="Laverie",
-            address="6 Boulevard Anatole France, 90000 Belfort",
-        )
 
         self.reset_index("club")
         for bar_id, bar_name in settings.SITH_COUNTER_BARS:
@@ -291,13 +286,7 @@ class Command(BaseCommand):
             page=services_page,
             title="Services",
             author=skia,
-            content="""
-|   |   |   |
-| :---: | :---: | :---: |
-| [Eboutic](/eboutic) | [Laverie](/launderette) | Matmat |
-| SAS | Weekmail | Forum|
-
-""",
+            content="- [Eboutic](/eboutic)\n- Matmat\n- SAS\n- Weekmail\n- Forum",
         )
 
         index_page = Page(name="Index")
@@ -306,23 +295,10 @@ class Command(BaseCommand):
             page=index_page,
             title="Wiki index",
             author=root,
-            content="""
-Welcome to the wiki page!
-""",
+            content="Welcome to the wiki page!",
         )
 
-        laundry_page = Page(name="launderette")
-        laundry_page.save(force_lock=True)
-        PageRev.objects.create(
-            page=laundry_page,
-            title="Laverie",
-            author=root,
-            content="Fonctionnement de la laverie",
-        )
-
-        groups.public.viewable_page.set(
-            [syntax_page, services_page, index_page, laundry_page]
-        )
+        groups.public.viewable_page.set([syntax_page, services_page, index_page])
 
         self._create_subscription(root)
         self._create_subscription(skia)
@@ -868,7 +844,7 @@ Welcome to the wiki page!
         counter_admin.permissions.add(
             *list(
                 perms.filter(
-                    Q(content_type__app_label__in=["counter", "launderette"])
+                    Q(content_type__app_label__in=["counter"])
                     & ~Q(codename__in=["delete_product", "delete_producttype"])
                 )
             )

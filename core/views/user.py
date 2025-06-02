@@ -48,6 +48,7 @@ from django.views.generic import (
     DeleteView,
     DetailView,
     ListView,
+    RedirectView,
     TemplateView,
 )
 from django.views.generic.dates import MonthMixin, YearMixin
@@ -180,6 +181,13 @@ class UserCreationView(FormView):
         user = form.save()
         login(self.request, user)
         return super().form_valid(form)
+
+
+class UserMeRedirect(LoginRequiredMixin, RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        if remaining := kwargs.get("remaining_path"):
+            return f"/user/{self.request.user.id}/{remaining}/"
+        return f"/user/{self.request.user.id}/"
 
 
 class UserTabsMixin(TabedViewMixin):
@@ -564,10 +572,8 @@ class UserToolsView(LoginRequiredMixin, QuickNotifMixin, UserTabsMixin, Template
 
     def get_context_data(self, **kwargs):
         self.object = self.request.user
-        from launderette.models import Launderette
 
         kwargs = super().get_context_data(**kwargs)
-        kwargs["launderettes"] = Launderette.objects.all()
         kwargs["profile"] = self.request.user
         kwargs["object"] = self.request.user
         return kwargs

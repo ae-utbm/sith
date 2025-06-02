@@ -47,7 +47,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 from .honeypot import custom_honeypot_error
 
-env = Env()
+env = Env(expand_vars=True)
 env.read_env()
 
 
@@ -106,6 +106,8 @@ INSTALLED_APPS = (
     "django_jinja",
     "ninja_extra",
     "haystack",
+    "django_celery_results",
+    "django_celery_beat",
     "captcha",
     "core",
     "club",
@@ -182,7 +184,6 @@ TEMPLATES = [
                 "can_edit": "core.auth.mixins.can_edit",
                 "can_view": "core.auth.mixins.can_view",
                 "settings": "sith.settings",
-                "Launderette": "launderette.models.Launderette",
                 "Counter": "counter.models.Counter",
                 "timezone": "django.utils.timezone",
                 "get_sith": "com.views.sith",
@@ -335,6 +336,14 @@ EMAIL_BACKEND = env.str(
 )
 EMAIL_HOST = env.str("EMAIL_HOST", default="localhost")
 EMAIL_PORT = env.int("EMAIL_PORT", default=25)
+
+# Celery
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_BROKER_URL = env.str("TASK_BROKER_URL")
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 # Below this line, only Sith-specific variables are defined
 
@@ -658,10 +667,6 @@ with open(
 ) as f:
     SITH_EBOUTIC_PUB_KEY = f.read()
 
-# Launderette variables
-SITH_LAUNDERETTE_MACHINE_TYPES = [("WASHING", _("Washing")), ("DRYING", _("Drying"))]
-SITH_LAUNDERETTE_PRICES = {"WASHING": 1.0, "DRYING": 0.75}
-
 SITH_NOTIFICATIONS = [
     ("POSTER_MODERATION", _("A new poster needs to be moderated")),
     ("MAILING_MODERATION", _("A new mailing list needs to be moderated")),
@@ -718,7 +723,6 @@ if DEBUG:
         "debug_toolbar.panels.headers.HeadersPanel",
         "debug_toolbar.panels.request.RequestPanel",
         "debug_toolbar.panels.sql.SQLPanel",
-        "debug_toolbar.panels.staticfiles.StaticFilesPanel",
         "sith.toolbar_debug.TemplatesPanel",
         "debug_toolbar.panels.cache.CachePanel",
         "debug_toolbar.panels.signals.SignalsPanel",

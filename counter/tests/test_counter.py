@@ -46,6 +46,15 @@ from counter.models import (
 )
 
 
+def set_age(user: User, age: int):
+    user.date_of_birth = localdate().replace(year=localdate().year - age)
+    user.save()
+
+
+def force_refill_user(user: User, amount: Decimal | int):
+    baker.make(Refilling, amount=amount, customer=user.customer, is_validated=False)
+
+
 class TestFullClickBase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -226,11 +235,11 @@ class TestCounterClick(TestFullClickBase):
         cls.banned_counter_customer = subscriber_user.make()
         cls.banned_alcohol_customer = subscriber_user.make()
 
-        cls.set_age(cls.customer, 20)
-        cls.set_age(cls.barmen, 20)
-        cls.set_age(cls.club_admin, 20)
-        cls.set_age(cls.banned_alcohol_customer, 20)
-        cls.set_age(cls.underage_customer, 17)
+        set_age(cls.customer, 20)
+        set_age(cls.barmen, 20)
+        set_age(cls.club_admin, 20)
+        set_age(cls.banned_alcohol_customer, 20)
+        set_age(cls.underage_customer, 17)
 
         cls.banned_alcohol_customer.ban_groups.add(
             BanGroup.objects.get(pk=settings.SITH_GROUP_BANNED_ALCOHOL_ID)
@@ -278,11 +287,6 @@ class TestCounterClick(TestFullClickBase):
             {"username": used_barman.username, "password": "plop"},
         )
 
-    @classmethod
-    def set_age(cls, user: User, age: int):
-        user.date_of_birth = localdate().replace(year=localdate().year - age)
-        user.save()
-
     def submit_basket(
         self,
         user: User,
@@ -306,9 +310,6 @@ class TestCounterClick(TestFullClickBase):
             data,
         )
 
-    def refill_user(self, user: User, amount: Decimal | int):
-        baker.make(Refilling, amount=amount, customer=user.customer, is_validated=False)
-
     def test_click_eboutic_failure(self):
         eboutic = baker.make(Counter, type="EBOUTIC")
         self.client.force_login(self.club_admin)
@@ -318,7 +319,7 @@ class TestCounterClick(TestFullClickBase):
         assert res.status_code == 404
 
     def test_click_office_success(self):
-        self.refill_user(self.customer, 10)
+        force_refill_user(self.customer, 10)
         self.client.force_login(self.club_admin)
         res = self.submit_basket(
             self.customer, [BasketItem(self.stamps.id, 5)], counter=self.club_counter
@@ -327,7 +328,7 @@ class TestCounterClick(TestFullClickBase):
         assert self.updated_amount(self.customer) == Decimal("2.5")
 
         # Test no special price on office counter
-        self.refill_user(self.club_admin, 10)
+        force_refill_user(self.club_admin, 10)
         res = self.submit_basket(
             self.club_admin, [BasketItem(self.stamps.id, 1)], counter=self.club_counter
         )
@@ -336,7 +337,7 @@ class TestCounterClick(TestFullClickBase):
         assert self.updated_amount(self.club_admin) == Decimal("8.5")
 
     def test_click_bar_success(self):
-        self.refill_user(self.customer, 10)
+        force_refill_user(self.customer, 10)
         self.login_in_bar(self.barmen)
         res = self.submit_basket(
             self.customer, [BasketItem(self.beer.id, 2), BasketItem(self.snack.id, 1)]
@@ -347,7 +348,7 @@ class TestCounterClick(TestFullClickBase):
 
         # Test barmen special price
 
-        self.refill_user(self.barmen, 10)
+        force_refill_user(self.barmen, 10)
 
         assert (
             self.submit_basket(self.barmen, [BasketItem(self.beer.id, 1)])
@@ -356,7 +357,7 @@ class TestCounterClick(TestFullClickBase):
         assert self.updated_amount(self.barmen) == Decimal("9")
 
     def test_click_tray_price(self):
-        self.refill_user(self.customer, 20)
+        force_refill_user(self.customer, 20)
         self.login_in_bar(self.barmen)
 
         # Not applying tray price
@@ -373,7 +374,7 @@ class TestCounterClick(TestFullClickBase):
         self.login_in_bar()
 
         for user in [self.underage_customer, self.banned_alcohol_customer]:
-            self.refill_user(user, 10)
+            force_refill_user(user, 10)
 
             # Buy product without age limit
             res = self.submit_basket(user, [BasketItem(self.snack.id, 2)])
@@ -394,7 +395,7 @@ class TestCounterClick(TestFullClickBase):
             self.banned_counter_customer,
             self.customer_old_can_not_buy,
         ]:
-            self.refill_user(user, 10)
+            force_refill_user(user, 10)
             resp = self.submit_basket(user, [BasketItem(self.snack.id, 2)])
             assert resp.status_code == 302
             assert resp.url == resolve_url(self.counter)
@@ -410,7 +411,7 @@ class TestCounterClick(TestFullClickBase):
 
     def test_click_allowed_old_subscriber(self):
         self.login_in_bar()
-        self.refill_user(self.customer_old_can_buy, 10)
+        force_refill_user(self.customer_old_can_buy, 10)
         res = self.submit_basket(
             self.customer_old_can_buy, [BasketItem(self.snack.id, 2)]
         )
@@ -420,7 +421,7 @@ class TestCounterClick(TestFullClickBase):
 
     def test_click_wrong_counter(self):
         self.login_in_bar()
-        self.refill_user(self.customer, 10)
+        force_refill_user(self.customer, 10)
         res = self.submit_basket(
             self.customer, [BasketItem(self.snack.id, 2)], counter=self.other_counter
         )
@@ -444,7 +445,7 @@ class TestCounterClick(TestFullClickBase):
         assert self.updated_amount(self.customer) == Decimal("10")
 
     def test_click_not_connected(self):
-        self.refill_user(self.customer, 10)
+        force_refill_user(self.customer, 10)
         res = self.submit_basket(self.customer, [BasketItem(self.snack.id, 2)])
         assertRedirects(res, self.counter.get_absolute_url())
 
@@ -456,15 +457,29 @@ class TestCounterClick(TestFullClickBase):
         assert self.updated_amount(self.customer) == Decimal("10")
 
     def test_click_product_not_in_counter(self):
-        self.refill_user(self.customer, 10)
+        force_refill_user(self.customer, 10)
         self.login_in_bar()
 
         res = self.submit_basket(self.customer, [BasketItem(self.stamps.id, 2)])
         assert res.status_code == 200
         assert self.updated_amount(self.customer) == Decimal("10")
 
+    def test_basket_empty(self):
+        force_refill_user(self.customer, 10)
+
+        for basket in [
+            [],
+            [BasketItem(None, None)],
+            [BasketItem(None, None), BasketItem(None, None)],
+        ]:
+            assertRedirects(
+                self.submit_basket(self.customer, basket),
+                self.counter.get_absolute_url(),
+            )
+            assert self.updated_amount(self.customer) == Decimal("10")
+
     def test_click_product_invalid(self):
-        self.refill_user(self.customer, 10)
+        force_refill_user(self.customer, 10)
         self.login_in_bar()
 
         for item in [
@@ -472,14 +487,12 @@ class TestCounterClick(TestFullClickBase):
             BasketItem(self.beer.id, -1),
             BasketItem(None, 1),
             BasketItem(self.beer.id, None),
-            BasketItem(None, None),
         ]:
             assert self.submit_basket(self.customer, [item]).status_code == 200
-
             assert self.updated_amount(self.customer) == Decimal("10")
 
     def test_click_not_enough_money(self):
-        self.refill_user(self.customer, 10)
+        force_refill_user(self.customer, 10)
         self.login_in_bar()
         res = self.submit_basket(
             self.customer,
@@ -509,7 +522,7 @@ class TestCounterClick(TestFullClickBase):
         assert self.updated_amount(self.customer) == 0
 
     def test_recordings(self):
-        self.refill_user(self.customer, self.cons.selling_price * 3)
+        force_refill_user(self.customer, self.cons.selling_price * 3)
         self.login_in_bar(self.barmen)
         res = self.submit_basket(self.customer, [BasketItem(self.cons.id, 3)])
         assert res.status_code == 302

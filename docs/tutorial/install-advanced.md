@@ -120,7 +120,7 @@ les conflits avec les instances de redis déjà en fonctionnement.
 
 ```dotenv
 REDIS_PORT=6379
-CACHE_URL=redis://127.0.0.1:${REDIS_PORT}/0
+CACHE_URL=redis://127.0.0.1:6379/0
 ```
 
 Si on souhaite configurer redis pour communiquer via un socket :
@@ -151,7 +151,7 @@ ALTER ROLE sith SET client_encoding TO 'utf8';
 ALTER ROLE sith SET default_transaction_isolation TO 'read committed';
 ALTER ROLE sith SET timezone TO 'UTC';
 
-GRANT ALL PRIVILEGES ON DATABASE sith TO SITH;
+GRANT ALL PRIVILEGES ON DATABASE sith TO sith;
 \q
 ```
 
@@ -279,6 +279,26 @@ Toutes les requêtes vers des fichiers statiques et les medias publiques
 seront servies directement par nginx.
 Toutes les autres requêtes seront transmises au serveur django.
 
+## Celery
+
+Celery ne tourne pas dans django.
+C'est une application à part, avec ses propres processus,
+qui tourne de manière indépendante et qui ne communique
+que par messages avec l'instance de django.
+
+Pour faire tourner Celery, faites la commande suivante dans 
+un terminal à part :
+
+```bash
+uv run celery -A sith worker --beat -l INFO 
+```
+
+!!!note
+
+    Nous utilisons Redis comme broker pour Celery,
+    donc vous devez aussi configurer l'URL du broker,
+    de la même manière que ce qui est décrit plus haut
+    pour Redis.
 
 ## Mettre à jour la base de données antispam
 

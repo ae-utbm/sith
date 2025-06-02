@@ -17,11 +17,12 @@ import {
 
 @registerComponent("ics-calendar")
 export class IcsCalendar extends inheritHtmlElement("div") {
-  static observedAttributes = ["locale", "can_moderate", "can_delete"];
+  static observedAttributes = ["locale", "can_moderate", "can_delete", "ics-help-url"];
   private calendar: Calendar;
   private locale = "en";
   private canModerate = false;
   private canDelete = false;
+  private helpUrl = "";
 
   attributeChangedCallback(name: string, _oldValue?: string, newValue?: string) {
     if (name === "locale") {
@@ -32,6 +33,10 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     }
     if (name === "can_delete") {
       this.canDelete = newValue.toLowerCase() === "true";
+    }
+
+    if (name === "ics-help-url") {
+      this.helpUrl = newValue;
     }
   }
 
@@ -48,11 +53,11 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     if (this.isMobile()) {
       return {
         start: "",
-        center: "getCalendarLink",
+        center: "getCalendarLink helpButton",
         end: "",
       };
     }
-    return { start: "getCalendarLink", center: "", end: "" };
+    return { start: "getCalendarLink helpButton", center: "", end: "" };
   }
 
   currentHeaderToolbar() {
@@ -87,15 +92,8 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     );
   }
 
-  async refreshEvents() {
+  refreshEvents() {
     this.click(); // Remove focus from popup
-    // We can't just refresh events because some ics files are in
-    // local browser cache (especially internal.ics)
-    // To invalidate the cache, we need to remove the source and add it again
-    this.calendar.removeAllEventSources();
-    for (const source of await this.getEventSources()) {
-      this.calendar.addEventSource(source);
-    }
     this.calendar.refetchEvents();
   }
 
@@ -114,7 +112,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         },
       }),
     );
-    await this.refreshEvents();
+    this.refreshEvents();
   }
 
   async unpublishNews(id: number) {
@@ -132,7 +130,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         },
       }),
     );
-    await this.refreshEvents();
+    this.refreshEvents();
   }
 
   async deleteNews(id: number) {
@@ -150,22 +148,23 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         },
       }),
     );
-    await this.refreshEvents();
+    this.refreshEvents();
   }
 
   async getEventSources() {
-    const cacheInvalidate = `?invalidate=${Date.now()}`;
     return [
       {
-        url: `${await makeUrl(calendarCalendarInternal)}${cacheInvalidate}`,
+        url: `${await makeUrl(calendarCalendarInternal)}`,
         format: "ics",
         className: "internal",
+        cache: false,
       },
       {
-        url: `${await makeUrl(calendarCalendarUnpublished)}${cacheInvalidate}`,
+        url: `${await makeUrl(calendarCalendarUnpublished)}`,
         format: "ics",
         color: "red",
         className: "unpublished",
+        cache: false,
       },
     ];
   }
@@ -320,14 +319,14 @@ export class IcsCalendar extends inheritHtmlElement("div") {
           click: async (event: Event) => {
             const button = event.target as HTMLButtonElement;
             button.classList.add("text-copy");
-            if (!button.hasAttribute("position")) {
-              button.setAttribute("tooltip", gettext("Link copied"));
-              button.setAttribute("position", "top");
-              button.setAttribute("no-hover", "");
+            button.setAttribute("tooltip-class", "calendar-copy-tooltip");
+            if (!button.hasAttribute("tooltip-position")) {
+              button.setAttribute("tooltip-position", "top");
             }
             if (button.classList.contains("text-copied")) {
               button.classList.remove("text-copied");
             }
+            button.setAttribute("tooltip", gettext("Link copied"));
             navigator.clipboard.writeText(
               new URL(
                 await makeUrl(calendarCalendarInternal),
@@ -335,10 +334,20 @@ export class IcsCalendar extends inheritHtmlElement("div") {
               ).toString(),
             );
             setTimeout(() => {
+              button.setAttribute("tooltip-class", "calendar-copy-tooltip text-copied");
               button.classList.remove("text-copied");
               button.classList.add("text-copied");
               button.classList.remove("text-copy");
             }, 1500);
+          },
+        },
+        helpButton: {
+          text: "?",
+          hint: gettext("How to use calendar link"),
+          click: () => {
+            if (this.helpUrl) {
+              window.open(this.helpUrl, "_blank");
+            }
           },
         },
       },
@@ -348,6 +357,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       headerToolbar: this.currentHeaderToolbar(),
       footerToolbar: this.currentFooterToolbar(),
       eventSources: await this.getEventSources(),
+      lazyFetching: false,
       windowResize: () => {
         this.calendar.changeView(this.currentView());
         this.calendar.setOption("headerToolbar", this.currentHeaderToolbar());

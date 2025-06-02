@@ -131,6 +131,31 @@ de données fonctionnent avec l'un comme avec l'autre.
 Heureusement, et grâce à l'ORM de Django, cette
 double compatibilité est presque toujours possible.
 
+### Celery
+
+[Site officiel](https://docs.celeryq.dev/en/stable/)
+
+Dans certaines situations, on veut séparer une tâche
+pour la faire tourner dans son coin.
+Deux cas qui correspondent à cette situation sont :
+
+- les tâches longues à exécuter 
+  (comme l'envoi de mail ou la génération de documents),
+  pour lesquelles on veut pouvoir dire à l'utilisateur
+  que sa requête a été prise en compte, sans pour autant
+  le faire trop patienter
+- les tâches régulières séparées du cycle requête/réponse.
+
+Pour ça, nous utilisons Celery.
+Grâce à son intégration avec Django,
+il permet de mettre en place une queue de message
+avec assez peu complexité ajoutée.
+
+En outre, ses extensions `django-celery-results`
+et `django-celery-beat` enrichissent son intégration
+avec django et offrent des moyens de manipuler certaines
+tâches directement dans l'interface admin de django.
+
 ## Frontend
 
 ### Jinja2

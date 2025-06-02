@@ -45,63 +45,6 @@ body {
   }
 }
 
-[tooltip] {
-  position: relative;
-}
-
-[tooltip]::before {
-  @include shadow;
-  z-index: 1;
-  pointer-events: none;
-  content: attr(tooltip);
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #333;
-  color: #fff;
-  border: 0.5px solid hsl(0, 0%, 50%);
-  border-radius: 5px;
-  padding: 5px 10px;
-  position: absolute;
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 500ms ease-out;
-  top: 120%; // Put the tooltip under the element
-}
-
-[tooltip]:hover::before {
-  opacity: 1;
-  transition: opacity 500ms ease-in;
-}
-
-[no-hover][tooltip]::before {
-  opacity: 1;
-  transition: opacity 500ms ease-in;
-}
-
-[position="top"][tooltip]::before {
-  top: initial;
-  bottom: 120%;
-}
-
-[position="bottom"][tooltip]::before {
-  top: 120%;
-  bottom: initial;
-}
-
-[position="left"][tooltip]::before {
-  top: initial;
-  bottom: 0%;
-  left: initial;
-  right: 65%;
-}
-
-[position="right"][tooltip]::before {
-  top: initial;
-  bottom: 0%;
-  left: 150%;
-  right: initial;
-}
-
 .ib {
   display: inline-block;
   padding: 1px;
@@ -820,12 +763,6 @@ u,
 textarea {
   width: 98%;
   margin-top: 10px;
-}
-
-/*---------------------------LAUNDERETTE-------------------------------*/
-
-#token_form label {
-  display: inline;
 }
 
 /*--------------------------------FOOTER-------------------------------*/

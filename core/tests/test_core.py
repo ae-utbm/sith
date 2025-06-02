@@ -411,10 +411,11 @@ class TestUserIsInGroup(TestCase):
         """Test that the number of db queries is stable
         and that less queries are made when making a new call.
         """
-        # make sure Skia is in at least one group
         group_in = baker.make(Group)
         self.public_user.groups.add(group_in)
 
+        # clear the cached property `User.cached_groups`
+        self.public_user.__dict__.pop("cached_groups", None)
         cache.clear()
         # Test when the user is in the group
         with self.assertNumQueries(2):
@@ -423,6 +424,7 @@ class TestUserIsInGroup(TestCase):
             self.public_user.is_in_group(pk=group_in.id)
 
         group_not_in = baker.make(Group)
+        self.public_user.__dict__.pop("cached_groups", None)
         cache.clear()
         # Test when the user is not in the group
         with self.assertNumQueries(2):
@@ -446,24 +448,6 @@ class TestUserIsInGroup(TestCase):
             f"membership_{self.club.id}_{self.public_user.id}"
         )
         assert cached_membership == "not_member"
-
-    def test_cache_properly_cleared_group(self):
-        """Test that when a user is removed from a group,
-        the is_in_group_method return False when calling it again.
-        """
-        # testing with pk
-        self.public_user.groups.add(self.com_admin.pk)
-        assert self.public_user.is_in_group(pk=self.com_admin.pk) is True
-
-        self.public_user.groups.remove(self.com_admin.pk)
-        assert self.public_user.is_in_group(pk=self.com_admin.pk) is False
-
-        # testing with name
-        self.public_user.groups.add(self.sas_admin.pk)
-        assert self.public_user.is_in_group(name="SAS admin") is True
-
-        self.public_user.groups.remove(self.sas_admin.pk)
-        assert self.public_user.is_in_group(name="SAS admin") is False
 
     def test_not_existing_group(self):
         """Test that searching for a not existing group

@@ -318,3 +318,20 @@ def test_displayed_other_user_tabs(user_factory, expected_tabs: list[str]):
     view.object = subscriber_user.make()  # user whose page is being seen
     tabs = [tab["slug"] for tab in view.get_list_of_tabs()]
     assert tabs == expected_tabs
+
+
+@pytest.mark.django_db
+class TestRedirectMe:
+    @pytest.mark.parametrize(
+        "route", ["core:user_profile", "core:user_account", "core:user_edit"]
+    )
+    def test_redirect(self, client: Client, route: str):
+        user = subscriber_user.make()
+        client.force_login(user)
+        target_url = reverse(route, kwargs={"user_id": user.id})
+        src_url = target_url.replace(str(user.id), "me")
+        assertRedirects(client.get(src_url), target_url)
+
+    def test_anonymous_user(self, client: Client):
+        url = reverse("core:user_me_redirect")
+        assertRedirects(client.get(url), reverse("core:login", query={"next": url}))
