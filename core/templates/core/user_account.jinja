@@ -1,7 +1,7 @@
 {% extends "core/base.jinja" %}
 
 {% macro monthly(objects) %}
-  <div>
+  <div class="accordion-content">
     <table>
       <thead>
         <tr>
@@ -37,22 +37,28 @@
   {% if customer %}
     <h3>{% trans %}User account{% endtrans %}</h3>
     <p>{% trans %}Amount: {% endtrans %}{{ customer.amount }} €</p>
-    <div id="drop">
-      {% if buyings_month %}
-        <h5>{% trans %}Account purchases{% endtrans %}</h5>
+    {% if buyings_month %}
+      <details class="accordion" name="account" open>
+        <summary>{% trans %}Account purchases{% endtrans %}</summary>
         {{ monthly(buyings_month) }}
-      {% endif %}
-      {% if refilling_month %}
-        <h5>{% trans %}Reloads{% endtrans %}</h5>
+      </details>
+    {% endif %}
+    {% if refilling_month %}
+      <details class="accordion" name="account">
+        <summary>{% trans %}Reloads{% endtrans %}</summary>
         {{ monthly(refilling_month) }}
-      {% endif %}
-      {% if invoices_month %}
-        <h5>{% trans %}Eboutic invoices{% endtrans %}</h5>
+      </details>
+    {% endif %}
+    {% if invoices_month %}
+      <details class="accordion" name="account">
+        <summary>{% trans %}Eboutic invoices{% endtrans %}</summary>
         {{ monthly(invoices_month) }}
-      {% endif %}
-      {% if etickets %}
-        <h4>{% trans %}Etickets{% endtrans %}</h4>
-        <div>
+      </details>
+    {% endif %}
+    {% if etickets %}
+      <details class="accordion" name="account">
+        <summary>{% trans %}Etickets{% endtrans %}</summary>
+        <div class="accordion-content">
           <ul>
             {% for s in etickets %}
               <li>
@@ -63,22 +69,9 @@
             {% endfor %}
           </ul>
         </div>
-      {% endif %}
-    </div>
+      </details>
+    {% endif %}
   {% else %}
     <p>{% trans %}User has no account{% endtrans %}</p>
   {% endif %}
 {% endblock %}
-
-{% block script %}
-  {{ super() }}
-  <script>
-    $(function(){
-      $("#drop").accordion({
-        heightStyle: "content"
-      });
-    });
-  </script>
-{% endblock %}
-
-

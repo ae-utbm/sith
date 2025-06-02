@@ -1,0 +1,39 @@
+details.accordion summary {
+  margin: 2px 0 0 0;
+  padding: .5em .5em .5em .7em;
+  cursor: pointer;
+  user-select: none;
+
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+
+}
+
+details[open].accordion summary {
+  border: 1px solid #003eff;
+  background: #007fff;
+  color: #ffffff;
+}
+
+
+details:not([open]).accordion summary {
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+
+  border: 1px solid #c5c5c5;
+  background: #f6f6f6;
+  color: #454545;
+}
+
+
+// ::details-content isn't available on firefox yet
+// we use .accordion-content as a workaround
+details.accordion>.accordion-content {
+  background: #ffffff;
+  color: #333333;
+  padding: 1em 2.2em;
+  overflow: auto;
+  border: 1px solid #dddddd;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}

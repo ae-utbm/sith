@@ -51,185 +51,192 @@
     </div>
 
     <div id="click-form">
-      <h5 id="selling-accordion">{% trans %}Selling{% endtrans %}</h5>
-      <div>
-        {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user_id) %}
+      <details class="accordion" id="selling-accordion" name="selling" open>
+        <summary>{% trans %}Selling{% endtrans %}</summary>
+        <div class="accordion-content">
+          {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user_id) %}
 
-        <form method="post" action=""
-              class="code_form" @submit.prevent="handleCode">
+          <form method="post" action=""
+                class="code_form" @submit.prevent="handleCode">
 
-          <counter-product-select name="code" x-ref="codeField" autofocus required placeholder="{% trans %}Select a product...{% endtrans %}">
-            <option value=""></option>
-            <optgroup label="{% trans %}Operations{% endtrans %}">
-              <option value="FIN">{% trans %}Confirm (FIN){% endtrans %}</option>
-              <option value="ANN">{% trans %}Cancel (ANN){% endtrans %}</option>
-            </optgroup>
-            {% for category in categories.keys() %}
-              <optgroup label="{{ category }}">
-                {% for product in categories[category] %}
-                  <option value="{{ product.id }}">{{ product }}</option>
-                {% endfor %}
+            <counter-product-select name="code" x-ref="codeField" autofocus required placeholder="{% trans %}Select a product...{% endtrans %}">
+              <option value=""></option>
+              <optgroup label="{% trans %}Operations{% endtrans %}">
+                <option value="FIN">{% trans %}Confirm (FIN){% endtrans %}</option>
+                <option value="ANN">{% trans %}Cancel (ANN){% endtrans %}</option>
               </optgroup>
-            {% endfor %}
-          </counter-product-select>
+              {% for category in categories.keys() %}
+                <optgroup label="{{ category }}">
+                  {% for product in categories[category] %}
+                    <option value="{{ product.id }}">{{ product }}</option>
+                  {% endfor %}
+                </optgroup>
+              {% endfor %}
+            </counter-product-select>
 
-          <input type="submit" value="{% trans %}Go{% endtrans %}"/>
-        </form>
+            <input type="submit" value="{% trans %}Go{% endtrans %}"/>
+          </form>
 
-        {% for error in form.non_form_errors() %}
-          <div class="alert alert-red">
-            {{ error }}
-          </div>
-        {% endfor %}
-        <p>{% trans %}Basket: {% endtrans %}</p>
+          {% for error in form.non_form_errors() %}
+            <div class="alert alert-red">
+              {{ error }}
+            </div>
+          {% endfor %}
+          <p>{% trans %}Basket: {% endtrans %}</p>
 
-        <form x-cloak method="post" action="" x-ref="basketForm">
+          <form x-cloak method="post" action="" x-ref="basketForm">
 
-          <div class="basket-error-container">
+            <div class="basket-error-container">
+              <div
+                x-cloak
+                class="alert alert-red basket-error"
+                x-show="alertMessage.show"
+                x-transition.duration.500ms
+                x-text="alertMessage.content"
+              ></div>
+            </div>
+
+            {% csrf_token %}
+            <div x-ref="basketManagementForm">
+              {{ form.management_form }}
+            </div>
+            <ul>
+              <li x-show="getBasketSize() === 0">{% trans %}This basket is empty{% endtrans %}</li>
+              <template x-for="(item, index) in Object.values(basket)">
+                <li>
+                  <template x-for="error in item.errors">
+                    <div class="alert alert-red" x-text="error">
+                    </div>
+                  </template>
+
+                  <button @click.prevent="addToBasketWithMessage(item.product.id, -1)">-</button>
+                  <span class="quantity" x-text="item.quantity"></span>
+                  <button @click.prevent="addToBasketWithMessage(item.product.id, 1)">+</button>
+
+                  <span x-text="item.product.name"></span> :
+                  <span x-text="item.sum().toLocaleString(undefined, { minimumFractionDigits: 2 })">€</span>
+                  <span x-show="item.getBonusQuantity() > 0" x-text="`${item.getBonusQuantity()} x P`"></span>
+
+                  <button
+                    class="remove-item"
+                    @click.prevent="removeFromBasket(item.product.id)"
+                  ><i class="fa fa-trash-can delete-action"></i></button>
+
+                  <input
+                    type="hidden"
+                    :value="item.quantity"
+                    :id="`id_form-${index}-quantity`"
+                    :name="`form-${index}-quantity`"
+                    required
+                    readonly
+                  >
+                  <input
+                    type="hidden"
+                    :value="item.product.id"
+                    :id="`id_form-${index}-id`"
+                    :name="`form-${index}-id`"
+                    required
+                    readonly
+                  >
+                </li>
+              </template>
+            </ul>
+
+            <p class="margin-bottom">
+              <strong>Total: </strong>
+              <strong x-text="sumBasket().toLocaleString(undefined, { minimumFractionDigits: 2 })"></strong>
+              <strong> €</strong>
+            </p>
+
+            <div class="row">
+              <input
+                class="btn btn-blue"
+                type="submit"
+                @click.prevent="finish"
+                :disabled="getBasketSize() === 0"
+                value="{% trans %}Finish{% endtrans %}"
+              />
+              <input
+                class="btn btn-grey"
+                type="submit" @click.prevent="cancel"
+                value="{% trans %}Cancel{% endtrans %}"
+              />
+            </div>
+          </form>
+        </div>
+      </details>
+      <details class="accordion" name="selling">
+        <summary>{% trans %}Refilling{% endtrans %}</summary>
+        {% if object.type == "BAR" %}
+          {% if refilling_fragment %}
             <div
-              x-cloak
-              class="alert alert-red basket-error"
-              x-show="alertMessage.show"
-              x-transition.duration.500ms
-              x-text="alertMessage.content"
-            ></div>
-          </div>
+              class="accordion-content"
+              @htmx:after-request="onRefillingSuccess"
+            >
+              {{ refilling_fragment }}
+            </div>
+          {% else %}
+            <div class="accordion-content">
+              <p class="alert alert-yellow">
+                {% trans trimmed %}
+                  As a barman, you are not able to refill any account on your own.
+                  An admin should be connected on this counter for that.
+                  The customer can refill by using the eboutic.
+                {% endtrans %}
+              </p>
+            </div>
+          {% endif %}
+          </details>
+          {% if student_card_fragment %}
+            <details class="accordion" name="selling">
+              <summary>{% trans %}Student card{% endtrans %}</summary>
+              <div class="accordion-content">
+                {{ student_card_fragment }}
+              </div>
+            </details>
+          {% endif %}
 
-          {% csrf_token %}
-          <div x-ref="basketManagementForm">
-            {{ form.management_form }}
-          </div>
-          <ul>
-            <li x-show="getBasketSize() === 0">{% trans %}This basket is empty{% endtrans %}</li>
-            <template x-for="(item, index) in Object.values(basket)">
-              <li>
-                <template x-for="error in item.errors">
-                  <div class="alert alert-red" x-text="error">
-                  </div>
-                </template>
-
-                <button @click.prevent="addToBasketWithMessage(item.product.id, -1)">-</button>
-                <span class="quantity" x-text="item.quantity"></span>
-                <button @click.prevent="addToBasketWithMessage(item.product.id, 1)">+</button>
-
-                <span x-text="item.product.name"></span> :
-                <span x-text="item.sum().toLocaleString(undefined, { minimumFractionDigits: 2 })">€</span>
-                <span x-show="item.getBonusQuantity() > 0" x-text="`${item.getBonusQuantity()} x P`"></span>
-
-                <button
-                  class="remove-item"
-                  @click.prevent="removeFromBasket(item.product.id)"
-                ><i class="fa fa-trash-can delete-action"></i></button>
-
-                <input
-                  type="hidden"
-                  :value="item.quantity"
-                  :id="`id_form-${index}-quantity`"
-                  :name="`form-${index}-quantity`"
-                  required
-                  readonly
-                >
-                <input
-                  type="hidden"
-                  :value="item.product.id"
-                  :id="`id_form-${index}-id`"
-                  :name="`form-${index}-id`"
-                  required
-                  readonly
-                >
-              </li>
-            </template>
-          </ul>
-
-          <p class="margin-bottom">
-            <strong>Total: </strong>
-            <strong x-text="sumBasket().toLocaleString(undefined, { minimumFractionDigits: 2 })"></strong>
-            <strong> €</strong>
-          </p>
-
-          <div class="row">
-            <input
-              class="btn btn-blue"
-              type="submit"
-              @click.prevent="finish"
-              :disabled="getBasketSize() === 0"
-              value="{% trans %}Finish{% endtrans %}"
-            />
-            <input
-              class="btn btn-grey"
-              type="submit" @click.prevent="cancel"
-              value="{% trans %}Cancel{% endtrans %}"
-            />
-          </div>
-        </form>
+        {% endif %}
       </div>
-      {% if object.type == "BAR" %}
-        <h5>{% trans %}Refilling{% endtrans %}</h5>
-        {% if refilling_fragment %}
-          <div
-            @htmx:after-request="onRefillingSuccess"
-          >
-            {{ refilling_fragment }}
+
+      <div id="products">
+        {% if not products %}
+          <div class="alert alert-red">
+            {% trans %}No products available on this counter for this user{% endtrans %}
           </div>
         {% else %}
-          <div>
-            <p class="alert alert-yellow">
-              {% trans trimmed %}
-                As a barman, you are not able to refill any account on your own.
-                An admin should be connected on this counter for that.
-                The customer can refill by using the eboutic.
-              {% endtrans %}
-            </p>
-          </div>
-        {% endif %}
-        {% if student_card_fragment %}
-          <h5>{% trans %}Student card{% endtrans %}</h3>
-          <div>
-            {{ student_card_fragment }}
-          </div>
-        {% endif %}
-
-      {% endif %}
-    </div>
-
-    <div id="products">
-      {% if not products %}
-        <div class="alert alert-red">
-          {% trans %}No products available on this counter for this user{% endtrans %}
-        </div>
-      {% else %}
-        <ul>
+          <ul>
+            {% for category in categories.keys() -%}
+              <li><a href="#cat_{{ category|slugify }}">{{ category }}</a></li>
+            {%- endfor %}
+          </ul>
           {% for category in categories.keys() -%}
-            <li><a href="#cat_{{ category|slugify }}">{{ category }}</a></li>
-          {%- endfor %}
-        </ul>
-        {% for category in categories.keys() -%}
-          <div id="cat_{{ category|slugify }}">
-            <h5 class="margin-bottom">{{ category }}</h5>
-            <div class="row gap-2x">
-              {% for product in categories[category] -%}
-                <button class="card shadow" @click="addToBasketWithMessage('{{ product.id }}', 1)">
-                  <img
-                    class="card-image"
-                    alt="image de {{ product.name }}"
-                    {% if product.icon %}
-                      src="{{ product.icon.url }}"
-                    {% else %}
-                      src="{{ static('core/img/na.gif') }}"
-                    {% endif %}
-                  />
-                  <span class="card-content">
-                    <strong class="card-title">{{ product.name }}</strong>
-                    <p>{{ product.price }} €<br>{{ product.code }}</p>
-                  </span>
-                </button>
-              {%- endfor %}
+            <div id="cat_{{ category|slugify }}">
+              <h5 class="margin-bottom">{{ category }}</h5>
+              <div class="row gap-2x">
+                {% for product in categories[category] -%}
+                  <button class="card shadow" @click="addToBasketWithMessage('{{ product.id }}', 1)">
+                    <img
+                      class="card-image"
+                      alt="image de {{ product.name }}"
+                      {% if product.icon %}
+                        src="{{ product.icon.url }}"
+                      {% else %}
+                        src="{{ static('core/img/na.gif') }}"
+                      {% endif %}
+                    />
+                    <span class="card-content">
+                      <strong class="card-title">{{ product.name }}</strong>
+                      <p>{{ product.price }} €<br>{{ product.code }}</p>
+                    </span>
+                  </button>
+                {%- endfor %}
+              </div>
             </div>
-          </div>
-        {%- endfor %}
-      {% endif %}
+          {%- endfor %}
+        {% endif %}
+      </div>
     </div>
-  </div>
 {% endblock content %}
 
 {% block script %}
