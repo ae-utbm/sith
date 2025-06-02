@@ -1395,3 +1395,49 @@ class ScheduledProductAction(PeriodicTask):
         # adapted in the case of scheduled product action,
         # so we skip it and execute directly Model.validate_unique
         return super(PeriodicTask, self).validate_unique(*args, **kwargs)
+
+
+class MonthField(models.DateField):
+    description = _("Year + month field (day forced to 1)")
+    default_error_messages = {
+        "invalid": _(
+            "“%(value)s” value has an invalid date format. It must be "
+            "in YYYY-MM format."
+        ),
+        "invalid_date": _(
+            "“%(value)s” value has the correct format (YYYY-MM) "
+            "but it is an invalid date."
+        ),
+    }
+
+    def to_python(self, value):
+        if isinstance(value, date):
+            return value.replace(day=1)
+
+        if isinstance(value, str):
+            try:
+                year, month = map(int, value.split("-"))
+                return date(year, month, 1)
+            except (ValueError, TypeError) as err:
+                raise ValueError(
+                    self.error_messages["invalid"] % {"value": value}
+                ) from err
+
+        return super().to_python(value)
+
+
+class InvoiceCall(models.Model):
+    is_validated = models.BooleanField(verbose_name=_("is validated"), default=False)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    month = MonthField(verbose_name=_("invoice date"))
+
+    class Meta:
+        verbose_name = _("Invoice call")
+        verbose_name_plural = _("Invoice calls")
+
+    def __str__(self):
+        return f"invoice call of {self.month} made by {self.club}"
+
+    def save(self, *args, **kwargs):
+        self.month = self._meta.get_field("month").to_python(self.month)
+        super().save(*args, **kwargs)
