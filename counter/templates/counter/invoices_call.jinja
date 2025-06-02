@@ -27,12 +27,11 @@
       {% for i in sums %}
         <tr>
           <td>{{ i['club__name'] }}</td>
-          <td>{{ i['selling_sum'] }} €</td>
+          <td>{{"%.2f"|format(i['selling_sum'])}} €</td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
 {% endblock %}
-
 
 
