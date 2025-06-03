@@ -1,22 +1,22 @@
-details.accordion summary {
+details.accordion>summary {
   margin: 2px 0 0 0;
   padding: .5em .5em .5em .7em;
   cursor: pointer;
   user-select: none;
+  display: block;
 
   border-top-right-radius: 3px;
   border-top-left-radius: 3px;
-
 }
 
-details[open].accordion summary {
+details[open].accordion>summary {
   border: 1px solid #003eff;
   background: #007fff;
   color: #ffffff;
 }
 
 
-details:not([open]).accordion summary {
+details:not([open]).accordion>summary {
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
 
@@ -25,6 +25,18 @@ details:not([open]).accordion summary {
   color: #454545;
 }
 
+details.accordion>summary::before {
+  font-family: FontAwesome;
+  content: '\f0da';
+  margin-right: 5px;
+  transition: 700ms;
+  font-size: 0.8em;
+}
+
+details[open]>summary::before {
+  font-family: FontAwesome;
+  content: '\f0d7';
+}
 
 // ::details-content isn't available on firefox yet
 // we use .accordion-content as a workaround
@@ -59,10 +71,10 @@ details.accordion>.accordion-content {
   }
 }
 
-details[open].accordion summary~* {
+details[open].accordion>summary~* {
   animation: open 700ms;
 }
 
-details::not([open]).accordion summary~* {
+details::not([open]).accordion>summary~* {
   animation: open 700ms;
 }
