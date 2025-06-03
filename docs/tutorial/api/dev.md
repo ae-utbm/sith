@@ -62,6 +62,8 @@ Cette dernière est documentée [ici](../perms.md).
 
 ### Limites des clefs d'API
 
+#### Incompatibilité avec certaines permissions
+
 Le système des clefs d'API est apparu très tard dans l'histoire du site
 (en P25, 10 ans après le début du développement).
 Il s'agit ni plus ni moins qu'un système d'authentification parallèle fait maison,
@@ -90,6 +92,28 @@ Les principaux points de friction sont :
   Par définition, un client d'API ne peut pas être cotisant.
 - `IsLoggedInCounter`, qui utilise encore un autre système 
   d'authentification maison et qui n'est pas fait pour être utilisé en dehors du site.
+
+#### Incompatibilité avec les tokens csrf
+
+Le [CSRF (*cross-site request forgery*)](https://fr.wikipedia.org/wiki/Cross-site_request_forgery)
+est un des multiples facteurs d'attaque sur le web.
+Heureusement, Django vient encore une fois à notre aide,
+avec des mécanismes intégrés pour s'en protéger.
+Ceux-ci incluent notamment un système de 
+[token CSRF](https://docs.djangoproject.com/fr/stable/ref/csrf/)
+à fournir dans les requêtes POST/PUT/PATCH.
+
+Ceux-ci sont bien adaptés au cycle requêtes/réponses
+typique de l'expérience utilisateur sur un navigateur, 
+où les requêtes POST sont toujours effectuées après une requête
+GET au cours de laquelle on a pu récupérer un token csrf.
+Cependant, le flux des requêtes sur une API est bien différent ;
+de ce fait, il est à attendre que les requêtes POST envoyées à l'API
+par un client externe n'aient pas de token CSRF et se retrouvent 
+donc bloquées.
+
+Pour ces raisons, l'accès aux requêtes POST/PUT/PATCH de l'API
+par un client externe ne marche pas.
 
 ## Créer un client et une clef d'API
 
