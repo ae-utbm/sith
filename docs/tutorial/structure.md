@@ -42,46 +42,44 @@ sith/
 │   └── ...
 ├── galaxy/ (11)
 │   └── ...
-├── launderette/ (12)
+├── locale/ (12)
 │   └── ...
-├── locale/ (13)
+├── matmat/ (13)
 │   └── ...
-├── matmat/ (14)
+├── pedagogy/ (14)
 │   └── ...
-├── pedagogy/ (15)
+├── rootplace/ (15)
 │   └── ...
-├── rootplace/ (16)
+├── sas/ (16)
 │   └── ...
-├── sas/ (17)
+├── sith/ (17)
 │   └── ...
-├── sith/ (18)
+├── subscription/ (18)
 │   └── ...
-├── subscription/ (19)
+├── trombi/ (19)
 │   └── ...
-├── trombi/ (20)
+├── antispam/ (20)
 │   └── ...
-├── antispam/ (21)
+├── staticfiles/ (21)
 │   └── ...
-├── staticfiles/ (22)
-│   └── ...
-├── processes/ (23)
+├── processes/ (22)
 │   └── ...
 │
-├── .coveragerc (24)
-├── .envrc (25)
+├── .coveragerc (23)
+├── .envrc (24)
 ├── .gitattributes
 ├── .gitignore
 ├── .mailmap
-├── .env (26)
-├── .env.example (27)
-├── manage.py (28)
-├── mkdocs.yml (29)
+├── .env (25)
+├── .env.example (26)
+├── manage.py (27)
+├── mkdocs.yml (28)
 ├── uv.lock
-├── pyproject.toml (30)
-├── .venv/ (31)
-├── .python-version (32)
-├── Procfile.static (33)
-├── Procfile.service (34)
+├── pyproject.toml (29)
+├── .venv/ (30)
+├── .python-version (31)
+├── Procfile.static (32)
+├── Procfile.service (33)
 └── README.md
 ```
 </div>
@@ -108,40 +106,39 @@ sith/
 11. Application de gestion de la galaxie ; la galaxie
     est un graphe des niveaux de proximité entre les différents
     étudiants.
-12. Gestion des machines à laver de l'AE
-13. Dossier contenant les fichiers de traduction.
-14. Fonctionnalités de recherche d'utilisateurs.
-15. Le guide des UEs du site, sur lequel les utilisateurs
+12. Dossier contenant les fichiers de traduction.
+13. Fonctionnalités de recherche d'utilisateurs.
+14. Le guide des UEs du site, sur lequel les utilisateurs
     peuvent également laisser leurs avis.
-16. Fonctionnalités utiles aux utilisateurs root.
-17. Le SAS, où l'on trouve toutes les photos de l'AE.
-18. Application principale du projet, contenant sa configuration. 
-19. Gestion des cotisations des utilisateurs du site. 
-20. Outil pour faciliter la fabrication des trombinoscopes de promo. 
-21. Fonctionnalités pour gérer le spam. 
-22. Gestion des statics du site. Override le système de statics de Django.
+15. Fonctionnalités utiles aux utilisateurs root.
+16. Le SAS, où l'on trouve toutes les photos de l'AE.
+17. Application principale du projet, contenant sa configuration. 
+18. Gestion des cotisations des utilisateurs du site. 
+19. Outil pour faciliter la fabrication des trombinoscopes de promo. 
+20. Fonctionnalités pour gérer le spam. 
+21. Gestion des statics du site. Override le système de statics de Django.
     Ajoute l'intégration du scss et du bundler js
     de manière transparente pour l'utilisateur. 
-23. Module de gestion des services externes.
+22. Module de gestion des services externes.
     Offre une API simple pour utiliser les fichiers `Procfile.*`.
-24. Fichier de configuration de coverage. 
-25. Fichier de configuration de direnv. 
-26. Contient les variables d'environnement, qui sont susceptibles
+23. Fichier de configuration de coverage. 
+24. Fichier de configuration de direnv. 
+25. Contient les variables d'environnement, qui sont susceptibles
     de varier d'une machine à l'autre.
-27. Contient des valeurs par défaut pour le `.env`
+26. Contient des valeurs par défaut pour le `.env`
     pouvant convenir à un environnment de développement local
-28. Fichier généré automatiquement par Django. C'est lui
+27. Fichier généré automatiquement par Django. C'est lui
     qui permet d'appeler des commandes de gestion du projet
     avec la syntaxe `python ./manage.py <nom de la commande>`
-29. Le fichier de configuration de la documentation,
+28. Le fichier de configuration de la documentation,
     avec ses plugins et sa table des matières. 
-30. Le fichier où sont déclarés les dépendances et la configuration
+29. Le fichier où sont déclarés les dépendances et la configuration
     de certaines d'entre elles.
-31. Dossier d'environnement virtuel généré par uv
-32. Fichier qui contrôle quelle version de python utiliser pour le projet
-33. Fichier qui contrôle les commandes à lancer pour gérer la compilation
+30. Dossier d'environnement virtuel généré par uv
+31. Fichier qui contrôle quelle version de python utiliser pour le projet
+32. Fichier qui contrôle les commandes à lancer pour gérer la compilation
     automatique des static et autres services nécessaires à la command runserver.
-34. Fichier qui contrôle les services tiers nécessaires au fonctionnement
+33. Fichier qui contrôle les services tiers nécessaires au fonctionnement
     du Sith tel que redis.
 
 ## L'application principale

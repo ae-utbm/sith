@@ -114,7 +114,6 @@ INSTALLED_APPS = (
     "subscription",
     "counter",
     "eboutic",
-    "launderette",
     "rootplace",
     "sas",
     "com",
