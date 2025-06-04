@@ -86,10 +86,11 @@ nav:
     - antispam:
       - reference/antispam/models.md
       - reference/antispam/forms.md
-    - apikey:
-      - reference/apikey/auth.md
-      - reference/apikey/hashers.md
-      - reference/apikey/models.md
+    - api:
+      - reference/api/auth.md
+      - reference/api/hashers.md
+      - reference/api/models.md
+      - reference/api/perms.md
     - club:
       - reference/club/models.md
       - reference/club/views.md
