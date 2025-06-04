@@ -8,8 +8,8 @@ from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import NotFound
 from ninja_extra.pagination import PageNumberPaginationExtra, PaginatedResponseSchema
 
-from apikey.auth import ApiKeyAuth
-from core.auth.api_permissions import HasPerm
+from api.auth import ApiKeyAuth
+from api.permissions import HasPerm
 from pedagogy.models import UV
 from pedagogy.schemas import SimpleUvSchema, UvFilterSchema, UvSchema
 from pedagogy.utbm_api import UtbmApiClient

@@ -1,4 +1,4 @@
-::: apikey.hashers
+::: api.hashers
     handler: python
     options:
         heading_level: 3

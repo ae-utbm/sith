@@ -11,9 +11,9 @@ from ninja_extra.exceptions import PermissionDenied
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
-from apikey.auth import ApiKeyAuth
+from api.auth import ApiKeyAuth
+from api.permissions import CanAccessLookup, CanView, HasPerm
 from club.models import Mailing
-from core.auth.api_permissions import CanAccessLookup, CanView, HasPerm
 from core.models import Group, QuickUploadImage, SithFile, User
 from core.schemas import (
     FamilyGodfatherSchema,

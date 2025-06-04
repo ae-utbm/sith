@@ -39,7 +39,7 @@ Example:
 
 import operator
 from functools import reduce
-from typing import Any
+from typing import Any, Callable
 
 from django.contrib.auth.models import Permission
 from django.http import HttpRequest
@@ -67,21 +67,26 @@ class HasPerm(BasePermission):
 
     Example:
         ```python
-        # this route will require both permissions
-        @route.put("/foo", permissions=[HasPerm(["foo.change_foo", "foo.add_foo"])]
-        def foo(self): ...
+        @api_controller("/foo")
+        class FooController(ControllerBase):
+            # this route will require both permissions
+            @route.put("/foo", permissions=[HasPerm(["foo.change_foo", "foo.add_foo"])]
+            def foo(self): ...
 
-        # This route will require at least one of the perm,
-        # but it's not mandatory to have all of them
-        @route.put(
-            "/bar",
-            permissions=[HasPerm(["foo.change_bar", "foo.add_bar"], op=operator.or_)],
-        )
-        def bar(self): ...
+            # This route will require at least one of the perm,
+            # but it's not mandatory to have all of them
+            @route.put(
+                "/bar",
+                permissions=[HasPerm(["foo.change_bar", "foo.add_bar"], op=operator.or_)],
+            )
+            def bar(self): ...
+        ```
     """
 
     def __init__(
-        self, perms: str | Permission | list[str | Permission], op=operator.and_
+        self,
+        perms: str | Permission | list[str | Permission],
+        op: Callable[[bool, bool], bool] = operator.and_,
     ):
         """
         Args:
@@ -103,7 +108,7 @@ class HasPerm(BasePermission):
         # If not, this authentication has not been done, but the user may
         # still be implicitly authenticated through AuthenticationMiddleware
         user = request.auth if hasattr(request, "auth") else request.user
-        # `user` may either be a `core.User` or an `apikey.ApiClient` ;
+        # `user` may either be a `core.User` or an `api.ApiClient` ;
         # they are not the same model, but they both implement the `has_perm` method
         return reduce(self._operator, (user.has_perm(p) for p in self._perms))
 

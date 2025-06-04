@@ -1,8 +1,8 @@
 from django.http import HttpRequest
 from ninja.security import APIKeyHeader
 
-from apikey.hashers import get_hasher
-from apikey.models import ApiClient, ApiKey
+from api.hashers import get_hasher
+from api.models import ApiClient, ApiKey
 
 
 class ApiKeyAuth(APIKeyHeader):
