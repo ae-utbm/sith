@@ -2,9 +2,9 @@ import pytest
 from django.test import RequestFactory
 from model_bakery import baker
 
-from apikey.auth import ApiKeyAuth
-from apikey.hashers import generate_key
-from apikey.models import ApiClient, ApiKey
+from api.auth import ApiKeyAuth
+from api.hashers import generate_key
+from api.models import ApiClient, ApiKey
 
 
 @pytest.mark.django_db

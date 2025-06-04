@@ -1,7 +1,7 @@
 from ninja_extra import ControllerBase, api_controller, route
 from ninja_extra.exceptions import NotFound
 
-from core.auth.api_permissions import CanView
+from api.permissions import CanView
 from counter.models import BillingInfo
 from eboutic.models import Basket
 

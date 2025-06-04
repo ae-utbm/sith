@@ -194,7 +194,7 @@ class NewsDateQuerySet(models.QuerySet):
 class NewsDate(models.Model):
     """A date associated with news.
 
-    A [News][] can have multiple dates, for example if it is a recurring event.
+    A [News][com.models.News] can have multiple dates, for example if it is a recurring event.
     """
 
     news = models.ForeignKey(

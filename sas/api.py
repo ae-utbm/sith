@@ -13,8 +13,8 @@ from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 from pydantic import NonNegativeInt
 
-from apikey.auth import ApiKeyAuth
-from core.auth.api_permissions import (
+from api.auth import ApiKeyAuth
+from api.permissions import (
     CanAccessLookup,
     CanEdit,
     CanView,

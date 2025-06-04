@@ -3,8 +3,8 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
-from apikey.hashers import generate_key
-from apikey.models import ApiClient, ApiKey
+from api.hashers import generate_key
+from api.models import ApiClient, ApiKey
 
 
 @admin.register(ApiClient)

@@ -21,8 +21,8 @@ from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
-from apikey.auth import ApiKeyAuth
-from core.auth.api_permissions import CanAccessLookup, CanView, IsInGroup, IsRoot
+from api.auth import ApiKeyAuth
+from api.permissions import CanAccessLookup, CanView, IsInGroup, IsRoot
 from counter.models import Counter, Product, ProductType
 from counter.schemas import (
     CounterFilterSchema,

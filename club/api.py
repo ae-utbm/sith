@@ -6,10 +6,10 @@ from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
-from apikey.auth import ApiKeyAuth
+from api.auth import ApiKeyAuth
+from api.permissions import CanAccessLookup, HasPerm
 from club.models import Club
 from club.schemas import ClubSchema, SimpleClubSchema
-from core.auth.api_permissions import CanAccessLookup, HasPerm
 
 
 @api_controller("/club")

@@ -4,6 +4,25 @@ Ce sont des librairies relativement simples et qui présentent
 l'immense avantage d'offrir des mécanismes de validation et de sérialisation
 de données à la fois simples et expressifs.
 
+## Dossiers et fichiers
+
+L'API possède une application (`api`) 
+à la racine du projet, contenant des utilitaires 
+et de la configuration partagée par toutes les autres applications.
+C'est la pièce centrale de notre API, mais ce n'est pas là que
+vous trouverez les routes de l'API.
+
+Les routes en elles-mêmes sont contenues dans les autres applications,
+de manière thématiques :
+les routes liées aux clubs sont dans `club`, les routes liées
+aux photos dans `sas` et ainsi de suite.
+
+Les fichiers liés à l'API dans chaque application sont
+`schemas.py` et `api.py`.
+`schemas.py` contient les schémas de validation de données
+et `api.py` contient les contrôleurs de l'API.
+
+
 ## Schéma de données
 
 Le cœur de django-ninja étant sa validation de données grâce à Pydantic,
@@ -33,7 +52,7 @@ La plus grande partie des routes de l'API utilisent la méthode par cookie de se
 
 Pour placer une route d'API derrière l'une de ces méthodes (ou bien les deux),
 utilisez l'attribut `auth` et les classes `SessionAuth` et 
-[`ApiKeyAuth`][apikey.auth.ApiKeyAuth].
+[`ApiKeyAuth`][api.auth.ApiKeyAuth].
 
 !!!example
 
