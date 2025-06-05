@@ -1,11 +1,19 @@
-const setMaxHeight = (element: HTMLDetailsElement) => {
-  element.setAttribute("style", `max-height: ${element.scrollHeight}px`);
+const updateMaxHeight = (element: HTMLDetailsElement) => {
+  const content = element.querySelector(".accordion-content") as HTMLElement | null;
+  if (!content) {
+    return;
+  }
+  if (element.hasAttribute("open")) {
+    content.style.maxHeight = `${content.scrollHeight}px`;
+  } else {
+    content.style.maxHeight = "0px";
+  }
 };
 
 // Initialize max-height at load
 window.addEventListener("DOMContentLoaded", () => {
   for (const el of document.querySelectorAll("details.accordion")) {
-    setMaxHeight(el as HTMLDetailsElement);
+    updateMaxHeight(el as HTMLDetailsElement);
   }
 });
 
@@ -16,7 +24,7 @@ new MutationObserver((mutations: MutationRecord[]) => {
     if (target.tagName !== "DETAILS" || !target.classList.contains("accordion")) {
       continue;
     }
-    setMaxHeight(target);
+    updateMaxHeight(target);
   }
 }).observe(document.body, {
   attributes: true,

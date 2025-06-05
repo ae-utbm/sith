@@ -44,12 +44,17 @@ details.accordion>.accordion-content {
   background: #ffffff;
   color: #333333;
   padding: 1em 2.2em;
-  overflow: auto;
   border: 1px solid #dddddd;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
+  opacity: 0;
+  overflow: hidden;
 }
 
-details.accordion {
-  transition: max-height 300ms ease-in-out;
+details[open].accordion>.accordion-content {
+  opacity: 1;
+  // Setting a transition on all states of the content
+  // will create a strange behavior where the transition
+  // continues without being shown, creating inconsistenties
+  transition: all 300ms ease-out;
 }
