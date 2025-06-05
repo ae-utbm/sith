@@ -3,11 +3,13 @@ from typing import Annotated
 
 from annotated_types import Ge
 from ninja import Query
+from ninja.security import SessionAuth
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import NotFound
 from ninja_extra.pagination import PageNumberPaginationExtra, PaginatedResponseSchema
 
-from core.auth.api_permissions import HasPerm
+from api.auth import ApiKeyAuth
+from api.permissions import HasPerm
 from pedagogy.models import UV
 from pedagogy.schemas import SimpleUvSchema, UvFilterSchema, UvSchema
 from pedagogy.utbm_api import UtbmApiClient
@@ -17,6 +19,7 @@ from pedagogy.utbm_api import UtbmApiClient
 class UvController(ControllerBase):
     @route.get(
         "/{code}",
+        auth=[SessionAuth(), ApiKeyAuth()],
         permissions=[
             # this route will almost always be called in the context
             # of a UV creation/edition
@@ -42,6 +45,7 @@ class UvController(ControllerBase):
         "",
         response=PaginatedResponseSchema[SimpleUvSchema],
         url_name="fetch_uvs",
+        auth=[SessionAuth(), ApiKeyAuth()],
         permissions=[HasPerm("pedagogy.view_uv")],
     )
     @paginate(PageNumberPaginationExtra, page_size=100)

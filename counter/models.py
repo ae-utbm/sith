@@ -61,7 +61,7 @@ class CustomerQuerySet(models.QuerySet):
         Returns:
             The number of updated rows.
 
-        Warnings:
+        Warning:
             The execution time of this query grows really quickly.
             When updating 500 customers, it may take around a second.
             If you try to update all customers at once, the execution time
