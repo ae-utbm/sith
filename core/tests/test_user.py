@@ -335,3 +335,10 @@ class TestRedirectMe:
     def test_anonymous_user(self, client: Client):
         url = reverse("core:user_me_redirect")
         assertRedirects(client.get(url), reverse("core:login", query={"next": url}))
+
+
+@pytest.mark.parametrize("promo", [7, 22])
+@pytest.mark.django_db
+def test_promo_has_logo(promo):
+    user = baker.make(User, promo=promo)
+    assert user.promo_has_logo()
