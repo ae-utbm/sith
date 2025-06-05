@@ -33,7 +33,7 @@ details.accordion>summary::before {
   font-size: 0.8em;
 }
 
-details[open]>summary::before {
+details[open].accordion>summary::before {
   font-family: FontAwesome;
   content: '\f0d7';
 }
