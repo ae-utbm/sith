@@ -1362,3 +1362,20 @@ class ReturnableProductBalance(models.Model):
             f"return balance of {self.customer} "
             f"for {self.returnable.product_id} : {self.balance}"
         )
+
+
+class InvoiceCall(models.Model):
+    validated = models.BooleanField(verbose_name=_("is validated"))
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+
+    # le formattage des dates dans les models Django ne permet pas d'exclure le jour
+    # donc on utilise deux entiers plutot qu'un datefield avec jour fixe
+    month = models.PositiveSmallIntegerField(verbose_name=_("invoice month"))
+    year = models.PositiveIntegerField(verbose_name=_("invoice year"))
+
+    class Meta:
+        verbose_name = _("Invoice call")
+        verbose_name_plural = _("Invoice calls")
+
+    def __str__(self):
+        return f"invoice call of {self.month}/{self.year} made by {self.club}"
