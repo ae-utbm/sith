@@ -1,6 +1,7 @@
 from typing import Literal
 
 from django.http import HttpResponse
+from django.utils.cache import add_never_cache_headers
 from ninja import Query
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
@@ -18,7 +19,9 @@ from core.views.files import send_raw_file
 class CalendarController(ControllerBase):
     @route.get("/internal.ics", url_name="calendar_internal")
     def calendar_internal(self):
-        return send_raw_file(IcsCalendar.get_internal())
+        response = send_raw_file(IcsCalendar.get_internal())
+        add_never_cache_headers(response)
+        return response
 
     @route.get(
         "/unpublished.ics",
@@ -26,10 +29,12 @@ class CalendarController(ControllerBase):
         url_name="calendar_unpublished",
     )
     def calendar_unpublished(self):
-        return HttpResponse(
+        response = HttpResponse(
             IcsCalendar.get_unpublished(self.context.request.user),
             content_type="text/calendar",
         )
+        add_never_cache_headers(response)
+        return response
 
 
 @api_controller("/news")
