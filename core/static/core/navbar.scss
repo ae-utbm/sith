@@ -1,5 +1,7 @@
 @import "colors";
 
+$desktop-size: 500px;
+
 nav.navbar {
   background-color: $primary-dark-color;
   margin: 1em;
@@ -7,7 +9,7 @@ nav.navbar {
   border-radius: 0.6em;
   min-height: 40px;
 
-  @media (max-width: 500px) {
+  @media (max-width: $desktop-size) {
     position: relative;
     flex-direction: column;
     align-items: flex-start;
@@ -41,13 +43,13 @@ nav.navbar {
       color: white;
     }
 
-    @media (max-width: 500px) {
+    @media (max-width: $desktop-size) {
       display: flex;
     }
   }
 
   >.content {
-    @media (min-width: 500px) {
+    @media (min-width: $desktop-size) {
       flex-direction: row;
       flex-wrap: wrap;
       align-items: center;
@@ -65,7 +67,7 @@ nav.navbar {
       justify-content: center;
       cursor: pointer;
 
-      @media (max-width: 500px) {
+      @media (max-width: $desktop-size) {
         width: 100%;
         height: auto;
         justify-content: flex-start;
@@ -87,7 +89,7 @@ nav.navbar {
 
     >.menu>summary,
     >.link {
-      @media (max-width: 500px) {
+      @media (max-width: $desktop-size) {
         padding: 10px;
       }
     }
@@ -118,6 +120,10 @@ nav.navbar {
         height: 100%;
         padding-left: 20px;
         padding-right: 20px;
+
+        @media (min-width: $desktop-size) {
+          justify-content: center;
+        }
       }
 
       summary::-webkit-details-marker {
@@ -129,7 +135,7 @@ nav.navbar {
         background: white;
         margin: 0;
 
-        @media (min-width: 500px) {
+        @media (min-width: $desktop-size) {
           box-shadow: 3px 3px 3px 0 #dfdfdf;
         }
 
@@ -137,7 +143,7 @@ nav.navbar {
           display: flex;
           padding: 15px 20px;
 
-          @media (max-width: 500px) {
+          @media (max-width: $desktop-size) {
             padding: 10px;
           }
 
