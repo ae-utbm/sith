@@ -341,8 +341,8 @@ class User(AbstractUser):
         return reverse("core:user_profile", kwargs={"user_id": self.pk})
 
     def promo_has_logo(self) -> bool:
-        return Path(
-            settings.BASE_DIR / f"core/static/core/img/promo_{self.promo}.png"
+        return (
+            settings.BASE_DIR / f"core/static/core/img/promo_{self.promo:02d}.png"
         ).exists()
 
     @cached_property
