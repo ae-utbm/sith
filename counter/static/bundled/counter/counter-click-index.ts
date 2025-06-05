@@ -103,7 +103,7 @@ document.addEventListener("alpine:init", () => {
       this.customerBalance += Number.parseFloat(
         (event.detail.target.querySelector("#id_amount") as HTMLInputElement).value,
       );
-      document.getElementById("selling-accordion").click();
+      document.getElementById("selling-accordion").setAttribute("open", "");
       this.codeField.widget.focus();
     },
 
@@ -139,12 +139,6 @@ document.addEventListener("alpine:init", () => {
 });
 
 $(() => {
-  /* Accordion UI between basket and refills */
-  // biome-ignore lint/suspicious/noExplicitAny: dealing with legacy jquery
-  ($("#click-form") as any).accordion({
-    heightStyle: "content",
-    activate: () => $(".focus").focus(),
-  });
   // biome-ignore lint/suspicious/noExplicitAny: dealing with legacy jquery
   ($("#products") as any).tabs();
 });

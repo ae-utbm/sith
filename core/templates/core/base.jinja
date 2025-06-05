@@ -12,6 +12,7 @@
       <link rel="stylesheet" href="{{ static('core/header.scss') }}">
       <link rel="stylesheet" href="{{ static('core/navbar.scss') }}">
       <link rel="stylesheet" href="{{ static('core/pagination.scss') }}">
+      <link rel="stylesheet" href="{{ static('core/accordion.scss') }}">
 
       {% block jquery_css %}
         {# Thile file is quite heavy (around 250kb), so declaring it in a block allows easy removal #}
@@ -26,6 +27,7 @@
       <script type="module" src="{{ static('bundled/htmx-index.js') }}"></script>
       <script type="module" src="{{ static('bundled/country-flags-index.ts') }}"></script>
       <script type="module" src="{{ static('bundled/core/tooltips-index.ts') }}"></script>
+      <script type="module" src="{{ static('bundled/core/accordion-index.ts') }}"></script>
 
       <!-- Jquery declared here to be accessible in every django widgets -->
       <script src="{{ static('bundled/vendored/jquery.min.js') }}"></script>

@@ -90,9 +90,9 @@
           <p>{% trans %}You already posted a comment on this UV. If you want to comment again, please modify or delete your previous comment.{% endtrans %}</p>
         </div>
       {% elif user.has_perm("pedagogy.add_uvcomment") %}
-        <div id="leave_comment">
-          <h2>{% trans %}Leave comment{% endtrans %}</h2>
-          <div>
+        <details class="accordion" id="leave_comment">
+          <summary>{% trans %}Leave comment{% endtrans %}</summary>
+          <div class="accordion-content">
             <form action="{{ url('pedagogy:uv_detail', uv_id=object.id) }}" method="post" enctype="multipart/form-data">
               {% csrf_token %}
               <div class="leave-comment-grid-container">
@@ -142,7 +142,7 @@
               <p><input type="submit" value="{% trans %}Comment{% endtrans %}" /></p>
             </form>
           </div>
-        </div>
+        </details>
       {% endif %}
       <br>
 
@@ -221,21 +221,5 @@
   <script type="text/javascript">
     $("#return_noscript").hide();
     $("#return_js").show();
-    const icons = {
-      header: "fa fa-toggle-right",
-      activeHeader: "fa fa-toggle-down"
-    };
-    $(function(){
-      $("#leave_comment").accordion({
-        icons: icons,
-        heightStyle: "content",
-        active: false,
-        collapsible: true
-      });
-    });
-	// Remove jquery-ui icons to make fontawesome work
-    $(document).ready(function(){
-      $(".ui-accordion-header-icon").first().removeClass("ui-icon");
-    });
   </script>
 {% endblock %}
