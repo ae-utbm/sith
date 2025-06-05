@@ -1,5 +1,7 @@
 @import "colors";
 
+$desktop-size: 500px;
+
 nav.navbar {
   background-color: $primary-dark-color;
   margin: 1em;
@@ -7,15 +9,24 @@ nav.navbar {
   border-radius: 0.6em;
   min-height: 40px;
 
-  @media (max-width: 500px) {
+  @media (max-width: $desktop-size) {
     position: relative;
     flex-direction: column;
     align-items: flex-start;
     gap: 0;
     margin: .2em;
+
+    >.content[mobile-display="hidden"] {
+      display: none;
+    }
+
+    >.content[mobile-display="revealed"] {
+      display: block;
+    }
   }
 
-  > .expand-button {
+
+  >.expand-button {
     background-color: transparent;
     display: none;
     position: relative;
@@ -27,27 +38,27 @@ nav.navbar {
     align-items: center;
     margin: 0;
 
-    > i {
+    >i {
       font-size: 1.5em;
       color: white;
     }
 
-    @media (max-width: 500px) {
+    @media (max-width: $desktop-size) {
       display: flex;
     }
   }
 
-  > .content {
-    @media (min-width: 500px) {display: flex;
+  >.content {
+    @media (min-width: $desktop-size) {
       flex-direction: row;
       flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      display: flex !important;
+      display: flex;
     }
 
-    > .menu,
-    > .link {
+    >.menu,
+    >.link {
       box-sizing: border-box;
       width: 130px;
       height: 52px;
@@ -56,7 +67,7 @@ nav.navbar {
       justify-content: center;
       cursor: pointer;
 
-      @media (max-width: 500px) {
+      @media (max-width: $desktop-size) {
         width: 100%;
         height: auto;
         justify-content: flex-start;
@@ -64,80 +75,75 @@ nav.navbar {
         &:last-child {
           border-radius: 0 0 .6em .6em;
 
-          > .content {
+          >.content {
             box-shadow: 3px 3px 3px 0 #dfdfdf;
           }
         }
       }
     }
 
-    > .menu > .head,
-    > .link {
+    >.menu>.head,
+    >.link {
       color: white;
-      padding: 10px 20px;
-      box-sizing: border-box;
+    }
 
-      @media (max-width: 500px) {
+    >.menu>summary,
+    >.link {
+      @media (max-width: $desktop-size) {
         padding: 10px;
       }
     }
+
+    >.link {
+      padding: 10px 20px;
+      box-sizing: border-box;
+    }
+
 
     .link:hover,
     .menu:hover {
       background-color: rgba(0, 0, 0, .2);
     }
 
-    > .menu > .head,
-    > .link {
-      color: white;
-      padding: 10px 20px;
-      box-sizing: border-box;
+    details.menu {
+      cursor: pointer;
+      user-select: none;
+      z-index: 10;
+      align-items: center;
+      display: inline-block;
 
-      @media (max-width: 500px) {
-        padding: 10px;
+      summary {
+        list-style: none;
+
+        display: flex;
+        align-items: center;
+        height: 100%;
+        padding-left: 20px;
+        padding-right: 20px;
+
+        @media (min-width: $desktop-size) {
+          justify-content: center;
+        }
       }
-    }
 
-    .link:hover,
-    .menu:hover {
-      background-color: rgba(0, 0, 0, .2);
-    }
-
-    > .menu:hover > .content,
-    > .menu > .head:hover + .content,
-    > .menu > .content:hover {
-      display: flex;
-    }
-
-    > .menu {
-      display: flex;
-      position: relative;
-
-      > .content {
-        z-index: 10;
+      summary::-webkit-details-marker {
         display: none;
-        position: absolute;
-        top: 100%;
-        background-color: white;
-        margin: 0;
-        list-style-type: none;
-        width: 130px;
-        box-shadow: 3px 3px 3px 0 #dfdfdf;
-        flex-direction: column;
+      }
 
-        @media (max-width: 500px) {
-          position: absolute;
-          flex-direction: row;
-          flex-wrap: wrap;
-          width: 100%;
-          box-shadow: inset 3px 3px 3px 0 #dfdfdf;
+      ul.content {
+        list-style-type: none;
+        background: white;
+        margin: 0;
+
+        @media (min-width: $desktop-size) {
+          box-shadow: 3px 3px 3px 0 #dfdfdf;
         }
 
-        > li > a {
+        >li>a {
           display: flex;
           padding: 15px 20px;
 
-          @media (max-width: 500px) {
+          @media (max-width: $desktop-size) {
             padding: 10px;
           }
 

@@ -124,10 +124,27 @@
 
     {% block script %}
       <script>
+        const menuItems = document.querySelectorAll(".navbar details[name='navbar'].menu");
+        const isMobile = () => {
+          return window.innerWidth >= 500;
+        }
+        for (const item of menuItems){
+          item.addEventListener("mouseover", () => {
+            if (isMobile()){
+              item.setAttribute("open", "");
+            }
+          })
+          item.addEventListener("mouseout", () => {
+            if (isMobile()){
+              item.removeAttribute("open");
+            }
+          })
+        }
+
         function showMenu() {
           let navbar = document.getElementById("navbar-content");
-          const current = navbar.style.getPropertyValue("display");
-          navbar.style.setProperty("display", current === "none" ? "block" : "none");
+          const current = navbar.getAttribute("mobile-display");
+          navbar.setAttribute("mobile-display", current === "hidden" ? "revealed" : "hidden")
         }
 
         document.addEventListener("keydown", (e) => {

@@ -1,47 +1,47 @@
 <nav class="navbar">
   <button class="expand-button" onclick="showMenu()"><i class="fa fa-bars"></i></button>
-  <div id="navbar-content" class="content" style="display: none;">
+  <div id="navbar-content" class="content" mobile-display="hidden">
     <a class="link" href="{{ url('core:index') }}">{% trans %}Main{% endtrans %}</a>
-    <div class="menu">
-      <span class="head">{% trans %}Associations & Clubs{% endtrans %}</span>
+    <details name="navbar" class="menu">
+      <summary class="head">{% trans %}Associations & Clubs{% endtrans %}</summary>
       <ul class="content">
         <li><a href="{{ url('core:page', page_name='ae') }}">{% trans %}AE{% endtrans %}</a></li>
         <li><a href="{{ url('core:page', page_name='clubs') }}">{% trans %}AE's clubs{% endtrans %}</a></li>
         <li><a href="{{ url('core:page', page_name='utbm-associations') }}">{% trans %}Others UTBM's Associations{% endtrans %}</a></li>
       </ul>
-    </div>
-    <div class="menu">
-      <span class="head">{% trans %}Events{% endtrans %}</span>
+    </details>
+    <details name="navbar" class="menu">
+      <summary class="head">{% trans %}Events{% endtrans %}</summary>
       <ul class="content">
         <li><a href="{{ url('election:list') }}">{% trans %}Elections{% endtrans %}</a></li>
         <li><a href="{{ url('core:page', page_name='ga') }}">{% trans %}Big event{% endtrans %}</a></li>
       </ul>
-    </div>
+    </details>
     <a class="link" href="{{ url('forum:main') }}">{% trans %}Forum{% endtrans %}</a>
     <a class="link" href="{{ url('sas:main') }}">{% trans %}Gallery{% endtrans %}</a>
     <a class="link" href="{{ url('eboutic:main') }}">{% trans %}Eboutic{% endtrans %}</a>
-    <div class="menu">
-      <span class="head">{% trans %}Services{% endtrans %}</span>
+    <details name="navbar" class="menu">
+      <summary class="head">{% trans %}Services{% endtrans %}</summary>
       <ul class="content">
         <li><a href="{{ url('matmat:search_clear') }}">{% trans %}Matmatronch{% endtrans %}</a></li>
         <li><a href="{{ url('core:file_list') }}">{% trans %}Files{% endtrans %}</a></li>
         <li><a href="{{ url('pedagogy:guide') }}">{% trans %}Pedagogy{% endtrans %}</a></li>
       </ul>
-    </div>
-    <div class="menu">
-      <span class="head">{% trans %}My Benefits{% endtrans %}</span>
+    </details>
+    <details name="navbar" class="menu">
+      <summary class="head">{% trans %}My Benefits{% endtrans %}</summary>
       <ul class="content">
         <li><a href="{{ url('core:page', page_name='partenaires')}}">{% trans %}Sponsors{% endtrans %}</a></li>
         <li><a href="{{ url('core:page', page_name='avantages') }}">{% trans %}Subscriber benefits{% endtrans %}</a></li>
       </ul>
-    </div>
-    <div class="menu">
-      <span class="head">{% trans %}Help{% endtrans %}</span>
+    </details>
+    <details name="navbar" class="menu">
+      <summary class="head">{% trans %}Help{% endtrans %}</summary>
       <ul class="content">
         <li><a href="{{ url('core:page', page_name='FAQ') }}">{% trans %}FAQ{% endtrans %}</a></li>
         <li><a href="{{ url('core:page', 'contacts') }}">{% trans %}Contacts{% endtrans %}</a></li>
         <li><a href="{{ url('core:page', page_name='Index') }}">{% trans %}Wiki{% endtrans %}</a></li>
       </ul>
-    </div>
+    </details>
   </div>
 </nav>
