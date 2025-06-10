@@ -61,6 +61,7 @@
     "jquery": "^3.7.1",
     "jquery-ui": "^1.14.0",
     "js-cookie": "^3.0.5",
+    "lit-html": "^3.3.0",
     "native-file-system-adapter": "^3.0.1",
     "three": "^0.172.0",
     "three-spritetext": "^1.9.0",
