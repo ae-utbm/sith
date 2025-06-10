@@ -8,8 +8,8 @@ Certaines dépendances sont nécessaires niveau système :
 - zlib1g-dev
 - gettext
 - redis
-- npm
-- node (22.16)
+- npm (^10.9.2)
+- node (^22.16)
 
 ### Installer WSL
 
