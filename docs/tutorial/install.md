@@ -8,6 +8,8 @@ Certaines dépendances sont nécessaires niveau système :
 - zlib1g-dev
 - gettext
 - redis
+- npm
+- node (22.16)
 
 ### Installer WSL
 
@@ -67,7 +69,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
         ```bash
         sudo apt install curl build-essential libssl-dev \
             libjpeg-dev zlib1g-dev npm libffi-dev pkg-config \
-            gettext git redis
+            gettext git redis libxapian-dev
         curl -LsSf https://astral.sh/uv/install.sh | sh
         ```
 
