@@ -38,8 +38,6 @@ details[open].accordion>summary::before {
   content: '\f0d7';
 }
 
-// ::details-content isn't available on firefox yet
-// we use .accordion-content as a workaround
 details.accordion>.accordion-content {
   background: #ffffff;
   color: #333333;
@@ -47,27 +45,45 @@ details.accordion>.accordion-content {
   border: 1px solid #dddddd;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
-  opacity: 0;
   overflow: hidden;
 }
 
-details[open].accordion>.accordion-content {
-  opacity: 1;
-  // Setting a transition on all states of the content
-  // will create a strange behavior where the transition
-  // continues without being shown, creating inconsistenties
-  transition: all 300ms ease-out;
+@mixin animation($selector) {
+  details.accordion#{$selector} {
+    opacity: 0;
+
+    @supports (max-height: calc-size(max-content, size)) {
+      max-height: 0px;
+    }
+  }
+
+  details[open].accordion#{$selector} {
+    opacity: 1;
+
+    // Setting a transition on all states of the content
+    // will create a strange behavior where the transition
+    // continues without being shown, creating inconsistenties
+    transition: all 300ms ease-out;
+
+    @supports (max-height: calc-size(max-content, size)) {
+      max-height: calc-size(max-content, size);
+    }
+  }
 }
 
-// For some reason, it's still not enough for chrome
-// We repeat duplicate the transition again but only for chrome
-// And since everything with ::details-content crashes firefox
-// we put this at the end so it doesn't break the previous code
-details.accordion::details-content {
-  opacity: 0;
+// ::details-content isn't available on firefox yet
+// we use .accordion-content as a workaround
+// But we need to use ::details-content for chrome because it's
+// not working correctly otherwise
+// it only happen in chrome, not safari or firefox
+// Note: `selector` is not supported by scss so we comment it out to
+// avoid compiling it and sending it straight to the css
+// This is a trick that comes from here :
+// https://stackoverflow.com/questions/62665318/using-supports-selector-despite-sass-not-supporting-it
+@supports #{'selector(details::details-content)'} {
+  @include animation("::details-content")
 }
 
-details[open].accordion::details-content {
-  opacity: 1;
-  transition: all 300ms ease-out;
+@supports #{'not selector(details::details-content)'} {
+  @include animation(">.accordion-content")
 }
