@@ -58,3 +58,16 @@ details[open].accordion>.accordion-content {
   // continues without being shown, creating inconsistenties
   transition: all 300ms ease-out;
 }
+
+// For some reason, it's still not enough for chrome
+// We repeat duplicate the transition again but only for chrome
+// And since everything with ::details-content crashes firefox
+// we put this at the end so it doesn't break the previous code
+details.accordion::details-content {
+  opacity: 0;
+}
+
+details[open].accordion::details-content {
+  opacity: 1;
+  transition: all 300ms ease-out;
+}
