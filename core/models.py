@@ -23,7 +23,6 @@
 #
 from __future__ import annotations
 
-import importlib
 import logging
 import os
 import string
@@ -51,6 +50,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.html import escape
+from django.utils.module_loading import import_string
 from django.utils.timezone import localdate, now
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
@@ -1452,22 +1452,24 @@ class Notification(models.Model):
         return self.get_type_display()
 
     def save(self, *args, **kwargs):
-        if not self.id and self.type in settings.SITH_PERMANENT_NOTIFICATIONS:
+        if self._state.adding and self.type in settings.SITH_PERMANENT_NOTIFICATIONS:
             old_notif = self.user.notifications.filter(type=self.type).last()
             if old_notif:
                 old_notif.callback()
                 old_notif.save()
                 return
+            # if this permanent notification is the first one,
+            # go into the callback nonetheless, because the logic
+            # to set Notification.param is here
+            # (please don't be mad at me, I'm not the one who cooked this spaghetti)
+            self.callback()
         super().save(*args, **kwargs)
 
     def callback(self):
-        # Get the callback defined in settings to update existing
-        # notifications
-        mod_name, func_name = settings.SITH_PERMANENT_NOTIFICATIONS[self.type].rsplit(
-            ".", 1
-        )
-        mod = importlib.import_module(mod_name)
-        getattr(mod, func_name)(self)
+        func_name = settings.SITH_PERMANENT_NOTIFICATIONS.get(self.type)
+        if not func_name:
+            return
+        import_string(func_name)(self)
 
 
 class Gift(models.Model):
