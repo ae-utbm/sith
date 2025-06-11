@@ -1451,6 +1451,10 @@ class PageRev(models.Model):
         return self.page.can_be_edited_by(user)
 
 
+def get_notification_types():
+    return settings.SITH_NOTIFICATIONS
+
+
 class Notification(models.Model):
     user = models.ForeignKey(
         User, related_name="notifications", on_delete=models.CASCADE
@@ -1458,9 +1462,9 @@ class Notification(models.Model):
     url = models.CharField(_("url"), max_length=255)
     param = models.CharField(_("param"), max_length=128, default="")
     type = models.CharField(
-        _("type"), max_length=32, choices=settings.SITH_NOTIFICATIONS, default="GENERIC"
+        _("type"), max_length=32, choices=get_notification_types, default="GENERIC"
     )
-    date = models.DateTimeField(_("date"), default=timezone.now)
+    date = models.DateTimeField(_("date"), auto_now=True)
     viewed = models.BooleanField(_("viewed"), default=False, db_index=True)
 
     def __str__(self):

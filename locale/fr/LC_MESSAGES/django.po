@@ -5103,8 +5103,9 @@ msgid "There are %s pictures to be moderated in the SAS"
 msgstr "Il y a %s photos à modérer dans le SAS"
 
 #: sith/settings.py
-msgid "You've been identified on some pictures"
-msgstr "Vous avez été identifié sur des photos"
+#, python-format
+msgid "You've been identified in album %s"
+msgstr "Vous avez été identifié dans l'album %s"
 
 #: sith/settings.py
 #, python-format
