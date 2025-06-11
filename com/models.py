@@ -160,9 +160,12 @@ class News(models.Model):
         )
 
 
-def news_notification_callback(notif):
+def news_notification_callback(notif: Notification):
+    # the NewsDate linked to the News
+    # which creation triggered this callback may not exist yet,
+    # so it's important to filter by "not past date" rather than by "future date"
     count = News.objects.filter(
-        dates__start_date__gt=timezone.now(), is_published=False
+        ~Q(dates__start_date__gt=timezone.now()), is_published=False
     ).count()
     if count:
         notif.viewed = False
