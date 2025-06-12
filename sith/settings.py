@@ -124,6 +124,7 @@ INSTALLED_APPS = (
     "pedagogy",
     "galaxy",
     "antispam",
+    "api",
 )
 
 MIDDLEWARE = (
