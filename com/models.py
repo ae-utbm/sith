@@ -170,7 +170,6 @@ def news_notification_callback(notif: Notification):
     if count:
         notif.viewed = False
         notif.param = str(count)
-        notif.date = timezone.now()
     else:
         notif.viewed = True
 
