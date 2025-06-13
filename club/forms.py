@@ -163,15 +163,16 @@ class SellingsForm(forms.Form):
 
     def __init__(self, club, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        counters_qs = (
-            Counter.objects.filter(
-                Q(club=club)
-                | Q(products__club=club)
-                | Exists(Selling.objects.filter(counter=OuterRef("pk"), club=club))
-            )
-            .distinct()
-            .order_by(Lower("name"))
+        # postgres struggles really hard with a single query having three WHERE conditions,
+        # but deals perfectly fine with UNION of multiple queryset with their own WHERE clause,
+        # so we do this to get the ids, which we use to build another queryset that can be used by django.
+        club_sales_subquery = Selling.objects.filter(counter=OuterRef("pk"), club=club)
+        ids = (
+            Counter.objects.filter(Q(club=club) | Q(products__club=club))
+            .union(Counter.objects.filter(Exists(club_sales_subquery)))
+            .values_list("id", flat=True)
         )
+        counters_qs = Counter.objects.filter(id__in=ids).order_by(Lower("name"))
         self.fields["counters"] = forms.ModelMultipleChoiceField(
             counters_qs, label=_("Counter"), required=False
         )
