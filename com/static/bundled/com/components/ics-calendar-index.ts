@@ -7,6 +7,7 @@ import frLocale from "@fullcalendar/core/locales/fr";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import iCalendarPlugin from "@fullcalendar/icalendar";
 import listPlugin from "@fullcalendar/list";
+import { type HTMLTemplateResult, html, render } from "lit-html";
 import {
   calendarCalendarInternal,
   calendarCalendarUnpublished,
@@ -176,29 +177,25 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       oldPopup.remove();
     }
 
-    const makePopupInfo = (info: HTMLElement, iconClass: string) => {
-      const row = document.createElement("div");
-      const icon = document.createElement("i");
-
-      row.setAttribute("class", "event-details-row");
-
-      icon.setAttribute("class", `event-detail-row-icon fa-xl ${iconClass}`);
-
-      row.appendChild(icon);
-      row.appendChild(info);
-
-      return row;
+    const makePopupInfo = (info: HTMLTemplateResult, iconClass: string) => {
+      return html`
+        <div class="event-details-row">
+          <i class="event-detail-row-icon fa-xl ${iconClass}"></i>
+          ${info}
+        </div>
+      `;
     };
 
     const makePopupTitle = (event: EventImpl) => {
-      const row = document.createElement("div");
-      row.innerHTML = `
-        <h4 class="event-details-row-content">
-          ${event.title}
-        </h4>
-        <span class="event-details-row-content">
-          ${this.formatDate(event.start)} - ${this.formatDate(event.end)}
-        </span>
+      const row = html`
+        <div>
+          <h4 class="event-details-row-content">
+            ${event.title}
+          </h4>
+          <span class="event-details-row-content">
+            ${this.formatDate(event.start)} - ${this.formatDate(event.end)}
+          </span>
+        </div>
       `;
       return makePopupInfo(
         row,
@@ -210,9 +207,11 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       if (event.extendedProps.location === null) {
         return null;
       }
-      const info = document.createElement("div");
-      info.innerText = event.extendedProps.location;
-
+      const info = html`
+        <div>
+          ${event.extendedProps.location}
+        </div>
+      `;
       return makePopupInfo(info, "fa-solid fa-location-dot");
     };
 
@@ -220,10 +219,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       if (event.url === "") {
         return null;
       }
-      const url = document.createElement("a");
-      url.href = event.url;
-      url.textContent = gettext("More info");
-
+      const url = html`<a href="${event.url}">${gettext("More info")}</a>`;
       return makePopupInfo(url, "fa-solid fa-link");
     };
 
@@ -232,64 +228,59 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         return null;
       }
       const newsId = this.getNewsId(event);
-      const div = document.createElement("div");
+      const buttons = [] as HTMLTemplateResult[];
+
       if (this.canModerate) {
         if (event.source.internalEventSource.ui.classNames.includes("unpublished")) {
-          const button = document.createElement("button");
-          button.innerHTML = `<i class="fa fa-check"></i>${gettext("Publish")}`;
-          button.setAttribute("class", "btn btn-green");
-          button.onclick = () => {
-            this.publishNews(newsId);
-          };
-          div.appendChild(button);
+          const button = html`
+            <button class="btn btn-green" @click="${() => this.publishNews(newsId)}">
+              <i class="fa fa-check"></i>${gettext("Publish")}
+            </button>
+          `;
+          buttons.push(button);
         } else {
-          const button = document.createElement("button");
-          button.innerHTML = `<i class="fa fa-times"></i>${gettext("Unpublish")}`;
-          button.setAttribute("class", "btn btn-orange");
-          button.onclick = () => {
-            this.unpublishNews(newsId);
-          };
-          div.appendChild(button);
+          const button = html`
+            <button class="btn btn-orange" @click="${() => this.unpublishNews(newsId)}">
+              <i class="fa fa-times"></i>${gettext("Unpublish")}
+            </button>
+          `;
+          buttons.push(button);
         }
       }
       if (this.canDelete) {
-        const button = document.createElement("button");
-        button.innerHTML = `<i class="fa fa-trash-can"></i>${gettext("Delete")}`;
-        button.setAttribute("class", "btn btn-red");
-        button.onclick = () => {
-          this.deleteNews(newsId);
-        };
-        div.appendChild(button);
+        const button = html`
+          <button class="btn btn-red" @click="${() => this.deleteNews(newsId)}">
+            <i class="fa fa-trash-can"></i>${gettext("Delete")}
+          </button>
+        `;
+        buttons.push(button);
       }
 
-      return makePopupInfo(div, "fa-solid fa-toolbox");
+      return makePopupInfo(html`<div>${buttons}</div>`, "fa-solid fa-toolbox");
     };
 
     // Create new popup
-    const popup = document.createElement("div");
-    const popupContainer = document.createElement("div");
-
-    popup.setAttribute("id", "event-details");
-    popupContainer.setAttribute("class", "event-details-container");
-
-    popupContainer.appendChild(makePopupTitle(event.event));
+    const infos = [] as HTMLTemplateResult[];
+    infos.push(makePopupTitle(event.event));
 
     const location = makePopupLocation(event.event);
     if (location !== null) {
-      popupContainer.appendChild(location);
+      infos.push(location);
     }
 
     const url = makePopupUrl(event.event);
     if (url !== null) {
-      popupContainer.appendChild(url);
+      infos.push(url);
     }
 
     const tools = makePopupTools(event.event);
     if (tools !== null) {
-      popupContainer.appendChild(tools);
+      infos.push(tools);
     }
 
-    popup.appendChild(popupContainer);
+    const popup = document.createElement("div");
+    popup.setAttribute("id", "event-details");
+    render(html`<div class="event-details-container">${infos}</div>`, popup);
 
     // We can't just add the element relative to the one we want to appear under
     // Otherwise, it either gets clipped by the boundaries of the calendar or resize cells
