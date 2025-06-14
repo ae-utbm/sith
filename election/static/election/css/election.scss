@@ -93,13 +93,14 @@ $min_col_width: 100px;
         align-items: center;
         justify-content: space-between;
         margin: 0;
-        row-gap: 10px;
+        gap: 20px;
         padding: $padding;
         width: 100%;
 
 
         >.role_text {
           display: flex;
+          width: 100%;
           flex-direction: column;
 
           >h4 {
@@ -107,7 +108,6 @@ $min_col_width: 100px;
           }
 
           .role_description {
-            flex-grow: 1;
             margin-top: .5em;
             text-wrap: auto;
             text-align: left;
