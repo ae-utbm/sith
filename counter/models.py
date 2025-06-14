@@ -1378,7 +1378,7 @@ class MonthField(models.CharField):
         if value is None:
             return value
         try:
-            year, month = map(int, value.split("-"))
+            year, month = value.split("-")
             return date(year, month, 1)
         except (ValueError, TypeError):
             return value
@@ -1388,7 +1388,7 @@ class MonthField(models.CharField):
             return value
         if isinstance(value, str):
             try:
-                year, month = map(int, value.split("-"))
+                year, month = value.split("-")
                 return date(year, month, 1)
             except ValueError:
                 pass
@@ -1407,7 +1407,7 @@ class MonthField(models.CharField):
 
 
 class InvoiceCall(models.Model):
-    validated = models.BooleanField(verbose_name=_("is validated"))
+    is_validated = models.BooleanField(verbose_name=_("is validated"))
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
     month = MonthField(verbose_name=_("invoice date"))
 
