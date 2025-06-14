@@ -15,7 +15,8 @@
 from datetime import date, datetime, timedelta
 from datetime import timezone as tz
 
-from django.db.models import F
+from django.db.models import Exists, F, OuterRef
+from django.shortcuts import redirect
 from django.utils import timezone
 from django.views.generic import TemplateView
 
@@ -82,14 +83,12 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
             .order_by("-selling_sum")
         )
 
-        # une query pour tous les clubs qu'on met dans un dico dont la clé est le nom du club
         club_names = [i["club__name"] for i in kwargs["sums"]]
         clubs = Club.objects.filter(name__in=club_names)
 
-        # et une query pour les factures
         invoice_calls = InvoiceCall.objects.filter(month=month_str, club__in=clubs)
 
-        invoice_statuses = {ic.club.name: ic.validated for ic in invoice_calls}
+        invoice_statuses = {ic.club.name: ic.is_validated for ic in invoice_calls}
 
         kwargs["validated"] = invoice_statuses
         return kwargs
@@ -98,44 +97,26 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
         month_str = request.POST.get("month")
         if not month_str:
             return self.get(request, *args, **kwargs)
-
         try:
             start_date = datetime.strptime(month_str, "%Y-%m")
             start_date = date(start_date.year, start_date.month, 1)
         except ValueError:
-            from django.shortcuts import redirect
-
             return redirect(request.path)
 
-        club_names = list(
-            Selling.objects.filter(
-                date__year=start_date.year, date__month=start_date.month
-            )
-            .values_list("club__name", flat=True)
-            .distinct()
+        selling_subquery = Selling.objects.filter(
+            club=OuterRef("pk"),
+            date__year=start_date.year,
+            date__month=start_date.month,
         )
 
-        clubs = Club.objects.filter(name__in=club_names)
-        club_map = {club.name: club for club in clubs}
+        clubs = Club.objects.annotate(has_selling=Exists(selling_subquery)).filter(
+            has_selling=True
+        )
 
-        invoice_calls = InvoiceCall.objects.filter(month=month_str, club__in=clubs)
-        invoice_statuses = {ic.club.name: ic for ic in invoice_calls}
+        for club in clubs:
+            is_checked = f"validate_{club.name}" in request.POST
 
-        for club_name in club_names:
-            is_checked = f"validate_{club_name}" in request.POST
-            invoice_call = invoice_statuses.get(club_name)
-
-            if invoice_call:
-                if invoice_call.validated != is_checked:
-                    invoice_call.validated = is_checked
-                    invoice_call.save()
-            else:
-                InvoiceCall.objects.create(
-                    month=month_str,
-                    club=club_map[club_name],
-                    validated=is_checked,
-                )
-
-        from django.shortcuts import redirect
-
+            InvoiceCall.objects.update_or_create(
+                month=month_str, club=club, defaults={"is_validated": is_checked}
+            )
         return redirect(f"{request.path}?month={request.POST.get('month', '')}")
