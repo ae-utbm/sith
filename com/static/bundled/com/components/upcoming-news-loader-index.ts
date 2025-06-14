@@ -8,13 +8,17 @@ interface ParsedNewsDateSchema extends Omit<NewsDateSchema, "start_date" | "end_
 }
 
 document.addEventListener("alpine:init", () => {
-  Alpine.data("upcomingNewsLoader", (startDate: Date) => ({
+  Alpine.data("upcomingNewsLoader", (startDate: Date, locale: string) => ({
     startDate: startDate,
     currentPage: 1,
     pageSize: 6,
     hasNext: true,
     loading: false,
     newsDates: [] as NewsDateSchema[],
+    dateFormat: new Intl.DateTimeFormat(locale, {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }),
 
     async loadMore() {
       this.loading = true;
