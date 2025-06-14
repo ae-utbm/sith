@@ -1364,7 +1364,7 @@ class ReturnableProductBalance(models.Model):
         )
 
 
-class MonthField(models.DateField):
+class MonthField(models.CharField):
     description = _("Year + month field")
 
     def __init__(self, *args, **kwargs):
@@ -1377,21 +1377,33 @@ class MonthField(models.DateField):
     def from_db_value(self, value, expression, connection):
         if value is None:
             return value
-        year, month = map(value.split("-"))
-        return date(year, month, 1)
+        try:
+            year, month = map(int, value.split("-"))
+            return date(year, month, 1)
+        except (ValueError, TypeError):
+            return value
+
+    def to_python(self, value):
+        if isinstance(value, date):
+            return value
+        if isinstance(value, str):
+            try:
+                year, month = map(int, value.split("-"))
+                return date(year, month, 1)
+            except ValueError:
+                pass
+        return value
 
     def get_prep_value(self, value):
         if isinstance(value, date):
             return value.strftime("%Y-%m")
-        elif isinstance(value, str):
-            try:
-                datetime.strptime(value, "%Y-%m")
-            except ValueError:
-                raise ValueError("invalid format for date (use YYYY-mm)") from None
-        elif value is None:
+        if isinstance(value, str) and len(value) == 7 and value[4] == "-":
             return value
-        else:
-            raise TypeError("Invalid type for MonthField")
+        return value
+
+    def value_to_string(self, obj):
+        value = self.value_from_object(obj)
+        return self.get_prep_value(value)
 
 
 class InvoiceCall(models.Model):
@@ -1404,4 +1416,4 @@ class InvoiceCall(models.Model):
         verbose_name_plural = _("Invoice calls")
 
     def __str__(self):
-        return f"invoice call of {self.month}/{self.year} made by {self.club}"
+        return f"invoice call of {self.month} made by {self.club}"

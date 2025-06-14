@@ -32,7 +32,9 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
         """Add sums to the context."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["months"] = Selling.objects.datetimes("date", "month", order="DESC")
-        if "month" in self.request.GET:
+        month_str = self.request.GET.get("month")
+
+        if month_str:
             start_date = datetime.strptime(self.request.GET["month"], "%Y-%m")
         else:
             start_date = datetime(
@@ -85,9 +87,7 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
         clubs = Club.objects.filter(name__in=club_names)
 
         # et une query pour les factures
-        invoice_calls = InvoiceCall.objects.filter(
-            month=date(start_date.year, start_date.month, 1), club__in=clubs
-        )
+        invoice_calls = InvoiceCall.objects.filter(month=month_str, club__in=clubs)
 
         invoice_statuses = {ic.club.name: ic.validated for ic in invoice_calls}
 
@@ -95,14 +95,22 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
         return kwargs
 
     def post(self, request, *args, **kwargs):
-        if request.POST["month"]:
-            start_date = datetime.strptime(request.POST["month"], "%Y-%m")
+        month_str = request.POST.get("month")
+        if not month_str:
+            return self.get(request, *args, **kwargs)
 
-        year = start_date.year
-        month = start_date.month
+        try:
+            start_date = datetime.strptime(month_str, "%Y-%m")
+            start_date = date(start_date.year, start_date.month, 1)
+        except ValueError:
+            from django.shortcuts import redirect
+
+            return redirect(request.path)
 
         club_names = list(
-            Selling.objects.filter(date__year=year, date__month=month)
+            Selling.objects.filter(
+                date__year=start_date.year, date__month=start_date.month
+            )
             .values_list("club__name", flat=True)
             .distinct()
         )
@@ -110,9 +118,7 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
         clubs = Club.objects.filter(name__in=club_names)
         club_map = {club.name: club for club in clubs}
 
-        invoice_calls = InvoiceCall.objects.filter(
-            month=date(year, month, 1), club__in=clubs
-        )
+        invoice_calls = InvoiceCall.objects.filter(month=month_str, club__in=clubs)
         invoice_statuses = {ic.club.name: ic for ic in invoice_calls}
 
         for club_name in club_names:
@@ -125,7 +131,7 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
                     invoice_call.save()
             else:
                 InvoiceCall.objects.create(
-                    month=date(year, month, 1),
+                    month=month_str,
                     club=club_map[club_name],
                     validated=is_checked,
                 )
