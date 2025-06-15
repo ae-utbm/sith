@@ -193,24 +193,24 @@ urlpatterns = [
         name="user_gift_delete",
     ),
     # File views
-    re_path(r"^file/(?P<popup>popup)?$", FileListView.as_view(), name="file_list"),
+    re_path(r"^file/$", FileListView.as_view(), name="file_list"),
     re_path(
-        r"^file/(?P<file_id>[0-9]+)/(?P<popup>popup)?$",
+        r"^file/(?P<file_id>[0-9]+)/$",
         FileView.as_view(),
         name="file_detail",
     ),
     re_path(
-        r"^file/(?P<file_id>[0-9]+)/edit/(?P<popup>popup)?$",
+        r"^file/(?P<file_id>[0-9]+)/edit/$",
         FileEditView.as_view(),
         name="file_edit",
     ),
     re_path(
-        r"^file/(?P<file_id>[0-9]+)/prop/(?P<popup>popup)?$",
+        r"^file/(?P<file_id>[0-9]+)/prop/$",
         FileEditPropView.as_view(),
         name="file_prop",
     ),
     re_path(
-        r"^file/(?P<file_id>[0-9]+)/delete/(?P<popup>popup)?$",
+        r"^file/(?P<file_id>[0-9]+)/delete/$",
         FileDeleteView.as_view(),
         name="file_delete",
     ),

@@ -12,7 +12,7 @@
           {% else %}
             <i class="fa fa-file" aria-hidden="true"></i>
           {% endif %}
-          <a href="{{ url('core:file_detail', file_id=f.id, popup=popup) }}">{{ f.name }}</a></li>
+          <a href="{{ url('core:file_detail', file_id=f.id) }}">{{ f.name }}</a></li>
       {% endfor %}
     </ul>
   {% else %}
