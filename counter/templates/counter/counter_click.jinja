@@ -9,12 +9,14 @@
   <link rel="stylesheet" type="text/css" href="{{ static('counter/css/counter-click.scss') }}" defer></link>
   <link rel="stylesheet" type="text/css" href="{{ static('bundled/core/components/ajax-select-index.css') }}" defer></link>
   <link rel="stylesheet" type="text/css" href="{{ static('core/components/ajax-select.scss') }}" defer></link>
+  <link rel="stylesheet" type="text/css" href="{{ static('core/components/tabs.scss') }}" defer></link>
   <link rel="stylesheet" href="{{ static("core/components/card.scss") }}">
 {% endblock %}
 
 {% block additional_js %}
   <script type="module" src="{{ static('bundled/counter/counter-click-index.ts') }}"></script>
   <script type="module" src="{{ static('bundled/counter/components/counter-product-select-index.ts') }}"></script>
+  <script type="module" src="{{ static('bundled/core/components/tabs-index.ts') }}"></script>
 {% endblock %}
 
 {% block info_boxes %}
@@ -205,35 +207,32 @@
             {% trans %}No products available on this counter for this user{% endtrans %}
           </div>
         {% else %}
-          <ul>
+          <ui-tab-group>
             {% for category in categories.keys() -%}
-              <li><a href="#cat_{{ category|slugify }}">{{ category }}</a></li>
-            {%- endfor %}
-          </ul>
-          {% for category in categories.keys() -%}
-            <div id="cat_{{ category|slugify }}">
-              <h5 class="margin-bottom">{{ category }}</h5>
-              <div class="row gap-2x">
-                {% for product in categories[category] -%}
-                  <button class="card shadow" @click="addToBasketWithMessage('{{ product.id }}', 1)">
-                    <img
-                      class="card-image"
-                      alt="image de {{ product.name }}"
-                      {% if product.icon %}
-                        src="{{ product.icon.url }}"
-                      {% else %}
-                        src="{{ static('core/img/na.gif') }}"
-                      {% endif %}
-                    />
-                    <span class="card-content">
-                      <strong class="card-title">{{ product.name }}</strong>
-                      <p>{{ product.price }} €<br>{{ product.code }}</p>
-                    </span>
-                  </button>
-                {%- endfor %}
-              </div>
-            </div>
-          {%- endfor %}
+              <ui-tab title="{{ category }}" {% if loop.index == 1 -%}active{%- endif -%}>
+                <h5 class="margin-bottom">{{ category }}</h5>
+                <div class="row gap-2x">
+                  {% for product in categories[category] -%}
+                    <button class="card shadow" @click="addToBasketWithMessage('{{ product.id }}', 1)">
+                      <img
+                        class="card-image"
+                        alt="image de {{ product.name }}"
+                        {% if product.icon %}
+                          src="{{ product.icon.url }}"
+                        {% else %}
+                          src="{{ static('core/img/na.gif') }}"
+                        {% endif %}
+                      />
+                      <span class="card-content">
+                        <strong class="card-title">{{ product.name }}</strong>
+                        <p>{{ product.price }} €<br>{{ product.code }}</p>
+                      </span>
+                    </button>
+                  {%- endfor %}
+                </div>
+              </ui-tab>
+            {% endfor %}
+          </ui-tab-group>
         {% endif %}
       </div>
     </div>
