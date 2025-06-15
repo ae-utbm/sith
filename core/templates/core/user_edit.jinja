@@ -74,7 +74,7 @@
     {%- if this_picture -%}
       {% set default_picture = this_picture.get_download_url()|tojson %}
       {% set delete_url = (
-        url('core:file_delete', file_id=this_picture.id, popup='')
+        url('core:file_delete', file_id=this_picture.id)
         + "?next=" + url('core:user_edit', user_id=profile.id)
       )|tojson %}
     {%- else -%}

@@ -198,9 +198,6 @@ class FileListView(ListView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["popup"] = ""
-        if self.kwargs.get("popup") is not None:
-            kwargs["popup"] = "popup"
         return kwargs
 
 
@@ -217,20 +214,7 @@ class FileEditView(CanEditMixin, UpdateView):
         return modelform_factory(SithFile, fields=fields)
 
     def get_success_url(self):
-        if self.kwargs.get("popup") is not None:
-            return reverse(
-                "core:file_detail", kwargs={"file_id": self.object.id, "popup": "popup"}
-            )
-        return reverse(
-            "core:file_detail", kwargs={"file_id": self.object.id, "popup": ""}
-        )
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["popup"] = ""
-        if self.kwargs.get("popup") is not None:
-            kwargs["popup"] = "popup"
-        return kwargs
+        return reverse("core:file_detail", kwargs={"file_id": self.object.id})
 
 
 class FileEditPropForm(forms.ModelForm):
@@ -268,15 +252,8 @@ class FileEditPropView(CanEditPropMixin, UpdateView):
     def get_success_url(self):
         return reverse(
             "core:file_detail",
-            kwargs={"file_id": self.object.id, "popup": self.kwargs.get("popup", "")},
+            kwargs={"file_id": self.object.id},
         )
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["popup"] = ""
-        if self.kwargs.get("popup") is not None:
-            kwargs["popup"] = "popup"
-        return kwargs
 
 
 class FileView(CanViewMixin, DetailView, FormMixin):
@@ -353,15 +330,12 @@ class FileView(CanViewMixin, DetailView, FormMixin):
     def get_success_url(self):
         return reverse(
             "core:file_detail",
-            kwargs={"file_id": self.object.id, "popup": self.kwargs.get("popup", "")},
+            kwargs={"file_id": self.object.id},
         )
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["popup"] = ""
         kwargs["form"] = self.form
-        if self.kwargs.get("popup") is not None:
-            kwargs["popup"] = "popup"
         kwargs["clipboard"] = SithFile.objects.filter(
             id__in=self.request.session["clipboard"]
         )
@@ -380,19 +354,17 @@ class FileDeleteView(AllowFragment, CanEditPropMixin, DeleteView):
             return self.request.GET["next"]
         if self.object.parent is None:
             return reverse(
-                "core:file_list", kwargs={"popup": self.kwargs.get("popup", "")}
+                "core:file_list",
             )
         return reverse(
             "core:file_detail",
             kwargs={
                 "file_id": self.object.parent.id,
-                "popup": self.kwargs.get("popup", ""),
             },
         )
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["popup"] = "" if self.kwargs.get("popup") is None else "popup"
         kwargs["next"] = self.request.GET.get("next", None)
         kwargs["previous"] = self.request.GET.get("previous", None)
         kwargs["current"] = self.request.path

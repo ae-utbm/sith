@@ -146,7 +146,7 @@ class TestUserProfilePicture:
         return client.post(
             reverse(
                 "core:file_delete",
-                kwargs={"file_id": user.profile_pict.pk, "popup": ""},
+                kwargs={"file_id": user.profile_pict.pk},
                 query={"next": user.get_absolute_url()},
             ),
         )

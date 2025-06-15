@@ -137,8 +137,3 @@ document.addEventListener("alpine:init", () => {
     },
   }));
 });
-
-$(() => {
-  // biome-ignore lint/suspicious/noExplicitAny: dealing with legacy jquery
-  ($("#products") as any).tabs();
-});
