@@ -18,6 +18,12 @@ class AlbumFilterSchema(FilterSchema):
     parent_id: int | None = Field(None, q="parent_id")
 
 
+class SimpleAlbumSchema(ModelSchema):
+    class Meta:
+        model = Album
+        fields = ["id", "name"]
+
+
 class AlbumSchema(ModelSchema):
     class Meta:
         model = Album
@@ -70,7 +76,7 @@ class PictureSchema(ModelSchema):
     full_size_url: str
     compressed_url: str
     thumb_url: str
-    album: str
+    album: SimpleAlbumSchema = Field(alias="parent")
     report_url: str
     edit_url: str
 

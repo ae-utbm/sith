@@ -22,11 +22,11 @@ document.addEventListener("alpine:init", () => {
       } as PicturesFetchPicturesData);
 
       this.albums = this.pictures.reduce(
-        (acc: Record<string, PictureSchema[]>, picture: PictureSchema) => {
-          if (!acc[picture.album]) {
-            acc[picture.album] = [];
+        (acc: Record<number, PictureSchema[]>, picture: PictureSchema) => {
+          if (!acc[picture.album.id]) {
+            acc[picture.album.id] = [];
           }
-          acc[picture.album].push(picture);
+          acc[picture.album.id].push(picture);
           return acc;
         },
         {},

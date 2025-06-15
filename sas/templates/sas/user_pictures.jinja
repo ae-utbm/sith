@@ -20,11 +20,11 @@
       {{ download_button(_("Download all my pictures")) }}
     {% endif %}
 
-    <template x-for="[album, pictures] in Object.entries(albums)" x-cloak>
+    <template x-for="[album_id, pictures] in Object.entries(albums)" x-cloak>
       <section>
         <br />
         <div class="row">
-          <h4 x-text="album"></h4>
+          <h4 x-text="pictures[0].album.name" :id="`album-${album_id}`"></h4>
           {% if user.id == object.id %}
             &nbsp;{{ download_button("") }}
           {% endif %}
