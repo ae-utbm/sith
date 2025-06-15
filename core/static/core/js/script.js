@@ -1,42 +1,4 @@
 $(() => {
-  // const buttons = $('.choose_file_button')
-  const popups = $(".choose_file_widget");
-  popups.dialog({
-    autoOpen: false,
-    modal: true,
-    width: "90%",
-    create: (event) => {
-      const target = $(event.target);
-      target.parent().css({
-        position: "fixed",
-        top: "5%",
-        bottom: "5%",
-      });
-      target.css("height", "300px");
-    },
-    buttons: [
-      {
-        text: "Choose",
-        click: function () {
-          $(`input[name=${$(this).attr("name")}]`).attr(
-            "value",
-            $("#file_id").attr("value"),
-          );
-          $(this).dialog("close");
-        },
-        disabled: true,
-      },
-    ],
-  });
-  $(".choose_file_button")
-    .button()
-    .on("click", function () {
-      const popup = popups.filter(`[name=${$(this).attr("name")}]`);
-      popup.html(
-        '<iframe src="/file/popup" width="100%" height="95%"></iframe><div id="file_id" value="null" />',
-      );
-      popup.dialog({ title: $(this).text() }).dialog("open");
-    });
   $("#quick_notif li").click(function () {
     $(this).hide();
   });

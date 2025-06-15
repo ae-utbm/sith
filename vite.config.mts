@@ -93,10 +93,6 @@ export default defineConfig((config: UserConfig) => {
             src: resolve(nodeModules, "jquery/dist/jquery.min.js"),
             dest: vendored,
           },
-          {
-            src: resolve(nodeModules, "jquery-ui/dist/jquery-ui.min.js"),
-            dest: vendored,
-          },
         ],
       }),
     ],
