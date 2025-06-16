@@ -19,6 +19,7 @@ from counter.models import (
     Counter,
     Customer,
     Eticket,
+    InvoiceCall,
     Product,
     Refilling,
     ReturnableProduct,
@@ -373,3 +374,35 @@ class BaseBasketForm(forms.BaseFormSet):
 BasketForm = forms.formset_factory(
     ProductForm, formset=BaseBasketForm, absolute_max=None, min_num=1
 )
+
+
+class InvoiceCallForm(forms.Form):
+    def __init__(self, *args, month=None, clubs=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.month = month
+        self.clubs = clubs
+
+        for club in self.clubs:
+            field_name = f"club_{club.id}"
+            initial = (
+                InvoiceCall.objects.filter(club=club, month=month)
+                .values_list("is_validated", flat=True)
+                .first()
+            )
+
+            self.fields[field_name] = forms.BooleanField(
+                required=False,
+                initial=initial,
+            )
+
+    def save(self):
+        for club in self.clubs:
+            field_name = f"club_{club.id}"
+            is_validated = self.cleaned_data.get(field_name, False)
+
+            InvoiceCall.objects.update_or_create(
+                month=self.month, club=club, defaults={"is_validated": is_validated}
+            )
+
+    def get_club_name(self, club_id):
+        return f"club_{club_id}"

@@ -1407,7 +1407,7 @@ class MonthField(models.CharField):
 
 
 class InvoiceCall(models.Model):
-    is_validated = models.BooleanField(verbose_name=_("is validated"))
+    is_validated = models.BooleanField(verbose_name=_("is validated"), default=False)
     club = models.ForeignKey(Club, on_delete=models.CASCADE)
     month = MonthField(verbose_name=_("invoice date"))
 
