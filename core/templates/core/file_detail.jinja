@@ -45,7 +45,7 @@
             {% else %}
               <i class="fa fa-file" aria-hidden="true"></i>
             {% endif %}
-            <a href="{{ url('core:file_detail', file_id=f.id, popup=popup) }}">{{ f.get_display_name() }}</a></li>
+            <a href="{{ url('core:file_detail', file_id=f.id) }}">{{ f.get_display_name() }}</a></li>
         {% endfor %}
       </ul>
     </form>
@@ -59,22 +59,9 @@
     <p><a href="{{ url('core:download', file_id=file.id) }}">{% trans %}Download{% endtrans %}</a></p>
   {% endif %}
   {% if not file.home_of and not file.home_of_club and file.parent %}
-    <p><a href="{{ url('core:file_delete', file_id=file.id, popup=popup) }}">{% trans %}Delete{% endtrans %}</a></p>
+    <p><a href="{{ url('core:file_delete', file_id=file.id) }}">{% trans %}Delete{% endtrans %}</a></p>
   {% endif %}
   {% if user.is_com_admin %}
     <p><a href="{{ url('core:file_moderate', file_id=file.id) }}">{% trans %}Moderate{% endtrans %}</a></p>
   {% endif %}
 {% endblock %}
-
-{% block script %}
-  {{ super() }}
-  <script>
-    {% if popup and file.is_file %}
-      parent.$("#file_id").replaceWith('<div id="file_id" value="{{ file.id }}">{{ file.name }}</div>');
-      parent.$(".ui-dialog-buttonpane button").button("option", "disabled", false);
-    {% endif %}
-  </script>
-{% endblock %}
-
-
-

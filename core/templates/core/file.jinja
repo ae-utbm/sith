@@ -19,9 +19,9 @@
 {% macro print_file_name(file) %}
   {% if file %}
     {{ print_file_name(file.parent) }} >
-    <a href="{{ url('core:file_detail', file_id=file.id, popup=popup) }}">{{ file.get_display_name() }}</a>
+    <a href="{{ url('core:file_detail', file_id=file.id) }}">{{ file.get_display_name() }}</a>
   {% else %}
-    <a href="{{ url('core:file_list', popup) }}">{% trans %}Files{% endtrans %}</a>
+    <a href="{{ url('core:file_list') }}">{% trans %}Files{% endtrans %}</a>
   {% endif %}
 {% endmacro %}
 
@@ -33,16 +33,16 @@
       <div>
         {% set home = user.home %}
         {% if home %}
-          <a href="{{ url('core:file_detail', home.id, popup) }}">{% trans %}My files{% endtrans %}</a>
+          <a href="{{ url('core:file_detail', home.id) }}">{% trans %}My files{% endtrans %}</a>
         {% endif %}
       </div>
       {% if file %}
-        <a href="{{ url('core:file_detail', file.id, popup) }}">{% trans %}View{% endtrans %}</a>
+        <a href="{{ url('core:file_detail', file.id) }}">{% trans %}View{% endtrans %}</a>
         {% if can_edit(file, user) %}
-          <a href="{{ url('core:file_edit', file_id=file.id, popup=popup) }}">{% trans %}Edit{% endtrans %}</a>
+          <a href="{{ url('core:file_edit', file_id=file.id) }}">{% trans %}Edit{% endtrans %}</a>
         {% endif %}
         {% if can_edit_prop(file, user) %}
-          <a href="{{ url('core:file_prop', file_id=file.id, popup=popup) }}">{% trans %}Prop{% endtrans %}</a>
+          <a href="{{ url('core:file_prop', file_id=file.id) }}">{% trans %}Prop{% endtrans %}</a>
         {% endif %}
       {% endif %}
     </div>

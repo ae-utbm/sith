@@ -45,7 +45,7 @@ msgstr "Comment utiliser le lien du calendrier"
 msgid "Link copied"
 msgstr "Lien copié"
 
-#: com/static/bundled/com/components/moderation-alert-index.ts
+#: com/static/bundled/com/moderation-alert-index.ts
 #, javascript-format
 msgid ""
 "This event will take place every week for %s weeks. If you publish or delete "

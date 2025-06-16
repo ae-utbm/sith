@@ -86,30 +86,6 @@ class NFCTextInput(TextInput):
         return context
 
 
-class SelectFile(TextInput):
-    def render(self, name, value, attrs=None, renderer=None):
-        if attrs:
-            attrs["class"] = "select_file"
-        else:
-            attrs = {"class": "select_file"}
-        output = (
-            '%(content)s<div name="%(name)s" class="choose_file_widget" title="%(title)s"></div>'
-            % {
-                "content": super().render(name, value, attrs, renderer),
-                "title": _("Choose file"),
-                "name": name,
-            }
-        )
-        output += (
-            '<span name="'
-            + name
-            + '" class="choose_file_button">'
-            + gettext("Choose file")
-            + "</span>"
-        )
-        return output
-
-
 class SelectUser(TextInput):
     def render(self, name, value, attrs=None, renderer=None):
         if attrs:

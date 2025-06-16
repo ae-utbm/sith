@@ -14,10 +14,6 @@
       <link rel="stylesheet" href="{{ static('core/pagination.scss') }}">
       <link rel="stylesheet" href="{{ static('core/accordion.scss') }}">
 
-      {% block jquery_css %}
-        {# Thile file is quite heavy (around 250kb), so declaring it in a block allows easy removal #}
-        <link rel="stylesheet" href="{{ static('bundled/jquery-ui-index.css') }}">
-      {% endblock %}
       <link rel="preload" as="style" href="{{ static('bundled/fontawesome-index.css') }}" onload="this.onload=null;this.rel='stylesheet'">
       <noscript><link rel="stylesheet" href="{{ static('bundled/fontawesome-index.css') }}"></noscript>
 
@@ -30,10 +26,7 @@
 
       <!-- Jquery declared here to be accessible in every django widgets -->
       <script src="{{ static('bundled/vendored/jquery.min.js') }}"></script>
-      <script src="{{ static('bundled/vendored/jquery-ui.min.js') }}"></script>
       <script src="{{ static('core/js/script.js') }}"></script>
-
-
 
       {% block additional_css %}{% endblock %}
       {% block additional_js %}{% endblock %}
@@ -47,35 +40,28 @@
     {% csrf_token %}
 
     {% block header %}
-      {% if not popup %}
-        {% include "core/base/header.jinja" %}
+      {% include "core/base/header.jinja" %}
 
-        {% block info_boxes %}
-          <div id="info_boxes">
-            {% set sith = get_sith() %}
-            {% if sith.alert_msg %}
-              <div id="alert_box">
-                {{ sith.alert_msg|markdown }}
-              </div>
-            {% endif %}
-            {% if sith.info_msg %}
-              <div id="info_box">
-                {{ sith.info_msg|markdown }}
-              </div>
-            {% endif %}
-          </div>
-        {% endblock %}
-
-      {% else %}
-        <div id="popupheader">{{ user.get_display_name() }}</div>
-      {% endif %}
+      {% block info_boxes %}
+        <div id="info_boxes">
+          {% set sith = get_sith() %}
+          {% if sith.alert_msg %}
+            <div id="alert_box">
+              {{ sith.alert_msg|markdown }}
+            </div>
+          {% endif %}
+          {% if sith.info_msg %}
+            <div id="info_box">
+              {{ sith.info_msg|markdown }}
+            </div>
+          {% endif %}
+        </div>
+      {% endblock %}
 
     {% endblock %}
 
     {% block nav %}
-      {% if not popup %}
-        {% include "core/base/navbar.jinja" %}
-      {% endif %}
+      {% include "core/base/navbar.jinja" %}
     {% endblock %}
 
     <div id="page">
@@ -102,24 +88,22 @@
       </div>
     </div>
 
-    {% if not popup %}
-      <footer>
-        {% block footer %}
-          <div>
-            <a href="{{ url('core:page', 'contacts') }}">{% trans %}Contacts{% endtrans %}</a>
-            <a href="{{ url('core:page', 'legals') }}">{% trans %}Legal notices{% endtrans %}</a>
-            <a href="{{ url('core:page', 'copyright_agent') }}">{% trans %}Intellectual property{% endtrans %}</a>
-            <a href="{{ url('core:page', 'docs') }}">{% trans %}Help & Documentation{% endtrans %}</a>
-            <a href="{{ url('core:page', 'rd') }}">{% trans %}R&D{% endtrans %}</a>
-          </div>
-          <a rel="nofollow" href="https://github.com/ae-utbm/sith" target="#">
-            <i class="fa-brands fa-github"></i>
-            {% trans %}Site created by the IT Department of the AE{% endtrans %}
-          </a>
-        {% endblock %}
-        <br>
-      </footer>
-    {% endif %}
+    <footer>
+      {% block footer %}
+        <div>
+          <a href="{{ url('core:page', 'contacts') }}">{% trans %}Contacts{% endtrans %}</a>
+          <a href="{{ url('core:page', 'legals') }}">{% trans %}Legal notices{% endtrans %}</a>
+          <a href="{{ url('core:page', 'copyright_agent') }}">{% trans %}Intellectual property{% endtrans %}</a>
+          <a href="{{ url('core:page', 'docs') }}">{% trans %}Help & Documentation{% endtrans %}</a>
+          <a href="{{ url('core:page', 'rd') }}">{% trans %}R&D{% endtrans %}</a>
+        </div>
+        <a rel="nofollow" href="https://github.com/ae-utbm/sith" target="#">
+          <i class="fa-brands fa-github"></i>
+          {% trans %}Site created by the IT Department of the AE{% endtrans %}
+        </a>
+      {% endblock %}
+      <br>
+    </footer>
 
     {% block script %}
       <script>
