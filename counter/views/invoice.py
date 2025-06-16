@@ -30,6 +30,19 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
     template_name = "counter/invoices_call.jinja"
     current_tab = "invoices_call"
 
+    def get(self, request, *args, **kwargs):
+        month_str = request.GET.get("month")
+
+        if month_str:
+            try:
+                start_date = datetime.strptime(month_str, "%Y-%m").date()
+                today = timezone.now().date().replace(day=1)
+                if start_date > today:
+                    return redirect("counter:invoices_call")
+            except ValueError:
+                return redirect("counter:invoices_call")
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         """Add sums to the context."""
         kwargs = super().get_context_data(**kwargs)
@@ -37,7 +50,10 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
         month_str = self.request.GET.get("month")
 
         if month_str:
-            start_date = datetime.strptime(self.request.GET["month"], "%Y-%m")
+            try:
+                start_date = datetime.strptime(self.request.GET["month"], "%Y-%m")
+            except ValueError:
+                return redirect("counter:invoices_call")
         else:
             start_date = datetime(
                 year=timezone.now().year,
@@ -128,9 +144,7 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
             date__month=start_date.month,
         )
 
-        clubs = Club.objects.annotate(has_selling=Exists(selling_subquery)).filter(
-            has_selling=True
-        )
+        clubs = Club.objects.filter(Exists(selling_subquery))
 
         form = InvoiceCallForm(request.POST, clubs=clubs, month=month_str)
 
