@@ -805,6 +805,8 @@ class Command(BaseCommand):
                         "add_peoplepicturerelation",
                         "add_page",
                         "add_quickuploadimage",
+                        "view_club",
+                        "access_lookup",
                     ]
                 )
             )

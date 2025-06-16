@@ -20,13 +20,6 @@
             - CanCreateMixin
             - CanEditMixin
             - CanViewMixin
+            - CanEditPropMixin
             - FormerSubscriberMixin
             - PermissionOrAuthorRequiredMixin
-
-
-## API Permissions
-
-::: core.auth.api_permissions
-    handler: python
-    options:
-        heading_level: 3

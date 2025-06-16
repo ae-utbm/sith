@@ -1,9 +1,10 @@
 from ninja import ModelSchema
 
-from club.models import Club
+from club.models import Club, Membership
+from core.schemas import SimpleUserSchema
 
 
-class ClubSchema(ModelSchema):
+class SimpleClubSchema(ModelSchema):
     class Meta:
         model = Club
         fields = ["id", "name"]
@@ -21,3 +22,19 @@ class ClubProfileSchema(ModelSchema):
     @staticmethod
     def resolve_url(obj: Club) -> str:
         return obj.get_absolute_url()
+
+
+class ClubMemberSchema(ModelSchema):
+    class Meta:
+        model = Membership
+        fields = ["start_date", "end_date", "role", "description"]
+
+    user: SimpleUserSchema
+
+
+class ClubSchema(ModelSchema):
+    class Meta:
+        model = Club
+        fields = ["id", "name", "logo", "is_active", "short_description", "address"]
+
+    members: list[ClubMemberSchema]

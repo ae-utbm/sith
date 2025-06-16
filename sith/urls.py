@@ -12,23 +12,20 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.http import Http404
 from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
-from ninja_extra import NinjaExtraAPI
+
+from api.urls import api
 
 js_info_dict = {"packages": ("sith",)}
 
 handler403 = "core.views.forbidden"
 handler404 = "core.views.not_found"
 handler500 = "core.views.internal_servor_error"
-
-api = NinjaExtraAPI(version="0.2.0", urls_namespace="api", csrf=True)
-api.auto_discover_controllers()
 
 urlpatterns = [
     path("", include(("core.urls", "core"), namespace="core")),

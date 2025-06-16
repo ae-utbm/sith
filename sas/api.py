@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import F
 from django.urls import reverse
 from ninja import Body, File, Query
+from ninja.security import SessionAuth
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import NotFound, PermissionDenied
 from ninja_extra.pagination import PageNumberPaginationExtra
@@ -12,7 +13,8 @@ from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 from pydantic import NonNegativeInt
 
-from core.auth.api_permissions import (
+from api.auth import ApiKeyAuth
+from api.permissions import (
     CanAccessLookup,
     CanEdit,
     CanView,
@@ -53,6 +55,7 @@ class AlbumController(ControllerBase):
     @route.get(
         "/autocomplete-search",
         response=PaginatedResponseSchema[AlbumAutocompleteSchema],
+        auth=[SessionAuth(), ApiKeyAuth()],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)

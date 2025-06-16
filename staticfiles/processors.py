@@ -11,7 +11,7 @@ import rjsmin
 import sass
 from django.conf import settings
 
-from sith.urls import api
+from api.urls import api
 from staticfiles.apps import BUNDLED_FOLDER_NAME, BUNDLED_ROOT, GENERATED_ROOT
 
 

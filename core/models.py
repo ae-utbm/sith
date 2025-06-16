@@ -754,6 +754,23 @@ class UserBan(models.Model):
         return f"Ban of user {self.user.id}"
 
 
+class GlobalPermissionRights(models.Model):
+    """Little hack to have permissions not linked to a specific db table."""
+
+    class Meta:
+        # No database table creation or deletion
+        # operations will be performed for this model.
+        managed = False
+
+        # disable "add", "change", "delete" and "view" default permissions
+        default_permissions = []
+
+        permissions = [("access_lookup", "Can access any lookup in the sith")]
+
+    def __str__(self):
+        return self.__class__.__name__
+
+
 class Preferences(models.Model):
     user = models.OneToOneField(
         User, related_name="_preferences", on_delete=models.CASCADE
