@@ -34,7 +34,7 @@
             <td>{{ data.club.name }}</td>
             <td>{{"%.2f"|format(data.sum)}} €</td>
             <td>
-            {{ form[form.get_club_name(data.club.id)] }}
+              {{ form[form.get_club_name(data.club.id)] }}
             </td>
           </tr>
         {% endfor %}
