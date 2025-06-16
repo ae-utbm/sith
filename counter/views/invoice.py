@@ -21,6 +21,7 @@ from django.utils import timezone
 from django.views.generic import TemplateView
 
 from counter.fields import CurrencyField
+from counter.forms import InvoiceCallForm
 from counter.models import Club, InvoiceCall, Refilling, Selling
 from counter.views.mixins import CounterAdminMixin, CounterAdminTabsMixin
 
@@ -87,10 +88,28 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
         clubs = Club.objects.filter(name__in=club_names)
 
         invoice_calls = InvoiceCall.objects.filter(month=month_str, club__in=clubs)
-
         invoice_statuses = {ic.club.name: ic.is_validated for ic in invoice_calls}
 
-        kwargs["validated"] = invoice_statuses
+        kwargs["form"] = InvoiceCallForm(clubs=clubs, month=month_str)
+
+        kwargs["club_data"] = []
+        for club in clubs:
+            selling_sum = next(
+                (
+                    item["selling_sum"]
+                    for item in kwargs["sums"]
+                    if item["club__name"] == club.name
+                ),
+                0,
+            )
+            kwargs["club_data"].append(
+                {
+                    "club": club,
+                    "sum": selling_sum,
+                    "validated": invoice_statuses.get(club.name, False),
+                }
+            )
+
         return kwargs
 
     def post(self, request, *args, **kwargs):
@@ -113,10 +132,9 @@ class InvoiceCallView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
             has_selling=True
         )
 
-        for club in clubs:
-            is_checked = f"validate_{club.name}" in request.POST
+        form = InvoiceCallForm(request.POST, clubs=clubs, month=month_str)
 
-            InvoiceCall.objects.update_or_create(
-                month=month_str, club=club, defaults={"is_validated": is_checked}
-            )
+        if form.is_valid():
+            form.save()
+
         return redirect(f"{request.path}?month={request.POST.get('month', '')}")

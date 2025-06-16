@@ -29,12 +29,12 @@
         <td>{% trans %}Validated{% endtrans %}</td>
       </thead>
       <tbody>
-        {% for i in sums %}
+        {% for data in club_data %}
           <tr>
-            <td>{{ i['club__name'] }}</td>
-            <td>{{"%.2f"|format(i['selling_sum'])}} €</td>
+            <td>{{ data.club.name }}</td>
+            <td>{{"%.2f"|format(data.sum)}} €</td>
             <td>
-              <input type="checkbox" name="validate_{{ i['club__name'] }}" {% if validated[i['club__name']] %}checked{% endif %}>
+            {{ form[form.get_club_name(data.club.id)] }}
             </td>
           </tr>
         {% endfor %}
