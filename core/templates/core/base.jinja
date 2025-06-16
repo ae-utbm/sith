@@ -108,18 +108,28 @@
     {% block script %}
       <script>
         const menuItems = document.querySelectorAll(".navbar details[name='navbar'].menu");
-        const isMobile = () => {
+        const isDesktop = () => {
           return window.innerWidth >= 500;
         }
         for (const item of menuItems){
           item.addEventListener("mouseover", () => {
-            if (isMobile()){
+            if (isDesktop()){
               item.setAttribute("open", "");
             }
           })
           item.addEventListener("mouseout", () => {
-            if (isMobile()){
+            if (isDesktop()){
               item.removeAttribute("open");
+            }
+          })
+          item.addEventListener("click", (event) => {
+            // Ignore keyboard clicks
+            if (event.detail === 0){
+              return;
+            }
+
+            if (isDesktop()){
+              event.preventDefault();
             }
           })
         }
