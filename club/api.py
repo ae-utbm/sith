@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from annotated_types import MinLen
+from django.db.models import Prefetch
 from ninja.security import SessionAuth
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
@@ -8,7 +9,7 @@ from ninja_extra.schemas import PaginatedResponseSchema
 
 from api.auth import ApiKeyAuth
 from api.permissions import CanAccessLookup, HasPerm
-from club.models import Club
+from club.models import Club, Membership
 from club.schemas import ClubSchema, SimpleClubSchema
 
 
@@ -33,6 +34,9 @@ class ClubController(ControllerBase):
         url_name="fetch_club",
     )
     def fetch_club(self, club_id: int):
+        prefetch = Prefetch(
+            "members", queryset=Membership.objects.ongoing().select_related("user")
+        )
         return self.get_object_or_exception(
-            Club.objects.prefetch_related("members", "members__user"), id=club_id
+            Club.objects.prefetch_related(prefetch), id=club_id
         )
