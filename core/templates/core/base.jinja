@@ -123,8 +123,11 @@
             }
           })
           item.addEventListener("click", (event) => {
-            // Ignore keyboard clicks
-            if (event.detail === 0){
+            // Don't close when clicking on desktop mode
+            if (
+              event.target.nodeName !== "SUMMARY"
+              || event.detail === 0
+            ){
               return;
             }
 
