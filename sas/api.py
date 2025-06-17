@@ -2,9 +2,9 @@ from typing import Any, Literal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models import F
 from django.urls import reverse
 from ninja import Body, File, Query
+from ninja.security import SessionAuth
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import NotFound, PermissionDenied
 from ninja_extra.pagination import PageNumberPaginationExtra
@@ -12,7 +12,8 @@ from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 from pydantic import NonNegativeInt
 
-from core.auth.api_permissions import (
+from api.auth import ApiKeyAuth
+from api.permissions import (
     CanAccessLookup,
     CanEdit,
     CanView,
@@ -53,6 +54,7 @@ class AlbumController(ControllerBase):
     @route.get(
         "/autocomplete-search",
         response=PaginatedResponseSchema[AlbumAutocompleteSchema],
+        auth=[SessionAuth(), ApiKeyAuth()],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
@@ -102,8 +104,7 @@ class PicturesController(ControllerBase):
             filters.filter(Picture.objects.viewable_by(user))
             .distinct()
             .order_by("-parent__date", "date")
-            .select_related("owner")
-            .annotate(album=F("parent__name"))
+            .select_related("owner", "parent")
         )
 
     @route.post(
@@ -150,7 +151,9 @@ class PicturesController(ControllerBase):
 
     @route.put("/{picture_id}/identified", permissions=[IsAuthenticated, CanView])
     def identify_users(self, picture_id: NonNegativeInt, users: set[NonNegativeInt]):
-        picture = self.get_object_or_exception(Picture, pk=picture_id)
+        picture = self.get_object_or_exception(
+            Picture.objects.select_related("parent"), pk=picture_id
+        )
         db_users = list(User.objects.filter(id__in=users))
         if len(users) != len(db_users):
             raise NotFound
@@ -163,13 +166,15 @@ class PicturesController(ControllerBase):
         ]
         PeoplePictureRelation.objects.bulk_create(relations)
         for u in identified:
+            html_id = f"album-{picture.parent_id}"
+            url = reverse(
+                "sas:user_pictures", kwargs={"user_id": u.id}, fragment=html_id
+            )
             Notification.objects.get_or_create(
                 user=u,
                 viewed=False,
                 type="NEW_PICTURES",
-                defaults={
-                    "url": reverse("sas:user_pictures", kwargs={"user_id": u.id})
-                },
+                defaults={"url": url, "param": picture.parent.name},
             )
 
     @route.delete("/{picture_id}", permissions=[IsSasAdmin])

@@ -23,7 +23,6 @@
 #
 from __future__ import annotations
 
-import importlib
 import logging
 import os
 import string
@@ -51,6 +50,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.html import escape
+from django.utils.module_loading import import_string
 from django.utils.timezone import localdate, now
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
@@ -754,6 +754,23 @@ class UserBan(models.Model):
         return f"Ban of user {self.user.id}"
 
 
+class GlobalPermissionRights(models.Model):
+    """Little hack to have permissions not linked to a specific db table."""
+
+    class Meta:
+        # No database table creation or deletion
+        # operations will be performed for this model.
+        managed = False
+
+        # disable "add", "change", "delete" and "view" default permissions
+        default_permissions = []
+
+        permissions = [("access_lookup", "Can access any lookup in the sith")]
+
+    def __str__(self):
+        return self.__class__.__name__
+
+
 class Preferences(models.Model):
     user = models.OneToOneField(
         User, related_name="_preferences", on_delete=models.CASCADE
@@ -1434,6 +1451,10 @@ class PageRev(models.Model):
         return self.page.can_be_edited_by(user)
 
 
+def get_notification_types():
+    return settings.SITH_NOTIFICATIONS
+
+
 class Notification(models.Model):
     user = models.ForeignKey(
         User, related_name="notifications", on_delete=models.CASCADE
@@ -1441,9 +1462,9 @@ class Notification(models.Model):
     url = models.CharField(_("url"), max_length=255)
     param = models.CharField(_("param"), max_length=128, default="")
     type = models.CharField(
-        _("type"), max_length=32, choices=settings.SITH_NOTIFICATIONS, default="GENERIC"
+        _("type"), max_length=32, choices=get_notification_types, default="GENERIC"
     )
-    date = models.DateTimeField(_("date"), default=timezone.now)
+    date = models.DateTimeField(_("date"), auto_now=True)
     viewed = models.BooleanField(_("viewed"), default=False, db_index=True)
 
     def __str__(self):
@@ -1452,22 +1473,24 @@ class Notification(models.Model):
         return self.get_type_display()
 
     def save(self, *args, **kwargs):
-        if not self.id and self.type in settings.SITH_PERMANENT_NOTIFICATIONS:
+        if self._state.adding and self.type in settings.SITH_PERMANENT_NOTIFICATIONS:
             old_notif = self.user.notifications.filter(type=self.type).last()
             if old_notif:
                 old_notif.callback()
                 old_notif.save()
                 return
+            # if this permanent notification is the first one,
+            # go into the callback nonetheless, because the logic
+            # to set Notification.param is here
+            # (please don't be mad at me, I'm not the one who cooked this spaghetti)
+            self.callback()
         super().save(*args, **kwargs)
 
     def callback(self):
-        # Get the callback defined in settings to update existing
-        # notifications
-        mod_name, func_name = settings.SITH_PERMANENT_NOTIFICATIONS[self.type].rsplit(
-            ".", 1
-        )
-        mod = importlib.import_module(mod_name)
-        getattr(mod, func_name)(self)
+        func_name = settings.SITH_PERMANENT_NOTIFICATIONS.get(self.type)
+        if not func_name:
+            return
+        import_string(func_name)(self)
 
 
 class Gift(models.Model):

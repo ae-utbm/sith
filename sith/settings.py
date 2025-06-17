@@ -124,6 +124,7 @@ INSTALLED_APPS = (
     "pedagogy",
     "galaxy",
     "antispam",
+    "api",
 )
 
 MIDDLEWARE = (
@@ -676,7 +677,7 @@ SITH_NOTIFICATIONS = [
     ("NEWS_MODERATION", _("There are %s fresh news to be moderated")),
     ("FILE_MODERATION", _("New files to be moderated")),
     ("SAS_MODERATION", _("There are %s pictures to be moderated in the SAS")),
-    ("NEW_PICTURES", _("You've been identified on some pictures")),
+    ("NEW_PICTURES", _("You've been identified in album %s")),
     ("REFILLING", _("You just refilled of %s €")),
     ("SELLING", _("You just bought %s")),
     ("GENERIC", _("You have a notification")),

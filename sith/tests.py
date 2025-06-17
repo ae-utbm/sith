@@ -1,7 +1,7 @@
 from contextlib import nullcontext as does_not_raise
 
 import pytest
-from _pytest.python_api import RaisesContext
+from _pytest.raises import RaisesExc
 from django.test import Client
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -23,7 +23,7 @@ def test_sentry_debug_endpoint(
     client: Client,
     sentry_dsn: str,
     sentry_env: str,
-    expected_error: RaisesContext[ZeroDivisionError] | does_not_raise[None],
+    expected_error: RaisesExc[ZeroDivisionError] | does_not_raise[None],
     expected_return_code: int | None,
 ):
     with (

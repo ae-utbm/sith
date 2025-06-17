@@ -16,11 +16,13 @@ from django.conf import settings
 from django.db.models import F
 from django.shortcuts import get_object_or_404
 from ninja import Query
+from ninja.security import SessionAuth
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
-from core.auth.api_permissions import CanAccessLookup, CanView, IsInGroup, IsRoot
+from api.auth import ApiKeyAuth
+from api.permissions import CanAccessLookup, CanView, IsInGroup, IsRoot
 from counter.models import Counter, Product, ProductType
 from counter.schemas import (
     CounterFilterSchema,
@@ -62,6 +64,7 @@ class CounterController(ControllerBase):
     @route.get(
         "/search",
         response=PaginatedResponseSchema[SimplifiedCounterSchema],
+        auth=[SessionAuth(), ApiKeyAuth()],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
@@ -74,6 +77,7 @@ class ProductController(ControllerBase):
     @route.get(
         "/search",
         response=PaginatedResponseSchema[SimpleProductSchema],
+        auth=[SessionAuth(), ApiKeyAuth()],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)

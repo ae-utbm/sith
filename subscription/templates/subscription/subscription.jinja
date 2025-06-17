@@ -12,6 +12,7 @@
    So we give them here.
    If the aforementioned bug is resolved, you can remove this. #}
 {% block additional_js %}
+  <script type="module" src="{{ static('bundled/core/components/tabs-index.ts') }}"></script>
   <script type="module" src="{{ static("bundled/core/components/ajax-select-index.ts") }}"></script>
   <script
     type="module"
@@ -19,6 +20,7 @@
   ></script>
 {% endblock %}
 {% block additional_css %}
+  <link rel="stylesheet" href="{{ static("core/components/tabs.scss") }}">
   <link rel="stylesheet" href="{{ static("bundled/core/components/ajax-select-index.css") }}">
   <link rel="stylesheet" href="{{ static("core/components/ajax-select.scss") }}">
   <link rel="stylesheet" href="{{ static("subscription/css/subscription.scss") }}">
@@ -34,12 +36,12 @@
 
 {% block content %}
   <h3>{% trans %}New subscription{% endtrans %}</h3>
-  <div id="subscription-form">
-    {% with title1=_("Existing member"), title2=_("New member") %}
-      {{ tabs([
-      (title1, form_fragment(existing_user_form, existing_user_post_url)),
-      (title2, form_fragment(new_user_form, new_user_post_url)),
-      ]) }}
-    {% endwith %}
-  </div>
+  <ui-tab-group id="subscription-form">
+    <ui-tab title="{% trans %}Existing member{% endtrans %}" active>
+      {{ form_fragment(existing_user_form, existing_user_post_url) }}
+    </ui-tab>
+    <ui-tab title="{% trans %}New member{% endtrans %}">
+      {{ form_fragment(new_user_form, new_user_post_url) }}
+    </ui-tab>
+  </ui-tab-group>
 {% endblock %}

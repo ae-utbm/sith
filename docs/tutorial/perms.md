@@ -606,4 +606,4 @@ vous ne devriez pas être perdu, étant donné
 que le système de permissions de l'API utilise
 des noms assez similaires : `IsInGroup`, `IsRoot`, `IsSubscriber`...
 Vous pouvez trouver des exemples d'utilisation de ce système
-dans [cette partie](../reference/core/api_permissions.md).
+dans [cette partie](../reference/api/perms.md).

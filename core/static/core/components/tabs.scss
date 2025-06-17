@@ -1,0 +1,53 @@
+@import "core/static/core/colors";
+
+ui-tab-group {
+  *[hidden] {
+    display: none;
+  }
+
+  .tabs {
+    border-radius: 5px;
+
+    .tab-headers {
+      display: flex;
+      flex-flow: row wrap;
+      background-color: $primary-neutral-light-color;
+      padding: 3px 12px 12px;
+      column-gap: 20px;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+
+      .tab-header {
+        border: none;
+        padding-right: 0;
+        padding-left: 0;
+        font-size: 120%;
+        background-color: unset;
+        position: relative;
+
+        &:after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          border-bottom: 4px solid darken($primary-neutral-light-color, 10%);
+          border-radius: 2px;
+          transition: all 0.2s ease-in-out;
+        }
+
+        &:hover:after {
+          border-bottom-color: darken($primary-neutral-light-color, 20%);
+        }
+
+        &.active:after {
+          border-bottom-color: $primary-dark-color;
+        }
+      }
+    }
+
+    section {
+      padding: 20px;
+    }
+  }
+}

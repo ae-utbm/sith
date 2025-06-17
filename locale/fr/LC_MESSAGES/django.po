@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-04 09:58+0200\n"
+"POT-Creation-Date: 2025-06-16 14:54+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -34,6 +34,68 @@ msgid ""
 msgstr ""
 "True si gardé à jour par le biais d'un fournisseur externe de domains "
 "toxics, False sinon"
+
+#: api/admin.py
+#, python-format
+msgid ""
+"The API key for %(name)s is: %(key)s. Please store it somewhere safe: you "
+"will not be able to see it again."
+msgstr ""
+"La clef d'API pour %(name)s est : %(key)s. Gardez-là dans un emplacement "
+"sûr : vous ne pourrez pas la revoir à nouveau."
+
+#: api/admin.py
+msgid "Revoke selected API keys"
+msgstr "Révoquer les clefs d'API sélectionnées"
+
+#: api/models.py club/models.py com/models.py counter/models.py forum/models.py
+msgid "name"
+msgstr "nom"
+
+#: api/models.py core/models.py
+msgid "owner"
+msgstr "propriétaire"
+
+#: api/models.py core/models.py
+msgid "groups"
+msgstr "groupes"
+
+#: api/models.py
+msgid "client permissions"
+msgstr "permissions du client"
+
+#: api/models.py
+msgid "Specific permissions for this api client."
+msgstr "Permissions spécifiques pour ce client d'API"
+
+#: api/models.py
+msgid "api client"
+msgstr "client d'api"
+
+#: api/models.py
+msgid "api clients"
+msgstr "clients d'api"
+
+#: api/models.py
+msgid "prefix"
+msgstr "préfixe"
+
+#: api/models.py
+msgid "hashed key"
+msgstr "hash de la clef"
+
+#: api/models.py
+msgctxt "api key"
+msgid "revoked"
+msgstr "révoquée"
+
+#: api/models.py
+msgid "api key"
+msgstr "clef d'api"
+
+#: api/models.py
+msgid "api keys"
+msgstr "clefs d'api"
 
 #: club/forms.py
 msgid "Users to add"
@@ -118,10 +180,6 @@ msgstr "Vous devez choisir un rôle"
 #: club/forms.py sas/forms.py
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
-
-#: club/models.py com/models.py counter/models.py forum/models.py
-msgid "name"
-msgstr "nom"
 
 #: club/models.py
 msgid "slug name"
@@ -669,8 +727,7 @@ msgstr "message d'info"
 msgid "weekmail destinations"
 msgstr "destinataires du weekmail"
 
-#: com/models.py core/templates/core/macros.jinja election/models.py
-#: forum/models.py pedagogy/models.py
+#: com/models.py election/models.py forum/models.py pedagogy/models.py
 msgid "title"
 msgstr "titre"
 
@@ -1095,7 +1152,7 @@ msgstr "Nouvel article"
 msgid "Articles in no weekmail yet"
 msgstr "Articles dans aucun weekmail"
 
-#: com/templates/com/weekmail.jinja core/templates/core/macros.jinja
+#: com/templates/com/weekmail.jinja
 msgid "Content"
 msgstr "Contenu"
 
@@ -1256,10 +1313,6 @@ msgstr "surnom"
 #: core/models.py
 msgid "last update"
 msgstr "dernière mise à jour"
-
-#: core/models.py
-msgid "groups"
-msgstr "groupes"
 
 #: core/models.py
 msgid ""
@@ -1496,10 +1549,6 @@ msgstr "version allégée"
 #: core/models.py
 msgid "thumbnail"
 msgstr "miniature"
-
-#: core/models.py
-msgid "owner"
-msgstr "propriétaire"
 
 #: core/models.py
 msgid "edit group"
@@ -2724,10 +2773,6 @@ msgstr "Erreur d'envoi du fichier %(file_name)s : %(msg)s"
 #: core/views/files.py sas/forms.py
 msgid "Apply rights recursively"
 msgstr "Appliquer les droits récursivement"
-
-#: core/views/forms.py
-msgid "Choose file"
-msgstr "Choisir un fichier"
 
 #: core/views/forms.py
 msgid "Choose user"
@@ -5058,8 +5103,9 @@ msgid "There are %s pictures to be moderated in the SAS"
 msgstr "Il y a %s photos à modérer dans le SAS"
 
 #: sith/settings.py
-msgid "You've been identified on some pictures"
-msgstr "Vous avez été identifié sur des photos"
+#, python-format
+msgid "You've been identified in album %s"
+msgstr "Vous avez été identifié dans l'album %s"
 
 #: sith/settings.py
 #, python-format

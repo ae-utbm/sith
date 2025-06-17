@@ -37,8 +37,6 @@ from core.views.forms import LoginForm
 
 def forbidden(request, exception):
     context = {"next": request.path, "form": LoginForm()}
-    if popup := request.resolver_match.kwargs.get("popup"):
-        context["popup"] = popup
     return HttpResponseForbidden(render(request, "core/403.jinja", context=context))
 
 
