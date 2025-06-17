@@ -25,11 +25,10 @@ from django.core.cache import cache
 from django.db import models
 from django.db.models import Exists, OuterRef, Q
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
 
-from core.models import SithFile, User
+from core.models import Notification, SithFile, User
 from core.utils import exif_auto_rotate, resize_image
 
 
@@ -256,14 +255,10 @@ class Album(SasFile):
             self.save()
 
 
-def sas_notification_callback(notif):
+def sas_notification_callback(notif: Notification):
     count = Picture.objects.filter(is_moderated=False).count()
-    if count:
-        notif.viewed = False
-    else:
-        notif.viewed = True
-    notif.param = "%s" % count
-    notif.date = timezone.now()
+    notif.viewed = not bool(count)
+    notif.param = str(count)
 
 
 class PeoplePictureRelation(models.Model):
