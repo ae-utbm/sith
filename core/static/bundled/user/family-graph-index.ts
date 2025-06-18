@@ -1,13 +1,26 @@
 import { History, initialUrlParams, updateQueryString } from "#core:utils/history";
-import cytoscape from "cytoscape";
+import cytoscape, {
+  type ElementDefinition,
+  type NodeSingular,
+  type Singular,
+} from "cytoscape";
 import cxtmenu from "cytoscape-cxtmenu";
 import klay from "cytoscape-klay";
-import { familyGetFamilyGraph } from "#openapi";
+import { type UserProfileSchema, familyGetFamilyGraph } from "#openapi";
 
 cytoscape.use(klay);
 cytoscape.use(cxtmenu);
 
-async function getGraphData(userId, godfathersDepth, godchildrenDepth) {
+type GraphData = (
+  | { data: UserProfileSchema }
+  | { data: { source: number; target: number } }
+)[];
+
+async function getGraphData(
+  userId: number,
+  godfathersDepth: number,
+  godchildrenDepth: number,
+): Promise<GraphData> {
   const data = (
     await familyGetFamilyGraph({
       path: {
@@ -34,13 +47,13 @@ async function getGraphData(userId, godfathersDepth, godchildrenDepth) {
   ];
 }
 
-function createGraph(container, data, activeUserId) {
+function createGraph(container: HTMLDivElement, data: GraphData, activeUserId: number) {
   const cy = cytoscape({
     boxSelectionEnabled: false,
     autounselectify: true,
 
     container,
-    elements: data,
+    elements: data as ElementDefinition[],
     minZoom: 0.5,
 
     style: [
@@ -101,28 +114,30 @@ function createGraph(container, data, activeUserId) {
       },
     },
   });
-  const activeUser = cy.getElementById(activeUserId).style("shape", "rectangle");
+  const activeUser = cy
+    .getElementById(activeUserId.toString())
+    .style("shape", "rectangle");
   /* Reset graph */
   const resetGraph = () => {
-    cy.elements((element) => {
+    cy.elements(((element: Singular) => {
       if (element.hasClass("traversed")) {
         element.removeClass("traversed");
       }
       if (element.hasClass("not-traversed")) {
         element.removeClass("not-traversed");
       }
-    });
+    }) as unknown as string);
   };
 
-  const onNodeTap = (el) => {
+  const onNodeTap = (el: Singular) => {
     resetGraph();
     /* Create path on graph if selected isn't the targeted user */
     if (el === activeUser) {
       return;
     }
-    cy.elements((element) => {
+    cy.elements(((element: Singular) => {
       element.addClass("not-traversed");
-    });
+    }) as unknown as string);
 
     for (const traversed of cy.elements().aStar({
       root: el,
@@ -169,106 +184,102 @@ function createGraph(container, data, activeUserId) {
   return cy;
 }
 
-/**
- * @typedef FamilyGraphConfig
- * @property {number} activeUser Id of the user to fetch the tree from
- * @property {number} depthMin Minimum tree depth for godfathers and godchildren
- * @property {number} depthMax Maximum tree depth for godfathers and godchildren
- **/
+interface FamilyGraphConfig {
+  activeUser: number; // activeUser Id of the user to fetch the tree from
+  depthMin: number; // depthMin Minimum tree depth for godfathers and godchildren
+  depthMax: number; // depthMax Maximum tree depth for godfathers and godchildren
+}
 
-/**
- * Create a family graph of an user
- * @param {FamilyGraphConfig} config
- **/
-window.loadFamilyGraph = (config) => {
-  document.addEventListener("alpine:init", () => {
-    const defaultDepth = 2;
+document.addEventListener("alpine:init", () => {
+  const defaultDepth = 2;
 
-    function getInitialDepth(prop) {
+  Alpine.data("graph", (config: FamilyGraphConfig) => ({
+    loading: false,
+    godfathersDepth: 0,
+    godchildrenDepth: 0,
+    reverse: initialUrlParams.get("reverse")?.toLowerCase?.() === "true",
+    graph: undefined as cytoscape.Core,
+    graphData: {},
+
+    getInitialDepth(prop: string) {
       const value = Number.parseInt(initialUrlParams.get(prop));
       if (Number.isNaN(value) || value < config.depthMin || value > config.depthMax) {
         return defaultDepth;
       }
       return value;
-    }
+    },
 
-    Alpine.data("graph", () => ({
-      loading: false,
-      godfathersDepth: getInitialDepth("godfathersDepth"),
-      godchildrenDepth: getInitialDepth("godchildrenDepth"),
-      reverse: initialUrlParams.get("reverse")?.toLowerCase?.() === "true",
-      graph: undefined,
-      graphData: {},
+    async init() {
+      this.godfathersDepth = this.getInitialDepth("godfathersDepth");
+      this.godchildrenDepth = this.getInitialDepth("godchildrenDepth");
 
-      async init() {
-        const delayedFetch = Alpine.debounce(async () => {
-          await this.fetchGraphData();
-        }, 100);
-        for (const param of ["godfathersDepth", "godchildrenDepth"]) {
-          this.$watch(param, async (value) => {
-            if (value < config.depthMin || value > config.depthMax) {
-              return;
-            }
-            updateQueryString(param, value, History.Replace);
-            await delayedFetch();
-          });
-        }
-        this.$watch("reverse", async (value) => {
-          updateQueryString("reverse", value, History.Replace);
-          await this.reverseGraph();
-        });
-        this.$watch("graphData", async () => {
-          this.generateGraph();
-          if (this.reverse) {
-            await this.reverseGraph();
-          }
-        });
+      const delayedFetch = Alpine.debounce(async () => {
         await this.fetchGraphData();
-      },
-
-      screenshot() {
-        const link = document.createElement("a");
-        link.href = this.graph.jpg();
-        link.download = interpolate(
-          gettext("family_tree.%(extension)s"),
-          { extension: "jpg" },
-          true,
-        );
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      },
-
-      reset() {
-        this.reverse = false;
-        this.godfathersDepth = defaultDepth;
-        this.godchildrenDepth = defaultDepth;
-      },
-
-      async reverseGraph() {
-        this.graph.elements((el) => {
-          el.position({ x: -el.position().x, y: -el.position().y });
+      }, 100);
+      for (const param of ["godfathersDepth", "godchildrenDepth"]) {
+        this.$watch(param, async (value: number) => {
+          if (value < config.depthMin || value > config.depthMax) {
+            return;
+          }
+          updateQueryString(param, value.toString(), History.Replace);
+          await delayedFetch();
         });
-        this.graph.center(this.graph.elements());
-      },
+      }
+      this.$watch("reverse", async (value: number) => {
+        updateQueryString("reverse", value.toString(), History.Replace);
+        await this.reverseGraph();
+      });
+      this.$watch("graphData", async () => {
+        this.generateGraph();
+        if (this.reverse) {
+          await this.reverseGraph();
+        }
+      });
+      await this.fetchGraphData();
+    },
 
-      async fetchGraphData() {
-        this.graphData = await getGraphData(
-          config.activeUser,
-          this.godfathersDepth,
-          this.godchildrenDepth,
-        );
-      },
+    screenshot() {
+      const link = document.createElement("a");
+      link.href = this.graph.jpg();
+      link.download = interpolate(
+        gettext("family_tree.%(extension)s"),
+        { extension: "jpg" },
+        true,
+      );
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
 
-      generateGraph() {
-        this.loading = true;
-        this.graph = createGraph(
-          $(this.$refs.graph),
-          this.graphData,
-          config.activeUser,
-        );
-        this.loading = false;
-      },
-    }));
-  });
-};
+    reset() {
+      this.reverse = false;
+      this.godfathersDepth = defaultDepth;
+      this.godchildrenDepth = defaultDepth;
+    },
+
+    async reverseGraph() {
+      this.graph.elements((el: NodeSingular) => {
+        el.position({ x: -el.position().x, y: -el.position().y });
+      });
+      this.graph.center(this.graph.elements());
+    },
+
+    async fetchGraphData() {
+      this.graphData = await getGraphData(
+        config.activeUser,
+        this.godfathersDepth,
+        this.godchildrenDepth,
+      );
+    },
+
+    generateGraph() {
+      this.loading = true;
+      this.graph = createGraph(
+        this.$refs.graph as HTMLDivElement,
+        this.graphData,
+        config.activeUser,
+      );
+      this.loading = false;
+    },
+  }));
+});

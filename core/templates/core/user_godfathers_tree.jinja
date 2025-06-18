@@ -7,7 +7,7 @@
 {%- endblock -%}
 
 {% block additional_js %}
-  <script type="module" src="{{ static("bundled/user/family-graph-index.js") }}"></script>
+  <script type="module" src="{{ static("bundled/user/family-graph-index.ts") }}"></script>
 {% endblock %}
 
 {% block title %}
@@ -15,7 +15,14 @@
 {% endblock %}
 
 {% block content %}
-  <div x-data="graph" :aria-busy="loading">
+  <div
+    x-data="graph({
+            activeUser: {{ object.id }},
+            depthMin: {{ depth_min }},
+            depthMax: {{ depth_max }},
+            })"
+    :aria-busy="loading"
+  >
     <div class="graph-toolbar">
       <div class="toolbar-column">
         <div class="toolbar-input">
@@ -89,14 +96,5 @@
     <div x-ref="graph" class="graph"></div>
   </div>
 
-  <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      loadFamilyGraph({
-        activeUser: {{ object.id }},
-        depthMin: {{ depth_min }},
-        depthMax: {{ depth_max }},
-      });
-    });
-  </script>
 {% endblock %}
 
