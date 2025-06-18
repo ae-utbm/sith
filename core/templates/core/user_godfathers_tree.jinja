@@ -77,6 +77,7 @@
               ></i></button>
           </span>
         </div>
+
       </div>
 
       <div class="toolbar-column">
@@ -91,6 +92,31 @@
           <i class="fa fa-camera"></i>
           {% trans %}Save{% endtrans %}
         </button>
+
+        <div class="toolbar-input">
+          <button
+            @click="() => graph.zoom(graph.zoom() + 1)"
+          >
+            <i class="fa-solid fa-magnifying-glass-plus"></i>
+          </button>
+          <button
+            @click="() => graph.zoom(graph.zoom() - 1)"
+          >
+            <i class="fa-solid fa-magnifying-glass-minus"></i>
+          </button>
+          <button
+            x-show="isZoomEnabled"
+            @click="() => isZoomEnabled = false"
+          >
+            <i class="fa-solid fa-unlock"></i>
+          </button>
+          <button
+            x-show="!isZoomEnabled"
+            @click="() => isZoomEnabled = true"
+          >
+            <i class="fa-solid fa-lock"></i>
+          </button>
+        </div>
       </div>
     </div>
     <div x-ref="graph" class="graph"></div>

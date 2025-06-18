@@ -16,6 +16,10 @@ type GraphData = (
   | { data: { source: number; target: number } }
 )[];
 
+function isMobile() {
+  return window.innerWidth < 500;
+}
+
 async function getGraphData(
   userId: number,
   godfathersDepth: number,
@@ -151,7 +155,6 @@ function createGraph(container: HTMLDivElement, data: GraphData, activeUserId: n
   cy.on("tap", "node", (tapped) => {
     onNodeTap(tapped.target);
   });
-  cy.zoomingEnabled(false);
 
   /* Add context menu */
   cy.cxtmenu({
@@ -200,6 +203,7 @@ document.addEventListener("alpine:init", () => {
     reverse: initialUrlParams.get("reverse")?.toLowerCase?.() === "true",
     graph: undefined as cytoscape.Core,
     graphData: {},
+    isZoomEnabled: !isMobile(),
 
     getInitialDepth(prop: string) {
       const value = Number.parseInt(initialUrlParams.get(prop));
@@ -234,6 +238,9 @@ document.addEventListener("alpine:init", () => {
         if (this.reverse) {
           await this.reverseGraph();
         }
+      });
+      this.$watch("isZoomEnabled", () => {
+        this.graph.userZoomingEnabled(this.isZoomEnabled);
       });
       await this.fetchGraphData();
     },
@@ -279,6 +286,7 @@ document.addEventListener("alpine:init", () => {
         this.graphData,
         config.activeUser,
       );
+      this.graph.userZoomingEnabled(this.isZoomEnabled);
       this.loading = false;
     },
   }));
