@@ -2,6 +2,12 @@
   width: 100%;
   height: 70vh;
   display: block;
+  overflow: clip;
+}
+
+.zoom-control {
+  float: right;
+  margin-right: 10px;
 }
 
 .graph-toolbar {
@@ -12,7 +18,7 @@
   justify-content: space-around;
   gap: 30px;
 
-  .toolbar-column{
+  .toolbar-column {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -34,31 +40,38 @@
 
     .depth-choice {
       white-space: nowrap;
+
       input[type="number"] {
         -webkit-appearance: textfield;
         -moz-appearance: textfield;
         appearance: textfield;
+
         &::-webkit-inner-spin-button,
         &::-webkit-outer-spin-button {
           -webkit-appearance: none;
         }
       }
+
       button {
         background: none;
-        & > .fa {
+
+        &>.fa {
           border-radius: 50%;
           font-size: 12px;
           padding: 5px;
         }
-        &:enabled > .fa {
+
+        &:enabled>.fa {
           background-color: #354a5f;
           color: white;
         }
-        &:enabled:hover > .fa {
+
+        &:enabled:hover>.fa {
           color: white;
           background-color: #35405f; // just a bit darker
         }
-        &:disabled > .fa {
+
+        &:disabled>.fa {
           background-color: gray;
           color: white;
         }
@@ -74,6 +87,7 @@
   @media screen and (max-width: 500px) {
     flex-direction: column;
     gap: 20px;
+
     .toolbar-column {
       min-width: 100%;
     }
@@ -87,14 +101,16 @@
   padding: 10px;
   box-sizing: border-box;
 
-  > form {
+  >form {
     margin: 0;
   }
 }
+
 #family-tree-link {
   display: inline-block;
   margin-top: 10px;
   text-align: center;
+
   @media (min-width: 450px) {
     margin-right: auto;
   }
@@ -122,10 +138,10 @@
     width: 100%;
   }
 
-  > div.mini_profile_link {
+  >div.mini_profile_link {
     position: relative;
 
-    > a {
+    >a {
       &.mini_profile_link {
         display: flex;
         flex-direction: column;
@@ -140,7 +156,7 @@
           max-height: 65px;
         }
 
-        > span {
+        >span {
           height: 150px;
           width: 100%;
 
@@ -149,7 +165,7 @@
             width: 80px;
           }
 
-          > img {
+          >img {
             width: 100%;
             max-width: 100%;
             max-height: 100%;
@@ -163,7 +179,7 @@
           }
         }
 
-        > em {
+        >em {
           box-sizing: border-box;
           padding: 0 5px;
           text-align: center;
@@ -195,7 +211,7 @@
     }
   }
 
-  > a.mini_profile_link {
+  >a.mini_profile_link {
     display: none;
   }
 }
