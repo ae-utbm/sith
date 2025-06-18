@@ -59,6 +59,7 @@ class PopulatedGroups(NamedTuple):
     counter_admin: Group
     accounting_admin: Group
     pedagogy_admin: Group
+    location_admin: Group
 
 
 class Command(BaseCommand):
@@ -877,6 +878,16 @@ class Command(BaseCommand):
                 .values_list("pk", flat=True)
             )
         )
+        location_admin = Group.objects.create(
+            name="Respo site", is_manually_manageable=True
+        )
+        location_admin.permissions.add(
+            *counter_admin.permissions.values_list("pk", flat=True),
+            *perms.filter(content_type__app_label="reservation").values_list(
+                "pk", flat=True
+            ),
+        )
+
         self.reset_index("core", "auth")
 
         return PopulatedGroups(
@@ -889,6 +900,7 @@ class Command(BaseCommand):
             accounting_admin=accounting_admin,
             sas_admin=sas_admin,
             pedagogy_admin=pedagogy_admin,
+            location_admin=location_admin,
         )
 
     def _create_ban_groups(self):
