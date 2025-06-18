@@ -287,7 +287,6 @@ document.addEventListener("alpine:init", () => {
         config.activeUser,
       );
       this.graph.userZoomingEnabled(this.isZoomEnabled);
-      this.$refs.graph.prepend(this.$refs.zoomControl);
       this.loading = false;
     },
   }));
