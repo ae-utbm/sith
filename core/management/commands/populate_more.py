@@ -238,7 +238,13 @@ class Command(BaseCommand):
         ae = Club.objects.get(id=settings.SITH_MAIN_CLUB_ID)
         other_clubs = random.sample(list(Club.objects.all()), k=3)
         groups = list(
-            Group.objects.filter(name__in=["Subscribers", "Old subscribers", "Public"])
+            Group.objects.filter(
+                id__in=[
+                    settings.SITH_GROUP_SUBSCRIBERS_ID,
+                    settings.SITH_GROUP_OLD_SUBSCRIBERS_ID,
+                    settings.SITH_GROUP_PUBLIC_ID,
+                ]
+            )
         )
         counters = list(
             Counter.objects.filter(name__in=["Foyer", "MDE", "La Gommette", "Eboutic"])
