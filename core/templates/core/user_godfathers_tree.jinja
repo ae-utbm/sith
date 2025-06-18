@@ -97,11 +97,13 @@
     <div class="zoom-control" x-ref="zoomControl">
       <button
         @click="graph.zoom(graph.zoom() + 1)"
+        :disabled="!isZoomEnabled"
       >
         <i class="fa-solid fa-magnifying-glass-plus"></i>
       </button>
       <button
         @click="graph.zoom(graph.zoom() - 1)"
+        :disabled="!isZoomEnabled"
       >
         <i class="fa-solid fa-magnifying-glass-minus"></i>
       </button>

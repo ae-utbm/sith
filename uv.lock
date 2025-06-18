@@ -1852,7 +1852,7 @@ dev = [
     { name = "ipython", specifier = ">=9.0.2,<10.0.0" },
     { name = "pre-commit", specifier = ">=4.1.0,<5.0.0" },
     { name = "rjsmin", specifier = ">=1.2.4,<2.0.0" },
-    { name = "ruff", specifier = ">=0.11.11,<1.0.0" },
+    { name = "ruff", specifier = ">=0.11.13,<1.0.0" },
 ]
 docs = [
     { name = "mkdocs", specifier = ">=1.6.1,<2.0.0" },

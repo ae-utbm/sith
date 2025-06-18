@@ -5,7 +5,7 @@ import cytoscape, {
   type Singular,
 } from "cytoscape";
 import cxtmenu from "cytoscape-cxtmenu";
-import klay from "cytoscape-klay";
+import klay, { type KlayLayoutOptions } from "cytoscape-klay";
 import { type UserProfileSchema, familyGetFamilyGraph } from "#openapi";
 
 cytoscape.use(klay);
@@ -100,9 +100,9 @@ function createGraph(container: HTMLDivElement, data: GraphData, activeUserId: n
       {
         selector: ".not-traversed",
         style: {
-          "line-opacity": "0.5",
-          "background-opacity": "0.5",
-          "background-image-opacity": "0.5",
+          "line-opacity": 0.5,
+          "background-opacity": 0.5,
+          "background-image-opacity": 0.5,
         },
       },
     ],
@@ -116,21 +116,14 @@ function createGraph(container: HTMLDivElement, data: GraphData, activeUserId: n
         nodePlacement: "INTERACTIVE",
         layoutHierarchy: true,
       },
-    },
+    } as KlayLayoutOptions,
   });
   const activeUser = cy
     .getElementById(activeUserId.toString())
     .style("shape", "rectangle");
   /* Reset graph */
   const resetGraph = () => {
-    cy.elements(((element: Singular) => {
-      if (element.hasClass("traversed")) {
-        element.removeClass("traversed");
-      }
-      if (element.hasClass("not-traversed")) {
-        element.removeClass("not-traversed");
-      }
-    }) as unknown as string);
+    cy.elements().removeClass("traversed not-traversed");
   };
 
   const onNodeTap = (el: Singular) => {
@@ -139,9 +132,7 @@ function createGraph(container: HTMLDivElement, data: GraphData, activeUserId: n
     if (el === activeUser) {
       return;
     }
-    cy.elements(((element: Singular) => {
-      element.addClass("not-traversed");
-    }) as unknown as string);
+    cy.elements().addClass("not-traversed");
 
     for (const traversed of cy.elements().aStar({
       root: el,
@@ -188,9 +179,12 @@ function createGraph(container: HTMLDivElement, data: GraphData, activeUserId: n
 }
 
 interface FamilyGraphConfig {
-  activeUser: number; // activeUser Id of the user to fetch the tree from
-  depthMin: number; // depthMin Minimum tree depth for godfathers and godchildren
-  depthMax: number; // depthMax Maximum tree depth for godfathers and godchildren
+  /**Id of the user to fetch the tree from*/
+  activeUser: number;
+  /**Minimum tree depth for godfathers and godchildren*/
+  depthMin: number;
+  /**Maximum tree depth for godfathers and godchildren*/
+  depthMax: number;
 }
 
 document.addEventListener("alpine:init", () => {
