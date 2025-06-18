@@ -96,24 +96,24 @@
 
     <div class="zoom-control" x-ref="zoomControl" x-show="graph !== undefined">
       <button
-        @click="() => graph.zoom(graph.zoom() + 1)"
+        @click="graph.zoom(graph.zoom() + 1)"
       >
         <i class="fa-solid fa-magnifying-glass-plus"></i>
       </button>
       <button
-        @click="() => graph.zoom(graph.zoom() - 1)"
+        @click="graph.zoom(graph.zoom() - 1)"
       >
         <i class="fa-solid fa-magnifying-glass-minus"></i>
       </button>
       <button
         x-show="isZoomEnabled"
-        @click="() => isZoomEnabled = false"
+        @click="isZoomEnabled = false"
       >
         <i class="fa-solid fa-unlock"></i>
       </button>
       <button
         x-show="!isZoomEnabled"
-        @click="() => isZoomEnabled = true"
+        @click="isZoomEnabled = true"
       >
         <i class="fa-solid fa-lock"></i>
       </button>
