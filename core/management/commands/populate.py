@@ -59,6 +59,7 @@ class PopulatedGroups(NamedTuple):
     counter_admin: Group
     accounting_admin: Group
     pedagogy_admin: Group
+    location_admin: Group
 
 
 class Command(BaseCommand):
@@ -784,13 +785,22 @@ class Command(BaseCommand):
         # public has no permission.
         # Its purpose is not to link users to permissions,
         # but to other objects (like products)
-        public_group = Group.objects.create(name="Public")
+        public_group = Group.objects.create(name="Publique")
 
-        subscribers = Group.objects.create(name="Subscribers")
+        subscribers = Group.objects.create(name="Cotisants")
         subscribers.permissions.add(
-            *list(perms.filter(codename__in=["add_news", "add_uvcomment"]))
+            *list(
+                perms.filter(
+                    codename__in=[
+                        "add_news",
+                        "add_uvcomment",
+                        "add_reservationslot",
+                        "view_reservationslot",
+                    ]
+                )
+            )
         )
-        old_subscribers = Group.objects.create(name="Old subscribers")
+        old_subscribers = Group.objects.create(name="Anciens cotisants")
         old_subscribers.permissions.add(
             *list(
                 perms.filter(
@@ -812,7 +822,7 @@ class Command(BaseCommand):
             )
         )
         accounting_admin = Group.objects.create(
-            name="Accounting admin", is_manually_manageable=True
+            name="Admin comptabilité", is_manually_manageable=True
         )
         accounting_admin.permissions.add(
             *list(
@@ -833,7 +843,7 @@ class Command(BaseCommand):
             )
         )
         com_admin = Group.objects.create(
-            name="Communication admin", is_manually_manageable=True
+            name="Admin communication", is_manually_manageable=True
         )
         com_admin.permissions.add(
             *list(
@@ -841,7 +851,7 @@ class Command(BaseCommand):
             )
         )
         counter_admin = Group.objects.create(
-            name="Counter admin", is_manually_manageable=True
+            name="Admin comptoirs", is_manually_manageable=True
         )
         counter_admin.permissions.add(
             *list(
@@ -851,14 +861,14 @@ class Command(BaseCommand):
                 )
             )
         )
-        sas_admin = Group.objects.create(name="SAS admin", is_manually_manageable=True)
+        sas_admin = Group.objects.create(name="Admin SAS", is_manually_manageable=True)
         sas_admin.permissions.add(
             *list(
                 perms.filter(content_type__app_label="sas").values_list("pk", flat=True)
             )
         )
         forum_admin = Group.objects.create(
-            name="Forum admin", is_manually_manageable=True
+            name="Admin forum", is_manually_manageable=True
         )
         forum_admin.permissions.add(
             *list(
@@ -868,7 +878,7 @@ class Command(BaseCommand):
             )
         )
         pedagogy_admin = Group.objects.create(
-            name="Pedagogy admin", is_manually_manageable=True
+            name="Admin pédagogie", is_manually_manageable=True
         )
         pedagogy_admin.permissions.add(
             *list(
@@ -877,6 +887,16 @@ class Command(BaseCommand):
                 .values_list("pk", flat=True)
             )
         )
+        location_admin = Group.objects.create(
+            name="Respo site", is_manually_manageable=True
+        )
+        location_admin.permissions.add(
+            *counter_admin.permissions.values_list("pk", flat=True),
+            *perms.filter(content_type__app_label="reservation").values_list(
+                "pk", flat=True
+            ),
+        )
+
         self.reset_index("core", "auth")
 
         return PopulatedGroups(
@@ -889,6 +909,7 @@ class Command(BaseCommand):
             accounting_admin=accounting_admin,
             sas_admin=sas_admin,
             pedagogy_admin=pedagogy_admin,
+            location_admin=location_admin,
         )
 
     def _create_ban_groups(self):
