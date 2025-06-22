@@ -713,47 +713,6 @@ textarea {
   margin-top: 10px;
 }
 
-/*--------------------------------FOOTER-------------------------------*/
-
-footer {
-  width: 90%;
-  margin: 2em auto;
-
-  font-size: 90%;
-  text-align: center;
-  vertical-align: middle;
-
-  div {
-    margin: 0.6em 0;
-    color: $white-color;
-    border-radius: 5px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    background-color: $primary-neutral-dark-color;
-    box-shadow: $shadow-color 0 0 15px;
-
-    a {
-      padding: 0.8em;
-      flex: 1;
-      font-weight: bold;
-      color: $white-color !important;
-
-      &:hover {
-        color: $primary-dark-color;
-      }
-    }
-  }
-
-  >.version {
-    margin-top: 3px;
-    color: rgba(0, 0, 0, 0.3);
-  }
-
-  .fa-github {
-    color: $githubblack;
-  }
-}
 
 
 .ui-dialog .ui-dialog-buttonpane {
