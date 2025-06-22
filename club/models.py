@@ -29,14 +29,14 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import RegexValidator, validate_email
 from django.db import models, transaction
-from django.db.models import Exists, F, OuterRef, Q, Value
-from django.db.models.functions import Greatest
+from django.db.models import Exists, F, OuterRef, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.timezone import localdate
 from django.utils.translation import gettext_lazy as _
+from ordered_model.models import OrderedModel
 
 from core.fields import ResizedImageField
 from core.models import Group, Notification, Page, SithFile, User
@@ -220,6 +220,62 @@ class Club(models.Model):
         return user.is_in_group(pk=self.board_group_id)
 
 
+class ClubRole(OrderedModel):
+    club = models.ForeignKey(
+        Club,
+        verbose_name=_("club"),
+        help_text=_("The club with which this role is associated"),
+        related_name="roles",
+        on_delete=models.CASCADE,
+    )
+    name = models.CharField(_("name"), max_length=50)
+    description = models.TextField(_("description"), blank=True, default="")
+    is_board = models.BooleanField(_("Board role"), default=False)
+    is_presidency = models.BooleanField(_("Presidency role"), default=False)
+    is_active = models.BooleanField(
+        _("is active"),
+        default=True,
+        help_text=_(
+            "If the role is inactive, people joining the club won't be able to get it."
+        ),
+    )
+
+    order_with_respect_to = "club"
+
+    class Meta(OrderedModel.Meta):
+        verbose_name = _("club role")
+        verbose_name_plural = _("club roles")
+        abstract = False
+        constraints = [
+            # presidency IMPLIES board <=> NOT presidency OR board
+            # cf. MT1 :)
+            models.CheckConstraint(
+                condition=Q(is_presidency=False) | Q(is_board=True),
+                name="clubrole_presidency_implies_board",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.name} - {self.club.name}"
+
+    def get_display_name(self):
+        return f"{self.name} - {self.club.name}"
+
+    def get_absolute_url(self):
+        return reverse("club:club_roles", kwargs={"club_id": self.club_id})
+
+    def clean(self):
+        if self.is_presidency and not self.is_board:
+            raise ValidationError(
+                _(
+                    "Role %(name)s was declared as a presidency role "
+                    "without being a board role"
+                )
+                % {"name": self.name}
+            )
+        return super().clean()
+
+
 class MembershipQuerySet(models.QuerySet):
     def ongoing(self) -> Self:
         """Filter all memberships which are not finished yet."""
@@ -232,9 +288,10 @@ class MembershipQuerySet(models.QuerySet):
         are included, even if there are no more members.
 
         If you want to get the users who are currently in the board,
-        mind combining this with the `ongoing` queryset method
+        mind combining this with the [MembershipQuerySet.ongoing][]
+        queryset method
         """
-        return self.filter(role__gt=settings.SITH_MAXIMUM_FREE_ROLE)
+        return self.filter(role__is_board=True)
 
     def editable_by(self, user: User) -> Self:
         """Filter Memberships that this user can edit.
@@ -257,21 +314,16 @@ class MembershipQuerySet(models.QuerySet):
         """
         if user.has_perm("club.change_membership"):
             return self.all()
-        return self.filter(
+        return self.ongoing().filter(
             Q(user=user)
             | Exists(
-                Membership.objects.filter(
-                    Q(
-                        role__gt=Greatest(
-                            OuterRef("role"), Value(settings.SITH_MAXIMUM_FREE_ROLE)
-                        )
-                    ),
+                Membership.objects.ongoing().filter(
                     user=user,
-                    end_date=None,
                     club=OuterRef("club"),
+                    role__is_board=True,
+                    role__order__gt=OuterRef("role__order"),
                 )
-            ),
-            end_date=None,
+            )
         )
 
     def update(self, **kwargs) -> int:
@@ -341,10 +393,11 @@ class Membership(models.Model):
     )
     start_date = models.DateField(_("start date"), default=timezone.now)
     end_date = models.DateField(_("end date"), null=True, blank=True)
-    role = models.IntegerField(
-        _("role"),
-        choices=sorted(settings.SITH_CLUB_ROLES.items()),
-        default=sorted(settings.SITH_CLUB_ROLES.items())[0][0],
+    role = models.ForeignKey(
+        ClubRole,
+        verbose_name=_("role"),
+        related_name="members",
+        on_delete=models.PROTECT,
     )
     description = models.CharField(
         _("description"), max_length=128, null=False, blank=True
@@ -362,7 +415,7 @@ class Membership(models.Model):
     def __str__(self):
         return (
             f"{self.club.name} - {self.user.username} "
-            f"- {settings.SITH_CLUB_ROLES[self.role]} "
+            f"- {self.role.name} "
             f"- {str(_('past member')) if self.end_date is not None else ''}"
         )
 
@@ -391,7 +444,7 @@ class Membership(models.Model):
         if user.is_root or user.is_board_member:
             return True
         membership = self.club.get_membership_for(user)
-        return membership is not None and membership.role >= self.role
+        return membership is not None and membership.role.order < self.role.order
 
     def delete(self, *args, **kwargs):
         self._remove_club_groups([self])
@@ -467,7 +520,7 @@ class Membership(models.Model):
                     group_id=membership.club.members_group_id,
                 )
             )
-            if membership.role > settings.SITH_MAXIMUM_FREE_ROLE:
+            if membership.role.is_board:
                 club_groups.append(
                     User.groups.through(
                         user_id=membership.user_id,
