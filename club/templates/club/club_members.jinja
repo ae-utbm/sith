@@ -1,8 +1,40 @@
 {% extends "core/base.jinja" %}
 {% from 'core/macros.jinja' import user_profile_link, select_all_checkbox %}
 
+{%- block additional_css -%}
+  <link rel="stylesheet" href="{{ static('club/css/members.scss') }}">
+{%- endblock -%}
+
 {% block content %}
   <h2>{% trans %}Club members{% endtrans %}</h2>
+  <form class="add-members" action="{{ url('club:club_members', club_id=club.id) }}" id="add_users" method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors() }}
+    <div>
+      <label for="{{ form.users.id_for_label }}">{{ form.users.label }} :</label>
+      {{ form.users }}
+      {{ form.users.errors }}
+      <span class="helptext">{{ form.users.help_text }}</span>
+    </div>
+    <div>
+      <label for="{{ form.role.id_for_label }}">{{ form.role.label }} :</label>
+      {{ form.role }}
+      {{ form.role.errors }}
+    </div>
+    <div>
+      <label for="{{ form.description.id_for_label }}">{{ form.description.label }} :</label>
+      {{ form.description }}
+      {{ form.description.errors }}
+    </div>
+    {% if form.start_date %}
+      <div>
+        <label for="{{ form.start_date.id_for_label }}">{{ form.start_date.label }} :</label>
+        {{ form.start_date }}
+        {{ form.start_date.errors }}
+      </div>
+    {% endif %}
+    <div><input type="submit" value="{% trans %}Add{% endtrans %}" /></div>
+  </form>
   {% if members %}
     <form action="{{ url('club:club_members', club_id=club.id) }}" id="users_old" method="post">
       {% csrf_token %}
@@ -11,7 +43,7 @@
         {{ select_all_checkbox("users_old") }}
         <p></p>
       {% endif %}
-      <table id="club_members_table">
+      <table id="club_members_table" class="members-table">
         <thead>
           <tr>
             <td>{% trans %}User{% endtrans %}</td>
@@ -44,39 +76,10 @@
       </table>
       {{ form.users_old.errors }}
       {% if users_old %}
-        <p></p>
         <input type="submit" name="submit" value="{% trans %}Mark as old{% endtrans %}">
       {% endif %}
     </form>
   {% else %}
     <p>{% trans %}There are no members in this club.{% endtrans %}</p>
   {% endif %}
-  <form action="{{ url('club:club_members', club_id=club.id) }}" id="add_users" method="post">
-    {% csrf_token %}
-    {{ form.non_field_errors() }}
-    <p>
-      {{ form.users.errors }}
-      <label for="{{ form.users.id_for_label }}">{{ form.users.label }} :</label>
-      {{ form.users }}
-      <span class="helptext">{{ form.users.help_text }}</span>
-    </p>
-    <p>
-      {{ form.role.errors }}
-      <label for="{{ form.role.id_for_label }}">{{ form.role.label }} :</label>
-      {{ form.role }}
-    </p>
-    {% if form.start_date %}
-      <p>
-        {{ form.start_date.errors }}
-        <label for="{{ form.start_date.id_for_label }}">{{ form.start_date.label }} :</label>
-        {{ form.start_date }}
-      </p>
-    {% endif %}
-    <p>
-      {{ form.description.errors }}
-      <label for="{{ form.description.id_for_label }}">{{ form.description.label }} :</label>
-      {{ form.description }}
-    </p>
-    <p><input type="submit" value="{% trans %}Add{% endtrans %}" /></p>
-  </form>
 {% endblock %}

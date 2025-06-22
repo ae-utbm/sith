@@ -1,0 +1,39 @@
+@import "core/static/core/devices";
+
+.add-members {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 10px;
+
+  & > *:nth-child(2) {
+    width: 100%;
+  }
+
+  & > * {
+    margin: 0
+  }
+
+  & > *:last-child {
+    margin: auto 0;
+  }
+
+  @media (max-width: $medium-devices) {
+    flex-direction: column;
+    align-items: center;
+
+    & > * > input,
+    & > * > select,
+    & > * {
+      width: 100%;
+      max-width: 100% !important;
+    }
+  }
+}
+
+.members-table {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}

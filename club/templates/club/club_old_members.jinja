@@ -1,9 +1,13 @@
 {% extends "core/base.jinja" %}
 {% from 'core/macros.jinja' import user_profile_link %}
 
+{%- block additional_css -%}
+  <link rel="stylesheet" href="{{ static('club/css/members.scss') }}">
+{%- endblock -%}
+
 {% block content %}
   <h2>{% trans %}Club old members{% endtrans %}</h2>
-  <table>
+  <table class="members-table">
     <thead>
       <td>{% trans %}User{% endtrans %}</td>
       <td>{% trans %}Role{% endtrans %}</td>
@@ -24,6 +28,3 @@
     </tbody>
   </table>
 {% endblock %}
-
-
-
