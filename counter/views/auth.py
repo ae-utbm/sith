@@ -13,10 +13,10 @@
 #
 #
 
-from django.db.models import F
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
+from django.utils.timezone import now
 from django.views.decorators.http import require_POST
 
 from core.views.forms import LoginForm
@@ -47,7 +47,7 @@ def counter_login(request: HttpRequest, counter_id: int) -> HttpResponseRedirect
 @require_POST
 def counter_logout(request: HttpRequest, counter_id: int) -> HttpResponseRedirect:
     """End the permanency of a user in this counter."""
-    Permanency.objects.filter(counter=counter_id, user=request.POST["user_id"]).update(
-        end=F("activity")
-    )
+    Permanency.objects.filter(
+        counter=counter_id, user=request.POST["user_id"], end=None
+    ).update(end=now())
     return redirect("counter:details", counter_id=counter_id)
