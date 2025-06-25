@@ -50,7 +50,7 @@
  #}
 {% macro download_button(name) %}
   <div x-data="pictures_download">
-    <div x-show="pictures.length > 0" x-cloak>
+    <div x-show="albums.length > 0" x-cloak>
       <button
         :disabled="isDownloading"
         class="btn btn-blue {% if name == "" %}btn-no-text{% endif %}"
