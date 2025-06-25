@@ -382,17 +382,9 @@ class TestUserIsInGroup(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.root_group = Group.objects.get(name="Root")
-        cls.public_group = Group.objects.get(name="Public")
+        cls.public_group = Group.objects.get(id=settings.SITH_GROUP_PUBLIC_ID)
         cls.public_user = baker.make(User)
-        cls.subscribers = Group.objects.get(name="Subscribers")
-        cls.old_subscribers = Group.objects.get(name="Old subscribers")
-        cls.accounting_admin = Group.objects.get(name="Accounting admin")
-        cls.com_admin = Group.objects.get(name="Communication admin")
-        cls.counter_admin = Group.objects.get(name="Counter admin")
-        cls.sas_admin = Group.objects.get(name="SAS admin")
         cls.club = baker.make(Club)
-        cls.main_club = Club.objects.get(id=1)
 
     def assert_in_public_group(self, user):
         assert user.is_in_group(pk=self.public_group.id)
@@ -400,15 +392,7 @@ class TestUserIsInGroup(TestCase):
 
     def assert_only_in_public_group(self, user):
         self.assert_in_public_group(user)
-        for group in (
-            self.root_group,
-            self.accounting_admin,
-            self.sas_admin,
-            self.subscribers,
-            self.old_subscribers,
-            self.club.members_group,
-            self.club.board_group,
-        ):
+        for group in Group.objects.exclude(id=self.public_group.id):
             assert not user.is_in_group(pk=group.pk)
             assert not user.is_in_group(name=group.name)
 
