@@ -26,9 +26,11 @@
     {% endif %}
   {% endif %}
 
-  <form method="post" action="{{ url('core:login') }}">
+  <form method="post" action="{{ url('core:login') }}" id="login-form">
     {% if form.errors %}
-      <p class="alert alert-red">{% trans %}Your username and password didn't match. Please try again.{% endtrans %}</p>
+      <p class="alert alert-red">
+        {% trans %}Your credentials didn't match. Please try again.{% endtrans %}
+      </p>
     {% endif %}
 
     {% csrf_token %}
