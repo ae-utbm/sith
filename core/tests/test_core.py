@@ -38,6 +38,7 @@ from core.markdown import markdown
 from core.models import AnonymousUser, Group, Page, User
 from core.utils import get_semester_code, get_start_of_semester
 from core.views import AllowFragment
+from counter.models import Customer
 from sith import settings
 
 
@@ -151,24 +152,44 @@ class TestUserLogin:
     def user(self) -> User:
         return baker.make(User, password=make_password("plop"))
 
-    def test_login_fail(self, client, user):
+    @pytest.mark.parametrize(
+        "identifier_getter",
+        [
+            lambda user: user.username,
+            lambda user: user.email,
+            lambda user: Customer.get_or_create(user)[0].account_id,
+        ],
+    )
+    def test_login_fail(self, client, user, identifier_getter):
         """Should not login a user correctly."""
+        identifier = identifier_getter(user)
         response = client.post(
             reverse("core:login"),
-            {"username": user.username, "password": "wrong-password"},
+            {"username": identifier, "password": "wrong-password"},
         )
         assert response.status_code == 200
-        assert (
-            '<p class="alert alert-red">Votre nom d\'utilisateur '
-            "et votre mot de passe ne correspondent pas. Merci de réessayer.</p>"
-        ) in response.text
         assert response.wsgi_request.user.is_anonymous
+        soup = BeautifulSoup(response.text, "lxml")
+        form = soup.find(id="login-form")
+        assert (
+            form.find(class_="alert alert-red").get_text(strip=True)
+            == "Vos identifiants ne correspondent pas. Veuillez réessayer."
+        )
+        assert form.find("input", attrs={"name": "username"}).get("value") == identifier
 
-    def test_login_success(self, client, user):
+    @pytest.mark.parametrize(
+        "identifier_getter",
+        [
+            lambda user: user.username,
+            lambda user: user.email,
+            lambda user: Customer.get_or_create(user)[0].account_id,
+        ],
+    )
+    def test_login_success(self, client, user, identifier_getter):
         """Should login a user correctly."""
         response = client.post(
             reverse("core:login"),
-            {"username": user.username, "password": "plop"},
+            {"username": identifier_getter(user), "password": "plop"},
         )
         assertRedirects(response, reverse("core:index"))
         assert response.wsgi_request.user == user

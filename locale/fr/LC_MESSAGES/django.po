@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-16 14:54+0200\n"
+"POT-Creation-Date: 2025-06-25 16:29+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -2015,10 +2015,8 @@ msgid "Please login or create an account to see this page."
 msgstr "Merci de vous identifier ou de créer un compte pour voir cette page."
 
 #: core/templates/core/login.jinja
-msgid "Your username and password didn't match. Please try again."
-msgstr ""
-"Votre nom d'utilisateur et votre mot de passe ne correspondent pas. Merci de "
-"réessayer."
+msgid "Your credentials didn't match. Please try again."
+msgstr "Vos identifiants ne correspondent pas. Veuillez réessayer."
 
 #: core/templates/core/login.jinja
 msgid "Lost password?"

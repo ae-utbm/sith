@@ -132,28 +132,30 @@ class FutureDateTimeField(forms.DateTimeField):
 
 class LoginForm(AuthenticationForm):
     def __init__(self, *arg, **kwargs):
-        if "data" in kwargs:
-            from counter.models import Customer
-
-            data = kwargs["data"].copy()
-            account_code = re.compile(r"^[0-9]+[A-Za-z]$")
-            try:
-                if account_code.match(data["username"]):
-                    user = (
-                        Customer.objects.filter(account_id__iexact=data["username"])
-                        .first()
-                        .user
-                    )
-                elif "@" in data["username"]:
-                    user = User.objects.filter(email__iexact=data["username"]).first()
-                else:
-                    user = User.objects.filter(username=data["username"]).first()
-                data["username"] = user.username
-            except:  # noqa E722 I don't know what error is supposed to be raised here
-                pass
-            kwargs["data"] = data
         super().__init__(*arg, **kwargs)
         self.fields["username"].label = _("Username, email, or account number")
+
+    def clean_username(self):
+        identifier: str = self.cleaned_data["username"]
+        account_code = re.compile(r"^[0-9]+[A-Za-z]$")
+        if account_code.match(identifier):
+            qs_filter = "customer__account_id__iexact"
+        elif identifier.count("@") == 1:
+            qs_filter = "email"
+        else:
+            qs_filter = None
+        if qs_filter:
+            # if the user gave an email or an account code instead of
+            # a username, retrieve and return the corresponding username.
+            # If there is no username, return an empty string, so that
+            # Django will properly handle the error when failing the authentication
+            identifier = (
+                User.objects.filter(**{qs_filter: identifier})
+                .values_list("username", flat=True)
+                .first()
+                or ""
+            )
+        return identifier
 
 
 class RegisteringForm(UserCreationForm):
