@@ -1362,3 +1362,58 @@ class ReturnableProductBalance(models.Model):
             f"return balance of {self.customer} "
             f"for {self.returnable.product_id} : {self.balance}"
         )
+
+
+class MonthField(models.CharField):
+    description = _("Year + month field")
+
+    def __init__(self, *args, **kwargs):
+        kwargs["max_length"] = 7
+        super().__init__(*args, **kwargs)
+
+    def db_type(self, connection):
+        return "char(7)"
+
+    def from_db_value(self, value, expression, connection):
+        if value is None:
+            return value
+        try:
+            year, month = value.split("-")
+            return date(year, month, 1)
+        except (ValueError, TypeError):
+            return value
+
+    def to_python(self, value):
+        if isinstance(value, date):
+            return value
+        if isinstance(value, str):
+            try:
+                year, month = value.split("-")
+                return date(year, month, 1)
+            except ValueError:
+                pass
+        return value
+
+    def get_prep_value(self, value):
+        if isinstance(value, date):
+            return value.strftime("%Y-%m")
+        if isinstance(value, str) and len(value) == 7 and value[4] == "-":
+            return value
+        return value
+
+    def value_to_string(self, obj):
+        value = self.value_from_object(obj)
+        return self.get_prep_value(value)
+
+
+class InvoiceCall(models.Model):
+    is_validated = models.BooleanField(verbose_name=_("is validated"), default=False)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    month = MonthField(verbose_name=_("invoice date"))
+
+    class Meta:
+        verbose_name = _("Invoice call")
+        verbose_name_plural = _("Invoice calls")
+
+    def __str__(self):
+        return f"invoice call of {self.month} made by {self.club}"
