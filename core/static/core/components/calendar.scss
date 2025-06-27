@@ -16,16 +16,76 @@
   --event-details-padding: 20px;
   --event-details-border: 1px solid #EEEEEE;
   --event-details-border-radius: 4px;
-  --event-details-box-shadow: 0px 6px 20px 4px rgb(0 0 0 / 16%);
+  --event-details-box-shadow: 0 6px 20px 4px rgb(0 0 0 / 16%);
   --event-details-max-width: 600px;
   --event-recurring-internal-color: #6f69cd;
   --event-recurring-unpublished-color: orange;
 }
 
-ics-calendar {
+ics-calendar,
+room-scheduler {
   border: none;
   box-shadow: none;
 
+  a.fc-col-header-cell-cushion,
+  a.fc-col-header-cell-cushion:hover {
+    color: black;
+  }
+
+  a.fc-daygrid-day-number,
+  a.fc-daygrid-day-number:hover {
+    color: rgb(34, 34, 34);
+  }
+
+  td {
+    overflow: visible; // Show events on multiple days
+  }
+
+  td, th {
+    text-align: unset;
+  }
+
+  //Reset from style.scss
+  table {
+    box-shadow: none;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    margin: 0;
+  }
+
+  // Reset from style.scss
+  thead {
+    background-color: white;
+    color: black;
+  }
+
+  // Reset from style.scss
+  tbody > tr {
+    &:nth-child(even):not(.highlight) {
+      background: white;
+    }
+  }
+
+  .fc .fc-toolbar.fc-footer-toolbar {
+    margin-bottom: 0.5em;
+  }
+
+  button.text-copy,
+  button.text-copy:focus,
+  button.text-copy:hover {
+    background-color: #67AE6E !important;
+    transition: 500ms ease-in;
+  }
+
+  button.text-copied,
+  button.text-copied:focus,
+  button.text-copied:hover {
+    transition: 500ms ease-out;
+  }
+
+}
+
+ics-calendar {
   #event-details {
     z-index: 10;
     max-width: 1151px;
@@ -62,82 +122,60 @@ ics-calendar {
       align-items: start;
       flex-direction: row;
       background-color: var(--event-details-background-color);
-      margin-top: 0px;
+      margin-top: 0;
       margin-bottom: 4px;
     }
   }
+}
 
-  a.fc-col-header-cell-cushion,
-  a.fc-col-header-cell-cushion:hover {
-    color: black;
+// Reset from style.scss
+thead {
+  background-color: white;
+  color: black;
+}
+
+// Reset from style.scss
+tbody > tr {
+  &:nth-child(even):not(.highlight) {
+    background: white;
   }
+}
 
-  a.fc-daygrid-day-number,
-  a.fc-daygrid-day-number:hover {
-    color: rgb(34, 34, 34);
-  }
+.fc .fc-toolbar.fc-footer-toolbar {
+  margin-bottom: 0.5em;
+}
 
-  td {
-    overflow: visible; // Show events on multiple days
-  }
+button.text-copy,
+button.text-copy:focus,
+button.text-copy:hover {
+  background-color: #67AE6E !important;
+  transition: 500ms ease-in;
+}
 
-  //Reset from style.scss
-  table {
-    box-shadow: none;
-    border-radius: 0px;
-    -moz-border-radius: 0px;
-    margin: 0px;
-  }
+button.text-copied,
+button.text-copied:focus,
+button.text-copied:hover {
+  transition: 500ms ease-out;
+}
 
-  // Reset from style.scss
-  thead {
-    background-color: white;
-    color: black;
-  }
+.fc .fc-getCalendarLink-button {
+  margin-right: 0.5rem;
+}
 
-  // Reset from style.scss
-  tbody>tr {
-    &:nth-child(even):not(.highlight) {
-      background: white;
-    }
-  }
-
-  .fc .fc-toolbar.fc-footer-toolbar {
-    margin-bottom: 0.5em;
-  }
-
-  button.text-copy,
-  button.text-copy:focus,
-  button.text-copy:hover {
-    background-color: #67AE6E !important;
-    transition: 500ms ease-in;
-  }
-
-  button.text-copied,
-  button.text-copied:focus,
-  button.text-copied:hover {
-    transition: 500ms ease-out;
-  }
-
-  .fc .fc-getCalendarLink-button {
-    margin-right: 0.5rem;
-  }
-
-  .fc .fc-helpButton-button {
-    border-radius: 70%;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    background-color: rgba(0, 0, 0, 0.8);
-    transition: 100ms ease-out;
-    width: 30px;
-    height: 30px;
-    font-size: 11px;
-  }
+.fc .fc-helpButton-button {
+  border-radius: 70%;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  transition: 100ms ease-out;
+  width: 30px;
+  height: 30px;
+  font-size: 11px;
+}
 
 
-  .fc .fc-helpButton-button:hover {
-    background-color: rgba(20, 20, 20, 0.6);
-  }
+.fc .fc-helpButton-button:hover {
+  background-color: rgba(20, 20, 20, 0.6);
 }
 
 .tooltip.calendar-copy-tooltip {

@@ -23,7 +23,8 @@
     "#core:*": "./core/static/bundled/*",
     "#pedagogy:*": "./pedagogy/static/bundled/*",
     "#counter:*": "./counter/static/bundled/*",
-    "#com:*": "./com/static/bundled/*"
+    "#com:*": "./com/static/bundled/*",
+    "#reservation:*": "./reservation/static/bundled/*"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
@@ -48,7 +49,11 @@
     "@fullcalendar/core": "^6.1.20",
     "@fullcalendar/daygrid": "^6.1.20",
     "@fullcalendar/icalendar": "^6.1.20",
+    "@fullcalendar/interaction": "^6.1.19",
     "@fullcalendar/list": "^6.1.20",
+    "@fullcalendar/resource": "^6.1.17",
+    "@fullcalendar/resource-timeline": "^6.1.17",
+    "@hey-api/client-fetch": "^0.8.2",
     "@sentry/browser": "^10.38.0",
     "@zip.js/zip.js": "^2.8.20",
     "3d-force-graph": "^1.79.1",
