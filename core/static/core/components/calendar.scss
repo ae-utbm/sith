@@ -1,0 +1,187 @@
+@import "core/static/core/colors";
+@import "core/static/core/tooltips";
+
+
+:root {
+  --fc-button-border-color: #fff;
+  --fc-button-hover-border-color: #fff;
+  --fc-button-active-border-color: #fff;
+  --fc-button-text-color: #fff;
+  --fc-button-bg-color: #1a78b3;
+  --fc-button-active-bg-color: #15608F;
+  --fc-button-hover-bg-color: #15608F;
+  --fc-today-bg-color: rgba(26, 120, 179, 0.1);
+  --fc-border-color: #DDDDDD;
+  --event-details-background-color: white;
+  --event-details-padding: 20px;
+  --event-details-border: 1px solid #EEEEEE;
+  --event-details-border-radius: 4px;
+  --event-details-box-shadow: 0 6px 20px 4px rgb(0 0 0 / 16%);
+  --event-details-max-width: 600px;
+}
+
+ics-calendar,
+room-scheduler {
+  border: none;
+  box-shadow: none;
+
+  a.fc-col-header-cell-cushion,
+  a.fc-col-header-cell-cushion:hover {
+    color: black;
+  }
+
+  a.fc-daygrid-day-number,
+  a.fc-daygrid-day-number:hover {
+    color: rgb(34, 34, 34);
+  }
+
+  td {
+    overflow: visible; // Show events on multiple days
+  }
+
+  td, th {
+    text-align: unset;
+  }
+
+  //Reset from style.scss
+  table {
+    box-shadow: none;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    margin: 0;
+  }
+
+  // Reset from style.scss
+  thead {
+    background-color: white;
+    color: black;
+  }
+
+  // Reset from style.scss
+  tbody > tr {
+    &:nth-child(even):not(.highlight) {
+      background: white;
+    }
+  }
+
+  .fc .fc-toolbar.fc-footer-toolbar {
+    margin-bottom: 0.5em;
+  }
+
+  button.text-copy,
+  button.text-copy:focus,
+  button.text-copy:hover {
+    background-color: #67AE6E !important;
+    transition: 500ms ease-in;
+  }
+
+  button.text-copied,
+  button.text-copied:focus,
+  button.text-copied:hover {
+    transition: 500ms ease-out;
+  }
+
+}
+
+ics-calendar {
+  #event-details {
+    z-index: 10;
+    max-width: 1151px;
+    position: absolute;
+
+    .event-details-container {
+      display: flex;
+      color: black;
+      flex-direction: column;
+      min-width: 200px;
+      max-width: var(--event-details-max-width);
+      padding: var(--event-details-padding);
+      border: var(--event-details-border);
+      border-radius: var(--event-details-border-radius);
+      background-color: var(--event-details-background-color);
+      box-shadow: var(--event-details-box-shadow);
+      gap: 20px;
+    }
+
+    .event-detail-row-icon {
+      margin-left: 10px;
+      margin-right: 20px;
+      align-content: center;
+      align-self: center;
+    }
+
+    .event-details-row {
+      display: flex;
+      align-items: start;
+    }
+
+    .event-details-row-content {
+      display: flex;
+      align-items: start;
+      flex-direction: row;
+      background-color: var(--event-details-background-color);
+      margin-top: 0;
+      margin-bottom: 4px;
+    }
+  }
+}
+
+// Reset from style.scss
+thead {
+  background-color: white;
+  color: black;
+}
+
+// Reset from style.scss
+tbody > tr {
+  &:nth-child(even):not(.highlight) {
+    background: white;
+  }
+}
+
+.fc .fc-toolbar.fc-footer-toolbar {
+  margin-bottom: 0.5em;
+}
+
+button.text-copy,
+button.text-copy:focus,
+button.text-copy:hover {
+  background-color: #67AE6E !important;
+  transition: 500ms ease-in;
+}
+
+button.text-copied,
+button.text-copied:focus,
+button.text-copied:hover {
+  transition: 500ms ease-out;
+}
+
+.fc .fc-getCalendarLink-button {
+  margin-right: 0.5rem;
+}
+
+.fc .fc-helpButton-button {
+  border-radius: 70%;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  transition: 100ms ease-out;
+  width: 30px;
+  height: 30px;
+  font-size: 11px;
+}
+
+
+.fc .fc-helpButton-button:hover {
+  background-color: rgba(20, 20, 20, 0.6);
+}
+
+.tooltip.calendar-copy-tooltip {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.tooltip.calendar-copy-tooltip.text-copied {
+  opacity: 0;
+  transition: opacity 500ms ease-out;
+}

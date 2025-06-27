@@ -8,10 +8,13 @@ from django.views.generic import CreateView, DeleteView, TemplateView, UpdateVie
 
 from club.models import Club
 from core.auth.mixins import CanEditMixin
-from core.views import UseFragmentsMixin
-from core.views.mixins import FragmentMixin
-from reservation.forms import ReservationForm, RoomCreateForm, RoomUpdateForm
-from reservation.models import ReservationSlot, Room
+from reservation.forms import RoomCreateForm, RoomUpdateForm
+from reservation.models import Room
+
+
+class ReservationScheduleView(PermissionRequiredMixin, TemplateView):
+    template_name = "reservation/schedule.jinja"
+    permission_required = "reservation.view_room"
 
 
 class RoomCreateView(SuccessMessageMixin, PermissionRequiredMixin, CreateView):

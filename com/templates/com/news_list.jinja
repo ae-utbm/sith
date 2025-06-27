@@ -1,9 +1,11 @@
 {% extends "core/base.jinja" %}
 {% from "com/macros.jinja" import news_moderation_alert %}
 
+{% block title %}AE UTBM{% endblock %}
+
 {% block additional_css %}
   <link rel="stylesheet" href="{{ static('com/css/news-list.scss') }}">
-  <link rel="stylesheet" href="{{ static('com/components/ics-calendar.scss') }}">
+  <link rel="stylesheet" href="{{ static('core/components/calendar.scss') }}">
 
   {# Atom feed discovery, not really css but also goes there #}
   <link rel="alternate" type="application/rss+xml" title="{% trans %}News feed{% endtrans %}" href="{{ url("com:news_feed") }}">
@@ -212,6 +214,10 @@
             <li>
               <i class="fa-solid fa-magnifying-glass fa-xl"></i>
               <a href="{{ url("matmat:search_clear") }}">{% trans %}Matmatronch{% endtrans %}</a>
+            </li>
+            <li>
+              <i class="fa-solid fa-thumbtack fa-xl"></i>
+              <a href="{{ url("reservation:main") }}">{% trans %}Room reservation{% endtrans %}</a>
             </li>
             <li>
               <i class="fa-solid fa-check-to-slot fa-xl"></i>
