@@ -49,6 +49,10 @@ urlpatterns = [
     path("trombi/", include(("trombi.urls", "trombi"), namespace="trombi")),
     path("matmatronch/", include(("matmat.urls", "matmat"), namespace="matmat")),
     path("pedagogy/", include(("pedagogy.urls", "pedagogy"), namespace="pedagogy")),
+    path(
+        "reservation/",
+        include(("reservation.urls", "reservation"), namespace="reservation"),
+    ),
     path("admin/", admin.site.urls),
     path("i18n/", include("django.conf.urls.i18n")),
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
