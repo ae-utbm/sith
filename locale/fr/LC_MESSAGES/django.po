@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-25 16:29+0200\n"
+"POT-Creation-Date: 2025-06-27 12:45+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1708,27 +1708,27 @@ msgstr "500, Erreur Serveur"
 msgid "Welcome!"
 msgstr "Bienvenue !"
 
-#: core/templates/core/base.jinja core/templates/core/base/navbar.jinja
+#: core/templates/core/base/footer.jinja core/templates/core/base/navbar.jinja
 msgid "Contacts"
 msgstr "Contacts"
 
-#: core/templates/core/base.jinja
+#: core/templates/core/base/footer.jinja
 msgid "Legal notices"
 msgstr "Mentions légales"
 
-#: core/templates/core/base.jinja
+#: core/templates/core/base/footer.jinja
 msgid "Intellectual property"
 msgstr "Propriété intellectuelle"
 
-#: core/templates/core/base.jinja
+#: core/templates/core/base/footer.jinja
 msgid "Help & Documentation"
 msgstr "Aide & Documentation"
 
-#: core/templates/core/base.jinja
+#: core/templates/core/base/footer.jinja
 msgid "R&D"
 msgstr "R&D"
 
-#: core/templates/core/base.jinja
+#: core/templates/core/base/footer.jinja
 msgid "Site created by the IT Department of the AE"
 msgstr "Site réalisé par le Pôle Informatique de l'AE"
 
@@ -3927,7 +3927,7 @@ msgid "You can't buy a refilling with sith money"
 msgstr "Vous ne pouvez pas acheter un rechargement avec de l'argent du sith"
 
 #: election/forms.py
-msgid "You have selected too much candidates."
+msgid "You have selected too many candidates."
 msgstr "Vous avez sélectionné trop de candidats."
 
 #: election/forms.py
