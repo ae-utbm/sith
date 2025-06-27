@@ -18,4 +18,8 @@
     can_edit_slot="{{ user.has_perm("reservation.change_reservationslot") }}"
     can_create_slot="{{ user.has_perm("reservation.add_reservationslot") }}"
   ></room-scheduler>
+  {% if user.has_perm("reservation.add_reservationslot") %}
+    <p><em>{% trans %}You can book a room by selecting a free slot in the calendar.{% endtrans %}</em></p>
+    {{ add_slot_fragment }}
+  {% endif %}
 {% endblock %}
