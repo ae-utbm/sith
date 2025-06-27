@@ -8,13 +8,37 @@ from django.views.generic import CreateView, DeleteView, TemplateView, UpdateVie
 
 from club.models import Club
 from core.auth.mixins import CanEditMixin
-from reservation.forms import RoomCreateForm, RoomUpdateForm
-from reservation.models import Room
+from core.views import UseFragmentsMixin
+from core.views.mixins import FragmentMixin
+from reservation.forms import ReservationForm, RoomCreateForm, RoomUpdateForm
+from reservation.models import ReservationSlot, Room
 
 
-class ReservationScheduleView(PermissionRequiredMixin, TemplateView):
+class ReservationFragment(PermissionRequiredMixin, FragmentMixin, CreateView):
+    model = ReservationSlot
+    form_class = ReservationForm
+    permission_required = "reservation.add_reservationslot"
+    template_name = "reservation/fragments/create_reservation.jinja"
+    success_url = reverse_lazy("reservation:main")
+    reload_on_redirect = True
+    object = None
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"author": self.request.user}
+
+    def get_context_data(self, **kwargs):
+        # if method is POST, then it means the form just failed
+        # to validate, so it must be shown, with error messages.
+        # Else, it can be initially hidden.
+        return super().get_context_data(**kwargs) | {
+            "displayForm": self.request.method == "POST"
+        }
+
+
+class ReservationScheduleView(PermissionRequiredMixin, UseFragmentsMixin, TemplateView):
     template_name = "reservation/schedule.jinja"
     permission_required = "reservation.view_room"
+    fragments = {"add_slot_fragment": ReservationFragment}
 
 
 class RoomCreateView(SuccessMessageMixin, PermissionRequiredMixin, CreateView):
