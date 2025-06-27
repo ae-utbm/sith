@@ -2,7 +2,8 @@ from django import forms
 
 from club.widgets.ajax_select import AutoCompleteSelectClub
 from core.models import User
-from reservation.models import Room
+from core.views.forms import FutureDateTimeField, SelectDateTime
+from reservation.models import ReservationSlot, Room
 
 
 class RoomCreateForm(forms.ModelForm):
@@ -31,3 +32,22 @@ class RoomUpdateForm(forms.ModelForm):
             # (i.e. it's a club board member, but not a sith admin)
             # some fields aren't editable
             del self.fields["club"]
+
+
+class ReservationForm(forms.ModelForm):
+    required_css_class = "required"
+    error_css_class = "error"
+
+    class Meta:
+        model = ReservationSlot
+        fields = ["room", "start_at", "end_at", "comment"]
+        field_classes = {"start_at": FutureDateTimeField, "end_at": FutureDateTimeField}
+        widgets = {"start_at": SelectDateTime(), "end_at": SelectDateTime()}
+
+    def __init__(self, *args, author: User, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.author = author
+
+    def save(self, commit: bool = True):  # noqa FBT001
+        self.instance.author = self.author
+        return super().save(commit)
