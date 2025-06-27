@@ -81,9 +81,8 @@
     }
 
     #links_content {
-      overflow: auto;
       box-shadow: $shadow-color 1px 1px 1px;
-      height: 20em;
+      padding: .5rem;
 
       h4 {
         margin-left: 5px;

@@ -1,0 +1,21 @@
+{% extends "core/base.jinja" %}
+
+{% block additional_js %}
+  <script type="module" src="{{ static("bundled/reservation/components/room-scheduler-index.ts") }}"></script>
+  <script type="module" src="{{ static("bundled/reservation/slot-reservation-index.ts") }}"></script>
+{% endblock %}
+
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static('core/components/calendar.scss') }}">
+  <link rel="stylesheet" href="{{ static('reservation/reservation.scss') }}">
+{% endblock %}
+
+
+{% block content %}
+  <h2 class="margin-bottom">{% trans %}Room reservation{% endtrans %}</h2>
+  <room-scheduler
+    locale="{{ LANGUAGE_CODE }}"
+    can_edit_slot="{{ user.has_perm("reservation.change_reservationslot") }}"
+    can_create_slot="{{ user.has_perm("reservation.add_reservationslot") }}"
+  ></room-scheduler>
+{% endblock %}
