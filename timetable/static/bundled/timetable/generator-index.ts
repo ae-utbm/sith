@@ -1,3 +1,5 @@
+import html2canvas from "html2canvas";
+
 // see https://regex101.com/r/QHSaPM/2
 const TIMETABLE_ROW_RE: RegExp =
   /^(?<ueCode>[A-Z\d]{4}(?:\+[A-Z\d]{4})?)\s+(?<courseType>[A-Z]{2}\d)\s+((?<weekGroup>[AB])\s+)?(?<weekday>(lundi)|(mardi)|(mercredi)|(jeudi)|(vendredi)|(samedi)|(dimanche))\s+(?<startHour>\d{2}:\d{2})\s+(?<endHour>\d{2}:\d{2})\s+[\dA-B]\s+(?:[\wé]*\s+)?(?<room>\w+(?:, \w+)?)$/;
@@ -116,6 +118,17 @@ document.addEventListener("alpine:init", () => {
         top: `${(slot.startSlot - this.startSlot) * SLOT_HEIGHT}px`,
         left: `${this.displayedWeekdays.indexOf(slot.weekday) * SLOT_WIDTH}px`,
       };
+    },
+
+    async savePng() {
+      const elem = document.getElementById("timetable");
+      const img = (await html2canvas(elem)).toDataURL();
+      const downloadLink = document.createElement("a");
+      downloadLink.href = img;
+      downloadLink.download = "edt.png";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
     },
   }));
 });

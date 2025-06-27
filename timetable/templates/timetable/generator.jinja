@@ -28,7 +28,7 @@
     <div
       id="timetable"
       x-show="table.height > 0 && table.width > 0"
-      :style="{width: `${table.width}px`, height: `${table.height}px`}"
+      :style="{width: `${table.width}px`, height: `${table.height+40}px`}"
     >
       <div class="header">
         <template x-for="weekday in displayedWeekdays">
@@ -45,5 +45,12 @@
         </template>
       </div>
     </div>
+    <button
+      class="margin-bottom btn btn-blue"
+      @click="savePng"
+      x-show="table.height > 0 && table.width > 0"
+    >
+      {% trans %}Save to PNG{% endtrans %}
+    </button>
   </div>
 {% endblock content %}
