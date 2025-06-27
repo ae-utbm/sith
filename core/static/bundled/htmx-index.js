@@ -1,4 +1,5 @@
 import htmx from "htmx.org";
+import "htmx-ext-alpine-morph";
 
 document.body.addEventListener("htmx:beforeRequest", (event) => {
   event.target.ariaBusy = true;

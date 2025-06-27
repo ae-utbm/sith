@@ -1,6 +1,7 @@
 import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
 import {
   Calendar,
+  type DateSelectArg,
   type EventDropArg,
   type EventSourceFuncArg,
 } from "@fullcalendar/core";
@@ -18,6 +19,7 @@ import {
 import { paginated } from "#core:utils/api";
 import interactionPlugin from "@fullcalendar/interaction";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
+import type { SlotSelectedEventArg } from "#reservation:reservation/types";
 
 @registerComponent("room-scheduler")
 export class RoomScheduler extends inheritHtmlElement("div") {
@@ -26,6 +28,7 @@ export class RoomScheduler extends inheritHtmlElement("div") {
   private locale = "en";
   private canEditSlot = false;
   private canBookSlot = false;
+  private canDeleteSlot = false;
 
   attributeChangedCallback(name: string, _oldValue?: string, newValue?: string) {
     if (name === "locale") {
@@ -36,6 +39,9 @@ export class RoomScheduler extends inheritHtmlElement("div") {
     }
     if (name === "can_create_slot") {
       this.canBookSlot = newValue.toLowerCase() === "true";
+    }
+    if (name === "can_delete_slot") {
+      this.canDeleteSlot = newValue.toLowerCase() === "true";
     }
   }
 
@@ -84,6 +90,18 @@ export class RoomScheduler extends inheritHtmlElement("div") {
     }
   }
 
+  selectFreeSlot(infos: DateSelectArg) {
+    document.dispatchEvent(
+      new CustomEvent<SlotSelectedEventArg>("timeSlotSelected", {
+        detail: {
+          ressource: Number.parseInt(infos.resource.id),
+          start: infos.startStr,
+          end: infos.endStr,
+        },
+      }),
+    );
+  }
+
   connectedCallback() {
     super.connectedCallback();
     this.scheduler = new Calendar(this.node, {
@@ -109,6 +127,7 @@ export class RoomScheduler extends inheritHtmlElement("div") {
       resourceAreaWidth: "20%",
       resources: this.fetchResources,
       events: this.fetchEvents,
+      select: this.selectFreeSlot,
       selectOverlap: false,
       selectable: this.canBookSlot,
       selectConstraint: { start: new Date() },
