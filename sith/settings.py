@@ -276,7 +276,7 @@ LOGGING = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
-LANGUAGE_CODE = "fr-FR"
+LANGUAGE_CODE = "fr"
 
 LANGUAGES = [("en", _("English")), ("fr", _("French"))]
 
