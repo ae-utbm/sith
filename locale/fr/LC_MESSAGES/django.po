@@ -4044,7 +4044,7 @@ msgid "You can't buy a refilling with sith money"
 msgstr "Vous ne pouvez pas acheter un rechargement avec de l'argent du sith"
 
 #: election/forms.py
-msgid "You have selected too much candidates."
+msgid "You have selected too many candidates."
 msgstr "Vous avez sélectionné trop de candidats."
 
 #: election/forms.py

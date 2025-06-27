@@ -27,7 +27,7 @@ class LimitedCheckboxField(forms.ModelMultipleChoiceField):
     def validate(self, qs):
         if qs.count() > self.max_choice:
             raise forms.ValidationError(
-                _("You have selected too much candidates."), code="invalid"
+                _("You have selected too many candidates."), code="invalid"
             )
 
 
@@ -49,9 +49,7 @@ class CandidateForm(forms.ModelForm):
             "election_list": AutoCompleteSelect,
         }
 
-    def __init__(
-        self, *args, election: Election | None, can_edit: bool = False, **kwargs
-    ):
+    def __init__(self, *args, election: Election, can_edit: bool = False, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["role"].queryset = election.roles.select_related("election")
         self.fields["election_list"].queryset = election.election_lists.all()
@@ -62,7 +60,7 @@ class CandidateForm(forms.ModelForm):
 class VoteForm(forms.Form):
     def __init__(self, election: Election, user: User, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if election.can_vote(user):
+        if not election.can_vote(user):
             return
         for role in election.roles.all():
             cand = role.candidatures
