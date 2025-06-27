@@ -1,0 +1,39 @@
+#slot-reservation {
+  margin-top: 3em;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  h3 {
+    display: block;
+    margin: auto;
+    text-align: left;
+  }
+
+  .alert, .error {
+    display: block;
+    margin: 1em auto auto;
+    max-width: 400px;
+    word-wrap: break-word;
+    text-wrap: wrap;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+    justify-content: center;
+
+    .buttons-row {
+      input[type="submit"], button {
+        margin: 0;
+      }
+    }
+    textarea {
+      max-width: unset;
+      width: 100%;
+      margin-top: unset;
+    }
+  }
+}
