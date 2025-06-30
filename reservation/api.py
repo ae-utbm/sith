@@ -23,7 +23,7 @@ class ReservableRoomController(ControllerBase):
     @route.get(
         "",
         response=list[RoomSchema],
-        permissions=[HasPerm("reservation.viem_room")],
+        permissions=[HasPerm("reservation.view_room")],
         url_name="fetch_reservable_rooms",
     )
     def fetch_rooms(self, filters: Query[RoomFilterSchema]):
@@ -36,6 +36,7 @@ class ReservationSlotController(ControllerBase):
         "",
         response=PaginatedResponseSchema[SlotSchema],
         permissions=[HasPerm("reservation.view_reservationslot")],
+        url_name="fetch_reservation_slots",
     )
     @paginate(PageNumberPaginationExtra)
     def fetch_slots(self, filters: Query[SlotFilterSchema]):

@@ -51,10 +51,10 @@ class Room(models.Model):
 
 
 class ReservationSlotQuerySet(models.QuerySet):
-    def overlapping_with(self, other: ReservationSlot) -> Self:
+    def overlapping_with(self, slot: ReservationSlot) -> Self:
         return self.filter(
-            Q(start_at__lt=other.start_at, start_at__gt=other.start_at)
-            | Q(end_at__gt=other.start_at, end_at__lt=other.end_at)
+            Q(start_at__lt=slot.start_at, end_at__gt=slot.start_at)
+            | Q(start_at__lt=slot.end_at, end_at__gt=slot.end_at)
         )
 
 
@@ -68,7 +68,7 @@ class ReservationSlot(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("author"))
     comment = models.TextField(_("comment"), blank=True, default="")
     start_at = models.DateTimeField(_("slot start"), db_index=True)
-    end_at = models.DateTimeField(verbose_name=_("slot end"))
+    end_at = models.DateTimeField(_("slot end"))
     created_at = models.DateTimeField(auto_now_add=True)
 
     objects = ReservationSlotQuerySet.as_manager()
@@ -78,8 +78,9 @@ class ReservationSlot(models.Model):
         verbose_name_plural = _("reservation slots")
         constraints = [
             models.CheckConstraint(
-                check=Q(end_at__gt=F("start_at")),
+                condition=Q(end_at__gt=F("start_at")),
                 name="reservation_slot_end_after_start",
+                violation_error_code="start_after_end",
             )
         ]
 
