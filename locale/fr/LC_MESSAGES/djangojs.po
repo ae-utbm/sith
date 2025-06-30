@@ -255,6 +255,10 @@ msgstr "La réorganisation des types de produit a échoué avec le code : %d"
 msgid "Rooms"
 msgstr "Salles"
 
+#: reservation/static/bundled/reservation/slot-reservation-index.ts
+msgid "This slot has been successfully moved"
+msgstr "Ce créneau a été bougé avec succès"
+
 #: sas/static/bundled/sas/pictures-download-index.ts
 msgid "pictures.%(extension)s"
 msgstr "photos.%(extension)s"
