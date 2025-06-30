@@ -52,7 +52,6 @@
     "@fullcalendar/list": "^6.1.17",
     "@fullcalendar/resource": "^6.1.17",
     "@fullcalendar/resource-timeline": "^6.1.17",
-    "@hey-api/client-fetch": "^0.8.2",
     "@sentry/browser": "^9.29.0",
     "@zip.js/zip.js": "^2.7.52",
     "3d-force-graph": "^1.73.4",
