@@ -17,9 +17,9 @@ import {
 } from "#openapi";
 
 import { paginated } from "#core:utils/api";
+import type { SlotSelectedEventArg } from "#reservation:reservation/types";
 import interactionPlugin from "@fullcalendar/interaction";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
-import type { SlotSelectedEventArg } from "#reservation:reservation/types";
 
 @registerComponent("room-scheduler")
 export class RoomScheduler extends inheritHtmlElement("div") {
