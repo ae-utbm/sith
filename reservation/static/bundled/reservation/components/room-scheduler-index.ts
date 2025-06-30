@@ -1,4 +1,3 @@
-import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
 import {
   Calendar,
   type DateSelectArg,
@@ -7,16 +6,18 @@ import {
 } from "@fullcalendar/core";
 import enLocale from "@fullcalendar/core/locales/en-gb";
 import frLocale from "@fullcalendar/core/locales/fr";
+import interactionPlugin, { type EventResizeDoneArg } from "@fullcalendar/interaction";
+import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 
+import { paginated } from "#core:utils/api";
+import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
 import {
   type ReservationslotFetchSlotsData,
-  type SlotSchema,
   reservableroomFetchRooms,
   reservationslotFetchSlots,
   reservationslotUpdateSlot,
+  type SlotSchema,
 } from "#openapi";
-
-import { paginated } from "#core:utils/api";
 import type { SlotSelectedEventArg } from "#reservation:reservation/types";
 import interactionPlugin from "@fullcalendar/interaction";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
