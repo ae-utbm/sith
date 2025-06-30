@@ -5,7 +5,6 @@ from typing import Self
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F, Q
-from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from club.models import Club
@@ -38,9 +37,6 @@ class Room(models.Model):
 
     def __str__(self):
         return self.name
-
-    def get_absolute_url(self):
-        return reverse("reservation:room_detail", kwargs={"room_id": self.id})
 
     def can_be_edited_by(self, user: User) -> bool:
         # a user may edit a room if it has the global perm
@@ -95,9 +91,10 @@ class ReservationSlot(models.Model):
             # so in this case, don't do the overlap check and let
             # Django manage the non-null constraint error.
             return
-        if (
-            ReservationSlot.objects.overlapping_with(self)
-            .filter(room_id=self.room_id)
-            .exists()
-        ):
+        overlapping = ReservationSlot.objects.overlapping_with(self).filter(
+            room_id=self.room_id
+        )
+        if self.id is not None:
+            overlapping = overlapping.exclude(id=self.id)
+        if overlapping.exists():
             raise ValidationError(_("There is already a reservation on this slot."))
