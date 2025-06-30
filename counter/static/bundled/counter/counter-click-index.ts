@@ -1,18 +1,14 @@
 import { BasketItem } from "#counter:counter/basket";
 import type { CounterConfig, ErrorMessage } from "#counter:counter/types";
 import type { CounterProductSelect } from "./components/counter-product-select-index.ts";
+import { AlertMessage } from "#core:utils/alert-message";
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("counter", (config: CounterConfig) => ({
     basket: {} as Record<string, BasketItem>,
-    errors: [],
     customerBalance: config.customerBalance,
     codeField: null as CounterProductSelect | null,
-    alertMessage: {
-      content: "",
-      show: false,
-      timeout: null,
-    },
+    alertMessage: new AlertMessage({ defaultDuration: 2000 }),
 
     init() {
       // Fill the basket with the initial data
@@ -77,22 +73,10 @@ document.addEventListener("alpine:init", () => {
       return total;
     },
 
-    showAlertMessage(message: string) {
-      if (this.alertMessage.timeout !== null) {
-        clearTimeout(this.alertMessage.timeout);
-      }
-      this.alertMessage.content = message;
-      this.alertMessage.show = true;
-      this.alertMessage.timeout = setTimeout(() => {
-        this.alertMessage.show = false;
-        this.alertMessage.timeout = null;
-      }, 2000);
-    },
-
     addToBasketWithMessage(id: string, quantity: number) {
       const message = this.addToBasket(id, quantity);
       if (message.length > 0) {
-        this.showAlertMessage(message);
+        this.alertMessage.display(message, { success: false });
       }
     },
 
@@ -109,7 +93,9 @@ document.addEventListener("alpine:init", () => {
 
     finish() {
       if (this.getBasketSize() === 0) {
-        this.showAlertMessage(gettext("You can't send an empty basket."));
+        this.alertMessage.display(gettext("You can't send an empty basket."), {
+          success: false,
+        });
         return;
       }
       this.$refs.basketForm.submit();
