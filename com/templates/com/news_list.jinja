@@ -215,10 +215,12 @@
               <i class="fa-solid fa-magnifying-glass fa-xl"></i>
               <a href="{{ url("matmat:search_clear") }}">{% trans %}Matmatronch{% endtrans %}</a>
             </li>
-            <li>
-              <i class="fa-solid fa-thumbtack fa-xl"></i>
-              <a href="{{ url("reservation:main") }}">{% trans %}Room reservation{% endtrans %}</a>
-            </li>
+            {% if user.has_perm("reservation.view_reservationslot") %}
+              <li>
+                <i class="fa-solid fa-thumbtack fa-xl"></i>
+                <a href="{{ url("reservation:main") }}">{% trans %}Room reservation{% endtrans %}</a>
+              </li>
+            {% endif %}
             <li>
               <i class="fa-solid fa-check-to-slot fa-xl"></i>
               <a href="{{ url("election:list") }}">{% trans %}Elections{% endtrans %}</a>

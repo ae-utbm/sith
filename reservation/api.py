@@ -1,4 +1,3 @@
-from datetime import timedelta
 from typing import Any, Literal
 
 from django.core.exceptions import ValidationError
@@ -6,7 +5,6 @@ from ninja import Query
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
-from pydantic import FutureDatetime
 
 from api.permissions import HasPerm
 from reservation.models import ReservationSlot, Room
@@ -15,6 +13,7 @@ from reservation.schemas import (
     RoomSchema,
     SlotFilterSchema,
     SlotSchema,
+    UpdateReservationSlotSchema,
 )
 
 
@@ -52,11 +51,12 @@ class ReservationSlotController(ControllerBase):
             409: dict[Literal["detail"], dict[str, list[str]]],
             422: dict[Literal["detail"], list[dict[str, Any]]],
         },
+        url_name="change_reservation_slot",
     )
-    def update_slot(self, start: FutureDatetime, duration: timedelta, slot_id: int):
+    def update_slot(self, slot_id: int, params: UpdateReservationSlotSchema):
         slot = self.get_object_or_exception(ReservationSlot, id=slot_id)
-        slot.start_at = start
-        slot.end_at = start + duration
+        slot.start_at = params.start_at
+        slot.end_at = params.end_at
         try:
             slot.full_clean()
             slot.save()

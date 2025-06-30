@@ -2,7 +2,7 @@
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DeleteView, TemplateView, UpdateView
 
@@ -29,14 +29,13 @@ class ReservationFragment(PermissionRequiredMixin, FragmentMixin, CreateView):
 
 class ReservationScheduleView(PermissionRequiredMixin, UseFragmentsMixin, TemplateView):
     template_name = "reservation/schedule.jinja"
-    permission_required = "reservation.view_room"
+    permission_required = "reservation.view_reservationslot"
     fragments = {"add_slot_fragment": ReservationFragment}
 
 
-class RoomCreateView(SuccessMessageMixin, PermissionRequiredMixin, CreateView):
+class RoomCreateView(PermissionRequiredMixin, CreateView):
     form_class = RoomCreateForm
     template_name = "core/create.jinja"
-    success_message = _("%(name)s was created successfully")
     permission_required = "reservation.add_room"
 
     def get_initial(self):
@@ -46,6 +45,9 @@ class RoomCreateView(SuccessMessageMixin, PermissionRequiredMixin, CreateView):
             if club_id.isdigit() and int(club_id) > 0:
                 init["club"] = Club.objects.filter(id=int(club_id)).first()
         return init
+
+    def get_success_url(self):
+        return reverse("club:tools", kwargs={"club_id": self.object.club_id})
 
 
 class RoomUpdateView(SuccessMessageMixin, CanEditMixin, UpdateView):

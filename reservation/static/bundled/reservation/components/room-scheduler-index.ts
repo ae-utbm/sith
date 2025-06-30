@@ -80,9 +80,9 @@ export class RoomScheduler extends inheritHtmlElement("div") {
     const response = await reservationslotUpdateSlot({
       // biome-ignore lint/style/useNamingConvention: api is snake_case
       path: { slot_id: Number.parseInt(args.event.id) },
-      query: {
-        start: args.event.startStr,
-        duration: `PT${duration.getUTCHours()}H${duration.getUTCMinutes()}M${duration.getUTCSeconds()}S`,
+      body: {
+        start_at: args.event.startStr,
+        end_at: args.event.endStr,
       },
     });
     if (response.response.ok) {

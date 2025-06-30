@@ -48,7 +48,9 @@
         {%- endfor -%}
       </ul>
     {%- else -%}
-      {% trans %}This club manages no reservable room{% endtrans %}
+      <p>
+        {% trans %}This club manages no reservable room{% endtrans %}
+      </p>
     {%- endif -%}
     <h4>{% trans %}Counters:{% endtrans %}</h4>
     <ul>
