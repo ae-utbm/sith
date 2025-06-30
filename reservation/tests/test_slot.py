@@ -17,10 +17,8 @@ from reservation.models import ReservationSlot, Room
 class TestFetchReservationSlotsApi:
     @pytest.fixture
     def user(self):
-        return baker.make(
-            User,
-            user_permissions=[Permission.objects.get(codename="view_reservationslot")],
-        )
+        perm = Permission.objects.get(codename="view_reservationslot")
+        return baker.make(User, user_permissions=[perm])
 
     def test_fetch_simple(self, client: Client, user: User):
         slots = baker.make(ReservationSlot, _quantity=5, _bulk_create=True)
@@ -53,6 +51,67 @@ class TestFetchReservationSlotsApi:
             # 4 for authentication
             # 1 to fetch the actual data
             client.get(reverse("api:fetch_reservation_slots"))
+
+
+@pytest.mark.django_db
+class TestUpdateReservationSlotApi:
+    @pytest.fixture
+    def user(self):
+        perm = Permission.objects.get(codename="change_reservationslot")
+        return baker.make(User, user_permissions=[perm])
+
+    @pytest.fixture
+    def slot(self):
+        return baker.make(
+            ReservationSlot,
+            start_at=now() + timedelta(hours=2),
+            end_at=now() + timedelta(hours=4),
+        )
+
+    def test_ok(self, client: Client, user: User, slot: ReservationSlot):
+        client.force_login(user)
+        new_start = (slot.start_at + timedelta(hours=1)).replace(microsecond=0)
+        response = client.patch(
+            reverse("api:change_reservation_slot", kwargs={"slot_id": slot.id}),
+            {"start_at": new_start, "end_at": new_start + timedelta(hours=2)},
+            content_type="application/json",
+        )
+        assert response.status_code == 200
+        slot.refresh_from_db()
+        assert slot.start_at.replace(microsecond=0) == new_start
+        assert slot.end_at.replace(microsecond=0) == new_start + timedelta(hours=2)
+
+    def test_change_past_event(self, client, user: User, slot: ReservationSlot):
+        """Test that moving a slot that already began is impossible."""
+        client.force_login(user)
+        new_start = now() - timedelta(hours=1)
+        response = client.patch(
+            reverse("api:change_reservation_slot", kwargs={"slot_id": slot.id}),
+            {"start_at": new_start, "end_at": new_start + timedelta(hours=2)},
+            content_type="application/json",
+        )
+
+        assert response.status_code == 422
+
+    def test_move_event_to_occupied_slot(
+        self, client: Client, user: User, slot: ReservationSlot
+    ):
+        client.force_login(user)
+        other_slot = baker.make(
+            ReservationSlot,
+            room=slot.room,
+            start_at=slot.end_at + timedelta(hours=1),
+            end_at=slot.end_at + timedelta(hours=3),
+        )
+        response = client.patch(
+            reverse("api:change_reservation_slot", kwargs={"slot_id": slot.id}),
+            {
+                "start_at": other_slot.start_at - timedelta(hours=1),
+                "end_at": other_slot.start_at + timedelta(hours=1),
+            },
+            content_type="application/json",
+        )
+        assert response.status_code == 409
 
 
 @pytest.mark.django_db
@@ -109,3 +168,40 @@ class TestReservationForm:
         assert form.errors == {
             "__all__": ["Il y a déjà une réservation sur ce créneau."]
         }
+
+
+@pytest.mark.django_db
+class TestCreateReservationSlot:
+    @pytest.fixture
+    def user(self):
+        perms = Permission.objects.filter(
+            codename__in=["add_reservationslot", "view_reservationslot"]
+        )
+        return baker.make(User, user_permissions=list(perms))
+
+    def test_ok(self, client: Client, user: User):
+        client.force_login(user)
+        start = now() + timedelta(hours=2)
+        end = start + timedelta(hours=1)
+        room = baker.make(Room)
+        response = client.post(
+            reverse("reservation:make_reservation"),
+            {"room": room.id, "start_at": start, "end_at": end},
+        )
+        assert response.status_code == 200
+        assert response.headers.get("HX-Redirect", "") == reverse("reservation:main")
+        slot = ReservationSlot.objects.filter(room=room).last()
+        assert slot is not None
+        assert slot.start_at == start
+        assert slot.end_at == end
+        assert slot.author == user
+
+    def test_permissions_denied(self, client: Client):
+        client.force_login(baker.make(User))
+        start = now() + timedelta(hours=2)
+        end = start + timedelta(hours=1)
+        response = client.post(
+            reverse("reservation:make_reservation"),
+            {"room": baker.make(Room), "start_at": start, "end_at": end},
+        )
+        assert response.status_code == 403
