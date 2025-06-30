@@ -109,6 +109,7 @@ class Migration(migrations.Migration):
                     models.CheckConstraint(
                         condition=models.Q(("end_at__gt", models.F("start_at"))),
                         name="reservation_slot_end_after_start",
+                        violation_error_code="start_after_end",
                     )
                 ],
             },
