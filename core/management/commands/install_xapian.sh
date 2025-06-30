@@ -4,13 +4,13 @@
 VERSION="$1"
 
 # Cleanup env vars for auto discovery mechanism
-export CPATH=
-export LIBRARY_PATH=
-export CFLAGS=
-export LDFLAGS=
-export CCFLAGS=
-export CXXFLAGS=
-export CPPFLAGS=
+unset CPATH
+unset LIBRARY_PATH
+unset CFLAGS
+unset LDFLAGS
+unset CCFLAGS
+unset CXXFLAGS
+unset CPPFLAGS
 
 # prepare
 rm -rf "$VIRTUAL_ENV/packages"
