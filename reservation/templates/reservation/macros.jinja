@@ -1,0 +1,27 @@
+{% macro room_detail(room, can_edit, can_delete) %}
+  <div class="card card-row card-row-m">
+    <div class="card-content">
+      <strong class="card-title">{{ room.name }}</strong>
+      <em>{{ room.get_location_display() }}</em>
+      <p>{{ room.description|truncate(250) }}</p>
+    </div>
+    <div class="card-top-left">
+      {% if can_edit %}
+        <a
+          class="btn btn-grey btn-no-text"
+          href="{{ url("reservation:room_edit", room_id=room.id) }}"
+        >
+          <i class="fa fa-edit"></i>
+        </a>
+      {% endif %}
+      {% if can_delete %}
+        <a
+          class="btn btn-red btn-no-text"
+          href="{{ url("reservation:room_delete", room_id=room.id) }}"
+        >
+          <i class="fa fa-trash"></i>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+{% endmacro %}
