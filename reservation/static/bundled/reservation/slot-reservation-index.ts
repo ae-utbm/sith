@@ -1,3 +1,4 @@
+import { AlertMessage } from "#core:utils/alert-message";
 import type { SlotSelectedEventArg } from "#reservation:reservation/types";
 
 document.addEventListener("alpine:init", () => {
@@ -18,6 +19,21 @@ document.addEventListener("alpine:init", () => {
           this.$nextTick(() => this.$el.scrollIntoView({ behavior: "smooth" })).then();
         },
       );
+    },
+  }));
+
+  /**
+   * Component that will catch events sent from the scheduler
+   * to display success messages accordingly.
+   */
+  Alpine.data("scheduleMessages", () => ({
+    alertMessage: new AlertMessage({ defaultDuration: 2000 }),
+    init() {
+      document.addEventListener("reservationSlotChanged", (_event: CustomEvent) => {
+        this.alertMessage.display(gettext("This slot has been successfully moved"), {
+          success: true,
+        });
+      });
     },
   }));
 });
