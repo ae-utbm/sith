@@ -8,7 +8,6 @@ import enLocale from "@fullcalendar/core/locales/en-gb";
 import frLocale from "@fullcalendar/core/locales/fr";
 import interactionPlugin, { type EventResizeDoneArg } from "@fullcalendar/interaction";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
-
 import { paginated } from "#core:utils/api";
 import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
 import {
@@ -19,8 +18,6 @@ import {
   type SlotSchema,
 } from "#openapi";
 import type { SlotSelectedEventArg } from "#reservation:reservation/types";
-import interactionPlugin from "@fullcalendar/interaction";
-import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 
 @registerComponent("room-scheduler")
 export class RoomScheduler extends inheritHtmlElement("div") {
@@ -76,17 +73,15 @@ export class RoomScheduler extends inheritHtmlElement("div") {
    * Send a request to the API to change
    * the start and the duration of a reservation slot
    */
-  async changeReservation(args: EventDropArg) {
-    const duration = new Date(args.event.end.getTime() - args.event.start.getTime());
+  async changeReservation(args: EventDropArg | EventResizeDoneArg) {
     const response = await reservationslotUpdateSlot({
       // biome-ignore lint/style/useNamingConvention: api is snake_case
       path: { slot_id: Number.parseInt(args.event.id) },
-      body: {
-        start_at: args.event.startStr,
-        end_at: args.event.endStr,
-      },
+      // biome-ignore lint/style/useNamingConvention: api is snake_case
+      body: { start_at: args.event.startStr, end_at: args.event.endStr },
     });
     if (response.response.ok) {
+      document.dispatchEvent(new CustomEvent("reservationSlotChanged"));
       this.scheduler.refetchEvents();
     }
   }
@@ -134,6 +129,7 @@ export class RoomScheduler extends inheritHtmlElement("div") {
       selectConstraint: { start: new Date() },
       nowIndicator: true,
       eventDrop: this.changeReservation,
+      eventResize: this.changeReservation,
     });
     this.scheduler.render();
   }
