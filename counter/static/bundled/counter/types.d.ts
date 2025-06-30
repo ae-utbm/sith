@@ -1,4 +1,4 @@
-type ErrorMessage = string;
+export type ErrorMessage = string;
 
 export interface InitialFormData {
   /* Used to refill the form when the backend raises an error */

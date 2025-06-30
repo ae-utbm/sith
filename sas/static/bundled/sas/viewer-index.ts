@@ -1,3 +1,4 @@
+import type { UserAjaxSelect } from "#core:core/components/ajax-select-index";
 import { paginated } from "#core:utils/api";
 import { exportToHtml } from "#core:utils/globals";
 import { History } from "#core:utils/history";
@@ -130,7 +131,7 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
       currentPicture: {
         // biome-ignore lint/style/useNamingConvention: api is in snake_case
         is_moderated: true,
-        id: null,
+        id: null as number,
         name: "",
         // biome-ignore lint/style/useNamingConvention: api is in snake_case
         display_name: "",
@@ -142,7 +143,7 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
         full_size_url: "",
         owner: "",
         date: new Date(),
-        identifications: [],
+        identifications: [] as IdentifiedUserSchema[],
       },
       /**
        * The picture which will be displayed next if the user press the "next" button
@@ -155,7 +156,7 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
       /**
        * The select2 component used to identify users
        **/
-      selector: undefined,
+      selector: undefined as UserAjaxSelect,
       /**
        * Error message when a moderation operation fails
        **/

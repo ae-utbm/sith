@@ -14,6 +14,7 @@
     "types": ["jquery", "alpinejs"],
     "paths": {
       "#openapi": ["./staticfiles/generated/openapi/client/index.ts"],
+      "#openapi:*": ["./staticfiles/generated/openapi/client/*"],
       "#core:*": ["./core/static/bundled/*"],
       "#pedagogy:*": ["./pedagogy/static/bundled/*"],
       "#counter:*": ["./counter/static/bundled/*"],

@@ -1,7 +1,7 @@
+import { AlertMessage } from "#core:utils/alert-message";
 import { BasketItem } from "#counter:counter/basket";
 import type { CounterConfig, ErrorMessage } from "#counter:counter/types";
 import type { CounterProductSelect } from "./components/counter-product-select-index.ts";
-import { AlertMessage } from "#core:utils/alert-message";
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("counter", (config: CounterConfig) => ({

@@ -1,5 +1,5 @@
-import type { Client, Options, RequestResult, TDataShape } from "@hey-api/client-fetch";
-import { client } from "#openapi";
+import type { Client, RequestResult, TDataShape } from "#openapi:client";
+import { type Options, client } from "#openapi";
 
 export interface PaginatedResponse<T> {
   count: number;

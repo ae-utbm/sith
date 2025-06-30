@@ -1,6 +1,6 @@
+import { AlertMessage } from "#core:utils/alert-message";
 import Alpine from "alpinejs";
 import { producttypeReorder } from "#openapi";
-import { AlertMessage } from "#core:utils/alert-message";
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("productTypesList", () => ({
