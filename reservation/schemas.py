@@ -3,7 +3,7 @@ from datetime import datetime
 from ninja import FilterSchema, ModelSchema
 from pydantic import Field
 
-from club.schemas import ClubSchema
+from club.schemas import SimpleClubSchema
 from core.schemas import SimpleUserSchema
 from reservation.models import ReservationSlot, Room
 
@@ -17,7 +17,7 @@ class RoomSchema(ModelSchema):
         model = Room
         fields = ["id", "name", "description", "location"]
 
-    club: ClubSchema
+    club: SimpleClubSchema
 
     @staticmethod
     def resolve_location(obj: Room):
