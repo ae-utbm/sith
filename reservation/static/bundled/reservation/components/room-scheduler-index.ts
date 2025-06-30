@@ -76,16 +76,14 @@ export class RoomScheduler extends inheritHtmlElement("div") {
    * the start and the duration of a reservation slot
    */
   async changeReservation(args: EventDropArg) {
-    const duration = new Date(args.event.end.getTime() - args.event.start.getTime());
     const response = await reservationslotUpdateSlot({
       // biome-ignore lint/style/useNamingConvention: api is snake_case
       path: { slot_id: Number.parseInt(args.event.id) },
-      body: {
-        start_at: args.event.startStr,
-        end_at: args.event.endStr,
-      },
+      // biome-ignore lint/style/useNamingConvention: api is snake_case
+      body: { start_at: args.event.startStr, end_at: args.event.endStr },
     });
     if (response.response.ok) {
+      document.dispatchEvent(new CustomEvent("reservationSlotChanged"));
       this.scheduler.refetchEvents();
     }
   }
