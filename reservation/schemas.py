@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from ninja import FilterSchema, ModelSchema
-from pydantic import Field
+from ninja import FilterSchema, ModelSchema, Schema
+from pydantic import Field, FutureDatetime
 
 from club.schemas import SimpleClubSchema
 from core.schemas import SimpleUserSchema
@@ -39,3 +39,8 @@ class SlotSchema(ModelSchema):
     start: datetime = Field(alias="start_at")
     end: datetime = Field(alias="end_at")
     author: SimpleUserSchema
+
+
+class UpdateReservationSlotSchema(Schema):
+    start_at: FutureDatetime
+    end_at: FutureDatetime
