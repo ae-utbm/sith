@@ -251,6 +251,10 @@ msgstr "Types de produits réordonnés !"
 msgid "Product type reorganisation failed with status code : %d"
 msgstr "La réorganisation des types de produit a échoué avec le code : %d"
 
+#: reservation/static/bundled/reservation/components/room-scheduler-index.ts
+msgid "Rooms"
+msgstr "Salles"
+
 #: sas/static/bundled/sas/pictures-download-index.ts
 msgid "pictures.%(extension)s"
 msgstr "photos.%(extension)s"

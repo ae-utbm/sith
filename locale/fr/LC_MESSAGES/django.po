@@ -239,7 +239,7 @@ msgid "role"
 msgstr "rôle"
 
 #: club/models.py core/models.py counter/models.py election/models.py
-#: forum/models.py
+#: forum/models.py reservation/models.py
 msgid "description"
 msgstr "description"
 
@@ -512,6 +512,18 @@ msgstr "Nouveau Trombi"
 #: com/templates/com/poster_list.jinja core/templates/core/user_tools.jinja
 msgid "Posters"
 msgstr "Affiches"
+
+#: club/templates/club/club_tools.jinja
+msgid "Reservable rooms"
+msgstr "Salles réservables"
+
+#: club/templates/club/club_tools.jinja
+msgid "Add a room"
+msgstr "Ajouter une salle"
+
+#: club/templates/club/club_tools.jinja
+msgid "This club manages no reservable room"
+msgstr "Ce club ne gère pas de salle réservable"
 
 #: club/templates/club/club_tools.jinja
 msgid "Counters:"
@@ -791,7 +803,7 @@ msgstr "Une description plus détaillée et exhaustive de l'évènement."
 msgid "The club which organizes the event."
 msgstr "Le club qui organise l'évènement."
 
-#: com/models.py pedagogy/models.py trombi/models.py
+#: com/models.py pedagogy/models.py reservation/models.py trombi/models.py
 msgid "author"
 msgstr "auteur"
 
@@ -1087,6 +1099,11 @@ msgstr "Emploi du temps"
 #: com/templates/com/news_list.jinja core/templates/core/base/navbar.jinja
 msgid "Matmatronch"
 msgstr "Matmatronch"
+
+#: com/templates/com/news_list.jinja
+#: reservation/templates/reservation/schedule.jinja
+msgid "Room reservation"
+msgstr "Réservation de salle"
 
 #: com/templates/com/news_list.jinja core/templates/core/base/navbar.jinja
 #: core/templates/core/user_tools.jinja
@@ -1948,6 +1965,7 @@ msgstr "Confirmation"
 #: core/templates/core/file_delete_confirm.jinja
 #: counter/templates/counter/counter_click.jinja
 #: counter/templates/counter/fragments/delete_student_card.jinja
+#: reservation/templates/reservation/fragments/create_reservation.jinja
 #: sas/templates/sas/ask_picture_removal.jinja
 msgid "Cancel"
 msgstr "Annuler"
@@ -3068,7 +3086,7 @@ msgstr "Mettre à True si le mail a reçu une erreur"
 msgid "The operation that emptied the account."
 msgstr "L'opération qui a vidé le compte."
 
-#: counter/models.py pedagogy/models.py
+#: counter/models.py pedagogy/models.py reservation/models.py
 msgid "comment"
 msgstr "commentaire"
 
@@ -4680,6 +4698,73 @@ msgstr "Signaler ce commentaire"
 #: pedagogy/templates/pedagogy/uv_edit.jinja
 msgid "Edit UE"
 msgstr "Éditer l'UE"
+
+#: reservation/forms.py
+msgid "The start must be set before the end"
+msgstr "Le début doit être placé avant la fin"
+
+#: reservation/models.py
+msgid "room name"
+msgstr "Nom de la salle"
+
+#: reservation/models.py
+msgid "room owner"
+msgstr "propriétaire de la salle"
+
+#: reservation/models.py
+msgid "The club which manages this room"
+msgstr "Le club qui gère cette salle"
+
+#: reservation/models.py
+msgid "site"
+msgstr "site"
+
+#: reservation/models.py
+msgid "reservable room"
+msgstr "salle réservable"
+
+#: reservation/models.py
+msgid "reservable rooms"
+msgstr "salles réservables"
+
+#: reservation/models.py
+msgid "reserved room"
+msgstr "salle réservée"
+
+#: reservation/models.py
+msgid "slot start"
+msgstr "début du créneau"
+
+#: reservation/models.py
+msgid "slot end"
+msgstr "fin du créneau"
+
+#: reservation/models.py
+msgid "reservation slot"
+msgstr "créneau de réservation"
+
+#: reservation/models.py
+msgid "reservation slots"
+msgstr "créneaux de réservation"
+
+#: reservation/models.py
+msgid "There is already a reservation on this slot."
+msgstr "Il y a déjà une réservation sur ce créneau."
+
+#: reservation/templates/reservation/fragments/create_reservation.jinja
+msgid "Book a room"
+msgstr "Réserver une salle"
+
+#: reservation/templates/reservation/schedule.jinja
+msgid "You can book a room by selecting a free slot in the calendar."
+msgstr ""
+"Vous pouvez réserver une salle en sélectionnant un emplacement libre dans le "
+"calendrier."
+
+#: reservation/views.py
+#, python-format
+msgid "%(name)s was updated successfully"
+msgstr "%(name)s a été mis à jour avec succès"
 
 #: rootplace/forms.py
 msgid "User that will be kept"
