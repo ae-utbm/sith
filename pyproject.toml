@@ -92,7 +92,7 @@ docs = [
 default-groups = ["dev", "tests", "docs"]
 
 [tool.xapian]
-version = "1.4.25"
+version = "1.4.29"
 
 [tool.ruff]
 output-format = "concise" # makes ruff error logs easier to read
