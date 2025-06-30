@@ -1,4 +1,6 @@
 from django import forms
+from django.core.exceptions import NON_FIELD_ERRORS
+from django.utils.translation import gettext_lazy as _
 
 from club.widgets.ajax_select import AutoCompleteSelectClub
 from core.models import User
@@ -43,6 +45,11 @@ class ReservationForm(forms.ModelForm):
         fields = ["room", "start_at", "end_at", "comment"]
         field_classes = {"start_at": FutureDateTimeField, "end_at": FutureDateTimeField}
         widgets = {"start_at": SelectDateTime(), "end_at": SelectDateTime()}
+        error_messages = {
+            NON_FIELD_ERRORS: {
+                "start_after_end": _("The start must be set before the end")
+            }
+        }
 
     def __init__(self, *args, author: User, **kwargs):
         super().__init__(*args, **kwargs)
