@@ -1,15 +1,24 @@
 name: "Setup project"
 description: "Setup Python and Poetry"
+inputs:
+  full:
+    description: > 
+      If true, do a full setup, else install
+      only python, uv and non-xapian python deps
+    required: false
+    default: "false"
 runs:
   using: composite
   steps:
     - name: Install apt packages
+      if: ${{ inputs.full == 'true' }}
       uses: awalsh128/cache-apt-pkgs-action@v1.4.3
       with:
         packages: gettext
         version: 1.0  # increment to reset cache
 
     - name: Install Redis
+      if: ${{ inputs.full == 'true' }}
       uses: shogo82148/actions-setup-redis@v1
       with:
         redis-version: "7.x"
@@ -37,15 +46,20 @@ runs:
       shell: bash
 
     - name: Install Xapian
+      if: ${{ inputs.full == 'true' }}
       run: uv run ./manage.py install_xapian
       shell: bash
 
+    # compiling xapian accounts for almost the entirety of the virtualenv setup,
+    # so we save the virtual environment only on workflows where it has been installed
     - name: Save cached virtualenv
+      if: ${{ inputs.full == 'true' }}
       uses: actions/cache/save@v4
       with:
         key: venv-${{ runner.os }}-${{ hashFiles('.python-version') }}-${{ hashFiles('pyproject.toml') }}-${{ env.CACHE_SUFFIX }}
         path: .venv
 
     - name: Compile gettext messages
+      if: ${{ inputs.full == 'true' }}
       run: uv run ./manage.py compilemessages
       shell: bash

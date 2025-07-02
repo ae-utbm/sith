@@ -167,7 +167,7 @@ document.addEventListener("alpine:init", () => {
       });
       // if products to download are already in-memory, directly take them.
       // If not, fetch them.
-      const products =
+      const products: ProductSchema[] =
         this.nbPages > 1
           ? await paginated(productSearchProductsDetailed, this.getQueryParams())
           : Object.values<ProductSchema[]>(this.products).flat();

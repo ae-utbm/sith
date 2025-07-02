@@ -37,6 +37,8 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
       - uses: ./.github/actions/setup_project
+        with:
+          full: true
         env:
           # To avoid race conditions on environment cache
           CACHE_SUFFIX: ${{ matrix.pytest-mark }}

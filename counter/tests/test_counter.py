@@ -17,6 +17,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import Permission, make_password
 from django.core.cache import cache
@@ -823,3 +824,53 @@ class TestClubCounterClickAccess(TestCase):
         self.client.force_login(self.user)
         res = self.client.get(self.click_url)
         assert res.status_code == 200
+
+
+@pytest.mark.django_db
+class TestCounterLogout:
+    def test_logout_simple(self, client: Client):
+        perm_counter = baker.make(Counter, type="BAR")
+        permanence = baker.make(
+            Permanency,
+            counter=perm_counter,
+            start=now() - timedelta(hours=1),
+            activity=now() - timedelta(minutes=10),
+        )
+        with freeze_time():
+            res = client.post(
+                reverse("counter:logout", kwargs={"counter_id": permanence.counter_id}),
+                data={"user_id": permanence.user_id},
+            )
+            assertRedirects(
+                res,
+                reverse(
+                    "counter:details", kwargs={"counter_id": permanence.counter_id}
+                ),
+            )
+            permanence.refresh_from_db()
+            assert permanence.end == now()
+
+    def test_logout_doesnt_change_old_permanences(self, client: Client):
+        perm_counter = baker.make(Counter, type="BAR")
+        permanence = baker.make(
+            Permanency,
+            counter=perm_counter,
+            start=now() - timedelta(hours=1),
+            activity=now() - timedelta(minutes=10),
+        )
+        old_end = now() - relativedelta(year=10)
+        old_permanence = baker.make(
+            Permanency,
+            counter=perm_counter,
+            end=old_end,
+            activity=now() - relativedelta(year=8),
+        )
+        with freeze_time():
+            client.post(
+                reverse("counter:logout", kwargs={"counter_id": permanence.counter_id}),
+                data={"user_id": permanence.user_id},
+            )
+            permanence.refresh_from_db()
+            assert permanence.end == now()
+            old_permanence.refresh_from_db()
+            assert old_permanence.end == old_end

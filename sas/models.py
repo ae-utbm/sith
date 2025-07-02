@@ -41,6 +41,10 @@ class SasFile(SithFile):
 
     class Meta:
         proxy = True
+        permissions = [
+            ("moderate_sasfile", "Can moderate SAS files"),
+            ("view_unmoderated_sasfile", "Can view not moderated SAS files"),
+        ]
 
     def can_be_viewed_by(self, user):
         if user.is_anonymous:
@@ -59,7 +63,7 @@ class SasFile(SithFile):
         return self.id in viewable
 
     def can_be_edited_by(self, user):
-        return user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
+        return user.has_perm("sas.change_sasfile")
 
 
 class PictureQuerySet(models.QuerySet):
@@ -69,7 +73,7 @@ class PictureQuerySet(models.QuerySet):
         Warning:
             Calling this queryset method may add several additional requests.
         """
-        if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
+        if user.has_perm("sas.moderate_sasfile"):
             return self.all()
         if user.was_subscribed:
             return self.filter(Q(is_moderated=True) | Q(owner=user))
@@ -182,7 +186,7 @@ class AlbumQuerySet(models.QuerySet):
         Warning:
             Calling this queryset method may add several additional requests.
         """
-        if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
+        if user.has_perm("sas.moderate_sasfile"):
             return self.all()
         if user.was_subscribed:
             return self.filter(Q(is_moderated=True) | Q(owner=user))

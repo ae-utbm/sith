@@ -41,6 +41,7 @@ class ProductAdmin(SearchModelAdmin):
         "profit",
         "archived",
     )
+    list_select_related = ("product_type",)
     search_fields = ("name", "code")
 
 
@@ -81,19 +82,12 @@ class AccountDumpAdmin(admin.ModelAdmin):
         "customer",
         "warning_mail_sent_at",
         "warning_mail_error",
-        "dump_operation",
+        "dump_operation__date",
         "amount",
     )
+    list_select_related = ("customer", "customer__user", "dump_operation")
     autocomplete_fields = ("customer", "dump_operation")
     list_filter = ("warning_mail_error",)
-
-    def get_queryset(self, request):
-        # the `amount` property requires to know the customer and the dump_operation
-        return (
-            super()
-            .get_queryset(request)
-            .select_related("customer", "customer__user", "dump_operation")
-        )
 
 
 @admin.register(Counter)
@@ -113,11 +107,14 @@ class RefillingAdmin(SearchModelAdmin):
         "customer__account_id",
         "counter__name",
     )
+    list_filter = (("counter", admin.RelatedOnlyFieldListFilter),)
+    date_hierarchy = "date"
 
 
 @admin.register(Selling)
 class SellingAdmin(SearchModelAdmin):
     list_display = ("customer", "label", "unit_price", "quantity", "counter", "date")
+    list_select_related = ("customer", "customer__user", "counter")
     search_fields = (
         "customer__user__username",
         "customer__user__first_name",
@@ -126,6 +123,8 @@ class SellingAdmin(SearchModelAdmin):
         "counter__name",
     )
     autocomplete_fields = ("customer", "seller")
+    list_filter = (("counter", admin.RelatedOnlyFieldListFilter),)
+    date_hierarchy = "date"
 
 
 @admin.register(Permanency)

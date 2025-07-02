@@ -53,9 +53,9 @@ class TestMergeUser(TestCase):
         self.to_keep.address = "Jerusalem"
         self.to_delete.parent_address = "Rome"
         self.to_delete.address = "Rome"
-        subscribers = Group.objects.get(name="Subscribers")
+        subscribers = Group.objects.get(id=settings.SITH_GROUP_SUBSCRIBERS_ID)
         mde_admin = Group.objects.get(name="MDE admin")
-        sas_admin = Group.objects.get(name="SAS admin")
+        sas_admin = Group.objects.get(id=settings.SITH_GROUP_SAS_ADMIN_ID)
         self.to_keep.groups.add(subscribers.id)
         self.to_delete.groups.add(mde_admin.id)
         self.to_keep.groups.add(sas_admin.id)

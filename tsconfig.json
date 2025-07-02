@@ -4,7 +4,7 @@
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "esnext",
-    "target": "es2022",
+    "target": "es2024",
     "allowJs": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
@@ -14,6 +14,7 @@
     "types": ["jquery", "alpinejs"],
     "paths": {
       "#openapi": ["./staticfiles/generated/openapi/client/index.ts"],
+      "#openapi:*": ["./staticfiles/generated/openapi/client/*"],
       "#core:*": ["./core/static/bundled/*"],
       "#pedagogy:*": ["./pedagogy/static/bundled/*"],
       "#counter:*": ["./counter/static/bundled/*"],

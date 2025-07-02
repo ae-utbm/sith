@@ -11,6 +11,7 @@
       <link rel="stylesheet" href="{{ static('core/markdown.scss') }}">
       <link rel="stylesheet" href="{{ static('core/header.scss') }}">
       <link rel="stylesheet" href="{{ static('core/navbar.scss') }}">
+      <link rel="stylesheet" href="{{ static('core/footer.scss') }}">
       <link rel="stylesheet" href="{{ static('core/pagination.scss') }}">
       <link rel="stylesheet" href="{{ static('core/accordion.scss') }}">
 
@@ -18,6 +19,7 @@
       <noscript><link rel="stylesheet" href="{{ static('bundled/fontawesome-index.css') }}"></noscript>
 
       <script src="{{ url('javascript-catalog') }}"></script>
+      <script type="module" src={{ static("bundled/core/navbar-index.ts") }}></script>
       <script type="module" src={{ static("bundled/core/components/include-index.ts") }}></script>
       <script type="module" src="{{ static('bundled/alpine-index.js') }}"></script>
       <script type="module" src="{{ static('bundled/htmx-index.js') }}"></script>
@@ -88,58 +90,12 @@
       </div>
     </div>
 
-    <footer>
-      {% block footer %}
-        <div>
-          <a href="{{ url('core:page', 'contacts') }}">{% trans %}Contacts{% endtrans %}</a>
-          <a href="{{ url('core:page', 'legals') }}">{% trans %}Legal notices{% endtrans %}</a>
-          <a href="{{ url('core:page', 'copyright_agent') }}">{% trans %}Intellectual property{% endtrans %}</a>
-          <a href="{{ url('core:page', 'docs') }}">{% trans %}Help & Documentation{% endtrans %}</a>
-          <a href="{{ url('core:page', 'rd') }}">{% trans %}R&D{% endtrans %}</a>
-        </div>
-        <a rel="nofollow" href="https://github.com/ae-utbm/sith" target="#">
-          <i class="fa-brands fa-github"></i>
-          {% trans %}Site created by the IT Department of the AE{% endtrans %}
-        </a>
-      {% endblock %}
-      <br>
-    </footer>
+    {% block footer %}
+      {% include "core/base/footer.jinja" %}
+    {% endblock %}
 
     {% block script %}
       <script>
-        const menuItems = document.querySelectorAll(".navbar details[name='navbar'].menu");
-        const isDesktop = () => {
-          return window.innerWidth >= 500;
-        }
-        for (const item of menuItems){
-          item.addEventListener("mouseover", () => {
-            if (isDesktop()){
-              item.setAttribute("open", "");
-            }
-          })
-          item.addEventListener("mouseout", () => {
-            if (isDesktop()){
-              item.removeAttribute("open");
-            }
-          })
-          item.addEventListener("click", (event) => {
-            // Ignore keyboard clicks
-            if (event.detail === 0){
-              return;
-            }
-
-            if (isDesktop()){
-              event.preventDefault();
-            }
-          })
-        }
-
-        function showMenu() {
-          let navbar = document.getElementById("navbar-content");
-          const current = navbar.getAttribute("mobile-display");
-          navbar.setAttribute("mobile-display", current === "hidden" ? "revealed" : "hidden")
-        }
-
         document.addEventListener("keydown", (e) => {
           // Looking at the `s` key when not typing in a form
           if (e.keyCode !== 83 || ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.nodeName)) {
