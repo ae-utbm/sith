@@ -83,7 +83,6 @@ document.addEventListener("alpine:init", () => {
 
   Alpine.data("pictureUpload", (albumId: number) => ({
     errors: [] as string[],
-    pictures: [],
     sending: false,
     progress: null as HTMLProgressElement,
 

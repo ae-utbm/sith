@@ -1,15 +1,11 @@
+import { AlertMessage } from "#core:utils/alert-message";
 import Alpine from "alpinejs";
 import { producttypeReorder } from "#openapi";
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("productTypesList", () => ({
     loading: false,
-    alertMessage: {
-      open: false,
-      success: true,
-      content: "",
-      timeout: null,
-    },
+    alertMessage: new AlertMessage({ defaultDuration: 2000 }),
 
     async reorder(itemId: number, newPosition: number) {
       // The sort plugin of Alpine doesn't manage dynamic lists with x-sort
@@ -41,23 +37,14 @@ document.addEventListener("alpine:init", () => {
     },
 
     openAlertMessage(response: Response) {
-      if (response.ok) {
-        this.alertMessage.success = true;
-        this.alertMessage.content = gettext("Products types reordered!");
-      } else {
-        this.alertMessage.success = false;
-        this.alertMessage.content = interpolate(
-          gettext("Product type reorganisation failed with status code : %d"),
-          [response.status],
-        );
-      }
-      this.alertMessage.open = true;
-      if (this.alertMessage.timeout !== null) {
-        clearTimeout(this.alertMessage.timeout);
-      }
-      this.alertMessage.timeout = setTimeout(() => {
-        this.alertMessage.open = false;
-      }, 2000);
+      const success = response.ok;
+      const content = response.ok
+        ? gettext("Products types reordered!")
+        : interpolate(
+            gettext("Product type reorganisation failed with status code : %d"),
+            [response.status],
+          );
+      this.alertMessage.display(content, { success: success });
       this.loading = false;
     },
   }));
