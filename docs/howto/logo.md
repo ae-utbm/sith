@@ -12,6 +12,15 @@ nouveau logo d'une promo. C'est un processus manuel.
 	de faire cette opération manuellement, ça prend quelques
 	minutes et on est certain de la qualité à la fin.
 
+### avec une commande django
+```bash
+./manage.py add_promo_logo numero_de_promo chemin_dacces_du_logo
+```
+options:
+
+* `--force/-f` pour automatiquement écraser les logos de promo avec le même nom.
+
+### manuellement
 Les logos de promo sont à manuellement ajouter dans le projet.
 Ils se situent dans le dossier `core/static/core/img/`.
 
