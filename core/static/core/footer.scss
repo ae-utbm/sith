@@ -2,6 +2,10 @@
 @import "devices";
 
 footer.bottom-links {
+  >section>a {
+    text-align: center;
+  }
+
   @media (max-width: $small-devices) {
     margin-top: 0.6em;
     padding: 1.25em;
