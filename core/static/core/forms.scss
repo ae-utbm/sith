@@ -568,6 +568,11 @@ form {
     }
   }
 
+  input[type="date"] {
+    // fix date input height to match other inputs
+    padding: calc(var(--nf-input-size) * 0.56) calc(var(--nf-input-size) * 0.65);
+  }
+
   // --------------- TEXAREA
 
   textarea {
@@ -580,7 +585,7 @@ form {
   input[type="radio"] {
     width: var(--nf-input-size);
     height: var(--nf-input-size);
-    padding: inherit;
+    padding: 0; // keep square shape
     margin: 0;
     display: inline-block;
     vertical-align: top;
@@ -728,5 +733,9 @@ form {
     background-position: right calc(var(--nf-input-size) * 0.75) bottom 50%;
     background-repeat: no-repeat;
     background-size: var(--nf-input-size);
+  }
+
+  select {
+    margin-top: 1px; // fix base select element offset
   }
 }

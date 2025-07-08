@@ -1,15 +1,11 @@
 @import "core/static/core/colors";
-
+@import "core/static/core/devices";
 
 $pedagogy-blue: #1bb9ea;
 $pedagogy-orange: #ea7900;
 $pedagogy-hover-blue: #0e97ce;
 $pedagogy-light-blue: #caf0ff;
 $pedagogy-white-text: #f0f0f0;
-
-$small-devices: 576px;
-$medium-devices: 768px;
-$large-devices: 992px;
 
 .pedagogy {
   &.star-not-checked {
