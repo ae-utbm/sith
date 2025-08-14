@@ -47,7 +47,7 @@ Commencez par installer les dépendances système :
     === "Debian/Ubuntu"
 
         ```bash
-        sudo apt install postgresql libq-dev nginx
+        sudo apt install postgresql libpq-dev nginx
         ```
 
     === "Arch Linux"
@@ -59,7 +59,7 @@ Commencez par installer les dépendances système :
 === "macOS"
 
     ```bash
-    brew install postgresql lipbq nginx
+    brew install postgresql libpq nginx
     export PATH="/usr/local/opt/libpq/bin:$PATH"
     source ~/.zshrc
     ```
