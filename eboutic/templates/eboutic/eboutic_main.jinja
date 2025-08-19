@@ -120,7 +120,7 @@
           </span>
         </div>
       {% endif %}
-      <section>
+      {# <section>
         <div class="category-header">
           <h3 class="margin-bottom">{% trans %}Eurockéennes 2025 partnership{% endtrans %}</h3>
           {% if user.is_subscribed %}
@@ -169,7 +169,7 @@
             </p>
           {% endif %}
         </div>
-      </section>
+      </section> #}
       {% for priority_groups in products|groupby('order') %}
         {% for category, items in priority_groups.list|groupby('category') %}
           {% if items|count > 0 %}
