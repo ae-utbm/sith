@@ -37,7 +37,7 @@
     "typescript": "^5.8.3",
     "vite": "^6.2.5",
     "vite-bundle-visualizer": "^1.2.1",
-    "vite-plugin-static-copy": "^3.0.2"
+    "vite-plugin-static-copy": "^3.1.2"
   },
   "dependencies": {
     "@alpinejs/sort": "^3.14.7",
