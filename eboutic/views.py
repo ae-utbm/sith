@@ -48,7 +48,14 @@ from django_countries.fields import Country
 from core.auth.mixins import CanViewMixin, IsSubscriberMixin
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
 from counter.forms import BaseBasketForm, BillingInfoForm, ProductForm
-from counter.models import BillingInfo, Customer, Product, Selling, get_eboutic
+from counter.models import (
+    BillingInfo,
+    Customer,
+    Product,
+    Refilling,
+    Selling,
+    get_eboutic,
+)
 from eboutic.models import (
     Basket,
     BasketItem,
@@ -120,17 +127,39 @@ class EbouticMainView(LoginRequiredMixin, FormView):
     def customer(self) -> Customer:
         return Customer.get_or_create(self.request.user)[0]
 
+    def get_purchase_timestamp(
+        self, purchase: Selling | Refilling | None
+    ) -> int | None:
+        if purchase is None:
+            return None
+        return int(purchase.date.timestamp() * 1000)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["products"] = self.products
         context["customer_amount"] = self.request.user.account_balance
-        last_purchase: Selling | None = (
+
+        last_buying: Selling | None = (
             self.customer.buyings.filter(counter__type="EBOUTIC")
             .order_by("-date")
             .first()
         )
+        last_refilling: Refilling | None = (
+            self.customer.refillings.filter(counter__type="EBOUTIC")
+            .order_by("-date")
+            .first()
+        )
+        purchase_times = [
+            timestamp
+            for timestamp in [
+                self.get_purchase_timestamp(last_buying),
+                self.get_purchase_timestamp(last_refilling),
+            ]
+            if timestamp is not None
+        ]
+
         context["last_purchase_time"] = (
-            int(last_purchase.date.timestamp() * 1000) if last_purchase else "null"
+            max(*purchase_times) if len(purchase_times) > 0 else "null"
         )
         return context
 
