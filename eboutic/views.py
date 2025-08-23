@@ -133,28 +133,30 @@ class EbouticMainView(LoginRequiredMixin, FormView):
         context["products"] = self.products
         context["customer_amount"] = self.request.user.account_balance
 
+        purchases = (
+            Customer.objects.filter(pk=self.customer.pk)
+            .annotate(
+                last_refill=Subquery(
+                    Refilling.objects.filter(
+                        counter__type="EBOUTIC", customer_id=self.customer.pk
+                    )
+                    .order_by("-date")
+                    .values("date")[:1]
+                ),
+                last_purchase=Subquery(
+                    Selling.objects.filter(
+                        counter__type="EBOUTIC", customer_id=self.customer.pk
+                    )
+                    .order_by("-date")
+                    .values("date")[:1]
+                ),
+            )
+            .values_list("last_refill", "last_purchase")
+        )[0]
+
         purchase_times = [
             int(purchase.timestamp() * 1000)
-            for purchase in (
-                Customer.objects.filter(pk=self.customer.pk)
-                .annotate(
-                    last_refill=Subquery(
-                        Refilling.objects.filter(
-                            counter__type="EBOUTIC", customer_id=self.customer.pk
-                        )
-                        .order_by("-date")
-                        .values("date")[:1]
-                    ),
-                    last_purchase=Subquery(
-                        Selling.objects.filter(
-                            counter__type="EBOUTIC", customer_id=self.customer.pk
-                        )
-                        .order_by("-date")
-                        .values("date")[:1]
-                    ),
-                )
-                .values("last_refill", "last_purchase")
-            )[0].values()
+            for purchase in purchases
             if purchase is not None
         ]
 
