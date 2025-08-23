@@ -120,56 +120,6 @@
           </span>
         </div>
       {% endif %}
-      <section>
-        <div class="category-header">
-          <h3 class="margin-bottom">{% trans %}Eurockéennes 2025 partnership{% endtrans %}</h3>
-          {% if user.is_subscribed %}
-            <div id="eurok-partner" style="
-                                           min-height: 600px;
-                                           background-color: lightgrey;
-                                           display: flex;
-                                           justify-content: center;
-                                           align-items: center;
-                                           flex-direction: column;
-                                           gap: 10px;
-                                          ">
-              <p style="text-align: center;">
-                {% trans trimmed %}
-                  Our partner uses Weezevent to sell tickets.
-                  Weezevent may collect user info according to
-                  its own privacy policy.
-                  By clicking the accept button you consent to
-                  their terms of services.
-                {% endtrans %}
-              </p>
-
-              <a href="https://weezevent.com/fr/politique-de-confidentialite/">{% trans %}Privacy policy{% endtrans %}</a>
-
-              <button
-                hx-get="{{ url("eboutic:eurok") }}"
-                hx-target="#eurok-partner"
-                hx-swap="outerHTML"
-                hx-trigger="click, load[document.cookie.includes('weezevent_accept=true')]"
-                @htmx:after-request="document.cookie = 'weezevent_accept=true'"
-              >{% trans %}Accept{% endtrans %}
-              </button>
-            </div>
-          {% else %}
-            <p>
-              {%- trans trimmed %}
-                You must be subscribed to benefit from the partnership with the Eurockéennes.
-              {% endtrans -%}
-            </p>
-            <p>
-              {%- trans trimmed %}
-                This partnership offers a discount of up to 33%
-                on tickets for Friday, Saturday and Sunday,
-                as well as the 3-day package from Friday to Sunday.
-              {% endtrans -%}
-            </p>
-          {% endif %}
-        </div>
-      </section>
       {% for priority_groups in products|groupby('order') %}
         {% for category, items in priority_groups.list|groupby('category') %}
           {% if items|count > 0 %}
