@@ -34,6 +34,7 @@ from django.contrib.auth.mixins import (
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.db import DatabaseError, transaction
+from django.db.models import Subquery
 from django.db.models.fields import forms
 from django.db.utils import cached_property
 from django.http import HttpResponse
@@ -127,39 +128,38 @@ class EbouticMainView(LoginRequiredMixin, FormView):
     def customer(self) -> Customer:
         return Customer.get_or_create(self.request.user)[0]
 
-    def get_purchase_timestamp(
-        self, purchase: Selling | Refilling | None
-    ) -> int | None:
-        if purchase is None:
-            return None
-        return int(purchase.date.timestamp() * 1000)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["products"] = self.products
         context["customer_amount"] = self.request.user.account_balance
 
-        last_buying: Selling | None = (
-            self.customer.buyings.filter(counter__type="EBOUTIC")
-            .order_by("-date")
-            .first()
-        )
-        last_refilling: Refilling | None = (
-            self.customer.refillings.filter(counter__type="EBOUTIC")
-            .order_by("-date")
-            .first()
-        )
         purchase_times = [
-            timestamp
-            for timestamp in [
-                self.get_purchase_timestamp(last_buying),
-                self.get_purchase_timestamp(last_refilling),
-            ]
-            if timestamp is not None
+            int(purchase.timestamp() * 1000)
+            for purchase in (
+                Customer.objects.filter(pk=self.customer.pk)
+                .annotate(
+                    last_refill=Subquery(
+                        Refilling.objects.filter(
+                            counter__type="EBOUTIC", customer_id=self.customer.pk
+                        )
+                        .order_by("-date")
+                        .values("date")[:1]
+                    ),
+                    last_purchase=Subquery(
+                        Selling.objects.filter(
+                            counter__type="EBOUTIC", customer_id=self.customer.pk
+                        )
+                        .order_by("-date")
+                        .values("date")[:1]
+                    ),
+                )
+                .values("last_refill", "last_purchase")
+            )[0].values()
+            if purchase is not None
         ]
 
         context["last_purchase_time"] = (
-            max(*purchase_times) if len(purchase_times) > 0 else "null"
+            max(purchase_times) if len(purchase_times) > 0 else "null"
         )
         return context
 
