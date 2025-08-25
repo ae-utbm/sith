@@ -16,6 +16,13 @@
   }
 }
 
+.card-group {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
 .card {
   background-color: $primary-neutral-light-color;
   border-radius: 5px;
@@ -92,13 +99,23 @@
   }
 
   @media screen and (max-width: 765px) {
-    @include row-layout
+    @include row-layout;
   }
 
   // When combined with card, card-row display the card in a row layout,
   // whatever the size of the screen.
   &.card-row {
-    @include row-layout
+    @include row-layout;
+
+    &.card-row-m {
+      //width: 50%;
+      max-width: 50%;
+    }
+
+    &.card-row-s {
+      //width: 33%;
+      max-width: 33%;
+    }
   }
 }
 
