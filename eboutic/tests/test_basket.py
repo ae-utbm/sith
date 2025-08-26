@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 import pytest
 from django.http import HttpResponse
 from django.test import TestCase
@@ -9,8 +11,13 @@ from pytest_django.asserts import assertRedirects
 
 from core.baker_recipes import subscriber_user
 from core.models import Group, User
-from counter.baker_recipes import product_recipe
-from counter.models import Counter, ProductType, get_eboutic
+from counter.baker_recipes import product_recipe, refill_recipe, sale_recipe
+from counter.models import (
+    Counter,
+    Customer,
+    ProductType,
+    get_eboutic,
+)
 from counter.tests.test_counter import BasketItem
 from eboutic.models import Basket
 
@@ -22,6 +29,96 @@ def test_get_eboutic():
     baker.make(Counter, type="EBOUTIC")
 
     assert Counter.objects.get(name="Eboutic") == get_eboutic()
+
+
+@pytest.mark.django_db
+def test_eboutic_access_unregistered(client: Client):
+    eboutic_url = reverse("eboutic:main")
+    assertRedirects(
+        client.get(eboutic_url), reverse("core:login", query={"next": eboutic_url})
+    )
+
+
+@pytest.mark.django_db
+def test_eboutic_access_new_customer(client: Client):
+    user = baker.make(User)
+    assert not Customer.objects.filter(user=user).exists()
+
+    client.force_login(user)
+
+    assert client.get(reverse("eboutic:main")).status_code == 200
+    assert Customer.objects.filter(user=user).exists()
+
+
+@pytest.mark.django_db
+def test_eboutic_access_old_customer(client: Client):
+    user = baker.make(User)
+    customer = Customer.get_or_create(user)[0]
+
+    client.force_login(user)
+
+    assert client.get(reverse("eboutic:main")).status_code == 200
+    assert Customer.objects.filter(user=user).first() == customer
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("sellings", "refillings", "expected"),
+    (
+        ([], [], None),
+        (
+            [datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc)],
+            [],
+            datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc),
+        ),
+        (
+            [],
+            [datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc)],
+            datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc),
+        ),
+        (
+            [datetime(2025, 2, 7, 1, 2, 3, tzinfo=timezone.utc)],
+            [datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc)],
+            datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc),
+        ),
+        (
+            [datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc)],
+            [datetime(2025, 2, 7, 1, 2, 3, tzinfo=timezone.utc)],
+            datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc),
+        ),
+        (
+            [
+                datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc),
+                datetime(2025, 2, 7, 1, 2, 3, tzinfo=timezone.utc),
+            ],
+            [datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc)],
+            datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc),
+        ),
+    ),
+)
+def test_eboutic_basket_expiry(
+    client: Client,
+    sellings: list[datetime],
+    refillings: list[datetime],
+    expected: datetime | None,
+):
+    eboutic = get_eboutic()
+
+    customer = baker.make(Customer)
+
+    client.force_login(customer.user)
+
+    for date in sellings:
+        sale_recipe.make(
+            customer=customer, counter=eboutic, date=date, is_validated=True
+        )
+    for date in refillings:
+        refill_recipe.make(customer=customer, counter=eboutic, date=date)
+
+    assert (
+        f'x-data="basket({int(expected.timestamp() * 1000) if expected else "null"})"'
+        in client.get(reverse("eboutic:main")).text
+    )
 
 
 class TestEboutic(TestCase):
