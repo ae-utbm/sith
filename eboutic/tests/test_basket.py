@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 from django.http import HttpResponse
@@ -9,16 +9,13 @@ from django.utils.timezone import localdate
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
-from club.models import Club
 from core.baker_recipes import subscriber_user
 from core.models import Group, User
-from counter.baker_recipes import product_recipe
+from counter.baker_recipes import product_recipe, refill_recipe, sale_recipe
 from counter.models import (
     Counter,
     Customer,
     ProductType,
-    Refilling,
-    Selling,
     get_eboutic,
 )
 from counter.tests.test_counter import BasketItem
@@ -45,12 +42,12 @@ def test_eboutic_access_unregistered(client: Client):
 @pytest.mark.django_db
 def test_eboutic_access_new_customer(client: Client):
     user = baker.make(User)
-    assert Customer.objects.filter(user=user).first() is None
+    assert not Customer.objects.filter(user=user).exists()
 
     client.force_login(user)
 
     assert client.get(reverse("eboutic:main")).status_code == 200
-    assert Customer.objects.filter(user=user).first()
+    assert Customer.objects.filter(user=user).exists()
 
 
 @pytest.mark.django_db
@@ -69,22 +66,33 @@ def test_eboutic_access_old_customer(client: Client):
     ("sellings", "refillings", "expected"),
     (
         ([], [], None),
-        ([datetime(2025, 3, 7, 1, 2, 3)], [], datetime(2025, 3, 7, 1, 2, 3)),
-        ([], [datetime(2025, 3, 7, 1, 2, 3)], datetime(2025, 3, 7, 1, 2, 3)),
         (
-            [datetime(2025, 2, 7, 1, 2, 3)],
-            [datetime(2025, 3, 7, 1, 2, 3)],
-            datetime(2025, 3, 7, 1, 2, 3),
+            [datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc)],
+            [],
+            datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc),
         ),
         (
-            [datetime(2025, 3, 7, 1, 2, 3)],
-            [datetime(2025, 2, 7, 1, 2, 3)],
-            datetime(2025, 3, 7, 1, 2, 3),
+            [],
+            [datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc)],
+            datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc),
         ),
         (
-            [datetime(2025, 3, 7, 1, 2, 3), datetime(2025, 2, 7, 1, 2, 3)],
-            [datetime(2025, 3, 7, 1, 2, 3)],
-            datetime(2025, 3, 7, 1, 2, 3),
+            [datetime(2025, 2, 7, 1, 2, 3, tzinfo=timezone.utc)],
+            [datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc)],
+            datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc),
+        ),
+        (
+            [datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc)],
+            [datetime(2025, 2, 7, 1, 2, 3, tzinfo=timezone.utc)],
+            datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc),
+        ),
+        (
+            [
+                datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc),
+                datetime(2025, 2, 7, 1, 2, 3, tzinfo=timezone.utc),
+            ],
+            [datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc)],
+            datetime(2025, 3, 7, 1, 2, 3, tzinfo=timezone.utc),
         ),
     ),
 )
@@ -96,24 +104,16 @@ def test_eboutic_basket_expiry(
 ):
     eboutic = get_eboutic()
 
-    user = baker.make(User)
-    customer = Customer.get_or_create(user)[0]
+    customer = baker.make(Customer)
 
-    client.force_login(user)
+    client.force_login(customer.user)
 
     for date in sellings:
-        baker.make(
-            Selling,
-            customer=customer,
-            counter=eboutic,
-            club=baker.make(Club),
-            seller=user,
-            date=date,
-            is_validated=True,  # Ignore not enough money warnings
+        sale_recipe.make(
+            customer=customer, counter=eboutic, date=date, is_validated=True
         )
-
     for date in refillings:
-        baker.make(Refilling, customer=customer, counter=eboutic, date=date)
+        refill_recipe.make(customer=customer, counter=eboutic, date=date)
 
     assert (
         f'x-data="basket({int(expected.timestamp() * 1000) if expected else "null"})"'
