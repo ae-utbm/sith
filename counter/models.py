@@ -1278,7 +1278,7 @@ class ReturnableProduct(models.Model):
         verbose_name_plural = _("returnable products")
         constraints = [
             models.CheckConstraint(
-                check=~Q(product=F("returned_product")),
+                condition=~Q(product=F("returned_product")),
                 name="returnableproduct_product_different_from_returned",
                 violation_error_message=_(
                     "The returnable product cannot be the same as the returned one"

@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="membership",
             constraint=models.CheckConstraint(
-                check=models.Q(("end_date__gte", models.F("start_date"))),
+                condition=models.Q(("end_date__gte", models.F("start_date"))),
                 name="end_after_start",
             ),
         ),
