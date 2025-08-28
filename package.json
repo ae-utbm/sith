@@ -35,9 +35,9 @@
     "@types/jquery": "^3.5.31",
     "@types/js-cookie": "^3.0.6",
     "typescript": "^5.8.3",
-    "vite": "^6.2.5",
+    "vite": "^6.2.6",
     "vite-bundle-visualizer": "^1.2.1",
-    "vite-plugin-static-copy": "^3.0.2"
+    "vite-plugin-static-copy": "^3.1.2"
   },
   "dependencies": {
     "@alpinejs/sort": "^3.14.7",
