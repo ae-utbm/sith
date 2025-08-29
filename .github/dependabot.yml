@@ -4,11 +4,19 @@
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 
 version: 2
-updates:
-  - package-ecosystem: "pip" # See documentation for possible values
-    directory: "/" # Location of package manifests
+
+multi-ecosystem-groups:
+  common:
+    directory: "/"
     schedule:
       interval: "weekly"
     target-branch: "taiste"
     commit-message:
       prefix: "[UPDATE] "
+
+updates:
+  - package-ecosystem: "uv"
+    multi-ecosystem-group: "common"
+
+  - package-ecosystem: "npm"
+    multi-ecosystem-group: "common"
