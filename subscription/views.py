@@ -14,6 +14,7 @@
 #
 
 from django.conf import settings
+from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
@@ -65,10 +66,22 @@ class CreateSubscriptionExistingUserFragment(CreateSubscriptionFragment):
 
 
 class CreateSubscriptionNewUserFragment(CreateSubscriptionFragment):
-    """Create a subscription for a user who already exists."""
+    """Create a subscription for a user who doesn't exist yet."""
 
     form_class = SubscriptionNewUserForm
     extra_context = {"post_url": reverse_lazy("subscription:fragment-new-user")}
+
+    def form_valid(self, form):
+        res = super().form_valid(form)
+        reset_form = PasswordResetForm({"email": form.cleaned_data["email"]})
+        if reset_form.is_valid():
+            reset_form.save(
+                use_https=True,
+                email_template_name="core/new_user_email.jinja",
+                subject_template_name="core/new_user_email_subject.jinja",
+                from_email="ae@utbm.fr",
+            )
+        return res
 
 
 class SubscriptionCreatedFragment(PermissionRequiredMixin, DetailView):

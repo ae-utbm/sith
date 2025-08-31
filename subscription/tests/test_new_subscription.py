@@ -5,6 +5,7 @@ from typing import Callable
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.test import Client
 from django.urls import reverse
@@ -14,8 +15,10 @@ from pytest_django.asserts import assertRedirects
 from pytest_django.fixtures import SettingsWrapper
 
 from core.baker_recipes import board_user, old_subscriber_user, subscriber_user
-from core.models import User
+from core.models import Group, User
+from counter.models import Customer
 from subscription.forms import SubscriptionExistingUserForm, SubscriptionNewUserForm
+from subscription.models import Subscription
 
 
 @pytest.mark.django_db
@@ -189,3 +192,17 @@ def test_submit_form_new_user(client: Client, settings: SettingsWrapper):
             kwargs={"subscription_id": current_subscription.id},
         ),
     )
+
+
+@pytest.mark.django_db
+def test_subscription_for_user_that_had_a_sith_account():
+    """Test that a newly subscribed user is added to the old subscribers group,
+    even if there already was a sith account (e.g. created during an eboutic purchase).
+    """
+    user = baker.make(User)
+    Customer.get_or_create(user)
+    group = Group.objects.get(id=settings.SITH_GROUP_OLD_SUBSCRIBERS_ID)
+    assert not user.groups.contains(group)
+    subscription = baker.prepare(Subscription, member=user)
+    subscription.save()
+    assert user.groups.contains(group)
