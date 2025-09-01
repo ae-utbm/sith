@@ -1714,7 +1714,7 @@ msgid ""
 "student life at UTBM and manages its student facilities."
 msgstr ""
 "L'AE UTBM est une association bénévole gérée par les étudiants de "
-"l'UTBM.Elle organise la vie étudiante de l'UTBM et gère ses lieux de vie."
+"l'UTBM. Elle organise la vie étudiante de l'UTBM et gère ses lieux de vie."
 
 #: core/templates/core/base/footer.jinja core/templates/core/base/navbar.jinja
 msgid "Contacts"
@@ -4162,7 +4162,7 @@ msgstr "Trier par date"
 
 #: forum/templates/forum/main.jinja
 msgid "A forum dedicated to the UTBM students."
-msgstr "un forum dédié aux étudiants de l'UTBM."
+msgstr "Un forum dédié aux étudiants de l'UTBM."
 
 #: forum/templates/forum/main.jinja
 msgid "View last unread messages"
