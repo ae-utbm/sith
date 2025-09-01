@@ -1,8 +1,12 @@
 {% extends "core/base.jinja" %}
 
-{% block title %}
+{% block title -%}
   {% trans %}Club list{% endtrans %}
-{% endblock %}
+{%- endblock %}
+
+{% block description -%}
+  {% trans %}The list of all clubs existing at UTBM.{% endtrans %}
+{%- endblock %}
 
 {% macro display_club(club) -%}
 
@@ -21,7 +25,7 @@
 
   {%- if club.children.all()|length != 0 %}
     <ul>
-      {%- for c in club.children.order_by('name') %}
+      {%- for c in club.children.order_by('name').prefetch_related("children") %}
         {{ display_club(c) }}
       {%- endfor %}
     </ul>
@@ -36,8 +40,8 @@
   {% if club_list %}
     <h3>{% trans %}Club list{% endtrans %}</h3>
     <ul>
-      {%- for c in club_list.all().order_by('name') if c.parent is none %}
-        {{ display_club(c) }}
+      {%- for club in club_list %}
+        {{ display_club(club) }}
       {%- endfor %}
     </ul>
   {% else %}
