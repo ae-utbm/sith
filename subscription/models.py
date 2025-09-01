@@ -71,19 +71,21 @@ class Subscription(models.Model):
         else:
             return f"No user - {self.pk}"
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
+        if self.member.was_subscribed:
+            super().save()
+            return
+
         from counter.models import Customer
 
-        if not self.member.was_subscribed:
-            # This is the first ever subscription for this user
-            customer, _ = Customer.get_or_create(self.member)
-            # Someone who subscribed once will be considered forever
-            # as an old subscriber.
-            self.member.groups.add(settings.SITH_GROUP_OLD_SUBSCRIBERS_ID)
-            self.member.make_home()
-            # now that the user is an old subscriber, change the cached
-            # property accordingly
-            self.member.__dict__["was_subscribed"] = True
+        customer, _ = Customer.get_or_create(self.member)
+        # Someone who subscribed once will be considered forever
+        # as an old subscriber.
+        self.member.groups.add(settings.SITH_GROUP_OLD_SUBSCRIBERS_ID)
+        self.member.make_home()
+        # now that the user is an old subscriber, change the cached
+        # property accordingly
+        self.member.__dict__["was_subscribed"] = True
         super().save()
 
     def get_absolute_url(self):
