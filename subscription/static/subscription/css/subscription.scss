@@ -1,4 +1,14 @@
 #subscription-form form {
+  margin-top: 0;
+
+  .form-content {
+    margin-top: 0;
+  }
+
+  fieldset p:first-of-type, & > p:first-of-type {
+    margin-top: 0;
+  }
+
   .form-content.existing-user {
     max-height: 100%;
     display: flex;
