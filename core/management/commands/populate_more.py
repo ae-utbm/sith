@@ -94,7 +94,11 @@ class Command(BaseCommand):
                 username=self.faker.user_name(),
                 first_name=self.faker.first_name(),
                 last_name=self.faker.last_name(),
-                date_of_birth=self.faker.date_of_birth(minimum_age=15, maximum_age=25),
+                date_of_birth=(
+                    None
+                    if random.random() < 0.2
+                    else self.faker.date_of_birth(minimum_age=15, maximum_age=25)
+                ),
                 email=self.faker.email(),
                 phone=self.faker.phone_number(),
                 address=self.faker.address(),
