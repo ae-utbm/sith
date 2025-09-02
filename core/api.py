@@ -25,6 +25,7 @@ from core.schemas import (
     UserFamilySchema,
     UserFilterSchema,
     UserProfileSchema,
+    UserSchema,
 )
 from core.templatetags.renderer import markdown
 
@@ -69,16 +70,22 @@ class MailingListController(ControllerBase):
         return data
 
 
-@api_controller("/user", permissions=[CanAccessLookup])
+@api_controller("/user")
 class UserController(ControllerBase):
-    @route.get("", response=list[UserProfileSchema])
+    @route.get("", response=list[UserProfileSchema], permissions=[CanAccessLookup])
     def fetch_profiles(self, pks: Query[set[int]]):
         return User.objects.filter(pk__in=pks)
+
+    @route.get("/{int:user_id}", response=UserSchema, permissions=[CanView])
+    def fetch_user(self, user_id: int):
+        """Fetch a single user"""
+        return self.get_object_or_exception(User, id=user_id)
 
     @route.get(
         "/search",
         response=PaginatedResponseSchema[UserProfileSchema],
         url_name="search_users",
+        permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=20)
     def search_users(self, filters: Query[UserFilterSchema]):

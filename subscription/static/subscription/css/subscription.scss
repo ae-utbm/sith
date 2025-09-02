@@ -23,6 +23,11 @@
      * then display the user profile right in the middle of the remaining space. */
     fieldset {
       flex: 0 1 auto;
+
+      p:has(input[hidden]) {
+        // when the input is hidden, hide the whole label+input+help text group
+        display: none;
+      }
     }
 
     #subscription-form-user-mini-profile {

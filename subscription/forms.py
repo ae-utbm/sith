@@ -23,8 +23,8 @@ class SelectionDateForm(forms.Form):
 
 
 class SubscriptionForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        initial = kwargs.pop("initial", {})
+    def __init__(self, *args, initial=None, **kwargs):
+        initial = initial or {}
         if "subscription_type" not in initial:
             initial["subscription_type"] = "deux-semestres"
         if "payment_method" not in initial:
@@ -131,8 +131,55 @@ class SubscriptionExistingUserForm(SubscriptionForm):
     """Form to add a subscription to an existing user."""
 
     template_name = "subscription/forms/create_existing_user.html"
+    required_css_class = "required"
+
+    birthdate = forms.fields_for_model(
+        User,
+        ["date_of_birth"],
+        widgets={"date_of_birth": SelectDate(attrs={"hidden": True})},
+        help_texts={"date_of_birth": _("This user didn't fill its birthdate yet.")},
+    )["date_of_birth"]
 
     class Meta:
         model = Subscription
         fields = ["member", "subscription_type", "payment_method", "location"]
         widgets = {"member": AutoCompleteSelectUser}
+
+    field_order = [
+        "member",
+        "birthdate",
+        "subscription_type",
+        "payment_method",
+        "location",
+    ]
+
+    def __init__(self, *args, initial=None, **kwargs):
+        super().__init__(*args, initial=initial, **kwargs)
+        self.fields["birthdate"].required = True
+        if not initial:
+            return
+        member = initial.get("member")
+        if member:
+            member = User.objects.filter(id=member).first()
+        if member and member.date_of_birth:
+            # if there is an initial member with a birthdate,
+            # there is no need to ask this to the user
+            self.fields["birthdate"].initial = member.date_of_birth
+        elif member:
+            # if there is an initial member without a birthdate,
+            # then the field must be displayed
+            self.fields["birthdate"].widget.attrs.update({"hidden": False})
+        # if there is no initial member, it means that it will be
+        # dynamically selected using the AutoCompleteSelectUser widget.
+        # JS will take care of un-hiding the field if necessary
+
+    def save(self, *args, **kwargs):
+        if self.errors:
+            return super().save(*args, **kwargs)
+        if (
+            self.cleaned_data["birthdate"] is not None
+            and self.instance.member.date_of_birth != self.cleaned_data["birthdate"]
+        ):
+            self.instance.member.date_of_birth = self.cleaned_data["birthdate"]
+            self.instance.member.save()
+        return super().save(*args, **kwargs)
