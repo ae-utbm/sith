@@ -68,7 +68,7 @@ class IcsCalendar:
                 start=news_date.start_date,
                 end=news_date.end_date,
                 url=as_absolute_url(
-                    reverse("com:news_detail", kwargs={"news_id": news_date.news.id})
+                    reverse("com:news_detail", kwargs={"news_id": news_date.news_id})
                 ),
             )
             calendar.events.append(event)
