@@ -745,7 +745,7 @@ class UserBan(models.Model):
                 fields=["ban_group", "user"], name="unique_ban_type_per_user"
             ),
             models.CheckConstraint(
-                check=Q(expires_at__gte=F("created_at")),
+                condition=Q(expires_at__gte=F("created_at")),
                 name="user_ban_end_after_start",
             ),
         ]

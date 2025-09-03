@@ -58,7 +58,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="returnableproduct",
             constraint=models.CheckConstraint(
-                check=models.Q(
+                condition=models.Q(
                     ("product", models.F("returned_product")), _negated=True
                 ),
                 name="returnableproduct_product_different_from_returned",

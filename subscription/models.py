@@ -18,7 +18,6 @@ from datetime import date, timedelta
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.contrib.auth.forms import PasswordResetForm
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
@@ -72,24 +71,22 @@ class Subscription(models.Model):
         else:
             return f"No user - {self.pk}"
 
-    def save(self, *args, **kwargs):
-        super().save()
+    def save(self, *args, **kwargs) -> None:
+        if self.member.was_subscribed:
+            super().save()
+            return
+
         from counter.models import Customer
 
-        _, account_created = Customer.get_or_create(self.member)
-        if account_created:
-            # Someone who subscribed once will be considered forever
-            # as an old subscriber.
-            self.member.groups.add(settings.SITH_GROUP_OLD_SUBSCRIBERS_ID)
-            form = PasswordResetForm({"email": self.member.email})
-            if form.is_valid():
-                form.save(
-                    use_https=True,
-                    email_template_name="core/new_user_email.jinja",
-                    subject_template_name="core/new_user_email_subject.jinja",
-                    from_email="ae@utbm.fr",
-                )
+        customer, _ = Customer.get_or_create(self.member)
+        # Someone who subscribed once will be considered forever
+        # as an old subscriber.
+        self.member.groups.add(settings.SITH_GROUP_OLD_SUBSCRIBERS_ID)
         self.member.make_home()
+        # now that the user is an old subscriber, change the cached
+        # property accordingly
+        self.member.__dict__["was_subscribed"] = True
+        super().save()
 
     def get_absolute_url(self):
         return reverse("core:user_edit", kwargs={"user_id": self.member_id})

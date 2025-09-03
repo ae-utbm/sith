@@ -154,7 +154,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="userban",
             constraint=models.CheckConstraint(
-                check=models.Q(("expires_at__gte", models.F("created_at"))),
+                condition=models.Q(("expires_at__gte", models.F("created_at"))),
                 name="user_ban_end_after_start",
             ),
         ),

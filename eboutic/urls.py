@@ -31,7 +31,6 @@ from eboutic.views import (
     EbouticMainView,
     EbouticPayWithSith,
     EtransactionAutoAnswer,
-    EurokPartnerFragment,
     payment_result,
 )
 
@@ -46,7 +45,6 @@ urlpatterns = [
         "pay/sith/<int:basket_id>", EbouticPayWithSith.as_view(), name="pay_with_sith"
     ),
     path("pay/<res:result>/", payment_result, name="payment_result"),
-    path("eurok/", EurokPartnerFragment.as_view(), name="eurok"),
     path(
         "et_autoanswer",
         EtransactionAutoAnswer.as_view(),

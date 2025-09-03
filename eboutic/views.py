@@ -34,6 +34,7 @@ from django.contrib.auth.mixins import (
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.db import DatabaseError, transaction
+from django.db.models import Subquery
 from django.db.models.fields import forms
 from django.db.utils import cached_property
 from django.http import HttpResponse
@@ -41,14 +42,21 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
-from django.views.generic import DetailView, FormView, TemplateView, UpdateView, View
+from django.views.generic import DetailView, FormView, UpdateView, View
 from django.views.generic.edit import SingleObjectMixin
 from django_countries.fields import Country
 
-from core.auth.mixins import CanViewMixin, IsSubscriberMixin
+from core.auth.mixins import CanViewMixin
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
 from counter.forms import BaseBasketForm, BillingInfoForm, ProductForm
-from counter.models import BillingInfo, Customer, Product, Selling, get_eboutic
+from counter.models import (
+    BillingInfo,
+    Customer,
+    Product,
+    Refilling,
+    Selling,
+    get_eboutic,
+)
 from eboutic.models import (
     Basket,
     BasketItem,
@@ -124,13 +132,36 @@ class EbouticMainView(LoginRequiredMixin, FormView):
         context = super().get_context_data(**kwargs)
         context["products"] = self.products
         context["customer_amount"] = self.request.user.account_balance
-        last_purchase: Selling | None = (
-            self.customer.buyings.filter(counter__type="EBOUTIC")
-            .order_by("-date")
-            .first()
-        )
+
+        purchases = (
+            Customer.objects.filter(pk=self.customer.pk)
+            .annotate(
+                last_refill=Subquery(
+                    Refilling.objects.filter(
+                        counter__type="EBOUTIC", customer_id=self.customer.pk
+                    )
+                    .order_by("-date")
+                    .values("date")[:1]
+                ),
+                last_purchase=Subquery(
+                    Selling.objects.filter(
+                        counter__type="EBOUTIC", customer_id=self.customer.pk
+                    )
+                    .order_by("-date")
+                    .values("date")[:1]
+                ),
+            )
+            .values_list("last_refill", "last_purchase")
+        )[0]
+
+        purchase_times = [
+            int(purchase.timestamp() * 1000)
+            for purchase in purchases
+            if purchase is not None
+        ]
+
         context["last_purchase_time"] = (
-            int(last_purchase.date.timestamp() * 1000) if last_purchase else "null"
+            max(purchase_times) if len(purchase_times) > 0 else "null"
         )
         return context
 
@@ -140,10 +171,6 @@ class EbouticMainView(LoginRequiredMixin, FormView):
 def payment_result(request, result: str) -> HttpResponse:
     context = {"success": result == "success"}
     return render(request, "eboutic/eboutic_payment_result.jinja", context)
-
-
-class EurokPartnerFragment(IsSubscriberMixin, TemplateView):
-    template_name = "eboutic/eurok_fragment.jinja"
 
 
 class BillingInfoFormFragment(

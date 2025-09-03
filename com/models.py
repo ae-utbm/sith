@@ -212,7 +212,7 @@ class NewsDate(models.Model):
         verbose_name_plural = _("news dates")
         constraints = [
             models.CheckConstraint(
-                check=Q(end_date__gte=F("start_date")),
+                condition=Q(end_date__gte=F("start_date")),
                 name="news_date_end_date_after_start_date",
             )
         ]
