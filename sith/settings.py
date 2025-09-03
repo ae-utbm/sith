@@ -686,8 +686,10 @@ SITH_NOTIFICATIONS = [
 # The keys are the notification names as found in SITH_NOTIFICATIONS, and the
 # values are the callback function to update the notifs.
 # The callback must take the notif object as first and single argument.
+# If a notification is permanent but requires no post-action, set the
+# callback import string as None
 SITH_PERMANENT_NOTIFICATIONS = {
-    "NEWS_MODERATION": "com.models.news_notification_callback",
+    "NEWS_MODERATION": None,
     "SAS_MODERATION": "sas.models.sas_notification_callback",
 }
 
