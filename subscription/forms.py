@@ -158,9 +158,11 @@ class SubscriptionExistingUserForm(SubscriptionForm):
         self.fields["birthdate"].required = True
         if not initial:
             return
-        member = initial.get("member")
-        if member:
-            member = User.objects.filter(id=member).first()
+        member: str | None = initial.get("member")
+        if member and member.isdigit():
+            member: User | None = User.objects.filter(id=int(member)).first()
+        else:
+            member = None
         if member and member.date_of_birth:
             # if there is an initial member with a birthdate,
             # there is no need to ask this to the user
@@ -178,7 +180,7 @@ class SubscriptionExistingUserForm(SubscriptionForm):
             return super().save(*args, **kwargs)
         if (
             self.cleaned_data["birthdate"] is not None
-            and self.instance.member.date_of_birth != self.cleaned_data["birthdate"]
+            and self.instance.member.date_of_birth is None
         ):
             self.instance.member.date_of_birth = self.cleaned_data["birthdate"]
             self.instance.member.save()
