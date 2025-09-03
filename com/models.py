@@ -27,7 +27,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.db import models, transaction
-from django.db.models import F, Q
+from django.db.models import Exists, F, OuterRef, Q
 from django.shortcuts import render
 from django.templatetags.static import static
 from django.urls import reverse
@@ -55,8 +55,16 @@ class Sith(models.Model):
 
 
 class NewsQuerySet(models.QuerySet):
-    def moderated(self) -> Self:
+    def published(self) -> Self:
         return self.filter(is_published=True)
+
+    def waiting_moderation(self) -> Self:
+        """Filter all non-finished non-published news"""
+        # Because of the way News and NewsDates are created,
+        # there may be some cases where this method is called before
+        # the NewsDates linked to a Date are actually persisted in db.
+        # Thus, it's important to filter by "not past date" rather than by "future date"
+        return self.filter(~Q(dates__start_date__lt=timezone.now()), is_published=False)
 
     def viewable_by(self, user: User) -> Self:
         """Filter news that the given user can view.
@@ -127,20 +135,28 @@ class News(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if self.is_published:
-            return
-        for user in User.objects.filter(
-            groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID]
-        ):
-            Notification.objects.create(
-                user=user, url=reverse("com:news_admin_list"), type="NEWS_MODERATION"
+        if not self.is_published:
+            admins_without_notif = User.objects.filter(
+                ~Exists(
+                    Notification.objects.filter(
+                        user=OuterRef("pk"), type="NEWS_MODERATION"
+                    )
+                ),
+                groups__id=settings.SITH_GROUP_COM_ADMIN_ID,
             )
+            notif_url = reverse("com:news_admin_list")
+            new_notifs = [
+                Notification(user=user, url=notif_url, type="NEWS_MODERATION")
+                for user in admins_without_notif
+            ]
+            Notification.objects.bulk_create(new_notifs)
+        self.update_moderation_notifs()
 
     def get_absolute_url(self):
         return reverse("com:news_detail", kwargs={"news_id": self.id})
 
     def get_full_url(self):
-        return "https://%s%s" % (settings.SITH_URL, self.get_absolute_url())
+        return f"https://{settings.SITH_URL}{self.get_absolute_url()}"
 
     def is_owned_by(self, user):
         if user.is_anonymous:
@@ -159,19 +175,16 @@ class News(models.Model):
             or (user.is_authenticated and self.author_id == user.id)
         )
 
-
-def news_notification_callback(notif: Notification):
-    # the NewsDate linked to the News
-    # which creation triggered this callback may not exist yet,
-    # so it's important to filter by "not past date" rather than by "future date"
-    count = News.objects.filter(
-        ~Q(dates__start_date__gt=timezone.now()), is_published=False
-    ).count()
-    if count:
-        notif.viewed = False
-        notif.param = str(count)
-    else:
-        notif.viewed = True
+    @staticmethod
+    def update_moderation_notifs():
+        count = News.objects.waiting_moderation().count()
+        notifs_qs = Notification.objects.filter(
+            type="NEWS_MODERATION", user__groups__id=settings.SITH_GROUP_COM_ADMIN_ID
+        )
+        if count:
+            notifs_qs.update(viewed=False, param=str(count))
+        else:
+            notifs_qs.update(viewed=True)
 
 
 class NewsDateQuerySet(models.QuerySet):
