@@ -560,7 +560,7 @@ class User(AbstractUser):
         """Determine if the object is owned by the user."""
         if hasattr(obj, "is_owned_by") and obj.is_owned_by(self):
             return True
-        if hasattr(obj, "owner_group") and self.is_in_group(pk=obj.owner_group.id):
+        if hasattr(obj, "owner_group") and self.is_in_group(pk=obj.owner_group_id):
             return True
         return self.is_root
 
@@ -569,9 +569,15 @@ class User(AbstractUser):
         if hasattr(obj, "can_be_edited_by") and obj.can_be_edited_by(self):
             return True
         if hasattr(obj, "edit_groups"):
-            for pk in obj.edit_groups.values_list("pk", flat=True):
-                if self.is_in_group(pk=pk):
-                    return True
+            if (
+                hasattr(obj, "_prefetched_objects_cache")
+                and "edit_groups" in obj._prefetched_objects_cache
+            ):
+                pks = [g.id for g in obj.edit_groups.all()]
+            else:
+                pks = list(obj.edit_groups.values_list("id", flat=True))
+            if any(self.is_in_group(pk=pk) for pk in pks):
+                return True
         if isinstance(obj, User) and obj == self:
             return True
         return self.is_owner(obj)
@@ -581,9 +587,18 @@ class User(AbstractUser):
         if hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self):
             return True
         if hasattr(obj, "view_groups"):
-            for pk in obj.view_groups.values_list("pk", flat=True):
-                if self.is_in_group(pk=pk):
-                    return True
+            # if "view_groups" has already been prefetched, use
+            # the prefetch cache, else fetch only the ids, to make
+            # the query lighter.
+            if (
+                hasattr(obj, "_prefetched_objects_cache")
+                and "view_groups" in obj._prefetched_objects_cache
+            ):
+                pks = [g.id for g in obj.view_groups.all()]
+            else:
+                pks = list(obj.view_groups.values_list("id", flat=True))
+            if any(self.is_in_group(pk=pk) for pk in pks):
+                return True
         return self.can_edit(obj)
 
     def can_be_edited_by(self, user):
@@ -1384,9 +1399,9 @@ class Page(models.Model):
 
     @cached_property
     def is_club_page(self):
-        club_root_page = Page.objects.filter(name=settings.SITH_CLUB_ROOT_PAGE).first()
-        return club_root_page is not None and (
-            self == club_root_page or club_root_page in self.get_parent_list()
+        return (
+            self.name == settings.SITH_CLUB_ROOT_PAGE
+            or settings.SITH_CLUB_ROOT_PAGE in [p.name for p in self.get_parent_list()]
         )
 
     @cached_property

@@ -12,7 +12,10 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models import F, OuterRef, Subquery
+from django.db.models.functions import Coalesce
 
 # This file contains all the views that concern the page model
 from django.forms.models import modelform_factory
@@ -43,6 +46,20 @@ class CanEditPagePropMixin(CanEditPropMixin):
 class PageListView(CanViewMixin, ListView):
     model = Page
     template_name = "core/page_list.jinja"
+    queryset = (
+        Page.objects.annotate(
+            display_name=Coalesce(
+                Subquery(
+                    PageRev.objects.filter(page=OuterRef("id"))
+                    .order_by("-date")
+                    .values("title")[:1]
+                ),
+                F("name"),
+            )
+        )
+        .prefetch_related("view_groups")
+        .select_related("parent")
+    )
 
 
 class PageView(CanViewMixin, DetailView):
