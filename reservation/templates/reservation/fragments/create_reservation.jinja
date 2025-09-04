@@ -1,0 +1,51 @@
+<section
+  id="slot-reservation"
+  x-data="slotReservation"
+  x-show="showForm"
+  hx-target="this"
+  hx-ext="alpine-morph"
+  hx-swap="morph"
+>
+  <h3>{% trans %}Book a room{% endtrans %}</h3>
+  {% set non_field_errors = form.non_field_errors() %}
+  {% if non_field_errors %}
+    <div class="alert alert-red">
+      {% for error in non_field_errors %}
+        <span>{{ error }}</span>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <form
+    id="slot-reservation-form"
+    hx-post="{{ url("reservation:make_reservation") }}"
+    hx-disabled-elt="find input[type='submit']"
+  >
+    {% csrf_token %}
+    <div class="form-group">
+      {{ form.room.errors }}
+      {{ form.room.label_tag() }}
+      {{ form.room|add_attr("x-model=room") }}
+    </div>
+    <div class="form-group">
+      {{ form.start_at.errors }}
+      {{ form.start_at.label_tag() }}
+      {{ form.start_at|add_attr("x-model=start") }}
+    </div>
+    <div class="form-group">
+      {{ form.end_at.errors }}
+      {{ form.end_at.label_tag() }}
+      {{ form.end_at|add_attr("x-model=end") }}
+    </div>
+    <div class="form-group">
+      {{ form.comment.errors }}
+      {{ form.comment.label_tag() }}
+      {{ form.comment }}
+    </div>
+    <div class="row gap buttons-row">
+      <button class="btn btn-grey grow" @click.prevent="showForm = false">
+        {% trans %}Cancel{% endtrans %}
+      </button>
+      <input class="btn btn-blue grow" type="submit">
+    </div>
+  </form>
+</section>
