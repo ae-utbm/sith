@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-23 15:30+0200\n"
+"POT-Creation-Date: 2025-09-01 18:18+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -305,6 +305,10 @@ msgstr "Utilisateur non enregistré"
 #: club/templates/club/club_list.jinja
 msgid "Club list"
 msgstr "Liste des clubs"
+
+#: club/templates/club/club_list.jinja
+msgid "The list of all clubs existing at UTBM."
+msgstr "La liste de tous les clubs existants à l'UTBM"
 
 #: club/templates/club/club_list.jinja
 msgid "inactive"
@@ -901,7 +905,7 @@ msgid "News admin"
 msgstr "Administration des nouvelles"
 
 #: com/templates/com/news_admin_list.jinja com/templates/com/news_detail.jinja
-#: com/templates/com/news_list.jinja com/views.py
+#: com/views.py
 msgid "News"
 msgstr "Nouvelles"
 
@@ -1035,7 +1039,7 @@ msgstr "Liens"
 msgid "Our services"
 msgstr "Nos services"
 
-#: com/templates/com/news_list.jinja pedagogy/templates/pedagogy/guide.jinja
+#: com/templates/com/news_list.jinja
 msgid "UV Guide"
 msgstr "Guide des UVs"
 
@@ -1705,8 +1709,12 @@ msgid "500, Server Error"
 msgstr "500, Erreur Serveur"
 
 #: core/templates/core/base.jinja
-msgid "Welcome!"
-msgstr "Bienvenue !"
+msgid ""
+"AE UTBM is a voluntary organisation run by UTBM students. It organises "
+"student life at UTBM and manages its student facilities."
+msgstr ""
+"L'AE UTBM est une association bénévole gérée par les étudiants de "
+"l'UTBM. Elle organise la vie étudiante de l'UTBM et gère ses lieux de vie."
 
 #: core/templates/core/base/footer.jinja core/templates/core/base/navbar.jinja
 msgid "Contacts"
@@ -3820,6 +3828,10 @@ msgid "Pay with Sith account"
 msgstr "Payer avec un compte AE"
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "The online shop of the association."
+msgstr "La boutique en ligne de l'association."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "Clear"
 msgstr "Vider"
 
@@ -4149,6 +4161,10 @@ msgid "Order by date"
 msgstr "Trier par date"
 
 #: forum/templates/forum/main.jinja
+msgid "A forum dedicated to the UTBM students."
+msgstr "Un forum dédié aux étudiants de l'UTBM."
+
+#: forum/templates/forum/main.jinja
 msgid "View last unread messages"
 msgstr "Voir les derniers messages non lus"
 
@@ -4373,6 +4389,14 @@ msgstr "signaler"
 #: pedagogy/models.py
 msgid "reporter"
 msgstr "signalant"
+
+#: pedagogy/templates/pedagogy/guide.jinja
+msgid "UE Guide"
+msgstr "Guide des UEs"
+
+#: pedagogy/templates/pedagogy/guide.jinja
+msgid "A guide of courses available at UTBM."
+msgstr "Un guide de tous les cours disponibles à l'UTBM."
 
 #: pedagogy/templates/pedagogy/guide.jinja
 #, python-format
@@ -4665,6 +4689,11 @@ msgstr "Demande de retrait d'image"
 #: sas/templates/sas/ask_picture_removal.jinja
 msgid "Request removal"
 msgstr "Demander le retrait"
+
+#: sas/templates/sas/main.jinja
+msgid "See all the photos taken during events organised by the AE."
+msgstr ""
+"Retrouvez toutes les photos prises lors des événements organisés par l'AE."
 
 #: sas/templates/sas/main.jinja
 msgid "You must be logged in to see the SAS."

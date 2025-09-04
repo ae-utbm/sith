@@ -2,9 +2,13 @@
 {% from 'core/macros.jinja' import user_profile_link %}
 {% from 'forum/macros.jinja' import display_forum, display_search_bar %}
 
-{% block title %}
+{% block title -%}
   {% trans %}Forum{% endtrans %}
-{% endblock %}
+{%- endblock %}
+
+{% block description -%}
+  {% trans %}A forum dedicated to the UTBM students.{% endtrans %}
+{%- endblock %}
 
 {% block additional_css %}
   <link rel="stylesheet" href="{{ static('forum/css/forum.scss') }}">

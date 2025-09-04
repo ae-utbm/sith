@@ -171,6 +171,10 @@ class ClubListView(ListView):
 
     model = Club
     template_name = "club/club_list.jinja"
+    queryset = (
+        Club.objects.filter(parent=None).order_by("name").prefetch_related("children")
+    )
+    context_object_name = "club_list"
 
 
 class ClubView(ClubTabsMixin, DetailView):

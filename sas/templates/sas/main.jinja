@@ -8,6 +8,10 @@
   {% trans %}SAS{% endtrans %}
 {% endblock %}
 
+{% block description -%}
+  {% trans %}See all the photos taken during events organised by the AE.{% endtrans %}
+{%- endblock %}
+
 {% set is_sas_admin = user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
 
 {% from "sas/macros.jinja" import display_album %}
