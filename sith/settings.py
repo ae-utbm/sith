@@ -125,6 +125,7 @@ INSTALLED_APPS = (
     "pedagogy",
     "galaxy",
     "antispam",
+    "timetable",
     "api",
 )
 
