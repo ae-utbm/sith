@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
 from club.widgets.ajax_select import AutoCompleteSelectClub
-from core.models import User
+from core.models import User, Club
 from core.views.forms import NFCTextInput, SelectDate, SelectDateTime
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
@@ -377,22 +377,24 @@ BasketForm = forms.formset_factory(
 
 
 class InvoiceCallForm(forms.Form):
-    def __init__(self, *args, month=None, clubs=None, **kwargs):
+    def __init__(self, *args, month=None, clubs: list[Club] | None = None, **kwargs):
         super().__init__(*args, **kwargs)
         self.month = month
         self.clubs = clubs
 
-        for club in self.clubs:
-            field_name = f"club_{club.id}"
-            initial = (
-                InvoiceCall.objects.filter(club=club, month=month)
-                .values_list("is_validated", flat=True)
-                .first()
+        if self.clubs is None:
+            self.clubs = []
+        invoices = {
+            i["club_id"]: i["is_validated"]
+            for i in InvoiceCall.objects.filter(club__in=self.clubs).values(
+                "club_id", "is_validated"
             )
+        }
+        for club in self.clubs:
+            is_validated = invoices.get(club.id, False)
 
-            self.fields[field_name] = forms.BooleanField(
-                required=False,
-                initial=initial,
+            self.fields[f"club_{club.id}"] = forms.BooleanField(
+                required=False, initial=is_validated
             )
 
     def save(self):
