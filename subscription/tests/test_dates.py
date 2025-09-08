@@ -90,7 +90,7 @@ class TestSubscriptionIntegration(TestCase):
         s = Subscription(
             member=self.user,
             subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
-            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1],
         )
         s.subscription_start = date(2017, 8, 29)
         s.subscription_end = s.compute_end(duration=0.166, start=s.subscription_start)
@@ -101,7 +101,7 @@ class TestSubscriptionIntegration(TestCase):
         s = Subscription(
             member=self.user,
             subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
-            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1],
         )
         s.subscription_start = date(2017, 8, 29)
         s.subscription_end = s.compute_end(duration=0.333, start=s.subscription_start)
@@ -112,7 +112,7 @@ class TestSubscriptionIntegration(TestCase):
         s = Subscription(
             member=self.user,
             subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
-            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1],
         )
         s.subscription_start = date(2017, 8, 29)
         s.subscription_end = s.compute_end(
@@ -126,7 +126,7 @@ class TestSubscriptionIntegration(TestCase):
         s = Subscription(
             member=self.user,
             subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
-            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1],
         )
         s.subscription_start = date(2017, 8, 29)
         s.subscription_end = s.compute_end(duration=0.5, start=s.subscription_start)
@@ -137,7 +137,7 @@ class TestSubscriptionIntegration(TestCase):
         s = Subscription(
             member=self.user,
             subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
-            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1],
         )
         s.subscription_start = date(2017, 8, 29)
         s.subscription_end = s.compute_end(duration=0.67, start=s.subscription_start)
@@ -148,7 +148,7 @@ class TestSubscriptionIntegration(TestCase):
         s = Subscription(
             member=self.user,
             subscription_type=list(settings.SITH_SUBSCRIPTIONS.keys())[3],
-            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1],
         )
         s.subscription_start = date(2018, 9, 1)
         s.subscription_end = s.compute_end(duration=0.23, start=s.subscription_start)
@@ -160,7 +160,7 @@ class TestSubscriptionIntegration(TestCase):
         s = Subscription(
             member=user,
             subscription_type="deux-semestres",
-            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1],
         )
         s.subscription_start = date(2015, 8, 29)
         s.subscription_end = s.compute_end(
@@ -181,7 +181,7 @@ class TestSubscriptionIntegration(TestCase):
         s = Subscription(
             member=user,
             subscription_type="deux-mois-essai",
-            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1],
         )
         s.subscription_start = date(2015, 8, 29)
         s.subscription_end = s.compute_end(
@@ -202,7 +202,7 @@ class TestSubscriptionIntegration(TestCase):
         s = Subscription(
             member=user,
             subscription_type="deux-mois-essai",
-            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0],
+            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1],
         )
         s.subscription_start = date(2015, 8, 29)
         s.subscription_end = s.compute_end(
