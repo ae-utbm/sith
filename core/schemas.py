@@ -34,6 +34,22 @@ class SimpleUserSchema(ModelSchema):
         fields = ["id", "nick_name", "first_name", "last_name"]
 
 
+class UserSchema(ModelSchema):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "nick_name",
+            "first_name",
+            "last_name",
+            "date_of_birth",
+            "email",
+            "role",
+            "quote",
+            "promo",
+        ]
+
+
 class UserProfileSchema(ModelSchema):
     """The necessary information to show a user profile"""
 
