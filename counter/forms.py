@@ -5,8 +5,9 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
+from club.models import Club
 from club.widgets.ajax_select import AutoCompleteSelectClub
-from core.models import User, Club
+from core.models import User
 from core.views.forms import NFCTextInput, SelectDate, SelectDateTime
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
