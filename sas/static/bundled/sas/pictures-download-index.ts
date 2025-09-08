@@ -30,10 +30,10 @@ document.addEventListener("alpine:init", () => {
 
       await Promise.all(
         this.pictures.map((p: PictureSchema) => {
-          const imgName = `${p.album}/IMG_${p.date.replace(/[:\-]/g, "_")}${p.name.slice(p.name.lastIndexOf("."))}`;
+          const imgName = `${p.album}/IMG_${p.created_at.replace(/[:\-]/g, "_")}${p.name.slice(p.name.lastIndexOf("."))}`;
           return zipWriter.add(imgName, new HttpReader(p.full_size_url), {
             level: 9,
-            lastModDate: new Date(p.date),
+            lastModDate: new Date(p.created_at),
             onstart: incrementProgressBar,
           });
         }),

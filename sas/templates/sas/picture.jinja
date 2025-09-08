@@ -1,9 +1,9 @@
 {% extends "core/base.jinja" %}
 
 {%- block additional_css -%}
-  <link defer rel="stylesheet" href="{{ static('bundled/core/components/ajax-select-index.css') }}">
-  <link defer rel="stylesheet" href="{{ static('core/components/ajax-select.scss') }}">
-  <link defer rel="stylesheet" href="{{ static('sas/css/picture.scss') }}">
+  <link rel="stylesheet" href="{{ static('bundled/core/components/ajax-select-index.css') }}">
+  <link rel="stylesheet" href="{{ static('core/components/ajax-select.scss') }}">
+  <link rel="stylesheet" href="{{ static('sas/css/picture.scss') }}">
 {%- endblock -%}
 
 {%- block additional_js -%}
@@ -104,7 +104,7 @@
                 <span
                   x-text="Intl.DateTimeFormat(
                           '{{ LANGUAGE_CODE }}', {dateStyle: 'long'}
-                          ).format(new Date(currentPicture.date))"
+                          ).format(new Date(currentPicture.created_at))"
                 >
                 </span>
               </div>
