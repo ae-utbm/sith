@@ -344,7 +344,7 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         form = self.get_form()
         if form.is_valid():
             if not len([v for v in form.cleaned_data.values() if v is not None]):
-                qs = Selling.objects.filter(id=-1)
+                qs = Selling.objects.none()
             if form.cleaned_data["begin_date"]:
                 qs = qs.filter(date__gte=form.cleaned_data["begin_date"])
             if form.cleaned_data["end_date"]:
@@ -362,7 +362,9 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
             if len(selected_products) > 0:
                 qs = qs.filter(product__in=selected_products)
 
-            kwargs["result"] = qs.all().order_by("-id")
+            kwargs["result"] = qs.select_related(
+                "counter", "counter__club", "customer", "customer__user", "seller"
+            ).order_by("-id")
             kwargs["total"] = sum([s.quantity * s.unit_price for s in kwargs["result"]])
             total_quantity = qs.all().aggregate(Sum("quantity"))
             if total_quantity["quantity__sum"]:
