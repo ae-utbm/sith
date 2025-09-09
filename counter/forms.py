@@ -378,19 +378,21 @@ BasketForm = forms.formset_factory(
 
 
 class InvoiceCallForm(forms.Form):
-    def __init__(self, *args, month=None, clubs: list[Club] | None = None, **kwargs):
+    def __init__(self, *args, month, clubs: list[Club] | None = None, **kwargs):
         super().__init__(*args, **kwargs)
         self.month = month
         self.clubs = clubs
 
         if self.clubs is None:
             self.clubs = []
+
         invoices = {
             i["club_id"]: i["is_validated"]
-            for i in InvoiceCall.objects.filter(club__in=self.clubs).values(
-                "club_id", "is_validated"
-            )
+            for i in InvoiceCall.objects.filter(
+                club__in=self.clubs, month=self.month
+            ).values("club_id", "is_validated")
         }
+
         for club in self.clubs:
             is_validated = invoices.get(club.id, False)
 

@@ -1364,46 +1364,33 @@ class ReturnableProductBalance(models.Model):
         )
 
 
-class MonthField(models.CharField):
-    description = _("Year + month field")
-
-    def __init__(self, *args, **kwargs):
-        kwargs["max_length"] = 7
-        super().__init__(*args, **kwargs)
-
-    def db_type(self, connection):
-        return "char(7)"
-
-    def from_db_value(self, value, expression, connection):
-        if value is None:
-            return value
-        try:
-            year, month = value.split("-")
-            return date(year, month, 1)
-        except (ValueError, TypeError):
-            return value
+class MonthField(models.DateField):
+    description = _("Year + month field (day forced to 1)")
+    default_error_messages = {
+        "invalid": _(
+            "“%(value)s” value has an invalid date format. It must be "
+            "in YYYY-MM format."
+        ),
+        "invalid_date": _(
+            "“%(value)s” value has the correct format (YYYY-MM) "
+            "but it is an invalid date."
+        ),
+    }
 
     def to_python(self, value):
         if isinstance(value, date):
-            return value
+            return value.replace(day=1)
+
         if isinstance(value, str):
             try:
-                year, month = value.split("-")
+                year, month = map(int, value.split("-"))
                 return date(year, month, 1)
-            except ValueError:
-                pass
-        return value
+            except (ValueError, TypeError) as err:
+                raise ValueError(
+                    self.error_messages["invalid"] % {"value": value}
+                ) from err
 
-    def get_prep_value(self, value):
-        if isinstance(value, date):
-            return value.strftime("%Y-%m")
-        if isinstance(value, str) and len(value) == 7 and value[4] == "-":
-            return value
-        return value
-
-    def value_to_string(self, obj):
-        value = self.value_from_object(obj)
-        return self.get_prep_value(value)
+        return super().to_python(value)
 
 
 class InvoiceCall(models.Model):
