@@ -40,6 +40,7 @@
           <div class="slot" :style="getStyle(course)">
             <span x-text="`${course.ueCode} (${course.courseType})`"></span>
             <span x-text="`${course.startHour} - ${course.endHour}`"></span>
+            <span x-text="(course.weekGroup ? `\nGroupe ${course.weekGroup}` : '')"></span>
             <span x-text="course.room"></span>
           </div>
         </template>
