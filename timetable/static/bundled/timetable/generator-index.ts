@@ -87,6 +87,21 @@ document.addEventListener("alpine:init", () => {
       width: 0,
     },
 
+    colors: {} as Record<string, string>,
+    colorPalette: [
+      "#27ae60",
+      "#2980b9",
+      "#c0392b",
+      "#7f8c8d",
+      "#f1c40f",
+      "#1abc9c",
+      "#95a5a6",
+      "#26C6DA",
+      "#c2185b",
+      "#e64a19",
+      "#1b5e20",
+    ],
+
     generate() {
       try {
         this.courses = parseSlots(this.content);
@@ -96,16 +111,27 @@ document.addEventListener("alpine:init", () => {
         );
         return;
       }
+
+      // color each UE
+      let colorIndex = 0;
+      for (const slot of this.courses) {
+        if (!this.colors[slot.ueCode]) {
+          this.colors[slot.ueCode] =
+            this.colorPalette[colorIndex % this.colorPalette.length];
+          colorIndex++;
+        }
+      }
+
       this.displayedWeekdays = WEEKDAYS.filter((day) =>
         this.courses.some((slot: TimetableSlot) => slot.weekday === day),
       );
       this.startSlot = this.courses.reduce(
         (acc: number, curr: TimetableSlot) => Math.min(acc, curr.startSlot),
-        24 * 4,
+        25 * 4,
       );
       this.endSlot = this.courses.reduce(
         (acc: number, curr: TimetableSlot) => Math.max(acc, curr.endSlot),
-        0,
+        1,
       );
       this.table.height = SLOT_HEIGHT * (this.endSlot - this.startSlot);
       this.table.width = SLOT_WIDTH * this.displayedWeekdays.length;
@@ -117,6 +143,7 @@ document.addEventListener("alpine:init", () => {
         width: `${SLOT_WIDTH}px`,
         top: `${(slot.startSlot - this.startSlot) * SLOT_HEIGHT}px`,
         left: `${this.displayedWeekdays.indexOf(slot.weekday) * SLOT_WIDTH}px`,
+        backgroundColor: this.colors[slot.ueCode],
       };
     },
 
