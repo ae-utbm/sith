@@ -73,10 +73,17 @@ exportToHtml("loadGalaxy", async (config: GalaxyConfig) => {
           width: 0.1,
         },
       },
+      {
+        selector: ".direct",
+        style: {
+          width: "5px",
+          "line-color": "red",
+        },
+      },
     ],
     layout: {
       name: "d3-force",
-      animate: false,
+      animate: true,
       fit: false,
       ungrabifyWhileSimulating: true,
       fixedAfterDragging: true,
@@ -93,24 +100,37 @@ exportToHtml("loadGalaxy", async (config: GalaxyConfig) => {
         return 1 / Math.max(1, link?.value);
       },
 
+      linkIterations: 10,
+
       manyBodyStrength: (node) => {
         return node?.mass;
       },
 
-      stop: () => {
+      // manyBodyDistanceMin: 500,
+      collideRadius: () => {
+        return 50;
+      },
+
+      ready: (e) => {
+        // Center on current user node at the start of the simulation
+        // Color all direct paths from that citizen to it's neighbor
+        const citizen = e.cy.nodes(`#${config.nodeId}`)[0];
+        citizen.addClass("focused");
+        citizen.connectedEdges().addClass("direct");
+        e.cy.center(citizen);
+      },
+
+      tick: () => {
+        // Center on current user node during simulation
+        const citizen = cy.nodes(`#${config.nodeId}`)[0];
+        cy.center(citizen);
+      },
+
+      stop: (e) => {
         // Disable user grabbing of nodes
         // This has to be disabled after the simulation is done
         // Otherwise the simulation can't move nodes
-        cy.autolock(true);
-
-        // Center on current user node
-        for (const node of cy.nodes()) {
-          if (node.id() === `${config.nodeId}`) {
-            node.addClass("focused");
-            cy.center(node);
-            break;
-          }
-        }
+        e.cy.autolock(true);
       },
     } as D3ForceLayoutOptions,
   });
