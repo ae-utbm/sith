@@ -80,12 +80,21 @@ exportToHtml("loadGalaxy", async (config: GalaxyConfig) => {
       fit: false,
       ungrabifyWhileSimulating: true,
       fixedAfterDragging: true,
+
       linkId: (node) => {
         return node.id;
       },
 
       linkDistance: (link) => {
-        return link?.value * 1000;
+        return elements.nodes.length * 10;
+      },
+
+      linkStrength: (link) => {
+        return 1 / Math.max(1, link?.value);
+      },
+
+      manyBodyStrength: (node) => {
+        return node?.mass;
       },
 
       stop: () => {
