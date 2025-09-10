@@ -5,14 +5,14 @@
 {% endblock %}
 
 {% block additional_js %}
-  <script type="module" src="{{ static('bundled/galaxy/galaxy-index.js') }}"></script>
+  <script type="module" src="{{ static('bundled/galaxy/galaxy-index.ts') }}"></script>
 {% endblock %}
 
 
 {% block content %}
   {% if object.current_star %}
     <div style="display: flex; flex-wrap: wrap;">
-      <div id="3d-graph"></div>
+      <div style="width: 100%; height: 70vh; display: block" id="3d-graph"></div>
 
       <div style="margin: 1em;">
         <p><a onclick="window.focusNode(window.getNodeFromId({{ object.id }}))">Reset on {{ object.get_display_name() }}</a></p>
