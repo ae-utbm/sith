@@ -122,7 +122,7 @@ class TestGalaxyModel(TestCase):
             self.com,
         ]
 
-        with self.assertNumQueries(44):
+        with self.assertNumQueries(38):
             while len(users) > 0:
                 user1 = users.pop(0)
                 family_scores = Galaxy.compute_user_family_score(user1)
@@ -150,7 +150,7 @@ class TestGalaxyModel(TestCase):
         that the number of queries to rule the galaxy is stable.
         """
         galaxy = Galaxy.objects.create()
-        with self.assertNumQueries(39):
+        with self.assertNumQueries(36):
             galaxy.rule(0)  # We want everybody here
 
 
