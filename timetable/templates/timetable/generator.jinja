@@ -9,7 +9,7 @@
 {%- endblock -%}
 
 {% block title %}
-  {% trans %}Timeplan generator{% endtrans %}
+  {% trans %}Timetable generator{% endtrans %}
 {% endblock %}
 
 {% block content %}
@@ -17,7 +17,7 @@
     <form @submit.prevent="generate()">
       <h1>Générateur d'emploi du temps</h1>
       <div class="alert alert-red" x-show="!!error" x-cloak>
-        <p class="alert-main" x-text="error"></p>
+        <span class="alert-main" x-text="error"></span>
       </div>
       <div class="form-group">
         <label for="timetable-input">Colle ton emploi du temps (sans l'entête)</label>
@@ -38,7 +38,8 @@
       <div class="content">
         <template x-for="course in courses">
           <div class="slot" :style="getStyle(course)">
-            <span x-text="`${course.ueCode} (${course.courseType})`"></span>
+            <span class="course-type" x-text="course.courseType"></span>
+            <span x-text="course.ueCode"></span>
             <span x-text="`${course.startHour} - ${course.endHour}`"></span>
             <span x-text="(course.weekGroup ? `\nGroupe ${course.weekGroup}` : '')"></span>
             <span x-text="course.room"></span>
