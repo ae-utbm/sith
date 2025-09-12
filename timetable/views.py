@@ -1,10 +1,8 @@
 # Create your views here.
-from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic import TemplateView
 
+from core.auth.mixins import FormerSubscriberMixin
 
-class GeneratorView(UserPassesTestMixin, TemplateView):
+
+class GeneratorView(FormerSubscriberMixin, TemplateView):
     template_name = "timetable/generator.jinja"
-
-    def test_func(self):
-        return self.request.user.is_subscribed
