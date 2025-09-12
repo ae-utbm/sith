@@ -37,7 +37,7 @@ const WEEKDAYS = [
 ] as const;
 
 const SLOT_HEIGHT = 20 as const; // Each 15min has a height of 20px in the timetable
-const SLOT_WIDTH = 400 as const; // Each weekday ha a width of 400px in the timetable
+const SLOT_WIDTH = 250 as const; // Each weekday ha a width of 400px in the timetable
 const MINUTES_PER_SLOT = 15 as const;
 
 interface TimetableSlot {
