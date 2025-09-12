@@ -1039,6 +1039,10 @@ msgstr "Nos services"
 msgid "UV Guide"
 msgstr "Guide des UVs"
 
+#: com/templates/com/news_list.jinja
+msgid "Timetable"
+msgstr "Emploi du temps"
+
 #: com/templates/com/news_list.jinja core/templates/core/base/navbar.jinja
 msgid "Matmatronch"
 msgstr "Matmatronch"
@@ -5209,6 +5213,18 @@ msgstr "Membre existant"
 #: subscription/views.py
 msgid "the groups that can create subscriptions"
 msgstr "les groupes pouvant créer des cotisations"
+
+#: timetable/templates/timetable/generator.jinja
+msgid "Timetable generator"
+msgstr "Générateur d'emploi du temps"
+
+#: timetable/templates/timetable/generator.jinja
+msgid "Generate"
+msgstr "Générer"
+
+#: timetable/templates/timetable/generator.jinja
+msgid "Save to PNG"
+msgstr "Sauver en PNG"
 
 #: trombi/models.py
 msgid "subscription deadline"
