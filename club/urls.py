@@ -25,6 +25,7 @@
 from django.urls import path
 
 from club.views import (
+    ClubAddMembersFragment,
     ClubCreateView,
     ClubEditView,
     ClubListView,
@@ -60,6 +61,11 @@ urlpatterns = [
     path("<int:club_id>/edit/", ClubEditView.as_view(), name="club_edit"),
     path("<int:club_id>/edit/page/", ClubPageEditView.as_view(), name="club_edit_page"),
     path("<int:club_id>/members/", ClubMembersView.as_view(), name="club_members"),
+    path(
+        "fragment/<int:club_id>/members/",
+        ClubAddMembersFragment.as_view(),
+        name="club_new_members",
+    ),
     path(
         "<int:club_id>/elderlies/",
         ClubOldMembersView.as_view(),

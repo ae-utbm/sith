@@ -1,0 +1,27 @@
+<h4>{% trans %}Add a new member{% endtrans %}</h4>
+<form
+  hx-post="{{ url('club:club_new_members', club_id=club.id) }}"
+  hx-disabled-elt="find input[type='submit']"
+  hx-swap="outerHTML"
+  id="add_users"
+>
+  {% csrf_token %}
+  {{ form.non_field_errors() }}
+  <p>
+    {{ form.user.errors }}
+    {{ form.user.label_tag()}}
+    <span class="helptext">{{ form.user.help_text }}</span>
+    {{ form.user }}
+  </p>
+  <p>
+    {{ form.role.errors }}
+    {{ form.role.label_tag()}}
+    {{ form.role }}
+  </p>
+  <p>
+    {{ form.description.errors }}
+    {{ form.description.label_tag()}}
+    {{ form.description }}
+  </p>
+  <p><input type="submit" /></p>
+</form>
