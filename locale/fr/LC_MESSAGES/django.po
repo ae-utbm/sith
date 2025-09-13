@@ -173,10 +173,6 @@ msgstr "L'utilisateur doit être cotisant pour faire partie d'un club"
 msgid "You can not add the same user twice"
 msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 
-#: club/forms.py
-msgid "You should specify a role"
-msgstr "Vous devez choisir un rôle"
-
 #: club/forms.py sas/forms.py
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
@@ -327,6 +323,14 @@ msgid "Club members"
 msgstr "Membres du club"
 
 #: club/templates/club/club_members.jinja
+msgid "Add a new member"
+msgstr "Ajouter un nouveau membre"
+
+#: club/templates/club/club_members.jinja
+msgid "Current club members"
+msgstr "Membres actuels du club"
+
+#: club/templates/club/club_members.jinja
 #: club/templates/club/club_old_members.jinja
 #: core/templates/core/user_clubs.jinja
 #: trombi/templates/trombi/edit_profile.jinja
@@ -349,11 +353,6 @@ msgstr "Depuis"
 #: club/templates/club/club_members.jinja
 msgid "There are no members in this club."
 msgstr "Il n'y a pas de membres dans ce club."
-
-#: club/templates/club/club_members.jinja core/templates/core/file_detail.jinja
-#: core/views/forms.py trombi/templates/trombi/detail.jinja
-msgid "Add"
-msgstr "Ajouter"
 
 #: club/templates/club/club_old_members.jinja
 msgid "Club old members"
@@ -568,6 +567,12 @@ msgstr ""
 #: trombi/templates/trombi/user_tools.jinja
 msgid "Save"
 msgstr "Sauver"
+
+#: club/templates/club/fragments/add_member.jinja
+#: core/templates/core/file_detail.jinja core/views/forms.py
+#: trombi/templates/trombi/detail.jinja
+msgid "Add"
+msgstr "Ajouter"
 
 #: club/templates/club/mailing.jinja
 msgid "Mailing lists"
