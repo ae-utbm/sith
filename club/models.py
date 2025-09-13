@@ -30,7 +30,8 @@ from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import RegexValidator, validate_email
 from django.db import models, transaction
-from django.db.models import Exists, F, OuterRef, Q
+from django.db.models import Exists, F, OuterRef, Q, Value
+from django.db.models.functions import Greatest
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -252,6 +253,41 @@ class MembershipQuerySet(models.QuerySet):
         """
         return self.filter(role__gt=settings.SITH_MAXIMUM_FREE_ROLE)
 
+    def editable_by(self, user: User) -> Self:
+        """Filter Memberships that this user can edit.
+
+        Users with the `club.change_membership` permission can edit all Membership.
+        The other users can end :
+        - their own membership
+        - if they are board members, memberships with a role lower than their own
+
+        For example, let's suppose the following users :
+        - A : board member
+        - B : board member
+        - C : simple member
+        - D : curious
+
+        A will be able to end the memberships of A, C and D ;
+        C and D will be able to end only their own membership.
+        """
+        if user.has_perm("club.change_membership"):
+            return self.all()
+        return self.filter(
+            Exists(
+                Membership.objects.filter(
+                    Q(
+                        role__gt=Greatest(
+                            OuterRef("role"), Value(settings.SITH_MAXIMUM_FREE_ROLE)
+                        )
+                    )
+                    | Q(pk=OuterRef("pk")),
+                    user=user,
+                    end_date=None,
+                    club=OuterRef("club"),
+                )
+            )
+        )
+
     def update(self, **kwargs) -> int:
         """Refresh the cache and edit group ownership.
 
@@ -328,16 +364,12 @@ class Membership(models.Model):
         User,
         verbose_name=_("user"),
         related_name="memberships",
-        null=False,
-        blank=False,
         on_delete=models.CASCADE,
     )
     club = models.ForeignKey(
         Club,
         verbose_name=_("club"),
         related_name="members",
-        null=False,
-        blank=False,
         on_delete=models.CASCADE,
     )
     start_date = models.DateField(_("start date"), default=timezone.now)
