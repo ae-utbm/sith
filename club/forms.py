@@ -26,6 +26,7 @@ from django import forms
 from django.conf import settings
 from django.db.models import Exists, OuterRef, Q
 from django.db.models.functions import Lower
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from club.models import Club, Mailing, MailingSubscription, Membership
@@ -217,19 +218,35 @@ class ClubMemberForm(forms.ModelForm):
         fields = ["user", "role", "description"]
         widgets = {"user": AutoCompleteSelectUser}
 
-    def __init__(
-        self,
-        *args,
-        club: Club,
-        request_user: User,
-        **kwargs,
-    ):
+    def __init__(self, *args, club: Club, request_user: User, **kwargs):
         self.club = club
         self.request_user = request_user
         self.request_user_membership = self.club.get_membership_for(self.request_user)
         super().__init__(*args, **kwargs)
         self.fields["role"].required = True
+        self.fields["role"].choices = [
+            (value, name)
+            for value, name in settings.SITH_CLUB_ROLES.items()
+            if value <= self.max_available_role
+        ]
         self.instance.club = club
+
+    @cached_property
+    def max_available_role(self):
+        """The greatest role that will be obtainable with this form.
+
+        Admins and the club president can attribute any role.
+        Board members can attribute roles lower than their own.
+        Other users can attribute curious and member roles.
+        """
+        if self.request_user.has_perm("club.add_subscription"):
+            return settings.SITH_CLUB_ROLES_ID["President"]
+        membership = self.request_user_membership
+        if membership is not None and membership.role > settings.SITH_MAXIMUM_FREE_ROLE:
+            if membership.role == settings.SITH_CLUB_ROLES_ID["President"]:
+                return membership.role
+            return membership.role - 1
+        return settings.SITH_MAXIMUM_FREE_ROLE
 
     def clean_user(self):
         """Check that the user is not trying to add a user already in the club.
@@ -248,16 +265,21 @@ class ClubMemberForm(forms.ModelForm):
         return user
 
     def clean(self):
-        """Check user rights for adding an user."""
+        """Check user rights for adding a user."""
         cleaned_data = super().clean()
         if "role" not in cleaned_data:
             return cleaned_data
-        request_user = self.request_user
-        membership = self.request_user_membership
-        if not (
-            cleaned_data["role"] <= settings.SITH_MAXIMUM_FREE_ROLE
-            or (membership is not None and membership.role >= cleaned_data["role"])
-            or request_user.has_perm("club.add_subscription")
-        ):
+        if (
+            self.request_user_membership is None
+            or self.request_user_membership.role <= settings.SITH_MAXIMUM_FREE_ROLE
+        ) and not self.request_user.has_perm("club.add_membership"):
+            raise forms.ValidationError(
+                _(
+                    "You cannot add other users to a club "
+                    "if you are not in the club board."
+                ),
+                code="invalid",
+            )
+        if cleaned_data["role"] > self.max_available_role:
             raise forms.ValidationError(_("You do not have the permission to do that"))
         return cleaned_data

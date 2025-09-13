@@ -69,7 +69,7 @@ from com.views import (
 from core.auth.mixins import CanCreateMixin, CanEditMixin
 from core.models import PageRev
 from core.views import DetailFormView, PageEditViewBase, UseFragmentsMixin
-from core.views.mixins import FragmentMixin, TabedViewMixin
+from core.views.mixins import FragmentMixin, FragmentRenderer, TabedViewMixin
 from counter.models import Selling
 
 
@@ -301,8 +301,13 @@ class ClubMembersView(
     form_class = ClubOldMemberForm
     template_name = "club/club_members.jinja"
     current_tab = "members"
-    fragments = {"add_member_fragment": ClubAddMembersFragment}
     permission_required = "club.view_club"
+
+    def get_fragments(self) -> dict[str, type[FragmentMixin] | FragmentRenderer]:
+        membership = self.object.get_membership_for(self.request.user)
+        if membership and membership.role <= settings.SITH_MAXIMUM_FREE_ROLE:
+            return {}
+        return {"add_member_fragment": ClubAddMembersFragment}
 
     def get_fragment_data(self) -> dict[str, Any]:
         return {"add_member_fragment": {"club": self.object}}

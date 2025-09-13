@@ -353,7 +353,7 @@ class TestMembership(TestClub):
 
         assert not form.is_valid()
         assert form.errors == {
-            "__all__": ["Vous n'avez pas la permission de faire cela"]
+            "role": ["Sélectionnez un choix valide. 10 n\u2019en fait pas partie."]
         }
         self.club.refresh_from_db()
         assert nb_memberships == self.club.members.count()

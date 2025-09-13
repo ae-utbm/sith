@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-13 15:18+0200\n"
+"POT-Creation-Date: 2025-09-13 18:32+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -173,6 +173,13 @@ msgstr "L'utilisateur doit être cotisant pour faire partie d'un club"
 msgid "You can not add the same user twice"
 msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 
+#: club/forms.py
+msgid ""
+"You cannot add other users to a club if you are not in the club board."
+msgstr ""
+"Vous ne pouvez pas ajouter d'autres utilisateurs dans un club si vous "
+"ne faites pas partie de son bureau."
+
 #: club/forms.py sas/forms.py
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
@@ -325,10 +332,6 @@ msgstr "Membres du club"
 #: club/templates/club/club_members.jinja
 msgid "Add a new member"
 msgstr "Ajouter un nouveau membre"
-
-#: club/templates/club/club_members.jinja
-msgid "Current club members"
-msgstr "Membres actuels du club"
 
 #: club/templates/club/club_members.jinja
 #: club/templates/club/club_old_members.jinja
@@ -683,6 +686,11 @@ msgstr "Listes de diffusion"
 #: club/views.py com/views.py
 msgid "Posters list"
 msgstr "Liste d'affiches"
+
+#: club/views.py
+#, python-format
+msgid "%(user)s has been added to club."
+msgstr "%(user)s a été ajouté au club."
 
 #: com/forms.py
 msgid "Format: 16:9 | Resolution: 1920x1080"
