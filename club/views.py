@@ -348,6 +348,15 @@ class ClubOldMembersView(ClubTabsMixin, PermissionRequiredMixin, DetailView):
     current_tab = "elderlies"
     permission_required = "club.view_club"
 
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "old_members": (
+                self.object.members.exclude(end_date=None)
+                .order_by("-role", "description", "-end_date")
+                .select_related("user")
+            )
+        }
+
 
 class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
     """Sellings of a club."""
