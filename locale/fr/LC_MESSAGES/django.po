@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-01 18:18+0200\n"
+"POT-Creation-Date: 2025-09-13 14:43+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -173,10 +173,6 @@ msgstr "L'utilisateur doit être cotisant pour faire partie d'un club"
 msgid "You can not add the same user twice"
 msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 
-#: club/forms.py
-msgid "You should specify a role"
-msgstr "Vous devez choisir un rôle"
-
 #: club/forms.py sas/forms.py
 msgid "You do not have the permission to do that"
 msgstr "Vous n'avez pas la permission de faire cela"
@@ -327,6 +323,14 @@ msgid "Club members"
 msgstr "Membres du club"
 
 #: club/templates/club/club_members.jinja
+msgid "Add a new member"
+msgstr "Ajouter un nouveau membre"
+
+#: club/templates/club/club_members.jinja
+msgid "Current club members"
+msgstr "Membres actuels du club"
+
+#: club/templates/club/club_members.jinja
 #: club/templates/club/club_old_members.jinja
 #: core/templates/core/user_clubs.jinja
 #: trombi/templates/trombi/edit_profile.jinja
@@ -349,11 +353,6 @@ msgstr "Depuis"
 #: club/templates/club/club_members.jinja
 msgid "There are no members in this club."
 msgstr "Il n'y a pas de membres dans ce club."
-
-#: club/templates/club/club_members.jinja core/templates/core/file_detail.jinja
-#: core/views/forms.py trombi/templates/trombi/detail.jinja
-msgid "Add"
-msgstr "Ajouter"
 
 #: club/templates/club/club_old_members.jinja
 msgid "Club old members"
@@ -568,6 +567,12 @@ msgstr ""
 #: trombi/templates/trombi/user_tools.jinja
 msgid "Save"
 msgstr "Sauver"
+
+#: club/templates/club/fragments/add_member.jinja
+#: core/templates/core/file_detail.jinja core/views/forms.py
+#: trombi/templates/trombi/detail.jinja
+msgid "Add"
+msgstr "Ajouter"
 
 #: club/templates/club/mailing.jinja
 msgid "Mailing lists"
@@ -1713,8 +1718,8 @@ msgid ""
 "AE UTBM is a voluntary organisation run by UTBM students. It organises "
 "student life at UTBM and manages its student facilities."
 msgstr ""
-"L'AE UTBM est une association bénévole gérée par les étudiants de "
-"l'UTBM. Elle organise la vie étudiante de l'UTBM et gère ses lieux de vie."
+"L'AE UTBM est une association bénévole gérée par les étudiants de l'UTBM. "
+"Elle organise la vie étudiante de l'UTBM et gère ses lieux de vie."
 
 #: core/templates/core/base/footer.jinja core/templates/core/base/navbar.jinja
 msgid "Contacts"
@@ -2156,10 +2161,6 @@ msgstr ""
 #: core/templates/core/page_hist.jinja
 msgid "Page history"
 msgstr "Historique de la page"
-
-#: core/templates/core/page_list.jinja
-msgid "There is no page in this website."
-msgstr "Il n'y a pas de page sur ce site web."
 
 #: core/templates/core/page_prop.jinja
 msgid "Page properties"
