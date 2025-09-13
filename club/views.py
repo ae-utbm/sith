@@ -27,6 +27,7 @@ from typing import Any
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
 from django.db.models import Q, Sum
@@ -261,13 +262,16 @@ class ClubToolsView(ClubTabsMixin, CanEditMixin, DetailView):
     current_tab = "tools"
 
 
-class ClubAddMembersFragment(FragmentMixin, PermissionRequiredMixin, CreateView):
+class ClubAddMembersFragment(
+    FragmentMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView
+):
     template_name = "club/fragments/add_member.jinja"
     form_class = ClubMemberForm
     model = Membership
     object = None
     reload_on_redirect = True
     permission_required = "club.view_club"
+    success_message = _("%(user)s has been added to club.")
 
     def dispatch(self, *args, **kwargs):
         club_id = self.kwargs.get("club_id")
