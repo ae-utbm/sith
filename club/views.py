@@ -23,12 +23,13 @@
 #
 
 import csv
+from typing import Any
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
-from django.db.models import Sum
+from django.db.models import Q, Sum
 from django.http import (
     Http404,
     HttpResponseRedirect,
@@ -37,7 +38,8 @@ from django.http import (
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.utils.functional import cached_property
+from django.utils.safestring import SafeString
+from django.utils.timezone import now
 from django.utils.translation import gettext as _t
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, View
@@ -47,10 +49,16 @@ from club.forms import (
     ClubAdminEditForm,
     ClubEditForm,
     ClubMemberForm,
+    ClubOldMemberForm,
     MailingForm,
     SellingsForm,
 )
-from club.models import Club, Mailing, MailingSubscription, Membership
+from club.models import (
+    Club,
+    Mailing,
+    MailingSubscription,
+    Membership,
+)
 from com.models import Poster
 from com.views import (
     PosterCreateBaseView,
@@ -60,11 +68,10 @@ from com.views import (
 )
 from core.auth.mixins import (
     CanEditMixin,
-    CanViewMixin,
 )
 from core.models import PageRev
-from core.views import DetailFormView, PageEditViewBase
-from core.views.mixins import TabedViewMixin
+from core.views import DetailFormView, PageEditViewBase, UseFragmentsMixin
+from core.views.mixins import FragmentMixin, TabedViewMixin
 from counter.models import Selling
 
 
@@ -86,7 +93,7 @@ class ClubTabsMixin(TabedViewMixin):
                 "name": _("Infos"),
             }
         ]
-        if self.request.user.can_view(self.object):
+        if self.request.user.has_perm("club.view_club"):
             tab_list.extend(
                 [
                     {
@@ -105,16 +112,16 @@ class ClubTabsMixin(TabedViewMixin):
                     },
                 ]
             )
-        if self.object.page:
-            tab_list.append(
-                {
-                    "url": reverse(
-                        "club:club_hist", kwargs={"club_id": self.object.id}
-                    ),
-                    "slug": "history",
-                    "name": _("History"),
-                }
-            )
+            if self.object.page:
+                tab_list.append(
+                    {
+                        "url": reverse(
+                            "club:club_hist", kwargs={"club_id": self.object.id}
+                        ),
+                        "slug": "history",
+                        "name": _("History"),
+                    }
+                )
         if self.request.user.can_edit(self.object):
             tab_list.extend(
                 [
@@ -235,13 +242,14 @@ class ClubPageEditView(ClubTabsMixin, PageEditViewBase):
         return reverse_lazy("club:club_view", kwargs={"club_id": self.club.id})
 
 
-class ClubPageHistView(ClubTabsMixin, CanViewMixin, DetailView):
+class ClubPageHistView(ClubTabsMixin, PermissionRequiredMixin, DetailView):
     """Modification hostory of the page."""
 
     model = Club
     pk_url_kwarg = "club_id"
     template_name = "club/page_history.jinja"
     current_tab = "history"
+    permission_required = "club.view_club"
 
 
 class ClubToolsView(ClubTabsMixin, CanEditMixin, DetailView):
@@ -253,57 +261,92 @@ class ClubToolsView(ClubTabsMixin, CanEditMixin, DetailView):
     current_tab = "tools"
 
 
-class ClubMembersView(ClubTabsMixin, CanViewMixin, DetailFormView):
+class ClubAddMembersFragment(FragmentMixin, PermissionRequiredMixin, CreateView):
+    template_name = "club/fragments/add_member.jinja"
+    form_class = ClubMemberForm
+    model = Membership
+    object = None
+    reload_on_redirect = True
+    permission_required = "club.view_club"
+
+    def dispatch(self, *args, **kwargs):
+        club_id = self.kwargs.get("club_id")
+        if not club_id:
+            raise Http404
+        self.club = get_object_or_404(Club, pk=kwargs.get("club_id"))
+        return super().dispatch(*args, **kwargs)
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {
+            "request_user": self.request.user,
+            "club": self.club,
+        }
+
+    def render_fragment(self, request, **kwargs) -> SafeString:
+        self.club = kwargs.get("club")
+        return super().render_fragment(request, **kwargs)
+
+    def get_success_url(self):
+        return reverse("club:club_members", kwargs={"club_id": self.club.id})
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"club": self.club}
+
+
+class ClubMembersView(
+    ClubTabsMixin, UseFragmentsMixin, PermissionRequiredMixin, DetailFormView
+):
     """View of a club's members."""
 
     model = Club
     pk_url_kwarg = "club_id"
-    form_class = ClubMemberForm
+    form_class = ClubOldMemberForm
     template_name = "club/club_members.jinja"
     current_tab = "members"
+    fragments = {"add_member_fragment": ClubAddMembersFragment}
+    permission_required = "club.view_club"
 
-    @cached_property
-    def members(self) -> list[Membership]:
-        return list(self.object.members.ongoing().order_by("-role"))
+    def get_fragment_data(self) -> dict[str, Any]:
+        return {"add_member_fragment": {"club": self.object}}
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["request_user"] = self.request.user
+        kwargs["user"] = self.request.user
         kwargs["club"] = self.object
-        kwargs["club_members"] = self.members
         return kwargs
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["members"] = self.members
+        editable = list(
+            kwargs["form"].fields["members_old"].queryset.values_list("id", flat=True)
+        )
+        kwargs["members"] = list(
+            self.object.members.ongoing()
+            .annotate(is_editable=Q(id__in=editable))
+            .order_by("-role")
+            .select_related("user")
+        )
+        kwargs["can_end_membership"] = len(editable) > 0
         return kwargs
 
     def form_valid(self, form):
-        """Check user rights."""
-        resp = super().form_valid(form)
-
-        data = form.clean()
-        users = data.pop("users", [])
-        users_old = data.pop("users_old", [])
-        for user in users:
-            Membership(club=self.object, user=user, **data).save()
-        for user in users_old:
-            membership = self.object.get_membership_for(user)
-            membership.end_date = timezone.now()
+        for membership in form.cleaned_data.get("members_old"):
+            membership.end_date = now()
             membership.save()
-        return resp
+        return super().form_valid(form)
 
     def get_success_url(self, **kwargs):
         return self.request.path
 
 
-class ClubOldMembersView(ClubTabsMixin, CanViewMixin, DetailView):
+class ClubOldMembersView(ClubTabsMixin, PermissionRequiredMixin, DetailView):
     """Old members of a club."""
 
     model = Club
     pk_url_kwarg = "club_id"
     template_name = "club/club_old_members.jinja"
     current_tab = "elderlies"
+    permission_required = "club.view_club"
 
 
 class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):

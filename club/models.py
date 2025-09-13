@@ -210,10 +210,6 @@ class Club(models.Model):
         """Method to see if that object can be edited by the given user."""
         return self.has_rights_in_club(user)
 
-    def can_be_viewed_by(self, user: User) -> bool:
-        """Method to see if that object can be seen by the given user."""
-        return user.was_subscribed
-
     def get_membership_for(self, user: User) -> Membership | None:
         """Return the current membership the given user.
 
