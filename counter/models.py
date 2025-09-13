@@ -535,13 +535,6 @@ class Counter(models.Model):
     def __str__(self):
         return self.name
 
-    def __getattribute__(self, name: str):
-        if name == "edit_groups":
-            return Group.objects.filter(
-                name=self.club.unix_name + settings.SITH_BOARD_SUFFIX
-            ).all()
-        return object.__getattribute__(self, name)
-
     def get_absolute_url(self) -> str:
         if self.type == "EBOUTIC":
             return reverse("eboutic:main")

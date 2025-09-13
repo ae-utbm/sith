@@ -34,12 +34,10 @@ def migrate_meta_groups(apps: StateApps, schema_editor):
     clubs = list(Club.objects.all())
     for club in clubs:
         club.board_group = meta_groups.get_or_create(
-            name=club.unix_name + settings.SITH_BOARD_SUFFIX,
-            defaults={"is_meta": True},
+            name=f"{club.unix_name}-bureau", defaults={"is_meta": True}
         )[0]
         club.members_group = meta_groups.get_or_create(
-            name=club.unix_name + settings.SITH_MEMBER_SUFFIX,
-            defaults={"is_meta": True},
+            name=f"{club.unix_name}-membres", defaults={"is_meta": True}
         )[0]
         club.save()
         club.refresh_from_db()
