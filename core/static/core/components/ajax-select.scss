@@ -36,6 +36,7 @@
   > .ts-control {
     box-shadow: none;
     max-width: 300px;
+    width: 300px;
     background-color: var(--nf-input-background-color);
 
     &::after {

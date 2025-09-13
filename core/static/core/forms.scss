@@ -47,6 +47,7 @@
   }
 
   input,
+  select,
   textarea[type="text"],
   [type="number"],
   .ts-control {
@@ -239,6 +240,23 @@ form {
         width: 95%;
       }
     }
+  }
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="week"],
+  input[type="time"],
+  input[type="month"],
+  input[type="search"],
+  textarea,
+  select,
+  .ts-control {
+    min-height: calc(var(--nf-input-size) * 2.5);
   }
 
   input[type="text"],
