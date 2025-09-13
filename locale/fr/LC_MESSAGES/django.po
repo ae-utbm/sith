@@ -556,6 +556,7 @@ msgstr ""
 #: core/templates/core/user_godfathers_tree.jinja
 #: core/templates/core/user_preferences.jinja
 #: counter/templates/counter/cash_register_summary.jinja
+#: counter/templates/counter/product_form.jinja
 #: forum/templates/forum/reply.jinja
 #: subscription/templates/subscription/fragments/creation_form.jinja
 #: trombi/templates/trombi/comment.jinja
@@ -2956,6 +2957,20 @@ msgid "User not found"
 msgstr "Utilisateur non trouvé"
 
 #: counter/forms.py
+msgid "Enabled"
+msgstr "Activé"
+
+#: counter/forms.py
+msgid "Date and time of archiving"
+msgstr "Date et heure de l'archivage"
+
+#: counter/forms.py
+msgid ""
+"Automatic archiving cannot be enabled without providing a archiving date."
+msgstr ""
+"L'archivage automatique ne peut pas activé sans fournir une date d'archivage."
+
+#: counter/forms.py
 msgid ""
 "Describe the product. If it's an event's click, give some insights about it, "
 "like the date (including the year)."
@@ -3606,6 +3621,29 @@ msgstr ""
 "vous ne perdrez pas vos droits. Vous serez toujours en mesure de renouveler "
 "votre cotisation. Si vous ne renouvelez pas votre cotisation, il n'y aura "
 "aucune conséquence autre que le retrait de l'argent de votre compte."
+
+#: counter/templates/counter/product_form.jinja
+#, python-format
+msgid "Edit product %(name)s"
+msgstr "Édition du produit %(name)s"
+
+#: counter/templates/counter/product_form.jinja
+#, fuzzy
+#| msgid "Product state"
+msgid "Product creation"
+msgstr "Etat du produit"
+
+#: counter/templates/counter/product_form.jinja
+msgid "Automatic archiving"
+msgstr "Archivage automatique"
+
+#: counter/templates/counter/product_form.jinja
+msgid ""
+"Automatic archiving allows you to mark a product as archived and remove it "
+"from all its counters at a specified time and date."
+msgstr ""
+"L'archivage automatique permet de marquer un produit comme archivé et de le "
+"retirer de tous ses comptoirs à une heure et une date voulues."
 
 #: counter/templates/counter/product_list.jinja
 msgid "Product list"

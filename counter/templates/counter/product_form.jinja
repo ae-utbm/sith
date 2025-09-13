@@ -1,0 +1,31 @@
+{% extends "core/base.jinja" %}
+
+{% block content %}
+  {% if object %}
+    <h2>{% trans name=object %}Edit product {{ name }}{% endtrans %}</h2>
+  {% else %}
+    <h2>{% trans %}Product creation{% endtrans %}</h2>
+  {% endif %}
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p() }}
+
+    <br />
+
+    <h3>{% trans %}Automatic archiving{% endtrans %}</h3>
+
+    <p>
+      <em>
+        {%- trans trimmed -%}
+          Automatic archiving allows you to mark a product as archived
+          and remove it from all its counters at a specified time and date.
+        {%- endtrans -%}
+      </em>
+    </p>
+
+    <fieldset x-data="{enabled: {{ form.archive_form.enabled.initial|tojson }}}">
+      {{ form.archive_form.as_p() }}
+    </fieldset>
+    <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
+  </form>
+{% endblock %}

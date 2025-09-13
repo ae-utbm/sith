@@ -1,13 +1,19 @@
 import math
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
+from django_celery_beat.models import ClockedSchedule, PeriodicTask
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
 from club.widgets.ajax_select import AutoCompleteSelectClub
 from core.models import User
-from core.views.forms import NFCTextInput, SelectDate, SelectDateTime
+from core.views.forms import (
+    NFCTextInput,
+    SelectDate,
+    SelectDateTime,
+)
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
     AutoCompleteSelectMultipleGroup,
@@ -158,6 +164,66 @@ class CounterEditForm(forms.ModelForm):
         }
 
 
+class ProductArchiveForm(forms.Form):
+    """Form for automatic product archiving."""
+
+    enabled = forms.BooleanField(
+        label=_("Enabled"),
+        widget=forms.CheckboxInput(attrs={"class": "switch"}),
+        required=False,
+    )
+    archive_at = forms.DateTimeField(
+        label=_("Date and time of archiving"), widget=SelectDateTime, required=False
+    )
+
+    def __init__(self, *args, product: Product, **kwargs):
+        self.product = product
+        self.instance = PeriodicTask.objects.filter(
+            task="counter.tasks.archive_product", args=f"[{product.id}]"
+        ).first()
+        super().__init__(*args, **kwargs)
+        if self.instance:
+            self.fields["enabled"].initial = self.instance.enabled
+            self.fields["archive_at"].initial = self.instance.clocked.clocked_time
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data["enabled"] is True and cleaned_data["archive_at"] is None:
+            raise ValidationError(
+                _(
+                    "Automatic archiving cannot be enabled "
+                    "without providing a archiving date."
+                )
+            )
+
+    def save(self):
+        if not self.changed_data:
+            return
+        if not self.instance:
+            PeriodicTask.objects.create(
+                task="counter.tasks.archive_product",
+                args=f"[{self.product.id}]",
+                name=f"Archive product {self.product}",
+                clocked=ClockedSchedule.objects.create(
+                    clocked_time=self.cleaned_data["archive_at"]
+                ),
+                enabled=self.cleaned_data["enabled"],
+                one_off=True,
+            )
+            return
+        if (
+            "archive_at" in self.changed_data
+            and self.cleaned_data["archive_at"] is None
+        ):
+            self.instance.delete()
+        elif "archive_at" in self.changed_data:
+            self.instance.clocked.clocked_time = self.cleaned_data["archive_at"]
+            self.instance.clocked.save()
+        self.instance.enabled = self.cleaned_data["enabled"]
+        self.instance.save()
+        return self.instance
+
+
 class ProductEditForm(forms.ModelForm):
     error_css_class = "error"
     required_css_class = "required"
@@ -199,22 +265,19 @@ class ProductEditForm(forms.ModelForm):
         queryset=Counter.objects.all(),
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, instance=None, **kwargs):
+        super().__init__(*args, instance=instance, **kwargs)
         if self.instance.id:
             self.fields["counters"].initial = self.instance.counters.all()
+        self.archive_form = ProductArchiveForm(*args, product=self.instance, **kwargs)
+
+    def is_valid(self):
+        return super().is_valid() and self.archive_form.is_valid()
 
     def save(self, *args, **kwargs):
         ret = super().save(*args, **kwargs)
-        if self.fields["counters"].initial:
-            # Remove the product from all counter it was added to
-            # It will then only be added to selected counters
-            for counter in self.fields["counters"].initial:
-                counter.products.remove(self.instance)
-                counter.save()
-        for counter in self.cleaned_data["counters"]:
-            counter.products.add(self.instance)
-            counter.save()
+        self.instance.counters.set(self.cleaned_data["counters"])
+        self.archive_form.save()
         return ret
 
 
