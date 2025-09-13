@@ -445,7 +445,8 @@ class Product(models.Model):
         buying_groups = list(self.buying_groups.all())
         if not buying_groups:
             return True
-        return any(user.is_in_group(pk=group.id) for group in buying_groups)
+        res = any(user.is_in_group(pk=group.id) for group in buying_groups)
+        return res
 
     @property
     def profit(self):

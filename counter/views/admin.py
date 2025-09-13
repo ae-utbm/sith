@@ -147,7 +147,7 @@ class ProductCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
 
     model = Product
     form_class = ProductEditForm
-    template_name = "core/create.jinja"
+    template_name = "counter/product_form.jinja"
     current_tab = "products"
 
 
@@ -157,7 +157,7 @@ class ProductEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     model = Product
     form_class = ProductEditForm
     pk_url_kwarg = "product_id"
-    template_name = "core/edit.jinja"
+    template_name = "counter/product_form.jinja"
     current_tab = "products"
 
 
