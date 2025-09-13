@@ -1,13 +1,15 @@
 from bs4 import BeautifulSoup
 from django.conf import settings
+from django.contrib.auth.models import Permission
 from django.core.cache import cache
 from django.db.models import Max
+from django.test import TestCase
 from django.urls import reverse
 from django.utils.timezone import localdate, localtime, now
 from model_bakery import baker
 
 from club.forms import ClubMemberForm
-from club.models import Membership
+from club.models import Club, Membership
 from club.tests.base import TestClub
 from core.baker_recipes import subscriber_user
 from core.models import AnonymousUser, User
@@ -135,6 +137,38 @@ class TestMembershipQuerySet(TestClub):
         assert set(user.groups.all()).issuperset(club_groups)
         user.memberships.all().delete()
         assert set(user.groups.all()).isdisjoint(club_groups)
+
+
+class TestMembershipEditableBy(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        Membership.objects.all().delete()
+        cls.club_a, cls.club_b = baker.make(Club, _quantity=2)
+        cls.memberships = [
+            *baker.make(
+                Membership, role=iter([7, 3, 3, 1]), club=cls.club_a, _quantity=4
+            ),
+            *baker.make(
+                Membership, role=iter([7, 3, 3, 1]), club=cls.club_b, _quantity=4
+            ),
+        ]
+
+    def test_admin_user(self):
+        perm = Permission.objects.get(codename="change_membership")
+        user = baker.make(User, user_permissions=[perm])
+        qs = Membership.objects.editable_by(user).values_list("id", flat=True)
+        assert set(qs) == set(Membership.objects.values_list("id", flat=True))
+
+    def test_simple_subscriber_user(self):
+        user = subscriber_user.make()
+        assert not Membership.objects.editable_by(user).exists()
+
+    def test_board_member(self):
+        # a board member can end lower memberships and its own one
+        user = self.memberships[2].user
+        qs = Membership.objects.editable_by(user).values_list("id", flat=True)
+        expected = {self.memberships[2].id, self.memberships[3].id}
+        assert set(qs) == expected
 
 
 class TestMembership(TestClub):
