@@ -21,14 +21,6 @@
     <a class="link" href="{{ url('sas:main') }}">{% trans %}Gallery{% endtrans %}</a>
     <a class="link" href="{{ url('eboutic:main') }}">{% trans %}Eboutic{% endtrans %}</a>
     <details name="navbar" class="menu">
-      <summary class="head">{% trans %}Services{% endtrans %}</summary>
-      <ul class="content">
-        <li><a href="{{ url('matmat:search_clear') }}">{% trans %}Matmatronch{% endtrans %}</a></li>
-        <li><a href="{{ url('core:file_list') }}">{% trans %}Files{% endtrans %}</a></li>
-        <li><a href="{{ url('pedagogy:guide') }}">{% trans %}Pedagogy{% endtrans %}</a></li>
-      </ul>
-    </details>
-    <details name="navbar" class="menu">
       <summary class="head">{% trans %}My Benefits{% endtrans %}</summary>
       <ul class="content">
         <li><a href="{{ url('core:page', page_name='partenaires')}}">{% trans %}Sponsors{% endtrans %}</a></li>
