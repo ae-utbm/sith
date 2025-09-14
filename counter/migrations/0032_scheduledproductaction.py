@@ -34,10 +34,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                "verbose_name": "Product scheduled action",
-                "ordering": ["-clocked"],
-            },
+            options={"verbose_name": "Product scheduled action"},
             bases=("django_celery_beat.periodictask",),
         ),
     ]

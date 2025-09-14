@@ -1,15 +1,18 @@
+import json
 import math
 
 from django import forms
-from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.forms.formsets import DELETION_FIELD_NAME, BaseFormSet
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
-from django_celery_beat.models import ClockedSchedule, PeriodicTask
+from django_celery_beat.models import ClockedSchedule
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
 from club.widgets.ajax_select import AutoCompleteSelectClub
 from core.models import User
 from core.views.forms import (
+    FutureDateTimeField,
     NFCTextInput,
     SelectDate,
     SelectDateTime,
@@ -28,7 +31,9 @@ from counter.models import (
     Product,
     Refilling,
     ReturnableProduct,
+    ScheduledProductAction,
     StudentCard,
+    get_product_actions,
 )
 from counter.widgets.ajax_select import (
     AutoCompleteSelectMultipleCounter,
@@ -164,64 +169,108 @@ class CounterEditForm(forms.ModelForm):
         }
 
 
-class ProductArchiveForm(forms.Form):
-    """Form for automatic product archiving."""
+class ScheduledProductActionForm(forms.Form):
+    """Form for automatic product archiving.
 
-    enabled = forms.BooleanField(
-        label=_("Enabled"),
-        widget=forms.CheckboxInput(attrs={"class": "switch"}),
-        required=False,
+    The `save` method will update or create tasks using celery-beat.
+    """
+
+    required_css_class = "required"
+    prefix = "product-action-form"
+
+    task = forms.fields_for_model(
+        ScheduledProductAction,
+        ["task"],
+        widgets={"task": forms.RadioSelect(choices=get_product_actions)},
+        labels={"task": _("Action")},
+        help_texts={"task": ""},
+    )["task"]
+    trigger_at = FutureDateTimeField(
+        label=_("Date and time of action"), widget=SelectDateTime
     )
-    archive_at = forms.DateTimeField(
-        label=_("Date and time of archiving"), widget=SelectDateTime, required=False
+    counters = forms.ModelMultipleChoiceField(
+        label=_("New counters"),
+        help_text=_("The selected counters will replace the current ones"),
+        required=False,
+        widget=AutoCompleteSelectMultipleCounter,
+        queryset=Counter.objects.all(),
     )
 
     def __init__(self, *args, product: Product, **kwargs):
         self.product = product
-        self.instance = PeriodicTask.objects.filter(
-            task="counter.tasks.archive_product", args=f"[{product.id}]"
-        ).first()
         super().__init__(*args, **kwargs)
-        if self.instance:
-            self.fields["enabled"].initial = self.instance.enabled
-            self.fields["archive_at"].initial = self.instance.clocked.clocked_time
-
-    def clean(self):
-        cleaned_data = super().clean()
-        if cleaned_data["enabled"] is True and cleaned_data["archive_at"] is None:
-            raise ValidationError(
-                _(
-                    "Automatic archiving cannot be enabled "
-                    "without providing a archiving date."
-                )
-            )
 
     def save(self):
         if not self.changed_data:
             return
-        if not self.instance:
-            PeriodicTask.objects.create(
-                task="counter.tasks.archive_product",
-                args=f"[{self.product.id}]",
-                name=f"Archive product {self.product}",
+        task = self.cleaned_data["task"]
+        instance = ScheduledProductAction.objects.filter(
+            product=self.product, task=task
+        ).first()
+        if not instance:
+            instance = ScheduledProductAction(
+                product=self.product,
                 clocked=ClockedSchedule.objects.create(
-                    clocked_time=self.cleaned_data["archive_at"]
+                    clocked_time=self.cleaned_data["trigger_at"]
                 ),
-                enabled=self.cleaned_data["enabled"],
-                one_off=True,
             )
-            return
-        if (
-            "archive_at" in self.changed_data
-            and self.cleaned_data["archive_at"] is None
-        ):
-            self.instance.delete()
-        elif "archive_at" in self.changed_data:
-            self.instance.clocked.clocked_time = self.cleaned_data["archive_at"]
-            self.instance.clocked.save()
-        self.instance.enabled = self.cleaned_data["enabled"]
-        self.instance.save()
-        return self.instance
+        elif "trigger_at" in self.changed_data:
+            instance.clocked.clocked_time = self.cleaned_data["trigger_at"]
+            instance.clocked.save()
+        instance.task = task
+        task_kwargs = {"product_id": self.product.id}
+        if task == "counter.tasks.change_counters":
+            task_kwargs["counters"] = [c.id for c in self.cleaned_data["counters"]]
+        instance.kwargs = json.dumps(task_kwargs)
+        instance.name = f"{self.cleaned_data['task']} - {self.product}"
+        instance.enabled = True
+        instance.save()
+        return instance
+
+    def delete(self):
+        instance = ScheduledProductAction.objects.get(
+            product=self.product, task=self.cleaned_data["task"]
+        )
+        # if the clocked object linked to the task has no other task,
+        # delete it and let the task be deleted in cascade,
+        # else delete only the task.
+        if instance.clocked.periodictask_set.count() > 1:
+            return instance.clocked.delete()
+        return instance.delete()
+
+
+class BaseScheduledProductActionFormSet(BaseFormSet):
+    def __init__(self, *args, product: Product, **kwargs):
+        initial = [
+            {
+                "task": action.task,
+                "trigger_at": action.clocked.clocked_time,
+                "counters": json.loads(action.kwargs).get("counters"),
+            }
+            for action in product.scheduled_actions.filter(
+                enabled=True, clocked__clocked_time__gt=now()
+            ).order_by("clocked__clocked_time")
+        ]
+        kwargs["initial"] = initial
+        kwargs["form_kwargs"] = {"product": product}
+        super().__init__(*args, **kwargs)
+
+    def save(self):
+        for form in self.forms:
+            if form.cleaned_data.get(DELETION_FIELD_NAME, False):
+                form.delete()
+            else:
+                form.save()
+
+
+ScheduledProductActionFormSet = forms.formset_factory(
+    ScheduledProductActionForm,
+    formset=BaseScheduledProductActionFormSet,
+    absolute_max=None,
+    can_delete=True,
+    can_delete_extra=False,
+    extra=2,
+)
 
 
 class ProductEditForm(forms.ModelForm):
@@ -269,15 +318,17 @@ class ProductEditForm(forms.ModelForm):
         super().__init__(*args, instance=instance, **kwargs)
         if self.instance.id:
             self.fields["counters"].initial = self.instance.counters.all()
-        self.archive_form = ProductArchiveForm(*args, product=self.instance, **kwargs)
+        self.action_formset = ScheduledProductActionFormSet(
+            *args, product=self.instance, **kwargs
+        )
 
     def is_valid(self):
-        return super().is_valid() and self.archive_form.is_valid()
+        return super().is_valid() and self.action_formset.is_valid()
 
     def save(self, *args, **kwargs):
         ret = super().save(*args, **kwargs)
         self.instance.counters.set(self.cleaned_data["counters"])
-        self.archive_form.save()
+        self.action_formset.save()
         return ret
 
 

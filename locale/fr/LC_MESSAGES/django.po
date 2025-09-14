@@ -117,7 +117,7 @@ msgstr "S'abonner"
 msgid "Remove"
 msgstr "Retirer"
 
-#: club/forms.py pedagogy/templates/pedagogy/moderation.jinja
+#: club/forms.py counter/forms.py pedagogy/templates/pedagogy/moderation.jinja
 msgid "Action"
 msgstr "Action"
 
@@ -2957,18 +2957,16 @@ msgid "User not found"
 msgstr "Utilisateur non trouvé"
 
 #: counter/forms.py
-msgid "Enabled"
-msgstr "Activé"
+msgid "Date and time of action"
+msgstr "Date et heure de l'action"
 
 #: counter/forms.py
-msgid "Date and time of archiving"
-msgstr "Date et heure de l'archivage"
+msgid "New counters"
+msgstr "Nouveaux comptoirs"
 
 #: counter/forms.py
-msgid ""
-"Automatic archiving cannot be enabled without providing a archiving date."
-msgstr ""
-"L'archivage automatique ne peut pas activé sans fournir une date d'archivage."
+msgid "The selected counters will replace the current ones"
+msgstr "Les comptoirs sélectionnés remplaceront les comptoirs actuels"
 
 #: counter/forms.py
 msgid ""
@@ -3304,6 +3302,18 @@ msgid "The returnable product cannot be the same as the returned one"
 msgstr ""
 "Le produit consigné ne peut pas être le même que le produit de déconsigne"
 
+#: counter/models.py
+msgid "Archiving"
+msgstr "Archivage"
+
+#: counter/models.py
+msgid "Counters change"
+msgstr "Changement des comptoirs"
+
+#: counter/models.py
+msgid "Product scheduled action"
+msgstr "Actions sur produit planifiées"
+
 #: counter/templates/counter/activity.jinja
 #, python-format
 msgid "%(counter_name)s activity"
@@ -3628,22 +3638,18 @@ msgid "Edit product %(name)s"
 msgstr "Édition du produit %(name)s"
 
 #: counter/templates/counter/product_form.jinja
-#, fuzzy
-#| msgid "Product state"
 msgid "Product creation"
-msgstr "Etat du produit"
+msgstr "Création de produit"
 
 #: counter/templates/counter/product_form.jinja
-msgid "Automatic archiving"
-msgstr "Archivage automatique"
+msgid "Automatic actions"
+msgstr "Actions automatiques"
 
 #: counter/templates/counter/product_form.jinja
-msgid ""
-"Automatic archiving allows you to mark a product as archived and remove it "
-"from all its counters at a specified time and date."
+msgid "Automatic actions allows to schedule product changes ahead of time."
 msgstr ""
-"L'archivage automatique permet de marquer un produit comme archivé et de le "
-"retirer de tous ses comptoirs à une heure et une date voulues."
+"Les actions automatiques vous permettent de planifier des modifications du "
+"produit à l'avance."
 
 #: counter/templates/counter/product_list.jinja
 msgid "Product list"

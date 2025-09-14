@@ -154,10 +154,8 @@ form {
     margin-bottom: 1rem;
   }
 
-  .row {
-    label {
-      margin: unset;
-    }
+  .row > label {
+    margin: unset;
   }
 
   // ------------- LABEL

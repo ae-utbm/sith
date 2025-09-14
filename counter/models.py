@@ -1377,7 +1377,6 @@ class ScheduledProductAction(PeriodicTask):
 
     class Meta:
         verbose_name = _("Product scheduled action")
-        ordering = ["-clocked"]
 
     def __init__(self, *args, **kwargs):
         self._meta.get_field("task").choices = get_product_actions()
