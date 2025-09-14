@@ -12,20 +12,44 @@
 
     <br />
 
-    <h3>{% trans %}Automatic archiving{% endtrans %}</h3>
+    <h3>{% trans %}Automatic actions{% endtrans %}</h3>
 
-    <p>
+    <p class="margin-bottom">
       <em>
         {%- trans trimmed -%}
-          Automatic archiving allows you to mark a product as archived
-          and remove it from all its counters at a specified time and date.
+          Automatic actions allows to schedule product changes
+          ahead of time.
         {%- endtrans -%}
       </em>
     </p>
 
-    <fieldset x-data="{enabled: {{ form.archive_form.enabled.initial|tojson }}}">
-      {{ form.archive_form.as_p() }}
-    </fieldset>
+    {{ form.action_formset.management_form }}
+    {% for action_form in form.action_formset.forms %}
+      <fieldset x-data="{action: '{{ action_form.task.initial }}'}">
+        <div class="row gap-2x margin-bottom">
+          <div>
+            {{ action_form.task.errors }}
+            {{ action_form.task.label_tag() }}
+            {{ action_form.task|add_attr("x-model=action") }}
+          </div>
+          <div>
+            {{ action_form.trigger_at.as_field_group() }}
+          </div>
+        </div>
+        <div x-show="action==='counter.tasks.change_counters'" class="margin-bottom">
+          {{ action_form.counters.as_field_group() }}
+        </div>
+        {% if action_form.DELETE %}
+          <div class="row gap">
+            {{ action_form.DELETE.as_field_group() }}
+          </div>
+        {% endif %}
+      </fieldset>
+      {% if not loop.last %}
+        <hr class="margin-bottom">
+      {% endif %}
+
+    {% endfor %}
     <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
   </form>
 {% endblock %}
