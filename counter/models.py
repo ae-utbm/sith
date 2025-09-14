@@ -34,6 +34,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django_celery_beat.models import PeriodicTask
 from django_countries.fields import CountryField
 from ordered_model.models import OrderedModel
 from phonenumber_field.modelfields import PhoneNumberField
@@ -1358,3 +1359,30 @@ class ReturnableProductBalance(models.Model):
             f"return balance of {self.customer} "
             f"for {self.returnable.product_id} : {self.balance}"
         )
+
+
+def get_product_actions():
+    return [
+        ("counter.tasks.archive_product", _("Archiving")),
+        ("counter.tasks.change_counters", _("Counters change")),
+    ]
+
+
+class ScheduledProductAction(PeriodicTask):
+    """Extension of celery-beat tasks dedicated to perform actions on Product."""
+
+    product = models.ForeignKey(
+        Product, related_name="scheduled_actions", on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = _("Product scheduled action")
+        ordering = ["-clocked"]
+
+    def __init__(self, *args, **kwargs):
+        self._meta.get_field("task").choices = get_product_actions()
+        super().__init__(*args, **kwargs)
+
+    def save(self, *args, **kwargs):
+        self.one_off = True  # A product action should occur one time only
+        return super().save(*args, **kwargs)
