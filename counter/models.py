@@ -690,8 +690,10 @@ class Counter(models.Model):
         Prices will be annotated
         """
 
-        products = self.products.select_related("product_type").prefetch_related(
-            "buying_groups"
+        products = (
+            self.products.filter(archived=False)
+            .select_related("product_type")
+            .prefetch_related("buying_groups")
         )
 
         # Only include age appropriate products
