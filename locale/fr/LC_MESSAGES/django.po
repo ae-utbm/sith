@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-01 18:18+0200\n"
+"POT-Creation-Date: 2025-09-13 00:17+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1043,6 +1043,10 @@ msgstr "Nos services"
 msgid "UV Guide"
 msgstr "Guide des UVs"
 
+#: com/templates/com/news_list.jinja
+msgid "Timetable"
+msgstr "Emploi du temps"
+
 #: com/templates/com/news_list.jinja core/templates/core/base/navbar.jinja
 msgid "Matmatronch"
 msgstr "Matmatronch"
@@ -1713,8 +1717,8 @@ msgid ""
 "AE UTBM is a voluntary organisation run by UTBM students. It organises "
 "student life at UTBM and manages its student facilities."
 msgstr ""
-"L'AE UTBM est une association bénévole gérée par les étudiants de "
-"l'UTBM. Elle organise la vie étudiante de l'UTBM et gère ses lieux de vie."
+"L'AE UTBM est une association bénévole gérée par les étudiants de l'UTBM. "
+"Elle organise la vie étudiante de l'UTBM et gère ses lieux de vie."
 
 #: core/templates/core/base/footer.jinja core/templates/core/base/navbar.jinja
 msgid "Contacts"
@@ -2156,10 +2160,6 @@ msgstr ""
 #: core/templates/core/page_hist.jinja
 msgid "Page history"
 msgstr "Historique de la page"
-
-#: core/templates/core/page_list.jinja
-msgid "There is no page in this website."
-msgstr "Il n'y a pas de page sur ce site web."
 
 #: core/templates/core/page_prop.jinja
 msgid "Page properties"
@@ -5201,6 +5201,18 @@ msgstr "Membre existant"
 msgid "the groups that can create subscriptions"
 msgstr "les groupes pouvant créer des cotisations"
 
+#: timetable/templates/timetable/generator.jinja
+msgid "Timetable generator"
+msgstr "Générateur d'emploi du temps"
+
+#: timetable/templates/timetable/generator.jinja
+msgid "Generate"
+msgstr "Générer"
+
+#: timetable/templates/timetable/generator.jinja
+msgid "Save to PNG"
+msgstr "Sauver en PNG"
+
 #: trombi/models.py
 msgid "subscription deadline"
 msgstr "fin des inscriptions"
@@ -5498,3 +5510,9 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
+
+#~ msgid "Timeplan generator"
+#~ msgstr "Temps de génération du template : "
+
+#~ msgid "There is no page in this website."
+#~ msgstr "Il n'y a pas de page sur ce site web."
