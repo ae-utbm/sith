@@ -18,25 +18,23 @@ nous définissons comme IA :
 > qui peuvent influencer des environnements physiques ou virtuels.
 
 Cette définition recouvre toutes les IAs génératives, ce qui inclut
-ChatGPT, DeepSeek, Claude, Copilot, Llama et autres outils similaires.
+ChatGPT, DeepSeek, Claude, Copilot, Mistral, Llama et autres outils similaires.
 
 ## Utilisation dans le développement
 
-!!!danger
+!!!abstract
     La soumission de code généré par IA est strictement interdite.
 
 Aucune contribution contenant du code généré par IA n'est acceptée.
 Toute PR contenant en proportion significative du code duquel
 on peut raisonnablement penser qu'il a été généré par IA 
-pourra être refusée sans aucun autre motif.
+ne sera acceptée.
 
-Bien que nous ne puissions pas l'interdire,
-nous déconseillons également fortement l'usage de tout
+Nous déconseillons également fortement l'usage de tout
 recours à un système d'IA dans le processus de développement,
 quel que soit son usage (debug, recherche d'information ou autres).
-Référez-vous en priorité à la documentation du site,
-à celle de Django et à l'aide des autres développeurs,
-mais par pitié, ne faites jamais appel à l'IA.
+A la place de l'IA, Référez-vous en priorité à la documentation du site,
+à celle de Django et à l'aide des autres développeurs.
 
 ## Intégration dans le site
 
@@ -46,7 +44,7 @@ est strictement prohibée, quel qu'en soit l'objectif.
 
 Toute tâche de modération, de génération
 ou de détection de contenu ne doit être accomplie
-par des êtres humains ou par des algorithmes
+que par des êtres humains ou par des algorithmes
 déterministes, testés et compris.
 
 L'usage des données du site a des fins d'entrainement d'IA,
@@ -55,7 +53,7 @@ est strictement interdit.
 Tout acte de cette nature sera considéré comme une violation
 grave de la politique de gestion des données de l'AE.
 
-## Motifs de cette politique
+## Motifs
 
 Le site AE est un programme écrit par des humains, pour des humains.
 C'est un logiciel dont la complexité nécessite des connaissances
@@ -65,10 +63,6 @@ plus approfondies que ce qui est attendu de la part d'un
 développement est pensée avant tout dans une optique 
 de formation des développeurs, de stabilité de la base de code
 et de transmission des connaissances.
-
-Nous ferons ici abstraction de l'impact écologique néfaste de l'IA,
-qui n'en reste pas moins préoccupant et qui renforce
-les autres motifs ayant poussé à interdire l'IA dans le cadre de l'AE.
 
 ### Formation des développeurs
 
@@ -106,3 +100,21 @@ de guider et d'aider leurs successeurs.
 Comme développé dans les deux points précédents, 
 cet objectif est incompatible avec l'usage de systèmes d'IA.
 
+### Autres motifs
+
+En plus de ces aspects purement liés à la qualité
+du code et à la pédagogie, l'IA pose des problèmes
+écologiques et éthiques :
+
+- Les projets commerciaux d'IA se livrent fréquemment 
+  à des violations flagrantes du droit d'auteur 
+  et à un mépris complet des petits acteurs du web
+  (dont le site AE fait partie) pour entraîner leurs modèles.
+- Leurs activités nécessitent une consommation massive d'énergie et d'eau,
+  ainsi qu'une quantité massive de matériel, entrainant conflits d'usage,
+  et intensification des dommages sociaux et environnementaux de l'industrie.
+- La promotion et l'utilisation des modèles d'IA ont causé un préjudice
+  important aux salariés, une aliénation de leur travail et une baisse de la qualité des services.
+- Les LLM ont favorisé les activités de spam et d'escroquerie.
+- L'IA est devenu un maillon essentiel du fichage des individus,
+  du renforcement des biais sociétaux, et de la désinformation de masse.
