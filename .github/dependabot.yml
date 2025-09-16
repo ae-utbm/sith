@@ -16,7 +16,16 @@ multi-ecosystem-groups:
 
 updates:
   - package-ecosystem: "uv"
+    patterns: ["*"]
     multi-ecosystem-group: "common"
 
   - package-ecosystem: "npm"
+    patterns: ["*"]
     multi-ecosystem-group: "common"
+    groups:
+      # npm supports production and development groups, but not uv
+      # cf. https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference#dependency-type-groups
+      main-deps:
+        dependency-type: "production"
+      dev-deps:
+        dependency-type: "development"
