@@ -176,7 +176,7 @@ class ScheduledProductActionForm(forms.Form):
     """
 
     required_css_class = "required"
-    prefix = "product-action-form"
+    prefix = "scheduled"
 
     task = forms.fields_for_model(
         ScheduledProductAction,
