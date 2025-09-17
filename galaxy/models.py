@@ -31,13 +31,14 @@ from collections import defaultdict
 from typing import NamedTuple, TypedDict
 
 from django.db import models
-from django.db.models import Count, F, Q, QuerySet
-from django.utils.timezone import localdate
+from django.db.models import Count, Exists, F, OuterRef, Q, QuerySet
+from django.utils.timezone import localdate, now
 from django.utils.translation import gettext_lazy as _
 
 from club.models import Membership
 from core.models import User
 from sas.models import PeoplePictureRelation, Picture
+from subscription.models import Subscription
 
 
 class GalaxyStar(models.Model):
@@ -198,8 +199,16 @@ class Galaxy(models.Model):
         cls, picture_count_threshold: int = DEFAULT_PICTURE_COUNT_THRESHOLD
     ) -> QuerySet[User]:
         return (
-            User.objects.exclude(subscriptions=None)
-            .annotate(pictures_count=Count("pictures"))
+            User.objects.filter(is_subscriber_viewable=True)
+            .exclude(subscriptions=None)
+            .annotate(
+                pictures_count=Count("pictures"),
+                is_active_in_galaxy=Exists(
+                    Subscription.objects.filter(
+                        member=OuterRef("id"), subscription_end__gt=now()
+                    )
+                ),
+            )
             .filter(pictures_count__gt=picture_count_threshold)
             .distinct()
         )
@@ -290,9 +299,9 @@ class Galaxy(models.Model):
         31/12/2022 (also two years, but with an offset of one year), then their
         club score is 365.
         """
-        memberships = user.memberships.only("start_date", "end_date", "club_id")
+        memberships = user.memberships.values("start_date", "end_date", "club_id")
         result = defaultdict(int)
-        now = localdate()
+        today = localdate()
         for membership in memberships:
             # This is a N+1 query, but 92% of galaxy users have less than 10 memberships.
             # Only 5 users have more than 30 memberships.
@@ -300,23 +309,23 @@ class Galaxy(models.Model):
                 Membership.objects.exclude(user=user)
                 .filter(
                     Q(  # start2 <= start1 <= end2
-                        start_date__lte=membership.start_date,
-                        end_date__gte=membership.start_date,
+                        start_date__lte=membership["start_date"],
+                        end_date__gte=membership["start_date"],
                     )
-                    | Q(  # start2 <= start1 <= now
-                        start_date__lte=membership.start_date, end_date=None
+                    | Q(  # start2 <= start1 <= today
+                        start_date__lte=membership["start_date"], end_date=None
                     )
                     | Q(  # start1 <= start2 <= end2
-                        start_date__gte=membership.start_date,
-                        start_date__lte=membership.end_date or now,
+                        start_date__gte=membership["start_date"],
+                        start_date__lte=membership["end_date"] or today,
                     ),
-                    club_id=membership.club_id,
+                    club_id=membership["club_id"],
                 )
                 .only("start_date", "end_date", "user_id")
             )
             for other in common_memberships:
-                start = max(membership.start_date, other.start_date)
-                end = min(membership.end_date or now, other.end_date or now)
+                start = max(membership["start_date"], other.start_date)
+                end = min(membership["end_date"] or today, other.end_date or today)
                 result[other.user_id] += (end - start).days * cls.CLUBS_POINTS
         return result
 
@@ -382,18 +391,22 @@ class Galaxy(models.Model):
         # this is memory expensive but prevents a lot of db hits, therefore
         # is far more time efficient
 
-        rulable_users = list(self.get_rulable_users(picture_count_threshold))
-        rulable_users_count = len(rulable_users)
+        rulable_users_qs = self.get_rulable_users(picture_count_threshold)
+        active_users_count = rulable_users_qs.filter(is_active_in_galaxy=True).count()
+        rulable_users = list(rulable_users_qs)
         user1_count = 0
         self.logger.info(
-            f"{rulable_users_count} citizen have been listed. Starting to rule."
+            f" {len(rulable_users)} citizens (with {active_users_count} active ones) "
+            f"have been listed. Starting to rule."
         )
 
         self.logger.info("Creating stars for all citizen")
         individual_scores = self.compute_individual_scores()
         GalaxyStar.objects.bulk_create(
             [
-                GalaxyStar(owner=user, galaxy=self, mass=individual_scores[user.id])
+                GalaxyStar(
+                    owner_id=user.id, galaxy=self, mass=individual_scores[user.id]
+                )
                 for user in rulable_users
             ]
         )
@@ -405,9 +418,9 @@ class Galaxy(models.Model):
         t_global_start = time.time()
         while len(rulable_users) > 0:
             user1 = rulable_users.pop()
+            if not user1.is_active_in_galaxy:
+                continue
             user1_count += 1
-            rulable_users_count2 = len(rulable_users)
-
             star1 = stars[user1.id]
 
             lanes = []
@@ -448,16 +461,19 @@ class Galaxy(models.Model):
                 self.logger.info("")
                 self.logger.info(f" Ruling of {self} ".center(60, "#"))
                 self.logger.info(
-                    f"Progression: {user1_count}/{rulable_users_count} "
-                    f"citizen -- {rulable_users_count - user1_count} remaining"
+                    f"Progression: {user1_count}/{active_users_count} "
+                    f"citizen -- {active_users_count - user1_count} remaining"
                 )
                 self.logger.info(f"Speed: {global_avg_speed:.2f} citizen per second")
-                eta = rulable_users_count2 // global_avg_speed
+                eta = len(rulable_users) // global_avg_speed
                 self.logger.info(
                     f"ETA: {int(eta // 60 % 60)} minutes {int(eta % 60)} seconds"
                 )
                 self.logger.info("#" * 60)
             t_global_start = time.time()
+
+        count, _ = self.stars.filter(Q(lanes1=None) & Q(lanes2=None)).delete()
+        self.logger.info(f"{count} orphan stars have been trimmed.")
 
         # Here, we get the IDs of the old galaxies that we'll need to delete. In normal operation, only one galaxy
         # should be returned, and we can't delete it yet, as it's the one still displayed by the Sith.
