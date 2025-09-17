@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block content %}
-  <main x-data="user_pictures({ userId: {{ object.id }} })">
+  <main x-data="user_pictures({ userId: {{ object.id }}, nbPictures: {{ object.nb_pictures }} })">
     {% if user.id == object.id %}
       {{ download_button(_("Download all my pictures")) }}
     {% endif %}
