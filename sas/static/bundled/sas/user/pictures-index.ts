@@ -7,6 +7,7 @@ import {
 
 interface PagePictureConfig {
   userId: number;
+  lastPhotoDate?: string;
 }
 
 interface Album {
@@ -20,11 +21,28 @@ document.addEventListener("alpine:init", () => {
     loading: true,
     albums: [] as Album[],
 
-    async init() {
+    async fetchPictures(): Promise<PictureSchema[]> {
+      const localStorageKey = `user${config.userId}Pictures`;
+      const localStorageDateKey = `user${config.userId}PicturesDate`;
+      const lastCachedDate = localStorage.getItem(localStorageDateKey);
+      if (
+        config.lastPhotoDate !== undefined &&
+        lastCachedDate !== undefined &&
+        lastCachedDate >= config.lastPhotoDate
+      ) {
+        return JSON.parse(localStorage.getItem(localStorageKey));
+      }
       const pictures = await paginated(picturesFetchPictures, {
         // biome-ignore lint/style/useNamingConvention: from python api
         query: { users_identified: [config.userId] },
       } as PicturesFetchPicturesData);
+      localStorage.setItem(localStorageDateKey, config.lastPhotoDate);
+      localStorage.setItem(localStorageKey, JSON.stringify(pictures));
+      return pictures;
+    },
+
+    async init() {
+      const pictures = await this.fetchPictures();
       const groupedAlbums = Object.groupBy(pictures, (i: PictureSchema) => i.album.id);
       this.albums = Object.values(groupedAlbums).map((pictures: PictureSchema[]) => {
         return {
