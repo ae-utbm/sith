@@ -583,6 +583,16 @@ class TestCounterClick(TestFullClickBase):
             - self.beer.selling_price
         )
 
+    def test_no_fetch_archived_product(self):
+        counter = baker.make(Counter)
+        customer = baker.make(Customer)
+        product_recipe.make(archived=True, counters=[counter])
+        unarchived_products = product_recipe.make(
+            archived=False, counters=[counter], _quantity=3
+        )
+        customer_products = counter.get_products_for(customer)
+        assert unarchived_products == customer_products
+
 
 class TestCounterStats(TestCase):
     @classmethod
