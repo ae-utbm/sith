@@ -412,17 +412,5 @@ class Poster(models.Model):
         if self.date_end and self.date_begin > self.date_end:
             raise ValidationError(_("Begin date should be before end date"))
 
-    def is_owned_by(self, user):
-        if user.is_anonymous:
-            return False
-        return user.is_com_admin or len(user.clubs_with_rights) > 0
-
-    def can_be_moderated_by(self, user):
-        return user.is_com_admin
-
     def get_display_name(self):
         return self.club.get_display_name()
-
-    @property
-    def page(self):
-        return self.club.page

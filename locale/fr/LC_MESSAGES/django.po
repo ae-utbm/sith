@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-02 15:56+0200\n"
+"POT-Creation-Date: 2025-09-19 17:22+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -514,8 +514,8 @@ msgstr "Éditer le Trombi"
 msgid "New Trombi"
 msgstr "Nouveau Trombi"
 
-#: club/templates/club/club_tools.jinja com/templates/com/poster_list.jinja
-#: core/templates/core/user_tools.jinja
+#: club/templates/club/club_tools.jinja club/views.py
+#: com/templates/com/poster_list.jinja core/templates/core/user_tools.jinja
 msgid "Posters"
 msgstr "Affiches"
 
@@ -674,10 +674,6 @@ msgstr "Vente"
 #: club/views.py
 msgid "Mailing list"
 msgstr "Listes de diffusion"
-
-#: club/views.py com/views.py
-msgid "Posters list"
-msgstr "Liste d'affiches"
 
 #: com/forms.py
 msgid "Format: 16:9 | Resolution: 1920x1080"
@@ -1250,6 +1246,10 @@ msgid "Alert message"
 msgstr "Message d'alerte"
 
 #: com/views.py
+msgid "Posters list"
+msgstr "Liste d'affiches"
+
+#: com/views.py
 msgid "Screens list"
 msgstr "Liste d'écrans"
 
@@ -1271,6 +1271,11 @@ msgid ""
 msgstr ""
 "Vous devez êtres un membre du bureau du club sélectionné pour poster dans le "
 "Weekmail."
+
+#: core/auth/mixins.py
+#, python-format
+msgid "No club found with id %(id)s"
+msgstr "Pas de club avec l'id %(id)s trouvé"
 
 #: core/models.py
 msgid "Is manually manageable"
@@ -1713,8 +1718,8 @@ msgid ""
 "AE UTBM is a voluntary organisation run by UTBM students. It organises "
 "student life at UTBM and manages its student facilities."
 msgstr ""
-"L'AE UTBM est une association bénévole gérée par les étudiants de "
-"l'UTBM. Elle organise la vie étudiante de l'UTBM et gère ses lieux de vie."
+"L'AE UTBM est une association bénévole gérée par les étudiants de l'UTBM. "
+"Elle organise la vie étudiante de l'UTBM et gère ses lieux de vie."
 
 #: core/templates/core/base/footer.jinja core/templates/core/base/navbar.jinja
 msgid "Contacts"
@@ -2156,10 +2161,6 @@ msgstr ""
 #: core/templates/core/page_hist.jinja
 msgid "Page history"
 msgstr "Historique de la page"
-
-#: core/templates/core/page_list.jinja
-msgid "There is no page in this website."
-msgstr "Il n'y a pas de page sur ce site web."
 
 #: core/templates/core/page_prop.jinja
 msgid "Page properties"

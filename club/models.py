@@ -42,6 +42,13 @@ from core.fields import ResizedImageField
 from core.models import Group, Notification, Page, SithFile, User
 
 
+class ClubQuerySet(models.QuerySet):
+    def having_board_member(self, user: User) -> Self:
+        """Filter all club in which the given user is a board member."""
+        active_memberships = user.memberships.board().ongoing()
+        return self.filter(Exists(active_memberships.filter(club=OuterRef("pk"))))
+
+
 class Club(models.Model):
     """The Club class, made as a tree to allow nice tidy organization."""
 
@@ -90,6 +97,8 @@ class Club(models.Model):
     board_group = models.OneToOneField(
         Group, related_name="club_board", on_delete=models.PROTECT
     )
+
+    objects = ClubQuerySet.as_manager()
 
     class Meta:
         ordering = ["name"]

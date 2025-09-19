@@ -29,7 +29,13 @@ from typing import TYPE_CHECKING, Any, LiteralString
 
 from django.contrib.auth.mixins import AccessMixin, PermissionRequiredMixin
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+from django.utils.functional import cached_property
+from django.utils.translation import gettext as _
 from django.views.generic.base import View
+
+from club.models import Club
 
 if TYPE_CHECKING:
     from django.db.models import Model
@@ -297,3 +303,50 @@ class PermissionOrAuthorRequiredMixin(PermissionRequiredMixin):
             self.author_field += "_id"
         author_id = getattr(obj, self.author_field, None)
         return author_id == self.request.user.id
+
+
+class PermissionOrClubBoardRequiredMixin(PermissionRequiredMixin):
+    """Require that the user has the required perm or is the board of the club.
+
+    This mixin can be used in any view that is called from a url
+    having a `club_id` kwarg.
+
+    Example:
+
+        In `urls.py` :
+        ```python
+        urlpatterns = [
+            path("foo/<int:club_id>/bar/", FooView.as_view())
+        ]
+        ```
+
+        In `views.py` :
+
+        ```python
+        # this view is available to users that either have the
+        # "foo.view_foo" permission or are in the board of the club
+        # which id was given in the url
+        class FooView(PermissionOrClubBoardRequiredMixin, View):
+            permission_required = "foo.view_foo"
+        ```
+    """
+
+    club_pk_url_kwarg = "club_id"
+
+    @cached_property
+    def club(self):
+        club_id: str | int = self.kwargs.pop(self.club_pk_url_kwarg, None)
+        if club_id is None:
+            return None
+        if isinstance(club_id, int) or club_id.isdigit():
+            return get_object_or_404(Club, pk=club_id)
+        raise Http404(_("No club found with id %(id)s") % {"id": club_id})
+
+    def has_permission(self):
+        if self.request.user.is_anonymous:
+            return False
+        if super().has_permission():
+            return True
+        return self.club is not None and any(
+            g.id == self.club.board_group_id for g in self.request.user.cached_groups
+        )
