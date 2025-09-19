@@ -16,6 +16,7 @@ from typing import Any
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.db.models import OuterRef, Subquery
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -178,6 +179,13 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "sas/user_pictures.jinja"
     current_tab = "pictures"
+    queryset = User.objects.annotate(
+        last_photo_date=Subquery(
+            Picture.objects.filter(people__user=OuterRef("id"))
+            .order_by("-date")
+            .values("date")[:1]
+        )
+    ).all()
 
 
 # Admin views
