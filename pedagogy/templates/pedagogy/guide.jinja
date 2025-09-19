@@ -2,8 +2,12 @@
 {% from 'core/macros.jinja' import paginate_alpine %}
 
 {% block title %}
-  {% trans %}UV Guide{% endtrans %}
+  {% trans %}UE Guide{% endtrans %}
 {% endblock %}
+
+{% block description -%}
+  {% trans %}A guide of courses available at UTBM.{% endtrans %}
+{%- endblock %}
 
 {% block additional_css %}
   <link rel="stylesheet" href="{{ static('pedagogy/css/pedagogy.scss') }}">

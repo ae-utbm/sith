@@ -2,7 +2,6 @@ from datetime import date
 
 from dateutil.relativedelta import relativedelta
 from django import forms
-from django.db.models import Exists, OuterRef
 from django.forms import CheckboxInput
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -35,20 +34,18 @@ class PosterForm(forms.ModelForm):
         label=_("Start date"),
         widget=SelectDateTime,
         required=True,
-        initial=timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
+        initial=timezone.now(),
     )
     date_end = forms.DateTimeField(
         label=_("End date"), widget=SelectDateTime, required=False
     )
 
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop("user", None)
+    def __init__(self, *args, user: User, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.user and not self.user.is_com_admin:
-            self.fields["club"].queryset = Club.objects.filter(
-                id__in=self.user.clubs_with_rights
-            )
-            self.fields.pop("display_time")
+        if user.is_root or user.is_com_admin:
+            self.fields["club"].widget = AutoCompleteSelectClub()
+        else:
+            self.fields["club"].queryset = Club.objects.having_board_member(user)
 
 
 class NewsDateForm(forms.ModelForm):
@@ -161,16 +158,9 @@ class NewsForm(forms.ModelForm):
         # if the author is an admin, he/she can choose any club,
         # otherwise, only clubs for which he/she is a board member can be selected
         if author.is_root or author.is_com_admin:
-            self.fields["club"] = forms.ModelChoiceField(
-                queryset=Club.objects.all(), widget=AutoCompleteSelectClub
-            )
+            self.fields["club"].widget = AutoCompleteSelectClub()
         else:
-            active_memberships = author.memberships.board().ongoing()
-            self.fields["club"] = forms.ModelChoiceField(
-                queryset=Club.objects.filter(
-                    Exists(active_memberships.filter(club=OuterRef("pk")))
-                )
-            )
+            self.fields["club"].queryset = Club.objects.having_board_member(author)
 
     def is_valid(self):
         return super().is_valid() and self.date_form.is_valid()

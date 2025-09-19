@@ -535,13 +535,6 @@ class Counter(models.Model):
     def __str__(self):
         return self.name
 
-    def __getattribute__(self, name: str):
-        if name == "edit_groups":
-            return Group.objects.filter(
-                name=self.club.unix_name + settings.SITH_BOARD_SUFFIX
-            ).all()
-        return object.__getattribute__(self, name)
-
     def get_absolute_url(self) -> str:
         if self.type == "EBOUTIC":
             return reverse("eboutic:main")
@@ -690,8 +683,10 @@ class Counter(models.Model):
         Prices will be annotated
         """
 
-        products = self.products.select_related("product_type").prefetch_related(
-            "buying_groups"
+        products = (
+            self.products.filter(archived=False)
+            .select_related("product_type")
+            .prefetch_related("buying_groups")
         )
 
         # Only include age appropriate products

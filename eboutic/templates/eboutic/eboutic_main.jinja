@@ -1,8 +1,12 @@
 {% extends "core/base.jinja" %}
 
-{% block title %}
+{% block title -%}
   {% trans %}Eboutic{% endtrans %}
-{% endblock %}
+{%- endblock %}
+
+{% block description -%}
+  {% trans %}The online shop of the association.{% endtrans %}
+{%- endblock %}
 
 {% block additional_js %}
     {# This script contains the code to perform requests to manipulate the

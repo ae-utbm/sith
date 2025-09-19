@@ -1,6 +1,14 @@
 {% extends "core/base.jinja" %}
 {% from 'core/macros.jinja' import user_profile_link %}
 
+{% block title -%}
+  {{ club.name }}
+{%- endblock %}
+
+{% block description -%}
+  {{ club.short_description }}
+{%- endblock %}
+
 {% block content %}
   <div id="club_detail">
     {% if club.logo %}

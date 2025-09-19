@@ -99,9 +99,10 @@ INSTALLED_APPS = (
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
+    "django.contrib.sitemaps",
+    "django.contrib.sites",
     "django.contrib.messages",
     "staticfiles",
-    "django.contrib.sites",
     "honeypot",
     "django_jinja",
     "ninja_extra",
@@ -404,9 +405,6 @@ SITH_FORUM_PAGE_LENGTH = 30
 SITH_SAS_ROOT_DIR_ID = env.int("SITH_SAS_ROOT_DIR_ID", default=4)
 SITH_SAS_IMAGES_PER_PAGE = 60
 
-SITH_BOARD_SUFFIX = "-bureau"
-SITH_MEMBER_SUFFIX = "-membres"
-
 SITH_PROFILE_DEPARTMENTS = [
     ("TC", _("TC")),
     ("IMSI", _("IMSI")),
@@ -686,8 +684,10 @@ SITH_NOTIFICATIONS = [
 # The keys are the notification names as found in SITH_NOTIFICATIONS, and the
 # values are the callback function to update the notifs.
 # The callback must take the notif object as first and single argument.
+# If a notification is permanent but requires no post-action, set the
+# callback import string as None
 SITH_PERMANENT_NOTIFICATIONS = {
-    "NEWS_MODERATION": "com.models.news_notification_callback",
+    "NEWS_MODERATION": None,
     "SAS_MODERATION": "sas.models.sas_notification_callback",
 }
 

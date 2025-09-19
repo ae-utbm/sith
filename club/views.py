@@ -51,13 +51,17 @@ from club.forms import (
     SellingsForm,
 )
 from club.models import Club, Mailing, MailingSubscription, Membership
+from com.models import Poster
 from com.views import (
     PosterCreateBaseView,
     PosterDeleteBaseView,
     PosterEditBaseView,
     PosterListBaseView,
 )
-from core.auth.mixins import CanCreateMixin, CanEditMixin, CanViewMixin
+from core.auth.mixins import (
+    CanEditMixin,
+    CanViewMixin,
+)
 from core.models import PageRev
 from core.views import DetailFormView, PageEditViewBase
 from core.views.mixins import TabedViewMixin
@@ -66,9 +70,12 @@ from counter.models import Selling
 
 class ClubTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
-        obj = self.get_object()
-        if isinstance(obj, PageRev):
-            self.object = obj.page.club
+        if not hasattr(self, "object") or not self.object:
+            self.object = self.get_object()
+        if isinstance(self.object, PageRev):
+            self.object = self.object.page.club
+        elif isinstance(self.object, Poster):
+            self.object = self.object.club
         return self.object.get_display_name()
 
     def get_list_of_tabs(self):
@@ -159,7 +166,7 @@ class ClubTabsMixin(TabedViewMixin):
                             "club:poster_list", kwargs={"club_id": self.object.id}
                         ),
                         "slug": "posters",
-                        "name": _("Posters list"),
+                        "name": _("Posters"),
                     },
                 ]
             )
@@ -171,6 +178,10 @@ class ClubListView(ListView):
 
     model = Club
     template_name = "club/club_list.jinja"
+    queryset = (
+        Club.objects.filter(parent=None).order_by("name").prefetch_related("children")
+    )
+    context_object_name = "club_list"
 
 
 class ClubView(ClubTabsMixin, DetailView):
@@ -682,48 +693,45 @@ class MailingAutoGenerationView(View):
         return redirect("club:mailing", club_id=club.id)
 
 
-class PosterListView(ClubTabsMixin, PosterListBaseView, CanViewMixin):
+class PosterListView(ClubTabsMixin, PosterListBaseView):
     """List communication posters."""
+
+    current_tab = "posters"
+    extra_context = {"app": "club"}
+
+    def get_queryset(self):
+        return super().get_queryset().filter(club=self.club.id)
 
     def get_object(self):
         return self.club
 
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["app"] = "club"
-        kwargs["club"] = self.club
-        return kwargs
 
-
-class PosterCreateView(PosterCreateBaseView, CanCreateMixin):
+class PosterCreateView(ClubTabsMixin, PosterCreateBaseView):
     """Create communication poster."""
 
-    pk_url_kwarg = "club_id"
-
-    def get_object(self):
-        obj = super().get_object()
-        if not obj:
-            return self.club
-        return obj
+    current_tab = "posters"
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("club:poster_list", kwargs={"club_id": self.club.id})
 
+    def get_object(self, *args, **kwargs):
+        return self.club
 
-class PosterEditView(ClubTabsMixin, PosterEditBaseView, CanEditMixin):
+
+class PosterEditView(ClubTabsMixin, PosterEditBaseView):
     """Edit communication poster."""
+
+    current_tab = "posters"
+    extra_context = {"app": "club"}
 
     def get_success_url(self):
         return reverse_lazy("club:poster_list", kwargs={"club_id": self.club.id})
 
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["app"] = "club"
-        return kwargs
 
-
-class PosterDeleteView(PosterDeleteBaseView, ClubTabsMixin, CanEditMixin):
+class PosterDeleteView(ClubTabsMixin, PosterDeleteBaseView):
     """Delete communication poster."""
+
+    current_tab = "posters"
 
     def get_success_url(self):
         return reverse_lazy("club:poster_list", kwargs={"club_id": self.club.id})
