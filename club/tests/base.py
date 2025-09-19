@@ -43,6 +43,9 @@ class TestClub(TestCase):
 
         cls.ae = Club.objects.get(pk=settings.SITH_MAIN_CLUB_ID)
         cls.club = baker.make(Club)
+        cls.new_members_url = reverse(
+            "club:club_new_members", kwargs={"club_id": cls.club.id}
+        )
         cls.members_url = reverse("club:club_members", kwargs={"club_id": cls.club.id})
         a_month_ago = now() - timedelta(days=30)
         yesterday = now() - timedelta(days=1)

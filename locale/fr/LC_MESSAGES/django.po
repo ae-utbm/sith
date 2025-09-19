@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-19 17:22+0200\n"
+"POT-Creation-Date: 2025-09-19 19:58+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -174,8 +174,10 @@ msgid "You can not add the same user twice"
 msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 
 #: club/forms.py
-msgid "You should specify a role"
-msgstr "Vous devez choisir un rôle"
+msgid "You cannot add other users to a club if you are not in the club board."
+msgstr ""
+"Vous ne pouvez pas ajouter d'autres utilisateurs dans un club si vous ne "
+"faites pas partie de son bureau."
 
 #: club/forms.py sas/forms.py
 msgid "You do not have the permission to do that"
@@ -327,6 +329,10 @@ msgid "Club members"
 msgstr "Membres du club"
 
 #: club/templates/club/club_members.jinja
+msgid "Add a new member"
+msgstr "Ajouter un nouveau membre"
+
+#: club/templates/club/club_members.jinja
 #: club/templates/club/club_old_members.jinja
 #: core/templates/core/user_clubs.jinja
 #: trombi/templates/trombi/edit_profile.jinja
@@ -349,11 +355,6 @@ msgstr "Depuis"
 #: club/templates/club/club_members.jinja
 msgid "There are no members in this club."
 msgstr "Il n'y a pas de membres dans ce club."
-
-#: club/templates/club/club_members.jinja core/templates/core/file_detail.jinja
-#: core/views/forms.py trombi/templates/trombi/detail.jinja
-msgid "Add"
-msgstr "Ajouter"
 
 #: club/templates/club/club_old_members.jinja
 msgid "Club old members"
@@ -569,6 +570,12 @@ msgstr ""
 msgid "Save"
 msgstr "Sauver"
 
+#: club/templates/club/fragments/add_member.jinja
+#: core/templates/core/file_detail.jinja core/views/forms.py
+#: trombi/templates/trombi/detail.jinja
+msgid "Add"
+msgstr "Ajouter"
+
 #: club/templates/club/mailing.jinja
 msgid "Mailing lists"
 msgstr "Mailing listes"
@@ -674,6 +681,11 @@ msgstr "Vente"
 #: club/views.py
 msgid "Mailing list"
 msgstr "Listes de diffusion"
+
+#: club/views.py
+#, python-format
+msgid "%(user)s has been added to club."
+msgstr "%(user)s a été ajouté au club."
 
 #: com/forms.py
 msgid "Format: 16:9 | Resolution: 1920x1080"
