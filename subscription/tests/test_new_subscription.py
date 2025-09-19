@@ -1,6 +1,6 @@
 """Tests focused on testing subscription creation"""
 
-from datetime import timedelta
+from datetime import date, timedelta
 from typing import Callable
 
 import pytest
@@ -31,6 +31,26 @@ def test_form_existing_user_valid(
 ):
     """Test `SubscriptionExistingUserForm`"""
     user = user_factory()
+    user.date_of_birth = date(year=1967, month=3, day=14)
+    user.save()
+    data = {
+        "member": user,
+        "birthdate": user.date_of_birth,
+        "subscription_type": "deux-semestres",
+        "location": settings.SITH_SUBSCRIPTION_LOCATIONS[0][0],
+        "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
+    }
+    form = SubscriptionExistingUserForm(data)
+    assert form.is_valid()
+    form.save()
+    user.refresh_from_db()
+    assert user.is_subscribed
+
+
+@pytest.mark.django_db
+def test_form_existing_user_with_birthdate(settings: SettingsWrapper):
+    """Test `SubscriptionExistingUserForm`"""
+    user = baker.make(User, date_of_birth=None)
     data = {
         "member": user,
         "subscription_type": "deux-semestres",
@@ -38,11 +58,15 @@ def test_form_existing_user_valid(
         "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
     }
     form = SubscriptionExistingUserForm(data)
+    assert not form.is_valid()
 
+    data |= {"birthdate": date(year=1967, month=3, day=14)}
+    form = SubscriptionExistingUserForm(data)
     assert form.is_valid()
     form.save()
     user.refresh_from_db()
     assert user.is_subscribed
+    assert user.date_of_birth == date(year=1967, month=3, day=14)
 
 
 @pytest.mark.django_db
@@ -133,6 +157,14 @@ def test_page_access(
 
 
 @pytest.mark.django_db
+def test_page_access_with_get_data(client: Client):
+    user = old_subscriber_user.make()
+    client.force_login(baker.make(User, is_superuser=True))
+    res = client.get(reverse("subscription:subscription", query={"member": user.id}))
+    assert res.status_code == 200
+
+
+@pytest.mark.django_db
 def test_submit_form_existing_user(client: Client, settings: SettingsWrapper):
     client.force_login(
         baker.make(
@@ -140,11 +172,12 @@ def test_submit_form_existing_user(client: Client, settings: SettingsWrapper):
             user_permissions=Permission.objects.filter(codename="add_subscription"),
         )
     )
-    user = old_subscriber_user.make()
+    user = old_subscriber_user.make(date_of_birth=date(year=1967, month=3, day=14))
     response = client.post(
         reverse("subscription:fragment-existing-user"),
         {
             "member": user.id,
+            "birthdate": user.date_of_birth,
             "subscription_type": "deux-semestres",
             "location": settings.SITH_SUBSCRIPTION_LOCATIONS[0][0],
             "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],

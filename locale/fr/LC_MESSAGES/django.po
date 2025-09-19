@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-01 18:18+0200\n"
+"POT-Creation-Date: 2025-09-02 15:56+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -5135,6 +5135,10 @@ msgstr "Tee-shirt AE"
 msgid "A user with that email address already exists"
 msgstr "Un utilisateur avec cette adresse email existe déjà"
 
+#: subscription/forms.py
+msgid "This user didn't fill its birthdate yet."
+msgstr "Cet utilisateur n'a pas encore renseigné sa date de naissance"
+
 #: subscription/models.py
 msgid "Bad subscription type"
 msgstr "Mauvais type de cotisation"
@@ -5174,7 +5178,7 @@ msgid ""
 "%(user)s received its new %(type)s subscription. It will be active until "
 "%(end)s included."
 msgstr ""
-"%(user)s a reçu sa nouvelle cotisaton %(type)s. Elle sert active jusqu'au "
+"%(user)s a reçu sa nouvelle cotisaton %(type)s. Elle sera active jusqu'au "
 "%(end)s inclu."
 
 #: subscription/templates/subscription/fragments/creation_success.jinja
