@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
+from club.models import Club
 from club.widgets.ajax_select import AutoCompleteSelectClub
 from core.models import User
 from core.views.forms import NFCTextInput, SelectDate, SelectDateTime
@@ -19,6 +20,7 @@ from counter.models import (
     Counter,
     Customer,
     Eticket,
+    InvoiceCall,
     Product,
     Refilling,
     ReturnableProduct,
@@ -373,3 +375,39 @@ class BaseBasketForm(forms.BaseFormSet):
 BasketForm = forms.formset_factory(
     ProductForm, formset=BaseBasketForm, absolute_max=None, min_num=1
 )
+
+
+class InvoiceCallForm(forms.Form):
+    def __init__(self, *args, month, clubs: list[Club] | None = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.month = month
+        self.clubs = clubs
+
+        if self.clubs is None:
+            self.clubs = []
+
+        invoices = {
+            i["club_id"]: i["is_validated"]
+            for i in InvoiceCall.objects.filter(
+                club__in=self.clubs, month=self.month
+            ).values("club_id", "is_validated")
+        }
+
+        for club in self.clubs:
+            is_validated = invoices.get(club.id, False)
+
+            self.fields[f"club_{club.id}"] = forms.BooleanField(
+                required=False, initial=is_validated
+            )
+
+    def save(self):
+        for club in self.clubs:
+            field_name = f"club_{club.id}"
+            is_validated = self.cleaned_data.get(field_name, False)
+
+            InvoiceCall.objects.update_or_create(
+                month=self.month, club=club, defaults={"is_validated": is_validated}
+            )
+
+    def get_club_name(self, club_id):
+        return f"club_{club_id}"
