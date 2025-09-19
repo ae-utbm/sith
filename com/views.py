@@ -28,7 +28,9 @@ from typing import Any
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.contrib.auth.mixins import AccessMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import (
+    PermissionRequiredMixin,
+)
 from django.contrib.syndication.views import Feed
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Max
@@ -50,6 +52,7 @@ from core.auth.mixins import (
     CanEditPropMixin,
     CanViewMixin,
     PermissionOrAuthorRequiredMixin,
+    PermissionOrClubBoardRequiredMixin,
 )
 from core.models import User
 from core.views.mixins import QuickNotifMixin, TabedViewMixin
@@ -97,13 +100,6 @@ class ComTabsMixin(TabedViewMixin):
                 "name": _("Screens list"),
             },
         ]
-
-
-class IsComAdminMixin(AccessMixin):
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_com_admin:
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
 
 
 class ComEditView(ComTabsMixin, CanEditPropMixin, UpdateView):
@@ -558,161 +554,109 @@ class MailingModerateView(View):
         raise PermissionDenied
 
 
-class PosterAdminViewMixin(IsComAdminMixin, ComTabsMixin):
-    current_tab = "posters"
-
-
-class PosterListBaseView(PosterAdminViewMixin, ListView):
+class PosterListBaseView(PermissionOrClubBoardRequiredMixin, ListView):
     """List communication posters."""
 
-    current_tab = "posters"
     model = Poster
     template_name = "com/poster_list.jinja"
-
-    def dispatch(self, request, *args, **kwargs):
-        club_id = kwargs.pop("club_id", None)
-        self.club = None
-        if club_id:
-            self.club = get_object_or_404(Club, pk=club_id)
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_queryset(self):
-        if self.request.user.is_com_admin:
-            return Poster.objects.all().order_by("-date_begin")
-        else:
-            return Poster.objects.filter(club=self.club.id)
+    permission_required = "com.view_poster"
+    ordering = ["-date_begin"]
 
     def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        if not self.request.user.is_com_admin:
-            kwargs["club"] = self.club
-        return kwargs
+        return super().get_context_data(**kwargs) | {"club": self.club}
 
 
-class PosterCreateBaseView(PosterAdminViewMixin, CreateView):
+class PosterCreateBaseView(PermissionOrClubBoardRequiredMixin, CreateView):
     """Create communication poster."""
 
-    current_tab = "posters"
     form_class = PosterForm
     template_name = "core/create.jinja"
+    permission_required = "com.add_poster"
 
     def get_queryset(self):
         return Poster.objects.all()
 
-    def dispatch(self, request, *args, **kwargs):
-        if "club_id" in kwargs:
-            self.club = get_object_or_404(Club, pk=kwargs["club_id"])
-        return super().dispatch(request, *args, **kwargs)
-
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({"user": self.request.user})
-        return kwargs
+        return super().get_form_kwargs() | {"user": self.request.user}
+
+    def get_initial(self):
+        return {"club": self.club}
 
     def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        if not self.request.user.is_com_admin:
-            kwargs["club"] = self.club
-        return kwargs
+        return super().get_context_data(**kwargs) | {"club": self.club}
 
     def form_valid(self, form):
-        if self.request.user.is_com_admin:
+        if self.request.user.has_perm("com.moderate_poster"):
             form.instance.is_moderated = True
         return super().form_valid(form)
 
 
-class PosterEditBaseView(PosterAdminViewMixin, UpdateView):
+class PosterEditBaseView(PermissionOrClubBoardRequiredMixin, UpdateView):
     """Edit communication poster."""
 
     pk_url_kwarg = "poster_id"
-    current_tab = "posters"
     form_class = PosterForm
     template_name = "com/poster_edit.jinja"
-
-    def get_initial(self):
-        return {
-            "date_begin": self.object.date_begin.strftime("%Y-%m-%d %H:%M:%S")
-            if self.object.date_begin
-            else None,
-            "date_end": self.object.date_end.strftime("%Y-%m-%d %H:%M:%S")
-            if self.object.date_end
-            else None,
-        }
-
-    def dispatch(self, request, *args, **kwargs):
-        if kwargs.get("club_id"):
-            try:
-                self.club = Club.objects.get(pk=kwargs["club_id"])
-            except Club.DoesNotExist as e:
-                raise PermissionDenied from e
-        return super().dispatch(request, *args, **kwargs)
+    permission_required = "com.change_poster"
 
     def get_queryset(self):
         return Poster.objects.all()
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({"user": self.request.user})
-        return kwargs
+        return super().get_form_kwargs() | {"user": self.request.user}
 
     def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        if hasattr(self, "club"):
-            kwargs["club"] = self.club
-        return kwargs
+        return super().get_context_data(**kwargs) | {"club": self.club}
 
     def form_valid(self, form):
-        if self.request.user.is_com_admin:
+        if not self.request.user.has_perm("com.moderate_poster"):
             form.instance.is_moderated = False
         return super().form_valid(form)
 
 
-class PosterDeleteBaseView(PosterAdminViewMixin, DeleteView):
+class PosterDeleteBaseView(
+    PermissionOrClubBoardRequiredMixin, ComTabsMixin, DeleteView
+):
     """Edit communication poster."""
 
     pk_url_kwarg = "poster_id"
     current_tab = "posters"
     model = Poster
     template_name = "core/delete_confirm.jinja"
-
-    def dispatch(self, request, *args, **kwargs):
-        if kwargs.get("club_id"):
-            try:
-                self.club = Club.objects.get(pk=kwargs["club_id"])
-            except Club.DoesNotExist as e:
-                raise PermissionDenied from e
-        return super().dispatch(request, *args, **kwargs)
+    permission_required = "com.delete_poster"
 
 
-class PosterListView(PosterListBaseView):
+class PosterListView(ComTabsMixin, PosterListBaseView):
     """List communication posters."""
 
+    current_tab = "posters"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.user.has_perm("com.view_poster"):
+            return qs
+        return qs.filter(club=self.club.id)
+
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         kwargs["app"] = "com"
         return kwargs
 
 
-class PosterCreateView(PosterCreateBaseView):
+class PosterCreateView(ComTabsMixin, PosterCreateBaseView):
     """Create communication poster."""
 
+    current_tab = "posters"
     success_url = reverse_lazy("com:poster_list")
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["app"] = "com"
-        return kwargs
+    extra_context = {"app": "com"}
 
 
-class PosterEditView(PosterEditBaseView):
+class PosterEditView(ComTabsMixin, PosterEditBaseView):
     """Edit communication poster."""
 
+    current_tab = "posters"
     success_url = reverse_lazy("com:poster_list")
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["app"] = "com"
-        return kwargs
+    extra_context = {"app": "com"}
 
 
 class PosterDeleteView(PosterDeleteBaseView):
@@ -721,44 +665,39 @@ class PosterDeleteView(PosterDeleteBaseView):
     success_url = reverse_lazy("com:poster_list")
 
 
-class PosterModerateListView(PosterAdminViewMixin, ListView):
+class PosterModerateListView(PermissionRequiredMixin, ComTabsMixin, ListView):
     """Moderate list communication poster."""
 
     current_tab = "posters"
     model = Poster
     template_name = "com/poster_moderate.jinja"
     queryset = Poster.objects.filter(is_moderated=False).all()
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["app"] = "com"
-        return kwargs
+    permission_required = "com.moderate_poster"
+    extra_context = {"app": "com"}
 
 
-class PosterModerateView(PosterAdminViewMixin, View):
+class PosterModerateView(PermissionRequiredMixin, ComTabsMixin, View):
     """Moderate communication poster."""
+
+    current_tab = "posters"
+    permission_required = "com.moderate_poster"
+    extra_context = {"app": "com"}
 
     def get(self, request, *args, **kwargs):
         obj = get_object_or_404(Poster, pk=kwargs["object_id"])
-        if obj.can_be_moderated_by(request.user):
-            obj.is_moderated = True
-            obj.moderator = request.user
-            obj.save()
-            return redirect("com:poster_moderate_list")
-        raise PermissionDenied
-
-    def get_context_data(self, **kwargs):
-        kwargs = super(PosterModerateListView, self).get_context_data(**kwargs)
-        kwargs["app"] = "com"
-        return kwargs
+        obj.is_moderated = True
+        obj.moderator = request.user
+        obj.save()
+        return redirect("com:poster_moderate_list")
 
 
-class ScreenListView(IsComAdminMixin, ComTabsMixin, ListView):
+class ScreenListView(PermissionRequiredMixin, ComTabsMixin, ListView):
     """List communication screens."""
 
     current_tab = "screens"
     model = Screen
     template_name = "com/screen_list.jinja"
+    permission_required = "com.view_screen"
 
 
 class ScreenSlideshowView(DetailView):
@@ -769,12 +708,12 @@ class ScreenSlideshowView(DetailView):
     template_name = "com/screen_slideshow.jinja"
 
     def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["posters"] = self.object.active_posters()
-        return kwargs
+        return super().get_context_data(**kwargs) | {
+            "posters": self.object.active_posters()
+        }
 
 
-class ScreenCreateView(IsComAdminMixin, ComTabsMixin, CreateView):
+class ScreenCreateView(PermissionRequiredMixin, ComTabsMixin, CreateView):
     """Create communication screen."""
 
     current_tab = "screens"
@@ -782,9 +721,10 @@ class ScreenCreateView(IsComAdminMixin, ComTabsMixin, CreateView):
     fields = ["name"]
     template_name = "core/create.jinja"
     success_url = reverse_lazy("com:screen_list")
+    permission_required = "com.add_screen"
 
 
-class ScreenEditView(IsComAdminMixin, ComTabsMixin, UpdateView):
+class ScreenEditView(PermissionRequiredMixin, ComTabsMixin, UpdateView):
     """Edit communication screen."""
 
     pk_url_kwarg = "screen_id"
@@ -793,9 +733,10 @@ class ScreenEditView(IsComAdminMixin, ComTabsMixin, UpdateView):
     fields = ["name"]
     template_name = "com/screen_edit.jinja"
     success_url = reverse_lazy("com:screen_list")
+    permission_required = "com.change_screen"
 
 
-class ScreenDeleteView(IsComAdminMixin, ComTabsMixin, DeleteView):
+class ScreenDeleteView(PermissionRequiredMixin, ComTabsMixin, DeleteView):
     """Delete communication screen."""
 
     pk_url_kwarg = "screen_id"
@@ -803,3 +744,4 @@ class ScreenDeleteView(IsComAdminMixin, ComTabsMixin, DeleteView):
     model = Screen
     template_name = "core/delete_confirm.jinja"
     success_url = reverse_lazy("com:screen_list")
+    permission_required = "com.delete_screen"

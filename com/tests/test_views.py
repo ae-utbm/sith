@@ -18,17 +18,16 @@ from unittest.mock import patch
 import pytest
 from django.conf import settings
 from django.contrib.sites.models import Site
-from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import html
-from django.utils.timezone import localtime, now
+from django.utils.timezone import now
 from django.utils.translation import gettext as _
 from model_bakery import baker
 from pytest_django.asserts import assertNumQueries, assertRedirects
 
 from club.models import Club, Membership
-from com.models import News, NewsDate, Poster, Sith, Weekmail, WeekmailArticle
+from com.models import News, NewsDate, Sith, Weekmail, WeekmailArticle
 from core.baker_recipes import subscriber_user
 from core.models import AnonymousUser, Group, User
 
@@ -205,31 +204,6 @@ class TestWeekmailArticle(TestCase):
         assert not self.article.is_owned_by(self.author)
         assert not self.article.is_owned_by(self.anonymous)
         assert not self.article.is_owned_by(self.sli)
-
-
-class TestPoster(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.com_admin = User.objects.get(username="comunity")
-        cls.poster = Poster.objects.create(
-            name="dummy",
-            file=SimpleUploadedFile("dummy.jpg", b"azertyuiop"),
-            club=Club.objects.first(),
-            date_begin=localtime(now()),
-        )
-        cls.sli = User.objects.get(username="sli")
-        cls.sli.memberships.all().delete()
-        Membership(user=cls.sli, club=Club.objects.first(), role=5).save()
-        cls.susbcriber = User.objects.get(username="subscriber")
-        cls.anonymous = AnonymousUser()
-
-    def test_poster_owner(self):
-        """Test that poster are owned by com admins and board members in clubs."""
-        assert self.poster.is_owned_by(self.com_admin)
-        assert not self.poster.is_owned_by(self.anonymous)
-
-        assert not self.poster.is_owned_by(self.susbcriber)
-        assert self.poster.is_owned_by(self.sli)
 
 
 class TestNewsCreation(TestCase):
