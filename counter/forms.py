@@ -1,13 +1,22 @@
+import json
 import math
 
 from django import forms
 from django.db.models import Q
+from django.forms.formsets import DELETION_FIELD_NAME, BaseFormSet
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+from django_celery_beat.models import ClockedSchedule
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
 from club.widgets.ajax_select import AutoCompleteSelectClub
 from core.models import User
-from core.views.forms import NFCTextInput, SelectDate, SelectDateTime
+from core.views.forms import (
+    FutureDateTimeField,
+    NFCTextInput,
+    SelectDate,
+    SelectDateTime,
+)
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
     AutoCompleteSelectMultipleGroup,
@@ -22,7 +31,9 @@ from counter.models import (
     Product,
     Refilling,
     ReturnableProduct,
+    ScheduledProductAction,
     StudentCard,
+    get_product_actions,
 )
 from counter.widgets.ajax_select import (
     AutoCompleteSelectMultipleCounter,
@@ -158,6 +169,110 @@ class CounterEditForm(forms.ModelForm):
         }
 
 
+class ScheduledProductActionForm(forms.Form):
+    """Form for automatic product archiving.
+
+    The `save` method will update or create tasks using celery-beat.
+    """
+
+    required_css_class = "required"
+    prefix = "scheduled"
+
+    task = forms.fields_for_model(
+        ScheduledProductAction,
+        ["task"],
+        widgets={"task": forms.RadioSelect(choices=get_product_actions)},
+        labels={"task": _("Action")},
+        help_texts={"task": ""},
+    )["task"]
+    trigger_at = FutureDateTimeField(
+        label=_("Date and time of action"), widget=SelectDateTime
+    )
+    counters = forms.ModelMultipleChoiceField(
+        label=_("New counters"),
+        help_text=_("The selected counters will replace the current ones"),
+        required=False,
+        widget=AutoCompleteSelectMultipleCounter,
+        queryset=Counter.objects.all(),
+    )
+
+    def __init__(self, *args, product: Product, **kwargs):
+        self.product = product
+        super().__init__(*args, **kwargs)
+
+    def save(self):
+        if not self.changed_data:
+            return
+        task = self.cleaned_data["task"]
+        instance = ScheduledProductAction.objects.filter(
+            product=self.product, task=task
+        ).first()
+        if not instance:
+            instance = ScheduledProductAction(
+                product=self.product,
+                clocked=ClockedSchedule.objects.create(
+                    clocked_time=self.cleaned_data["trigger_at"]
+                ),
+            )
+        elif "trigger_at" in self.changed_data:
+            instance.clocked.clocked_time = self.cleaned_data["trigger_at"]
+            instance.clocked.save()
+        instance.task = task
+        task_kwargs = {"product_id": self.product.id}
+        if task == "counter.tasks.change_counters":
+            task_kwargs["counters"] = [c.id for c in self.cleaned_data["counters"]]
+        instance.kwargs = json.dumps(task_kwargs)
+        instance.name = f"{self.cleaned_data['task']} - {self.product}"
+        instance.enabled = True
+        instance.save()
+        return instance
+
+    def delete(self):
+        instance = ScheduledProductAction.objects.get(
+            product=self.product, task=self.cleaned_data["task"]
+        )
+        # if the clocked object linked to the task has no other task,
+        # delete it and let the task be deleted in cascade,
+        # else delete only the task.
+        if instance.clocked.periodictask_set.count() > 1:
+            return instance.clocked.delete()
+        return instance.delete()
+
+
+class BaseScheduledProductActionFormSet(BaseFormSet):
+    def __init__(self, *args, product: Product, **kwargs):
+        initial = [
+            {
+                "task": action.task,
+                "trigger_at": action.clocked.clocked_time,
+                "counters": json.loads(action.kwargs).get("counters"),
+            }
+            for action in product.scheduled_actions.filter(
+                enabled=True, clocked__clocked_time__gt=now()
+            ).order_by("clocked__clocked_time")
+        ]
+        kwargs["initial"] = initial
+        kwargs["form_kwargs"] = {"product": product}
+        super().__init__(*args, **kwargs)
+
+    def save(self):
+        for form in self.forms:
+            if form.cleaned_data.get(DELETION_FIELD_NAME, False):
+                form.delete()
+            else:
+                form.save()
+
+
+ScheduledProductActionFormSet = forms.formset_factory(
+    ScheduledProductActionForm,
+    formset=BaseScheduledProductActionFormSet,
+    absolute_max=None,
+    can_delete=True,
+    can_delete_extra=False,
+    extra=2,
+)
+
+
 class ProductEditForm(forms.ModelForm):
     error_css_class = "error"
     required_css_class = "required"
@@ -199,22 +314,21 @@ class ProductEditForm(forms.ModelForm):
         queryset=Counter.objects.all(),
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, instance=None, **kwargs):
+        super().__init__(*args, instance=instance, **kwargs)
         if self.instance.id:
             self.fields["counters"].initial = self.instance.counters.all()
+        self.action_formset = ScheduledProductActionFormSet(
+            *args, product=self.instance, **kwargs
+        )
+
+    def is_valid(self):
+        return super().is_valid() and self.action_formset.is_valid()
 
     def save(self, *args, **kwargs):
         ret = super().save(*args, **kwargs)
-        if self.fields["counters"].initial:
-            # Remove the product from all counter it was added to
-            # It will then only be added to selected counters
-            for counter in self.fields["counters"].initial:
-                counter.products.remove(self.instance)
-                counter.save()
-        for counter in self.cleaned_data["counters"]:
-            counter.products.add(self.instance)
-            counter.save()
+        self.instance.counters.set(self.cleaned_data["counters"])
+        self.action_formset.save()
         return ret
 
 

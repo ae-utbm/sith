@@ -115,7 +115,7 @@ class SelectUser(TextInput):
 
 def validate_future_timestamp(value: date | datetime):
     if value <= now():
-        raise ValueError(_("Ensure this timestamp is set in the future"))
+        raise ValidationError(_("Ensure this timestamp is set in the future"))
 
 
 class FutureDateTimeField(forms.DateTimeField):
