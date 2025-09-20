@@ -768,7 +768,7 @@ class Command(BaseCommand):
         s = Subscription(
             member=user,
             subscription_type=subscription_type,
-            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
+            payment_method=settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1][0],
         )
         s.subscription_start = s.compute_start(start)
         s.subscription_end = s.compute_end(
