@@ -253,35 +253,38 @@ class MembershipQuerySet(models.QuerySet):
         """Filter Memberships that this user can edit.
 
         Users with the `club.change_membership` permission can edit all Membership.
-        The other users can end :
+        The other users can edit :
         - their own membership
-        - if they are board members, memberships with a role lower than their own
+        - if they are board members, ongoing memberships with a role lower than their own
 
         For example, let's suppose the following users :
         - A : board member
         - B : board member
         - C : simple member
         - D : curious
+        - E : old member
 
-        A will be able to end the memberships of A, C and D ;
-        C and D will be able to end only their own membership.
+        A will be able to edit the memberships of A, C and D ;
+        C and D will be able to edit only their own membership ;
+        nobody will be able to edit E's membership.
         """
         if user.has_perm("club.change_membership"):
             return self.all()
         return self.filter(
-            Exists(
+            Q(user=user)
+            | Exists(
                 Membership.objects.filter(
                     Q(
                         role__gt=Greatest(
                             OuterRef("role"), Value(settings.SITH_MAXIMUM_FREE_ROLE)
                         )
-                    )
-                    | Q(pk=OuterRef("pk")),
+                    ),
                     user=user,
                     end_date=None,
                     club=OuterRef("club"),
                 )
-            )
+            ),
+            end_date=None,
         )
 
     def update(self, **kwargs) -> int:

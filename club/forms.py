@@ -267,8 +267,6 @@ class ClubMemberForm(forms.ModelForm):
     def clean(self):
         """Check user rights for adding a user."""
         cleaned_data = super().clean()
-        if "role" not in cleaned_data:
-            return cleaned_data
         if (
             self.request_user_membership is None
             or self.request_user_membership.role <= settings.SITH_MAXIMUM_FREE_ROLE
@@ -280,6 +278,4 @@ class ClubMemberForm(forms.ModelForm):
                 ),
                 code="invalid",
             )
-        if cleaned_data["role"] > self.max_available_role:
-            raise forms.ValidationError(_("You do not have the permission to do that"))
         return cleaned_data

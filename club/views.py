@@ -274,9 +274,6 @@ class ClubAddMembersFragment(
     success_message = _("%(user)s has been added to club.")
 
     def dispatch(self, *args, **kwargs):
-        club_id = self.kwargs.get("club_id")
-        if not club_id:
-            raise Http404
         self.club = get_object_or_404(Club, pk=kwargs.get("club_id"))
         return super().dispatch(*args, **kwargs)
 
@@ -316,6 +313,8 @@ class ClubMembersView(
             and membership.role <= settings.SITH_MAXIMUM_FREE_ROLE
             and not self.request.user.has_perm("club.add_membership")
         ):
+            # Simple club members won't see the form anymore.
+            # Even if they saw it, they couldn't add anyone to the club anyway
             return {}
         return {"add_member_fragment": ClubAddMembersFragment}
 

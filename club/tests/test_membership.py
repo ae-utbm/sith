@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -368,6 +370,44 @@ class TestMembership(TestClub):
         assert not form.is_valid()
         assert form.errors == {"role": ["Ce champ est obligatoire."]}
 
+    def test_add_member_already_there(self):
+        form = ClubMemberForm(
+            data={"user": self.simple_board_member, "role": 3},
+            request_user=self.root,
+            club=self.club,
+        )
+        assert not form.is_valid()
+        assert form.errors == {
+            "user": ["Vous ne pouvez pas ajouter deux fois le même utilisateur"]
+        }
+
+    def test_add_other_member_forbidden(self):
+        non_member = subscriber_user.make()
+        simple_member = baker.make(Membership, club=self.club, role=1).user
+        for user in non_member, simple_member:
+            form = ClubMemberForm(
+                data={"user": subscriber_user.make(), "role": 1},
+                request_user=user,
+                club=self.club,
+            )
+            assert not form.is_valid()
+            assert form.errors == {
+                "__all__": [
+                    "Vous ne pouvez pas ajouter d'autres utilisateurs "
+                    "dans un club si vous ne faites pas partie de son bureau."
+                ]
+            }
+
+    def test_simple_members_dont_see_form_anymore(self):
+        """Test that simple club members don't see the form to add members"""
+        user = subscriber_user.make()
+        baker.make(Membership, club=self.club, user=user, role=1)
+        self.client.force_login(user)
+        res = self.client.get(self.members_url)
+        assert res.status_code == 200
+        soup = BeautifulSoup(res.text, "lxml")
+        assert not soup.find(id="add_club_members_form")
+
     def test_end_membership_self(self):
         """Test that a member can end its own membership."""
         self.client.force_login(self.simple_board_member)
@@ -491,3 +531,34 @@ class TestMembership(TestClub):
         new_board = set(self.club.board_group.users.values_list("id", flat=True))
         assert new_members == initial_members
         assert new_board == initial_board
+
+
+class TestOldMembersView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        club = baker.make(Club)
+        roles = [1, 1, 1, 2, 2, 4, 4, 5, 7, 9, 10]
+        cls.memberships = baker.make(
+            Membership,
+            role=iter(roles),
+            club=club,
+            start_date=now() - timedelta(days=14),
+            end_date=now() - timedelta(days=7),
+            _quantity=len(roles),
+            _bulk_create=True,
+        )
+        cls.url = reverse("club:club_old_members", kwargs={"club_id": club.id})
+
+    def test_ok(self):
+        user = subscriber_user.make()
+        self.client.force_login(user)
+        res = self.client.get(self.url)
+        assert res.status_code == 200
+
+    def test_access_forbidden(self):
+        res = self.client.get(self.url)
+        assertRedirects(res, reverse("core:login", query={"next": self.url}))
+
+        self.client.force_login(baker.make(User))
+        res = self.client.get(self.url)
+        assert res.status_code == 403
