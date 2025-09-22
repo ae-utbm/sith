@@ -76,6 +76,7 @@ body {
       justify-content: center;
 
       top: 0px;
+      left: 0%;
 
       img {
         max-width: 100%;
@@ -83,18 +84,37 @@ body {
         object-fit: contain;
       }
 
-      &.active {
-        animation: scrolling 1s;
+      &.current {
         display: inline-flex;
+        left: 0%;
+        animation: scrolling-in 1s linear;
       }
 
-      @keyframes scrolling {
+      &.previous {
+        display: inline-flex;
+        animation: scrolling-out 1s linear;
+        opacity: 0;
+        transition: opacity 0.1s;
+        transition-delay: 0.9s;
+      }
+
+      @keyframes scrolling-in {
         0% {
           transform: translateX(100%);
         }
 
         100% {
           transform: translateX(0%);
+        }
+      }
+
+      @keyframes scrolling-out {
+        0% {
+          transform: translateX(0%);
+        }
+
+        100% {
+          transform: translateX(-100%);
         }
       }
 
@@ -131,13 +151,23 @@ body {
   }
 
   progress {
+    --color: #304c83;
+
     position: absolute;
     bottom: 0px;
     height: 10px;
-    // color: #304c83;
+    color: var(--color);
     width: 100%;
     margin-bottom: 0px;
     border: none;
+
+    &::-moz-progress-bar {
+      background: var(--color);
+    }
+
+    &::-webkit-progress-value {
+      background: var(--color);
+    }
 
     &[value] {
       background-color: transparent;

@@ -12,11 +12,13 @@ document.addEventListener("alpine:init", () => {
     elapsed: 0,
 
     current: 0,
+    previous: 0,
 
     init() {
       this.$watch("elapsed", () => {
         const displayTime = this.posters[this.current].displayTime * 1000;
         if (this.elapsed > displayTime) {
+          this.previous = this.current;
           this.current = this.getNext();
           this.elapsed = 0;
         }

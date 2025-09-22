@@ -19,7 +19,8 @@
       <div id="slides">
         <template x-for="(poster, index) in posters">
           <div class="slide" :class="{
-                                     active: index === current,
+                                     current: index === current,
+                                     previous: index !== current && index === previous,
                                      }">
             <img :src="poster.url">
           </div>
