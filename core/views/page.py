@@ -184,7 +184,7 @@ class PageEditViewBase(CanEditMixin, UpdateView):
     )
     template_name = "core/pagerev_edit.jinja"
 
-    def get_object(self):
+    def get_object(self, *args, **kwargs):
         self.page = Page.get_page_by_full_name(self.kwargs["page_name"])
         return self._get_revision()
 
