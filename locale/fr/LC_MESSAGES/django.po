@@ -2345,6 +2345,10 @@ msgid "User has no account"
 msgstr "L'utilisateur n'a pas de compte"
 
 #: core/templates/core/user_account_detail.jinja
+msgid "Deleted User"
+msgstr "Utilisateur supprimé"
+
+#: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/last_ops.jinja
 #: counter/templates/counter/refilling_list.jinja
 msgid "Amount"
@@ -5515,3 +5519,6 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
+
+#~ msgid "There is no page in this website."
+#~ msgstr "Il n'y a pas de page sur ce site web."

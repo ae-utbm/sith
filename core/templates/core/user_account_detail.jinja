@@ -30,7 +30,11 @@
               - {{ purchase.date|localtime|time(DATETIME_FORMAT) }}
             </td>
             <td>{{ purchase.counter }}</td>
-            <td><a href="{{ purchase.seller.get_absolute_url() }}">{{ purchase.seller.get_display_name() }}</a></td>
+            {% if not purchase.seller %}
+              <td>{% trans %}Deleted User{% endtrans %}</td>
+            {% else %}
+              <td><a href="{{ purchase.seller.get_absolute_url() }}">{{ purchase.seller.get_display_name() }}</a></td>
+            {% endif %}
             <td>{{ purchase.label }}</td>
             <td>{{ purchase.quantity }}</td>
             <td>{{ purchase.quantity * purchase.unit_price }} €</td>
