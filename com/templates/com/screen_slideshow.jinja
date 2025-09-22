@@ -3,27 +3,36 @@
   <head>
     <title>{% trans %}Slideshow{% endtrans %}</title>
     <link href="{{ static('css/slideshow.scss') }}" rel="stylesheet" type="text/css" />
-    <script src="{{ static('bundled/vendored/jquery.min.js') }}"></script>
-    <script src="{{ static('com/js/slideshow.js') }}"></script>
+    <script type="module" src="{{ static('bundled/alpine-index.js') }}"></script>
+    <script type="module" src="{{ static('bundled/com/slideshow-index.ts') }}"></script>
   </head>
-  <body>
-    <div id="slideshow">
+  <body x-data="slideshow([
+                {% for poster in posters %}
+                  {
+                  url: '{{ poster.file.url }}',
+                  displayTime: {{ poster.display_time }}
+                  },
+                {% endfor %}
+                ])">
+    <div id="slideshow" @click="toggleFullScreen">
 
       <div id="slides">
-        {% for poster in posters %}
-          <div class="slide {% if loop.first %}center{% else %}right{% endif %}" display_time="{{ poster.display_time }}">
-            <img src="{{ poster.file.url }}">
+        <template x-for="(poster, index) in posters">
+          <div class="slide" :class="{
+                                     active: index === current,
+                                     }">
+            <img :src="poster.url">
           </div>
-        {% endfor %}
+        </template>
       </div>
 
       <div id="progress_bullets">
-        {% for poster in posters %}
-          <div class="bullet {% if loop.first %}active{% endif %}"></div>
-        {% endfor %}
+        <template x-for="(poster, index) in posters">
+          <div class="bullet" :class="{active: current === index}"></div>
+        </template>
       </div>
 
-      <div id="progress_bar"></div>
+      <progress :value="progress" max="100" x-show="posters.length > 1 && progress > 0"></progress>
 
     </div>
   </body>
