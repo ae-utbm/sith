@@ -4819,8 +4819,8 @@ msgid "N/A"
 msgstr "N/A"
 
 #: sith/settings.py
-msgid "Transfert"
-msgstr "Virement"
+msgid "AE account"
+msgstr "Compte AE"
 
 #: sith/settings.py
 msgid "Belfort"
@@ -5167,6 +5167,14 @@ msgstr "lieu"
 #: subscription/models.py
 msgid "You can not subscribe many time for the same period"
 msgstr "Vous ne pouvez pas cotiser plusieurs fois pour la même période"
+
+#: subscription/templates/subscription/forms/create_existing_user.jinja
+msgid ""
+"If the subscription is done using the AE account, you must also click "
+"it on the AE counter."
+msgstr ""
+"Si la cotisation est faite en utilisant le compte AE, vous devez également "
+"la cliquer sur le comptoir AE."
 
 #: subscription/templates/subscription/fragments/creation_success.jinja
 #, python-format

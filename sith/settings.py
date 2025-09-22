@@ -421,18 +421,11 @@ SITH_PROFILE_DEPARTMENTS = [
     ("NA", _("N/A")),
 ]
 
-SITH_ACCOUNTING_PAYMENT_METHOD = [
-    ("CHECK", _("Check")),
-    ("CASH", _("Cash")),
-    ("TRANSFERT", _("Transfert")),
-    ("CARD", _("Credit card")),
-]
-
 SITH_SUBSCRIPTION_PAYMENT_METHOD = [
     ("CHECK", _("Check")),
     ("CARD", _("Credit card")),
     ("CASH", _("Cash")),
-    ("EBOUTIC", _("Eboutic")),
+    ("AE_ACCOUNT", _("AE account")),
     ("OTHER", _("Other")),
 ]
 
@@ -441,6 +434,7 @@ SITH_SUBSCRIPTION_LOCATIONS = [
     ("SEVENANS", _("Sevenans")),
     ("MONTBELIARD", _("Montbéliard")),
     ("EBOUTIC", _("Eboutic")),
+    ("OTHER", _("Other")),
 ]
 
 SITH_COUNTER_BARS = [(1, "MDE"), (2, "Foyer"), (35, "La Gommette")]

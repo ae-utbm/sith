@@ -2,6 +2,7 @@ import secrets
 from typing import Any
 
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
@@ -23,6 +24,13 @@ class SelectionDateForm(forms.Form):
 
 
 class SubscriptionForm(forms.ModelForm):
+    allowed_payment_methods = ["CARD", "CASH", "AE_ACCOUNT"]
+
+    class Meta:
+        model = Subscription
+        fields = ["subscription_type", "payment_method", "location"]
+        widgets = {"payment_method": forms.RadioSelect}
+
     def __init__(self, *args, initial=None, **kwargs):
         initial = initial or {}
         if "subscription_type" not in initial:
@@ -30,6 +38,14 @@ class SubscriptionForm(forms.ModelForm):
         if "payment_method" not in initial:
             initial["payment_method"] = "CARD"
         super().__init__(*args, initial=initial, **kwargs)
+        self.fields["payment_method"].choices = [
+            m
+            for m in settings.SITH_SUBSCRIPTION_PAYMENT_METHOD
+            if m[0] in self.allowed_payment_methods
+        ]
+        self.fields["location"].choices = [
+            m for m in settings.SITH_SUBSCRIPTION_LOCATIONS if m[0] != "EBOUTIC"
+        ]
 
     def save(self, *args, **kwargs):
         if self.errors:
@@ -61,7 +77,8 @@ class SubscriptionNewUserForm(SubscriptionForm):
         assert user.is_subscribed
     """
 
-    template_name = "subscription/forms/create_new_user.html"
+    allowed_payment_methods = ["CARD", "CASH"]
+    template_name = "subscription/forms/create_new_user.jinja"
 
     __user_fields = forms.fields_for_model(
         User,
@@ -72,10 +89,6 @@ class SubscriptionNewUserForm(SubscriptionForm):
     last_name = __user_fields["last_name"]
     email = __user_fields["email"]
     date_of_birth = __user_fields["date_of_birth"]
-
-    class Meta:
-        model = Subscription
-        fields = ["subscription_type", "payment_method", "location"]
 
     field_order = [
         "first_name",
@@ -130,7 +143,7 @@ class SubscriptionNewUserForm(SubscriptionForm):
 class SubscriptionExistingUserForm(SubscriptionForm):
     """Form to add a subscription to an existing user."""
 
-    template_name = "subscription/forms/create_existing_user.html"
+    template_name = "subscription/forms/create_existing_user.jinja"
     required_css_class = "required"
 
     birthdate = forms.fields_for_model(
@@ -140,10 +153,9 @@ class SubscriptionExistingUserForm(SubscriptionForm):
         help_texts={"date_of_birth": _("This user didn't fill its birthdate yet.")},
     )["date_of_birth"]
 
-    class Meta:
-        model = Subscription
-        fields = ["member", "subscription_type", "payment_method", "location"]
-        widgets = {"member": AutoCompleteSelectUser}
+    class Meta(SubscriptionForm.Meta):
+        fields = ["member", *SubscriptionForm.Meta.fields]
+        widgets = SubscriptionForm.Meta.widgets | {"member": AutoCompleteSelectUser}
 
     field_order = [
         "member",
