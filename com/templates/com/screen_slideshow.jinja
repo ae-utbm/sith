@@ -14,7 +14,7 @@
                   },
                 {% endfor %}
                 ])">
-    <div id="slideshow" @click="toggleFullScreen">
+    <div id="slideshow" @click="toggleFullScreen" hover="{% trans %}Click to expand{% endtrans %}">
 
       <div id="slides">
         <template x-for="(poster, index) in posters">

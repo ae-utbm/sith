@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-19 17:22+0200\n"
+"POT-Creation-Date: 2025-09-22 14:29+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1102,6 +1102,10 @@ msgstr "Modération"
 #: com/templates/com/poster_list.jinja
 msgid "No posters"
 msgstr "Aucune affiche"
+
+#: com/templates/com/poster_list.jinja com/templates/com/screen_slideshow.jinja
+msgid "Click to expand"
+msgstr "Cliquez pour agrandir"
 
 #: com/templates/com/poster_moderate.jinja
 msgid "Posters - moderation"
