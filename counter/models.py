@@ -481,7 +481,7 @@ class CounterQuerySet(models.QuerySet):
         return self.annotate(has_annotated_barman=Exists(subquery))
 
     def annotate_is_open(self) -> Self:
-        """Annotate tue queryset with the `is_open` field.
+        """Annotate the queryset with the `is_open` field.
 
         For each counter, if `is_open=True`, then the counter is currently opened.
         Else the counter is closed.
@@ -1382,6 +1382,6 @@ class ScheduledProductAction(PeriodicTask):
         self._meta.get_field("task").choices = get_product_actions()
         super().__init__(*args, **kwargs)
 
-    def save(self, *args, **kwargs):
+    def full_clean(self, *args, **kwargs):
         self.one_off = True  # A product action should occur one time only
-        return super().save(*args, **kwargs)
+        return super().full_clean(*args, **kwargs)

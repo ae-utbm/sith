@@ -24,32 +24,33 @@
     </p>
 
     {{ form.action_formset.management_form }}
-    {% for action_form in form.action_formset.forms %}
+    {%- for action_form in form.action_formset.forms -%}
       <fieldset x-data="{action: '{{ action_form.task.initial }}'}">
+        {{ action_form.non_field_errors() }}
         <div class="row gap-2x margin-bottom">
           <div>
             {{ action_form.task.errors }}
             {{ action_form.task.label_tag() }}
             {{ action_form.task|add_attr("x-model=action") }}
           </div>
-          <div>
-            {{ action_form.trigger_at.as_field_group() }}
-          </div>
+          <div>{{ action_form.trigger_at.as_field_group() }}</div>
         </div>
         <div x-show="action==='counter.tasks.change_counters'" class="margin-bottom">
           {{ action_form.counters.as_field_group() }}
         </div>
-        {% if action_form.DELETE %}
+        {%- if action_form.DELETE -%}
           <div class="row gap">
             {{ action_form.DELETE.as_field_group() }}
           </div>
-        {% endif %}
+        {%- endif -%}
+        {%- for field in action_form.hidden_fields() -%}
+          {{ field }}
+        {%- endfor -%}
       </fieldset>
-      {% if not loop.last %}
+      {%- if not loop.last -%}
         <hr class="margin-bottom">
-      {% endif %}
-
-    {% endfor %}
+      {%- endif -%}
+    {%- endfor -%}
     <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
   </form>
 {% endblock %}

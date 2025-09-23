@@ -1,9 +1,10 @@
 import json
 import math
+import uuid
 
 from django import forms
 from django.db.models import Q
-from django.forms.formsets import DELETION_FIELD_NAME, BaseFormSet
+from django.forms import BaseModelFormSet
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import ClockedSchedule
@@ -12,7 +13,6 @@ from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from club.widgets.ajax_select import AutoCompleteSelectClub
 from core.models import User
 from core.views.forms import (
-    FutureDateTimeField,
     NFCTextInput,
     SelectDate,
     SelectDateTime,
@@ -169,7 +169,7 @@ class CounterEditForm(forms.ModelForm):
         }
 
 
-class ScheduledProductActionForm(forms.Form):
+class ScheduledProductActionForm(forms.ModelForm):
     """Form for automatic product archiving.
 
     The `save` method will update or create tasks using celery-beat.
@@ -178,14 +178,14 @@ class ScheduledProductActionForm(forms.Form):
     required_css_class = "required"
     prefix = "scheduled"
 
-    task = forms.fields_for_model(
-        ScheduledProductAction,
-        ["task"],
-        widgets={"task": forms.RadioSelect(choices=get_product_actions)},
-        labels={"task": _("Action")},
-        help_texts={"task": ""},
-    )["task"]
-    trigger_at = FutureDateTimeField(
+    class Meta:
+        model = ScheduledProductAction
+        fields = ["task"]
+        widgets = {"task": forms.RadioSelect(choices=get_product_actions)}
+        labels = {"task": _("Action")}
+        help_texts = {"task": ""}
+
+    trigger_at = forms.DateTimeField(
         label=_("Date and time of action"), widget=SelectDateTime
     )
     counters = forms.ModelMultipleChoiceField(
@@ -199,71 +199,58 @@ class ScheduledProductActionForm(forms.Form):
     def __init__(self, *args, product: Product, **kwargs):
         self.product = product
         super().__init__(*args, **kwargs)
-
-    def save(self):
-        if not self.changed_data:
-            return
-        task = self.cleaned_data["task"]
-        instance = ScheduledProductAction.objects.filter(
-            product=self.product, task=task
-        ).first()
-        if not instance:
-            instance = ScheduledProductAction(
-                product=self.product,
-                clocked=ClockedSchedule.objects.create(
-                    clocked_time=self.cleaned_data["trigger_at"]
-                ),
+        if not self.instance._state.adding:
+            self.fields["trigger_at"].initial = self.instance.clocked.clocked_time
+            self.fields["counters"].initial = json.loads(self.instance.kwargs).get(
+                "counters"
             )
-        elif "trigger_at" in self.changed_data:
-            instance.clocked.clocked_time = self.cleaned_data["trigger_at"]
-            instance.clocked.save()
-        instance.task = task
-        task_kwargs = {"product_id": self.product.id}
-        if task == "counter.tasks.change_counters":
-            task_kwargs["counters"] = [c.id for c in self.cleaned_data["counters"]]
-        instance.kwargs = json.dumps(task_kwargs)
-        instance.name = f"{self.cleaned_data['task']} - {self.product}"
-        instance.enabled = True
-        instance.save()
-        return instance
 
-    def delete(self):
-        instance = ScheduledProductAction.objects.get(
-            product=self.product, task=self.cleaned_data["task"]
-        )
-        # if the clocked object linked to the task has no other task,
-        # delete it and let the task be deleted in cascade,
-        # else delete only the task.
-        if instance.clocked.periodictask_set.count() > 1:
-            return instance.clocked.delete()
-        return instance.delete()
-
-
-class BaseScheduledProductActionFormSet(BaseFormSet):
-    def __init__(self, *args, product: Product, **kwargs):
-        initial = [
-            {
-                "task": action.task,
-                "trigger_at": action.clocked.clocked_time,
-                "counters": json.loads(action.kwargs).get("counters"),
-            }
-            for action in product.scheduled_actions.filter(
-                enabled=True, clocked__clocked_time__gt=now()
-            ).order_by("clocked__clocked_time")
-        ]
-        kwargs["initial"] = initial
-        kwargs["form_kwargs"] = {"product": product}
-        super().__init__(*args, **kwargs)
-
-    def save(self):
-        for form in self.forms:
-            if form.cleaned_data.get(DELETION_FIELD_NAME, False):
-                form.delete()
+    def clean(self):
+        if not self.changed_data:
+            return super().clean()
+        if "trigger_at" in self.changed_data:
+            if not self.instance.clocked_id:
+                self.instance.clocked = ClockedSchedule(
+                    clocked_time=self.cleaned_data["trigger_at"]
+                )
             else:
-                form.save()
+                self.instance.clocked.clocked_time = self.cleaned_data["trigger_at"]
+            self.instance.clocked.save()
+        task_kwargs = {"product_id": self.product.id}
+        if (
+            self.cleaned_data["task"] == "counter.tasks.change_counters"
+            and "counters" in self.changed_data
+        ):
+            task_kwargs["counters"] = [c.id for c in self.cleaned_data["counters"]]
+        self.instance.product = self.product
+        self.instance.kwargs = json.dumps(task_kwargs)
+        self.instance.name = (
+            f"{self.cleaned_data['task']} - {self.product} - {uuid.uuid4()}"
+        )
+        return super().clean()
 
 
-ScheduledProductActionFormSet = forms.formset_factory(
+class BaseScheduledProductActionFormSet(BaseModelFormSet):
+    def __init__(self, *args, product: Product, **kwargs):
+        queryset = (
+            product.scheduled_actions.filter(
+                enabled=True, clocked__clocked_time__gt=now()
+            )
+            .order_by("clocked__clocked_time")
+            .select_related("clocked")
+        )
+        form_kwargs = {"product": product}
+        super().__init__(*args, queryset=queryset, form_kwargs=form_kwargs, **kwargs)
+
+    def delete_existing(self, obj: ScheduledProductAction, commit: bool = True):  # noqa FBT001
+        clocked = obj.clocked
+        super().delete_existing(obj, commit=commit)
+        if commit:
+            clocked.delete()
+
+
+ScheduledProductActionFormSet = forms.modelformset_factory(
+    ScheduledProductAction,
     ScheduledProductActionForm,
     formset=BaseScheduledProductActionFormSet,
     absolute_max=None,
