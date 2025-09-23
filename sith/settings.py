@@ -685,14 +685,6 @@ SITH_PERMANENT_NOTIFICATIONS = {
     "SAS_MODERATION": "sas.models.sas_notification_callback",
 }
 
-SITH_QUICK_NOTIF = {
-    "qn_success": _("Success!"),
-    "qn_fail": _("Fail!"),
-    "qn_weekmail_new_article": _("You successfully posted an article in the Weekmail"),
-    "qn_weekmail_article_edit": _("You successfully edited an article in the Weekmail"),
-    "qn_weekmail_send_success": _("You successfully sent the Weekmail"),
-}
-
 # Mailing related settings
 
 SITH_MAILING_DOMAIN = "utbm.fr"

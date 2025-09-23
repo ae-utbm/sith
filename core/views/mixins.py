@@ -2,7 +2,6 @@ import copy
 import inspect
 from typing import Any, ClassVar, LiteralString, Protocol, Unpack
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest, HttpResponse
 from django.template.loader import render_to_string
@@ -38,36 +37,6 @@ class TabedViewMixin(View):
         kwargs["tabs_title"] = self.get_tabs_title()
         kwargs["current_tab"] = self.get_current_tab()
         kwargs["list_of_tabs"] = self.get_list_of_tabs()
-        return kwargs
-
-
-class QuickNotifMixin:
-    quick_notif_list = []
-
-    def dispatch(self, request, *arg, **kwargs):
-        # In some cases, the class can stay instanciated, so we need to reset the list
-        self.quick_notif_list = []
-        return super().dispatch(request, *arg, **kwargs)
-
-    def get_success_url(self):
-        ret = super().get_success_url()
-        if hasattr(self, "quick_notif_url_arg"):
-            if "?" in ret:
-                ret += "&" + self.quick_notif_url_arg
-            else:
-                ret += "?" + self.quick_notif_url_arg
-        return ret
-
-    def get_context_data(self, **kwargs):
-        """Add quick notifications to context."""
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["quick_notifs"] = []
-        for n in self.quick_notif_list:
-            kwargs["quick_notifs"].append(settings.SITH_QUICK_NOTIF[n])
-        for key, val in settings.SITH_QUICK_NOTIF.items():
-            for gk in self.request.GET:
-                if key == gk:
-                    kwargs["quick_notifs"].append(val)
         return kwargs
 
 

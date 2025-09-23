@@ -1,4 +1,4 @@
-<div id="notifications"
+<div id="quick-notifications"
      x-data="{
              messages: [
              {% if messages %}
@@ -11,8 +11,8 @@
              {% endif %}
              ]
              }"
-     @notification-add="(e) => messages.push(e?.detail)"
-     @notification-delete="messages = []">
+     @quick-notification-add="(e) => messages.push(e?.detail)"
+     @quick-notification-delete="messages = []">
   <template x-for="message in messages">
     <div x-data="{show: true}" class="alert" :class="`alert-${message.tag}`" x-show="show" x-transition>
       <span class="alert-main" x-text="message.text"></span>

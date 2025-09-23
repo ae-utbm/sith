@@ -31,9 +31,7 @@
           <td>
             <a href="{{ url('com:weekmail_article_edit', article_id=a.id) }}">{% trans %}Edit{% endtrans %}</a> |
             <a href="{{ url('com:weekmail_article_delete', article_id=a.id) }}">{% trans %}Delete{% endtrans %}</a> |
-            <a href="?add_article={{ a.id }}">{% trans %}Add to weekmail{% endtrans %}</a> |
-            <a href="?up_article={{ a.id }}">{% trans %}Up{% endtrans %}</a> |
-            <a href="?down_article={{ a.id }}">{% trans %}Down{% endtrans %}</a>
+            <a href="?add_article={{ a.id }}">{% trans %}Add to weekmail{% endtrans %}</a>
           </td>
         </tr>
       {% endfor %}
