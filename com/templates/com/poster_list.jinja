@@ -1,11 +1,5 @@
 {% extends "core/base.jinja" %}
 
-{% block script %}
-  {{ super() }}
-  <script src="{{ static('com/js/poster_list.js') }}"></script>
-{% endblock %}
-
-
 {% block title %}
   {% trans %}Poster{% endtrans %}
 {% endblock %}
@@ -15,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-  <div id="poster_list">
+  <div id="poster_list" x-data="{ active: null }">
 
     <div id="title">
       <h3>{% trans %}Posters{% endtrans %}</h3>
@@ -38,7 +32,13 @@
         {% for poster in poster_list %}
           <div class="poster{% if not poster.is_moderated %} not_moderated{% endif %}">
             <div class="name">{{ poster.name }}</div>
-            <div class="image"><img src="{{ poster.file.url }}"></img></div>
+            <div
+              class="image"
+              hover="{% trans %}Click to expand{% endtrans %}"
+              @click="(e) => active = e.target.firstElementChild"
+            >
+              <img src="{{ poster.file.url }}"></img>
+            </div>
             <div class="dates">
               <div class="begin">{{ poster.date_begin | localtime | date("d/M/Y H:m") }}</div>
               <div class="end">{{ poster.date_end | localtime | date("d/M/Y H:m") }}</div>
@@ -62,7 +62,14 @@
 
     </div>
 
-    <div id="view"><div id="placeholder"></div></div>
+    <div
+      id="view"
+      @keyup.escape.window="active = null"
+      @click="active = null"
+      :class="{active: active !== null}"
+    >
+      <div id="placeholder"><img :src="active?.src"></div>
+    </div>
 
   </div>
 {% endblock %}
