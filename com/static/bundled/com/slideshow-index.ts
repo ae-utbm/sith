@@ -38,11 +38,11 @@ document.addEventListener("alpine:init", () => {
     },
 
     async toggleFullScreen(event: Event) {
-      const target = event.target as HTMLElement;
       if (document.fullscreenElement) {
         await document.exitFullscreen();
         return;
       }
+      const target = event.target as HTMLElement;
       await target.requestFullscreen();
     },
   }));

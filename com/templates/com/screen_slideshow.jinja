@@ -2,6 +2,7 @@
 <html lang="fr">
   <head>
     <title>{% trans %}Slideshow{% endtrans %}</title>
+    <link rel="shortcut icon" href="{{ static('core/img/favicon.ico') }}">
     <link href="{{ static('css/slideshow.scss') }}" rel="stylesheet" type="text/css" />
     <script type="module" src="{{ static('bundled/alpine-index.js') }}"></script>
     <script type="module" src="{{ static('bundled/com/slideshow-index.ts') }}"></script>
@@ -14,7 +15,12 @@
                   },
                 {% endfor %}
                 ])">
-    <div id="slideshow" @click="toggleFullScreen" hover="{% trans %}Click to expand{% endtrans %}">
+    <div
+      id="slideshow"
+      @click="toggleFullScreen"
+      hover="{% trans %}Click to expand{% endtrans %}"
+      @keyup.f.window="toggleFullScreen"
+    >
 
       <div id="slides">
         <template x-for="(poster, index) in posters">
