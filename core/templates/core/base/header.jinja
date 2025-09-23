@@ -74,9 +74,9 @@
             {% endif %}
           ></a>
         </div>
-        <div class="notification">
-          <a href="#" onclick="displayNotif()">
-            <i class="fa-regular fa-bell"></i>
+        <div class="notification" x-data="{display: false}" :class="{white: display}">
+          <a href="#" @click.prevent="display = !display">
+            <i :class="`fa-${display ? 'solid': 'regular'} fa-bell`" x-transition></i>
             {% set notification_count = user.notifications.filter(viewed=False).count() %}
 
             {% if notification_count > 0 %}
@@ -89,7 +89,7 @@
               </span>
             {% endif %}
           </a>
-          <div id="header_notif">
+          <div id="header_notif" x-show="display" x-cloak x-transition>
             <ul>
               {% if user.notifications.filter(viewed=False).count() > 0 %}
                 {% for n in user.notifications.filter(viewed=False).order_by('-date') %}

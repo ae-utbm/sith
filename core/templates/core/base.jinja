@@ -34,7 +34,6 @@
 
       <!-- Jquery declared here to be accessible in every django widgets -->
       <script src="{{ static('bundled/vendored/jquery.min.js') }}"></script>
-      <script src="{{ static('core/js/script.js') }}"></script>
 
       {% block additional_css %}{% endblock %}
       {% block additional_js %}{% endblock %}
@@ -74,11 +73,9 @@
 
     <div id="page">
 
-      <ul id="quick_notif">
-        {% for n in quick_notifs %}
-          <li>{{ n }}</li>
-        {% endfor %}
-      </ul>
+      {% block notifications %}
+        {% include "core/base/notifications.jinja" %}
+      {% endblock %}
 
       <div id="content">
         {%- block tabs -%}
