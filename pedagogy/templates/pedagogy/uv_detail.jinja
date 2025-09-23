@@ -13,16 +13,15 @@
 {% block content %}
   <div class="pedagogy">
     <div id="uv_detail">
-      <p id="return_noscript"><a href="{{ url('pedagogy:guide') }}">{% trans %}Back{% endtrans %}</a></p>
-      <button id="return_js" onclick='(function(){
-                                      // If comes from the guide page, go back with history
-                                      if (document.referrer.replace(/\?(.+)/gm,"").endsWith(`{{ url("pedagogy:guide") }}`)){
-                                      window.history.back();
-                                      return;
-                                      }
-                                      // Simply goes to the guide page
-                                      window.location.href = `{{ url("pedagogy:guide") }}`;
-                                      })()' hidden>{% trans %}Back{% endtrans %}</button>
+      <button onclick='(function(){
+                       // If comes from the guide page, go back with history
+                       if (document.referrer.replace(/\?(.+)/gm,"").endsWith(`{{ url("pedagogy:guide") }}`)){
+                       window.history.back();
+                       return;
+                       }
+                       // Simply goes to the guide page
+                       window.location.href = `{{ url("pedagogy:guide") }}`;
+                       })()' hidden>{% trans %}Back{% endtrans %}</button>
 
       <h1>{{ object.code }} - {{ object.title }}</h1>
       <br>
@@ -217,9 +216,4 @@
 
     </div>
   </div>
-
-  <script type="text/javascript">
-    $("#return_noscript").hide();
-    $("#return_js").show();
-  </script>
 {% endblock %}

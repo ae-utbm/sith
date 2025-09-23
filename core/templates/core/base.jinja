@@ -32,9 +32,6 @@
       <script type="module" src="{{ static('bundled/country-flags-index.ts') }}"></script>
       <script type="module" src="{{ static('bundled/core/tooltips-index.ts') }}"></script>
 
-      <!-- Jquery declared here to be accessible in every django widgets -->
-      <script src="{{ static('bundled/vendored/jquery.min.js') }}"></script>
-
       {% block additional_css %}{% endblock %}
       {% block additional_js %}{% endblock %}
     {% endblock %}

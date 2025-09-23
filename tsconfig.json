@@ -11,7 +11,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "types": ["jquery", "alpinejs"],
+    "types": ["alpinejs"],
     "paths": {
       "#openapi": ["./staticfiles/generated/openapi/client/index.ts"],
       "#openapi:*": ["./staticfiles/generated/openapi/client/*"],

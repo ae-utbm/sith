@@ -4,7 +4,6 @@ import inject from "@rollup/plugin-inject";
 import { glob } from "glob";
 import { type AliasOptions, type UserConfig, defineConfig } from "vite";
 import type { Rollup } from "vite";
-import { viteStaticCopy } from "vite-plugin-static-copy";
 import tsconfig from "./tsconfig.json";
 
 const outDir = resolve(__dirname, "./staticfiles/generated/bundled");
@@ -87,17 +86,6 @@ export default defineConfig((config: UserConfig) => {
         Alpine: "alpinejs",
         htmx: "htmx.org",
       }),
-      viteStaticCopy({
-        targets: [
-          {
-            src: resolve(nodeModules, "jquery/dist/jquery.min.js"),
-            dest: vendored,
-          },
-        ],
-      }),
     ],
-    optimizeDeps: {
-      include: ["jquery"],
-    },
   } satisfies UserConfig;
 });
