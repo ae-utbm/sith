@@ -1197,6 +1197,18 @@ class NotLocked(LockError):
     pass
 
 
+class PageQuerySet(models.QuerySet):
+    def viewable_by(self, user: User) -> Self:
+        if user.is_anonymous:
+            return self.filter(view_groups=settings.SITH_GROUP_PUBLIC_ID)
+        if user.has_perm("core.view_page"):
+            return self.all()
+        groups_ids = [g.id for g in user.cached_groups]
+        if user.is_subscribed:
+            groups_ids.append(settings.SITH_GROUP_SUBSCRIBERS_ID)
+        return self.filter(view_groups__in=groups_ids)
+
+
 # This function prevents generating migration upon settings change
 def get_default_owner_group():
     return settings.SITH_GROUP_ROOT_ID
@@ -1265,6 +1277,8 @@ class Page(models.Model):
     lock_timeout = models.DateTimeField(
         _("lock_timeout"), null=True, blank=True, default=None
     )
+
+    objects = PageQuerySet.as_manager()
 
     class Meta:
         unique_together = ("name", "parent")
