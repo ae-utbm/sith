@@ -101,16 +101,6 @@
     {% endblock %}
 
     {% block script %}
-      <script>
-        document.addEventListener("keydown", (e) => {
-          // Looking at the `s` key when not typing in a form
-          if (e.keyCode !== 83 || ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.nodeName)) {
-            return;
-          }
-          document.getElementById("search").focus();
-          e.preventDefault(); // Don't type the character in the focused search input
-        })
-      </script>
     {% endblock %}
   </body>
 </html>
