@@ -309,6 +309,7 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
         // Clear selection and cache of retrieved user so they can be filtered again
         widget.clear(false);
         widget.clearOptions();
+        widget.setTextboxValue("");
       },
 
       /**
