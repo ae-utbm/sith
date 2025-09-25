@@ -31,7 +31,7 @@
             </td>
             <td>{{ purchase.counter }}</td>
             {% if not purchase.seller %}
-              <td>{% trans %}Deleted User{% endtrans %}</td>
+              <td>{% trans %}Deleted user{% endtrans %}</td>
             {% else %}
               <td><a href="{{ purchase.seller.get_absolute_url() }}">{{ purchase.seller.get_display_name() }}</a></td>
             {% endif %}
