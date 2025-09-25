@@ -28,7 +28,7 @@
     <div
       id="timetable"
       x-show="table.height > 0 && table.width > 0"
-      :style="{width: `${table.width}px`, height: `${table.height+40}px`}"
+      :style="{width: `${table.width+80}px`, height: `${table.height+40}px`}"
     >
       <div class="header">
         <template x-for="weekday in displayedWeekdays">
@@ -36,15 +36,25 @@
         </template>
       </div>
       <div class="content">
-        <template x-for="course in courses">
-          <div class="slot" :style="getStyle(course)">
-            <span class="course-type" x-text="course.courseType"></span>
-            <span x-text="course.ueCode"></span>
-            <span x-text="`${course.startHour} - ${course.endHour}`"></span>
-            <span x-text="(course.weekGroup ? `\nGroupe ${course.weekGroup}` : '')"></span>
-            <span x-text="course.room"></span>
-          </div>
-        </template>
+        <div class="hours" :height="(endSlot - endSlot%4) - (startSlot - startSlot%4)">
+          <template x-for="[hour, style] in getHours()">
+            <div class="hour" :style="style">
+              <div x-text="hour"></div>
+              <div class="hour-bar" :style="{width: `${getWidth()}px`}"></div>
+            </div>
+          </template>
+        </div>
+        <div class="courses">
+          <template x-for="course in courses">
+            <div class="slot" :style="getStyle(course)">
+              <span class="course-type" x-text="course.courseType"></span>
+              <span x-text="course.ueCode"></span>
+              <span x-text="`${course.startHour} - ${course.endHour}`"></span>
+              <span x-text="(course.weekGroup ? `\nGroupe ${course.weekGroup}` : '')"></span>
+              <span x-text="course.room"></span>
+            </div>
+          </template>
+        </div>
       </div>
     </div>
     <button

@@ -82,6 +82,7 @@ document.addEventListener("alpine:init", () => {
     displayedWeekdays: [] as WeekDay[],
     courses: [] as TimetableSlot[],
     startSlot: 0,
+    endSlot: 0,
     table: {
       height: 0,
       width: 0,
@@ -148,6 +149,25 @@ document.addEventListener("alpine:init", () => {
         left: `${this.displayedWeekdays.indexOf(slot.weekday) * SLOT_WIDTH + leftOffset}px`,
         backgroundColor: this.colors[slot.ueCode],
       };
+    },
+
+    getHours(): [string, object][] {
+      let hour: number = Number.parseInt(
+        this.courses
+          .map((c: TimetableSlot) => c.startHour)
+          .reduce((res: string, hour: string) => (hour < res ? hour : res), "24:00")
+          .split(":")[0],
+      );
+      const res: [string, object][] = [];
+      for (let i = 0; i <= this.endSlot - this.startSlot; i += 60 / MINUTES_PER_SLOT) {
+        res.push([`${hour}:00`, { top: `${i * SLOT_HEIGHT}px` }]);
+        hour += 1;
+      }
+      return res;
+    },
+
+    getWidth() {
+      return this.displayedWeekdays.length * SLOT_WIDTH + 20;
     },
 
     async savePng() {

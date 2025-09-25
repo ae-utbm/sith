@@ -1,10 +1,17 @@
+@import "core/static/core/colors";
+
 #timetable {
+  --hour-side-width: 60px;
+
   display: block;
-  margin: 2em auto ;
+  margin: 2em auto;
   .header {
-    background-color: white;
+    background-color: $white-color;
+    font-weight: bold;
     box-shadow: none;
-    width: 100%;
+    width: calc(100% - var(--hour-side-width) - 10px);
+    margin-left: var(--hour-side-width);
+    padding-left: 0;
     display: flex;
     flex-direction: row;
     gap: 0;
@@ -15,7 +22,32 @@
   }
   .content {
     position: relative;
+  }
+  .hours {
+    position: absolute;
+    width: 40px;
+    left: 0;
+    top: -.5em;
+
+    .hour {
+      position: absolute;
+
+      .hour-bar {
+        content: "";
+        position: absolute;
+        height: 1px;
+        background: lightgray;
+        top: 50%;
+        left: 100%;
+        margin-left: 10px;
+      }
+    }
+  }
+  .courses {
+    position: absolute;
     text-align: center;
+    top: 0;
+    left: var(--hour-side-width);
 
     .slot {
       background-color: cadetblue;
