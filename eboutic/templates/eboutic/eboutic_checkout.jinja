@@ -1,5 +1,9 @@
 {% extends "core/base.jinja" %}
 
+{% block notifications %}
+  {# Notifications are moved inside the billing info fragment #}
+{% endblock %}
+
 {% block title %}
   {% trans %}Basket state{% endtrans %}
 {% endblock %}
