@@ -20,7 +20,8 @@ from core.baker_recipes import (
 )
 from core.models import Group, User
 from core.views import UserTabsMixin
-from counter.models import Counter, Refilling, Selling
+from counter.baker_recipes import sale_recipe
+from counter.models import Counter, Customer, Refilling, Selling
 from eboutic.models import Invoice, InvoiceItem
 
 
@@ -127,6 +128,31 @@ def test_user_account_not_found(client: Client):
         )
     )
     assert res.status_code == 404
+
+
+@pytest.mark.django_db
+def test_is_deleted_barman_shown_as_deleted(client: Client):
+    customer = baker.make(Customer)
+    date = now()
+    sale_recipe.make(
+        seller=iter([None, baker.make(User)]),
+        customer=customer,
+        date=date,
+        _quantity=2,
+        _bulk_create=True,
+    )
+    client.force_login(customer.user)
+    res = client.get(
+        reverse(
+            "core:user_account_detail",
+            kwargs={
+                "user_id": customer.user.id,
+                "year": date.year,
+                "month": date.month,
+            },
+        )
+    )
+    assert res.status_code == 200
 
 
 class TestFilterInactive(TestCase):

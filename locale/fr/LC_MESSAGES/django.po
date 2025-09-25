@@ -2345,6 +2345,10 @@ msgid "User has no account"
 msgstr "L'utilisateur n'a pas de compte"
 
 #: core/templates/core/user_account_detail.jinja
+msgid "Deleted user"
+msgstr "Utilisateur supprimé"
+
+#: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/last_ops.jinja
 #: counter/templates/counter/refilling_list.jinja
 msgid "Amount"
