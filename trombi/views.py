@@ -28,6 +28,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.forms.models import modelform_factory
@@ -135,16 +136,15 @@ class TrombiCreateView(CanCreateMixin, CreateView):
             return self.form_invalid(form)
 
 
-class TrombiEditView(CanEditPropMixin, TrombiTabsMixin, UpdateView):
+class TrombiEditView(
+    CanEditPropMixin, TrombiTabsMixin, SuccessMessageMixin, UpdateView
+):
     model = Trombi
     form_class = TrombiForm
     template_name = "core/edit.jinja"
     pk_url_kwarg = "trombi_id"
     current_tab = "admin_tools"
-
-    def get_success_url(self):
-        messages.success(self.request, _("Trombi modified"))
-        return super().get_success_url()
+    success_message = _("Trombi modified")
 
 
 class AddUserForm(forms.Form):
@@ -187,14 +187,16 @@ class TrombiExportView(CanEditMixin, TrombiTabsMixin, DetailView):
     current_tab = "admin_tools"
 
 
-class TrombiDeleteUserView(CanEditPropMixin, TrombiTabsMixin, DeleteView):
+class TrombiDeleteUserView(
+    CanEditPropMixin, TrombiTabsMixin, SuccessMessageMixin, DeleteView
+):
     model = TrombiUser
     pk_url_kwarg = "user_id"
     template_name = "core/delete_confirm.jinja"
     current_tab = "admin_tools"
+    success_message = _("User removed from the trombi")
 
     def get_success_url(self):
-        messages.success(self.request, _("User removed from the trombi"))
         return reverse("trombi:detail", kwargs={"trombi_id": self.object.trombi.id})
 
 
@@ -331,11 +333,14 @@ class UserTrombiToolsView(LoginRequiredMixin, TrombiTabsMixin, TemplateView):
         return kwargs
 
 
-class UserTrombiEditPicturesView(TrombiTabsMixin, UserIsInATrombiMixin, UpdateView):
+class UserTrombiEditPicturesView(
+    TrombiTabsMixin, UserIsInATrombiMixin, SuccessMessageMixin, UpdateView
+):
     model = TrombiUser
     fields = ["profile_pict", "scrub_pict"]
     template_name = "core/edit.jinja"
     current_tab = "pictures"
+    success_message = _("User modified")
 
     def get_object(self):
         return self.request.user.trombi_user
@@ -344,7 +349,9 @@ class UserTrombiEditPicturesView(TrombiTabsMixin, UserIsInATrombiMixin, UpdateVi
         return reverse("trombi:user_tools")
 
 
-class UserTrombiEditProfileView(TrombiTabsMixin, UserIsInATrombiMixin, UpdateView):
+class UserTrombiEditProfileView(
+    TrombiTabsMixin, UserIsInATrombiMixin, SuccessMessageMixin, UpdateView
+):
     model = User
     form_class = modelform_factory(
         User,
@@ -364,17 +371,20 @@ class UserTrombiEditProfileView(TrombiTabsMixin, UserIsInATrombiMixin, UpdateVie
     )
     template_name = "trombi/edit_profile.jinja"
     current_tab = "profile"
+    success_message = _("User modified")
 
     def get_object(self):
         return self.request.user
 
     def get_success_url(self):
-        messages.success(self.request, _("User modified"))
         return reverse("trombi:user_tools")
 
 
-class UserTrombiResetClubMembershipsView(UserIsInATrombiMixin, RedirectView):
+class UserTrombiResetClubMembershipsView(
+    UserIsInATrombiMixin, SuccessMessageMixin, RedirectView
+):
     permanent = False
+    success_message = _("User modified")
 
     def get(self, request, *args, **kwargs):
         user = self.request.user.trombi_user
@@ -385,12 +395,15 @@ class UserTrombiResetClubMembershipsView(UserIsInATrombiMixin, RedirectView):
         return reverse("trombi:profile")
 
 
-class UserTrombiDeleteMembershipView(TrombiTabsMixin, CanEditMixin, DeleteView):
+class UserTrombiDeleteMembershipView(
+    TrombiTabsMixin, CanEditMixin, SuccessMessageMixin, DeleteView
+):
     model = TrombiClubMembership
     pk_url_kwarg = "membership_id"
     template_name = "core/delete_confirm.jinja"
     success_url = reverse_lazy("trombi:profile")
     current_tab = "profile"
+    success_message = _("User removed from trombi")
 
     def get_success_url(self):
         return super().get_success_url()
@@ -423,12 +436,15 @@ class UserTrombiAddMembershipView(TrombiTabsMixin, CreateView):
         )
 
 
-class UserTrombiEditMembershipView(CanEditMixin, TrombiTabsMixin, UpdateView):
+class UserTrombiEditMembershipView(
+    CanEditMixin, TrombiTabsMixin, SuccessMessageMixin, UpdateView
+):
     model = TrombiClubMembership
     pk_url_kwarg = "membership_id"
     fields = ["role", "start", "end"]
     template_name = "core/edit.jinja"
     current_tab = "profile"
+    success_message = _("User modified")
 
     def get_success_url(self):
         return super().get_success_url()
@@ -456,12 +472,13 @@ class UserTrombiProfileView(TrombiTabsMixin, DetailView):
         return super().get(request, *args, **kwargs)
 
 
-class TrombiCommentFormView(LoginRequiredMixin, View):
+class TrombiCommentFormView(LoginRequiredMixin, SuccessMessageMixin, View):
     """Create/edit a trombi comment."""
 
     model = TrombiComment
     fields = ["content"]
     template_name = "trombi/comment.jinja"
+    success_message = _("Comment added")
 
     def get_form_class(self):
         self.trombi = self.request.user.trombi_user.trombi
