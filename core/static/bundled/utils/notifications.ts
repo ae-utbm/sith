@@ -23,3 +23,14 @@ export function deleteNotifications() {
   }
   return element.dispatchEvent(new CustomEvent("quick-notification-delete"));
 }
+
+export function alpinePlugin() {
+  return {
+    error: (message: string) => createNotification(message, NotificationLevel.Error),
+    warning: (message: string) =>
+      createNotification(message, NotificationLevel.Warning),
+    success: (message: string) =>
+      createNotification(message, NotificationLevel.Success),
+    clear: () => deleteNotifications(),
+  };
+}
