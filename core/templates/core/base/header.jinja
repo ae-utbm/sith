@@ -89,7 +89,7 @@
               </span>
             {% endif %}
           </a>
-          <div id="header_notif" x-show="display" x-cloak x-transition>
+          <div id="header_notif" x-show="display" x-cloak x-transition @click.outside="display = false">
             <ul>
               {% if user.notifications.filter(viewed=False).count() > 0 %}
                 {% for n in user.notifications.filter(viewed=False).order_by('-date') %}

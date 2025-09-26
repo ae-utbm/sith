@@ -405,9 +405,6 @@ class UserTrombiDeleteMembershipView(
     current_tab = "profile"
     success_message = _("User removed from trombi")
 
-    def get_success_url(self):
-        return super().get_success_url()
-
 
 # Used by admins when someone does not have every club in his list
 class UserTrombiAddMembershipView(TrombiTabsMixin, CreateView):
