@@ -31,12 +31,5 @@
   </div>
 
   <br>
-
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
+  {% include "core/base/notifications.jinja" %}
 </div>

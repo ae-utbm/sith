@@ -26,7 +26,9 @@ from datetime import date
 
 from django import forms
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.forms.models import modelform_factory
@@ -46,7 +48,7 @@ from core.auth.mixins import (
 )
 from core.models import User
 from core.views.forms import SelectDate
-from core.views.mixins import QuickNotifMixin, TabedViewMixin
+from core.views.mixins import TabedViewMixin
 from core.views.widgets.ajax_select import AutoCompleteSelectUser
 from trombi.models import Trombi, TrombiClubMembership, TrombiComment, TrombiUser
 
@@ -134,15 +136,15 @@ class TrombiCreateView(CanCreateMixin, CreateView):
             return self.form_invalid(form)
 
 
-class TrombiEditView(CanEditPropMixin, TrombiTabsMixin, UpdateView):
+class TrombiEditView(
+    CanEditPropMixin, TrombiTabsMixin, SuccessMessageMixin, UpdateView
+):
     model = Trombi
     form_class = TrombiForm
     template_name = "core/edit.jinja"
     pk_url_kwarg = "trombi_id"
     current_tab = "admin_tools"
-
-    def get_success_url(self):
-        return super().get_success_url() + "?qn_success"
+    success_message = _("Trombi modified")
 
 
 class AddUserForm(forms.Form):
@@ -155,7 +157,7 @@ class AddUserForm(forms.Form):
     )
 
 
-class TrombiDetailView(CanEditMixin, QuickNotifMixin, TrombiTabsMixin, DetailView):
+class TrombiDetailView(CanEditMixin, TrombiTabsMixin, DetailView):
     model = Trombi
     template_name = "trombi/detail.jinja"
     pk_url_kwarg = "trombi_id"
@@ -167,9 +169,9 @@ class TrombiDetailView(CanEditMixin, QuickNotifMixin, TrombiTabsMixin, DetailVie
         if form.is_valid():
             try:
                 TrombiUser(user=form.cleaned_data["user"], trombi=self.object).save()
-                self.quick_notif_list.append("qn_success")
+                messages.success(self.request, _("User added to the trombi"))
             except IntegrityError:  # We don't care about duplicate keys
-                self.quick_notif_list.append("qn_fail")
+                messages.error(self.request, _("User couldn't be added to the trombi"))
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -185,22 +187,20 @@ class TrombiExportView(CanEditMixin, TrombiTabsMixin, DetailView):
     current_tab = "admin_tools"
 
 
-class TrombiDeleteUserView(CanEditPropMixin, TrombiTabsMixin, DeleteView):
+class TrombiDeleteUserView(
+    CanEditPropMixin, TrombiTabsMixin, SuccessMessageMixin, DeleteView
+):
     model = TrombiUser
     pk_url_kwarg = "user_id"
     template_name = "core/delete_confirm.jinja"
     current_tab = "admin_tools"
+    success_message = _("User removed from the trombi")
 
     def get_success_url(self):
-        return (
-            reverse("trombi:detail", kwargs={"trombi_id": self.object.trombi.id})
-            + "?qn_success"
-        )
+        return reverse("trombi:detail", kwargs={"trombi_id": self.object.trombi.id})
 
 
-class TrombiModerateCommentsView(
-    CanEditPropMixin, QuickNotifMixin, TrombiTabsMixin, DetailView
-):
+class TrombiModerateCommentsView(CanEditPropMixin, TrombiTabsMixin, DetailView):
     model = Trombi
     template_name = "trombi/comment_moderation.jinja"
     pk_url_kwarg = "trombi_id"
@@ -235,16 +235,18 @@ class TrombiModerateCommentView(DetailView):
             if request.POST["action"] == "accept":
                 self.object.is_moderated = True
                 self.object.save()
+                messages.success(self.request, _("Comment accepted"))
                 return redirect(
                     reverse(
                         "trombi:moderate_comments",
                         kwargs={"trombi_id": self.object.author.trombi.id},
                     )
-                    + "?qn_success"
                 )
             elif request.POST["action"] == "reject":
+                messages.success(self.request, _("Comment rejected"))
                 return super().get(request, *args, **kwargs)
             elif request.POST["action"] == "delete" and "reason" in request.POST:
+                messages.success(self.request, _("Comment removed"))
                 self.object.author.user.email_user(
                     subject="[%s] %s" % (settings.SITH_NAME, _("Rejected comment")),
                     message=_(
@@ -265,7 +267,6 @@ class TrombiModerateCommentView(DetailView):
                         "trombi:moderate_comments",
                         kwargs={"trombi_id": self.object.author.trombi.id},
                     )
-                    + "?qn_success"
                 )
         raise Http404
 
@@ -299,9 +300,7 @@ class UserTrombiForm(forms.Form):
     )
 
 
-class UserTrombiToolsView(
-    LoginRequiredMixin, QuickNotifMixin, TrombiTabsMixin, TemplateView
-):
+class UserTrombiToolsView(LoginRequiredMixin, TrombiTabsMixin, TemplateView):
     """Display a user's trombi tools."""
 
     template_name = "trombi/user_tools.jinja"
@@ -318,7 +317,6 @@ class UserTrombiToolsView(
                     user=request.user, trombi=self.form.cleaned_data["trombi"]
                 )
             trombi_user.save()
-            self.quick_notif_list += ["qn_success"]
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -335,21 +333,24 @@ class UserTrombiToolsView(
         return kwargs
 
 
-class UserTrombiEditPicturesView(TrombiTabsMixin, UserIsInATrombiMixin, UpdateView):
+class UserTrombiEditPicturesView(
+    TrombiTabsMixin, UserIsInATrombiMixin, SuccessMessageMixin, UpdateView
+):
     model = TrombiUser
     fields = ["profile_pict", "scrub_pict"]
     template_name = "core/edit.jinja"
     current_tab = "pictures"
+    success_message = _("User modified")
 
     def get_object(self):
         return self.request.user.trombi_user
 
     def get_success_url(self):
-        return reverse("trombi:user_tools") + "?qn_success"
+        return reverse("trombi:user_tools")
 
 
 class UserTrombiEditProfileView(
-    QuickNotifMixin, TrombiTabsMixin, UserIsInATrombiMixin, UpdateView
+    TrombiTabsMixin, UserIsInATrombiMixin, SuccessMessageMixin, UpdateView
 ):
     model = User
     form_class = modelform_factory(
@@ -370,16 +371,20 @@ class UserTrombiEditProfileView(
     )
     template_name = "trombi/edit_profile.jinja"
     current_tab = "profile"
+    success_message = _("User modified")
 
     def get_object(self):
         return self.request.user
 
     def get_success_url(self):
-        return reverse("trombi:user_tools") + "?qn_success"
+        return reverse("trombi:user_tools")
 
 
-class UserTrombiResetClubMembershipsView(UserIsInATrombiMixin, RedirectView):
+class UserTrombiResetClubMembershipsView(
+    UserIsInATrombiMixin, SuccessMessageMixin, RedirectView
+):
     permanent = False
+    success_message = _("User modified")
 
     def get(self, request, *args, **kwargs):
         user = self.request.user.trombi_user
@@ -387,18 +392,18 @@ class UserTrombiResetClubMembershipsView(UserIsInATrombiMixin, RedirectView):
         return redirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse("trombi:profile") + "?qn_success"
+        return reverse("trombi:profile")
 
 
-class UserTrombiDeleteMembershipView(TrombiTabsMixin, CanEditMixin, DeleteView):
+class UserTrombiDeleteMembershipView(
+    TrombiTabsMixin, CanEditMixin, SuccessMessageMixin, DeleteView
+):
     model = TrombiClubMembership
     pk_url_kwarg = "membership_id"
     template_name = "core/delete_confirm.jinja"
     success_url = reverse_lazy("trombi:profile")
     current_tab = "profile"
-
-    def get_success_url(self):
-        return super().get_success_url() + "?qn_success"
+    success_message = _("User removed from trombi")
 
 
 # Used by admins when someone does not have every club in his list
@@ -428,15 +433,18 @@ class UserTrombiAddMembershipView(TrombiTabsMixin, CreateView):
         )
 
 
-class UserTrombiEditMembershipView(CanEditMixin, TrombiTabsMixin, UpdateView):
+class UserTrombiEditMembershipView(
+    CanEditMixin, TrombiTabsMixin, SuccessMessageMixin, UpdateView
+):
     model = TrombiClubMembership
     pk_url_kwarg = "membership_id"
     fields = ["role", "start", "end"]
     template_name = "core/edit.jinja"
     current_tab = "profile"
+    success_message = _("User modified")
 
     def get_success_url(self):
-        return super().get_success_url() + "?qn_success"
+        return super().get_success_url()
 
 
 class UserTrombiProfileView(TrombiTabsMixin, DetailView):
@@ -461,12 +469,13 @@ class UserTrombiProfileView(TrombiTabsMixin, DetailView):
         return super().get(request, *args, **kwargs)
 
 
-class TrombiCommentFormView(LoginRequiredMixin, View):
+class TrombiCommentFormView(LoginRequiredMixin, SuccessMessageMixin, View):
     """Create/edit a trombi comment."""
 
     model = TrombiComment
     fields = ["content"]
     template_name = "trombi/comment.jinja"
+    success_message = _("Comment added")
 
     def get_form_class(self):
         self.trombi = self.request.user.trombi_user.trombi
@@ -496,7 +505,7 @@ class TrombiCommentFormView(LoginRequiredMixin, View):
         )
 
     def get_success_url(self):
-        return reverse("trombi:user_tools") + "?qn_success"
+        return reverse("trombi:user_tools")
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)

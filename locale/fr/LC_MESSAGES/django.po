@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-22 14:29+0200\n"
+"POT-Creation-Date: 2025-09-25 15:33+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1165,20 +1165,20 @@ msgid "Add to weekmail"
 msgstr "Ajouter au Weekmail"
 
 #: com/templates/com/weekmail.jinja
-msgid "Up"
-msgstr "Monter"
-
-#: com/templates/com/weekmail.jinja
-msgid "Down"
-msgstr "Descendre"
-
-#: com/templates/com/weekmail.jinja
 msgid "Articles included the next weekmail"
 msgstr "Article inclus dans le prochain Weekmail"
 
 #: com/templates/com/weekmail.jinja
 msgid "Delete from weekmail"
 msgstr "Supprimer du Weekmail"
+
+#: com/templates/com/weekmail.jinja
+msgid "Up"
+msgstr "Monter"
+
+#: com/templates/com/weekmail.jinja
+msgid "Down"
+msgstr "Descendre"
 
 #: com/templates/com/weekmail_preview.jinja
 #: core/templates/core/user_account_detail.jinja
@@ -1262,12 +1262,36 @@ msgid "All incoming events"
 msgstr "Tous les événements à venir"
 
 #: com/views.py
+msgid "Weekmail sent successfully"
+msgstr "Weekmail envoyé avec succès"
+
+#: com/views.py
 msgid "Delete and save to regenerate"
 msgstr "Supprimer et sauver pour régénérer"
 
 #: com/views.py
 msgid "Weekmail of the "
 msgstr "Weekmail du "
+
+#: com/views.py
+#, python-format
+msgid "%(title)s moved up in the Weekmail"
+msgstr "%(title)s monté dans le Weekmail"
+
+#: com/views.py
+#, python-format
+msgid "%(title)s moved down in the Weekmail"
+msgstr "%(title)s descendu dans le Weekmail"
+
+#: com/views.py
+#, python-format
+msgid "%(title)s added to the Weekmail"
+msgstr "%(title)s ajouté dans Weekmail"
+
+#: com/views.py
+#, python-format
+msgid "%(title)s removed from the Weekmail"
+msgstr "%(title)s retiré du Weekmail"
 
 #: com/views.py
 msgid ""
@@ -4548,22 +4572,6 @@ msgstr "Signaler ce commentaire"
 msgid "Edit UE"
 msgstr "Éditer l'UE"
 
-#: pedagogy/templates/pedagogy/uv_edit.jinja
-msgid "Import from UTBM"
-msgstr "Importer depuis l'UTBM"
-
-#: pedagogy/templates/pedagogy/uv_edit.jinja
-msgid "Unknown UE code"
-msgstr "Code d'UE inconnu"
-
-#: pedagogy/templates/pedagogy/uv_edit.jinja
-msgid "Successful autocomplete"
-msgstr "Autocomplétion réussite"
-
-#: pedagogy/templates/pedagogy/uv_edit.jinja
-msgid "An error occurred: "
-msgstr "Une erreur est survenue : "
-
 #: rootplace/forms.py
 msgid "User that will be kept"
 msgstr "Utilisateur qui sera conservé"
@@ -5117,26 +5125,6 @@ msgid "You have a notification"
 msgstr "Vous avez une notification"
 
 #: sith/settings.py
-msgid "Success!"
-msgstr "Succès !"
-
-#: sith/settings.py
-msgid "Fail!"
-msgstr "Échec !"
-
-#: sith/settings.py
-msgid "You successfully posted an article in the Weekmail"
-msgstr "Article posté avec succès dans le Weekmail"
-
-#: sith/settings.py
-msgid "You successfully edited an article in the Weekmail"
-msgstr "Article édité avec succès dans le Weekmail"
-
-#: sith/settings.py
-msgid "You successfully sent the Weekmail"
-msgstr "Weekmail envoyé avec succès"
-
-#: sith/settings.py
 msgid "AE tee-shirt"
 msgstr "Tee-shirt AE"
 
@@ -5178,8 +5166,8 @@ msgstr "Vous ne pouvez pas cotiser plusieurs fois pour la même période"
 
 #: subscription/templates/subscription/forms/create_existing_user.jinja
 msgid ""
-"If the subscription is done using the AE account, you must also click "
-"it on the AE counter."
+"If the subscription is done using the AE account, you must also click it on "
+"the AE counter."
 msgstr ""
 "Si la cotisation est faite en utilisant le compte AE, vous devez également "
 "la cliquer sur le comptoir AE."
@@ -5448,8 +5436,36 @@ msgid "Admin tools"
 msgstr "Admin Trombi"
 
 #: trombi/views.py
+msgid "Trombi modified"
+msgstr "Trombi modifié"
+
+#: trombi/views.py
+msgid "User added to the trombi"
+msgstr "Utilisateur ajouté au trombi"
+
+#: trombi/views.py
+msgid "User couldn't be added to the trombi"
+msgstr "L'utilisateur n'a pas pu être ajouté au trombi"
+
+#: trombi/views.py
+msgid "User removed from the trombi"
+msgstr "Utilisateur retiré du trombi"
+
+#: trombi/views.py
 msgid "Explain why you rejected the comment"
 msgstr "Expliquez pourquoi vous refusez le commentaire"
+
+#: trombi/views.py
+msgid "Comment accepted"
+msgstr "Commentaire accepté"
+
+#: trombi/views.py
+msgid "Comment rejected"
+msgstr "Commentaire rejeté"
+
+#: trombi/views.py
+msgid "Comment removed"
+msgstr "Commentaire retiré"
 
 #: trombi/views.py
 msgid "Rejected comment"
@@ -5492,6 +5508,10 @@ msgstr ""
 "ou vous encourerez la colère des admins!"
 
 #: trombi/views.py
+msgid "User modified"
+msgstr "Utilisateur modifié"
+
+#: trombi/views.py
 msgid "Personal email (not UTBM)"
 msgstr "Email personnel (pas UTBM)"
 
@@ -5502,6 +5522,14 @@ msgstr "Téléphone"
 #: trombi/views.py
 msgid "Native town"
 msgstr "Ville d'origine"
+
+#: trombi/views.py
+msgid "User removed from trombi"
+msgstr "Utilisateur retiré du trombi"
+
+#: trombi/views.py
+msgid "Comment added"
+msgstr "Commentaire ajouté"
 
 #: trombi/views.py
 msgid ""

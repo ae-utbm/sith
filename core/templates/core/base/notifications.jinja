@@ -1,0 +1,24 @@
+<div id="quick-notifications"
+     x-data="{
+             messages: [
+             {% if messages %}
+               {% for message in messages %}
+                 {
+                 tag: '{{ message.tags }}',
+                 text: '{{ message }}',
+                 },
+               {% endfor %}
+             {% endif %}
+             ]
+             }"
+     @quick-notification-add="(e) => messages.push(e?.detail)"
+     @quick-notification-delete="messages = []">
+  <template x-for="message in messages">
+    <div x-data="{show: true}" class="alert" :class="`alert-${message.tag}`" x-show="show" x-transition>
+      <span class="alert-main" x-text="message.text"></span>
+      <span class="clickable" @click="show = false">
+        <i class="fa fa-close"></i>
+      </span>
+    </div>
+  </template>
+</div>
