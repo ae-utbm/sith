@@ -11,6 +11,10 @@
 {% endblock %}
 
 {% block content %}
+  {% block notifications %}
+    {# Notifications are moved inside the billing info fragment #}
+  {% endblock %}
+
   <h2>{% trans %}Club members{% endtrans %}</h2>
 
   {% if add_member_fragment %}
