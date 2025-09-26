@@ -70,14 +70,14 @@
 
     <div id="page">
 
-      {% block notifications %}
-        {% include "core/base/notifications.jinja" %}
-      {% endblock %}
-
       <div id="content">
         {%- block tabs -%}
           {% include "core/base/tabs.jinja" %}
         {%- endblock -%}
+
+        {% block notifications %}
+          {% include "core/base/notifications.jinja" %}
+        {% endblock %}
 
         {%- block errors -%}
           {% if error %}
