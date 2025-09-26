@@ -47,10 +47,11 @@ from django.views.generic import DetailView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from club.forms import (
+    ClubAddMemberForm,
     ClubAdminEditForm,
     ClubEditForm,
-    ClubMemberForm,
     ClubOldMemberForm,
+    JoinClubForm,
     MailingForm,
     SellingsForm,
 )
@@ -266,16 +267,20 @@ class ClubAddMembersFragment(
     FragmentMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView
 ):
     template_name = "club/fragments/add_member.jinja"
-    form_class = ClubMemberForm
     model = Membership
     object = None
     reload_on_redirect = True
     permission_required = "club.view_club"
-    success_message = _("%(user)s has been added to club.")
 
     def dispatch(self, *args, **kwargs):
         self.club = get_object_or_404(Club, pk=kwargs.get("club_id"))
         return super().dispatch(*args, **kwargs)
+
+    def get_form_class(self):
+        user = self.request.user
+        if user.has_perm("club.add_membership") or self.club.get_membership_for(user):
+            return ClubAddMemberForm
+        return JoinClubForm
 
     def get_form_kwargs(self):
         return super().get_form_kwargs() | {
@@ -292,6 +297,11 @@ class ClubAddMembersFragment(
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {"club": self.club}
+
+    def get_success_message(self, cleaned_data):
+        if "user" not in cleaned_data or cleaned_data["user"] == self.request.user:
+            return _("You are now a member of this club.")
+        return _("%(user)s has been added to club.") % cleaned_data
 
 
 class ClubMembersView(

@@ -1,5 +1,7 @@
+from collections.abc import Callable
 from datetime import timedelta
 
+import pytest
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -11,7 +13,7 @@ from django.utils.timezone import localdate, localtime, now
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
-from club.forms import ClubMemberForm
+from club.forms import ClubAddMemberForm, JoinClubForm
 from club.models import Club, Membership
 from club.tests.base import TestClub
 from core.baker_recipes import subscriber_user
@@ -268,7 +270,7 @@ class TestMembership(TestClub):
         cannot be members of clubs.
         """
         for user in self.public, self.old_subscriber:
-            form = ClubMemberForm(
+            form = ClubAddMemberForm(
                 data={"user": user.id, "role": 1},
                 request_user=self.root,
                 club=self.club,
@@ -308,7 +310,7 @@ class TestMembership(TestClub):
         nb_memberships = self.club.members.count()
         max_id = User.objects.aggregate(id=Max("id"))["id"]
         for members in [max_id + 1], [max_id + 1, self.subscriber.id]:
-            form = ClubMemberForm(
+            form = ClubAddMemberForm(
                 data={"user": members, "role": 1},
                 request_user=self.root,
                 club=self.club,
@@ -346,7 +348,7 @@ class TestMembership(TestClub):
         """Test that a member of the club member cannot create
         a membership with a greater role than its own.
         """
-        form = ClubMemberForm(
+        form = ClubAddMemberForm(
             data={"user": self.subscriber.id, "role": 10},
             request_user=self.simple_board_member,
             club=self.club,
@@ -363,7 +365,7 @@ class TestMembership(TestClub):
 
     def test_add_member_without_role(self):
         """Test that trying to add members without specifying their role fails."""
-        form = ClubMemberForm(
+        form = ClubAddMemberForm(
             data={"user": self.subscriber.id}, request_user=self.root, club=self.club
         )
 
@@ -371,7 +373,7 @@ class TestMembership(TestClub):
         assert form.errors == {"role": ["Ce champ est obligatoire."]}
 
     def test_add_member_already_there(self):
-        form = ClubMemberForm(
+        form = ClubAddMemberForm(
             data={"user": self.simple_board_member, "role": 3},
             request_user=self.root,
             club=self.club,
@@ -385,17 +387,14 @@ class TestMembership(TestClub):
         non_member = subscriber_user.make()
         simple_member = baker.make(Membership, club=self.club, role=1).user
         for user in non_member, simple_member:
-            form = ClubMemberForm(
+            form = ClubAddMemberForm(
                 data={"user": subscriber_user.make(), "role": 1},
                 request_user=user,
                 club=self.club,
             )
             assert not form.is_valid()
             assert form.errors == {
-                "__all__": [
-                    "Vous ne pouvez pas ajouter d'autres utilisateurs "
-                    "dans un club si vous ne faites pas partie de son bureau."
-                ]
+                "role": ["Sélectionnez un choix valide. 1 n\u2019en fait pas partie."]
             }
 
     def test_simple_members_dont_see_form_anymore(self):
@@ -531,6 +530,57 @@ class TestMembership(TestClub):
         new_board = set(self.club.board_group.users.values_list("id", flat=True))
         assert new_members == initial_members
         assert new_board == initial_board
+
+
+@pytest.mark.django_db
+class TestJoinClub:
+    @pytest.fixture(autouse=True)
+    def clear_cache(self):
+        cache.clear()
+
+    @pytest.mark.parametrize(
+        ("user_factory", "role", "errors"),
+        [
+            (
+                subscriber_user.make,
+                2,
+                {
+                    "role": [
+                        "Sélectionnez un choix valide. 2 n\u2019en fait pas partie."
+                    ]
+                },
+            ),
+            (
+                lambda: baker.make(User),
+                1,
+                {"__all__": ["Vous devez être cotisant pour faire partie d'un club"]},
+            ),
+        ],
+    )
+    def test_join_club_errors(
+        self, user_factory: Callable[[], User], role: int, errors: dict
+    ):
+        club = baker.make(Club)
+        user = user_factory()
+        form = JoinClubForm(club=club, request_user=user, data={"role": role})
+        assert not form.is_valid()
+        assert form.errors == errors
+
+    def test_user_already_in_club(self):
+        club = baker.make(Club)
+        user = subscriber_user.make()
+        baker.make(Membership, user=user, club=club)
+        form = JoinClubForm(club=club, request_user=user, data={"role": 1})
+        assert not form.is_valid()
+        assert form.errors == {"__all__": ["Vous êtes déjà membre de ce club."]}
+
+    def test_ok(self):
+        club = baker.make(Club)
+        user = subscriber_user.make()
+        form = JoinClubForm(club=club, request_user=user, data={"role": 1})
+        assert form.is_valid()
+        form.save()
+        assert Membership.objects.ongoing().filter(user=user, club=club).exists()
 
 
 class TestOldMembersView(TestCase):

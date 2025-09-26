@@ -6,23 +6,22 @@
 {% endblock %}
 {% block additional_css %}
   <link rel="stylesheet" href="{{ static("bundled/core/components/ajax-select-index.css") }}">
-  <link rel="stylesheet" href="{{ static("core/components/ajax-select.scss") }}">
   <link rel="stylesheet" href="{{ static("club/members.scss") }}">
 {% endblock %}
 
 {% block content %}
   {% block notifications %}
-    {# Notifications are moved inside the billing info fragment #}
+    {# Notifications are moved a little bit below #}
   {% endblock %}
 
   <h2>{% trans %}Club members{% endtrans %}</h2>
 
   {% if add_member_fragment %}
     <br />
-    <h4>{% trans %}Add a new member{% endtrans %}</h4>
     {{ add_member_fragment }}
     <br />
   {% endif %}
+  {% include "core/base/notifications.jinja" %}
   {% if members %}
     <form action="{{ url('club:club_members', club_id=club.id) }}" id="members_old" method="post">
       {% csrf_token %}
