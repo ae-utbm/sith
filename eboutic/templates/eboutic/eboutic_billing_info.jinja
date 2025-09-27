@@ -1,3 +1,5 @@
+{% from 'core/macros.jinja' import update_notifications %}
+
 <div id=billing-infos-fragment>
   <div
     class="collapse"
@@ -29,7 +31,6 @@
       >
     </form>
   </div>
-
   <br>
-  {% include "core/base/notifications.jinja" %}
+  {{ update_notifications(messages) }}
 </div>
