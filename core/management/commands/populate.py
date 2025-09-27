@@ -36,7 +36,7 @@ from django.utils import timezone
 from django.utils.timezone import localdate
 from PIL import Image
 
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 from com.ics_calendar import IcsCalendar
 from com.models import News, NewsDate, Sith, Weekmail
 from core.models import BanGroup, Group, Page, PageRev, SithFile, User
@@ -60,6 +60,13 @@ class PopulatedGroups(NamedTuple):
     accounting_admin: Group
     pedagogy_admin: Group
     campus_admin: Group
+
+
+class PopulatedClubs(NamedTuple):
+    ae: Club
+    troll: Club
+    pdf: Club
+    refound: Club
 
 
 class Command(BaseCommand):
@@ -113,32 +120,16 @@ class Command(BaseCommand):
         sas = SithFile.objects.create(
             name="SAS", owner=root, id=settings.SITH_SAS_ROOT_DIR_ID
         )
-        main_club = Club.objects.create(
-            id=1, name="AE", address="6 Boulevard Anatole France, 90000 Belfort"
-        )
-        main_club.board_group.permissions.add(
-            *Permission.objects.filter(
-                codename__in=[
-                    "view_subscription",
-                    "add_subscription",
-                    "view_hidden_user",
-                ]
-            )
-        )
-        bar_club = Club.objects.create(
-            id=settings.SITH_PDF_CLUB_ID,
-            name="PdF",
-            address="6 Boulevard Anatole France, 90000 Belfort",
-        )
+        clubs = self._create_clubs()
 
         self.reset_index("club")
         for bar_id, bar_name in settings.SITH_COUNTER_BARS:
-            Counter(id=bar_id, name=bar_name, club=bar_club, type="BAR").save()
+            Counter(id=bar_id, name=bar_name, club=clubs.pdf, type="BAR").save()
         self.reset_index("counter")
         counters = [
-            Counter(name="Eboutic", club=main_club, type="EBOUTIC"),
-            Counter(name="AE", club=main_club, type="OFFICE"),
-            Counter(name="Vidage comptes AE", club=main_club, type="OFFICE"),
+            Counter(name="Eboutic", club=clubs.ae, type="EBOUTIC"),
+            Counter(name="AE", club=clubs.ae, type="OFFICE"),
+            Counter(name="Vidage comptes AE", club=clubs.ae, type="OFFICE"),
         ]
         Counter.objects.bulk_create(counters)
         bar_groups = []
@@ -321,54 +312,41 @@ class Command(BaseCommand):
         self._create_subscription(tutu)
         StudentCard(uid="9A89B82018B0A0", customer=sli.customer).save()
 
-        # Clubs
-        Club.objects.create(
-            name="Bibo'UT", address="46 de la Boustifaille", parent=main_club
+        Membership.objects.create(
+            user=skia, club=clubs.ae, role=clubs.ae.roles.get(name="Respo Info")
         )
-        guyut = Club.objects.create(
-            name="Guy'UT", address="42 de la Boustifaille", parent=main_club
-        )
-        Club.objects.create(name="Woenzel'UT", address="Woenzel", parent=guyut)
-        troll = Club.objects.create(
-            name="Troll Penché", address="Terre Du Milieu", parent=main_club
-        )
-        refound = Club.objects.create(
-            name="Carte AE", address="Jamais imprimée", parent=main_club
-        )
-
-        Membership.objects.create(user=skia, club=main_club, role=3)
         Membership.objects.create(
             user=comunity,
-            club=bar_club,
+            club=clubs.pdf,
             start_date=localdate(),
-            role=settings.SITH_CLUB_ROLES_ID["Board member"],
+            role=clubs.pdf.roles.get(name="Membre du bureau"),
         )
         Membership.objects.create(
             user=sli,
-            club=troll,
-            role=9,
+            club=clubs.troll,
+            role=clubs.troll.roles.get(name="Vice-Président⸱e"),
             description="Padawan Troll",
             start_date=localdate() - timedelta(days=17),
         )
         Membership.objects.create(
             user=krophil,
-            club=troll,
-            role=10,
+            club=clubs.troll,
+            role=clubs.troll.roles.get(name="Président⸱e"),
             description="Maitre Troll",
             start_date=localdate() - timedelta(days=200),
         )
         Membership.objects.create(
             user=skia,
-            club=troll,
-            role=2,
+            club=clubs.troll,
+            role=clubs.troll.roles.get(name="Membre du bureau"),
             description="Grand Ancien Troll",
             start_date=localdate() - timedelta(days=400),
             end_date=localdate() - timedelta(days=86),
         )
         Membership.objects.create(
             user=richard,
-            club=troll,
-            role=2,
+            club=clubs.troll,
+            role=clubs.troll.roles.get(name="Membre du bureau"),
             description="",
             start_date=localdate() - timedelta(days=200),
             end_date=localdate() - timedelta(days=100),
@@ -385,7 +363,7 @@ class Command(BaseCommand):
             purchase_price="15",
             selling_price="15",
             special_selling_price="15",
-            club=main_club,
+            club=clubs.ae,
         )
         cotis2 = Product.objects.create(
             name="Cotis 2 semestres",
@@ -394,7 +372,7 @@ class Command(BaseCommand):
             purchase_price="28",
             selling_price="28",
             special_selling_price="28",
-            club=main_club,
+            club=clubs.ae,
         )
         refill = Product.objects.create(
             name="Rechargement 15 €",
@@ -403,7 +381,7 @@ class Command(BaseCommand):
             purchase_price="15",
             selling_price="15",
             special_selling_price="15",
-            club=main_club,
+            club=clubs.ae,
         )
         barb = Product.objects.create(
             name="Barbar",
@@ -412,7 +390,7 @@ class Command(BaseCommand):
             purchase_price="1.50",
             selling_price="1.7",
             special_selling_price="1.6",
-            club=main_club,
+            club=clubs.ae,
             limit_age=18,
         )
         cble = Product.objects.create(
@@ -422,7 +400,7 @@ class Command(BaseCommand):
             purchase_price="1.50",
             selling_price="1.7",
             special_selling_price="1.6",
-            club=main_club,
+            club=clubs.ae,
             limit_age=18,
         )
         cons = Product.objects.create(
@@ -432,7 +410,7 @@ class Command(BaseCommand):
             purchase_price="1",
             selling_price="1",
             special_selling_price="1",
-            club=main_club,
+            club=clubs.ae,
         )
         dcons = Product.objects.create(
             name="Déconsigne Eco-cup",
@@ -441,7 +419,7 @@ class Command(BaseCommand):
             purchase_price="-1",
             selling_price="-1",
             special_selling_price="-1",
-            club=main_club,
+            club=clubs.ae,
         )
         cors = Product.objects.create(
             name="Corsendonk",
@@ -450,7 +428,7 @@ class Command(BaseCommand):
             purchase_price="1.50",
             selling_price="1.7",
             special_selling_price="1.6",
-            club=main_club,
+            club=clubs.ae,
             limit_age=18,
         )
         carolus = Product.objects.create(
@@ -460,7 +438,7 @@ class Command(BaseCommand):
             purchase_price="1.50",
             selling_price="1.7",
             special_selling_price="1.6",
-            club=main_club,
+            club=clubs.ae,
             limit_age=18,
         )
         Product.objects.create(
@@ -469,7 +447,7 @@ class Command(BaseCommand):
             purchase_price="0",
             selling_price="0",
             special_selling_price="0",
-            club=refound,
+            club=clubs.refound,
         )
         groups.subscribers.products.add(
             cotis, cotis2, refill, barb, cble, cors, carolus
@@ -482,7 +460,7 @@ class Command(BaseCommand):
         eboutic = Counter.objects.get(name="Eboutic")
         eboutic.products.add(barb, cotis, cotis2, refill)
 
-        Counter.objects.create(name="Carte AE", club=refound, type="OFFICE")
+        Counter.objects.create(name="Carte AE", club=clubs.refound, type="OFFICE")
 
         ReturnableProduct.objects.create(
             product=cons, returned_product=dcons, max_return=3
@@ -506,7 +484,7 @@ class Command(BaseCommand):
             end_date="7942-06-12 10:28:45+01",
         )
         el.view_groups.add(groups.public)
-        el.edit_groups.add(main_club.board_group)
+        el.edit_groups.add(clubs.ae.board_group)
         el.candidature_groups.add(groups.subscribers)
         el.vote_groups.add(groups.subscribers)
         liste = ElectionList.objects.create(title="Candidature Libre", election=el)
@@ -579,7 +557,7 @@ class Command(BaseCommand):
             title="Apero barman",
             summary="Viens boire un coup avec les barmans",
             content="Glou glou glou glou glou glou glou",
-            club=bar_club,
+            club=clubs.pdf,
             author=subscriber,
             is_published=True,
             moderator=skia,
@@ -597,7 +575,7 @@ class Command(BaseCommand):
             content=(
                 "Viens donc t'enjailler avec les autres barmans aux frais du BdF! \\o/"
             ),
-            club=bar_club,
+            club=clubs.pdf,
             author=subscriber,
             is_published=True,
             moderator=skia,
@@ -613,7 +591,7 @@ class Command(BaseCommand):
             title="Repas fromager",
             summary="Wien manger du l'bon fromeug'",
             content="Fô viendre mangey d'la bonne fondue!",
-            club=bar_club,
+            club=clubs.pdf,
             author=subscriber,
             is_published=True,
             moderator=skia,
@@ -629,7 +607,7 @@ class Command(BaseCommand):
             title="SdF",
             summary="Enjoy la fin des finaux!",
             content="Viens faire la fête avec tout plein de gens!",
-            club=bar_club,
+            club=clubs.pdf,
             author=subscriber,
             is_published=True,
             moderator=skia,
@@ -647,7 +625,7 @@ class Command(BaseCommand):
             summary="Viens jouer!",
             content="Rejoins la fine équipe du Troll Penché et viens "
             "t'amuser le Vendredi soir!",
-            club=troll,
+            club=clubs.troll,
             author=subscriber,
             is_published=True,
             moderator=skia,
@@ -783,6 +761,57 @@ class Command(BaseCommand):
             start=s.subscription_start,
         )
         s.save()
+
+    def _create_clubs(self) -> PopulatedClubs:
+        ae = Club.objects.create(
+            id=1, name="AE", address="6 Boulevard Anatole France, 90000 Belfort"
+        )
+        ae.board_group.permissions.add(
+            *Permission.objects.filter(
+                codename__in=[
+                    "view_subscription",
+                    "add_subscription",
+                    "add_membership",
+                    "view_hidden_user",
+                ]
+            )
+        )
+        pdf = Club.objects.create(
+            id=settings.SITH_PDF_CLUB_ID,
+            name="PdF",
+            address="6 Boulevard Anatole France, 90000 Belfort",
+        )
+        troll = Club.objects.create(
+            name="Troll Penché", address="Terre Du Milieu", parent=ae
+        )
+        refound = Club.objects.create(
+            name="Carte AE", address="Jamais imprimée", parent=ae
+        )
+        roles = []
+        presidency_roles = ["Président⸱e", "Vice-Président⸱e"]
+        board_roles = [
+            "Trésorier⸱e",
+            "Secrétaire",
+            "Respo Info",
+            "Respo Com",
+            "Membre du bureau",
+        ]
+        simple_roles = ["Membre actif⸱ve", "Curieux⸱euse"]
+        for club in ae, pdf, troll, refound:
+            for i, role in enumerate(presidency_roles):
+                roles.append(
+                    ClubRole(
+                        club=club, order=i, name=role, is_presidency=True, is_board=True
+                    )
+                )
+            for i, role in enumerate(board_roles, start=len(presidency_roles)):
+                roles.append(ClubRole(club=club, order=i, name=role, is_board=True))
+            for i, role in enumerate(
+                simple_roles, start=len(presidency_roles) + len(board_roles)
+            ):
+                roles.append(ClubRole(club=club, order=i, name=role))
+        ClubRole.objects.bulk_create(roles)
+        return PopulatedClubs(ae=ae, troll=troll, pdf=pdf, refound=refound)
 
     def _create_groups(self) -> PopulatedGroups:
         perms = Permission.objects.all()
