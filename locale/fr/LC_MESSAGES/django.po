@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-25 15:33+0200\n"
+"POT-Creation-Date: 2025-09-26 17:36+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -174,12 +174,12 @@ msgid "You can not add the same user twice"
 msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 
 #: club/forms.py
-msgid "You should specify a role"
-msgstr "Vous devez choisir un rôle"
+msgid "You must be subscribed to join a club"
+msgstr "Vous devez être cotisant pour faire partie d'un club"
 
-#: club/forms.py sas/forms.py
-msgid "You do not have the permission to do that"
-msgstr "Vous n'avez pas la permission de faire cela"
+#: club/forms.py
+msgid "You are already a member of this club"
+msgstr "Vous êtes déjà membre de ce club."
 
 #: club/models.py
 msgid "slug name"
@@ -349,11 +349,6 @@ msgstr "Depuis"
 #: club/templates/club/club_members.jinja
 msgid "There are no members in this club."
 msgstr "Il n'y a pas de membres dans ce club."
-
-#: club/templates/club/club_members.jinja core/templates/core/file_detail.jinja
-#: core/views/forms.py trombi/templates/trombi/detail.jinja
-msgid "Add"
-msgstr "Ajouter"
 
 #: club/templates/club/club_old_members.jinja
 msgid "Club old members"
@@ -569,6 +564,24 @@ msgstr ""
 msgid "Save"
 msgstr "Sauver"
 
+#: club/templates/club/fragments/add_member.jinja
+msgid "Add a new member"
+msgstr "Ajouter un nouveau membre"
+
+#: club/templates/club/fragments/add_member.jinja
+msgid "Join club"
+msgstr "Rejoindre le club"
+
+#: club/templates/club/fragments/add_member.jinja
+#: core/templates/core/file_detail.jinja core/views/forms.py
+#: trombi/templates/trombi/detail.jinja
+msgid "Add"
+msgstr "Ajouter"
+
+#: club/templates/club/fragments/add_member.jinja
+msgid "Join"
+msgstr "Rejoindre"
+
 #: club/templates/club/mailing.jinja
 msgid "Mailing lists"
 msgstr "Mailing listes"
@@ -674,6 +687,15 @@ msgstr "Vente"
 #: club/views.py
 msgid "Mailing list"
 msgstr "Listes de diffusion"
+
+#: club/views.py
+#, python-format
+msgid "%(user)s has been added to club."
+msgstr "%(user)s a été ajouté au club."
+
+#: club/views.py
+msgid "You are now a member of this club."
+msgstr "Vous êtes maintenant membre de ce club."
 
 #: com/forms.py
 msgid "Format: 16:9 | Resolution: 1920x1080"
@@ -4644,6 +4666,10 @@ msgstr "Pas de ban actif"
 #: sas/forms.py
 msgid "Add a new album"
 msgstr "Ajouter un nouvel album"
+
+#: sas/forms.py
+msgid "You do not have the permission to do that"
+msgstr "Vous n'avez pas la permission de faire cela"
 
 #: sas/forms.py
 msgid "Upload images"

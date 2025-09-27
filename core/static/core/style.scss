@@ -506,6 +506,10 @@ th {
   >ul {
     margin-top: 0;
   }
+
+  >input[type="checkbox"] {
+    padding: unset;
+  }
 }
 
 td {

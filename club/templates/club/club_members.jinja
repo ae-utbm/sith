@@ -1,15 +1,33 @@
 {% extends "core/base.jinja" %}
 {% from 'core/macros.jinja' import user_profile_link, select_all_checkbox %}
 
+{% block additional_js %}
+  <script type="module" src="{{ static("bundled/core/components/ajax-select-index.ts") }}"></script>
+{% endblock %}
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("bundled/core/components/ajax-select-index.css") }}">
+  <link rel="stylesheet" href="{{ static("club/members.scss") }}">
+{% endblock %}
+
 {% block content %}
+  {% block notifications %}
+    {# Notifications are moved a little bit below #}
+  {% endblock %}
+
   <h2>{% trans %}Club members{% endtrans %}</h2>
+
+  {% if add_member_fragment %}
+    <br />
+    {{ add_member_fragment }}
+    <br />
+  {% endif %}
+  {% include "core/base/notifications.jinja" %}
   {% if members %}
-    <form action="{{ url('club:club_members', club_id=club.id) }}" id="users_old" method="post">
+    <form action="{{ url('club:club_members', club_id=club.id) }}" id="members_old" method="post">
       {% csrf_token %}
-      {% set users_old = dict(form.users_old | groupby("choice_label")) %}
-      {% if users_old %}
-        {{ select_all_checkbox("users_old") }}
-        <p></p>
+      {% if can_end_membership %}
+        {{ select_all_checkbox("members_old") }}
+        <br />
       {% endif %}
       <table id="club_members_table">
         <thead>
@@ -18,7 +36,7 @@
             <td>{% trans %}Role{% endtrans %}</td>
             <td>{% trans %}Description{% endtrans %}</td>
             <td>{% trans %}Since{% endtrans %}</td>
-            {% if users_old %}
+            {% if can_end_membership %}
               <td>{% trans %}Mark as old{% endtrans %}</td>
             {% endif %}
           </tr>
@@ -30,20 +48,24 @@
               <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
               <td>{{ m.description }}</td>
               <td>{{ m.start_date }}</td>
-              {% if users_old %}
+              {%- if can_end_membership -%}
                 <td>
-                  {% set user_old = users_old[m.user.get_display_name()] %}
-                  {% if user_old %}
-                    {{ user_old[0].tag() }}
-                  {% endif %}
+                  {%- if m.is_editable -%}
+                    <label for="id_members_old_{{ loop.index }}"></label>
+                    <input
+                      type="checkbox"
+                      name="members_old"
+                      value="{{ m.id }}"
+                      id="id_members_old_{{ loop.index }}"
+                    >
+                  {%- endif -%}
                 </td>
-              {% endif %}
+              {%- endif -%}
             </tr>
           {% endfor %}
         </tbody>
       </table>
-      {{ form.users_old.errors }}
-      {% if users_old %}
+      {% if can_end_membership %}
         <p></p>
         <input type="submit" name="submit" value="{% trans %}Mark as old{% endtrans %}">
       {% endif %}
@@ -51,32 +73,4 @@
   {% else %}
     <p>{% trans %}There are no members in this club.{% endtrans %}</p>
   {% endif %}
-  <form action="{{ url('club:club_members', club_id=club.id) }}" id="add_users" method="post">
-    {% csrf_token %}
-    {{ form.non_field_errors() }}
-    <p>
-      {{ form.users.errors }}
-      <label for="{{ form.users.id_for_label }}">{{ form.users.label }} :</label>
-      {{ form.users }}
-      <span class="helptext">{{ form.users.help_text }}</span>
-    </p>
-    <p>
-      {{ form.role.errors }}
-      <label for="{{ form.role.id_for_label }}">{{ form.role.label }} :</label>
-      {{ form.role }}
-    </p>
-    {% if form.start_date %}
-      <p>
-        {{ form.start_date.errors }}
-        <label for="{{ form.start_date.id_for_label }}">{{ form.start_date.label }} :</label>
-        {{ form.start_date }}
-      </p>
-    {% endif %}
-    <p>
-      {{ form.description.errors }}
-      <label for="{{ form.description.id_for_label }}">{{ form.description.label }} :</label>
-      {{ form.description }}
-    </p>
-    <p><input type="submit" value="{% trans %}Add{% endtrans %}" /></p>
-  </form>
 {% endblock %}
