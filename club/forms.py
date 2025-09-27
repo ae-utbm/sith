@@ -231,10 +231,10 @@ class ClubMemberForm(forms.ModelForm):
         self.instance.club = club
 
     @property
-    def max_available_role(self):  # pragma: no cover
+    def max_available_role(self):
         """The greatest role that will be obtainable with this form."""
         # this is unreachable, because it will be overridden by subclasses
-        return -1
+        return -1  # pragma: no cover
 
 
 class ClubAddMemberForm(ClubMemberForm):
@@ -283,6 +283,8 @@ class JoinClubForm(ClubMemberForm):
 
     def __init__(self, *args, club: Club, request_user: User, **kwargs):
         super().__init__(*args, club=club, request_user=request_user, **kwargs)
+        # this form doesn't manage the user who will join the club,
+        # so we must set this here to avoid errors
         self.instance.user = self.request_user
 
     @cached_property
