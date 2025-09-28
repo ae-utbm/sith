@@ -11,7 +11,7 @@ from django.utils.timezone import now
 from model_bakery import baker
 from pytest_django.asserts import assertHTMLEqual, assertRedirects
 
-from club.models import Club
+from club.models import Club, Membership
 from core.baker_recipes import board_user, subscriber_user
 from core.markdown import markdown
 from core.models import AnonymousUser, Page, PageRev, User
@@ -122,6 +122,9 @@ def test_page_revision_club_redirection(client: Client):
 @pytest.mark.django_db
 def test_viewable_by():
     # remove existing pages to prevent side effect
+    # club pages are protected, so we must delete clubs first
+    Membership.objects.all().delete()
+    Club.objects.all().delete()
     Page.objects.all().delete()
     view_groups = [
         [settings.SITH_GROUP_PUBLIC_ID],

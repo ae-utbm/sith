@@ -7,7 +7,7 @@ from django.utils.timezone import localdate
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 from core.baker_recipes import subscriber_user
 from core.models import User
 
@@ -19,11 +19,19 @@ def test_club_queryset_having_board_member():
     membership_recipe = Recipe(
         Membership, user=user, start_date=localdate() - timedelta(days=3)
     )
-    membership_recipe.make(club=clubs[0], role=1)
-    membership_recipe.make(club=clubs[1], role=3)
-    membership_recipe.make(club=clubs[2], role=7)
     membership_recipe.make(
-        club=clubs[3], role=3, end_date=localdate() - timedelta(days=1)
+        club=clubs[0], role=baker.make(ClubRole, club=clubs[0], is_board=False)
+    )
+    membership_recipe.make(
+        club=clubs[1], role=baker.make(ClubRole, club=clubs[1], is_board=True)
+    )
+    membership_recipe.make(
+        club=clubs[2], role=baker.make(ClubRole, club=clubs[2], is_board=True)
+    )
+    membership_recipe.make(
+        club=clubs[3],
+        role=baker.make(ClubRole, club=clubs[3], is_board=True),
+        end_date=localdate() - timedelta(days=1),
     )
 
     club_ids = Club.objects.having_board_member(user).values_list("id", flat=True)

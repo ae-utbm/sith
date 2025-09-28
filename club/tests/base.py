@@ -8,7 +8,7 @@ from django.utils.timezone import now
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import User
 
@@ -43,6 +43,11 @@ class TestClub(TestCase):
 
         cls.ae = Club.objects.get(pk=settings.SITH_MAIN_CLUB_ID)
         cls.club = baker.make(Club)
+        cls.president_role = baker.make(
+            ClubRole, club=cls.club, is_board=True, is_presidency=True, order=0
+        )
+        cls.board_role = baker.make(ClubRole, club=cls.club, is_board=True, order=1)
+        cls.member_role = baker.make(ClubRole, club=cls.club, order=2)
         cls.new_members_url = reverse(
             "club:club_new_members", kwargs={"club_id": cls.club.id}
         )
@@ -51,12 +56,17 @@ class TestClub(TestCase):
         yesterday = now() - timedelta(days=1)
         membership_recipe = Recipe(Membership, club=cls.club)
         membership_recipe.make(
-            user=cls.simple_board_member, start_date=a_month_ago, role=3
+            user=cls.simple_board_member, start_date=a_month_ago, role=cls.board_role
         )
-        membership_recipe.make(user=cls.richard, role=1)
-        membership_recipe.make(user=cls.president, start_date=a_month_ago, role=10)
+        membership_recipe.make(user=cls.richard, role=cls.member_role)
+        membership_recipe.make(
+            user=cls.president, start_date=a_month_ago, role=cls.president_role
+        )
         membership_recipe.make(  # sli was a member but isn't anymore
-            user=cls.sli, start_date=a_month_ago, end_date=yesterday, role=2
+            user=cls.sli,
+            start_date=a_month_ago,
+            end_date=yesterday,
+            role=cls.board_role,
         )
 
     def setUp(self):
