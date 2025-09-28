@@ -36,10 +36,21 @@ def migrate_roles(apps: StateApps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("club", "0014_alter_club_options_rename_unix_name_club_slug_name_and_more")
+        ("club", "0014_alter_club_options_rename_unix_name_club_slug_name_and_more"),
+        ("core", "0047_alter_notification_date_alter_notification_type"),
     ]
 
     operations = [
+        migrations.AlterField(
+            model_name="club",
+            name="page",
+            field=models.OneToOneField(
+                blank=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="club",
+                to="core.page",
+            ),
+        ),
         migrations.CreateModel(
             name="ClubRole",
             fields=[
