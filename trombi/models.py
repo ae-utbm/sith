@@ -23,7 +23,6 @@
 
 from datetime import date
 
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
@@ -152,10 +151,12 @@ class TrombiUser(models.Model):
 
     def make_memberships(self):
         self.memberships.all().delete()
-        for m in self.user.memberships.filter(
-            role__gt=settings.SITH_MAXIMUM_FREE_ROLE
-        ).order_by("end_date"):
-            role = str(settings.SITH_CLUB_ROLES[m.role])
+        for m in (
+            self.user.memberships.filter(role__is_board=True)
+            .select_related("role")
+            .order_by("end_date")
+        ):
+            role = m.role.name
             if m.description:
                 role += " (%s)" % m.description
             end_date = get_semester_code(m.end_date) if m.end_date else ""
