@@ -444,7 +444,11 @@ class Membership(models.Model):
         if user.is_root or user.is_board_member:
             return True
         membership = self.club.get_membership_for(user)
-        return membership is not None and membership.role.order < self.role.order
+        if not membership:
+            return False
+        return membership.user_id == user.id or (
+            membership.is_board and membership.role.order < self.role.order
+        )
 
     def delete(self, *args, **kwargs):
         self._remove_club_groups([self])

@@ -37,7 +37,8 @@ class ClubController(ControllerBase):
     )
     def fetch_club(self, club_id: int):
         prefetch = Prefetch(
-            "members", queryset=Membership.objects.ongoing().select_related("user")
+            "members",
+            queryset=Membership.objects.ongoing().select_related("user", "role"),
         )
         return self.get_object_or_exception(
             Club.objects.prefetch_related(prefetch), id=club_id
@@ -59,5 +60,5 @@ class UserClubController(ControllerBase):
         return (
             Membership.objects.ongoing()
             .filter(user=user)
-            .select_related("club", "user")
+            .select_related("club", "user", "role")
         )

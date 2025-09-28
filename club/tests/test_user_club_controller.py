@@ -6,7 +6,7 @@ from django.utils.timezone import localdate
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 from club.schemas import UserMembershipSchema
 from core.baker_recipes import subscriber_user
 from core.models import Page
@@ -19,7 +19,10 @@ class TestFetchClub(TestCase):
         pages = baker.make(Page, _quantity=3, _bulk_create=True)
         clubs = baker.make(Club, page=iter(pages), _quantity=3, _bulk_create=True)
         recipe = Recipe(
-            Membership, user=cls.user, start_date=localdate() - timedelta(days=2)
+            Membership,
+            user=cls.user,
+            start_date=localdate() - timedelta(days=2),
+            role=baker.make(ClubRole),
         )
         cls.members = Membership.objects.bulk_create(
             [

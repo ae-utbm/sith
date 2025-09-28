@@ -503,7 +503,7 @@ class WeekmailArticleCreateView(CreateView):
         self.object = form.instance
         form.is_valid()  # Valid a first time to populate club field
         m = form.instance.club.get_membership_for(request.user)
-        if m is None or m.role <= settings.SITH_MAXIMUM_FREE_ROLE:
+        if m is None or not m.role.is_board:
             form.add_error(
                 "club",
                 ValidationError(
