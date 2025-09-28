@@ -9,7 +9,7 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertNumQueries
 
-from club.models import Club, ClubRole, Membership
+from club.models import Club, Membership, ClubRole
 from core.baker_recipes import subscriber_user
 from core.models import Group, Page, User
 
