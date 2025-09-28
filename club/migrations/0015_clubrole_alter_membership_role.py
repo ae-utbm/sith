@@ -5,24 +5,33 @@ from django.conf import settings
 from django.db import migrations, models
 from django.db.migrations.state import StateApps
 from django.db.models import Case, When
-from django.utils import translation
+
+PRESIDENT_ROLE = 10
+SITH_CLUB_ROLES = {
+    10: "Président⸱e",
+    9: "Vice-Président⸱e",
+    7: "Trésorier⸱e",
+    5: "Responsable communication",
+    4: "Secrétaire",
+    3: "Responsable info",
+    2: "Membre du bureau",
+    1: "Membre actif⸱ve",
+    0: "Curieux⸱euse",
+}
 
 
 def migrate_roles(apps: StateApps, schema_editor):
     ClubRole = apps.get_model("club", "ClubRole")
     Membership = apps.get_model("club", "Membership")
 
-    translation.activate("fr")
-
     updates = []
-    presidency = settings.SITH_CLUB_ROLES_ID["President"]
     for club_id, role in Membership.objects.values_list("club", "role").distinct():
         new_role = ClubRole.objects.create(
             name=SITH_CLUB_ROLES[role],
             is_board=role > settings.SITH_MAXIMUM_FREE_ROLE,
-            is_presidency=role == presidency,
+            is_presidency=role == PRESIDENT_ROLE,
             club_id=club_id,
-            order=presidency - role,
+            order=PRESIDENT_ROLE - role,
         )
         updates.append(When(role=role, then=new_role.id))
     # all updates must happen at the same time

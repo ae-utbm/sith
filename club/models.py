@@ -138,9 +138,7 @@ class Club(models.Model):
     @cached_property
     def president(self) -> Membership | None:
         """Fetch the membership of the current president of this club."""
-        return self.members.filter(
-            role=settings.SITH_CLUB_ROLES_ID["President"], end_date=None
-        ).first()
+        return self.members.filter(end_date=None).order_by("role__order").first()
 
     def check_loop(self):
         """Raise a validation error when a loop is found within the parent list."""
@@ -208,7 +206,9 @@ class Club(models.Model):
 
     @cached_property
     def current_members(self) -> list[Membership]:
-        return list(self.members.ongoing().select_related("user").order_by("-role"))
+        return list(
+            self.members.ongoing().select_related("user", "role").order_by("-role")
+        )
 
     def get_membership_for(self, user: User) -> Membership | None:
         """Return the current membership of the given user."""
@@ -256,7 +256,7 @@ class ClubRole(OrderedModel):
         ]
 
     def __str__(self):
-        return f"{self.name} - {self.club.name}"
+        return self.name
 
     def get_display_name(self):
         return f"{self.name} - {self.club.name}"
@@ -265,14 +265,29 @@ class ClubRole(OrderedModel):
         return reverse("club:club_roles", kwargs={"club_id": self.club_id})
 
     def clean(self):
+        errors = []
         if self.is_presidency and not self.is_board:
-            raise ValidationError(
-                _(
-                    "Role %(name)s was declared as a presidency role "
-                    "without being a board role"
+            errors.append(
+                ValidationError(
+                    _(
+                        "Role %(name)s was declared as a presidency role "
+                        "without being a board role"
+                    )
+                    % {"name": self.name}
                 )
-                % {"name": self.name}
             )
+        if (
+            self.is_board
+            and self.club.roles.filter(is_board=False, order__lt=self.order).exists()
+        ):
+            errors.append(
+                ValidationError(
+                    _("Board role %(role)s cannot be placed below a member role")
+                    % {"role": self.name}
+                )
+            )
+        if errors:
+            raise ValidationError(errors)
         return super().clean()
 
 
@@ -321,7 +336,7 @@ class MembershipQuerySet(models.QuerySet):
                     user=user,
                     club=OuterRef("club"),
                     role__is_board=True,
-                    role__order__gt=OuterRef("role__order"),
+                    role__order__lt=OuterRef("role__order"),
                 )
             )
         )
