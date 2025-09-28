@@ -32,7 +32,7 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertRedirects
 
-from club.models import Membership
+from club.models import ClubRole, Membership
 from core.baker_recipes import board_user, subscriber_user, very_old_subscriber_user
 from core.models import BanGroup, User
 from counter.baker_recipes import product_recipe, sale_recipe
@@ -88,7 +88,7 @@ class TestFullClickBase(TestCase):
             Membership,
             start_date=now() - timedelta(days=30),
             club=cls.club_counter.club,
-            role=settings.SITH_CLUB_ROLES_ID["Board member"],
+            role=baker.make(ClubRole, club=cls.club_counter.club, is_board=True),
             user=cls.club_admin,
         )
 
@@ -782,7 +782,13 @@ class TestClubCounterClickAccess(TestCase):
             "counter:click",
             kwargs={"counter_id": cls.counter.id, "user_id": cls.customer.id},
         )
-
+        cls.board_role, cls.member_role = baker.make(
+            ClubRole,
+            club=cls.counter.club,
+            is_board=iter([True, False]),
+            _quantity=2,
+            _bulk_create=True,
+        )
         cls.user = subscriber_user.make()
 
     def setUp(self):
@@ -797,13 +803,17 @@ class TestClubCounterClickAccess(TestCase):
         res = self.client.get(self.click_url)
         assert res.status_code == 403
         # being a member of the club, without being in the board, isn't enough
-        baker.make(Membership, club=self.counter.club, user=self.user, role=1)
+        baker.make(
+            Membership, club=self.counter.club, user=self.user, role=self.member_role
+        )
         res = self.client.get(self.click_url)
         assert res.status_code == 403
 
     def test_board_member(self):
         """By default, board members should be able to click on office counters"""
-        baker.make(Membership, club=self.counter.club, user=self.user, role=3)
+        baker.make(
+            Membership, club=self.counter.club, user=self.user, role=self.board_role
+        )
         self.client.force_login(self.user)
         res = self.client.get(self.click_url)
         assert res.status_code == 200
@@ -818,7 +828,9 @@ class TestClubCounterClickAccess(TestCase):
     def test_both_barman_and_board_member(self):
         """If the user is barman and board member, he should be authorized as well."""
         self.counter.sellers.add(self.user)
-        baker.make(Membership, club=self.counter.club, user=self.user, role=3)
+        baker.make(
+            Membership, club=self.counter.club, user=self.user, role=self.board_role
+        )
         self.client.force_login(self.user)
         res = self.client.get(self.click_url)
         assert res.status_code == 200

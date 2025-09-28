@@ -28,7 +28,7 @@ from django.utils.translation import gettext as _
 from model_bakery import baker
 from pytest_django.asserts import assertNumQueries, assertRedirects
 
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 from com.models import News, NewsDate, Poster, Sith, Weekmail, WeekmailArticle
 from core.baker_recipes import subscriber_user
 from core.models import AnonymousUser, Group, User
@@ -214,7 +214,8 @@ class TestNewsCreation(TestCase):
     def setUpTestData(cls):
         cls.club = baker.make(Club)
         cls.user = subscriber_user.make()
-        baker.make(Membership, user=cls.user, club=cls.club, role=5)
+        role = baker.make(ClubRole, club=cls.club, is_board=True)
+        baker.make(Membership, user=cls.user, club=cls.club, role=role)
 
     def setUp(self):
         self.client.force_login(self.user)

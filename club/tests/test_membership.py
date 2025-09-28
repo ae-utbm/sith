@@ -1,9 +1,9 @@
+import itertools
 from collections.abc import Callable
 from datetime import timedelta
 
 import pytest
 from bs4 import BeautifulSoup
-from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.core.cache import cache
 from django.db.models import Max
@@ -14,7 +14,7 @@ from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
 from club.forms import ClubAddMemberForm, JoinClubForm
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 from club.tests.base import TestClub
 from core.baker_recipes import subscriber_user
 from core.models import AnonymousUser, User
@@ -75,17 +75,22 @@ class TestMembershipQuerySet(TestClub):
     def test_update_change_club_groups(self):
         """Test that `update` set the user groups accordingly."""
         user = baker.make(User)
-        membership = baker.make(Membership, end_date=None, user=user, role=5)
+        board_role, member_role = baker.make(
+            ClubRole, is_board=iter([True, False]), _quantity=2, _bulk_create=True
+        )
+        membership = baker.make(
+            Membership, end_date=None, user=user, role=board_role, club=board_role.club
+        )
         members_group = membership.club.members_group
         board_group = membership.club.board_group
         assert user.groups.contains(members_group)
         assert user.groups.contains(board_group)
 
-        user.memberships.update(role=1)  # from board to simple member
+        user.memberships.update(role=member_role)  # from board to simple member
         assert user.groups.contains(members_group)
         assert not user.groups.contains(board_group)
 
-        user.memberships.update(role=5)  # from member to board
+        user.memberships.update(role=board_role)  # from member to board
         assert user.groups.contains(members_group)
         assert user.groups.contains(board_group)
 
@@ -96,7 +101,17 @@ class TestMembershipQuerySet(TestClub):
     def test_delete_remove_from_groups(self):
         """Test that `delete` removes from club groups"""
         user = baker.make(User)
-        memberships = baker.make(Membership, role=iter([1, 5]), user=user, _quantity=2)
+        club = baker.make(Club)
+        roles = baker.make(
+            ClubRole,
+            is_board=iter([False, True]),
+            club=club,
+            _quantity=2,
+            _bulk_create=True,
+        )
+        memberships = baker.make(
+            Membership, club=club, role=iter(roles), user=user, _quantity=2
+        )
         club_groups = {
             memberships[0].club.members_group,
             memberships[1].club.members_group,
@@ -112,13 +127,20 @@ class TestMembershipEditableBy(TestCase):
     def setUpTestData(cls):
         Membership.objects.all().delete()
         cls.club_a, cls.club_b = baker.make(Club, _quantity=2)
+        roles = baker.make(
+            ClubRole,
+            is_presidency=itertools.cycle([True, False, False, False]),
+            is_board=itertools.cycle([True, True, True, False]),
+            order=itertools.cycle(range(4)),
+            club=iter(
+                [*itertools.repeat(cls.club_a, 4), *itertools.repeat(cls.club_b, 4)]
+            ),
+            _quantity=8,
+            _bulk_create=True,
+        )
         cls.memberships = [
-            *baker.make(
-                Membership, role=iter([7, 3, 3, 1]), club=cls.club_a, _quantity=4
-            ),
-            *baker.make(
-                Membership, role=iter([7, 3, 3, 1]), club=cls.club_b, _quantity=4
-            ),
+            *baker.make(Membership, role=iter(roles[:4]), club=cls.club_a, _quantity=4),
+            *baker.make(Membership, role=iter(roles[4:]), club=cls.club_b, _quantity=4),
         ]
 
     def test_admin_user(self):
@@ -140,7 +162,7 @@ class TestMembershipEditableBy(TestCase):
 
 
 class TestMembership(TestClub):
-    def assert_membership_started_today(self, user: User, role: int):
+    def assert_membership_started_today(self, user: User, role: ClubRole):
         """Assert that the given membership is active and started today."""
         membership = user.memberships.ongoing().filter(club=self.club).first()
         assert membership is not None
@@ -189,21 +211,27 @@ class TestMembership(TestClub):
             "Marquer comme ancien",
         ]
         rows = table.find("tbody").find_all("tr")
-        memberships = self.club.members.ongoing().order_by("-role")
-        for row, membership in zip(
-            rows, memberships.select_related("user"), strict=False
-        ):
+        memberships = (
+            self.club.members.ongoing()
+            .order_by("role__order")
+            .select_related("user", "role")
+        )
+        user_role = ClubRole.objects.get(members__user=self.simple_board_member)
+        for row, membership in zip(rows, memberships, strict=False):
             user = membership.user
             user_url = reverse("core:user_profile", args=[user.id])
             cols = row.find_all("td")
             user_link = cols[0].find("a")
             assert user_link.attrs["href"] == user_url
             assert user_link.text == user.get_display_name()
-            assert cols[1].text == settings.SITH_CLUB_ROLES[membership.role]
+            assert cols[1].text == membership.role.name
             assert cols[2].text == membership.description
             assert cols[3].text == str(membership.start_date)
 
-            if membership.role < 3 or membership.user_id == self.simple_board_member.id:
+            if (
+                membership.role.order > user_role.order
+                or membership.user_id == self.simple_board_member.id
+            ):
                 # 3 is the role of simple_board_member
                 form_input = cols[4].find("input")
                 expected_attrs = {
@@ -219,14 +247,15 @@ class TestMembership(TestClub):
         """Test that root users can add members to clubs"""
         self.client.force_login(self.root)
         response = self.client.post(
-            self.new_members_url, {"user": self.subscriber.id, "role": 3}
+            self.new_members_url,
+            {"user": self.subscriber.id, "role": self.board_role.id},
         )
         assert response.status_code == 200
         assert response.headers.get("HX-Redirect", "") == reverse(
             "club:club_members", kwargs={"club_id": self.club.id}
         )
         self.subscriber.refresh_from_db()
-        self.assert_membership_started_today(self.subscriber, role=3)
+        self.assert_membership_started_today(self.subscriber, role=self.board_role)
 
     def test_add_unauthorized_members(self):
         """Test that users who are not currently subscribed
@@ -234,7 +263,7 @@ class TestMembership(TestClub):
         """
         for user in self.public, self.old_subscriber:
             form = ClubAddMemberForm(
-                data={"user": user.id, "role": 1},
+                data={"user": user.id, "role": self.member_role},
                 request_user=self.root,
                 club=self.club,
             )
@@ -255,7 +284,7 @@ class TestMembership(TestClub):
         nb_memberships = self.simple_board_member.memberships.count()
         self.client.post(
             self.members_url,
-            {"users": self.simple_board_member.id, "role": current_membership.role + 1},
+            {"users": self.simple_board_member.id, "role": self.member_role},
         )
         self.simple_board_member.refresh_from_db()
         assert nb_memberships == self.simple_board_member.memberships.count()
@@ -274,7 +303,7 @@ class TestMembership(TestClub):
         max_id = User.objects.aggregate(id=Max("id"))["id"]
         for members in [max_id + 1], [max_id + 1, self.subscriber.id]:
             form = ClubAddMemberForm(
-                data={"user": members, "role": 1},
+                data={"user": members, "role": self.member_role},
                 request_user=self.root,
                 club=self.club,
             )
@@ -290,12 +319,13 @@ class TestMembership(TestClub):
 
     def test_president_add_members(self):
         """Test that the president of the club can add members."""
-        president = self.club.members.get(role=10).user
+        president = self.club.members.get(role=self.president_role).user
         nb_club_membership = self.club.members.count()
         nb_subscriber_memberships = self.subscriber.memberships.count()
         self.client.force_login(president)
         response = self.client.post(
-            self.new_members_url, {"user": self.subscriber.id, "role": 9}
+            self.new_members_url,
+            {"user": self.subscriber.id, "role": self.president_role.id},
         )
         assert response.status_code == 200
         assert response.headers.get("HX-Redirect", "") == reverse(
@@ -305,14 +335,17 @@ class TestMembership(TestClub):
         self.subscriber.refresh_from_db()
         assert self.club.members.count() == nb_club_membership + 1
         assert self.subscriber.memberships.count() == nb_subscriber_memberships + 1
-        self.assert_membership_started_today(self.subscriber, role=9)
+        self.assert_membership_started_today(self.subscriber, role=self.president_role)
 
     def test_add_member_greater_role(self):
         """Test that a member of the club member cannot create
         a membership with a greater role than its own.
         """
+        user_role = self.simple_board_member.memberships.first().role
+        other_role = baker.make(ClubRole, club=user_role.club, is_board=True)
+        other_role.above(user_role)
         form = ClubAddMemberForm(
-            data={"user": self.subscriber.id, "role": 10},
+            data={"user": self.subscriber.id, "role": other_role.id},
             request_user=self.simple_board_member,
             club=self.club,
         )
@@ -320,7 +353,10 @@ class TestMembership(TestClub):
 
         assert not form.is_valid()
         assert form.errors == {
-            "role": ["Sélectionnez un choix valide. 10 n\u2019en fait pas partie."]
+            "role": [
+                "Sélectionnez un choix valide. "
+                "Ce choix ne fait pas partie de ceux disponibles."
+            ]
         }
         self.club.refresh_from_db()
         assert nb_memberships == self.club.members.count()
@@ -336,8 +372,9 @@ class TestMembership(TestClub):
         assert form.errors == {"role": ["Ce champ est obligatoire."]}
 
     def test_add_member_already_there(self):
+        role = ClubRole.objects.get(members__user=self.simple_board_member)
         form = ClubAddMemberForm(
-            data={"user": self.simple_board_member, "role": 3},
+            data={"user": self.simple_board_member, "role": role.id},
             request_user=self.root,
             club=self.club,
         )
@@ -348,22 +385,27 @@ class TestMembership(TestClub):
 
     def test_add_other_member_forbidden(self):
         non_member = subscriber_user.make()
-        simple_member = baker.make(Membership, club=self.club, role=1).user
+        simple_member = baker.make(
+            Membership, club=self.club, role=self.member_role
+        ).user
         for user in non_member, simple_member:
             form = ClubAddMemberForm(
-                data={"user": subscriber_user.make(), "role": 1},
+                data={"user": subscriber_user.make(), "role": self.member_role.id},
                 request_user=user,
                 club=self.club,
             )
             assert not form.is_valid()
             assert form.errors == {
-                "role": ["Sélectionnez un choix valide. 1 n\u2019en fait pas partie."]
+                "role": [
+                    "Sélectionnez un choix valide. "
+                    "Ce choix ne fait pas partie de ceux disponibles."
+                ]
             }
 
     def test_simple_members_dont_see_form_anymore(self):
         """Test that simple club members don't see the form to add members"""
         user = subscriber_user.make()
-        baker.make(Membership, club=self.club, user=user, role=1)
+        baker.make(Membership, club=self.club, user=user, role=self.member_role)
         self.client.force_login(user)
         res = self.client.get(self.members_url)
         assert res.status_code == 200
@@ -382,9 +424,10 @@ class TestMembership(TestClub):
         """Test that board members of the club can end memberships
         of users with lower roles.
         """
-        # reminder : simple_board_member has role 3
         self.client.force_login(self.simple_board_member)
-        membership = baker.make(Membership, club=self.club, role=2, end_date=None)
+        role = baker.make(ClubRole, club=self.club, is_board=True)
+        role.below(self.board_role)
+        membership = baker.make(Membership, club=self.club, role=role)
         response = self.client.post(self.members_url, {"members_old": [membership.id]})
         self.assertRedirects(response, self.members_url)
         self.club.refresh_from_db()
@@ -394,7 +437,9 @@ class TestMembership(TestClub):
         """Test that board members of the club cannot end memberships
         of users with higher roles.
         """
-        membership = self.president.memberships.filter(club=self.club).first()
+        membership = self.president.memberships.filter(
+            club=self.club, end_date=None
+        ).first()
         self.client.force_login(self.simple_board_member)
         self.client.post(self.members_url, {"members_old": [membership.id]})
         self.club.refresh_from_db()
@@ -436,7 +481,9 @@ class TestMembership(TestClub):
     def test_remove_from_club_group(self):
         """Test that when a membership ends, the user is removed from club groups."""
         user = baker.make(User)
-        baker.make(Membership, user=user, club=self.club, end_date=None, role=3)
+        baker.make(
+            Membership, user=user, club=self.club, end_date=None, role=self.board_role
+        )
         assert user.groups.contains(self.club.members_group)
         assert user.groups.contains(self.club.board_group)
         user.memberships.update(end_date=localdate())
@@ -447,18 +494,20 @@ class TestMembership(TestClub):
         """Test that when a membership begins, the user is added to the club group."""
         assert not self.subscriber.groups.contains(self.club.members_group)
         assert not self.subscriber.groups.contains(self.club.board_group)
-        baker.make(Membership, club=self.club, user=self.subscriber, role=3)
+        baker.make(
+            Membership, club=self.club, user=self.subscriber, role=self.board_role
+        )
         assert self.subscriber.groups.contains(self.club.members_group)
         assert self.subscriber.groups.contains(self.club.board_group)
 
     def test_change_position_in_club(self):
         """Test that when moving from board to members, club group change"""
         membership = baker.make(
-            Membership, club=self.club, user=self.subscriber, role=3
+            Membership, club=self.club, user=self.subscriber, role=self.board_role
         )
         assert self.subscriber.groups.contains(self.club.members_group)
         assert self.subscriber.groups.contains(self.club.board_group)
-        membership.role = 1
+        membership.role = self.member_role
         membership.save()
         assert self.subscriber.groups.contains(self.club.members_group)
         assert not self.subscriber.groups.contains(self.club.board_group)
@@ -471,7 +520,11 @@ class TestMembership(TestClub):
 
         # make sli a board member
         self.sli.memberships.all().delete()
-        Membership(club=self.ae, user=self.sli, role=3).save()
+        Membership(
+            club=self.ae,
+            user=self.sli,
+            role=baker.make(ClubRole, club=self.ae, is_board=True),
+        ).save()
         assert self.club.is_owned_by(self.sli)
 
     def test_change_club_name(self):
@@ -497,7 +550,7 @@ class TestMembership(TestClub):
 
 @pytest.mark.django_db
 def test_membership_set_old(client: Client):
-    membership = baker.make(Membership, end_date=None, user=(subscriber_user.make()))
+    membership = baker.make(Membership, end_date=None, user=subscriber_user.make())
     client.force_login(membership.user)
     response = client.post(
         reverse("club:membership_set_old", kwargs={"membership_id": membership.id})
@@ -531,55 +584,63 @@ class TestJoinClub:
         cache.clear()
 
     @pytest.mark.parametrize(
-        ("user_factory", "role", "errors"),
+        ("user_factory", "board_role", "errors"),
         [
             (
                 subscriber_user.make,
-                2,
+                True,
                 {
                     "role": [
-                        "Sélectionnez un choix valide. 2 n\u2019en fait pas partie."
+                        "Sélectionnez un choix valide. "
+                        "Ce choix ne fait pas partie de ceux disponibles."
                     ]
                 },
             ),
             (
                 lambda: baker.make(User),
-                1,
+                False,
                 {"__all__": ["Vous devez être cotisant pour faire partie d'un club"]},
             ),
         ],
     )
     def test_join_club_errors(
-        self, user_factory: Callable[[], User], role: int, errors: dict
+        self, user_factory: Callable[[], User], board_role, errors: dict
     ):
         club = baker.make(Club)
         user = user_factory()
-        form = JoinClubForm(club=club, request_user=user, data={"role": role})
+        role = baker.make(ClubRole, club=club, is_board=board_role)
+        form = JoinClubForm(club=club, request_user=user, data={"role": role.id})
         assert not form.is_valid()
         assert form.errors == errors
 
     def test_user_already_in_club(self):
-        club = baker.make(Club)
         user = subscriber_user.make()
-        baker.make(Membership, user=user, club=club)
-        form = JoinClubForm(club=club, request_user=user, data={"role": 1})
+        role = baker.make(ClubRole, is_board=False)
+        baker.make(Membership, user=user, club=role.club)
+        form = JoinClubForm(club=role.club, request_user=user, data={"role": role.id})
         assert not form.is_valid()
         assert form.errors == {"__all__": ["Vous êtes déjà membre de ce club."]}
 
     def test_ok(self):
-        club = baker.make(Club)
         user = subscriber_user.make()
-        form = JoinClubForm(club=club, request_user=user, data={"role": 1})
+        role = baker.make(ClubRole, is_board=False)
+        form = JoinClubForm(club=role.club, request_user=user, data={"role": role.id})
         assert form.is_valid()
         form.save()
-        assert Membership.objects.ongoing().filter(user=user, club=club).exists()
+        assert Membership.objects.ongoing().filter(user=user, club=role.club).exists()
 
 
 class TestOldMembersView(TestCase):
     @classmethod
     def setUpTestData(cls):
         club = baker.make(Club)
-        roles = [1, 1, 1, 2, 2, 4, 4, 5, 7, 9, 10]
+        roles = baker.make(
+            ClubRole,
+            club=club,
+            is_board=itertools.cycle([True, True, False]),
+            _quantity=10,
+            _bulk_create=True,
+        )
         cls.memberships = baker.make(
             Membership,
             role=iter(roles),
