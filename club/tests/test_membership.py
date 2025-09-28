@@ -317,6 +317,51 @@ class TestMembership(TestClub):
         self.club.refresh_from_db()
         assert self.club.members.count() == nb_memberships
 
+    def test_president_add_members(self):
+        """Test that the president of the club can add members."""
+        president = self.club.members.get(role=self.president_role).user
+        nb_club_membership = self.club.members.count()
+        nb_subscriber_memberships = self.subscriber.memberships.count()
+        self.client.force_login(president)
+        response = self.client.post(
+            self.new_members_url,
+            {"user": self.subscriber.id, "role": self.president_role.id},
+        )
+        assert response.status_code == 200
+        assert response.headers.get("HX-Redirect", "") == reverse(
+            "club:club_members", kwargs={"club_id": self.club.id}
+        )
+        self.club.refresh_from_db()
+        self.subscriber.refresh_from_db()
+        assert self.club.members.count() == nb_club_membership + 1
+        assert self.subscriber.memberships.count() == nb_subscriber_memberships + 1
+        self.assert_membership_started_today(self.subscriber, role=self.president_role)
+
+    def test_add_member_greater_role(self):
+        """Test that a member of the club member cannot create
+        a membership with a greater role than its own.
+        """
+        user_role = self.simple_board_member.memberships.first().role
+        other_role = baker.make(ClubRole, club=user_role.club, is_board=True)
+        other_role.above(user_role)
+        form = ClubAddMemberForm(
+            data={"user": self.subscriber.id, "role": other_role.id},
+            request_user=self.simple_board_member,
+            club=self.club,
+        )
+        nb_memberships = self.club.members.count()
+
+        assert not form.is_valid()
+        assert form.errors == {
+            "role": [
+                "Sélectionnez un choix valide. "
+                "Ce choix ne fait pas partie de ceux disponibles."
+            ]
+        }
+        self.club.refresh_from_db()
+        assert nb_memberships == self.club.members.count()
+        assert not self.subscriber.memberships.filter(club=self.club).exists()
+
     def test_add_member_without_role(self):
         """Test that trying to add members without specifying their role fails."""
         form = ClubAddMemberForm(
