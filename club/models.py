@@ -89,7 +89,7 @@ class Club(models.Model):
         on_delete=models.SET_NULL,
     )
     page = models.OneToOneField(
-        Page, related_name="club", blank=True, on_delete=models.CASCADE
+        Page, related_name="club", blank=True, on_delete=models.PROTECT
     )
     members_group = models.OneToOneField(
         Group, related_name="club", on_delete=models.PROTECT
