@@ -13,6 +13,7 @@ from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from club.widgets.ajax_select import AutoCompleteSelectClub
 from core.models import User
 from core.views.forms import (
+    FutureDateTimeField,
     NFCTextInput,
     SelectDate,
     SelectDateTime,
@@ -185,7 +186,7 @@ class ScheduledProductActionForm(forms.ModelForm):
         labels = {"task": _("Action")}
         help_texts = {"task": ""}
 
-    trigger_at = forms.DateTimeField(
+    trigger_at = FutureDateTimeField(
         label=_("Date and time of action"), widget=SelectDateTime
     )
     counters = forms.ModelMultipleChoiceField(
@@ -206,7 +207,7 @@ class ScheduledProductActionForm(forms.ModelForm):
             )
 
     def clean(self):
-        if not self.changed_data:
+        if not self.changed_data or "trigger_at" in self.errors:
             return super().clean()
         if "trigger_at" in self.changed_data:
             if not self.instance.clocked_id:

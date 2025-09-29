@@ -1385,3 +1385,13 @@ class ScheduledProductAction(PeriodicTask):
     def full_clean(self, *args, **kwargs):
         self.one_off = True  # A product action should occur one time only
         return super().full_clean(*args, **kwargs)
+
+    def clean_clocked(self):
+        if not self.clocked:
+            raise ValidationError(_("Product actions must declare a clocked schedule."))
+
+    def validate_unique(self, *args, **kwargs):
+        # The checks done in PeriodicTask.validate_unique aren't
+        # adapted in the case of scheduled product action,
+        # so we skip it and execute directly Model.validate_unique
+        return super(PeriodicTask, self).validate_unique(*args, **kwargs)
