@@ -32,7 +32,7 @@ from core.utils import get_semester_code, get_start_of_semester
 from counter.forms import (
     CloseCustomerAccountForm,
     CounterEditForm,
-    ProductEditForm,
+    ProductForm,
     ReturnableProductForm,
 )
 from counter.models import (
@@ -146,7 +146,7 @@ class ProductCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     """A create view for the admins."""
 
     model = Product
-    form_class = ProductEditForm
+    form_class = ProductForm
     template_name = "counter/product_form.jinja"
     current_tab = "products"
 
@@ -155,7 +155,7 @@ class ProductEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     """An edit view for the admins."""
 
     model = Product
-    form_class = ProductEditForm
+    form_class = ProductForm
     pk_url_kwarg = "product_id"
     template_name = "counter/product_form.jinja"
     current_tab = "products"

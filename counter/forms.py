@@ -232,13 +232,16 @@ class ScheduledProductActionForm(forms.ModelForm):
 
 class BaseScheduledProductActionFormSet(BaseModelFormSet):
     def __init__(self, *args, product: Product, **kwargs):
-        queryset = (
-            product.scheduled_actions.filter(
-                enabled=True, clocked__clocked_time__gt=now()
+        if product.id:
+            queryset = (
+                product.scheduled_actions.filter(
+                    enabled=True, clocked__clocked_time__gt=now()
+                )
+                .order_by("clocked__clocked_time")
+                .select_related("clocked")
             )
-            .order_by("clocked__clocked_time")
-            .select_related("clocked")
-        )
+        else:
+            queryset = ScheduledProductAction.objects.none()
         form_kwargs = {"product": product}
         super().__init__(*args, queryset=queryset, form_kwargs=form_kwargs, **kwargs)
 
@@ -260,7 +263,7 @@ ScheduledProductActionFormSet = forms.modelformset_factory(
 )
 
 
-class ProductEditForm(forms.ModelForm):
+class ProductForm(forms.ModelForm):
     error_css_class = "error"
     required_css_class = "required"
 
@@ -367,7 +370,7 @@ class CloseCustomerAccountForm(forms.Form):
     )
 
 
-class ProductForm(forms.Form):
+class BasketProductForm(forms.Form):
     quantity = forms.IntegerField(min_value=1, required=True)
     id = forms.IntegerField(min_value=0, required=True)
 
@@ -472,5 +475,5 @@ class BaseBasketForm(forms.BaseFormSet):
 
 
 BasketForm = forms.formset_factory(
-    ProductForm, formset=BaseBasketForm, absolute_max=None, min_num=1
+    BasketProductForm, formset=BaseBasketForm, absolute_max=None, min_num=1
 )

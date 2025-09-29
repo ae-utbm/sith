@@ -31,11 +31,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
 from django.db.models import Q, Sum
-from django.http import (
-    Http404,
-    HttpResponseRedirect,
-    StreamingHttpResponse,
-)
+from django.http import Http404, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -55,12 +51,7 @@ from club.forms import (
     MailingForm,
     SellingsForm,
 )
-from club.models import (
-    Club,
-    Mailing,
-    MailingSubscription,
-    Membership,
-)
+from club.models import Club, Mailing, MailingSubscription, Membership
 from com.models import Poster
 from com.views import (
     PosterCreateBaseView,
@@ -68,9 +59,7 @@ from com.views import (
     PosterEditBaseView,
     PosterListBaseView,
 )
-from core.auth.mixins import (
-    CanEditMixin,
-)
+from core.auth.mixins import CanEditMixin
 from core.models import PageRev
 from core.views import DetailFormView, PageEditViewBase, UseFragmentsMixin
 from core.views.mixins import FragmentMixin, FragmentRenderer, TabedViewMixin
