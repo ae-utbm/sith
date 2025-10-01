@@ -881,6 +881,7 @@ class Selling(models.Model):
             if (
                 self.product
                 and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER
+                and self.counter.type == "EBOUTIC"
             ):
                 sub = Subscription(
                     member=user,
@@ -904,6 +905,7 @@ class Selling(models.Model):
             elif (
                 self.product
                 and self.product.id == settings.SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS
+                and self.counter.type == "EBOUTIC"
             ):
                 sub = Subscription(
                     member=user,
