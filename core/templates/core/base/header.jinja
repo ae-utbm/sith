@@ -77,22 +77,22 @@
         <div class="notification" x-data="{display: false}" :class="{white: display}">
           <a href="#" @click.prevent="display = !display">
             <i :class="`fa-${display ? 'solid': 'regular'} fa-bell`" x-transition></i>
-            {% set notification_count = user.notifications.filter(viewed=False).count() %}
+            {% set notifications = user.notifications.filter(viewed=False).order_by("-date")|list %}
 
-            {% if notification_count > 0 %}
+            {%- if notifications|length > 0 -%}
               <span>
-                {% if notification_count < 100 %}
-                  {{ notification_count }}
-                {% else %}
-                  &nbsp;
-                {% endif %}
+                {% if notifications|length < 100 %}
+                  {{ notifications|length }}
+                {%- else -%}
+                  99+
+                {%- endif -%}
               </span>
             {% endif %}
           </a>
           <div id="header_notif" x-show="display" x-cloak x-transition @click.outside="display = false">
             <ul>
-              {% if user.notifications.filter(viewed=False).count() > 0 %}
-                {% for n in user.notifications.filter(viewed=False).order_by('-date') %}
+              {%- if notifications|length > 0 -%}
+                {%- for n in notifications -%}
                   <li>
                     <a href="{{ url("core:notification", notif_id=n.id) }}">
                       <div class="datetime">
@@ -108,10 +108,10 @@
                       </div>
                     </a>
                   </li>
-                {% endfor %}
-              {% else %}
+                {%- endfor -%}
+              {%- else -%}
                 <li class="empty-notification">{% trans %}You do not have any unread notification{% endtrans %}</li>
-              {% endif %}
+              {%- endif -%}
             </ul>
             <div class="options">
               <a href="{{ url('core:notification_list') }}">
