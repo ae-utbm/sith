@@ -651,19 +651,12 @@ class User(AbstractUser):
 
 
 class AnonymousUser(AuthAnonymousUser):
-    def __init__(self):
-        super().__init__()
-
     @property
     def was_subscribed(self):
         return False
 
     @property
     def is_subscribed(self):
-        return False
-
-    @property
-    def subscribed(self):
         return False
 
     @property

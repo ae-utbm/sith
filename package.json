@@ -59,6 +59,7 @@
     "d3-force-3d": "^3.0.5",
     "easymde": "^2.19.0",
     "glob": "^11.0.0",
+    "html2canvas": "^1.4.1",
     "htmx.org": "^2.0.3",
     "js-cookie": "^3.0.5",
     "lit-html": "^3.3.0",
