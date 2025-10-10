@@ -252,7 +252,7 @@ class ClubAddMemberForm(ClubMemberForm):
         Board members can attribute roles lower than their own.
         Other users cannot attribute roles with this form
         """
-        if self.request_user.has_perm("club.add_subscription"):
+        if self.request_user.has_perm("club.add_membership"):
             return settings.SITH_CLUB_ROLES_ID["President"]
         membership = self.request_user_membership
         if membership is None or membership.role <= settings.SITH_MAXIMUM_FREE_ROLE:
