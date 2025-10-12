@@ -16,6 +16,7 @@ from typing import Any
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count, OuterRef, Subquery
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -36,7 +37,7 @@ from sas.forms import (
     PictureModerationRequestForm,
     PictureUploadForm,
 )
-from sas.models import Album, Picture
+from sas.models import Album, PeoplePictureRelation, Picture
 
 
 class AlbumCreateFragment(FragmentMixin, CreateView):
@@ -178,6 +179,13 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "sas/user_pictures.jinja"
     current_tab = "pictures"
+    queryset = User.objects.annotate(
+        nb_pictures=Subquery(
+            PeoplePictureRelation.objects.filter(user=OuterRef("id"))
+            .values("user_id")
+            .values(count=Count("*"))
+        )
+    ).all()
 
 
 # Admin views
