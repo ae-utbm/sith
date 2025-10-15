@@ -1,9 +1,11 @@
 import json
 import math
 import uuid
+from datetime import date
 
+from dateutil.relativedelta import relativedelta
 from django import forms
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.forms import BaseModelFormSet
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
@@ -35,6 +37,7 @@ from counter.models import (
     Refilling,
     ReturnableProduct,
     ScheduledProductAction,
+    Selling,
     StudentCard,
     get_product_actions,
 )
@@ -483,36 +486,45 @@ BasketForm = forms.formset_factory(
 
 
 class InvoiceCallForm(forms.Form):
-    def __init__(self, *args, month, clubs: list[Club] | None = None, **kwargs):
+    def __init__(self, *args, month: date, **kwargs):
         super().__init__(*args, **kwargs)
         self.month = month
-        self.clubs = clubs
-
-        if self.clubs is None:
-            self.clubs = []
-
-        invoices = {
-            i["club_id"]: i["is_validated"]
-            for i in InvoiceCall.objects.filter(
-                club__in=self.clubs, month=self.month
-            ).values("club_id", "is_validated")
+        self.clubs = list(
+            Club.objects.filter(
+                Exists(
+                    Selling.objects.filter(
+                        club=OuterRef("pk"),
+                        date__gte=month,
+                        date__lte=month + relativedelta(months=1),
+                    )
+                )
+            ).annotate(
+                validated_invoice=Exists(
+                    InvoiceCall.objects.filter(
+                        club=OuterRef("pk"), month=month, is_validated=True
+                    )
+                )
+            )
+        )
+        self.fields = {
+            str(club.id): forms.BooleanField(
+                required=False, initial=club.validated_invoice
+            )
+            for club in self.clubs
         }
 
-        for club in self.clubs:
-            is_validated = invoices.get(club.id, False)
-
-            self.fields[f"club_{club.id}"] = forms.BooleanField(
-                required=False, initial=is_validated
-            )
-
     def save(self):
-        for club in self.clubs:
-            field_name = f"club_{club.id}"
-            is_validated = self.cleaned_data.get(field_name, False)
-
-            InvoiceCall.objects.update_or_create(
-                month=self.month, club=club, defaults={"is_validated": is_validated}
+        invoice_calls = [
+            InvoiceCall(
+                month=self.month,
+                club_id=club.id,
+                is_validated=self.cleaned_data.get(str(club.id), False),
             )
-
-    def get_club_name(self, club_id):
-        return f"club_{club_id}"
+            for club in self.clubs
+        ]
+        InvoiceCall.objects.bulk_create(
+            invoice_calls,
+            update_conflicts=True,
+            update_fields=["is_validated"],
+            unique_fields=["month", "club"],
+        )

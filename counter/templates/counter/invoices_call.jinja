@@ -16,31 +16,33 @@
     <input type="submit" value="{% trans %}Go{% endtrans %}" />
   </form>
 
+  <br>
+  <p>{% trans %}CB Payments{% endtrans %} : {{ sum_cb }} €</p>
+  <br>
+  {% include "core/base/notifications.jinja" %}
   <form method="post" action="">
     {% csrf_token %}
-    <br>
-    <p>{% trans %}CB Payments{% endtrans %} : {{ sum_cb }} €</p>
-    <br>
-
     <table>
       <thead>
-        <td>{% trans %}Club{% endtrans %}</td>
-        <td>{% trans %}Sum{% endtrans %}</td>
-        <td>{% trans %}Validated{% endtrans %}</td>
+        <tr>
+          <td>{% trans %}Club{% endtrans %}</td>
+          <td>{% trans %}Sum{% endtrans %}</td>
+          <td>{% trans %}Validated{% endtrans %}</td>
+        </tr>
       </thead>
       <tbody>
-        {% for data in club_data %}
+        {% for invoice in invoices %}
           <tr>
-            <td>{{ data.club.name }}</td>
-            <td>{{"%.2f"|format(data.sum)}} €</td>
+            <td>{{ invoice.club__name }}</td>
+            <td>{{ "%.2f"|format(invoice.selling_sum) }} €</td>
             <td>
-              {{ form[form.get_club_name(data.club.id)] }}
+              {{ form[invoice.club_id|string] }}
             </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
     <input type="hidden" name="month" value="{{ start_date|date('Y-m') }}">
-    <button type="submit">{% trans %}Save validation{% endtrans %}</button>
+    <button type="submit">{% trans %}Save{% endtrans %}</button>
   </form>
 {% endblock %}

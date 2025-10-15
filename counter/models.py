@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import base64
+import contextlib
 import os
 import random
 import string
@@ -1411,19 +1412,18 @@ class MonthField(models.DateField):
     }
 
     def to_python(self, value):
-        if isinstance(value, date):
-            return value.replace(day=1)
-
         if isinstance(value, str):
-            try:
-                year, month = map(int, value.split("-"))
-                return date(year, month, 1)
-            except (ValueError, TypeError) as err:
-                raise ValueError(
-                    self.error_messages["invalid"] % {"value": value}
-                ) from err
-
-        return super().to_python(value)
+            with contextlib.suppress(ValueError):
+                # If the string is given as YYYY-mm, try to parse it.
+                # If it fails, it means that the string may be in the form YYYY-mm-dd
+                # or in an invalid format.
+                # Whatever the case, we let Django deal with it
+                # and raise an error if needed
+                value = datetime.strptime(value, "%Y-%m")
+        value = super().to_python(value)
+        if value is None:
+            return None
+        return value.replace(day=1)
 
 
 class InvoiceCall(models.Model):
@@ -1434,10 +1434,11 @@ class InvoiceCall(models.Model):
     class Meta:
         verbose_name = _("Invoice call")
         verbose_name_plural = _("Invoice calls")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["club", "month"], name="counter_invoicecall_unique_club_month"
+            )
+        ]
 
     def __str__(self):
         return f"invoice call of {self.month} made by {self.club}"
-
-    def save(self, *args, **kwargs):
-        self.month = self._meta.get_field("month").to_python(self.month)
-        super().save(*args, **kwargs)

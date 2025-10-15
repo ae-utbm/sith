@@ -22,6 +22,7 @@ from counter.models import (
     Counter,
     Customer,
     Eticket,
+    InvoiceCall,
     Permanency,
     Product,
     ProductType,
@@ -160,3 +161,11 @@ class CashRegisterSummaryAdmin(SearchModelAdmin):
 class EticketAdmin(SearchModelAdmin):
     list_display = ("product", "event_date", "event_title")
     search_fields = ("product__name", "event_title")
+
+
+@admin.register(InvoiceCall)
+class InvoiceCallAdmin(SearchModelAdmin):
+    list_display = ("club", "month", "is_validated")
+    search_fields = ("club__name",)
+    list_filter = (("club", admin.RelatedOnlyFieldListFilter),)
+    date_hierarchy = "month"

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-26 17:36+0200\n"
+"POT-Creation-Date: 2025-10-17 13:41+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -556,6 +556,7 @@ msgstr ""
 #: core/templates/core/user_godfathers_tree.jinja
 #: core/templates/core/user_preferences.jinja
 #: counter/templates/counter/cash_register_summary.jinja
+#: counter/templates/counter/invoices_call.jinja
 #: counter/templates/counter/product_form.jinja
 #: forum/templates/forum/reply.jinja
 #: subscription/templates/subscription/fragments/creation_form.jinja
@@ -690,13 +691,13 @@ msgid "Mailing list"
 msgstr "Listes de diffusion"
 
 #: club/views.py
+msgid "You are now a member of this club."
+msgstr "Vous êtes maintenant membre de ce club."
+
+#: club/views.py
 #, python-format
 msgid "%(user)s has been added to club."
 msgstr "%(user)s a été ajouté au club."
-
-#: club/views.py
-msgid "You are now a member of this club."
-msgstr "Vous êtes maintenant membre de ce club."
 
 #: com/forms.py
 msgid "Format: 16:9 | Resolution: 1920x1080"
@@ -3314,6 +3315,40 @@ msgstr "Changement des comptoirs"
 msgid "Product scheduled action"
 msgstr "Actions sur produit planifiées"
 
+#: counter/models.py
+msgid "Product actions must declare a clocked schedule."
+msgstr "Les actions sur les produits doivent avoir un horaire planifié."
+
+#: counter/models.py
+msgid "Year + month field (day forced to 1)"
+msgstr "Champ Année + mois (jour forcé à 1)"
+
+#: counter/models.py
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM format."
+msgstr ""
+"La valeur « %(value)s » a un format de date invalide. Ce doit être au format "
+"YYYY-MM."
+
+#: counter/models.py
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM) but it is an invalid date."
+msgstr "La valeur « %(value)s » a le bon format, mais est une date invalide."
+
+#: counter/models.py
+msgid "invoice date"
+msgstr "date de la facture"
+
+#: counter/models.py
+msgid "Invoice call"
+msgstr "Appel à facture"
+
+#: counter/models.py
+msgid "Invoice calls"
+msgstr "Appels à facture"
+
 #: counter/templates/counter/activity.jinja
 #, python-format
 msgid "%(counter_name)s activity"
@@ -3543,6 +3578,10 @@ msgstr "Payements en Carte Bancaire"
 #: counter/templates/counter/invoices_call.jinja
 msgid "Sum"
 msgstr "Somme"
+
+#: counter/templates/counter/invoices_call.jinja
+msgid "Validated"
+msgstr "Validé"
 
 #: counter/templates/counter/last_ops.jinja
 #, python-format
@@ -3832,6 +3871,10 @@ msgstr "L'utilisateur n'est pas barman."
 #: counter/views/home.py
 msgid "Bad location, someone is already logged in somewhere else"
 msgstr "Mauvais comptoir, quelqu'un est déjà connecté ailleurs"
+
+#: counter/views/invoice.py
+msgid "Invoice calls status has been updated."
+msgstr "Le statut des appels à facture a été mis à jour."
 
 #: counter/views/mixins.py
 msgid "Cash summary"
