@@ -1,7 +1,22 @@
-from ninja import ModelSchema
+from typing import Optional
+
+from django.db.models import Q
+from ninja import Field, FilterSchema, ModelSchema
 
 from club.models import Club, Membership
 from core.schemas import SimpleUserSchema
+
+
+class ClubSearchFilterSchema(FilterSchema):
+    search: Optional[str] = Field(None, q="name__icontains")
+    club_id: Optional[int] = Field(None, q="id")
+    is_active: Optional[bool] = None
+    parent_id: Optional[int] = None
+    parent_name: Optional[str] = Field(None, q="parent__name__icontains")
+    exclude_ids: Optional[list[int]] = None
+
+    def filter_exclude_ids(self, value: list[int]):
+        return ~Q(id__in=value)
 
 
 class SimpleClubSchema(ModelSchema):
