@@ -117,7 +117,7 @@ msgstr "S'abonner"
 msgid "Remove"
 msgstr "Retirer"
 
-#: club/forms.py pedagogy/templates/pedagogy/moderation.jinja
+#: club/forms.py counter/forms.py pedagogy/templates/pedagogy/moderation.jinja
 msgid "Action"
 msgstr "Action"
 
@@ -556,6 +556,7 @@ msgstr ""
 #: core/templates/core/user_godfathers_tree.jinja
 #: core/templates/core/user_preferences.jinja
 #: counter/templates/counter/cash_register_summary.jinja
+#: counter/templates/counter/product_form.jinja
 #: forum/templates/forum/reply.jinja
 #: subscription/templates/subscription/fragments/creation_form.jinja
 #: trombi/templates/trombi/comment.jinja
@@ -2956,6 +2957,18 @@ msgid "User not found"
 msgstr "Utilisateur non trouvé"
 
 #: counter/forms.py
+msgid "Date and time of action"
+msgstr "Date et heure de l'action"
+
+#: counter/forms.py
+msgid "New counters"
+msgstr "Nouveaux comptoirs"
+
+#: counter/forms.py
+msgid "The selected counters will replace the current ones"
+msgstr "Les comptoirs sélectionnés remplaceront les comptoirs actuels"
+
+#: counter/forms.py
 msgid ""
 "Describe the product. If it's an event's click, give some insights about it, "
 "like the date (including the year)."
@@ -3289,6 +3302,18 @@ msgid "The returnable product cannot be the same as the returned one"
 msgstr ""
 "Le produit consigné ne peut pas être le même que le produit de déconsigne"
 
+#: counter/models.py
+msgid "Archiving"
+msgstr "Archivage"
+
+#: counter/models.py
+msgid "Counters change"
+msgstr "Changement des comptoirs"
+
+#: counter/models.py
+msgid "Product scheduled action"
+msgstr "Actions sur produit planifiées"
+
 #: counter/templates/counter/activity.jinja
 #, python-format
 msgid "%(counter_name)s activity"
@@ -3606,6 +3631,25 @@ msgstr ""
 "vous ne perdrez pas vos droits. Vous serez toujours en mesure de renouveler "
 "votre cotisation. Si vous ne renouvelez pas votre cotisation, il n'y aura "
 "aucune conséquence autre que le retrait de l'argent de votre compte."
+
+#: counter/templates/counter/product_form.jinja
+#, python-format
+msgid "Edit product %(name)s"
+msgstr "Édition du produit %(name)s"
+
+#: counter/templates/counter/product_form.jinja
+msgid "Product creation"
+msgstr "Création de produit"
+
+#: counter/templates/counter/product_form.jinja
+msgid "Automatic actions"
+msgstr "Actions automatiques"
+
+#: counter/templates/counter/product_form.jinja
+msgid "Automatic actions allows to schedule product changes ahead of time."
+msgstr ""
+"Les actions automatiques vous permettent de planifier des modifications du "
+"produit à l'avance."
 
 #: counter/templates/counter/product_list.jinja
 msgid "Product list"

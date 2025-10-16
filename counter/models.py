@@ -34,6 +34,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django_celery_beat.models import PeriodicTask
 from django_countries.fields import CountryField
 from ordered_model.models import OrderedModel
 from phonenumber_field.modelfields import PhoneNumberField
@@ -445,7 +446,8 @@ class Product(models.Model):
         buying_groups = list(self.buying_groups.all())
         if not buying_groups:
             return True
-        return any(user.is_in_group(pk=group.id) for group in buying_groups)
+        res = any(user.is_in_group(pk=group.id) for group in buying_groups)
+        return res
 
     @property
     def profit(self):
@@ -479,7 +481,7 @@ class CounterQuerySet(models.QuerySet):
         return self.annotate(has_annotated_barman=Exists(subquery))
 
     def annotate_is_open(self) -> Self:
-        """Annotate tue queryset with the `is_open` field.
+        """Annotate the queryset with the `is_open` field.
 
         For each counter, if `is_open=True`, then the counter is currently opened.
         Else the counter is closed.
@@ -1357,3 +1359,39 @@ class ReturnableProductBalance(models.Model):
             f"return balance of {self.customer} "
             f"for {self.returnable.product_id} : {self.balance}"
         )
+
+
+def get_product_actions():
+    return [
+        ("counter.tasks.archive_product", _("Archiving")),
+        ("counter.tasks.change_counters", _("Counters change")),
+    ]
+
+
+class ScheduledProductAction(PeriodicTask):
+    """Extension of celery-beat tasks dedicated to perform actions on Product."""
+
+    product = models.ForeignKey(
+        Product, related_name="scheduled_actions", on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = _("Product scheduled action")
+
+    def __init__(self, *args, **kwargs):
+        self._meta.get_field("task").choices = get_product_actions()
+        super().__init__(*args, **kwargs)
+
+    def full_clean(self, *args, **kwargs):
+        self.one_off = True  # A product action should occur one time only
+        return super().full_clean(*args, **kwargs)
+
+    def clean_clocked(self):
+        if not self.clocked:
+            raise ValidationError(_("Product actions must declare a clocked schedule."))
+
+    def validate_unique(self, *args, **kwargs):
+        # The checks done in PeriodicTask.validate_unique aren't
+        # adapted in the case of scheduled product action,
+        # so we skip it and execute directly Model.validate_unique
+        return super(PeriodicTask, self).validate_unique(*args, **kwargs)

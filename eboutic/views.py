@@ -48,7 +48,7 @@ from django_countries.fields import Country
 
 from core.auth.mixins import CanViewMixin
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
-from counter.forms import BaseBasketForm, BillingInfoForm, ProductForm
+from counter.forms import BaseBasketForm, BasketProductForm, BillingInfoForm
 from counter.models import (
     BillingInfo,
     Customer,
@@ -78,7 +78,7 @@ class BaseEbouticBasketForm(BaseBasketForm):
 
 
 EbouticBasketForm = forms.formset_factory(
-    ProductForm, formset=BaseEbouticBasketForm, absolute_max=None, min_num=1
+    BasketProductForm, formset=BaseEbouticBasketForm, absolute_max=None, min_num=1
 )
 
 
