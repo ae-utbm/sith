@@ -1,7 +1,7 @@
 {% extends "core/base.jinja" %}
 
 {% block notifications %}
-  {# Notifications are moved inside the billing info fragment #}
+  {# Notifications are moved under the billing form #}
 {% endblock %}
 
 {% block title %}
@@ -60,6 +60,7 @@
       <div @htmx:after-request="fill">
         {{ billing_infos_form }}
       </div>
+      {% include "core/base/notifications.jinja" %}
       <form
         method="post"
         action="{{ settings.SITH_EBOUTIC_ET_URL }}"

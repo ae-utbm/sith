@@ -13,10 +13,10 @@
              }"
      @quick-notification-add="(e) => messages.push(e?.detail)"
      @quick-notification-delete="messages = []">
-  <template x-for="message in messages">
-    <div x-data="{show: true}" class="alert" :class="`alert-${message.tag}`" x-show="show" x-transition>
+  <template x-for="(message, index) in messages">
+    <div class="alert" :class="`alert-${message.tag}`" x-transition>
       <span class="alert-main" x-text="message.text"></span>
-      <span class="clickable" @click="show = false">
+      <span class="clickable" @click="messages = messages.filter((item, i) => i !== index)">
         <i class="fa fa-close"></i>
       </span>
     </div>
