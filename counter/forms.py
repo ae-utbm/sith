@@ -1,15 +1,18 @@
 import json
 import math
 import uuid
+from datetime import date
 
+from dateutil.relativedelta import relativedelta
 from django import forms
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.forms import BaseModelFormSet
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import ClockedSchedule
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
+from club.models import Club
 from club.widgets.ajax_select import AutoCompleteSelectClub
 from core.models import User
 from core.views.forms import (
@@ -29,10 +32,12 @@ from counter.models import (
     Counter,
     Customer,
     Eticket,
+    InvoiceCall,
     Product,
     Refilling,
     ReturnableProduct,
     ScheduledProductAction,
+    Selling,
     StudentCard,
     get_product_actions,
 )
@@ -478,3 +483,48 @@ class BaseBasketForm(forms.BaseFormSet):
 BasketForm = forms.formset_factory(
     BasketProductForm, formset=BaseBasketForm, absolute_max=None, min_num=1
 )
+
+
+class InvoiceCallForm(forms.Form):
+    def __init__(self, *args, month: date, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.month = month
+        self.clubs = list(
+            Club.objects.filter(
+                Exists(
+                    Selling.objects.filter(
+                        club=OuterRef("pk"),
+                        date__gte=month,
+                        date__lte=month + relativedelta(months=1),
+                    )
+                )
+            ).annotate(
+                validated_invoice=Exists(
+                    InvoiceCall.objects.filter(
+                        club=OuterRef("pk"), month=month, is_validated=True
+                    )
+                )
+            )
+        )
+        self.fields = {
+            str(club.id): forms.BooleanField(
+                required=False, initial=club.validated_invoice
+            )
+            for club in self.clubs
+        }
+
+    def save(self):
+        invoice_calls = [
+            InvoiceCall(
+                month=self.month,
+                club_id=club.id,
+                is_validated=self.cleaned_data.get(str(club.id), False),
+            )
+            for club in self.clubs
+        ]
+        InvoiceCall.objects.bulk_create(
+            invoice_calls,
+            update_conflicts=True,
+            update_fields=["is_validated"],
+            unique_fields=["month", "club"],
+        )

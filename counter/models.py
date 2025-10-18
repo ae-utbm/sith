@@ -15,6 +15,7 @@
 from __future__ import annotations
 
 import base64
+import contextlib
 import os
 import random
 import string
@@ -1395,3 +1396,49 @@ class ScheduledProductAction(PeriodicTask):
         # adapted in the case of scheduled product action,
         # so we skip it and execute directly Model.validate_unique
         return super(PeriodicTask, self).validate_unique(*args, **kwargs)
+
+
+class MonthField(models.DateField):
+    description = _("Year + month field (day forced to 1)")
+    default_error_messages = {
+        "invalid": _(
+            "“%(value)s” value has an invalid date format. It must be "
+            "in YYYY-MM format."
+        ),
+        "invalid_date": _(
+            "“%(value)s” value has the correct format (YYYY-MM) "
+            "but it is an invalid date."
+        ),
+    }
+
+    def to_python(self, value):
+        if isinstance(value, str):
+            with contextlib.suppress(ValueError):
+                # If the string is given as YYYY-mm, try to parse it.
+                # If it fails, it means that the string may be in the form YYYY-mm-dd
+                # or in an invalid format.
+                # Whatever the case, we let Django deal with it
+                # and raise an error if needed
+                value = datetime.strptime(value, "%Y-%m")
+        value = super().to_python(value)
+        if value is None:
+            return None
+        return value.replace(day=1)
+
+
+class InvoiceCall(models.Model):
+    is_validated = models.BooleanField(verbose_name=_("is validated"), default=False)
+    club = models.ForeignKey(Club, on_delete=models.CASCADE)
+    month = MonthField(verbose_name=_("invoice date"))
+
+    class Meta:
+        verbose_name = _("Invoice call")
+        verbose_name_plural = _("Invoice calls")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["club", "month"], name="counter_invoicecall_unique_club_month"
+            )
+        ]
+
+    def __str__(self):
+        return f"invoice call of {self.month} made by {self.club}"

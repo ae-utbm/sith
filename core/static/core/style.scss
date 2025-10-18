@@ -503,6 +503,10 @@ th {
   text-align: center;
   padding: 5px 10px;
 
+  >input[type="checkbox"] {
+    padding: unset;
+  }
+
   >ul {
     margin-top: 0;
   }
