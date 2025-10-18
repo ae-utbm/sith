@@ -8,9 +8,15 @@ $background-color-hovered: #283747;
 $red-text-color: #eb2f06;
 $hovered-red-text-color: #ff4d4d;
 
+/**
+ * Behold the dirtiest css I wrote in a while.
+ * I had less than an hour to do it, and it will be removed
+ * in two weeks anyway
+ */
+
+
 .header {
   box-sizing: border-box;
-  background-color: $deepblue;
   box-shadow: 3px 3px 3px 0 #dfdfdf;
   border-radius: 0;
   width: 100%;
@@ -19,6 +25,28 @@ $hovered-red-text-color: #ff4d4d;
   flex-wrap: wrap;
   padding: 10px;
   gap: 10px;
+
+
+  // PINKTOBER
+  background-color: $pinktober;
+  border-bottom: 5px solid $pinktober-secondary;
+  .header-lang {
+    input {
+      background-color: $pinktober!important;
+
+    }
+  }
+  form input[type="text"].header-input {
+    background-color: $pinktober-secondary!important;
+    color: black!important;
+
+  }
+  *, .right * {
+    color: #050525;
+    &:hover {
+      color: #303060;
+    }
+  }
 
   @media (max-width: 700px) {
     height: auto;
@@ -215,7 +243,7 @@ $hovered-red-text-color: #ff4d4d;
           background-position: center center;
           background-size: cover;
           background-repeat: no-repeat;
-          background-color: $deepblue;
+          //background-color: $deepblue;
         }
 
         >.options {
@@ -233,11 +261,11 @@ $hovered-red-text-color: #ff4d4d;
             }
 
             >a {
-              color: $text-color;
-
-              &:hover {
-                color: $hovered-text-color;
-              }
+              //color: $text-color;
+              //
+              //&:hover {
+              //  color: $hovered-text-color;
+              //}
             }
           }
 
@@ -254,14 +282,13 @@ $hovered-red-text-color: #ff4d4d;
             a,
             button {
               font-size: 100%;
-              margin: 0;
               text-align: right;
-              color: $text-color;
-              margin-top: auto;
+              //color: $text-color;
+              margin: auto 0 0;
 
-              &:hover {
-                color: $hovered-text-color;
-              }
+              //&:hover {
+              //  color: $hovered-text-color;
+              //}
             }
 
             form#logout-form {
@@ -416,12 +443,12 @@ $hovered-red-text-color: #ff4d4d;
           border-radius: 5px;
           font-size: .9em;
           margin: 0;
-          background-color: $background-color-hovered;
+          background-color: $pinktober-secondary;
           padding: 0 10px;
-          color: $text-color;
+          //color: $text-color;
 
           &::placeholder {
-            color: $hovered-text-color;
+            color: black;
           }
         }
       }
