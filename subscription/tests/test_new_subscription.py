@@ -38,7 +38,7 @@ def test_form_existing_user_valid(
         "birthdate": user.date_of_birth,
         "subscription_type": "deux-semestres",
         "location": settings.SITH_SUBSCRIPTION_LOCATIONS[0][0],
-        "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
+        "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1][0],
     }
     form = SubscriptionExistingUserForm(data)
     assert form.is_valid()
@@ -55,7 +55,7 @@ def test_form_existing_user_with_birthdate(settings: SettingsWrapper):
         "member": user,
         "subscription_type": "deux-semestres",
         "location": settings.SITH_SUBSCRIPTION_LOCATIONS[0][0],
-        "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
+        "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1][0],
     }
     form = SubscriptionExistingUserForm(data)
     assert not form.is_valid()
@@ -81,7 +81,7 @@ def test_form_existing_user_invalid(settings: SettingsWrapper):
         "member": user,
         "subscription_type": "deux-semestres",
         "location": settings.SITH_SUBSCRIPTION_LOCATIONS[0][0],
-        "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
+        "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1][0],
     }
     form = SubscriptionExistingUserForm(data)
 
@@ -99,7 +99,7 @@ def test_form_new_user(settings: SettingsWrapper):
         "date_of_birth": localdate() - relativedelta(years=18),
         "subscription_type": "deux-semestres",
         "location": settings.SITH_SUBSCRIPTION_LOCATIONS[0][0],
-        "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
+        "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1][0],
     }
     form = SubscriptionNewUserForm(data)
     assert form.is_valid()
@@ -130,7 +130,7 @@ def test_form_set_new_user_as_student(settings: SettingsWrapper, subscription_ty
         "date_of_birth": localdate() - relativedelta(years=18),
         "subscription_type": subscription_type,
         "location": settings.SITH_SUBSCRIPTION_LOCATIONS[0][0],
-        "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
+        "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1][0],
     }
     form = SubscriptionNewUserForm(data)
     assert form.is_valid()
@@ -180,7 +180,7 @@ def test_submit_form_existing_user(client: Client, settings: SettingsWrapper):
             "birthdate": user.date_of_birth,
             "subscription_type": "deux-semestres",
             "location": settings.SITH_SUBSCRIPTION_LOCATIONS[0][0],
-            "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
+            "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1][0],
         },
     )
     user.refresh_from_db()
@@ -212,7 +212,7 @@ def test_submit_form_new_user(client: Client, settings: SettingsWrapper):
             "date_of_birth": localdate() - relativedelta(years=18),
             "subscription_type": "deux-semestres",
             "location": settings.SITH_SUBSCRIPTION_LOCATIONS[0][0],
-            "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[0][0],
+            "payment_method": settings.SITH_SUBSCRIPTION_PAYMENT_METHOD[1][0],
         },
     )
     user = User.objects.get(email="jdoe@utbm.fr")

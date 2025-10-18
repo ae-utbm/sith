@@ -245,3 +245,26 @@
   <button type="button" onclick="checkbox_{{form_id}}(true);">{% trans %}Select All{% endtrans %}</button>
   <button type="button" onclick="checkbox_{{form_id}}(false);">{% trans %}Unselect All{% endtrans %}</button>
 {% endmacro %}
+
+{% macro update_notifications(messages, clear) %}
+  {# Update notification area from new messages sent by django backend
+     This is useful when performing fragment swaps to keep messages up to date
+     Without this, the fragment would need to take control of the notification area and
+     this would be an issue when having more than one fragment
+
+     Parameters:
+      messages: messages from django.contrib
+      clear   : optional boolean that controls if notifications should be cleared first. True is the default
+  #}
+  {% set clear = clear|default(true) %}
+  {% if messages %}
+    <div x-init="() => {
+                 {% if clear %}
+                   $notifications.clear()
+                 {% endif %}
+                 {% for message in messages %}
+                   $notifications.{{ message.tags }}('{{ message }}')
+                 {% endfor %}
+                 }"></div>
+  {% endif %}
+{% endmacro %}

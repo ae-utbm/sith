@@ -1,3 +1,5 @@
+{% from 'core/macros.jinja' import update_notifications %}
+
 <div id=billing-infos-fragment>
   <div
     class="collapse"
@@ -29,14 +31,6 @@
       >
     </form>
   </div>
-
   <br>
-
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
+  {{ update_notifications(messages) }}
 </div>

@@ -65,7 +65,7 @@ from core.views.forms import (
     UserGroupsForm,
     UserProfileForm,
 )
-from core.views.mixins import QuickNotifMixin, TabedViewMixin, UseFragmentsMixin
+from core.views.mixins import TabedViewMixin, UseFragmentsMixin
 from counter.models import Counter, Refilling, Selling
 from eboutic.models import Invoice
 from subscription.models import Subscription
@@ -564,7 +564,7 @@ class UserUpdateGroupView(UserTabsMixin, CanEditPropMixin, UpdateView):
     current_tab = "groups"
 
 
-class UserToolsView(LoginRequiredMixin, QuickNotifMixin, UserTabsMixin, TemplateView):
+class UserToolsView(LoginRequiredMixin, UserTabsMixin, TemplateView):
     """Displays the logged user's tools."""
 
     template_name = "core/user_tools.jinja"

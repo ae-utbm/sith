@@ -125,6 +125,7 @@ INSTALLED_APPS = (
     "pedagogy",
     "galaxy",
     "antispam",
+    "timetable",
     "api",
 )
 
@@ -421,18 +422,11 @@ SITH_PROFILE_DEPARTMENTS = [
     ("NA", _("N/A")),
 ]
 
-SITH_ACCOUNTING_PAYMENT_METHOD = [
-    ("CHECK", _("Check")),
-    ("CASH", _("Cash")),
-    ("TRANSFERT", _("Transfert")),
-    ("CARD", _("Credit card")),
-]
-
 SITH_SUBSCRIPTION_PAYMENT_METHOD = [
     ("CHECK", _("Check")),
     ("CARD", _("Credit card")),
     ("CASH", _("Cash")),
-    ("EBOUTIC", _("Eboutic")),
+    ("AE_ACCOUNT", _("AE account")),
     ("OTHER", _("Other")),
 ]
 
@@ -441,6 +435,7 @@ SITH_SUBSCRIPTION_LOCATIONS = [
     ("SEVENANS", _("Sevenans")),
     ("MONTBELIARD", _("Montbéliard")),
     ("EBOUTIC", _("Eboutic")),
+    ("OTHER", _("Other")),
 ]
 
 SITH_COUNTER_BARS = [(1, "MDE"), (2, "Foyer"), (35, "La Gommette")]
@@ -689,14 +684,6 @@ SITH_NOTIFICATIONS = [
 SITH_PERMANENT_NOTIFICATIONS = {
     "NEWS_MODERATION": None,
     "SAS_MODERATION": "sas.models.sas_notification_callback",
-}
-
-SITH_QUICK_NOTIF = {
-    "qn_success": _("Success!"),
-    "qn_fail": _("Fail!"),
-    "qn_weekmail_new_article": _("You successfully posted an article in the Weekmail"),
-    "qn_weekmail_article_edit": _("You successfully edited an article in the Weekmail"),
-    "qn_weekmail_send_success": _("You successfully sent the Weekmail"),
 }
 
 # Mailing related settings

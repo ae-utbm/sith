@@ -1,13 +1,26 @@
+import json
 import math
+import uuid
+from datetime import date
 
+from dateutil.relativedelta import relativedelta
 from django import forms
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
+from django.forms import BaseModelFormSet
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+from django_celery_beat.models import ClockedSchedule
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
+from club.models import Club
 from club.widgets.ajax_select import AutoCompleteSelectClub
 from core.models import User
-from core.views.forms import NFCTextInput, SelectDate, SelectDateTime
+from core.views.forms import (
+    FutureDateTimeField,
+    NFCTextInput,
+    SelectDate,
+    SelectDateTime,
+)
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
     AutoCompleteSelectMultipleGroup,
@@ -19,10 +32,14 @@ from counter.models import (
     Counter,
     Customer,
     Eticket,
+    InvoiceCall,
     Product,
     Refilling,
     ReturnableProduct,
+    ScheduledProductAction,
+    Selling,
     StudentCard,
+    get_product_actions,
 )
 from counter.widgets.ajax_select import (
     AutoCompleteSelectMultipleCounter,
@@ -158,7 +175,101 @@ class CounterEditForm(forms.ModelForm):
         }
 
 
-class ProductEditForm(forms.ModelForm):
+class ScheduledProductActionForm(forms.ModelForm):
+    """Form for automatic product archiving.
+
+    The `save` method will update or create tasks using celery-beat.
+    """
+
+    required_css_class = "required"
+    prefix = "scheduled"
+
+    class Meta:
+        model = ScheduledProductAction
+        fields = ["task"]
+        widgets = {"task": forms.RadioSelect(choices=get_product_actions)}
+        labels = {"task": _("Action")}
+        help_texts = {"task": ""}
+
+    trigger_at = FutureDateTimeField(
+        label=_("Date and time of action"), widget=SelectDateTime
+    )
+    counters = forms.ModelMultipleChoiceField(
+        label=_("New counters"),
+        help_text=_("The selected counters will replace the current ones"),
+        required=False,
+        widget=AutoCompleteSelectMultipleCounter,
+        queryset=Counter.objects.all(),
+    )
+
+    def __init__(self, *args, product: Product, **kwargs):
+        self.product = product
+        super().__init__(*args, **kwargs)
+        if not self.instance._state.adding:
+            self.fields["trigger_at"].initial = self.instance.clocked.clocked_time
+            self.fields["counters"].initial = json.loads(self.instance.kwargs).get(
+                "counters"
+            )
+
+    def clean(self):
+        if not self.changed_data or "trigger_at" in self.errors:
+            return super().clean()
+        if "trigger_at" in self.changed_data:
+            if not self.instance.clocked_id:
+                self.instance.clocked = ClockedSchedule(
+                    clocked_time=self.cleaned_data["trigger_at"]
+                )
+            else:
+                self.instance.clocked.clocked_time = self.cleaned_data["trigger_at"]
+            self.instance.clocked.save()
+        task_kwargs = {"product_id": self.product.id}
+        if (
+            self.cleaned_data["task"] == "counter.tasks.change_counters"
+            and "counters" in self.changed_data
+        ):
+            task_kwargs["counters"] = [c.id for c in self.cleaned_data["counters"]]
+        self.instance.product = self.product
+        self.instance.kwargs = json.dumps(task_kwargs)
+        self.instance.name = (
+            f"{self.cleaned_data['task']} - {self.product} - {uuid.uuid4()}"
+        )
+        return super().clean()
+
+
+class BaseScheduledProductActionFormSet(BaseModelFormSet):
+    def __init__(self, *args, product: Product, **kwargs):
+        if product.id:
+            queryset = (
+                product.scheduled_actions.filter(
+                    enabled=True, clocked__clocked_time__gt=now()
+                )
+                .order_by("clocked__clocked_time")
+                .select_related("clocked")
+            )
+        else:
+            queryset = ScheduledProductAction.objects.none()
+        form_kwargs = {"product": product}
+        super().__init__(*args, queryset=queryset, form_kwargs=form_kwargs, **kwargs)
+
+    def delete_existing(self, obj: ScheduledProductAction, commit: bool = True):  # noqa FBT001
+        clocked = obj.clocked
+        super().delete_existing(obj, commit=commit)
+        if commit:
+            clocked.delete()
+
+
+ScheduledProductActionFormSet = forms.modelformset_factory(
+    ScheduledProductAction,
+    ScheduledProductActionForm,
+    formset=BaseScheduledProductActionFormSet,
+    absolute_max=None,
+    can_delete=True,
+    can_delete_extra=False,
+    extra=2,
+)
+
+
+class ProductForm(forms.ModelForm):
     error_css_class = "error"
     required_css_class = "required"
 
@@ -199,22 +310,21 @@ class ProductEditForm(forms.ModelForm):
         queryset=Counter.objects.all(),
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, instance=None, **kwargs):
+        super().__init__(*args, instance=instance, **kwargs)
         if self.instance.id:
             self.fields["counters"].initial = self.instance.counters.all()
+        self.action_formset = ScheduledProductActionFormSet(
+            *args, product=self.instance, **kwargs
+        )
+
+    def is_valid(self):
+        return super().is_valid() and self.action_formset.is_valid()
 
     def save(self, *args, **kwargs):
         ret = super().save(*args, **kwargs)
-        if self.fields["counters"].initial:
-            # Remove the product from all counter it was added to
-            # It will then only be added to selected counters
-            for counter in self.fields["counters"].initial:
-                counter.products.remove(self.instance)
-                counter.save()
-        for counter in self.cleaned_data["counters"]:
-            counter.products.add(self.instance)
-            counter.save()
+        self.instance.counters.set(self.cleaned_data["counters"])
+        self.action_formset.save()
         return ret
 
 
@@ -266,7 +376,7 @@ class CloseCustomerAccountForm(forms.Form):
     )
 
 
-class ProductForm(forms.Form):
+class BasketProductForm(forms.Form):
     quantity = forms.IntegerField(min_value=1, required=True)
     id = forms.IntegerField(min_value=0, required=True)
 
@@ -371,5 +481,50 @@ class BaseBasketForm(forms.BaseFormSet):
 
 
 BasketForm = forms.formset_factory(
-    ProductForm, formset=BaseBasketForm, absolute_max=None, min_num=1
+    BasketProductForm, formset=BaseBasketForm, absolute_max=None, min_num=1
 )
+
+
+class InvoiceCallForm(forms.Form):
+    def __init__(self, *args, month: date, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.month = month
+        self.clubs = list(
+            Club.objects.filter(
+                Exists(
+                    Selling.objects.filter(
+                        club=OuterRef("pk"),
+                        date__gte=month,
+                        date__lte=month + relativedelta(months=1),
+                    )
+                )
+            ).annotate(
+                validated_invoice=Exists(
+                    InvoiceCall.objects.filter(
+                        club=OuterRef("pk"), month=month, is_validated=True
+                    )
+                )
+            )
+        )
+        self.fields = {
+            str(club.id): forms.BooleanField(
+                required=False, initial=club.validated_invoice
+            )
+            for club in self.clubs
+        }
+
+    def save(self):
+        invoice_calls = [
+            InvoiceCall(
+                month=self.month,
+                club_id=club.id,
+                is_validated=self.cleaned_data.get(str(club.id), False),
+            )
+            for club in self.clubs
+        ]
+        InvoiceCall.objects.bulk_create(
+            invoice_calls,
+            update_conflicts=True,
+            update_fields=["is_validated"],
+            unique_fields=["month", "club"],
+        )

@@ -32,10 +32,6 @@
       <script type="module" src="{{ static('bundled/country-flags-index.ts') }}"></script>
       <script type="module" src="{{ static('bundled/core/tooltips-index.ts') }}"></script>
 
-      <!-- Jquery declared here to be accessible in every django widgets -->
-      <script src="{{ static('bundled/vendored/jquery.min.js') }}"></script>
-      <script src="{{ static('core/js/script.js') }}"></script>
-
       {% block additional_css %}{% endblock %}
       {% block additional_js %}{% endblock %}
     {% endblock %}
@@ -74,16 +70,14 @@
 
     <div id="page">
 
-      <ul id="quick_notif">
-        {% for n in quick_notifs %}
-          <li>{{ n }}</li>
-        {% endfor %}
-      </ul>
-
       <div id="content">
         {%- block tabs -%}
           {% include "core/base/tabs.jinja" %}
         {%- endblock -%}
+
+        {% block notifications %}
+          {% include "core/base/notifications.jinja" %}
+        {% endblock %}
 
         {%- block errors -%}
           {% if error %}
@@ -101,16 +95,6 @@
     {% endblock %}
 
     {% block script %}
-      <script>
-        document.addEventListener("keydown", (e) => {
-          // Looking at the `s` key when not typing in a form
-          if (e.keyCode !== 83 || ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.nodeName)) {
-            return;
-          }
-          document.getElementById("search").focus();
-          e.preventDefault(); // Don't type the character in the focused search input
-        })
-      </script>
     {% endblock %}
   </body>
 </html>

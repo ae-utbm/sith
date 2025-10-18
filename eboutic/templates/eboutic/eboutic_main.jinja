@@ -22,14 +22,6 @@
 {% block content %}
   <h1 id="eboutic-title">{% trans %}Eboutic{% endtrans %}</h1>
 
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-
   <div id="eboutic" x-data="basket({{ last_purchase_time }})">
     <div id="basket">
       <h3>Panier</h3>

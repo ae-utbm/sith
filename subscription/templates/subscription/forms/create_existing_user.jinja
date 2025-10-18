@@ -1,0 +1,28 @@
+{% load static %}
+{% load i18n %}
+
+
+<div x-data="existing_user_subscription_form" class="form-content existing-user">
+  <fieldset>
+    {{ errors }}
+    {% for field, errors in fields %}
+      <p{% with classes=field.css_classes %}{% if classes %} class="{{ classes }}"{% endif %}{% endwith %}>
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.help_text %}
+          <span class="helptext">{{ field.help_text }}</span>
+        {% endif %}
+      </p>
+      {% if field.name == "payment_method" %}
+        <i>
+          {% blocktranslate %}If the subscription is done using the AE account, you must also click it on the AE counter.{% endblocktranslate %}
+        </i>
+      {% endif %}
+    {% endfor %}
+  </fieldset>
+  <div
+    id="subscription-form-user-mini-profile"
+    x-html="profileFragment"
+    :aria-busy="loading"
+  ></div>
+</div>

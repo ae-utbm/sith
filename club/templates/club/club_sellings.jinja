@@ -83,9 +83,10 @@ TODO : rewrite the pagination used in this template an Alpine one
   </table>
   <script type="text/javascript">
     function formPagination(link){
-      $("form").attr("action", link.href);
+      const form = document.getElementById("form")
+      form.action = link.href;
       link.href = "javascript:void(0)"; // block link action
-      $("form").submit();
+      form.submit();
     }
   </script>
   {{ paginate(paginated_result, paginator, "formPagination(this)") }}

@@ -5,20 +5,22 @@
   <h2>{% trans %}Club old members{% endtrans %}</h2>
   <table>
     <thead>
-      <td>{% trans %}User{% endtrans %}</td>
-      <td>{% trans %}Role{% endtrans %}</td>
-      <td>{% trans %}Description{% endtrans %}</td>
-      <td>{% trans %}From{% endtrans %}</td>
-      <td>{% trans %}To{% endtrans %}</td>
+      <tr>
+        <td>{% trans %}User{% endtrans %}</td>
+        <td>{% trans %}Role{% endtrans %}</td>
+        <td>{% trans %}Description{% endtrans %}</td>
+        <td>{% trans %}From{% endtrans %}</td>
+        <td>{% trans %}To{% endtrans %}</td>
+      </tr>
     </thead>
     <tbody>
-      {% for m in club.members.exclude(end_date=None).order_by('-role', 'description', '-end_date').all() %}
+      {% for member in old_members %}
         <tr>
-          <td>{{ user_profile_link(m.user) }}</td>
-          <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
-          <td>{{ m.description }}</td>
-          <td>{{ m.start_date }}</td>
-          <td>{{ m.end_date }}</td>
+          <td>{{ user_profile_link(member.user) }}</td>
+          <td>{{ settings.SITH_CLUB_ROLES[member.role] }}</td>
+          <td>{{ member.description }}</td>
+          <td>{{ member.start_date }}</td>
+          <td>{{ member.end_date }}</td>
         </tr>
       {% endfor %}
     </tbody>

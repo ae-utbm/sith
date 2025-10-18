@@ -43,23 +43,25 @@ class CanEditPagePropMixin(CanEditPropMixin):
         return res
 
 
-class PageListView(CanViewMixin, ListView):
+class PageListView(ListView):
     model = Page
     template_name = "core/page_list.jinja"
-    queryset = (
-        Page.objects.annotate(
-            display_name=Coalesce(
-                Subquery(
-                    PageRev.objects.filter(page=OuterRef("id"))
-                    .order_by("-date")
-                    .values("title")[:1]
-                ),
-                F("name"),
+
+    def get_queryset(self):
+        return (
+            Page.objects.viewable_by(self.request.user)
+            .annotate(
+                display_name=Coalesce(
+                    Subquery(
+                        PageRev.objects.filter(page=OuterRef("id"))
+                        .order_by("-date")
+                        .values("title")[:1]
+                    ),
+                    F("name"),
+                )
             )
+            .select_related("parent")
         )
-        .prefetch_related("view_groups")
-        .select_related("parent")
-    )
 
 
 class PageView(CanViewMixin, DetailView):
@@ -184,7 +186,7 @@ class PageEditViewBase(CanEditMixin, UpdateView):
     )
     template_name = "core/pagerev_edit.jinja"
 
-    def get_object(self):
+    def get_object(self, *args, **kwargs):
         self.page = Page.get_page_by_full_name(self.kwargs["page_name"])
         return self._get_revision()
 

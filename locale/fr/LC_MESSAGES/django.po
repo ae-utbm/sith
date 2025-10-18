@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-19 17:22+0200\n"
+"POT-Creation-Date: 2025-10-17 13:41+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -117,7 +117,7 @@ msgstr "S'abonner"
 msgid "Remove"
 msgstr "Retirer"
 
-#: club/forms.py pedagogy/templates/pedagogy/moderation.jinja
+#: club/forms.py counter/forms.py pedagogy/templates/pedagogy/moderation.jinja
 msgid "Action"
 msgstr "Action"
 
@@ -174,12 +174,12 @@ msgid "You can not add the same user twice"
 msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
 
 #: club/forms.py
-msgid "You should specify a role"
-msgstr "Vous devez choisir un rôle"
+msgid "You must be subscribed to join a club"
+msgstr "Vous devez être cotisant pour faire partie d'un club"
 
-#: club/forms.py sas/forms.py
-msgid "You do not have the permission to do that"
-msgstr "Vous n'avez pas la permission de faire cela"
+#: club/forms.py
+msgid "You are already a member of this club"
+msgstr "Vous êtes déjà membre de ce club."
 
 #: club/models.py
 msgid "slug name"
@@ -349,11 +349,6 @@ msgstr "Depuis"
 #: club/templates/club/club_members.jinja
 msgid "There are no members in this club."
 msgstr "Il n'y a pas de membres dans ce club."
-
-#: club/templates/club/club_members.jinja core/templates/core/file_detail.jinja
-#: core/views/forms.py trombi/templates/trombi/detail.jinja
-msgid "Add"
-msgstr "Ajouter"
 
 #: club/templates/club/club_old_members.jinja
 msgid "Club old members"
@@ -561,6 +556,8 @@ msgstr ""
 #: core/templates/core/user_godfathers_tree.jinja
 #: core/templates/core/user_preferences.jinja
 #: counter/templates/counter/cash_register_summary.jinja
+#: counter/templates/counter/invoices_call.jinja
+#: counter/templates/counter/product_form.jinja
 #: forum/templates/forum/reply.jinja
 #: subscription/templates/subscription/fragments/creation_form.jinja
 #: trombi/templates/trombi/comment.jinja
@@ -568,6 +565,24 @@ msgstr ""
 #: trombi/templates/trombi/user_tools.jinja
 msgid "Save"
 msgstr "Sauver"
+
+#: club/templates/club/fragments/add_member.jinja
+msgid "Add a new member"
+msgstr "Ajouter un nouveau membre"
+
+#: club/templates/club/fragments/add_member.jinja
+msgid "Join club"
+msgstr "Rejoindre le club"
+
+#: club/templates/club/fragments/add_member.jinja
+#: core/templates/core/file_detail.jinja core/views/forms.py
+#: trombi/templates/trombi/detail.jinja
+msgid "Add"
+msgstr "Ajouter"
+
+#: club/templates/club/fragments/add_member.jinja
+msgid "Join"
+msgstr "Rejoindre"
 
 #: club/templates/club/mailing.jinja
 msgid "Mailing lists"
@@ -674,6 +689,15 @@ msgstr "Vente"
 #: club/views.py
 msgid "Mailing list"
 msgstr "Listes de diffusion"
+
+#: club/views.py
+msgid "You are now a member of this club."
+msgstr "Vous êtes maintenant membre de ce club."
+
+#: club/views.py
+#, python-format
+msgid "%(user)s has been added to club."
+msgstr "%(user)s a été ajouté au club."
 
 #: com/forms.py
 msgid "Format: 16:9 | Resolution: 1920x1080"
@@ -1039,6 +1063,10 @@ msgstr "Nos services"
 msgid "UV Guide"
 msgstr "Guide des UVs"
 
+#: com/templates/com/news_list.jinja
+msgid "Timetable"
+msgstr "Emploi du temps"
+
 #: com/templates/com/news_list.jinja core/templates/core/base/navbar.jinja
 msgid "Matmatronch"
 msgstr "Matmatronch"
@@ -1103,6 +1131,10 @@ msgstr "Modération"
 msgid "No posters"
 msgstr "Aucune affiche"
 
+#: com/templates/com/poster_list.jinja com/templates/com/screen_slideshow.jinja
+msgid "Click to expand"
+msgstr "Cliquez pour agrandir"
+
 #: com/templates/com/poster_moderate.jinja
 msgid "Posters - moderation"
 msgstr "Affiches - modération"
@@ -1161,20 +1193,20 @@ msgid "Add to weekmail"
 msgstr "Ajouter au Weekmail"
 
 #: com/templates/com/weekmail.jinja
-msgid "Up"
-msgstr "Monter"
-
-#: com/templates/com/weekmail.jinja
-msgid "Down"
-msgstr "Descendre"
-
-#: com/templates/com/weekmail.jinja
 msgid "Articles included the next weekmail"
 msgstr "Article inclus dans le prochain Weekmail"
 
 #: com/templates/com/weekmail.jinja
 msgid "Delete from weekmail"
 msgstr "Supprimer du Weekmail"
+
+#: com/templates/com/weekmail.jinja
+msgid "Up"
+msgstr "Monter"
+
+#: com/templates/com/weekmail.jinja
+msgid "Down"
+msgstr "Descendre"
 
 #: com/templates/com/weekmail_preview.jinja
 #: core/templates/core/user_account_detail.jinja
@@ -1258,12 +1290,36 @@ msgid "All incoming events"
 msgstr "Tous les événements à venir"
 
 #: com/views.py
+msgid "Weekmail sent successfully"
+msgstr "Weekmail envoyé avec succès"
+
+#: com/views.py
 msgid "Delete and save to regenerate"
 msgstr "Supprimer et sauver pour régénérer"
 
 #: com/views.py
 msgid "Weekmail of the "
 msgstr "Weekmail du "
+
+#: com/views.py
+#, python-format
+msgid "%(title)s moved up in the Weekmail"
+msgstr "%(title)s monté dans le Weekmail"
+
+#: com/views.py
+#, python-format
+msgid "%(title)s moved down in the Weekmail"
+msgstr "%(title)s descendu dans le Weekmail"
+
+#: com/views.py
+#, python-format
+msgid "%(title)s added to the Weekmail"
+msgstr "%(title)s ajouté dans Weekmail"
+
+#: com/views.py
+#, python-format
+msgid "%(title)s removed from the Weekmail"
+msgstr "%(title)s retiré du Weekmail"
 
 #: com/views.py
 msgid ""
@@ -2341,6 +2397,10 @@ msgid "User has no account"
 msgstr "L'utilisateur n'a pas de compte"
 
 #: core/templates/core/user_account_detail.jinja
+msgid "Deleted user"
+msgstr "Utilisateur supprimé"
+
+#: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/last_ops.jinja
 #: counter/templates/counter/refilling_list.jinja
 msgid "Amount"
@@ -2898,6 +2958,18 @@ msgid "User not found"
 msgstr "Utilisateur non trouvé"
 
 #: counter/forms.py
+msgid "Date and time of action"
+msgstr "Date et heure de l'action"
+
+#: counter/forms.py
+msgid "New counters"
+msgstr "Nouveaux comptoirs"
+
+#: counter/forms.py
+msgid "The selected counters will replace the current ones"
+msgstr "Les comptoirs sélectionnés remplaceront les comptoirs actuels"
+
+#: counter/forms.py
 msgid ""
 "Describe the product. If it's an event's click, give some insights about it, "
 "like the date (including the year)."
@@ -3231,6 +3303,52 @@ msgid "The returnable product cannot be the same as the returned one"
 msgstr ""
 "Le produit consigné ne peut pas être le même que le produit de déconsigne"
 
+#: counter/models.py
+msgid "Archiving"
+msgstr "Archivage"
+
+#: counter/models.py
+msgid "Counters change"
+msgstr "Changement des comptoirs"
+
+#: counter/models.py
+msgid "Product scheduled action"
+msgstr "Actions sur produit planifiées"
+
+#: counter/models.py
+msgid "Product actions must declare a clocked schedule."
+msgstr "Les actions sur les produits doivent avoir un horaire planifié."
+
+#: counter/models.py
+msgid "Year + month field (day forced to 1)"
+msgstr "Champ Année + mois (jour forcé à 1)"
+
+#: counter/models.py
+#, python-format
+msgid ""
+"“%(value)s” value has an invalid date format. It must be in YYYY-MM format."
+msgstr ""
+"La valeur « %(value)s » a un format de date invalide. Ce doit être au format "
+"YYYY-MM."
+
+#: counter/models.py
+#, python-format
+msgid ""
+"“%(value)s” value has the correct format (YYYY-MM) but it is an invalid date."
+msgstr "La valeur « %(value)s » a le bon format, mais est une date invalide."
+
+#: counter/models.py
+msgid "invoice date"
+msgstr "date de la facture"
+
+#: counter/models.py
+msgid "Invoice call"
+msgstr "Appel à facture"
+
+#: counter/models.py
+msgid "Invoice calls"
+msgstr "Appels à facture"
+
 #: counter/templates/counter/activity.jinja
 #, python-format
 msgid "%(counter_name)s activity"
@@ -3461,6 +3579,10 @@ msgstr "Payements en Carte Bancaire"
 msgid "Sum"
 msgstr "Somme"
 
+#: counter/templates/counter/invoices_call.jinja
+msgid "Validated"
+msgstr "Validé"
+
 #: counter/templates/counter/last_ops.jinja
 #, python-format
 msgid "%(counter_name)s last operations"
@@ -3548,6 +3670,25 @@ msgstr ""
 "vous ne perdrez pas vos droits. Vous serez toujours en mesure de renouveler "
 "votre cotisation. Si vous ne renouvelez pas votre cotisation, il n'y aura "
 "aucune conséquence autre que le retrait de l'argent de votre compte."
+
+#: counter/templates/counter/product_form.jinja
+#, python-format
+msgid "Edit product %(name)s"
+msgstr "Édition du produit %(name)s"
+
+#: counter/templates/counter/product_form.jinja
+msgid "Product creation"
+msgstr "Création de produit"
+
+#: counter/templates/counter/product_form.jinja
+msgid "Automatic actions"
+msgstr "Actions automatiques"
+
+#: counter/templates/counter/product_form.jinja
+msgid "Automatic actions allows to schedule product changes ahead of time."
+msgstr ""
+"Les actions automatiques vous permettent de planifier des modifications du "
+"produit à l'avance."
 
 #: counter/templates/counter/product_list.jinja
 msgid "Product list"
@@ -3730,6 +3871,10 @@ msgstr "L'utilisateur n'est pas barman."
 #: counter/views/home.py
 msgid "Bad location, someone is already logged in somewhere else"
 msgstr "Mauvais comptoir, quelqu'un est déjà connecté ailleurs"
+
+#: counter/views/invoice.py
+msgid "Invoice calls status has been updated."
+msgstr "Le statut des appels à facture a été mis à jour."
 
 #: counter/views/mixins.py
 msgid "Cash summary"
@@ -4540,22 +4685,6 @@ msgstr "Signaler ce commentaire"
 msgid "Edit UE"
 msgstr "Éditer l'UE"
 
-#: pedagogy/templates/pedagogy/uv_edit.jinja
-msgid "Import from UTBM"
-msgstr "Importer depuis l'UTBM"
-
-#: pedagogy/templates/pedagogy/uv_edit.jinja
-msgid "Unknown UE code"
-msgstr "Code d'UE inconnu"
-
-#: pedagogy/templates/pedagogy/uv_edit.jinja
-msgid "Successful autocomplete"
-msgstr "Autocomplétion réussite"
-
-#: pedagogy/templates/pedagogy/uv_edit.jinja
-msgid "An error occurred: "
-msgstr "Une erreur est survenue : "
-
 #: rootplace/forms.py
 msgid "User that will be kept"
 msgstr "Utilisateur qui sera conservé"
@@ -4628,6 +4757,10 @@ msgstr "Pas de ban actif"
 #: sas/forms.py
 msgid "Add a new album"
 msgstr "Ajouter un nouvel album"
+
+#: sas/forms.py
+msgid "You do not have the permission to do that"
+msgstr "Vous n'avez pas la permission de faire cela"
 
 #: sas/forms.py
 msgid "Upload images"
@@ -4819,8 +4952,8 @@ msgid "N/A"
 msgstr "N/A"
 
 #: sith/settings.py
-msgid "Transfert"
-msgstr "Virement"
+msgid "AE account"
+msgstr "Compte AE"
 
 #: sith/settings.py
 msgid "Belfort"
@@ -5109,26 +5242,6 @@ msgid "You have a notification"
 msgstr "Vous avez une notification"
 
 #: sith/settings.py
-msgid "Success!"
-msgstr "Succès !"
-
-#: sith/settings.py
-msgid "Fail!"
-msgstr "Échec !"
-
-#: sith/settings.py
-msgid "You successfully posted an article in the Weekmail"
-msgstr "Article posté avec succès dans le Weekmail"
-
-#: sith/settings.py
-msgid "You successfully edited an article in the Weekmail"
-msgstr "Article édité avec succès dans le Weekmail"
-
-#: sith/settings.py
-msgid "You successfully sent the Weekmail"
-msgstr "Weekmail envoyé avec succès"
-
-#: sith/settings.py
 msgid "AE tee-shirt"
 msgstr "Tee-shirt AE"
 
@@ -5168,6 +5281,14 @@ msgstr "lieu"
 msgid "You can not subscribe many time for the same period"
 msgstr "Vous ne pouvez pas cotiser plusieurs fois pour la même période"
 
+#: subscription/templates/subscription/forms/create_existing_user.jinja
+msgid ""
+"If the subscription is done using the AE account, you must also click it on "
+"the AE counter."
+msgstr ""
+"Si la cotisation est faite en utilisant le compte AE, vous devez également "
+"la cliquer sur le comptoir AE."
+
 #: subscription/templates/subscription/fragments/creation_success.jinja
 #, python-format
 msgid "Subscription created for %(user)s"
@@ -5205,6 +5326,18 @@ msgstr "Membre existant"
 #: subscription/views.py
 msgid "the groups that can create subscriptions"
 msgstr "les groupes pouvant créer des cotisations"
+
+#: timetable/templates/timetable/generator.jinja
+msgid "Timetable generator"
+msgstr "Générateur d'emploi du temps"
+
+#: timetable/templates/timetable/generator.jinja
+msgid "Generate"
+msgstr "Générer"
+
+#: timetable/templates/timetable/generator.jinja
+msgid "Save to PNG"
+msgstr "Sauver en PNG"
 
 #: trombi/models.py
 msgid "subscription deadline"
@@ -5432,8 +5565,36 @@ msgid "Admin tools"
 msgstr "Admin Trombi"
 
 #: trombi/views.py
+msgid "Trombi modified"
+msgstr "Trombi modifié"
+
+#: trombi/views.py
+msgid "User added to the trombi"
+msgstr "Utilisateur ajouté au trombi"
+
+#: trombi/views.py
+msgid "User couldn't be added to the trombi"
+msgstr "L'utilisateur n'a pas pu être ajouté au trombi"
+
+#: trombi/views.py
+msgid "User removed from the trombi"
+msgstr "Utilisateur retiré du trombi"
+
+#: trombi/views.py
 msgid "Explain why you rejected the comment"
 msgstr "Expliquez pourquoi vous refusez le commentaire"
+
+#: trombi/views.py
+msgid "Comment accepted"
+msgstr "Commentaire accepté"
+
+#: trombi/views.py
+msgid "Comment rejected"
+msgstr "Commentaire rejeté"
+
+#: trombi/views.py
+msgid "Comment removed"
+msgstr "Commentaire retiré"
 
 #: trombi/views.py
 msgid "Rejected comment"
@@ -5476,6 +5637,10 @@ msgstr ""
 "ou vous encourerez la colère des admins!"
 
 #: trombi/views.py
+msgid "User modified"
+msgstr "Utilisateur modifié"
+
+#: trombi/views.py
 msgid "Personal email (not UTBM)"
 msgstr "Email personnel (pas UTBM)"
 
@@ -5486,6 +5651,14 @@ msgstr "Téléphone"
 #: trombi/views.py
 msgid "Native town"
 msgstr "Ville d'origine"
+
+#: trombi/views.py
+msgid "User removed from trombi"
+msgstr "Utilisateur retiré du trombi"
+
+#: trombi/views.py
+msgid "Comment added"
+msgstr "Commentaire ajouté"
 
 #: trombi/views.py
 msgid ""

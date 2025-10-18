@@ -28,6 +28,7 @@ from typing import Any
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import (
     PermissionRequiredMixin,
 )
@@ -55,7 +56,7 @@ from core.auth.mixins import (
     PermissionOrClubBoardRequiredMixin,
 )
 from core.models import User
-from core.views.mixins import QuickNotifMixin, TabedViewMixin
+from core.views.mixins import TabedViewMixin
 from core.views.widgets.markdown import MarkdownInput
 
 # Sith object
@@ -333,7 +334,7 @@ class NewsFeed(Feed):
 # Weekmail
 
 
-class WeekmailPreviewView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, DetailView):
+class WeekmailPreviewView(ComTabsMixin, CanEditPropMixin, DetailView):
     model = Weekmail
     template_name = "com/weekmail_preview.jinja"
     success_url = reverse_lazy("com:weekmail")
@@ -345,12 +346,11 @@ class WeekmailPreviewView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, Detai
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        messages.success(self.request, _("Weekmail sent successfully"))
         if request.POST["send"] == "validate":
             try:
                 self.object.send()
-                return HttpResponseRedirect(
-                    reverse("com:weekmail") + "?qn_weekmail_send_success"
-                )
+                return HttpResponseRedirect(reverse("com:weekmail"))
             except SMTPRecipientsRefused as e:
                 self.bad_recipients = e.recipients
         elif request.POST["send"] == "clean":
@@ -361,7 +361,6 @@ class WeekmailPreviewView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, Detai
                 for u in users:
                     u.preferences.receive_weekmail = False
                     u.preferences.save()
-                self.quick_notif_list += ["qn_success"]
         return super().get(request, *args, **kwargs)
 
     def get_object(self, queryset=None):
@@ -375,7 +374,7 @@ class WeekmailPreviewView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, Detai
         return kwargs
 
 
-class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateView):
+class WeekmailEditView(ComTabsMixin, CanEditPropMixin, UpdateView):
     model = Weekmail
     template_name = "com/weekmail.jinja"
     form_class = modelform_factory(
@@ -415,7 +414,10 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
                 art.rank, prev_art.rank = prev_art.rank, art.rank
                 art.save()
                 prev_art.save()
-                self.quick_notif_list += ["qn_success"]
+                messages.success(
+                    self.request,
+                    _("%(title)s moved up in the Weekmail") % {"title": art.title},
+                )
         if "down_article" in request.GET:
             art = get_object_or_404(
                 WeekmailArticle, id=request.GET["down_article"], weekmail=self.object
@@ -427,7 +429,10 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
                 art.rank, next_art.rank = next_art.rank, art.rank
                 art.save()
                 next_art.save()
-                self.quick_notif_list += ["qn_success"]
+                messages.success(
+                    self.request,
+                    _("%(title)s moved down in the Weekmail") % {"title": art.title},
+                )
         if "add_article" in request.GET:
             art = get_object_or_404(
                 WeekmailArticle, id=request.GET["add_article"], weekmail=None
@@ -436,7 +441,10 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
             art.rank = self.object.articles.aggregate(Max("rank"))["rank__max"] or 0
             art.rank += 1
             art.save()
-            self.quick_notif_list += ["qn_success"]
+            messages.success(
+                self.request,
+                _("%(title)s added to the Weekmail") % {"title": art.title},
+            )
         if "del_article" in request.GET:
             art = get_object_or_404(
                 WeekmailArticle, id=request.GET["del_article"], weekmail=self.object
@@ -444,7 +452,10 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
             art.weekmail = None
             art.rank = -1
             art.save()
-            self.quick_notif_list += ["qn_success"]
+            messages.success(
+                self.request,
+                _("%(title)s removed from the Weekmail") % {"title": art.title},
+            )
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -454,9 +465,7 @@ class WeekmailEditView(ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateVi
         return kwargs
 
 
-class WeekmailArticleEditView(
-    ComTabsMixin, QuickNotifMixin, CanEditPropMixin, UpdateView
-):
+class WeekmailArticleEditView(ComTabsMixin, CanEditPropMixin, UpdateView):
     """Edit an article."""
 
     model = WeekmailArticle
@@ -468,11 +477,10 @@ class WeekmailArticleEditView(
     pk_url_kwarg = "article_id"
     template_name = "core/edit.jinja"
     success_url = reverse_lazy("com:weekmail")
-    quick_notif_url_arg = "qn_weekmail_article_edit"
     current_tab = "weekmail"
 
 
-class WeekmailArticleCreateView(QuickNotifMixin, CreateView):
+class WeekmailArticleCreateView(CreateView):
     """Post an article."""
 
     model = WeekmailArticle
@@ -483,7 +491,6 @@ class WeekmailArticleCreateView(QuickNotifMixin, CreateView):
     )
     template_name = "core/create.jinja"
     success_url = reverse_lazy("core:user_tools")
-    quick_notif_url_arg = "qn_weekmail_new_article"
 
     def get_initial(self):
         if "club" not in self.request.GET:

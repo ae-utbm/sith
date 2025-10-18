@@ -21,11 +21,6 @@
           {{ field.errors }}
           <label for="{{ field.name }}">{{ field.label }}</label>
           {{ field }}
-
-
-          {% if field.name == 'code' %}
-            <button type="button" id="autofill">{% trans %}Import from UTBM{% endtrans %}</button>
-          {% endif %}
         </p>
       {% endif %}
 
@@ -35,49 +30,4 @@
 
     <p><input type="submit" value="{% trans %}Update{% endtrans %}" /></p>
   </form>
-{% endblock %}
-
-{% block script %}
-  {{ super() }}
-
-  <script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function() {
-      const autofillBtn = document.getElementById('autofill')
-      const codeInput = document.querySelector('input[name="code"]')
-
-      autofillBtn.addEventListener('click', () => {
-        const url = `/api/uv/${codeInput.value}`;
-        deleteQuickNotifs()
-
-        $.ajax({
-          dataType: "json",
-          url: url,
-          success: function(data, _, xhr) {
-            if (xhr.status !== 200) {
-              createQuickNotif("{% trans %}Unknown UE code{% endtrans %}")
-              return
-            }
-            Object.entries(data)
-              .filter(([_, val]) => !!val)  // skip entries with null or undefined value
-              .map(([key, val]) => {  // convert keys to DOM elements
-                return [document.querySelector('[name="' + key + '"]'), val];
-              })
-              .filter(([elem, _]) => !!elem)  // skip non-existing DOM elements
-              .forEach(([elem, val]) => {  // write the value in the form field
-                if (elem.tagName === 'TEXTAREA') {
-                  // MD editor text input
-                  elem.parentNode.querySelector('.CodeMirror').CodeMirror.setValue(val);
-                } else {
-                  elem.value = val;
-                }
-              });
-            createQuickNotif('{% trans %}Successful autocomplete{% endtrans %}')
-          },
-          error: function(_, _, statusMessage) {
-            createQuickNotif('{% trans %}An error occurred: {% endtrans %}' + statusMessage)
-          },
-        })
-      })
-    })
-  </script>
 {% endblock %}

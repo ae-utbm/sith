@@ -26,12 +26,16 @@ from django import forms
 from django.conf import settings
 from django.db.models import Exists, OuterRef, Q
 from django.db.models.functions import Lower
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from club.models import Club, Mailing, MailingSubscription, Membership
 from core.models import User
-from core.views.forms import SelectDate, SelectDateTime
-from core.views.widgets.ajax_select import AutoCompleteSelectMultipleUser
+from core.views.forms import SelectDateTime
+from core.views.widgets.ajax_select import (
+    AutoCompleteSelectMultipleUser,
+    AutoCompleteSelectUser,
+)
 from counter.models import Counter, Selling
 
 
@@ -188,105 +192,113 @@ class SellingsForm(forms.Form):
         )
 
 
-class ClubMemberForm(forms.Form):
-    """Form handling the members of a club."""
+class ClubOldMemberForm(forms.Form):
+    members_old = forms.ModelMultipleChoiceField(
+        Membership.objects.none(),
+        label=_("Mark as old"),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+
+    def __init__(self, *args, user: User, club: Club, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["members_old"].queryset = (
+            Membership.objects.ongoing().filter(club=club).editable_by(user)
+        )
+
+
+class ClubMemberForm(forms.ModelForm):
+    """Form to add a member to the club, as a board member."""
 
     error_css_class = "error"
     required_css_class = "required"
 
-    users = forms.ModelMultipleChoiceField(
-        label=_("Users to add"),
-        help_text=_("Search users to add (one or more)."),
-        required=False,
-        widget=AutoCompleteSelectMultipleUser,
-        queryset=User.objects.all(),
-    )
+    class Meta:
+        model = Membership
+        fields = ["role", "description"]
 
-    def __init__(self, *args, **kwargs):
-        self.club = kwargs.pop("club")
-        self.request_user = kwargs.pop("request_user")
-        self.club_members = kwargs.pop("club_members", None)
-        if not self.club_members:
-            self.club_members = self.club.members.ongoing().order_by("-role").all()
+    def __init__(self, *args, club: Club, request_user: User, **kwargs):
+        self.club = club
+        self.request_user = request_user
         self.request_user_membership = self.club.get_membership_for(self.request_user)
         super().__init__(*args, **kwargs)
+        self.fields["role"].required = True
+        self.fields["role"].choices = [
+            (value, name)
+            for value, name in settings.SITH_CLUB_ROLES.items()
+            if value <= self.max_available_role
+        ]
+        self.instance.club = club
 
-        # Using a ModelForm binds too much the form with the model and we don't want that
-        # We want the view to process the model creation since they are multiple users
-        # We also want the form to handle bulk deletion
-        self.fields.update(
-            forms.fields_for_model(
-                Membership,
-                fields=("role", "start_date", "description"),
-                widgets={"start_date": SelectDate},
-            )
-        )
+    @property
+    def max_available_role(self):
+        """The greatest role that will be obtainable with this form."""
+        # this is unreachable, because it will be overridden by subclasses
+        return -1  # pragma: no cover
 
-        # Role is required only if users is specified
-        self.fields["role"].required = False
 
-        # Start date and description are never really required
-        self.fields["start_date"].required = False
-        self.fields["description"].required = False
+class ClubAddMemberForm(ClubMemberForm):
+    """Form to add a member to the club, as a board member."""
 
-        self.fields["users_old"] = forms.ModelMultipleChoiceField(
-            User.objects.filter(
-                id__in=[
-                    ms.user.id
-                    for ms in self.club_members
-                    if ms.can_be_edited_by(self.request_user)
-                ]
-            ).all(),
-            label=_("Mark as old"),
-            required=False,
-            widget=forms.CheckboxSelectMultiple,
-        )
-        if not self.request_user.is_root:
-            self.fields.pop("start_date")
+    class Meta(ClubMemberForm.Meta):
+        fields = ["user", *ClubMemberForm.Meta.fields]
+        widgets = {"user": AutoCompleteSelectUser}
 
-    def clean_users(self):
-        """Check that the user is not trying to add an user already in the club.
+    @cached_property
+    def max_available_role(self):
+        """The greatest role that will be obtainable with this form.
+
+        Admins and the club president can attribute any role.
+        Board members can attribute roles lower than their own.
+        Other users cannot attribute roles with this form
+        """
+        if self.request_user.has_perm("club.add_membership"):
+            return settings.SITH_CLUB_ROLES_ID["President"]
+        membership = self.request_user_membership
+        if membership is None or membership.role <= settings.SITH_MAXIMUM_FREE_ROLE:
+            return -1
+        if membership.role == settings.SITH_CLUB_ROLES_ID["President"]:
+            return membership.role
+        return membership.role - 1
+
+    def clean_user(self):
+        """Check that the user is not trying to add a user already in the club.
 
         Also check that the user is valid and has a valid subscription.
         """
-        cleaned_data = super().clean()
-        users = []
-        for user in cleaned_data["users"]:
-            if not user.is_subscribed:
-                raise forms.ValidationError(
-                    _("User must be subscriber to take part to a club"), code="invalid"
-                )
-            if self.club.get_membership_for(user):
-                raise forms.ValidationError(
-                    _("You can not add the same user twice"), code="invalid"
-                )
-            users.append(user)
-        return users
+        user = self.cleaned_data["user"]
+        if not user.is_subscribed:
+            raise forms.ValidationError(
+                _("User must be subscriber to take part to a club"), code="invalid"
+            )
+        if self.club.get_membership_for(user):
+            raise forms.ValidationError(
+                _("You can not add the same user twice"), code="invalid"
+            )
+        return user
+
+
+class JoinClubForm(ClubMemberForm):
+    """Form to join a club."""
+
+    def __init__(self, *args, club: Club, request_user: User, **kwargs):
+        super().__init__(*args, club=club, request_user=request_user, **kwargs)
+        # this form doesn't manage the user who will join the club,
+        # so we must set this here to avoid errors
+        self.instance.user = self.request_user
+
+    @cached_property
+    def max_available_role(self):
+        return settings.SITH_MAXIMUM_FREE_ROLE
 
     def clean(self):
-        """Check user rights for adding an user."""
-        cleaned_data = super().clean()
-
-        if "start_date" in cleaned_data and not cleaned_data["start_date"]:
-            # Drop start_date if allowed to edition but not specified
-            cleaned_data.pop("start_date")
-
-        if not cleaned_data.get("users"):
-            # No user to add equals no check needed
-            return cleaned_data
-
-        if cleaned_data.get("role", "") == "":
-            # Role is required if users exists
-            self.add_error("role", _("You should specify a role"))
-            return cleaned_data
-
-        request_user = self.request_user
-        membership = self.request_user_membership
-        if not (
-            cleaned_data["role"] <= settings.SITH_MAXIMUM_FREE_ROLE
-            or (membership is not None and membership.role >= cleaned_data["role"])
-            or request_user.is_board_member
-            or request_user.is_root
-        ):
-            raise forms.ValidationError(_("You do not have the permission to do that"))
-        return cleaned_data
+        """Check that the user is subscribed and isn't already in the club."""
+        if not self.request_user.is_subscribed:
+            raise forms.ValidationError(
+                _("You must be subscribed to join a club"), code="invalid"
+            )
+        if self.club.get_membership_for(self.request_user):
+            raise forms.ValidationError(
+                _("You are already a member of this club"), code="invalid"
+            )
+        return super().clean()

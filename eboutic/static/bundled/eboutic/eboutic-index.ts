@@ -17,7 +17,6 @@ document.addEventListener("alpine:init", () => {
       this.$watch("basket", () => {
         this.saveBasket();
       });
-
       // Invalidate basket if a purchase was made
       if (lastPurchaseTime !== null && localStorage.basketTimestamp !== undefined) {
         if (

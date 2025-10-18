@@ -67,13 +67,13 @@
                 <option value="FIN">{% trans %}Confirm (FIN){% endtrans %}</option>
                 <option value="ANN">{% trans %}Cancel (ANN){% endtrans %}</option>
               </optgroup>
-              {% for category in categories.keys() %}
+              {%- for category in categories.keys() -%}
                 <optgroup label="{{ category }}">
-                  {% for product in categories[category] %}
+                  {%- for product in categories[category] -%}
                     <option value="{{ product.id }}">{{ product }}</option>
-                  {% endfor %}
+                  {%- endfor -%}
                 </optgroup>
-              {% endfor %}
+              {%- endfor -%}
             </counter-product-select>
 
             <input type="submit" value="{% trans %}Go{% endtrans %}"/>

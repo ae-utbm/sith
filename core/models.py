@@ -651,19 +651,12 @@ class User(AbstractUser):
 
 
 class AnonymousUser(AuthAnonymousUser):
-    def __init__(self):
-        super().__init__()
-
     @property
     def was_subscribed(self):
         return False
 
     @property
     def is_subscribed(self):
-        return False
-
-    @property
-    def subscribed(self):
         return False
 
     @property
@@ -1197,6 +1190,18 @@ class NotLocked(LockError):
     pass
 
 
+class PageQuerySet(models.QuerySet):
+    def viewable_by(self, user: User) -> Self:
+        if user.is_anonymous:
+            return self.filter(view_groups=settings.SITH_GROUP_PUBLIC_ID)
+        if user.has_perm("core.view_page"):
+            return self.all()
+        groups_ids = [g.id for g in user.cached_groups]
+        if user.is_subscribed:
+            groups_ids.append(settings.SITH_GROUP_SUBSCRIBERS_ID)
+        return self.filter(view_groups__in=groups_ids)
+
+
 # This function prevents generating migration upon settings change
 def get_default_owner_group():
     return settings.SITH_GROUP_ROOT_ID
@@ -1266,6 +1271,8 @@ class Page(models.Model):
         _("lock_timeout"), null=True, blank=True, default=None
     )
 
+    objects = PageQuerySet.as_manager()
+
     class Meta:
         unique_together = ("name", "parent")
         permissions = (
@@ -1275,12 +1282,9 @@ class Page(models.Model):
     def __str__(self):
         return self.get_full_name()
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, force_lock: bool = False, **kwargs):
         """Performs some needed actions before and after saving a page in database."""
-        locked = kwargs.pop("force_lock", False)
-        if not locked:
-            locked = self.is_locked()
-        if not locked:
+        if not force_lock and not self.is_locked():
             raise NotLocked("The page is not locked and thus can not be saved")
         self.full_clean()
         if not self.id:
@@ -1292,7 +1296,7 @@ class Page(models.Model):
         # It also update all the children to maintain correct names
         self._full_name = self.get_full_name()
         for c in self.children.all():
-            c.save()
+            c.save(force_lock=force_lock)
         super().save(*args, **kwargs)
         self.unset_lock()
 
@@ -1408,14 +1412,14 @@ class Page(models.Model):
     def need_club_redirection(self):
         return self.is_club_page and self.name != settings.SITH_CLUB_ROOT_PAGE
 
-    def delete(self):
+    def delete(self, *args, **kwargs):
         self.unset_lock_recursive()
         self.set_lock_recursive(User.objects.get(id=0))
         for child in self.children.all():
             child.parent = self.parent
             child.save()
             child.unset_lock_recursive()
-        super().delete()
+        return super().delete(*args, **kwargs)
 
 
 class PageRev(models.Model):
@@ -1462,8 +1466,11 @@ class PageRev(models.Model):
     def get_absolute_url(self):
         return reverse("core:page", kwargs={"page_name": self.page._full_name})
 
-    def can_be_edited_by(self, user):
+    def can_be_edited_by(self, user: User) -> bool:
         return self.page.can_be_edited_by(user)
+
+    def is_owned_by(self, user: User) -> bool:
+        return any(g.id == self.page.owner_group_id for g in user.cached_groups)
 
 
 def get_notification_types():

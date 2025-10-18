@@ -76,18 +76,20 @@
               It will stay hidden for other users until it has been published.
             {% endtrans %}
           </p>
-          {% if user.has_perm("com.moderate_news") %}
+          {%- if user.has_perm("com.moderate_news") -%}
             {# This is an additional query for each non-moderated news,
             but it will be executed only for admin users, and only one time
-            (if they do their job and moderated news as soon as they see them),
+            (if they do their job and moderate news as soon as they see them),
             so it's still reasonable #}
             <div
-              {% if news is integer or news is string %}
+              {% if news is integer or news is string -%}
                 x-data="{ nbEvents: 0 }"
                 x-init="nbEvents = await nbToPublish()"
-              {% else %}
+              {%- elif news.is_published -%}
+                x-data="{ nbEvents: 0 }"
+              {%- else -%}
                 x-data="{ nbEvents: {{ news.dates.count() }} }"
-              {% endif %}
+              {%- endif -%}
             >
               <template x-if="nbEvents > 1">
                 <div>

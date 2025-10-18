@@ -1,0 +1,68 @@
+{% extends 'core/base.jinja' %}
+
+{%- block additional_css -%}
+  <link rel="stylesheet" href="{{ static('timetable/css/generator.scss') }}">
+{%- endblock -%}
+
+{%- block additional_js -%}
+  <script type="module" src="{{ static('bundled/timetable/generator-index.ts') }}"></script>
+{%- endblock -%}
+
+{% block title %}
+  {% trans %}Timetable generator{% endtrans %}
+{% endblock %}
+
+{% block content %}
+  <div x-data="timetableGenerator">
+    <form @submit.prevent="generate()">
+      <h1>Générateur d'emploi du temps</h1>
+      <div class="alert alert-red" x-show="!!error" x-cloak>
+        <span class="alert-main" x-text="error"></span>
+      </div>
+      <div class="form-group">
+        <label for="timetable-input">Colle ton emploi du temps (sans l'entête)</label>
+        <textarea id="timetable-input" cols="30" rows="15" x-model="content"></textarea>
+      </div>
+      <input type="submit" class="btn btn-blue" value="{% trans %}Generate{% endtrans %}">
+    </form>
+    <div
+      id="timetable"
+      x-show="table.height > 0 && table.width > 0"
+      :style="{width: `${table.width+80}px`, height: `${table.height+40}px`}"
+    >
+      <div class="header">
+        <template x-for="weekday in displayedWeekdays">
+          <span x-text="weekday"></span>
+        </template>
+      </div>
+      <div class="content">
+        <div class="hours" :height="(endSlot - endSlot%4) - (startSlot - startSlot%4)">
+          <template x-for="[hour, style] in getHours()">
+            <div class="hour" :style="style">
+              <div x-text="hour"></div>
+              <div class="hour-bar" :style="{width: `${getWidth()}px`}"></div>
+            </div>
+          </template>
+        </div>
+        <div class="courses">
+          <template x-for="course in courses">
+            <div class="slot" :style="getStyle(course)">
+              <span class="course-type" x-text="course.courseType"></span>
+              <span x-text="course.ueCode"></span>
+              <span x-text="`${course.startHour} - ${course.endHour}`"></span>
+              <span x-text="(course.weekGroup ? `\nGroupe ${course.weekGroup}` : '')"></span>
+              <span x-text="course.room"></span>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+    <button
+      class="margin-bottom btn btn-blue"
+      @click="savePng"
+      x-show="table.height > 0 && table.width > 0"
+    >
+      {% trans %}Save to PNG{% endtrans %}
+    </button>
+  </div>
+{% endblock content %}

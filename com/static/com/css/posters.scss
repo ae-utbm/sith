@@ -111,7 +111,7 @@
             top: 0;
             left: 0;
             z-index: 10;
-            content: "Click to expand";
+            content: attr(hover);
             color: white;
             background-color: rgba(black, 0.5);
           }
