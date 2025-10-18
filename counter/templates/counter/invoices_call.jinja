@@ -4,11 +4,13 @@
   {% trans %}Invoices call{% endtrans %}
 {% endblock %}
 
+{% block notifications %}{# Notifications are moved below #}{% endblock %}
+
 {% block content %}
   <h3>{% trans date=start_date|date("F Y") %}Invoices call for {{ date }}{% endtrans %}</h3>
-  <p>{% trans %}Choose another month: {% endtrans %}</p>
   <form method="get" action="">
-    <select name="month">
+    <label for="id_form_other_month">{% trans %}Choose another month: {% endtrans %}</label>
+    <select name="month" id="id_form_other_month">
       {% for m in months %}
         <option value="{{ m|date("Y-m") }}">{{ m|date("Y-m") }}</option>
       {% endfor %}
@@ -19,7 +21,9 @@
   <br>
   <p>{% trans %}CB Payments{% endtrans %} : {{ sum_cb }} €</p>
   <br>
+
   {% include "core/base/notifications.jinja" %}
+
   <form method="post" action="">
     {% csrf_token %}
     <table>
