@@ -1,5 +1,6 @@
-from typing import Optional
+from typing import Annotated, Optional
 
+from annotated_types import MinLen
 from django.db.models import Q
 from ninja import Field, FilterSchema, ModelSchema
 
@@ -8,14 +9,15 @@ from core.schemas import SimpleUserSchema
 
 
 class ClubSearchFilterSchema(FilterSchema):
-    search: Optional[str] = Field(None, q="name__icontains")
-    club_id: Optional[int] = Field(None, q="id")
-    is_active: Optional[bool] = None
-    parent_id: Optional[int] = None
-    parent_name: Optional[str] = Field(None, q="parent__name__icontains")
-    exclude_ids: Optional[list[int]] = None
+    search: Annotated[str, MinLen(1)] | None = Field(None, q="name__icontains")
+    is_active: bool | None = None
+    parent_id: int | None = None
+    parent_name: str | None = Field(None, q="parent__name__icontains")
+    exclude_ids: set[int] | None = None
 
-    def filter_exclude_ids(self, value: list[int]):
+    def filter_exclude_ids(self, value: set[int] | None):
+        if value is None:
+            return Q()
         return ~Q(id__in=value)
 
 
