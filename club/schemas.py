@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
 from annotated_types import MinLen
 from django.db.models import Q
