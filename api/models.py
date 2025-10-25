@@ -2,6 +2,8 @@ from typing import Iterable
 
 from django.contrib.auth.models import Permission
 from django.db import models
+from django.db.models import Q
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
@@ -29,8 +31,6 @@ class ApiClient(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    _perm_cache: set[str] | None = None
-
     class Meta:
         verbose_name = _("api client")
         verbose_name_plural = _("api clients")
@@ -38,29 +38,23 @@ class ApiClient(models.Model):
     def __str__(self):
         return self.name
 
+    @cached_property
+    def all_permissions(self) -> set[str]:
+        permissions = (
+            Permission.objects.filter(
+                Q(group__group__in=self.groups.all()) | Q(clients=self)
+            )
+            .values_list("content_type__app_label", "codename")
+            .order_by()
+        )
+        return {f"{content_type}.{name}" for content_type, name in permissions}
+
     def has_perm(self, perm: str):
         """Return True if the client has the specified permission."""
+        return perm in self.all_permissions
 
-        if self._perm_cache is None:
-            group_permissions = (
-                Permission.objects.filter(group__group__in=self.groups.all())
-                .values_list("content_type__app_label", "codename")
-                .order_by()
-            )
-            client_permissions = self.client_permissions.values_list(
-                "content_type__app_label", "codename"
-            ).order_by()
-            self._perm_cache = {
-                f"{content_type}.{name}"
-                for content_type, name in (*group_permissions, *client_permissions)
-            }
-        return perm in self._perm_cache
-
-    def has_perms(self, perm_list):
-        """
-        Return True if the client has each of the specified permissions. If
-        object is passed, check if the client has all required perms for it.
-        """
+    def has_perms(self, perm_list: Iterable[str]) -> bool:
+        """Return True if the client has each of the specified permissions."""
         if not isinstance(perm_list, Iterable) or isinstance(perm_list, str):
             raise ValueError("perm_list must be an iterable of permissions.")
         return all(self.has_perm(perm) for perm in perm_list)
