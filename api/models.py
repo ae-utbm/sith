@@ -1,3 +1,4 @@
+import secrets
 from typing import Iterable
 
 from django.contrib.auth.models import Permission
@@ -8,6 +9,10 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
 from core.models import Group, User
+
+
+def get_hmac_key():
+    return secrets.token_hex(64)
 
 
 class ApiClient(models.Model):
@@ -28,6 +33,7 @@ class ApiClient(models.Model):
         help_text=_("Specific permissions for this api client."),
         related_name="clients",
     )
+    hmac_key = models.CharField(_("HMAC Key"), max_length=128, default=get_hmac_key)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -58,6 +64,13 @@ class ApiClient(models.Model):
         if not isinstance(perm_list, Iterable) or isinstance(perm_list, str):
             raise ValueError("perm_list must be an iterable of permissions.")
         return all(self.has_perm(perm) for perm in perm_list)
+
+    def reset_hmac(self, *, commit: bool = True) -> str:
+        """Reset and return the HMAC key for this client."""
+        self.hmac_key = get_hmac_key()
+        if commit:
+            self.save()
+        return self.hmac_key
 
 
 class ApiKey(models.Model):
