@@ -36,6 +36,10 @@ msgstr ""
 "toxics, False sinon"
 
 #: api/admin.py
+msgid "Reset HMAC key"
+msgstr "Réinitialiser la clef HMAC"
+
+#: api/admin.py
 #, python-format
 msgid ""
 "The API key for %(name)s is: %(key)s. Please store it somewhere safe: you "
@@ -47,6 +51,23 @@ msgstr ""
 #: api/admin.py
 msgid "Revoke selected API keys"
 msgstr "Révoquer les clefs d'API sélectionnées"
+
+#: api/forms.py
+msgid "I have read and I accept the terms and conditions of use"
+msgstr "J'ai lu et j'accepte les conditions générales d'utilisation."
+
+#: api/forms.py
+msgid "You must approve the terms and conditions of use."
+msgstr "Vous devez approuver les conditions générales d'utilisation."
+
+#: api/forms.py
+msgid "You must confirm that this is your username."
+msgstr "Vous devez confirmer que c'est bien votre nom d'utilisateur."
+
+#: api/forms.py
+#, python-format
+msgid "I confirm that %(username)s is my username on %(app)s"
+msgstr "Je confirme que %(username)s est mon nom d'utilisateur sur %(app)s"
 
 #: api/models.py club/models.py com/models.py counter/models.py forum/models.py
 msgid "name"
@@ -67,6 +88,10 @@ msgstr "permissions du client"
 #: api/models.py
 msgid "Specific permissions for this api client."
 msgstr "Permissions spécifiques pour ce client d'API"
+
+#: api/models.py
+msgid "HMAC Key"
+msgstr "Clef HMAC"
 
 #: api/models.py
 msgid "api client"
@@ -96,6 +121,63 @@ msgstr "clef d'api"
 #: api/models.py
 msgid "api keys"
 msgstr "clefs d'api"
+
+#: api/templates/api/third_party/auth.jinja
+msgid "Confidentiality"
+msgstr "Confidentialité"
+
+#: api/templates/api/third_party/auth.jinja
+#, python-format
+msgid ""
+"By ticking this box and clicking on the send button, you acknowledge and "
+"agree to provide %(app)s with your first name, last name, nickname and any "
+"other information that was the third party app was explicitly authorized to "
+"fetch and that it must have acknowledged to you, in a complete and accurate "
+"manner."
+msgstr ""
+"En cochant cette case et en cliquant sur le bouton « Envoyer », vous "
+"reconnaissez et acceptez de fournir à %(app)s votre prénom, nom, pseudonyme "
+"et toute autre information que l'application tierce a été explicitement "
+"autorisée à récupérer et qu'elle doit vous avoir communiqué de manière "
+"complète et exacte."
+
+#: api/templates/api/third_party/auth.jinja
+#, python-format
+msgid ""
+"The privacy policies of <a href=\"%(cgu_link)s\">%(app)s</a> and of <a "
+"href=\"%(sith_cgu_link)s\">the Students' Association</a> applies as soon as "
+"the form is submitted."
+msgstr ""
+"Les politiques de confidentialité de <a href=\"%(cgu_link)s\">%(app)s</a> et de <a "
+"href=\"%(sith_cgu_link)s\">l'Association des Etudiants</a> s'appliquent dès la soumission "
+"du formulaire."
+
+#: api/templates/api/third_party/auth.jinja
+msgid "Confirmation of identity"
+msgstr "Confirmation d'identité"
+
+#: api/views.py
+#, python-format
+msgid ""
+"You are going to link your AE account and your %(app)s account. Continue "
+"only if this page was opened from %(app)s."
+msgstr ""
+"Vous allez lier votre compte AE et votre compte %(app)s. Poursuivez "
+"uniquement si cette page a été ouverte depuis %(app)s."
+
+#: api/views.py
+msgid "You have been successfully authenticated. You can now close this page."
+msgstr "Vous avez été authentifié avec succès. Vous pouvez maintenant fermer cette page."
+
+#: api/views.py
+msgid ""
+"Your authentication on the AE website was successful, but an error happened "
+"during the interaction with the third-party application. Please contact the "
+"managers of the latter."
+msgstr ""
+"Votre authentification sur le site AE a fonctionné, mais une erreur est arrivée "
+"durant l'interaction avec l'application tierce. Veuillez contacter les responsables "
+"de cette dernière."
 
 #: club/forms.py
 msgid "Users to add"
