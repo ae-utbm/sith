@@ -24,7 +24,7 @@
 
 from django.urls import path, register_converter
 
-from eboutic.converters import PaymentResultConverter
+from core.converters import ResultConverter
 from eboutic.views import (
     BillingInfoFormFragment,
     EbouticCheckout,
@@ -34,7 +34,7 @@ from eboutic.views import (
     payment_result,
 )
 
-register_converter(PaymentResultConverter, "res")
+register_converter(ResultConverter, "res")
 
 urlpatterns = [
     # Subscription views
