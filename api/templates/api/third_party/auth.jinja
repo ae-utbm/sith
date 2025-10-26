@@ -1,0 +1,32 @@
+{% extends "core/base.jinja" %}
+
+{% block content %}
+  <form method="post">
+    {% csrf_token %}
+    <h3>{% trans %}Confidentiality{% endtrans %}</h3>
+    <p>
+      {% trans trimmed app=third_party_app %}
+        By ticking this box and clicking on the send button, you
+        acknowledge and agree to provide {{ app }} with your
+        first name, last name, nickname and any other information
+        that was the third party app was explicitly authorized to fetch
+        and that it must have acknowledged to you, in a complete and accurate manner.
+      {% endtrans %}
+    </p>
+    <p class="margin-bottom">
+      {% trans trimmed app=third_party_app, cgu_link=third_party_cgu, sith_cgu_link=sith_cgu %}
+        The privacy policies of <a href="{{ cgu_link }}">{{ app }}</a>
+        and of <a href="{{ sith_cgu_link }}">the Students' Association</a>
+        applies as soon as the form is submitted.
+      {% endtrans %}
+    </p>
+    <div class="row">{{ form.cgu_accepted }} {{ form.cgu_accepted.label_tag() }}</div>
+    <br>
+    <h3 class="margin-bottom">{% trans %}Confirmation of identity{% endtrans %}</h3>
+    <div class="row margin-bottom">
+      {{ form.is_username_valid }} {{ form.is_username_valid.label_tag() }}
+    </div>
+    {% for field in form.hidden_fields() %}{{ field }}{% endfor %}
+    <input type="submit" class="btn btn-blue">
+  </form>
+{% endblock %}
