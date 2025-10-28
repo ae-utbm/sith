@@ -182,13 +182,12 @@ class OpenApi:
                 path[action]["operationId"] = "_".join(
                     desc["operationId"].split("_")[:-1]
                 )
+
         schema = str(schema)
 
         if old_hash == sha1(schema.encode("utf-8")).hexdigest():
             logging.getLogger("django").info("✨ Api did not change, nothing to do ✨")
             return
 
-        with open(out, "w") as f:
-            _ = f.write(schema)
-
+        out.write_text(schema)
         return subprocess.Popen(["npm", "run", "openapi"])
