@@ -23,7 +23,7 @@ class ThirdPartyAuthForm(forms.Form):
     )
     client_id = forms.IntegerField(widget=HiddenInput())
     third_party_app = forms.CharField(widget=HiddenInput())
-    cgu_link = forms.URLField(widget=HiddenInput())
+    privacy_link = forms.URLField(widget=HiddenInput())
     username = forms.CharField(widget=HiddenInput())
     callback_url = forms.URLField(widget=HiddenInput())
     signature = forms.CharField(widget=HiddenInput())

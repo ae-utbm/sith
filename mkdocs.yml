@@ -69,6 +69,7 @@ nav:
     - API:
       - Développement: tutorial/api/dev.md
       - Connexion à l'API: tutorial/api/connect.md
+      - Liaison avec le compte AE: tutorial/api/account-link.md
     - Etransactions: tutorial/etransaction.md
   - How-to:
     - L'ORM de Django: howto/querysets.md
@@ -91,6 +92,8 @@ nav:
       - reference/api/hashers.md
       - reference/api/models.md
       - reference/api/perms.md
+      - reference/api/schemas.md
+      - reference/api/views.md
     - club:
       - reference/club/models.md
       - reference/club/views.md

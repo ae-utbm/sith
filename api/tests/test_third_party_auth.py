@@ -9,6 +9,7 @@ from pytest_django.asserts import assertRedirects
 
 from api.models import ApiClient, get_hmac_key
 from core.baker_recipes import subscriber_user
+from core.schemas import UserProfileSchema
 from core.utils import hmac_hexdigest
 
 
@@ -34,14 +35,16 @@ class TestThirdPartyAuth(TestCase):
         self.query = {
             "client_id": self.api_client.id,
             "third_party_app": "app",
-            "cgu_link": "https://foobar.fr/",
+            "privacy_link": "https://foobar.fr/",
             "username": "bibou",
             "callback_url": "https://callback.fr/",
         }
         self.query["signature"] = hmac_hexdigest(self.api_client.hmac_key, self.query)
-        self.callback_data = {"user_id": self.user.id}
+        self.callback_data = {
+            "user": UserProfileSchema.from_orm(self.user).model_dump()
+        }
         self.callback_data["signature"] = hmac_hexdigest(
-            self.api_client.hmac_key, self.callback_data
+            self.api_client.hmac_key, self.callback_data["user"]
         )
 
     def test_auth_ok(self):

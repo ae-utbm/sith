@@ -210,14 +210,14 @@ def get_client_ip(request: HttpRequest) -> str | None:
 def hmac_hexdigest(
     key: str | bytes,
     data: Mapping[str, Any] | Sequence[tuple[str, Any]],
-    digest: str | Callable[[Buffer], HASH] = "sha256",
+    digest: str | Callable[[Buffer], HASH] = "sha512",
 ) -> str:
     """Return the hexdigest of the signature of the given data.
 
     Args:
         key: the HMAC key used for the signature
         data: the data to sign
-        digest: a PEP247 hashing algorithm
+        digest: a PEP247 hashing algorithm (by default, sha512)
 
     Examples:
         ```python
@@ -226,7 +226,7 @@ def hmac_hexdigest(
             "bar": "somevalue",
         }
         hmac_key = secrets.token_hex(64)
-        signature = hmac_hexdigest(hmac_key, data, "sha512")
+        signature = hmac_hexdigest(hmac_key, data, "sha256")
         ```
     """
     if isinstance(key, str):

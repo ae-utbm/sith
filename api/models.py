@@ -66,7 +66,11 @@ class ApiClient(models.Model):
         return all(self.has_perm(perm) for perm in perm_list)
 
     def reset_hmac(self, *, commit: bool = True) -> str:
-        """Reset and return the HMAC key for this client."""
+        """Reset and return the HMAC key for this client.
+
+        Args:
+            commit: if True (the default), persist the new hmac in db.
+        """
         self.hmac_key = get_hmac_key()
         if commit:
             self.save()
