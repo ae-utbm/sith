@@ -144,11 +144,11 @@ msgstr ""
 #: api/templates/api/third_party/auth.jinja
 #, python-format
 msgid ""
-"The privacy policies of <a href=\"%(cgu_link)s\">%(app)s</a> and of <a "
+"The privacy policies of <a href=\"%(privacy_link)s\">%(app)s</a> and of <a "
 "href=\"%(sith_cgu_link)s\">the Students' Association</a> applies as soon as "
 "the form is submitted."
 msgstr ""
-"Les politiques de confidentialité de <a href=\"%(cgu_link)s\">%(app)s</a> et de <a "
+"Les politiques de confidentialité de <a href=\"%(privacy_link)s\">%(app)s</a> et de <a "
 "href=\"%(sith_cgu_link)s\">l'Association des Etudiants</a> s'appliquent dès la soumission "
 "du formulaire."
 

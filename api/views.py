@@ -10,9 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import FormView, TemplateView
-from ninja import Schema
 from ninja_extra.shortcuts import get_object_or_none
-from pydantic import HttpUrl
 
 from api.forms import ThirdPartyAuthForm
 from api.models import ApiClient
@@ -20,15 +18,6 @@ from api.schemas import ThirdPartyAuthParamsSchema
 from core.models import Page
 from core.schemas import UserProfileSchema
 from core.utils import hmac_hexdigest
-
-
-class ThirdPartyAuthParamsSchema(Schema):
-    client_id: int
-    third_party_app: str
-    cgu_link: HttpUrl
-    username: str
-    callback_url: HttpUrl
-    signature: str
 
 
 class ThirdPartyAuthView(LoginRequiredMixin, FormView):
@@ -94,7 +83,7 @@ class ThirdPartyAuthView(LoginRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "third_party_app": self.params.third_party_app,
-            "third_party_cgu": self.params.cgu_link,
+            "third_party_cgu": self.params.privacy_link,
             "sith_cgu": Page.objects.get(_full_name=settings.SITH_CGU_PAGE),
         }
 
