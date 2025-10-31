@@ -777,7 +777,7 @@ class PosterListView(
             "create_url": reverse_lazy(
                 "club:poster_create", kwargs={"club_id": self.club.id}
             ),
-            "edit_url_factory": lambda poster: reverse(
+            "get_edit_url": lambda poster: reverse(
                 "club:poster_edit",
                 kwargs={"club_id": self.club.id, "poster_id": poster.id},
             ),

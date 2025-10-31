@@ -650,7 +650,7 @@ class PosterListView(PermissionRequiredMixin, ComTabsMixin, PosterListBaseView):
     current_tab = "posters"
     extra_context = {
         "create_url": reverse_lazy("com:poster_create"),
-        "edit_url_factory": lambda poster: reverse(
+        "get_edit_url": lambda poster: reverse(
             "com:poster_edit", kwargs={"poster_id": poster.id}
         ),
     }

@@ -130,28 +130,6 @@
         }
       }
 
-      .tooltip {
-        visibility: hidden;
-        width: 120px;
-        background-color: hsl(210, 20%, 98%);
-        color: hsl(0, 0%, 0%);
-        text-align: center;
-        padding: 5px 0;
-        border-radius: 6px;
-        position: absolute;
-        z-index: 10;
-
-        ul {
-          margin-left: 0;
-          display: inline-block;
-
-          li {
-            display: list-item;
-            list-style-type: none;
-          }
-        }
-      }
-
       &.not_moderated {
         border: 1px solid red;
       }

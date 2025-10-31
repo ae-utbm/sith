@@ -29,6 +29,9 @@
             class="image"
             hover="{% trans %}Click to expand{% endtrans %}"
             @click="active = $el.firstElementChild"
+            tooltip="{%- for screen in poster.screens.all() -%}
+                       {{ screen }}
+                     {% endfor %}"
           >
             <img src="{{ poster.file.url }}" alt="{{ poster.name }}">
           </div>
@@ -38,7 +41,7 @@
           </div>
           <div class="actions">
             {% if poster.is_editable %}
-              <a class="btn btn-blue" href="{{ edit_url_factory(poster) }}">
+              <a class="btn btn-blue" href="{{ get_edit_url(poster) }}">
                 <i class="fa fa-pen-to-square"></i>
                 {% trans %}Edit{% endtrans %}
               </a>
@@ -46,19 +49,12 @@
             {% if not poster.is_moderated and user.has_perm("com.moderate_poster") %}
               <form action="{{ url("com:poster_moderate", object_id=poster.id) }}" method="post">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-blue">
+                <button type="submit" class="btn btn-green">
                   <i class="fa fa-check"></i>
                   {% trans %}Moderate{% endtrans %}
                 </button>
               </form>
             {% endif %}
-          </div>
-          <div class="tooltip">
-            <ul>
-              {% for screen in poster.screens.all() %}
-                <li>{{ screen }}</li>
-              {% endfor %}
-            </ul>
           </div>
         </div>
       {% else %}
