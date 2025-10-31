@@ -637,17 +637,37 @@ class PosterListView(ComTabsMixin, PosterListBaseView):
     """List communication posters."""
 
     current_tab = "posters"
+    extra_context = {
+        "links": {
+            "title": _("Posters"),
+            "position": "right",
+            "links": [
+                {
+                    "pk": "create",
+                    "label": _("Create"),
+                    "url": reverse_lazy("com:poster_create"),
+                },
+                {
+                    "pk": "moderation",
+                    "label": "Moderation",
+                    "url": reverse_lazy("com:poster_moderate_list"),
+                },
+            ],
+        },
+        "action": {
+            "class": "edit",
+            "label": _("Edit"),
+            "get_url": lambda club, poster: reverse(
+                "com:poster_edit", kwargs={"poster_id": poster.id}
+            ),
+        },
+    }
 
     def get_queryset(self):
         qs = super().get_queryset()
         if self.request.user.has_perm("com.view_poster"):
             return qs
         return qs.filter(club=self.club.id)
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["app"] = "com"
-        return kwargs
 
 
 class PosterCreateView(ComTabsMixin, PosterCreateBaseView):
@@ -677,10 +697,29 @@ class PosterModerateListView(PermissionRequiredMixin, ComTabsMixin, ListView):
 
     current_tab = "posters"
     model = Poster
-    template_name = "com/poster_moderate.jinja"
+    template_name = "com/poster_list.jinja"
     queryset = Poster.objects.filter(is_moderated=False).all()
     permission_required = "com.moderate_poster"
-    extra_context = {"app": "com"}
+    extra_context = {
+        "links": {
+            "position": "left",
+            "title": _("Posters - moderation"),
+            "links": [
+                {
+                    "pk": "list",
+                    "label": _("List"),
+                    "url": reverse_lazy("com:poster_list"),
+                }
+            ],
+        },
+        "action": {
+            "class": "moderate",
+            "label": _("Moderate"),
+            "get_url": lambda club, poster: reverse(
+                "com:poster_moderate", kwargs={"object_id": poster.id}
+            ),
+        },
+    }
 
 
 class PosterModerateView(PermissionRequiredMixin, ComTabsMixin, View):

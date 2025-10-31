@@ -12,14 +12,11 @@
   <div id="poster_list" x-data="{ active: null }">
 
     <div id="title">
-      <h3>{% trans %}Posters{% endtrans %}</h3>
-      <div id="links" class="right">
-        {% if app == "com" %}
-          <a id="create" class="link" href="{{ url(app + ":poster_create") }}">{% trans %}Create{% endtrans %}</a>
-          <a id="moderation" class="link" href="{{ url("com:poster_moderate_list") }}">{% trans %}Moderation{% endtrans %}</a>
-        {% elif app == "club" %}
-          <a id="create" class="link" href="{{ url(app + ":poster_create", club.id) }}">{% trans %}Create{% endtrans %}</a>
-        {% endif %}
+      <h3>{{ links["title"] }}</h3>
+      <div id="links" class="{{ links["position"] }}">
+        {% for link in links["links"] %}
+          <a id="{{ link["pk"] }}" class="link" href="{{ link["url"] }}">{{ link["label"] }}</a>
+        {% endfor %}
       </div>
     </div>
 
@@ -43,11 +40,7 @@
               <div class="begin">{{ poster.date_begin | localtime | date("d/M/Y H:m") }}</div>
               <div class="end">{{ poster.date_end | localtime | date("d/M/Y H:m") }}</div>
             </div>
-            {% if app == "com" %}
-              <a class="edit" href="{{ url(app + ":poster_edit", poster.id) }}">{% trans %}Edit{% endtrans %}</a>
-            {% elif app == "club" %}
-              <a class="edit" href="{{ url(app + ":poster_edit", club.id, poster.id) }}">{% trans %}Edit{% endtrans %}</a>
-            {% endif %}
+            <a class="{{ action["class"] }}" href="{{ action["get_url"](club, poster) }}">{{ action["label"] }}</a>
             <div class="tooltip">
               <ul>
                 {% for screen in poster.screens.all() %}

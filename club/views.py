@@ -762,13 +762,38 @@ class PosterListView(ClubTabsMixin, PosterListBaseView):
     """List communication posters."""
 
     current_tab = "posters"
-    extra_context = {"app": "club"}
+    extra_context = {
+        "links": {
+            "title": _("Posters"),
+            "position": "right",
+        },
+        "action": {
+            "class": "edit",
+            "label": _("Edit"),
+            "get_url": lambda club, poster: reverse(
+                "club:poster_edit", kwargs={"club_id": club.id, "poster_id": poster.id}
+            ),
+        },
+    }
 
     def get_queryset(self):
         return super().get_queryset().filter(club=self.club.id)
 
     def get_object(self):
         return self.club
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs["links"]["links"] = [
+            {
+                "pk": "create",
+                "label": _("Create"),
+                "url": reverse_lazy(
+                    "club:poster_create", kwargs={"club_id": self.club.id}
+                ),
+            }
+        ]
+        return kwargs
 
 
 class PosterCreateView(ClubTabsMixin, PosterCreateBaseView):
