@@ -25,6 +25,7 @@ import itertools
 from datetime import date, timedelta
 from smtplib import SMTPRecipientsRefused
 from typing import Any
+from urllib.parse import urlparse
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -34,7 +35,7 @@ from django.contrib.auth.mixins import (
 )
 from django.contrib.syndication.views import Feed
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import Max
+from django.db.models import Exists, Max, OuterRef, Value
 from django.forms.models import modelform_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
@@ -45,7 +46,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, TemplateView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from club.models import Club, Mailing
+from club.models import Club, Mailing, Membership
 from com.forms import NewsDateForm, NewsForm, PosterForm
 from com.ics_calendar import IcsCalendar
 from com.models import News, NewsDate, Poster, Screen, Sith, Weekmail, WeekmailArticle
@@ -561,16 +562,26 @@ class MailingModerateView(View):
         raise PermissionDenied
 
 
-class PosterListBaseView(PermissionOrClubBoardRequiredMixin, ListView):
+class PosterListBaseView(ListView):
     """List communication posters."""
 
     model = Poster
     template_name = "com/poster_list.jinja"
     permission_required = "com.view_poster"
-    ordering = ["-date_begin"]
 
-    def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {"club": self.club}
+    def get_queryset(self):
+        qs = Poster.objects.prefetch_related("screens")
+        if self.request.user.has_perm("com.edit_poster"):
+            qs = qs.annotate(is_editable=Value(value=True))
+        else:
+            qs = qs.annotate(
+                is_editable=Exists(
+                    Membership.objects.ongoing()
+                    .board()
+                    .filter(user=self.request.user, club=OuterRef("club_id"))
+                )
+            )
+        return qs.order_by("-date_begin")
 
 
 class PosterCreateBaseView(PermissionOrClubBoardRequiredMixin, CreateView):
@@ -633,41 +644,17 @@ class PosterDeleteBaseView(
     permission_required = "com.delete_poster"
 
 
-class PosterListView(ComTabsMixin, PosterListBaseView):
+class PosterListView(PermissionRequiredMixin, ComTabsMixin, PosterListBaseView):
     """List communication posters."""
 
     current_tab = "posters"
     extra_context = {
-        "links": {
-            "title": _("Posters"),
-            "position": "right",
-            "links": [
-                {
-                    "pk": "create",
-                    "label": _("Create"),
-                    "url": reverse_lazy("com:poster_create"),
-                },
-                {
-                    "pk": "moderation",
-                    "label": "Moderation",
-                    "url": reverse_lazy("com:poster_moderate_list"),
-                },
-            ],
-        },
-        "action": {
-            "class": "edit",
-            "label": _("Edit"),
-            "get_url": lambda club, poster: reverse(
-                "com:poster_edit", kwargs={"poster_id": poster.id}
-            ),
-        },
+        "create_url": reverse_lazy("com:poster_create"),
+        "edit_url_factory": lambda poster: reverse(
+            "com:poster_edit", kwargs={"poster_id": poster.id}
+        ),
     }
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        if self.request.user.has_perm("com.view_poster"):
-            return qs
-        return qs.filter(club=self.club.id)
+    permission_required = "com.view_poster"
 
 
 class PosterCreateView(ComTabsMixin, PosterCreateBaseView):
@@ -692,36 +679,6 @@ class PosterDeleteView(PosterDeleteBaseView):
     success_url = reverse_lazy("com:poster_list")
 
 
-class PosterModerateListView(PermissionRequiredMixin, ComTabsMixin, ListView):
-    """Moderate list communication poster."""
-
-    current_tab = "posters"
-    model = Poster
-    template_name = "com/poster_list.jinja"
-    queryset = Poster.objects.filter(is_moderated=False).all()
-    permission_required = "com.moderate_poster"
-    extra_context = {
-        "links": {
-            "position": "left",
-            "title": _("Posters - moderation"),
-            "links": [
-                {
-                    "pk": "list",
-                    "label": _("List"),
-                    "url": reverse_lazy("com:poster_list"),
-                }
-            ],
-        },
-        "action": {
-            "class": "moderate",
-            "label": _("Moderate"),
-            "get_url": lambda club, poster: reverse(
-                "com:poster_moderate", kwargs={"object_id": poster.id}
-            ),
-        },
-    }
-
-
 class PosterModerateView(PermissionRequiredMixin, ComTabsMixin, View):
     """Moderate communication poster."""
 
@@ -729,12 +686,21 @@ class PosterModerateView(PermissionRequiredMixin, ComTabsMixin, View):
     permission_required = "com.moderate_poster"
     extra_context = {"app": "com"}
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         obj = get_object_or_404(Poster, pk=kwargs["object_id"])
         obj.is_moderated = True
         obj.moderator = request.user
         obj.save()
-        return redirect("com:poster_moderate_list")
+        # The moderation request may be originated from a club context (/club/poster)
+        # or a global context (/com/poster),
+        # so the redirection URL will be the URL of the page that called this view,
+        # as long as the latter belongs to the sith.
+        referer = self.request.META.get("HTTP_REFERER")
+        if referer:
+            parsed = urlparse(referer)
+            if parsed.netloc == settings.SITH_URL:
+                return redirect(parsed.path)
+        return redirect(reverse("com:poster_list"))
 
 
 class ScreenListView(PermissionRequiredMixin, ComTabsMixin, ListView):

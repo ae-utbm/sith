@@ -12,47 +12,58 @@
   <div id="poster_list" x-data="{ active: null }">
 
     <div id="title">
-      <h3>{{ links["title"] }}</h3>
-      <div id="links" class="{{ links["position"] }}">
-        {% for link in links["links"] %}
-          <a id="{{ link["pk"] }}" class="link" href="{{ link["url"] }}">{{ link["label"] }}</a>
-        {% endfor %}
+      <h3>{% trans %}Posters{% endtrans %}</h3>
+      <div id="links">
+        <a id="create" class="btn btn-blue" href="{{ create_url }}">
+          <i class="fa fa-plus"></i>
+          {% trans %}Create{% endtrans %}
+        </a>
       </div>
     </div>
 
     <div id="posters">
-
-      {% if poster_list.count() == 0 %}
-        <div id="no-posters">{% trans %}No posters{% endtrans %}</div>
-      {% else %}
-
-        {% for poster in poster_list %}
-          <div class="poster{% if not poster.is_moderated %} not_moderated{% endif %}">
-            <div class="name">{{ poster.name }}</div>
-            <div
-              class="image"
-              hover="{% trans %}Click to expand{% endtrans %}"
-              @click="active = $el.firstElementChild"
-            >
-              <img src="{{ poster.file.url }}"></img>
-            </div>
-            <div class="dates">
-              <div class="begin">{{ poster.date_begin | localtime | date("d/M/Y H:m") }}</div>
-              <div class="end">{{ poster.date_end | localtime | date("d/M/Y H:m") }}</div>
-            </div>
-            <a class="{{ action["class"] }}" href="{{ action["get_url"](club, poster) }}">{{ action["label"] }}</a>
-            <div class="tooltip">
-              <ul>
-                {% for screen in poster.screens.all() %}
-                  <li>{{ screen }}</li>
-                {% endfor %}
-              </ul>
-            </div>
+      {% for poster in poster_list %}
+        <div class="poster{% if not poster.is_moderated %} not_moderated{% endif %}">
+          <div class="name">{{ poster.name }}</div>
+          <div
+            class="image"
+            hover="{% trans %}Click to expand{% endtrans %}"
+            @click="active = $el.firstElementChild"
+          >
+            <img src="{{ poster.file.url }}" alt="{{ poster.name }}">
           </div>
-        {% endfor %}
-
-      {% endif %}
-
+          <div class="dates">
+            <div class="begin">{{ poster.date_begin | localtime | date("d/M/Y H:m") }}</div>
+            <div class="end">{{ poster.date_end | localtime | date("d/M/Y H:m") }}</div>
+          </div>
+          <div class="actions">
+            {% if poster.is_editable %}
+              <a class="btn btn-blue" href="{{ edit_url_factory(poster) }}">
+                <i class="fa fa-pen-to-square"></i>
+                {% trans %}Edit{% endtrans %}
+              </a>
+            {% endif %}
+            {% if not poster.is_moderated and user.has_perm("com.moderate_poster") %}
+              <form action="{{ url("com:poster_moderate", object_id=poster.id) }}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-blue">
+                  <i class="fa fa-check"></i>
+                  {% trans %}Moderate{% endtrans %}
+                </button>
+              </form>
+            {% endif %}
+          </div>
+          <div class="tooltip">
+            <ul>
+              {% for screen in poster.screens.all() %}
+                <li>{{ screen }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      {% else %}
+        <div id="no-posters">{% trans %}No posters{% endtrans %}</div>
+      {% endfor %}
     </div>
 
     <div
@@ -61,7 +72,9 @@
       @click="active = null"
       :class="{active: active !== null}"
     >
-      <div id="placeholder"><img :src="active?.src"></div>
+      <div id="placeholder">
+        <img :src="active?.src" :alt="active?.name">
+      </div>
     </div>
 
   </div>

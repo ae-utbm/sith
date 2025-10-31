@@ -20,33 +20,7 @@
       position: absolute;
       display: flex;
       bottom: 5px;
-
-      &.left {
-        left: 0;
-      }
-
-      &.right {
-        right: 0;
-      }
-
-      .link {
-        padding: 5px;
-        padding-left: 20px;
-        padding-right: 20px;
-        margin-left: 5px;
-        border-radius: 20px;
-        background-color: hsl(40, 100%, 50%);
-        color: black;
-
-        &:hover {
-          color: black;
-          background-color: hsl(40, 58%, 50%);
-        }
-
-        &.delete {
-          background-color: hsl(0, 100%, 40%);
-        }
-      }
+      left: 0;
     }
   }
 
@@ -143,22 +117,16 @@
         }
       }
 
-      .edit,
-      .moderate,
-      .slideshow {
-        padding: 5px;
-        border-radius: 20px;
-        background-color: hsl(40, 100%, 50%);
-        color: black;
-
-        &:hover {
-          color: black;
-          background-color: hsl(40, 58%, 50%);
-        }
-
-        &:nth-child(2n) {
-          margin-top: 5px;
-          margin-bottom: 5px;
+      .actions {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        form {
+          margin: unset;
+          padding: unset;
+          button {
+            width: 100%;
+          }
         }
       }
 

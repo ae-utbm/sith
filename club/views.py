@@ -59,7 +59,7 @@ from com.views import (
     PosterEditBaseView,
     PosterListBaseView,
 )
-from core.auth.mixins import CanEditMixin
+from core.auth.mixins import CanEditMixin, PermissionOrClubBoardRequiredMixin
 from core.models import PageRev
 from core.views import DetailFormView, PageEditViewBase, UseFragmentsMixin
 from core.views.mixins import FragmentMixin, FragmentRenderer, TabedViewMixin
@@ -758,23 +758,13 @@ class MailingAutoGenerationView(View):
         return redirect("club:mailing", club_id=club.id)
 
 
-class PosterListView(ClubTabsMixin, PosterListBaseView):
+class PosterListView(
+    PermissionOrClubBoardRequiredMixin, ClubTabsMixin, PosterListBaseView
+):
     """List communication posters."""
 
     current_tab = "posters"
-    extra_context = {
-        "links": {
-            "title": _("Posters"),
-            "position": "right",
-        },
-        "action": {
-            "class": "edit",
-            "label": _("Edit"),
-            "get_url": lambda club, poster: reverse(
-                "club:poster_edit", kwargs={"club_id": club.id, "poster_id": poster.id}
-            ),
-        },
-    }
+    permission_required = "com.view_poster"
 
     def get_queryset(self):
         return super().get_queryset().filter(club=self.club.id)
@@ -783,17 +773,15 @@ class PosterListView(ClubTabsMixin, PosterListBaseView):
         return self.club
 
     def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["links"]["links"] = [
-            {
-                "pk": "create",
-                "label": _("Create"),
-                "url": reverse_lazy(
-                    "club:poster_create", kwargs={"club_id": self.club.id}
-                ),
-            }
-        ]
-        return kwargs
+        return super().get_context_data(**kwargs) | {
+            "create_url": reverse_lazy(
+                "club:poster_create", kwargs={"club_id": self.club.id}
+            ),
+            "edit_url_factory": lambda poster: reverse(
+                "club:poster_edit",
+                kwargs={"club_id": self.club.id, "poster_id": poster.id},
+            ),
+        }
 
 
 class PosterCreateView(ClubTabsMixin, PosterCreateBaseView):
