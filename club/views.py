@@ -59,7 +59,7 @@ from com.views import (
     PosterEditBaseView,
     PosterListBaseView,
 )
-from core.auth.mixins import CanEditMixin
+from core.auth.mixins import CanEditMixin, PermissionOrClubBoardRequiredMixin
 from core.models import PageRev
 from core.views import DetailFormView, PageEditViewBase, UseFragmentsMixin
 from core.views.mixins import FragmentMixin, FragmentRenderer, TabedViewMixin
@@ -758,17 +758,30 @@ class MailingAutoGenerationView(View):
         return redirect("club:mailing", club_id=club.id)
 
 
-class PosterListView(ClubTabsMixin, PosterListBaseView):
+class PosterListView(
+    PermissionOrClubBoardRequiredMixin, ClubTabsMixin, PosterListBaseView
+):
     """List communication posters."""
 
     current_tab = "posters"
-    extra_context = {"app": "club"}
+    permission_required = "com.view_poster"
 
     def get_queryset(self):
         return super().get_queryset().filter(club=self.club.id)
 
     def get_object(self):
         return self.club
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "create_url": reverse_lazy(
+                "club:poster_create", kwargs={"club_id": self.club.id}
+            ),
+            "get_edit_url": lambda poster: reverse(
+                "club:poster_edit",
+                kwargs={"club_id": self.club.id, "poster_id": poster.id},
+            ),
+        }
 
 
 class PosterCreateView(ClubTabsMixin, PosterCreateBaseView):

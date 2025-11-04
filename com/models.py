@@ -402,9 +402,7 @@ class Poster(models.Model):
                 groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID]
             ):
                 Notification.objects.create(
-                    user=user,
-                    url=reverse("com:poster_moderate_list"),
-                    type="POSTER_MODERATION",
+                    user=user, url=reverse("com:poster_list"), type="POSTER_MODERATION"
                 )
         return super().save(*args, **kwargs)
 
