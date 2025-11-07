@@ -38,16 +38,19 @@ def validate_payment(value):
         raise ValidationError(_("Bad payment method"))
 
 
+def get_subscription_types():
+    return (
+        (k, f"{v['name']}, {v['price']}€")
+        for k, v in sorted(settings.SITH_SUBSCRIPTIONS.items())
+    )
+
+
 class Subscription(models.Model):
     member = models.ForeignKey(
         User, related_name="subscriptions", on_delete=models.CASCADE
     )
     subscription_type = models.CharField(
-        _("subscription type"),
-        max_length=255,
-        choices=(
-            (k, v["name"]) for k, v in sorted(settings.SITH_SUBSCRIPTIONS.items())
-        ),
+        _("subscription type"), max_length=255, choices=get_subscription_types
     )
     subscription_start = models.DateField(_("subscription start"))
     subscription_end = models.DateField(_("subscription end"))

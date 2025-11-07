@@ -5065,47 +5065,47 @@ msgstr "Suppression de rechargement"
 
 #: sith/settings.py
 msgid "One semester"
-msgstr "Un semestre, 20 €"
+msgstr "Un semestre"
 
 #: sith/settings.py
 msgid "Two semesters"
-msgstr "Deux semestres, 35 €"
+msgstr "Deux semestres"
 
 #: sith/settings.py
 msgid "Common core cursus"
-msgstr "Cursus tronc commun, 60 €"
+msgstr "Cursus tronc commun"
 
 #: sith/settings.py
 msgid "Branch cursus"
-msgstr "Cursus branche, 60 €"
+msgstr "Cursus branche"
 
 #: sith/settings.py
 msgid "Alternating cursus"
-msgstr "Cursus alternant, 30 €"
+msgstr "Cursus alternant"
 
 #: sith/settings.py
 msgid "Honorary member"
-msgstr "Membre honoraire, 0 €"
+msgstr "Membre honoraire"
 
 #: sith/settings.py
 msgid "Assidu member"
-msgstr "Membre d'Assidu, 0 €"
+msgstr "Membre d'Assidu"
 
 #: sith/settings.py
 msgid "Amicale/DOCEO member"
-msgstr "Membre de l'Amicale/DOCEO, 0 €"
+msgstr "Membre de l'Amicale/DOCEO"
 
 #: sith/settings.py
 msgid "UT network member"
-msgstr "Cotisant du réseau UT, 0 €"
+msgstr "Cotisant du réseau UT"
 
 #: sith/settings.py
 msgid "CROUS member"
-msgstr "Membres du CROUS, 0 €"
+msgstr "Membres du CROUS"
 
 #: sith/settings.py
 msgid "Sbarro/ESTA member"
-msgstr "Membre de Sbarro ou de l'ESTA, 20 €"
+msgstr "Membre de Sbarro ou de l'ESTA"
 
 #: sith/settings.py
 msgid "One semester Welcome Week"
@@ -5132,28 +5132,28 @@ msgid "One day"
 msgstr "Un jour"
 
 #: sith/settings.py
-msgid "GA staff member"
-msgstr "Membre staff GA (2 semaines), 1 €"
+msgid "GA staff member (2 weeks)"
+msgstr "Membre staff GA (2 semaines)"
 
 #: sith/settings.py
 msgid "One semester (-20%)"
-msgstr "Un semestre (-20%), 12 €"
+msgstr "Un semestre (-20%)"
 
 #: sith/settings.py
 msgid "Two semesters (-20%)"
-msgstr "Deux semestres (-20%), 22 €"
+msgstr "Deux semestres (-20%)"
 
 #: sith/settings.py
 msgid "Common core cursus (-20%)"
-msgstr "Cursus tronc commun (-20%), 36 €"
+msgstr "Cursus tronc commun (-20%)"
 
 #: sith/settings.py
 msgid "Branch cursus (-20%)"
-msgstr "Cursus branche (-20%), 36 €"
+msgstr "Cursus branche (-20%)"
 
 #: sith/settings.py
 msgid "Alternating cursus (-20%)"
-msgstr "Cursus alternant (-20%), 24 €"
+msgstr "Cursus alternant (-20%)"
 
 #: sith/settings.py
 msgid "One year for free(CA offer)"
