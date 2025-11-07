@@ -17,16 +17,16 @@
 {% block content %}
   <main x-data="user_pictures({ userId: {{ object.id }}, nbPictures: {{ object.nb_pictures }} })">
     {% if user.id == object.id %}
-      {{ download_button(_("Download all my pictures")) }}
+      {{ download_button(_("Download all my pictures"), "allPictures()") }}
     {% endif %}
 
     <template x-for="album in albums" x-cloak>
       <section>
         <br />
-        <div class="row">
+        <div class="row gap">
           <h4 x-text="album.name" :id="`album-${album.id}`"></h4>
           {% if user.id == object.id %}
-            &nbsp;{{ download_button("") }}
+            {{ download_button("", "album.pictures") }}
           {% endif %}
         </div>
         <div class="photos">

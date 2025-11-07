@@ -85,7 +85,7 @@
   <div x-data="pictures({ albumId: {{ album.id }}, maxPageSize: {{ settings.SITH_SAS_IMAGES_PER_PAGE }} })">
     <h4>{% trans %}Pictures{% endtrans %}</h4>
     <br>
-    {{ download_button(_("Download album")) }}
+    {{ download_button(_("Download album"), "pictures") }}
     <div class="photos" :aria-busy="loading" @pictures-upload-done.window="fetchPictures">
       <template x-for="picture in getPage(page)">
         <a :href="picture.sas_url">
