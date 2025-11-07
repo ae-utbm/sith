@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-17 13:41+0200\n"
+"POT-Creation-Date: 2025-11-04 12:43+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -893,7 +893,8 @@ msgstr "Administration des mailing listes"
 msgid "Actions"
 msgstr "Actions"
 
-#: com/templates/com/mailing_admin.jinja core/templates/core/file_detail.jinja
+#: com/templates/com/mailing_admin.jinja com/templates/com/poster_list.jinja
+#: core/templates/core/file_detail.jinja
 #: core/templates/core/file_moderation.jinja sas/templates/sas/moderation.jinja
 #: sas/templates/sas/picture.jinja
 msgid "Moderate"
@@ -1109,8 +1110,7 @@ msgstr "Vous n'avez pas accès à ce contenu"
 msgid "Poster"
 msgstr "Affiche"
 
-#: com/templates/com/poster_edit.jinja com/templates/com/poster_moderate.jinja
-#: com/templates/com/screen_edit.jinja
+#: com/templates/com/poster_edit.jinja com/templates/com/screen_edit.jinja
 msgid "List"
 msgstr "Liste"
 
@@ -1123,25 +1123,13 @@ msgstr "Affiche - modifier"
 msgid "Create"
 msgstr "Créer"
 
-#: com/templates/com/poster_list.jinja
-msgid "Moderation"
-msgstr "Modération"
-
-#: com/templates/com/poster_list.jinja
-msgid "No posters"
-msgstr "Aucune affiche"
-
 #: com/templates/com/poster_list.jinja com/templates/com/screen_slideshow.jinja
 msgid "Click to expand"
 msgstr "Cliquez pour agrandir"
 
-#: com/templates/com/poster_moderate.jinja
-msgid "Posters - moderation"
-msgstr "Affiches - modération"
-
-#: com/templates/com/poster_moderate.jinja
-msgid "No objects"
-msgstr "Aucun éléments"
+#: com/templates/com/poster_list.jinja
+msgid "No posters"
+msgstr "Aucune affiche"
 
 #: com/templates/com/screen_edit.jinja
 msgid "Screen"

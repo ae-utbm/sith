@@ -6,11 +6,11 @@ because it works with a somewhat dynamic form,
 but was written before Alpine was introduced in the project.
 TODO : rewrite the pagination used in this template an Alpine one
 #}
-{% macro paginate(page_obj, paginator, js_action) %}
-  {% set js = js_action|default('') %}
+{% macro paginate(page_obj, paginator) %}
+  {% set js = "formPagination(this)" %}
   {% if page_obj.has_previous() or page_obj.has_next() %}
     {% if page_obj.has_previous() %}
-      <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ page_obj.previous_page_number() }}">{% trans %}Previous{% endtrans %}</a>
+      <a type="submit" onclick="{{ js }}" href="?page={{ page_obj.previous_page_number() }}">{% trans %}Previous{% endtrans %}</a>
     {% else %}
       <span class="disabled">{% trans %}Previous{% endtrans %}</span>
     {% endif %}
@@ -18,11 +18,11 @@ TODO : rewrite the pagination used in this template an Alpine one
       {% if page_obj.number == i %}
         <span class="active">{{ i }} <span class="sr-only">({% trans %}current{% endtrans %})</span></span>
       {% else %}
-        <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ i }}">{{ i }}</a>
+        <a type="submit" onclick="{{ js }}" href="?page={{ i }}">{{ i }}</a>
       {% endif %}
     {% endfor %}
     {% if page_obj.has_next() %}
-      <a {% if js %} type="submit" onclick="{{ js }}" {% endif %} href="?page={{ page_obj.next_page_number() }}">{% trans %}Next{% endtrans %}</a>
+      <a type="submit" onclick="{{ js }}" href="?page={{ page_obj.next_page_number() }}">{% trans %}Next{% endtrans %}</a>
     {% else %}
       <span class="disabled">{% trans %}Next{% endtrans %}</span>
     {% endif %}
@@ -81,6 +81,10 @@ TODO : rewrite the pagination used in this template an Alpine one
       {% endfor %}
     </tbody>
   </table>
+  {{ paginate(paginated_result, paginator) }}
+{% endblock %}
+
+{% block script %}
   <script type="text/javascript">
     function formPagination(link){
       const form = document.getElementById("form")
@@ -89,7 +93,6 @@ TODO : rewrite the pagination used in this template an Alpine one
       form.submit();
     }
   </script>
-  {{ paginate(paginated_result, paginator, "formPagination(this)") }}
 {% endblock %}
 
 

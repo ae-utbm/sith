@@ -153,7 +153,7 @@
         current_page (django.core.paginator.Page): the current page object
         paginator (django.core.paginator.Paginator): the paginator object
     #}
-  {{  paginate_server_side(current_page, paginator, False) }}
+  {{ paginate_server_side(current_page, paginator, False) }}
 {% endmacro %}
 
 {% macro paginate_htmx(current_page, paginator) %}
@@ -168,7 +168,7 @@
         current_page (django.core.paginator.Page): the current page object
         paginator (django.core.paginator.Paginator): the paginator object
     #}
-  {{  paginate_server_side(current_page, paginator, True) }}
+  {{ paginate_server_side(current_page, paginator, True) }}
 {% endmacro %}
 
 {% macro paginate_server_side(current_page, paginator, use_htmx) %}
