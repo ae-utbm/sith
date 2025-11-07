@@ -849,7 +849,7 @@ class Selling(models.Model):
         blank=False,
         on_delete=models.SET_NULL,
     )
-    date = models.DateTimeField(_("date"))
+    date = models.DateTimeField(_("date"), db_index=True)
     payment_method = models.CharField(
         _("payment method"),
         max_length=255,
