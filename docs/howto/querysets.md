@@ -1,4 +1,4 @@
-L'ORM de Django est puissant, très puissant, non par parce qu'il
+L'ORM de Django est puissant, très puissant, non pas parce qu'il
 est performant (après tout, ce n'est qu'une interface, le gros du boulot,
 c'est la db qui le fait), mais parce qu'il permet d'écrire
 de manière relativement simple un grand panel de requêtes.
