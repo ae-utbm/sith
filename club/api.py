@@ -21,12 +21,8 @@ class ClubController(ControllerBase):
         url_name="search_club",
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
-    def search_club(
-        self,
-        filters: Query[ClubSearchFilterSchema],
-    ):
-        clubs = Club.objects.all()
-        return filters.filter(clubs)
+    def search_club(self, filters: Query[ClubSearchFilterSchema]):
+        return filters.filter(Club.objects.all())
 
     @route.get(
         "/{int:club_id}",

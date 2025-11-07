@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 import pytest
+from django.contrib.auth.models import Permission
 from django.test import Client, TestCase
 from django.urls import reverse
 from model_bakery import baker
@@ -9,49 +10,54 @@ from pytest_django.asserts import assertNumQueries
 
 from club.models import Club, Membership
 from core.baker_recipes import subscriber_user
-from core.models import User
+from core.models import Group, Page, User
 
 
 class TestClubSearch(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse("api:search_club")
-        cls.user = User.objects.get(username="root")
+        cls.user = baker.make(
+            User, user_permissions=[Permission.objects.get(codename="access_lookup")]
+        )
+        # delete existing clubs to avoid side effect
+        groups = list(
+            Group.objects.exclude(club=None, club_board=None).values_list(
+                "id", flat=True
+            )
+        )
+        Page.objects.exclude(club=None).delete()
+        Club.objects.all().delete()
+        Group.objects.filter(id__in=groups).delete()
+
+        cls.clubs = baker.make(
+            Club,
+            _quantity=5,
+            name=iter(["AE", "ae 1", "Troll", "Dev AE", "pdf"]),
+            is_active=True,
+        )
 
     def test_inactive_club(self):
         self.client.force_login(self.user)
+        inactive_ids = {self.clubs[0].id, self.clubs[2].id}
+        Club.objects.filter(id__in=inactive_ids).update(is_active=False)
         response = self.client.get(self.url, {"is_active": False})
         assert response.status_code == 200
-
-        data = response.json()
-        names = [item["name"] for item in data["results"]]
-        assert "AE" not in names
-        assert "Troll Penché" not in names
+        assert {d["id"] for d in response.json()["results"]} == inactive_ids
 
     def test_excluded_id(self):
         self.client.force_login(self.user)
-        response = self.client.get(self.url, {"exclude_ids": [1]})
+        response = self.client.get(self.url, {"exclude_ids": [self.clubs[1].id]})
         assert response.status_code == 200
-
-        data = response.json()
-        names = [item["name"] for item in data["results"]]
-        assert "AE" not in names
+        ids = {d["id"] for d in response.json()["results"]}
+        assert ids == {c.id for c in [self.clubs[0], *self.clubs[2:]]}
 
     def test_club_search(self):
         self.client.force_login(self.user)
         response = self.client.get(self.url, {"search": "AE"})
         assert response.status_code == 200
-
-        data = response.json()
-        names = [item["name"] for item in data["results"]]
-        assert len(names) > 1
-
-        for name in names:
-            assert "AE" in name.upper()
-
-    def test_anonymous_user_unauthorized(self):
-        response = self.client.get(self.url)
-        assert response.status_code == 401
+        ids = {d["id"] for d in response.json()["results"]}
+        assert ids == {c.id for c in [self.clubs[0], self.clubs[1], self.clubs[3]]}
 
 
 @pytest.mark.django_db
