@@ -355,7 +355,7 @@ class TestCounterClick(TestFullClickBase):
             self.submit_basket(self.barmen, [BasketItem(self.beer.id, 1)])
         ).status_code == 302
 
-        assert self.updated_amount(self.barmen) == Decimal("9")
+        assert self.updated_amount(self.barmen) == Decimal(9)
 
     def test_click_tray_price(self):
         force_refill_user(self.customer, 20)
@@ -364,12 +364,12 @@ class TestCounterClick(TestFullClickBase):
         # Not applying tray price
         res = self.submit_basket(self.customer, [BasketItem(self.beer_tap.id, 2)])
         assert res.status_code == 302
-        assert self.updated_amount(self.customer) == Decimal("17")
+        assert self.updated_amount(self.customer) == Decimal(17)
 
         # Applying tray price
         res = self.submit_basket(self.customer, [BasketItem(self.beer_tap.id, 7)])
         assert res.status_code == 302
-        assert self.updated_amount(self.customer) == Decimal("8")
+        assert self.updated_amount(self.customer) == Decimal(8)
 
     def test_click_alcool_unauthorized(self):
         self.login_in_bar()
@@ -381,13 +381,13 @@ class TestCounterClick(TestFullClickBase):
             res = self.submit_basket(user, [BasketItem(self.snack.id, 2)])
             assert res.status_code == 302
 
-            assert self.updated_amount(user) == Decimal("7")
+            assert self.updated_amount(user) == Decimal(7)
 
             # Buy product without age limit
             res = self.submit_basket(user, [BasketItem(self.beer.id, 2)])
             assert res.status_code == 200
 
-            assert self.updated_amount(user) == Decimal("7")
+            assert self.updated_amount(user) == Decimal(7)
 
     def test_click_unauthorized_customer(self):
         self.login_in_bar()
@@ -401,7 +401,7 @@ class TestCounterClick(TestFullClickBase):
             assert resp.status_code == 302
             assert resp.url == resolve_url(self.counter)
 
-            assert self.updated_amount(user) == Decimal("10")
+            assert self.updated_amount(user) == Decimal(10)
 
     def test_click_user_without_customer(self):
         self.login_in_bar()
@@ -418,7 +418,7 @@ class TestCounterClick(TestFullClickBase):
         )
         assert res.status_code == 302
 
-        assert self.updated_amount(self.customer_old_can_buy) == Decimal("7")
+        assert self.updated_amount(self.customer_old_can_buy) == Decimal(7)
 
     def test_click_wrong_counter(self):
         self.login_in_bar()
@@ -443,7 +443,7 @@ class TestCounterClick(TestFullClickBase):
         )
         assertRedirects(res, self.counter.get_absolute_url())
 
-        assert self.updated_amount(self.customer) == Decimal("10")
+        assert self.updated_amount(self.customer) == Decimal(10)
 
     def test_click_not_connected(self):
         force_refill_user(self.customer, 10)
@@ -455,7 +455,7 @@ class TestCounterClick(TestFullClickBase):
         )
         assert res.status_code == 403
 
-        assert self.updated_amount(self.customer) == Decimal("10")
+        assert self.updated_amount(self.customer) == Decimal(10)
 
     def test_click_product_not_in_counter(self):
         force_refill_user(self.customer, 10)
@@ -463,7 +463,7 @@ class TestCounterClick(TestFullClickBase):
 
         res = self.submit_basket(self.customer, [BasketItem(self.stamps.id, 2)])
         assert res.status_code == 200
-        assert self.updated_amount(self.customer) == Decimal("10")
+        assert self.updated_amount(self.customer) == Decimal(10)
 
     def test_basket_empty(self):
         force_refill_user(self.customer, 10)
@@ -477,7 +477,7 @@ class TestCounterClick(TestFullClickBase):
                 self.submit_basket(self.customer, basket),
                 self.counter.get_absolute_url(),
             )
-            assert self.updated_amount(self.customer) == Decimal("10")
+            assert self.updated_amount(self.customer) == Decimal(10)
 
     def test_click_product_invalid(self):
         force_refill_user(self.customer, 10)
@@ -490,7 +490,7 @@ class TestCounterClick(TestFullClickBase):
             BasketItem(self.beer.id, None),
         ]:
             assert self.submit_basket(self.customer, [item]).status_code == 200
-            assert self.updated_amount(self.customer) == Decimal("10")
+            assert self.updated_amount(self.customer) == Decimal(10)
 
     def test_click_not_enough_money(self):
         force_refill_user(self.customer, 10)
@@ -501,7 +501,7 @@ class TestCounterClick(TestFullClickBase):
         )
         assert res.status_code == 200
 
-        assert self.updated_amount(self.customer) == Decimal("10")
+        assert self.updated_amount(self.customer) == Decimal(10)
 
     def test_annotate_has_barman_queryset(self):
         """Test if the custom queryset method `annotate_has_barman` works as intended."""
