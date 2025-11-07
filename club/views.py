@@ -30,7 +30,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
-from django.db.models import Q, Sum
+from django.db.models import F, Q, Sum
 from django.http import Http404, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -370,7 +370,7 @@ class ClubOldMembersView(ClubTabsMixin, PermissionRequiredMixin, DetailView):
 
 
 class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
-    """Sellings of a club."""
+    """Sales of a club."""
 
     model = Club
     pk_url_kwarg = "club_id"
@@ -396,9 +396,8 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        qs = Selling.objects.filter(club=self.object)
 
-        kwargs["result"] = qs[:0]
+        kwargs["result"] = Selling.objects.none()
         kwargs["paginated_result"] = kwargs["result"]
         kwargs["total"] = 0
         kwargs["total_quantity"] = 0
@@ -406,6 +405,7 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
 
         form = self.get_form()
         if form.is_valid():
+            qs = Selling.objects.filter(club=self.object)
             if not len([v for v in form.cleaned_data.values() if v is not None]):
                 qs = Selling.objects.none()
             if form.cleaned_data["begin_date"]:
@@ -425,18 +425,18 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
             if len(selected_products) > 0:
                 qs = qs.filter(product__in=selected_products)
 
+            kwargs["total"] = qs.annotate(
+                price=F("quantity") * F("unit_price")
+            ).aggregate(total=Sum("price", default=0))["total"]
             kwargs["result"] = qs.select_related(
                 "counter", "counter__club", "customer", "customer__user", "seller"
             ).order_by("-id")
-            kwargs["total"] = sum([s.quantity * s.unit_price for s in kwargs["result"]])
-            total_quantity = qs.all().aggregate(Sum("quantity"))
-            if total_quantity["quantity__sum"]:
-                kwargs["total_quantity"] = total_quantity["quantity__sum"]
-            benefit = (
-                qs.exclude(product=None).all().aggregate(Sum("product__purchase_price"))
-            )
-            if benefit["product__purchase_price__sum"]:
-                kwargs["benefit"] = benefit["product__purchase_price__sum"]
+            kwargs["total_quantity"] = qs.aggregate(total=Sum("quantity", default=0))[
+                "total"
+            ]
+            kwargs["benefit"] = qs.exclude(product=None).aggregate(
+                res=Sum("product__purchase_price", default=0)
+            )["res"]
 
         kwargs["paginator"] = Paginator(kwargs["result"], self.paginate_by)
         try:
