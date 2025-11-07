@@ -36,21 +36,20 @@
 {% endmacro %}
 
 {# Helper macro to create a download button for a
-  record of albums with alpine
-
-  This needs to be used inside an alpine environment.
-  Downloaded pictures will be `pictures` from the 
-  parent data store.
+  record of albums with alpine.
 
   Note:
     This requires importing `bundled/sas/pictures-download-index.ts`
 
   Parameters:
     name (str): name displayed on the button
+    pictures (str): an alpine variable or function
+      which holds the images this button should download.
+      It must be different from "downloadPictures", or it won't work.
  #}
-{% macro download_button(name) %}
-  <div x-data="pictures_download">
-    <div x-show="albums.length > 0" x-cloak>
+{% macro download_button(name, pictures) %}
+  <div x-data="pictures_download()" x-modelable="downloadPictures" x-model="{{ pictures }}">
+    <div x-show="downloadPictures.length > 0" x-cloak>
       <button
         :disabled="isDownloading"
         class="btn btn-blue {% if name == "" %}btn-no-text{% endif %}"

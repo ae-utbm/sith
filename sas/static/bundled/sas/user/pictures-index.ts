@@ -57,5 +57,9 @@ document.addEventListener("alpine:init", () => {
       }
       this.loading = false;
     },
+
+    allPictures(): PictureSchema[] {
+      return this.albums.flatMap((album: Album) => album.pictures);
+    },
   }));
 });
