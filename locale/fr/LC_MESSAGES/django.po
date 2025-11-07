@@ -1043,7 +1043,7 @@ msgstr "Événements aujourd'hui et dans les prochains jours"
 
 #: com/templates/com/news_list.jinja
 msgid "Administrate news"
-msgstr "Administrer les news"
+msgstr "Administrer les nouvelles"
 
 #: com/templates/com/news_list.jinja
 msgid "Nothing to come..."
