@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-04 12:43+0100\n"
+"POT-Creation-Date: 2025-11-07 14:50+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -146,7 +146,7 @@ msgstr "Date de début"
 msgid "End date"
 msgstr "Date de fin"
 
-#: club/forms.py club/templates/club/club_sellings.jinja
+#: club/forms.py club/templates/club/club_sellings.jinja club/views.py
 #: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/cash_summary_list.jinja counter/views/mixins.py
 msgid "Counter"
@@ -409,7 +409,7 @@ msgstr "Total : "
 msgid "Benefit: "
 msgstr "Bénéfice : "
 
-#: club/templates/club/club_sellings.jinja
+#: club/templates/club/club_sellings.jinja club/views.py
 #: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/cash_summary_list.jinja
 #: counter/templates/counter/last_ops.jinja
@@ -419,34 +419,34 @@ msgstr "Bénéfice : "
 msgid "Date"
 msgstr "Date"
 
-#: club/templates/club/club_sellings.jinja
+#: club/templates/club/club_sellings.jinja club/views.py
 #: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/last_ops.jinja
 msgid "Barman"
 msgstr "Barman"
 
-#: club/templates/club/club_sellings.jinja
+#: club/templates/club/club_sellings.jinja club/views.py
 #: counter/templates/counter/counter_click.jinja
 #: counter/templates/counter/last_ops.jinja
 #: counter/templates/counter/refilling_list.jinja
 msgid "Customer"
 msgstr "Client"
 
-#: club/templates/club/club_sellings.jinja
+#: club/templates/club/club_sellings.jinja club/views.py
 #: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/last_ops.jinja
 #: rootplace/templates/rootplace/logs.jinja
 msgid "Label"
 msgstr "Étiquette"
 
-#: club/templates/club/club_sellings.jinja
+#: club/templates/club/club_sellings.jinja club/views.py
 #: core/templates/core/user_account_detail.jinja
 #: core/templates/core/user_stats.jinja
 #: counter/templates/counter/last_ops.jinja
 msgid "Quantity"
 msgstr "Quantité"
 
-#: club/templates/club/club_sellings.jinja
+#: club/templates/club/club_sellings.jinja club/views.py
 #: core/templates/core/user_account.jinja
 #: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/cash_summary_list.jinja
@@ -456,7 +456,7 @@ msgstr "Quantité"
 msgid "Total"
 msgstr "Total"
 
-#: club/templates/club/club_sellings.jinja
+#: club/templates/club/club_sellings.jinja club/views.py
 #: core/templates/core/user_account_detail.jinja
 #: core/templates/core/user_detail.jinja
 #: counter/templates/counter/last_ops.jinja
@@ -698,6 +698,18 @@ msgstr "Vous êtes maintenant membre de ce club."
 #, python-format
 msgid "%(user)s has been added to club."
 msgstr "%(user)s a été ajouté au club."
+
+#: club/views.py
+msgid "Benefit"
+msgstr "Bénéfice"
+
+#: club/views.py
+msgid "Selling price"
+msgstr "Prix de vente"
+
+#: club/views.py
+msgid "Purchase price"
+msgstr "Prix d'achat"
 
 #: com/forms.py
 msgid "Format: 16:9 | Resolution: 1920x1080"
