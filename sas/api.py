@@ -136,11 +136,14 @@ class PicturesController(ControllerBase):
         "/{picture_id}/identified",
         permissions=[CanView],
         response=list[IdentifiedUserSchema],
+        url_name="picture_identifications",
     )
     def fetch_identifications(self, picture_id: int):
         """Fetch the users that have been identified on the given picture."""
         picture = self.get_object_or_exception(Picture, pk=picture_id)
-        return picture.people.select_related("user")
+        return picture.people.viewable_by(self.context.request.user).select_related(
+            "user"
+        )
 
     @route.put("/{picture_id}/identified", permissions=[CanView])
     def identify_users(self, picture_id: NonNegativeInt, users: set[NonNegativeInt]):

@@ -1,10 +1,11 @@
+import pytest
 from django.test import TestCase
 from model_bakery import baker
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import User
 from sas.baker_recipes import picture_recipe
-from sas.models import Picture
+from sas.models import PeoplePictureRelation, Picture
 
 
 class TestPictureQuerySet(TestCase):
@@ -44,3 +45,25 @@ class TestPictureQuerySet(TestCase):
         user.pictures.create(picture=self.pictures[1])  # moderated
         pictures = list(Picture.objects.viewable_by(user))
         assert pictures == [self.pictures[1]]
+
+
+@pytest.mark.django_db
+def test_identifications_viewable_by_user():
+    picture = baker.make(Picture)
+    identifications = baker.make(
+        PeoplePictureRelation, picture=picture, _quantity=10, _bulk_create=True
+    )
+    identifications[0].user.is_subscriber_viewable = False
+    identifications[0].user.save()
+
+    assert (
+        list(picture.people.viewable_by(old_subscriber_user.make()))
+        == identifications[1:]
+    )
+    assert (
+        list(picture.people.viewable_by(baker.make(User, is_superuser=True)))
+        == identifications
+    )
+    assert list(picture.people.viewable_by(identifications[1].user)) == [
+        identifications[1]
+    ]

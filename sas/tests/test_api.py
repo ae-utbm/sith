@@ -186,6 +186,29 @@ class TestPictureRelation(TestSas):
         assert res.status_code == 404
         assert PeoplePictureRelation.objects.count() == relation_count
 
+    def test_fetch_relations_including_hidden_users(self):
+        """Test that normal subscribers users cannot see hidden profiles"""
+        picture = self.album_a.children_pictures.last()
+        self.user_a.is_subscriber_viewable = False
+        self.user_a.save()
+        url = reverse("api:picture_identifications", kwargs={"picture_id": picture.id})
+
+        # a normal subscriber user shouldn't see user_a as identified
+        self.client.force_login(subscriber_user.make())
+        response = self.client.get(url)
+        data = {user["user"]["id"] for user in response.json()}
+        assert data == {self.user_b.id, self.user_c.id}
+
+        # an admin should see everyone
+        self.client.force_login(
+            baker.make(
+                User, groups=[Group.objects.get(id=settings.SITH_GROUP_SAS_ADMIN_ID)]
+            )
+        )
+        response = self.client.get(url)
+        data = {user["user"]["id"] for user in response.json()}
+        assert data == {self.user_a.id, self.user_b.id, self.user_c.id}
+
 
 class TestPictureModeration(TestSas):
     @classmethod
