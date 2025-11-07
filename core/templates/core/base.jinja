@@ -4,12 +4,22 @@
     {% block head %}
       <title>{% block title %}Association des Étudiants de l'UTBM{% endblock %}</title>
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <meta name="description" content="{% block description -%}
-                                          {% trans trimmed %}
-                                            AE UTBM is a voluntary organisation run by UTBM students.
-                                            It organises student life at UTBM and manages its student facilities.
-                                          {% endtrans %}
-                                        {%- endblock %}">
+      <meta
+        name="description"
+        content="{% block description -%}
+                   {% trans trimmed %}
+                     AE UTBM is a voluntary organisation run by UTBM students.
+                     It organises student life at UTBM and manages its student facilities.
+                   {% endtrans %}
+                 {%- endblock %}"
+      >
+      <meta property="og:site_name" content="Association des Étudiants de l'UTBM" />
+      {% block metatags %}
+        <meta property="og:url" content="{{ request.build_absolute_uri() }}" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Association des Étudiants de l'UTBM" />
+        <meta property="og:image" content="{{ request.build_absolute_uri(static("core/img/logo_no_text.png")) }}" />
+      {% endblock %}
       <link rel="shortcut icon" href="{{ static('core/img/favicon.ico') }}">
       <link rel="stylesheet" href="{{ static('core/base.css') }}">
       <link rel="stylesheet" href="{{ static('core/style.scss') }}">

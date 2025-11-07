@@ -1,15 +1,20 @@
 {% extends "core/base.jinja" %}
-{% from 'core/macros.jinja' import user_profile_link, facebook_share, tweet, link_news_logo, gen_news_metatags %}
+{% from 'core/macros.jinja' import user_profile_link, link_news_logo %}
 {% from "com/macros.jinja" import news_moderation_alert %}
 
 {% block title %}
-  {% trans %}News{% endtrans %} -
-  {{ object.title }}
+  {% trans %}News{% endtrans %} - {{ object.title }}
 {% endblock %}
 
-{% block head %}
-  {{ super() }}
-  {{ gen_news_metatags(news) }}
+{% block description %}{{ news.summary }}{% endblock %}
+
+{% block metatags %}
+  <meta property="og:url" content="{{ news.get_full_url() }}" />
+  <meta property="og:type" content="article" />
+  <meta property="article:section" content="{% trans %}News{% endtrans %}" />
+  <meta property="og:title" content="{{ news.title }}" />
+  <meta property="og:description" content="{{ news.summary }}" />
+  <meta property="og:image" content="{{ request.build_absolute_uri(link_news_logo(news)) }}" />
 {% endblock %}
 
 
@@ -44,8 +49,14 @@
         <div><em>{{ news.summary|markdown }}</em></div>
         <br/>
         <div>{{ news.content|markdown }}</div>
-        {{ facebook_share(news) }}
-        {{ tweet(news) }}
+        <a
+          rel="nofollow"
+          target="#"
+          class="share_button facebook"
+          href="https://www.facebook.com/sharer/sharer.php?u={{ news.get_full_url() }}"
+        >
+          {% trans %}Share on Facebook{% endtrans %}
+        </a>
         <div class="news_meta">
           <p>{% trans %}Author: {% endtrans %}{{ user_profile_link(news.author) }}</p>
           {% if news.moderator %}

@@ -20,25 +20,6 @@
   {% endif %}
 {%- endmacro %}
 
-{% macro gen_news_metatags(news) -%}
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:site" content="{{ settings.SITH_TWITTER }}" />
-  <meta name="twitter:creator" content= "{{ settings.SITH_TWITTER }}" />
-  <meta property="og:url"                content="{{ news.get_full_url() }}" />
-  <meta property="og:type"               content="article" />
-  <meta property="og:title"              content="{{ news.title }}" />
-  <meta property="og:description"        content="{{ news.summary }}" />
-  <meta property="og:image"              content="{{ "https://%s%s" % (settings.SITH_URL, link_news_logo(news)) }}" />
-{%- endmacro %}
-
-{% macro facebook_share(news) -%}
-  <a rel="nofollow" target="#" class="share_button facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ news.get_full_url() }}">{% trans %}Share on Facebook{% endtrans %}</a>
-{%- endmacro %}
-
-{% macro tweet(news) -%}
-  <a rel="nofollow" target="#" class="share_button twitter" href="https://twitter.com/intent/tweet?text={{ news.get_full_url() }}">{% trans %}Tweet{% endtrans %}</a>
-{%- endmacro %}
-
 {% macro user_mini_profile(user) %}
   <div class="user_mini_profile">
     <div class="user_mini_profile_infos">
