@@ -108,7 +108,7 @@ class TestPaymentSith(TestPaymentBase):
         )
         assert Basket.objects.filter(id=self.basket.id).first() is None
         self.customer.customer.refresh_from_db()
-        assert self.customer.customer.amount == Decimal("1")
+        assert self.customer.customer.amount == Decimal(1)
 
         sellings = Selling.objects.filter(customer=self.customer.customer).order_by(
             "quantity"

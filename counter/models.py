@@ -86,7 +86,7 @@ class CustomerQuerySet(models.QuerySet):
             .annotate(res=Sum(F("unit_price") * F("quantity"), default=0))
             .values("res")
         )
-        return self.update(amount=Coalesce(money_in - money_out, Decimal("0")))
+        return self.update(amount=Coalesce(money_in - money_out, Decimal(0)))
 
 
 class Customer(models.Model):

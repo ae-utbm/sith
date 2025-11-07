@@ -78,7 +78,7 @@ class Subscription(models.Model):
 
         from counter.models import Customer
 
-        customer, _ = Customer.get_or_create(self.member)
+        Customer.get_or_create(self.member)
         # Someone who subscribed once will be considered forever
         # as an old subscriber.
         self.member.groups.add(settings.SITH_GROUP_OLD_SUBSCRIBERS_ID)
