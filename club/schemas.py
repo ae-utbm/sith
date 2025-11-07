@@ -1,7 +1,24 @@
-from ninja import ModelSchema
+from typing import Annotated
+
+from annotated_types import MinLen
+from django.db.models import Q
+from ninja import Field, FilterSchema, ModelSchema
 
 from club.models import Club, Membership
 from core.schemas import SimpleUserSchema
+
+
+class ClubSearchFilterSchema(FilterSchema):
+    search: Annotated[str, MinLen(1)] | None = Field(None, q="name__icontains")
+    is_active: bool | None = None
+    parent_id: int | None = None
+    parent_name: str | None = Field(None, q="parent__name__icontains")
+    exclude_ids: set[int] | None = None
+
+    def filter_exclude_ids(self, value: set[int] | None):
+        if value is None:
+            return Q()
+        return ~Q(id__in=value)
 
 
 class SimpleClubSchema(ModelSchema):
