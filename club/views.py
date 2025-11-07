@@ -23,6 +23,7 @@
 #
 
 import csv
+import itertools
 from typing import Any
 
 from django.conf import settings
@@ -37,7 +38,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import SafeString
 from django.utils.timezone import now
-from django.utils.translation import gettext as _t
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -487,40 +488,40 @@ class ClubSellingCSVView(ClubSellingView):
         kwargs = self.get_context_data(**kwargs)
 
         # Use the StreamWriter class instead of request for streaming
-        pseudo_buffer = self.StreamWriter()
-        writer = csv.writer(
-            pseudo_buffer, delimiter=";", lineterminator="\n", quoting=csv.QUOTE_ALL
-        )
+        writer = csv.writer(self.StreamWriter())
 
-        writer.writerow([_t("Quantity"), kwargs["total_quantity"]])
-        writer.writerow([_t("Total"), kwargs["total"]])
-        writer.writerow([_t("Benefit"), kwargs["benefit"]])
-        writer.writerow(
+        first_rows = [
+            [gettext("Quantity"), kwargs["total_quantity"]],
+            [gettext("Total"), kwargs["total"]],
+            [gettext("Benefit"), kwargs["benefit"]],
             [
-                _t("Date"),
-                _t("Counter"),
-                _t("Barman"),
-                _t("Customer"),
-                _t("Label"),
-                _t("Quantity"),
-                _t("Total"),
-                _t("Payment method"),
-                _t("Selling price"),
-                _t("Purchase price"),
-                _t("Benefit"),
-            ]
-        )
+                gettext("Date"),
+                gettext("Counter"),
+                gettext("Barman"),
+                gettext("Customer"),
+                gettext("Label"),
+                gettext("Quantity"),
+                gettext("Total"),
+                gettext("Payment method"),
+                gettext("Selling price"),
+                gettext("Purchase price"),
+                gettext("Benefit"),
+            ],
+        ]
 
         # Stream response
         response = StreamingHttpResponse(
-            (
-                writer.writerow(self.write_selling(selling))
-                for selling in kwargs["result"]
+            itertools.chain(
+                (writer.writerow(r) for r in first_rows),
+                (
+                    writer.writerow(self.write_selling(selling))
+                    for selling in kwargs["result"]
+                ),
             ),
             content_type="text/csv",
         )
-        name = _("Sellings") + "_" + self.object.name + ".csv"
-        response["Content-Disposition"] = "filename=" + name
+        name = f"{gettext('Sellings')}_{self.object.name}.csv"
+        response["Content-Disposition"] = f"attachment; filename={name}"
 
         return response
 
