@@ -45,8 +45,9 @@ class Command(BaseCommand):
                 "verbosity level should be between 0 and 2 included", stacklevel=2
             )
 
-        if options["verbosity"] == 2:
+        if options["verbosity"] >= 2:
             logger.setLevel(logging.DEBUG)
+            logging.getLogger("django.db.backends").setLevel(logging.DEBUG)
         elif options["verbosity"] == 1:
             logger.setLevel(logging.INFO)
         else:
@@ -59,6 +60,3 @@ class Command(BaseCommand):
         Galaxy.objects.filter(state__isnull=True).delete()
 
         logger.info("Ruled the galaxy in {} queries.".format(len(connection.queries)))
-        if options["verbosity"] > 2:
-            for q in connection.queries:
-                logger.debug(q)
