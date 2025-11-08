@@ -141,7 +141,7 @@ msgstr "vous devez spécifier au moins un utilisateur ou une adresse email"
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/forms.py com/forms.py counter/forms.py election/views.py
+#: club/forms.py com/forms.py counter/forms.py election/forms.py
 #: subscription/forms.py
 msgid "End date"
 msgstr "Date de fin"
@@ -715,7 +715,7 @@ msgstr "Prix d'achat"
 msgid "Format: 16:9 | Resolution: 1920x1080"
 msgstr "Format : 16:9 | Résolution : 1920x1080"
 
-#: com/forms.py election/views.py subscription/forms.py
+#: com/forms.py election/forms.py subscription/forms.py
 msgid "Start date"
 msgstr "Date de début"
 
@@ -4043,6 +4043,30 @@ msgstr ""
 msgid "You can't buy a refilling with sith money"
 msgstr "Vous ne pouvez pas acheter un rechargement avec de l'argent du sith"
 
+#: election/forms.py
+msgid "You have selected too many candidates."
+msgstr "Vous avez sélectionné trop de candidats."
+
+#: election/forms.py
+msgid "User to candidate"
+msgstr "Utilisateur se présentant"
+
+#: election/forms.py election/templates/election/election_detail.jinja
+msgid "Blank vote"
+msgstr "Vote blanc"
+
+#: election/forms.py
+msgid "This role already exists for this election"
+msgstr "Ce rôle existe déjà pour cette élection"
+
+#: election/forms.py
+msgid "Start candidature"
+msgstr "Début des candidatures"
+
+#: election/forms.py
+msgid "End candidature"
+msgstr "Fin des candidatures"
+
 #: election/models.py
 msgid "start candidature"
 msgstr "début des candidatures"
@@ -4066,6 +4090,10 @@ msgstr "groupe de vote"
 #: election/models.py
 msgid "candidature groups"
 msgstr "groupe de candidature"
+
+#: election/models.py
+msgid "voters"
+msgstr "électeurs"
 
 #: election/models.py
 msgid "election"
@@ -4122,17 +4150,10 @@ msgstr "Vous avez déjà soumis votre vote."
 msgid "You have voted in this election."
 msgstr "Vous avez déjà voté pour cette élection."
 
-#: election/templates/election/election_detail.jinja election/views.py
-msgid "Blank vote"
-msgstr "Vote blanc"
-
 #: election/templates/election/election_detail.jinja
-msgid "You may choose up to"
-msgstr "Vous pouvez choisir jusqu'à"
-
-#: election/templates/election/election_detail.jinja
-msgid "people."
-msgstr "personne(s)"
+#, python-format
+msgid "You may choose up to %(nb_choices)s people."
+msgstr "Vous pouvez choisir jusqu'à %(nb_choices)s personnes."
 
 #: election/templates/election/election_detail.jinja
 msgid "Choose blank vote"
@@ -4173,26 +4194,6 @@ msgstr "au"
 #: election/templates/election/election_list.jinja
 msgid "Polls open from"
 msgstr "Votes ouverts du"
-
-#: election/views.py
-msgid "You have selected too much candidates."
-msgstr "Vous avez sélectionné trop de candidats."
-
-#: election/views.py
-msgid "User to candidate"
-msgstr "Utilisateur se présentant"
-
-#: election/views.py
-msgid "This role already exists for this election"
-msgstr "Ce rôle existe déjà pour cette élection"
-
-#: election/views.py
-msgid "Start candidature"
-msgstr "Début des candidatures"
-
-#: election/views.py
-msgid "End candidature"
-msgstr "Fin des candidatures"
 
 #: forum/models.py
 msgid "is a category"
