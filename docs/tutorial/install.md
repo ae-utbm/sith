@@ -76,7 +76,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
         ```bash
         sudo pacman -Syu  # on s'assure que les dépôts et le système sont à jour
 
-        sudo pacman -S uv gcc git gettext pkgconf npm redis
+        sudo pacman -S uv gcc git gettext pkgconf npm valkey
         ```
 
 === "macOS"
