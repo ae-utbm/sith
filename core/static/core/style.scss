@@ -271,8 +271,9 @@ body {
 
   /*--------------------------------CONTENT------------------------------*/
   #content {
-    padding: 1em 1%;
-    box-shadow: $shadow-color 0 5px 10px;
+    padding: 1.5em 2%;
+    border-radius: 5px;
+    box-shadow: black 0 8px 15px;
     background: $white-color;
     overflow: auto;
   }
