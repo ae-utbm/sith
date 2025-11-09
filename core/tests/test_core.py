@@ -421,18 +421,16 @@ class TestUserIsInGroup(TestCase):
 
         # clear the cached property `User.cached_groups`
         self.public_user.__dict__.pop("cached_groups", None)
-        cache.clear()
         # Test when the user is in the group
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(1):
             self.public_user.is_in_group(pk=group_in.id)
         with self.assertNumQueries(0):
             self.public_user.is_in_group(pk=group_in.id)
 
         group_not_in = baker.make(Group)
         self.public_user.__dict__.pop("cached_groups", None)
-        cache.clear()
         # Test when the user is not in the group
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(1):
             self.public_user.is_in_group(pk=group_not_in.id)
         with self.assertNumQueries(0):
             self.public_user.is_in_group(pk=group_not_in.id)
