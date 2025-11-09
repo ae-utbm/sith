@@ -1,4 +1,3 @@
-
 Pour l'API, nous utilisons `django-ninja` et sa surcouche `django-ninja-extra`.
 Ce sont des librairies relativement simples et qui présentent
 l'immense avantage d'offrir des mécanismes de validation et de sérialisation
@@ -49,8 +48,9 @@ Notre API offre deux moyens d'authentification :
 - par clef d'API
 
 La plus grande partie des routes de l'API utilisent la méthode par cookie de session.
+Cette dernière est donc activée par défaut.
 
-Pour placer une route d'API derrière l'une de ces méthodes (ou bien les deux),
+Pour changer la méthode d'authentification,
 utilisez l'attribut `auth` et les classes `SessionAuth` et 
 [`ApiKeyAuth`][api.auth.ApiKeyAuth].
 
@@ -60,13 +60,17 @@ utilisez l'attribut `auth` et les classes `SessionAuth` et
     @api_controller("/foo")
     class FooController(ControllerBase):
         # Cette route sera accessible uniquement avec l'authentification
-        # par cookie de session
-        @route.get("", auth=[SessionAuth()])
+        # par clef d'API
+        @route.get("", auth=[ApiKeyAuth()])
         def fetch_foo(self, club_id: int): ...
 
-        # Et celle-ci sera accessible peut importe la méthode d'authentification
-        @route.get("/bar", auth=[SessionAuth(), ApiKeyAuth()])
+        # Celle-ci sera accessible avec les deux méthodes d'authentification
+        @route.get("/bar", auth=[ApiKeyAuth(), SessionAuth()])
         def fetch_bar(self, club_id: int): ...
+
+        # Et celle-ci sera accessible aussi aux utilisateurs non-connectés
+        @route.get("/public", auth=None)
+        def fetch_public(self, club_id: int): ...
     ```
 
 ### Permissions
@@ -79,9 +83,7 @@ par-dessus `django-ninja`, le système de permissions de django
 et notre propre système.
 Cette dernière est documentée [ici](../perms.md).
 
-### Limites des clefs d'API
-
-#### Incompatibilité avec certaines permissions
+### Incompatibilité avec certaines permissions
 
 Le système des clefs d'API est apparu très tard dans l'histoire du site
 (en P25, 10 ans après le début du développement).
@@ -112,10 +114,33 @@ Les principaux points de friction sont :
 - `IsLoggedInCounter`, qui utilise encore un autre système 
   d'authentification maison et qui n'est pas fait pour être utilisé en dehors du site.
 
-#### Incompatibilité avec les tokens csrf
+### CSRF
 
-Le [CSRF (*cross-site request forgery*)](https://fr.wikipedia.org/wiki/Cross-site_request_forgery)
-est un des multiples facteurs d'attaque sur le web.
+!!!info "A propos du csrf"
+
+    Le [CSRF (*cross-site request forgery*)](https://fr.wikipedia.org/wiki/Cross-site_request_forgery)
+    est un vecteur d'attaque sur le web consistant
+    à soumettre des données au serveur à l'insu
+    de l'utilisateur, en profitant de sa session.
+
+    C'est une attaque qui peut se produire lorsque l'utilisateur
+    est authentifié par cookie de session.
+    En effet, les cookies sont joints automatiquement à
+    toutes les requêtes ;
+    en l'absence de protection contre le CSRF, 
+    un attaquant parvenant à insérer un formulaire 
+    dans la page de l'utilisateur serait en mesure
+    de faire presque n'importe quoi en son nom,
+    et ce sans même que l'utilisateur ni les administrateurs
+    ne s'en rendent compte avant qu'il ne soit largement trop tard !
+
+    Sur le CSRF et les moyens de s'en prémunir, voir :
+
+    - [https://owasp.org/www-community/attacks/csrf]()
+    - [https://security.stackexchange.com/questions/166724/should-i-use-csrf-protection-on-rest-api-endpoints]()
+    - [https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html]()
+    
+Le CSRF, c'est dangereux.
 Heureusement, Django vient encore une fois à notre aide,
 avec des mécanismes intégrés pour s'en protéger.
 Ceux-ci incluent notamment un système de 
@@ -123,16 +148,39 @@ Ceux-ci incluent notamment un système de
 à fournir dans les requêtes POST/PUT/PATCH.
 
 Ceux-ci sont bien adaptés au cycle requêtes/réponses
-typique de l'expérience utilisateur sur un navigateur, 
+typiques de l'expérience utilisateur sur un navigateur, 
 où les requêtes POST sont toujours effectuées après une requête
 GET au cours de laquelle on a pu récupérer un token csrf.
-Cependant, le flux des requêtes sur une API est bien différent ;
-de ce fait, il est à attendre que les requêtes POST envoyées à l'API
-par un client externe n'aient pas de token CSRF et se retrouvent 
-donc bloquées.
+Cependant, ils sont également gênants et moins utiles
+dans le cadre d'une API REST, étant donné
+que l'authentification cesse d'être implicite :
+la clef d'API doit être explicitement jointe aux headers,
+pour chaque requête.
 
-Pour ces raisons, l'accès aux requêtes POST/PUT/PATCH de l'API
-par un client externe ne marche pas.
+Pour ces raisons, la vérification CSRF ne prend place
+que pour la vérification de l'authentification
+par cookie de session.
+
+!!!warning "L'ordre est important"
+
+    Si vous écrivez le code suivant, l'authentification par clef d'API
+    ne marchera plus :
+    
+    ```python
+    @api_controller("/foo")
+    class FooController(ControllerBase):
+        @route.post("/bar", auth=[SessionAuth(), ApiKeyAuth()])
+        def post_bar(self, club_id: int): ...
+    ```
+    
+    En effet, la vérification du cookie de session intègrera
+    toujours la vérification CSRF.
+    Or, un échec de cette dernière est traduit par django en un code HTTP 403
+    au lieu d'un HTTP 401.
+    L'authentification se retrouve alors court-circuitée,
+    faisant que la vérification de la clef d'API ne sera jamais appelée.
+    
+    `SessionAuth` doit donc être déclaré **après** `ApiKeyAuth`.
 
 ## Créer un client et une clef d'API
 
@@ -171,5 +219,3 @@ qui en a besoin.
 Dites-lui bien de garder cette clef en lieu sûr !
 Si la clef est perdue, il n'y a pas moyen de la récupérer,
 vous devrez en recréer une.
-
-

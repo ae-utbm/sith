@@ -99,7 +99,7 @@ class SithFileController(ControllerBase):
     @route.get(
         "/search",
         response=PaginatedResponseSchema[SithFileSchema],
-        auth=[SessionAuth(), ApiKeyAuth()],
+        auth=[ApiKeyAuth(), SessionAuth()],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
@@ -112,7 +112,7 @@ class GroupController(ControllerBase):
     @route.get(
         "/search",
         response=PaginatedResponseSchema[GroupSchema],
-        auth=[SessionAuth(), ApiKeyAuth()],
+        auth=[ApiKeyAuth(), SessionAuth()],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)

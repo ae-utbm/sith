@@ -64,7 +64,7 @@ class CounterController(ControllerBase):
     @route.get(
         "/search",
         response=PaginatedResponseSchema[SimplifiedCounterSchema],
-        auth=[SessionAuth(), ApiKeyAuth()],
+        auth=[ApiKeyAuth(), SessionAuth()],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
@@ -77,7 +77,7 @@ class ProductController(ControllerBase):
     @route.get(
         "/search",
         response=PaginatedResponseSchema[SimpleProductSchema],
-        auth=[SessionAuth(), ApiKeyAuth()],
+        auth=[ApiKeyAuth(), SessionAuth()],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
@@ -117,7 +117,7 @@ class ProductTypeController(ControllerBase):
     def fetch_all(self):
         return ProductType.objects.order_by("order")
 
-    @route.patch("/{type_id}/move")
+    @route.patch("/{type_id}/move", url_name="reorder_product_type")
     def reorder(self, type_id: int, other_id: Query[ReorderProductTypeSchema]):
         """Change the order of a product type.
 
