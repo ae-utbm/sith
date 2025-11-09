@@ -1,4 +1,8 @@
+from django.urls import path, register_converter
 from ninja_extra import NinjaExtraAPI
+
+from api.views import ThirdPartyAuthResultView, ThirdPartyAuthView
+from core.converters import ResultConverter
 
 api = NinjaExtraAPI(
     title="PICON",
@@ -8,3 +12,14 @@ api = NinjaExtraAPI(
     csrf=True,
 )
 api.auto_discover_controllers()
+
+register_converter(ResultConverter, "res")
+
+urlpatterns = [
+    path("auth/", ThirdPartyAuthView.as_view(), name="third-party-auth"),
+    path(
+        "auth/<res:result>/",
+        ThirdPartyAuthResultView.as_view(),
+        name="third-party-auth-result",
+    ),
+]

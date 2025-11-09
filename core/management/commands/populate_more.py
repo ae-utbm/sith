@@ -1,3 +1,4 @@
+import math
 import random
 from datetime import date, timedelta
 from datetime import timezone as tz
@@ -34,12 +35,17 @@ class Command(BaseCommand):
         super().__init__(*args, **kwargs)
         self.faker = Faker("fr_FR")
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "-n", "--nb-users", help="Number of users to create", type=int, default=600
+        )
+
     def handle(self, *args, **options):
         if not settings.DEBUG:
             raise Exception("Never call this command in prod. Never.")
 
         self.stdout.write("Creating users...")
-        users = self.create_users()
+        users = self.create_users(options["nb_users"])
         subscribers = random.sample(users, k=int(0.8 * len(users)))
         self.stdout.write("Creating subscriptions...")
         self.create_subscriptions(subscribers)
@@ -78,7 +84,7 @@ class Command(BaseCommand):
         self.stdout.write("Creating products...")
         self.create_products()
         self.stdout.write("Creating sales and refills...")
-        sellers = random.sample(list(User.objects.all()), 100)
+        sellers = random.sample(users, len(users) // 10)
         self.create_sales(sellers)
         self.stdout.write("Creating permanences...")
         self.create_permanences(sellers)
@@ -87,7 +93,7 @@ class Command(BaseCommand):
 
         self.stdout.write("Done")
 
-    def create_users(self) -> list[User]:
+    def create_users(self, nb_users: int = 600) -> list[User]:
         password = make_password("plop")
         users = [
             User(
@@ -104,7 +110,7 @@ class Command(BaseCommand):
                 address=self.faker.address(),
                 password=password,
             )
-            for _ in range(600)
+            for _ in range(nb_users)
         ]
         # there may a duplicate or two
         # Not a problem, we will just have 599 users instead of 600
@@ -389,8 +395,9 @@ class Command(BaseCommand):
         Permanency.objects.bulk_create(perms)
 
     def create_forums(self):
-        forumers = random.sample(list(User.objects.all()), 100)
-        most_actives = random.sample(forumers, 10)
+        users = list(User.objects.all())
+        forumers = random.sample(users, math.ceil(len(users) / 10))
+        most_actives = random.sample(forumers, math.ceil(len(forumers) / 6))
         categories = list(Forum.objects.filter(is_category=True))
         new_forums = [
             Forum(name=self.faker.text(20), parent=random.choice(categories))

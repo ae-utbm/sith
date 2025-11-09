@@ -12,21 +12,31 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from __future__ import annotations
 
+import hmac
 from datetime import date, timedelta
 
 # Image utils
 from io import BytesIO
-from typing import Final
+from typing import TYPE_CHECKING
+from urllib.parse import urlencode
 
 import PIL
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.core.files.uploadedfile import UploadedFile
-from django.http import HttpRequest
 from django.utils.timezone import localdate
 from PIL import ExifTags
 from PIL.Image import Image, Resampling
+
+if TYPE_CHECKING:
+    from _hashlib import HASH
+    from collections.abc import Buffer, Mapping, Sequence
+    from typing import Any, Callable, Final
+
+    from django.core.files.uploadedfile import UploadedFile
+    from django.http import HttpRequest
+
 
 RED_PIXEL_PNG: Final[bytes] = (
     b"\x89\x50\x4e\x47\x0d\x0a\x1a\x0a\x00\x00\x00\x0d\x49\x48\x44\x52"
@@ -186,7 +196,7 @@ def exif_auto_rotate(image):
 
 def get_client_ip(request: HttpRequest) -> str | None:
     headers = (
-        "X_FORWARDED_FOR",  # Common header for proixes
+        "X_FORWARDED_FOR",  # Common header for proxies
         "FORWARDED",  # Standard header defined by RFC 7239.
         "REMOTE_ADDR",  # Default IP Address (direct connection)
     )
@@ -195,3 +205,30 @@ def get_client_ip(request: HttpRequest) -> str | None:
             return ip
 
     return None
+
+
+def hmac_hexdigest(
+    key: str | bytes,
+    data: Mapping[str, Any] | Sequence[tuple[str, Any]],
+    digest: str | Callable[[Buffer], HASH] = "sha512",
+) -> str:
+    """Return the hexdigest of the signature of the given data.
+
+    Args:
+        key: the HMAC key used for the signature
+        data: the data to sign
+        digest: a PEP247 hashing algorithm (by default, sha512)
+
+    Examples:
+        ```python
+        data = {
+            "foo": 5,
+            "bar": "somevalue",
+        }
+        hmac_key = secrets.token_hex(64)
+        signature = hmac_hexdigest(hmac_key, data, "sha256")
+        ```
+    """
+    if isinstance(key, str):
+        key = key.encode()
+    return hmac.digest(key, urlencode(data).encode(), digest).hex()

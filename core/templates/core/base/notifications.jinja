@@ -1,14 +1,11 @@
 <div id="quick-notifications"
      x-data="{
              messages: [
-             {% if messages %}
-               {% for message in messages %}
-                 {
-                 tag: '{{ message.tags }}',
-                 text: '{{ message }}',
-                 },
-               {% endfor %}
-             {% endif %}
+             {%- if messages -%}
+               {%- for message in messages -%}
+                 { tag: '{{ message.tags }}', text: '{{ message }}' },
+               {%- endfor -%}
+             {%- endif -%}
              ]
              }"
      @quick-notification-add="(e) => messages.push(e?.detail)"
