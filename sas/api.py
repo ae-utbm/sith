@@ -8,7 +8,6 @@ from ninja.security import SessionAuth
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import NotFound, PermissionDenied
 from ninja_extra.pagination import PageNumberPaginationExtra
-from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 from pydantic import NonNegativeInt
 
@@ -41,7 +40,6 @@ class AlbumController(ControllerBase):
     @route.get(
         "/search",
         response=PaginatedResponseSchema[AlbumSchema],
-        permissions=[IsAuthenticated],
         url_name="search-album",
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
@@ -74,12 +72,7 @@ class AlbumController(ControllerBase):
 
 @api_controller("/sas/picture")
 class PicturesController(ControllerBase):
-    @route.get(
-        "",
-        response=PaginatedResponseSchema[PictureSchema],
-        permissions=[IsAuthenticated],
-        url_name="pictures",
-    )
+    @route.get("", response=PaginatedResponseSchema[PictureSchema], url_name="pictures")
     @paginate(PageNumberPaginationExtra, page_size=100)
     def fetch_pictures(self, filters: Query[PictureFilterSchema]):
         """Find pictures viewable by the user corresponding to the given filters.
@@ -141,7 +134,7 @@ class PicturesController(ControllerBase):
 
     @route.get(
         "/{picture_id}/identified",
-        permissions=[IsAuthenticated, CanView],
+        permissions=[CanView],
         response=list[IdentifiedUserSchema],
     )
     def fetch_identifications(self, picture_id: int):
@@ -149,7 +142,7 @@ class PicturesController(ControllerBase):
         picture = self.get_object_or_exception(Picture, pk=picture_id)
         return picture.people.select_related("user")
 
-    @route.put("/{picture_id}/identified", permissions=[IsAuthenticated, CanView])
+    @route.put("/{picture_id}/identified", permissions=[CanView])
     def identify_users(self, picture_id: NonNegativeInt, users: set[NonNegativeInt]):
         picture = self.get_object_or_exception(
             Picture.objects.select_related("parent"), pk=picture_id
@@ -209,7 +202,7 @@ class PicturesController(ControllerBase):
 
 @api_controller("/sas/relation", tags="User identification on SAS pictures")
 class UsersIdentifiedController(ControllerBase):
-    @route.delete("/{relation_id}", permissions=[IsAuthenticated])
+    @route.delete("/{relation_id}")
     def delete_relation(self, relation_id: NonNegativeInt):
         """Untag a user from a SAS picture.
 

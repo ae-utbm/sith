@@ -49,8 +49,9 @@ Notre API offre deux moyens d'authentification :
 - par clef d'API
 
 La plus grande partie des routes de l'API utilisent la méthode par cookie de session.
+Cette dernière est donc activée par défaut.
 
-Pour placer une route d'API derrière l'une de ces méthodes (ou bien les deux),
+Pour changer la méthode d'authentification,
 utilisez l'attribut `auth` et les classes `SessionAuth` et 
 [`ApiKeyAuth`][api.auth.ApiKeyAuth].
 
@@ -60,13 +61,17 @@ utilisez l'attribut `auth` et les classes `SessionAuth` et
     @api_controller("/foo")
     class FooController(ControllerBase):
         # Cette route sera accessible uniquement avec l'authentification
-        # par cookie de session
-        @route.get("", auth=[SessionAuth()])
+        # par clef d'API
+        @route.get("", auth=[ApiKeyAuth()])
         def fetch_foo(self, club_id: int): ...
 
-        # Et celle-ci sera accessible peut importe la méthode d'authentification
+        # Celle-ci sera accessible peu importe la méthode d'authentification
         @route.get("/bar", auth=[SessionAuth(), ApiKeyAuth()])
         def fetch_bar(self, club_id: int): ...
+
+        # Et celle-ci sera accessible aussi aux utilisateurs non-connectés
+        @route.get("/public", auth=None)
+        def fetch_public(self, club_id: int): ...
     ```
 
 ### Permissions
@@ -123,7 +128,7 @@ Ceux-ci incluent notamment un système de
 à fournir dans les requêtes POST/PUT/PATCH.
 
 Ceux-ci sont bien adaptés au cycle requêtes/réponses
-typique de l'expérience utilisateur sur un navigateur, 
+typiques de l'expérience utilisateur sur un navigateur, 
 où les requêtes POST sont toujours effectuées après une requête
 GET au cours de laquelle on a pu récupérer un token csrf.
 Cependant, le flux des requêtes sur une API est bien différent ;

@@ -55,7 +55,7 @@ class TestPictureSearch(TestSas):
 
     def test_anonymous_user_forbidden(self):
         res = self.client.get(self.url)
-        assert res.status_code == 403
+        assert res.status_code == 401
 
     def test_filter_by_album(self):
         self.client.force_login(self.user_b)
@@ -148,7 +148,7 @@ class TestPictureRelation(TestSas):
         relation = PeoplePictureRelation.objects.exclude(user=self.user_a).first()
 
         res = self.client.delete(f"/api/sas/relation/{relation.id}")
-        assert res.status_code == 403
+        assert res.status_code == 401
 
         for user in baker.make(User), self.user_a:
             self.client.force_login(user)

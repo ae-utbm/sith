@@ -5,7 +5,6 @@ from django.utils.cache import add_never_cache_headers
 from ninja import Query
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
-from ninja_extra.permissions import IsAuthenticated
 from ninja_extra.schemas import PaginatedResponseSchema
 
 from api.permissions import HasPerm
@@ -17,17 +16,13 @@ from core.views.files import send_raw_file
 
 @api_controller("/calendar")
 class CalendarController(ControllerBase):
-    @route.get("/internal.ics", url_name="calendar_internal")
+    @route.get("/internal.ics", auth=None, url_name="calendar_internal")
     def calendar_internal(self):
         response = send_raw_file(IcsCalendar.get_internal())
         add_never_cache_headers(response)
         return response
 
-    @route.get(
-        "/unpublished.ics",
-        permissions=[IsAuthenticated],
-        url_name="calendar_unpublished",
-    )
+    @route.get("/unpublished.ics", url_name="calendar_unpublished")
     def calendar_unpublished(self):
         response = HttpResponse(
             IcsCalendar.get_unpublished(self.context.request.user),
@@ -74,6 +69,7 @@ class NewsController(ControllerBase):
 
     @route.get(
         "/date",
+        auth=None,
         url_name="fetch_news_dates",
         response=PaginatedResponseSchema[NewsDateSchema],
     )

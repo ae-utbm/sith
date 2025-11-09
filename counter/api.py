@@ -117,7 +117,7 @@ class ProductTypeController(ControllerBase):
     def fetch_all(self):
         return ProductType.objects.order_by("order")
 
-    @route.patch("/{type_id}/move")
+    @route.patch("/{type_id}/move", url_name="reorder_product_type")
     def reorder(self, type_id: int, other_id: Query[ReorderProductTypeSchema]):
         """Change the order of a product type.
 
