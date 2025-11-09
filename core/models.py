@@ -271,12 +271,23 @@ class User(AbstractUser):
     parent_address = models.CharField(
         _("parent address"), max_length=128, blank=True, default=""
     )
-    is_subscriber_viewable = models.BooleanField(
-        _("is subscriber viewable"), default=True
+    is_viewable = models.BooleanField(
+        _("Profile visible by subscribers"),
+        help_text=_(
+            "If you disable this option, only admin users "
+            "will be able to see your profile."
+        ),
+        default=True,
     )
     godfathers = models.ManyToManyField("User", related_name="godchildren", blank=True)
 
     objects = CustomUserManager()
+
+    class Meta(AbstractUser.Meta):
+        abstract = False
+        permissions = [
+            ("view_hidden_user", "Can view hidden users"),
+        ]
 
     def __str__(self):
         return self.get_display_name()
@@ -551,8 +562,12 @@ class User(AbstractUser):
     def can_be_edited_by(self, user):
         return user.is_root or user.is_board_member
 
-    def can_be_viewed_by(self, user):
-        return (user.was_subscribed and self.is_subscriber_viewable) or user.is_root
+    def can_be_viewed_by(self, user: User) -> bool:
+        return (
+            user.id == self.id
+            or user.has_perm("core.view_hidden_user")
+            or (user.has_perm("core.view_user") and self.is_viewable)
+        )
 
     def get_mini_item(self):
         return """

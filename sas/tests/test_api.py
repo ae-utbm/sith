@@ -189,7 +189,7 @@ class TestPictureRelation(TestSas):
     def test_fetch_relations_including_hidden_users(self):
         """Test that normal subscribers users cannot see hidden profiles"""
         picture = self.album_a.children_pictures.last()
-        self.user_a.is_subscriber_viewable = False
+        self.user_a.is_viewable = False
         self.user_a.save()
         url = reverse("api:picture_identifications", kwargs={"picture_id": picture.id})
 

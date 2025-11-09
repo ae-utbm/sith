@@ -7,10 +7,13 @@
 .profile {
   &-visible {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     gap: 5px;
     padding-top: 10px;
+    input[type="checkbox"]+label {
+      max-width: unset;
+    }
   }
 
   &-pictures {
@@ -116,23 +119,19 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: var(--nf-input-size) 10px;
     justify-content: center;
   }
 
   &-field {
     display: flex;
-    flex-direction: row;
-    align-items: center;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 10px;
     width: 100%;
     max-width: 330px;
     min-width: 300px;
 
     @media (max-width: 750px) {
-      gap: 4px;
       max-width: 100%;
     }
 
@@ -142,22 +141,6 @@
 
       @media (max-width: 750px) {
         max-width: 100%;
-      }
-    }
-
-    &-label {
-      text-align: left !important;
-    }
-
-    &-content {
-      > * {
-        box-sizing: border-box;
-        text-align: left !important;
-        margin: 0;
-
-        > * {
-          text-align: left !important;
-        }
       }
     }
 

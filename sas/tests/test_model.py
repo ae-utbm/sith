@@ -53,7 +53,7 @@ def test_identifications_viewable_by_user():
     identifications = baker.make(
         PeoplePictureRelation, picture=picture, _quantity=10, _bulk_create=True
     )
-    identifications[0].user.is_subscriber_viewable = False
+    identifications[0].user.is_viewable = False
     identifications[0].user.save()
 
     assert (

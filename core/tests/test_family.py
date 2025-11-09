@@ -55,7 +55,7 @@ class TestFetchFamilyApi(TestCase):
         assert response.status_code == 403
 
     def test_fetch_family_hidden_user(self):
-        self.main_user.is_subscriber_viewable = False
+        self.main_user.is_viewable = False
         self.main_user.save()
         for user_to_login, error_code in [
             (self.main_user, 200),

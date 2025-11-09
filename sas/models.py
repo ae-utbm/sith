@@ -270,9 +270,7 @@ class PeoplePictureRelationQuerySet(models.QuerySet):
         if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
             return self
         if user.was_subscribed:
-            return self.filter(
-                Q(user_id=user.id) | Q(user__is_subscriber_viewable=True)
-            )
+            return self.filter(Q(user_id=user.id) | Q(user__is_viewable=True))
         return self.filter(user_id=user.id)
 
 

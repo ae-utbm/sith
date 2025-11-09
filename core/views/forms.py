@@ -177,7 +177,7 @@ class UserProfileForm(forms.ModelForm):
             "school",
             "promo",
             "forum_signature",
-            "is_subscriber_viewable",
+            "is_viewable",
         ]
         widgets = {
             "date_of_birth": SelectDate,
@@ -186,8 +186,8 @@ class UserProfileForm(forms.ModelForm):
             "quote": forms.Textarea,
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, label_suffix: str = "", **kwargs):
+        super().__init__(*args, label_suffix=label_suffix, **kwargs)
 
         # Image fields are injected here to override the file field provided by the model
         # This would be better if we could have a SithImage sort of model input instead of a generic SithFile
