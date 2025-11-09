@@ -52,7 +52,7 @@ class AlbumController(ControllerBase):
     @route.get(
         "/autocomplete-search",
         response=PaginatedResponseSchema[AlbumAutocompleteSchema],
-        auth=[SessionAuth(), ApiKeyAuth()],
+        auth=[ApiKeyAuth(), SessionAuth()],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)

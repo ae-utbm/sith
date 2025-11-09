@@ -64,7 +64,7 @@ class CounterController(ControllerBase):
     @route.get(
         "/search",
         response=PaginatedResponseSchema[SimplifiedCounterSchema],
-        auth=[SessionAuth(), ApiKeyAuth()],
+        auth=[ApiKeyAuth(), SessionAuth()],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
@@ -77,7 +77,7 @@ class ProductController(ControllerBase):
     @route.get(
         "/search",
         response=PaginatedResponseSchema[SimpleProductSchema],
-        auth=[SessionAuth(), ApiKeyAuth()],
+        auth=[ApiKeyAuth(), SessionAuth()],
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)

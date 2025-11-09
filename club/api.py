@@ -16,7 +16,7 @@ class ClubController(ControllerBase):
     @route.get(
         "/search",
         response=PaginatedResponseSchema[SimpleClubSchema],
-        auth=[SessionAuth(), ApiKeyAuth()],
+        auth=[ApiKeyAuth(), SessionAuth()],
         permissions=[CanAccessLookup],
         url_name="search_club",
     )
@@ -27,7 +27,7 @@ class ClubController(ControllerBase):
     @route.get(
         "/{int:club_id}",
         response=ClubSchema,
-        auth=[SessionAuth(), ApiKeyAuth()],
+        auth=[ApiKeyAuth(), SessionAuth()],
         permissions=[HasPerm("club.view_club")],
         url_name="fetch_club",
     )
