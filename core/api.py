@@ -74,7 +74,7 @@ class MailingListController(ControllerBase):
 class UserController(ControllerBase):
     @route.get("", response=list[UserProfileSchema], permissions=[CanAccessLookup])
     def fetch_profiles(self, pks: Query[set[int]]):
-        return User.objects.filter(pk__in=pks)
+        return User.objects.viewable_by(self.context.request.user).filter(pk__in=pks)
 
     @route.get("/{int:user_id}", response=UserSchema, permissions=[CanView])
     def fetch_user(self, user_id: int):
@@ -90,7 +90,9 @@ class UserController(ControllerBase):
     @paginate(PageNumberPaginationExtra, page_size=20)
     def search_users(self, filters: Query[UserFilterSchema]):
         return filters.filter(
-            User.objects.order_by(F("last_login").desc(nulls_last=True))
+            User.objects.viewable_by(self.context.request.user).order_by(
+                F("last_login").desc(nulls_last=True)
+            )
         )
 
 

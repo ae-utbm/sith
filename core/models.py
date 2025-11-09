@@ -136,6 +136,15 @@ class UserQuerySet(models.QuerySet):
             Q(Exists(subscriptions)) | Q(Exists(refills)) | Q(Exists(purchases))
         )
 
+    def viewable_by(self, user: User) -> Self:
+        if user.has_perm("core.view_hidden_user"):
+            return self
+        if user.has_perm("core.view_user"):
+            return self.filter(is_viewable=True)
+        if user.is_anonymous:
+            return self.none()
+        return self.filter(id=user.id)
+
 
 class CustomUserManager(UserManager.from_queryset(UserQuerySet)):
     # see https://docs.djangoproject.com/fr/stable/topics/migrations/#model-managers
