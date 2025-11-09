@@ -13,11 +13,11 @@
 {%- endmacro %}
 
 {% macro link_news_logo(news) -%}
-  {% if news.club.logo -%}
+  {%- if news.club.logo -%}
     {{ news.club.logo.url }}
-  {% else -%}
+  {%- else -%}
     {{ static("com/img/news.png") }}
-  {% endif %}
+  {%- endif -%}
 {%- endmacro %}
 
 {% macro user_mini_profile(user) %}
