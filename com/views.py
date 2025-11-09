@@ -700,7 +700,7 @@ class PosterModerateView(PermissionRequiredMixin, ComTabsMixin, View):
             parsed = urlparse(referer)
             if parsed.netloc == settings.SITH_URL:
                 return redirect(parsed.path)
-        return redirect(reverse("com:poster_list"))
+        return redirect("com:poster_list")
 
 
 class ScreenListView(PermissionRequiredMixin, ComTabsMixin, ListView):

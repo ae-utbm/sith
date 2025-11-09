@@ -17,7 +17,6 @@
             - can_edit_prop
             - can_edit
             - can_view
-            - CanCreateMixin
             - CanEditMixin
             - CanViewMixin
             - CanEditPropMixin
