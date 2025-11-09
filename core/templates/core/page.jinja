@@ -12,6 +12,18 @@
   {% endif %}
 {% endblock %}
 
+{% block metatags %}
+  {% if page %}
+    <meta property="og:url" content="{{ request.build_absolute_uri(page.get_absolute_url()) }}" />
+    <meta property="og:type" content="article" />
+    <meta property="article:section" content="{% trans %}Page{% endtrans %}" />
+    <meta property="og:title" content="{{ page.get_display_name() }}" />
+    <meta property="og:image" content="{{ request.build_absolute_uri(static("core/img/logo_no_text.png")) }}" />
+  {% else %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
+
 {%- macro print_page_name(page) -%}
   {%- if page -%}
     {{ print_page_name(page.parent) }} >

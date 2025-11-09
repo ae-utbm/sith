@@ -9,6 +9,18 @@
   {{ club.short_description }}
 {%- endblock %}
 
+{% block metatags %}
+  <meta property="og:url" content="{{ request.build_absolute_uri(club.get_absolute_url()) }}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="{{ club.name }}" />
+  <meta property="og:description" content="{{ club.short_description }}" />
+  {% if club.logo %}
+    <meta property="og:image" content="{{ request.build_absolute_uri(club.logo.url) }}" />
+  {% else %}
+    <meta property="og:image" content="{{ request.build_absolute_uri(static("core/img/logo_no_text.png")) }}" />
+  {% endif %}
+{% endblock %}
+
 {% block content %}
   <div id="club_detail">
     {% if club.logo %}
@@ -17,7 +29,7 @@
     {% if page_revision %}
       {{ page_revision|markdown }}
     {% else %}
-      <h3>{% trans %}Club{% endtrans %}</h3>
+      <h3>{{ club.name }}</h3>
     {% endif %}
   </div>
 {% endblock %}
