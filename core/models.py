@@ -23,8 +23,6 @@
 #
 from __future__ import annotations
 
-import logging
-import os
 import string
 import unicodedata
 from datetime import timedelta
@@ -453,14 +451,6 @@ class User(AbstractUser):
                 self.home.save()
         else:
             raise ValidationError(_("A user with that username already exists"))
-
-    def get_profile(self):
-        return {
-            "last_name": self.last_name,
-            "first_name": self.first_name,
-            "nick_name": self.nick_name,
-            "date_of_birth": self.date_of_birth,
-        }
 
     def get_short_name(self):
         """Returns the short name for the user."""
@@ -1015,63 +1005,6 @@ class SithFile(models.Model):
         self.parent = parent
         self.clean()
         self.save()
-
-    def _repair_fs(self):
-        """Rebuilds recursively the filesystem as it should be regarding the DB tree."""
-        if self.is_folder:
-            for c in self.children.all():
-                c._repair_fs()
-            return
-        elif not self._check_path_consistence():
-            # First get future parent path and the old file name
-            # Prepend "." so that we match all relative handling of Django's
-            # file storage
-            parent_path = "." + self.parent.get_full_path()
-            parent_full_path = settings.MEDIA_ROOT + parent_path
-            os.makedirs(parent_full_path, exist_ok=True)
-            old_path = self.file.name  # Should be relative: "./users/skia/bleh.jpg"
-            new_path = "." + self.get_full_path()
-            try:
-                # Make this atomic, so that a FS problem rolls back the DB change
-                with transaction.atomic():
-                    # Set the new filesystem path
-                    self.file.name = new_path
-                    self.save()
-                    # Really move at the FS level
-                    if os.path.exists(parent_full_path):
-                        os.rename(
-                            settings.MEDIA_ROOT + old_path,
-                            settings.MEDIA_ROOT + new_path,
-                        )
-                        # Empty directories may remain, but that's not really a
-                        # problem, and that can be solved with a simple shell
-                        # command: `find . -type d -empty -delete`
-            except Exception as e:
-                logging.error(e)
-
-    def _check_path_consistence(self):
-        file_path = str(self.file)
-        file_full_path = settings.MEDIA_ROOT + file_path
-        db_path = ".%s" % self.get_full_path()
-        if not os.path.exists(file_full_path):
-            print("%s: WARNING: real file does not exists!" % self.id)  # noqa T201
-            print("file path: %s" % file_path, end="")  # noqa T201
-            print("  db path: %s" % db_path)  # noqa T201
-            return False
-        if file_path != db_path:
-            print("%s: " % self.id, end="")  # noqa T201
-            print("file path: %s" % file_path, end="")  # noqa T201
-            print("  db path: %s" % db_path)  # noqa T201
-            return False
-        return True
-
-    def _check_fs(self):
-        if self.is_folder:
-            for c in self.children.all():
-                c._check_fs()
-            return
-        else:
-            self._check_path_consistence()
 
     @property
     def is_file(self):
