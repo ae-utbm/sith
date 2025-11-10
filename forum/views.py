@@ -27,14 +27,14 @@ from functools import partial
 
 from django import forms
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.utils import html, timezone
 from django.utils.decorators import method_decorator
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, RedirectView
 from django.views.generic.detail import SingleObjectMixin
@@ -44,7 +44,6 @@ from honeypot.decorators import check_honeypot
 
 from club.widgets.ajax_select import AutoCompleteSelectClub
 from core.auth.mixins import (
-    CanCreateMixin,
     CanEditMixin,
     CanEditPropMixin,
     CanViewMixin,
@@ -180,10 +179,18 @@ class ForumForm(forms.ModelForm):
     )
 
 
-class ForumCreateView(CanCreateMixin, CreateView):
+class ForumCreateView(UserPassesTestMixin, CreateView):
     model = Forum
     form_class = ForumForm
     template_name = "core/create.jinja"
+
+    def test_func(self):
+        if self.request.user.has_perm("forum.add_forum"):
+            return True
+        parent = Forum.objects.filter(id=self.request.GET["parent"]).first()
+        if parent is not None:
+            return self.request.user.is_owner(parent)
+        return False
 
     def get_initial(self):
         init = super().get_initial()
@@ -258,18 +265,19 @@ class TopicForm(forms.ModelForm):
 @method_decorator(
     partial(check_honeypot, field_name=settings.HONEYPOT_FIELD_NAME_FORUM), name="post"
 )
-class ForumTopicCreateView(CanCreateMixin, CreateView):
+class ForumTopicCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ForumMessage
     form_class = TopicForm
     template_name = "forum/reply.jinja"
 
-    def dispatch(self, request, *args, **kwargs):
-        self.forum = get_object_or_404(
-            Forum, id=self.kwargs["forum_id"], is_category=False
+    @cached_property
+    def forum(self):
+        return get_object_or_404(Forum, id=self.kwargs["forum_id"], is_category=False)
+
+    def test_func(self):
+        return self.request.user.has_perm("forum.add_forumtopic") or (
+            self.request.user.can_view(self.forum)
         )
-        if not request.user.can_view(self.forum):
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         topic = ForumTopic(
@@ -404,7 +412,7 @@ class ForumMessageUndeleteView(SingleObjectMixin, RedirectView):
 @method_decorator(
     partial(check_honeypot, field_name=settings.HONEYPOT_FIELD_NAME_FORUM), name="post"
 )
-class ForumMessageCreateView(CanCreateMixin, CreateView):
+class ForumMessageCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ForumMessage
     form_class = forms.modelform_factory(
         model=ForumMessage,
@@ -413,11 +421,14 @@ class ForumMessageCreateView(CanCreateMixin, CreateView):
     )
     template_name = "forum/reply.jinja"
 
-    def dispatch(self, request, *args, **kwargs):
-        self.topic = get_object_or_404(ForumTopic, id=self.kwargs["topic_id"])
-        if not request.user.can_view(self.topic):
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
+    @cached_property
+    def topic(self):
+        return get_object_or_404(ForumTopic, id=self.kwargs["topic_id"])
+
+    def test_func(self):
+        return self.request.user.has_perm(
+            "forum.add_forummessage"
+        ) or self.request.user.can_view(self.topic)
 
     def get_initial(self):
         init = super().get_initial()
