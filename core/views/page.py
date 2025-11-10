@@ -45,7 +45,7 @@ class CanEditPagePropMixin(CanEditPropMixin):
 
 class PageListView(ListView):
     model = Page
-    template_name = "core/page_list.jinja"
+    template_name = "core/page/list.jinja"
 
     def get_queryset(self):
         return (
@@ -66,7 +66,7 @@ class PageListView(ListView):
 
 class PageView(CanViewMixin, DetailView):
     model = Page
-    template_name = "core/page_detail.jinja"
+    template_name = "core/page/detail.jinja"
 
     def dispatch(self, request, *args, **kwargs):
         res = super().dispatch(request, *args, **kwargs)
@@ -87,7 +87,7 @@ class PageView(CanViewMixin, DetailView):
 
 class PageHistView(CanViewMixin, DetailView):
     model = Page
-    template_name = "core/page_hist.jinja"
+    template_name = "core/page/history.jinja"
     slug_field = "_full_name"
     slug_url_kwarg = "page_name"
     _cached_object: Page | None = None
@@ -106,7 +106,7 @@ class PageHistView(CanViewMixin, DetailView):
 
 class PageRevView(CanViewMixin, DetailView):
     model = Page
-    template_name = "core/page_detail.jinja"
+    template_name = "core/page/detail.jinja"
 
     def dispatch(self, request, *args, **kwargs):
         res = super().dispatch(request, *args, **kwargs)
@@ -137,7 +137,7 @@ class PageRevView(CanViewMixin, DetailView):
 class PageCreateView(PermissionRequiredMixin, CreateView):
     model = Page
     form_class = PageForm
-    template_name = "core/page_prop.jinja"
+    template_name = "core/page/prop.jinja"
     permission_required = "core.add_page"
 
     def get_initial(self):
@@ -166,7 +166,7 @@ class PageCreateView(PermissionRequiredMixin, CreateView):
 class PagePropView(CanEditPagePropMixin, UpdateView):
     model = Page
     form_class = PagePropForm
-    template_name = "core/page_prop.jinja"
+    template_name = "core/page/prop.jinja"
     slug_field = "_full_name"
     slug_url_kwarg = "page_name"
 
@@ -184,7 +184,7 @@ class PageEditViewBase(CanEditMixin, UpdateView):
     form_class = modelform_factory(
         model=PageRev, fields=["title", "content"], widgets={"content": MarkdownInput}
     )
-    template_name = "core/pagerev_edit.jinja"
+    template_name = "core/page/edit.jinja"
 
     def get_object(self, *args, **kwargs):
         self.page = Page.get_page_by_full_name(self.kwargs["page_name"])

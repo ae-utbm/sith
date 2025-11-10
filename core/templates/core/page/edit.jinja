@@ -1,5 +1,5 @@
-{% extends "core/page.jinja" %}
-{% from 'core/macros_pages.jinja' import page_edit_form %}
+{% extends "core/page/base.jinja" %}
+{% from 'core/page/macros.jinja' import page_edit_form %}
 
 {% block page %}
   {{ page_edit_form(form, url('core:page_edit', page_name=page.get_full_name())) }}
