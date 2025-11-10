@@ -30,7 +30,7 @@ opérations, telles que la validation de formulaire.
 En effet, valider un formulaire demande beaucoup
 de travail de nettoyage des données et d'affichage
 des messages d'erreur appropriés.
-Or, tout ce travail existe déjà dans django.
+Or, tout ce travail existe déjà dans Django.
 
 On veut donc, dans ces cas-là, ne pas demander
 toute une page HTML au serveur, mais uniquement
@@ -84,7 +84,7 @@ Grâce à ça, on peut écrire des vues qui
 fonctionnent dans les deux contextes.
 
 Par exemple, supposons que nous avons
-une `EditView` très simple, contenant
+une `UpdateView` très simple, contenant
 uniquement un formulaire.
 On peut écrire la vue et le template de la manière
 suivante :
@@ -94,8 +94,10 @@ suivante :
     ```python
     from django.views.generic import UpdateView
 
+    from core.views import AllowFragment
 
-    class FooUpdateView(UpdateView):
+
+    class FooUpdateView(AllowFragment, UpdateView):
         model = Foo
         fields = ["foo", "bar"]
         pk_url_kwarg = "foo_id"
@@ -132,7 +134,7 @@ Dans ces situations, pouvoir décomposer une vue
 en plusieurs vues de fragment permet de ne plus 
 raisonner en termes de condition, mais en termes
 de composition : on n'a pas un seul template
-qui peut changer les situations, on a plusieurs
+qui peut changer selon les situations, on a plusieurs
 templates que l'on injecte dans un template principal.
 
 Supposons, par exemple, que nous n'avons plus un,
@@ -238,10 +240,10 @@ qui se comportera alors comme une vue normale.
 
 #### La méthode `as_fragment`
 
-Il est à noter que l'instantiation d'un fragment
+Il est à noter que l'instanciation d'un fragment
 se fait en deux étapes :
 
-- on commence par instantier la vue en tant que renderer.
+- on commence par instancier la vue en tant que renderer.
 - on appelle le renderer en lui-même
 
 Ce qui donne la syntaxe `Fragment.as_fragment()()`.

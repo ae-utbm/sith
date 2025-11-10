@@ -182,29 +182,19 @@ ainsi même que de l'héritage de templates.
     si on souhaite faire des modifications côté client, 
     il faut utiliser du Javascript, rien ne change à ce niveau-là.
 
-### jQuery
+### Typescript
 
-[Site officiel](https://jquery.com/)
+[Site officiel](https://www.typescriptlang.org/)
 
-jQuery est une bibliothèque JavaScript 
-libre et multiplateforme créée pour faciliter
-l'écriture de scripts côté client 
-dans le code HTML des pages web. 
-La première version est lancée en janvier 2006 par John Resig.
+Pour rendre le site interactif, nous n'utilisons 
+pas directement Javascript, mais Typescript.
+Il s'agit d'un langage construit par-dessus Javascript,
+en ajoutant un typage statique et des éléments de sucre syntaxique.
+Grâce au système de type, le code est plus lisible,
+à la fois par les humains et par l'IDE, et plus fiable.
 
-C'est une vieille technologie et certains
-feront remarquer à juste titre que le Javascript 
-moderne permet d'utiliser assez simplement 
-la majorité de ce que fournit jQuery 
-sans rien avoir à installer. 
-Cependant, de nombreuses dépendances du projet
-utilisent encore jQuery qui est toujours 
-très implanté aujourd'hui. 
-Le sucre syntaxique qu'offre cette librairie 
-reste très agréable à utiliser et économise
-parfois beaucoup de temps. 
-Ça fonctionne et ça fonctionne très bien.
-C'est maintenu et pratique.
+Il faut parfois se battre un peu contre le système de types de Typescript,
+mais globalement Typescript est une alternative largement préférable à Javascript.
 
 
 ### AlpineJS
@@ -269,17 +259,6 @@ via le CSS et présentent l'avantage de fonctionner
 sur tous les navigateurs contrairement 
 à un simple icône unicode qui s'affiche 
 lui différemment selon la plate-forme.
-
-!!!note
-
-    C'est une dépendance capricieuse qui évolue très vite 
-    et qu'il faut très souvent mettre à jour.
-
-!!!warning
-
-    Il a été décidé de **ne pas utiliser**
-    de CDN puisque le site ralentissait régulièrement.
-    Il est préférable de fournir cette dépendance avec le site.
 
 ## Workflow
 

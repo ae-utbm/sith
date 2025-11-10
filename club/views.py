@@ -23,6 +23,7 @@
 #
 
 import csv
+import itertools
 from typing import Any
 
 from django.conf import settings
@@ -30,14 +31,14 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
-from django.db.models import Q, Sum
+from django.db.models import F, Q, Sum
 from django.http import Http404, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import SafeString
 from django.utils.timezone import now
-from django.utils.translation import gettext as _t
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -59,7 +60,7 @@ from com.views import (
     PosterEditBaseView,
     PosterListBaseView,
 )
-from core.auth.mixins import CanEditMixin
+from core.auth.mixins import CanEditMixin, PermissionOrClubBoardRequiredMixin
 from core.models import PageRev
 from core.views import DetailFormView, PageEditViewBase, UseFragmentsMixin
 from core.views.mixins import FragmentMixin, FragmentRenderer, TabedViewMixin
@@ -370,7 +371,7 @@ class ClubOldMembersView(ClubTabsMixin, PermissionRequiredMixin, DetailView):
 
 
 class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
-    """Sellings of a club."""
+    """Sales of a club."""
 
     model = Club
     pk_url_kwarg = "club_id"
@@ -396,9 +397,8 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        qs = Selling.objects.filter(club=self.object)
 
-        kwargs["result"] = qs[:0]
+        kwargs["result"] = Selling.objects.none()
         kwargs["paginated_result"] = kwargs["result"]
         kwargs["total"] = 0
         kwargs["total_quantity"] = 0
@@ -406,6 +406,7 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
 
         form = self.get_form()
         if form.is_valid():
+            qs = Selling.objects.filter(club=self.object)
             if not len([v for v in form.cleaned_data.values() if v is not None]):
                 qs = Selling.objects.none()
             if form.cleaned_data["begin_date"]:
@@ -425,18 +426,18 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
             if len(selected_products) > 0:
                 qs = qs.filter(product__in=selected_products)
 
+            kwargs["total"] = qs.annotate(
+                price=F("quantity") * F("unit_price")
+            ).aggregate(total=Sum("price", default=0))["total"]
             kwargs["result"] = qs.select_related(
                 "counter", "counter__club", "customer", "customer__user", "seller"
             ).order_by("-id")
-            kwargs["total"] = sum([s.quantity * s.unit_price for s in kwargs["result"]])
-            total_quantity = qs.all().aggregate(Sum("quantity"))
-            if total_quantity["quantity__sum"]:
-                kwargs["total_quantity"] = total_quantity["quantity__sum"]
-            benefit = (
-                qs.exclude(product=None).all().aggregate(Sum("product__purchase_price"))
-            )
-            if benefit["product__purchase_price__sum"]:
-                kwargs["benefit"] = benefit["product__purchase_price__sum"]
+            kwargs["total_quantity"] = qs.aggregate(total=Sum("quantity", default=0))[
+                "total"
+            ]
+            kwargs["benefit"] = qs.exclude(product=None).aggregate(
+                res=Sum("product__purchase_price", default=0)
+            )["res"]
 
         kwargs["paginator"] = Paginator(kwargs["result"], self.paginate_by)
         try:
@@ -487,40 +488,40 @@ class ClubSellingCSVView(ClubSellingView):
         kwargs = self.get_context_data(**kwargs)
 
         # Use the StreamWriter class instead of request for streaming
-        pseudo_buffer = self.StreamWriter()
-        writer = csv.writer(
-            pseudo_buffer, delimiter=";", lineterminator="\n", quoting=csv.QUOTE_ALL
-        )
+        writer = csv.writer(self.StreamWriter())
 
-        writer.writerow([_t("Quantity"), kwargs["total_quantity"]])
-        writer.writerow([_t("Total"), kwargs["total"]])
-        writer.writerow([_t("Benefit"), kwargs["benefit"]])
-        writer.writerow(
+        first_rows = [
+            [gettext("Quantity"), kwargs["total_quantity"]],
+            [gettext("Total"), kwargs["total"]],
+            [gettext("Benefit"), kwargs["benefit"]],
             [
-                _t("Date"),
-                _t("Counter"),
-                _t("Barman"),
-                _t("Customer"),
-                _t("Label"),
-                _t("Quantity"),
-                _t("Total"),
-                _t("Payment method"),
-                _t("Selling price"),
-                _t("Purchase price"),
-                _t("Benefit"),
-            ]
-        )
+                gettext("Date"),
+                gettext("Counter"),
+                gettext("Barman"),
+                gettext("Customer"),
+                gettext("Label"),
+                gettext("Quantity"),
+                gettext("Total"),
+                gettext("Payment method"),
+                gettext("Selling price"),
+                gettext("Purchase price"),
+                gettext("Benefit"),
+            ],
+        ]
 
         # Stream response
         response = StreamingHttpResponse(
-            (
-                writer.writerow(self.write_selling(selling))
-                for selling in kwargs["result"]
+            itertools.chain(
+                (writer.writerow(r) for r in first_rows),
+                (
+                    writer.writerow(self.write_selling(selling))
+                    for selling in kwargs["result"]
+                ),
             ),
             content_type="text/csv",
         )
-        name = _("Sellings") + "_" + self.object.name + ".csv"
-        response["Content-Disposition"] = "filename=" + name
+        name = f"{gettext('Sellings')}_{self.object.name}.csv"
+        response["Content-Disposition"] = f"attachment; filename={name}"
 
         return response
 
@@ -758,17 +759,30 @@ class MailingAutoGenerationView(View):
         return redirect("club:mailing", club_id=club.id)
 
 
-class PosterListView(ClubTabsMixin, PosterListBaseView):
+class PosterListView(
+    PermissionOrClubBoardRequiredMixin, ClubTabsMixin, PosterListBaseView
+):
     """List communication posters."""
 
     current_tab = "posters"
-    extra_context = {"app": "club"}
+    permission_required = "com.view_poster"
 
     def get_queryset(self):
         return super().get_queryset().filter(club=self.club.id)
 
     def get_object(self):
         return self.club
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "create_url": reverse_lazy(
+                "club:poster_create", kwargs={"club_id": self.club.id}
+            ),
+            "get_edit_url": lambda poster: reverse(
+                "club:poster_edit",
+                kwargs={"club_id": self.club.id, "poster_id": poster.id},
+            ),
+        }
 
 
 class PosterCreateView(ClubTabsMixin, PosterCreateBaseView):

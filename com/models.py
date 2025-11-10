@@ -144,7 +144,7 @@ class News(models.Model):
                 ),
                 groups__id=settings.SITH_GROUP_COM_ADMIN_ID,
             )
-            notif_url = reverse("com:news_admin_list")
+            notif_url = reverse("com:news_admin_list", fragment="moderation")
             new_notifs = [
                 Notification(user=user, url=notif_url, type="NEWS_MODERATION")
                 for user in admins_without_notif
@@ -402,9 +402,7 @@ class Poster(models.Model):
                 groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID]
             ):
                 Notification.objects.create(
-                    user=user,
-                    url=reverse("com:poster_moderate_list"),
-                    type="POSTER_MODERATION",
+                    user=user, url=reverse("com:poster_list"), type="POSTER_MODERATION"
                 )
         return super().save(*args, **kwargs)
 

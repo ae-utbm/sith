@@ -17,7 +17,9 @@ from unittest.mock import patch
 
 import pytest
 from django.conf import settings
+from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import html
@@ -27,9 +29,10 @@ from model_bakery import baker
 from pytest_django.asserts import assertNumQueries, assertRedirects
 
 from club.models import Club, Membership
-from com.models import News, NewsDate, Sith, Weekmail, WeekmailArticle
+from com.models import News, NewsDate, Poster, Sith, Weekmail, WeekmailArticle
 from core.baker_recipes import subscriber_user
 from core.models import AnonymousUser, Group, User
+from core.utils import RED_PIXEL_PNG
 
 
 @pytest.fixture()
@@ -314,7 +317,6 @@ def test_feed(client: Client):
     [
         reverse("com:poster_list"),
         reverse("com:poster_create"),
-        reverse("com:poster_moderate_list"),
     ],
 )
 def test_poster_management_views_crash_test(client: Client, url: str):
@@ -325,3 +327,37 @@ def test_poster_management_views_crash_test(client: Client, url: str):
     client.force_login(user)
     res = client.get(url)
     assert res.status_code == 200
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "referer",
+    [
+        None,
+        reverse("com:poster_list"),
+        reverse("club:poster_list", kwargs={"club_id": settings.SITH_MAIN_CLUB_ID}),
+    ],
+)
+def test_moderate_poster(client: Client, referer: str | None):
+    poster = baker.make(
+        Poster,
+        is_moderated=False,
+        file=SimpleUploadedFile("test.png", content=RED_PIXEL_PNG),
+        club_id=settings.SITH_MAIN_CLUB_ID,
+    )
+    user = baker.make(
+        User,
+        user_permissions=Permission.objects.filter(
+            codename__in=["view_poster", "moderate_poster"]
+        ),
+    )
+    client.force_login(user)
+    headers = {"REFERER": f"https://{settings.SITH_URL}{referer}"} if referer else {}
+    response = client.post(
+        reverse("com:poster_moderate", kwargs={"object_id": poster.id}), headers=headers
+    )
+    result_url = referer or reverse("com:poster_list")
+    assertRedirects(response, result_url)
+    poster.refresh_from_db()
+    assert poster.is_moderated
+    assert poster.moderator == user

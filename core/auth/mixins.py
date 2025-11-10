@@ -24,7 +24,6 @@
 from __future__ import annotations
 
 import types
-import warnings
 from typing import TYPE_CHECKING, Any, LiteralString
 
 from django.contrib.auth.mixins import AccessMixin, PermissionRequiredMixin
@@ -145,45 +144,6 @@ class GenericContentPermissionMixinBuilder(View):
 
         self.get_queryset = types.MethodType(get_qs, self)
         return super().dispatch(request, *arg, **kwargs)
-
-
-class CanCreateMixin(View):
-    """Protect any child view that would create an object.
-
-    Raises:
-        PermissionDenied:
-            If the user has not the necessary permission
-            to create the object of the view.
-    """
-
-    def __init_subclass__(cls, **kwargs):
-        warnings.warn(
-            f"{cls.__name__} is deprecated and should be replaced "
-            "by other permission verification mecanism.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        super().__init_subclass__(**kwargs)
-
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            f"{self.__class__.__name__} is deprecated and should be replaced "
-            "by other permission verification mecanism.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        super().__init__(*args, **kwargs)
-
-    def dispatch(self, request, *arg, **kwargs):
-        if not request.user.is_authenticated:
-            raise PermissionDenied
-        return super().dispatch(request, *arg, **kwargs)
-
-    def form_valid(self, form):
-        obj = form.instance
-        if can_edit_prop(obj, self.request.user):
-            return super().form_valid(form)
-        raise PermissionDenied
 
 
 class CanEditPropMixin(GenericContentPermissionMixinBuilder):

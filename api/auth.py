@@ -6,6 +6,8 @@ from api.models import ApiClient, ApiKey
 
 
 class ApiKeyAuth(APIKeyHeader):
+    """Authentication through client api keys."""
+
     param_name = "X-APIKey"
 
     def authenticate(self, request: HttpRequest, key: str | None) -> ApiClient | None:

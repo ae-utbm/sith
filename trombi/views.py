@@ -27,7 +27,7 @@ from datetime import date
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
@@ -35,17 +35,13 @@ from django.forms.models import modelform_factory
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, RedirectView, TemplateView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from club.models import Club
-from core.auth.mixins import (
-    CanCreateMixin,
-    CanEditMixin,
-    CanEditPropMixin,
-    CanViewMixin,
-)
+from core.auth.mixins import CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.models import User
 from core.views.forms import SelectDate
 from core.views.mixins import TabedViewMixin
@@ -117,19 +113,25 @@ class TrombiForm(forms.ModelForm):
         widgets = {"subscription_deadline": SelectDate, "comments_deadline": SelectDate}
 
 
-class TrombiCreateView(CanCreateMixin, CreateView):
+class TrombiCreateView(UserPassesTestMixin, CreateView):
     """Create a trombi for a club."""
 
     model = Trombi
     form_class = TrombiForm
     template_name = "core/create.jinja"
 
+    @cached_property
+    def club(self):
+        return get_object_or_404(Club, id=self.kwargs["club_id"])
+
+    def test_func(self):
+        return self.request.user.can_edit(self.club)
+
     def post(self, request, *args, **kwargs):
         """Affect club."""
         form = self.get_form()
         if form.is_valid():
-            club = get_object_or_404(Club, id=self.kwargs["club_id"])
-            form.instance.club = club
+            form.instance.club = self.club
             ret = self.form_valid(form)
             return ret
         else:

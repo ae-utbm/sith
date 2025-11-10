@@ -46,7 +46,7 @@ class TestFetchFamilyApi(TestCase):
         response = self.client.get(
             reverse("api:family_graph", args=[self.main_user.id])
         )
-        assert response.status_code == 403
+        assert response.status_code == 401
 
         self.client.force_login(baker.make(User))  # unsubscribed user
         response = self.client.get(

@@ -242,7 +242,7 @@ class Invoice(models.Model):
     def validate(self):
         if self.validated:
             raise DataError(_("Invoice already validated"))
-        customer, created = Customer.get_or_create(user=self.user)
+        customer, _created = Customer.get_or_create(user=self.user)
         eboutic = Counter.objects.filter(type="EBOUTIC").first()
         for i in self.items.all():
             if i.type_id == settings.SITH_COUNTER_PRODUCTTYPE_REFILLING:

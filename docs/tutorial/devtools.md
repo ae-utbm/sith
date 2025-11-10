@@ -157,16 +157,18 @@ que sont VsCode et Sublime Text.
     Si vous avez réussi à terminer l'installation, vous n'avez donc pas de configuration
     supplémentaire à effectuer.
 
-Pour utiliser Biome, placez-vous à la racine du projet et lancer la commande suivante:
+Pour utiliser Biome, placez-vous à la racine du projet et lancez la commande suivante:
 
 ```bash
     npx @biomejs/biome check # Pour checker le code avec le linter et le formater
-    npx @biomejs/biome check --write # Pour appliquer les changemnts
+    npx @biomejs/biome check --write # Pour appliquer les changements
 ```
 
 Biome va alors faire son travail sur l'ensemble du projet puis vous dire
 si des documents ont été reformatés (si vous avez fait `npx @biomejs/biome format --write`)
-ou bien s'il y a des erreurs à réparer (si vous avez faire `npx @biomejs/biome lint`) ou les deux (si vous avez fait `npx @biomejs/biome check --write`).
+ou bien s'il y a des erreurs à réparer 
+(si vous avez fait `npx @biomejs/biome lint`)
+ou les deux (si vous avez fait `npx @biomejs/biome check --write`).
 
 Appeler Biome en ligne de commandes avant de pousser votre code sur Github
 est une technique qui marche très bien.

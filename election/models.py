@@ -1,5 +1,7 @@
 from django.db import models
+from django.db.models import Count
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 
@@ -22,21 +24,18 @@ class Election(models.Model):
         verbose_name=_("edit groups"),
         blank=True,
     )
-
     view_groups = models.ManyToManyField(
         Group,
         related_name="viewable_elections",
         verbose_name=_("view groups"),
         blank=True,
     )
-
     vote_groups = models.ManyToManyField(
         Group,
         related_name="votable_elections",
         verbose_name=_("vote groups"),
         blank=True,
     )
-
     candidature_groups = models.ManyToManyField(
         Group,
         related_name="candidate_elections",
@@ -45,7 +44,7 @@ class Election(models.Model):
     )
 
     voters = models.ManyToManyField(
-        User, verbose_name=("voters"), related_name="voted_elections"
+        User, verbose_name=_("voters"), related_name="voted_elections"
     )
     archived = models.BooleanField(_("archived"), default=False)
 
@@ -55,20 +54,20 @@ class Election(models.Model):
     @property
     def is_vote_active(self):
         now = timezone.now()
-        return bool(now <= self.end_date and now >= self.start_date)
+        return self.start_date <= now <= self.end_date
 
     @property
     def is_vote_finished(self):
-        return bool(timezone.now() > self.end_date)
+        return timezone.now() > self.end_date
 
     @property
     def is_candidature_active(self):
         now = timezone.now()
-        return bool(now <= self.end_candidature and now >= self.start_candidature)
+        return self.start_candidature <= now <= self.end_candidature
 
     @property
     def is_vote_editable(self):
-        return bool(timezone.now() <= self.end_candidature)
+        return timezone.now() <= self.end_candidature
 
     def can_candidate(self, user):
         for group_id in self.candidature_groups.values_list("pk", flat=True):
@@ -87,19 +86,13 @@ class Election(models.Model):
     def has_voted(self, user):
         return self.voters.filter(id=user.id).exists()
 
-    @property
+    @cached_property
     def results(self):
         results = {}
         total_vote = self.voters.count()
         for role in self.roles.all():
             results[role.title] = role.results(total_vote)
         return results
-
-    def delete(self, *args, **kwargs):
-        self.election_lists.all().delete()
-        super().delete(*args, **kwargs)
-
-    # Permissions
 
 
 class Role(OrderedModel):
@@ -115,35 +108,36 @@ class Role(OrderedModel):
     description = models.TextField(_("description"), null=True, blank=True)
     max_choice = models.IntegerField(_("max choice"), default=1)
 
-    def results(self, total_vote):
-        results = {}
-        total_vote *= self.max_choice
-        non_blank = 0
-        for candidature in self.candidatures.all():
-            cand_results = {}
-            cand_results["vote"] = self.votes.filter(candidature=candidature).count()
-            if total_vote == 0:
-                cand_results["percent"] = 0
-            else:
-                cand_results["percent"] = cand_results["vote"] * 100 / total_vote
-            non_blank += cand_results["vote"]
-            results[candidature.user.username] = cand_results
-        results["total vote"] = total_vote
+    def __str__(self):
+        return f"{self.title} - {self.election.title}"
+
+    def results(self, total_vote: int) -> dict[str, dict[str, int | float]]:
         if total_vote == 0:
-            results["blank vote"] = {"vote": 0, "percent": 0}
-        else:
-            results["blank vote"] = {
-                "vote": total_vote - non_blank,
-                "percent": (total_vote - non_blank) * 100 / total_vote,
+            candidates = self.candidatures.values_list("user__username")
+            return {
+                key: {"vote": 0, "percent": 0} for key in ["blank_votes", *candidates]
             }
+        total_vote *= self.max_choice
+        results = {"total vote": total_vote}
+        non_blank = 0
+        candidatures = self.candidatures.annotate(nb_votes=Count("votes")).values(
+            "nb_votes", "user__username"
+        )
+        for candidature in candidatures:
+            non_blank += candidature["nb_votes"]
+            results[candidature["user__username"]] = {
+                "vote": candidature["nb_votes"],
+                "percent": candidature["nb_votes"] * 100 / total_vote,
+            }
+        results["blank vote"] = {
+            "vote": total_vote - non_blank,
+            "percent": (total_vote - non_blank) * 100 / total_vote,
+        }
         return results
 
     @property
     def edit_groups(self):
         return self.election.edit_groups
-
-    def __str__(self):
-        return ("%s : %s") % (self.election.title, self.title)
 
 
 class ElectionList(models.Model):
@@ -163,11 +157,6 @@ class ElectionList(models.Model):
     def can_be_edited_by(self, user):
         return user.can_edit(self.election)
 
-    def delete(self, *args, **kwargs):
-        for candidature in self.candidatures.all():
-            candidature.delete()
-        super().delete(*args, **kwargs)
-
 
 class Candidature(models.Model):
     """This class is a component of responsability."""
@@ -182,10 +171,9 @@ class Candidature(models.Model):
         User,
         verbose_name=_("user"),
         related_name="candidates",
-        blank=True,
         on_delete=models.CASCADE,
     )
-    program = models.TextField(_("description"), null=True, blank=True)
+    program = models.TextField(_("description"), default="", blank=True)
     election_list = models.ForeignKey(
         ElectionList,
         related_name="candidatures",
@@ -196,13 +184,10 @@ class Candidature(models.Model):
     def __str__(self):
         return f"{self.role.title} : {self.user.username}"
 
-    def delete(self):
-        for vote in self.votes.all():
-            vote.delete()
-        super().delete()
-
     def can_be_edited_by(self, user):
-        return (user == self.user) or user.can_edit(self.role.election)
+        return (
+            (user == self.user) or user.can_edit(self.role.election)
+        ) and self.role.election.is_vote_editable
 
 
 class Vote(models.Model):

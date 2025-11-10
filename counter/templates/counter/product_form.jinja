@@ -6,7 +6,7 @@
   {% else %}
     <h2>{% trans %}Product creation{% endtrans %}</h2>
   {% endif %}
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p() }}
 

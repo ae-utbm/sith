@@ -86,7 +86,7 @@ class CustomerQuerySet(models.QuerySet):
             .annotate(res=Sum(F("unit_price") * F("quantity"), default=0))
             .values("res")
         )
-        return self.update(amount=Coalesce(money_in - money_out, Decimal("0")))
+        return self.update(amount=Coalesce(money_in - money_out, Decimal(0)))
 
 
 class Customer(models.Model):
@@ -849,7 +849,7 @@ class Selling(models.Model):
         blank=False,
         on_delete=models.SET_NULL,
     )
-    date = models.DateTimeField(_("date"))
+    date = models.DateTimeField(_("date"), db_index=True)
     payment_method = models.CharField(
         _("payment method"),
         max_length=255,

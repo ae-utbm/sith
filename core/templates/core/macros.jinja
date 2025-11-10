@@ -13,30 +13,11 @@
 {%- endmacro %}
 
 {% macro link_news_logo(news) -%}
-  {% if news.club.logo -%}
+  {%- if news.club.logo -%}
     {{ news.club.logo.url }}
-  {% else -%}
+  {%- else -%}
     {{ static("com/img/news.png") }}
-  {% endif %}
-{%- endmacro %}
-
-{% macro gen_news_metatags(news) -%}
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:site" content="{{ settings.SITH_TWITTER }}" />
-  <meta name="twitter:creator" content= "{{ settings.SITH_TWITTER }}" />
-  <meta property="og:url"                content="{{ news.get_full_url() }}" />
-  <meta property="og:type"               content="article" />
-  <meta property="og:title"              content="{{ news.title }}" />
-  <meta property="og:description"        content="{{ news.summary }}" />
-  <meta property="og:image"              content="{{ "https://%s%s" % (settings.SITH_URL, link_news_logo(news)) }}" />
-{%- endmacro %}
-
-{% macro facebook_share(news) -%}
-  <a rel="nofollow" target="#" class="share_button facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ news.get_full_url() }}">{% trans %}Share on Facebook{% endtrans %}</a>
-{%- endmacro %}
-
-{% macro tweet(news) -%}
-  <a rel="nofollow" target="#" class="share_button twitter" href="https://twitter.com/intent/tweet?text={{ news.get_full_url() }}">{% trans %}Tweet{% endtrans %}</a>
+  {%- endif -%}
 {%- endmacro %}
 
 {% macro user_mini_profile(user) %}
@@ -153,7 +134,7 @@
         current_page (django.core.paginator.Page): the current page object
         paginator (django.core.paginator.Paginator): the paginator object
     #}
-  {{  paginate_server_side(current_page, paginator, False) }}
+  {{ paginate_server_side(current_page, paginator, False) }}
 {% endmacro %}
 
 {% macro paginate_htmx(current_page, paginator) %}
@@ -168,7 +149,7 @@
         current_page (django.core.paginator.Page): the current page object
         paginator (django.core.paginator.Paginator): the paginator object
     #}
-  {{  paginate_server_side(current_page, paginator, True) }}
+  {{ paginate_server_side(current_page, paginator, True) }}
 {% endmacro %}
 
 {% macro paginate_server_side(current_page, paginator, use_htmx) %}

@@ -19,7 +19,7 @@ from pedagogy.utbm_api import UtbmApiClient
 class UvController(ControllerBase):
     @route.get(
         "/{code}",
-        auth=[SessionAuth(), ApiKeyAuth()],
+        auth=[ApiKeyAuth(), SessionAuth()],
         permissions=[
             # this route will almost always be called in the context
             # of a UV creation/edition
@@ -45,7 +45,7 @@ class UvController(ControllerBase):
         "",
         response=PaginatedResponseSchema[SimpleUvSchema],
         url_name="fetch_uvs",
-        auth=[SessionAuth(), ApiKeyAuth()],
+        auth=[ApiKeyAuth(), SessionAuth()],
         permissions=[HasPerm("pedagogy.view_uv")],
     )
     @paginate(PageNumberPaginationExtra, page_size=100)

@@ -23,14 +23,12 @@
 #
 from __future__ import annotations
 
-import logging
-import os
 import string
 import unicodedata
 from datetime import timedelta
 from io import BytesIO
 from pathlib import Path
-from typing import TYPE_CHECKING, Optional, Self
+from typing import TYPE_CHECKING, Self
 from uuid import uuid4
 
 from django.conf import settings
@@ -95,48 +93,6 @@ def validate_promo(value: int) -> None:
             _("%(value)s is not a valid promo (between 0 and %(end)s)"),
             params={"value": value, "end": delta},
         )
-
-
-def get_group(*, pk: int | None = None, name: str | None = None) -> Group | None:
-    """Search for a group by its primary key or its name.
-    Either one of the two must be set.
-
-    The result is cached for the default duration (should be 5 minutes).
-
-    Args:
-        pk: The primary key of the group
-        name: The name of the group
-
-    Returns:
-        The group if it exists, else None
-
-    Raises:
-        ValueError: If no group matches the criteria
-    """
-    if pk is None and name is None:
-        raise ValueError("Either pk or name must be set")
-
-    # replace space characters to hide warnings with memcached backend
-    pk_or_name: str | int = pk if pk is not None else name.replace(" ", "_")
-    group = cache.get(f"sith_group_{pk_or_name}")
-
-    if group == "not_found":
-        # Using None as a cache value is a little bit tricky,
-        # so we use a special string to represent None
-        return None
-    elif group is not None:
-        return group
-    # if this point is reached, the group is not in cache
-    if pk is not None:
-        group = Group.objects.filter(pk=pk).first()
-    else:
-        group = Group.objects.filter(name=name).first()
-    if group is not None:
-        name = group.name.replace(" ", "_")
-        cache.set_many({f"sith_group_{group.id}": group, f"sith_group_{name}": group})
-    else:
-        cache.set(f"sith_group_{pk_or_name}", "not_found")
-    return group
 
 
 class BanGroup(AuthGroup):
@@ -382,19 +338,18 @@ class User(AbstractUser):
         Returns:
              True if the user is the group, else False
         """
-        if pk is not None:
-            group: Optional[Group] = get_group(pk=pk)
-        elif name is not None:
-            group: Optional[Group] = get_group(name=name)
-        else:
+        if not pk and not name:
             raise ValueError("You must either provide the id or the name of the group")
-        if group is None:
+        group_id: int | None = (
+            pk or Group.objects.filter(name=name).values_list("id", flat=True).first()
+        )
+        if group_id is None:
             return False
-        if group.id == settings.SITH_GROUP_SUBSCRIBERS_ID:
+        if group_id == settings.SITH_GROUP_SUBSCRIBERS_ID:
             return self.is_subscribed
-        if group.id == settings.SITH_GROUP_ROOT_ID:
+        if group_id == settings.SITH_GROUP_ROOT_ID:
             return self.is_root
-        return group in self.cached_groups
+        return any(g.id == group_id for g in self.cached_groups)
 
     @cached_property
     def cached_groups(self) -> list[Group]:
@@ -453,14 +408,6 @@ class User(AbstractUser):
                 self.home.save()
         else:
             raise ValidationError(_("A user with that username already exists"))
-
-    def get_profile(self):
-        return {
-            "last_name": self.last_name,
-            "first_name": self.first_name,
-            "nick_name": self.nick_name,
-            "date_of_birth": self.date_of_birth,
-        }
 
     def get_short_name(self):
         """Returns the short name for the user."""
@@ -689,8 +636,8 @@ class AnonymousUser(AuthAnonymousUser):
         if pk is not None:
             return pk == allowed_id
         elif name is not None:
-            group = get_group(name=name)
-            return group is not None and group.id == allowed_id
+            group = Group.objects.get(id=allowed_id)
+            return group.name == name
         else:
             raise ValueError("You must either provide the id or the name of the group")
 
@@ -1016,63 +963,6 @@ class SithFile(models.Model):
         self.clean()
         self.save()
 
-    def _repair_fs(self):
-        """Rebuilds recursively the filesystem as it should be regarding the DB tree."""
-        if self.is_folder:
-            for c in self.children.all():
-                c._repair_fs()
-            return
-        elif not self._check_path_consistence():
-            # First get future parent path and the old file name
-            # Prepend "." so that we match all relative handling of Django's
-            # file storage
-            parent_path = "." + self.parent.get_full_path()
-            parent_full_path = settings.MEDIA_ROOT + parent_path
-            os.makedirs(parent_full_path, exist_ok=True)
-            old_path = self.file.name  # Should be relative: "./users/skia/bleh.jpg"
-            new_path = "." + self.get_full_path()
-            try:
-                # Make this atomic, so that a FS problem rolls back the DB change
-                with transaction.atomic():
-                    # Set the new filesystem path
-                    self.file.name = new_path
-                    self.save()
-                    # Really move at the FS level
-                    if os.path.exists(parent_full_path):
-                        os.rename(
-                            settings.MEDIA_ROOT + old_path,
-                            settings.MEDIA_ROOT + new_path,
-                        )
-                        # Empty directories may remain, but that's not really a
-                        # problem, and that can be solved with a simple shell
-                        # command: `find . -type d -empty -delete`
-            except Exception as e:
-                logging.error(e)
-
-    def _check_path_consistence(self):
-        file_path = str(self.file)
-        file_full_path = settings.MEDIA_ROOT + file_path
-        db_path = ".%s" % self.get_full_path()
-        if not os.path.exists(file_full_path):
-            print("%s: WARNING: real file does not exists!" % self.id)  # noqa T201
-            print("file path: %s" % file_path, end="")  # noqa T201
-            print("  db path: %s" % db_path)  # noqa T201
-            return False
-        if file_path != db_path:
-            print("%s: " % self.id, end="")  # noqa T201
-            print("file path: %s" % file_path, end="")  # noqa T201
-            print("  db path: %s" % db_path)  # noqa T201
-            return False
-        return True
-
-    def _check_fs(self):
-        if self.is_folder:
-            for c in self.children.all():
-                c._check_fs()
-            return
-        else:
-            self._check_path_consistence()
-
     @property
     def is_file(self):
         return not self.is_folder
@@ -1157,8 +1047,6 @@ class QuickUploadImage(models.Model):
         identifier = str(uuid4())
         name = Path(image.name).stem[: cls.IMAGE_NAME_SIZE - 1]
         file = File(convert_image(image), name=f"{identifier}.webp")
-        width, height = Image.open(file).size
-
         return cls.objects.create(
             uuid=identifier,
             name=name,

@@ -11,7 +11,8 @@ $hovered-red-text-color: #ff4d4d;
 .header {
   box-sizing: border-box;
   background-color: $deepblue;
-  box-shadow: 3px 3px 3px 0 #dfdfdf;
+  box-shadow: black 0 1px 3px 0,
+              black 0 4px 8px 3px;
   border-radius: 0;
   width: 100%;
   display: flex;
@@ -99,7 +100,7 @@ $hovered-red-text-color: #ff4d4d;
         border-radius: 0;
         margin: 0;
         box-sizing: border-box;
-        background-color: $deepblue;
+        background-color: transparent;
         width: 45px;
         height: 25px;
         padding: 0;
@@ -331,7 +332,7 @@ $hovered-red-text-color: #ff4d4d;
           padding: 10px;
           z-index: 100;
           border-radius: 10px;
-          box-shadow: 3px 3px 3px 0 #767676;
+          @include shadow;
 
           >ul {
             list-style-type: none;

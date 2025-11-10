@@ -36,11 +36,4 @@ SITH_SUBSCRIPTIONS = {
 }
 ```
 
-Une fois ceci fait, il faut créer une nouvelle migration :
-
-```bash
-python ./manage.py makemigrations subscription
-python ./manage.py migrate
-```
-
-N'oubliez pas non plus les traductions (cf. [ici](./translation.md))
+Après ça, n'oubliez pas de gérer les traductions (cf. [ici](./translation.md))

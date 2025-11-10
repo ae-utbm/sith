@@ -33,7 +33,6 @@ from com.views import (
     PosterDeleteView,
     PosterEditView,
     PosterListView,
-    PosterModerateListView,
     PosterModerateView,
     ScreenCreateView,
     ScreenDeleteView,
@@ -101,11 +100,6 @@ urlpatterns = [
         "poster/<int:poster_id>/delete/",
         PosterDeleteView.as_view(),
         name="poster_delete",
-    ),
-    path(
-        "poster/moderate/",
-        PosterModerateListView.as_view(),
-        name="poster_moderate_list",
     ),
     path(
         "poster/<int:object_id>/moderate/",

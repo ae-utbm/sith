@@ -51,7 +51,7 @@ Pour accéder au fichier, il faut utiliser `static` comme pour le reste mais en 
 	Le bundler ne génère que des modules javascript.
 	Ajouter `type="module"` n'est pas optionnel !
 
-### Les imports au sein des fichiers des fichiers javascript bundlés
+### Les imports au sein des fichiers javascript bundlés
 
 Pour importer au sein d'un fichier js bundlé, il faut préfixer ses imports de `#app:`.
 

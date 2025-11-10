@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-17 13:41+0200\n"
+"POT-Creation-Date: 2025-11-07 14:50+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -141,12 +141,12 @@ msgstr "vous devez spécifier au moins un utilisateur ou une adresse email"
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/forms.py com/forms.py counter/forms.py election/views.py
+#: club/forms.py com/forms.py counter/forms.py election/forms.py
 #: subscription/forms.py
 msgid "End date"
 msgstr "Date de fin"
 
-#: club/forms.py club/templates/club/club_sellings.jinja
+#: club/forms.py club/templates/club/club_sellings.jinja club/views.py
 #: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/cash_summary_list.jinja counter/views/mixins.py
 msgid "Counter"
@@ -409,7 +409,7 @@ msgstr "Total : "
 msgid "Benefit: "
 msgstr "Bénéfice : "
 
-#: club/templates/club/club_sellings.jinja
+#: club/templates/club/club_sellings.jinja club/views.py
 #: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/cash_summary_list.jinja
 #: counter/templates/counter/last_ops.jinja
@@ -419,34 +419,34 @@ msgstr "Bénéfice : "
 msgid "Date"
 msgstr "Date"
 
-#: club/templates/club/club_sellings.jinja
+#: club/templates/club/club_sellings.jinja club/views.py
 #: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/last_ops.jinja
 msgid "Barman"
 msgstr "Barman"
 
-#: club/templates/club/club_sellings.jinja
+#: club/templates/club/club_sellings.jinja club/views.py
 #: counter/templates/counter/counter_click.jinja
 #: counter/templates/counter/last_ops.jinja
 #: counter/templates/counter/refilling_list.jinja
 msgid "Customer"
 msgstr "Client"
 
-#: club/templates/club/club_sellings.jinja
+#: club/templates/club/club_sellings.jinja club/views.py
 #: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/last_ops.jinja
 #: rootplace/templates/rootplace/logs.jinja
 msgid "Label"
 msgstr "Étiquette"
 
-#: club/templates/club/club_sellings.jinja
+#: club/templates/club/club_sellings.jinja club/views.py
 #: core/templates/core/user_account_detail.jinja
 #: core/templates/core/user_stats.jinja
 #: counter/templates/counter/last_ops.jinja
 msgid "Quantity"
 msgstr "Quantité"
 
-#: club/templates/club/club_sellings.jinja
+#: club/templates/club/club_sellings.jinja club/views.py
 #: core/templates/core/user_account.jinja
 #: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/cash_summary_list.jinja
@@ -456,7 +456,7 @@ msgstr "Quantité"
 msgid "Total"
 msgstr "Total"
 
-#: club/templates/club/club_sellings.jinja
+#: club/templates/club/club_sellings.jinja club/views.py
 #: core/templates/core/user_account_detail.jinja
 #: core/templates/core/user_detail.jinja
 #: counter/templates/counter/last_ops.jinja
@@ -699,11 +699,23 @@ msgstr "Vous êtes maintenant membre de ce club."
 msgid "%(user)s has been added to club."
 msgstr "%(user)s a été ajouté au club."
 
+#: club/views.py
+msgid "Benefit"
+msgstr "Bénéfice"
+
+#: club/views.py
+msgid "Selling price"
+msgstr "Prix de vente"
+
+#: club/views.py
+msgid "Purchase price"
+msgstr "Prix d'achat"
+
 #: com/forms.py
 msgid "Format: 16:9 | Resolution: 1920x1080"
 msgstr "Format : 16:9 | Résolution : 1920x1080"
 
-#: com/forms.py election/views.py subscription/forms.py
+#: com/forms.py election/forms.py subscription/forms.py
 msgid "Start date"
 msgstr "Date de début"
 
@@ -893,7 +905,8 @@ msgstr "Administration des mailing listes"
 msgid "Actions"
 msgstr "Actions"
 
-#: com/templates/com/mailing_admin.jinja core/templates/core/file_detail.jinja
+#: com/templates/com/mailing_admin.jinja com/templates/com/poster_list.jinja
+#: core/templates/core/file_detail.jinja
 #: core/templates/core/file_moderation.jinja sas/templates/sas/moderation.jinja
 #: sas/templates/sas/picture.jinja
 msgid "Moderate"
@@ -1030,7 +1043,7 @@ msgstr "Événements aujourd'hui et dans les prochains jours"
 
 #: com/templates/com/news_list.jinja
 msgid "Administrate news"
-msgstr "Administrer les news"
+msgstr "Administrer les nouvelles"
 
 #: com/templates/com/news_list.jinja
 msgid "Nothing to come..."
@@ -1109,8 +1122,7 @@ msgstr "Vous n'avez pas accès à ce contenu"
 msgid "Poster"
 msgstr "Affiche"
 
-#: com/templates/com/poster_edit.jinja com/templates/com/poster_moderate.jinja
-#: com/templates/com/screen_edit.jinja
+#: com/templates/com/poster_edit.jinja com/templates/com/screen_edit.jinja
 msgid "List"
 msgstr "Liste"
 
@@ -1123,25 +1135,13 @@ msgstr "Affiche - modifier"
 msgid "Create"
 msgstr "Créer"
 
-#: com/templates/com/poster_list.jinja
-msgid "Moderation"
-msgstr "Modération"
-
-#: com/templates/com/poster_list.jinja
-msgid "No posters"
-msgstr "Aucune affiche"
-
 #: com/templates/com/poster_list.jinja com/templates/com/screen_slideshow.jinja
 msgid "Click to expand"
 msgstr "Cliquez pour agrandir"
 
-#: com/templates/com/poster_moderate.jinja
-msgid "Posters - moderation"
-msgstr "Affiches - modération"
-
-#: com/templates/com/poster_moderate.jinja
-msgid "No objects"
-msgstr "Aucun éléments"
+#: com/templates/com/poster_list.jinja
+msgid "No posters"
+msgstr "Aucune affiche"
 
 #: com/templates/com/screen_edit.jinja
 msgid "Screen"
@@ -4043,6 +4043,30 @@ msgstr ""
 msgid "You can't buy a refilling with sith money"
 msgstr "Vous ne pouvez pas acheter un rechargement avec de l'argent du sith"
 
+#: election/forms.py
+msgid "You have selected too many candidates."
+msgstr "Vous avez sélectionné trop de candidats."
+
+#: election/forms.py
+msgid "User to candidate"
+msgstr "Utilisateur se présentant"
+
+#: election/forms.py election/templates/election/election_detail.jinja
+msgid "Blank vote"
+msgstr "Vote blanc"
+
+#: election/forms.py
+msgid "This role already exists for this election"
+msgstr "Ce rôle existe déjà pour cette élection"
+
+#: election/forms.py
+msgid "Start candidature"
+msgstr "Début des candidatures"
+
+#: election/forms.py
+msgid "End candidature"
+msgstr "Fin des candidatures"
+
 #: election/models.py
 msgid "start candidature"
 msgstr "début des candidatures"
@@ -4066,6 +4090,10 @@ msgstr "groupe de vote"
 #: election/models.py
 msgid "candidature groups"
 msgstr "groupe de candidature"
+
+#: election/models.py
+msgid "voters"
+msgstr "électeurs"
 
 #: election/models.py
 msgid "election"
@@ -4122,17 +4150,10 @@ msgstr "Vous avez déjà soumis votre vote."
 msgid "You have voted in this election."
 msgstr "Vous avez déjà voté pour cette élection."
 
-#: election/templates/election/election_detail.jinja election/views.py
-msgid "Blank vote"
-msgstr "Vote blanc"
-
 #: election/templates/election/election_detail.jinja
-msgid "You may choose up to"
-msgstr "Vous pouvez choisir jusqu'à"
-
-#: election/templates/election/election_detail.jinja
-msgid "people."
-msgstr "personne(s)"
+#, python-format
+msgid "You may choose up to %(nb_choices)s people."
+msgstr "Vous pouvez choisir jusqu'à %(nb_choices)s personnes."
 
 #: election/templates/election/election_detail.jinja
 msgid "Choose blank vote"
@@ -4173,26 +4194,6 @@ msgstr "au"
 #: election/templates/election/election_list.jinja
 msgid "Polls open from"
 msgstr "Votes ouverts du"
-
-#: election/views.py
-msgid "You have selected too much candidates."
-msgstr "Vous avez sélectionné trop de candidats."
-
-#: election/views.py
-msgid "User to candidate"
-msgstr "Utilisateur se présentant"
-
-#: election/views.py
-msgid "This role already exists for this election"
-msgstr "Ce rôle existe déjà pour cette élection"
-
-#: election/views.py
-msgid "Start candidature"
-msgstr "Début des candidatures"
-
-#: election/views.py
-msgid "End candidature"
-msgstr "Fin des candidatures"
 
 #: forum/models.py
 msgid "is a category"
@@ -5065,47 +5066,47 @@ msgstr "Suppression de rechargement"
 
 #: sith/settings.py
 msgid "One semester"
-msgstr "Un semestre, 20 €"
+msgstr "Un semestre"
 
 #: sith/settings.py
 msgid "Two semesters"
-msgstr "Deux semestres, 35 €"
+msgstr "Deux semestres"
 
 #: sith/settings.py
 msgid "Common core cursus"
-msgstr "Cursus tronc commun, 60 €"
+msgstr "Cursus tronc commun"
 
 #: sith/settings.py
 msgid "Branch cursus"
-msgstr "Cursus branche, 60 €"
+msgstr "Cursus branche"
 
 #: sith/settings.py
 msgid "Alternating cursus"
-msgstr "Cursus alternant, 30 €"
+msgstr "Cursus alternant"
 
 #: sith/settings.py
 msgid "Honorary member"
-msgstr "Membre honoraire, 0 €"
+msgstr "Membre honoraire"
 
 #: sith/settings.py
 msgid "Assidu member"
-msgstr "Membre d'Assidu, 0 €"
+msgstr "Membre d'Assidu"
 
 #: sith/settings.py
 msgid "Amicale/DOCEO member"
-msgstr "Membre de l'Amicale/DOCEO, 0 €"
+msgstr "Membre de l'Amicale/DOCEO"
 
 #: sith/settings.py
 msgid "UT network member"
-msgstr "Cotisant du réseau UT, 0 €"
+msgstr "Cotisant du réseau UT"
 
 #: sith/settings.py
 msgid "CROUS member"
-msgstr "Membres du CROUS, 0 €"
+msgstr "Membres du CROUS"
 
 #: sith/settings.py
 msgid "Sbarro/ESTA member"
-msgstr "Membre de Sbarro ou de l'ESTA, 20 €"
+msgstr "Membre de Sbarro ou de l'ESTA"
 
 #: sith/settings.py
 msgid "One semester Welcome Week"
@@ -5132,28 +5133,28 @@ msgid "One day"
 msgstr "Un jour"
 
 #: sith/settings.py
-msgid "GA staff member"
-msgstr "Membre staff GA (2 semaines), 1 €"
+msgid "GA staff member (2 weeks)"
+msgstr "Membre staff GA (2 semaines)"
 
 #: sith/settings.py
 msgid "One semester (-20%)"
-msgstr "Un semestre (-20%), 12 €"
+msgstr "Un semestre (-20%)"
 
 #: sith/settings.py
 msgid "Two semesters (-20%)"
-msgstr "Deux semestres (-20%), 22 €"
+msgstr "Deux semestres (-20%)"
 
 #: sith/settings.py
 msgid "Common core cursus (-20%)"
-msgstr "Cursus tronc commun (-20%), 36 €"
+msgstr "Cursus tronc commun (-20%)"
 
 #: sith/settings.py
 msgid "Branch cursus (-20%)"
-msgstr "Cursus branche (-20%), 36 €"
+msgstr "Cursus branche (-20%)"
 
 #: sith/settings.py
 msgid "Alternating cursus (-20%)"
-msgstr "Cursus alternant (-20%), 24 €"
+msgstr "Cursus alternant (-20%)"
 
 #: sith/settings.py
 msgid "One year for free(CA offer)"

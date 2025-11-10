@@ -269,7 +269,7 @@ def test_apply_rights_recursively():
             SimpleUploadedFile(
                 "test.jpg", content=RED_PIXEL_PNG, content_type="image/jpg"
             ),
-            403,
+            401,
         ),
         (
             lambda: baker.make(User),
