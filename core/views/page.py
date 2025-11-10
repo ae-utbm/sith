@@ -30,17 +30,24 @@ from core.auth.mixins import (
     CanEditPropMixin,
     CanViewMixin,
 )
-from core.models import LockError, Page, PageRev
+from core.models import Page, PageRev
 from core.views.forms import PageForm, PagePropForm
 from core.views.widgets.markdown import MarkdownInput
 
 
-class CanEditPagePropMixin(CanEditPropMixin):
-    def dispatch(self, request, *args, **kwargs):
-        res = super().dispatch(request, *args, **kwargs)
-        if self.object.is_club_page:
-            raise Http404
-        return res
+class PageNotFound(Http404):
+    """Http404 Exception, but specifically for when the not found object is a Page."""
+
+    def __init__(self, page_name: str):
+        self.page_name = page_name
+
+
+def get_page_or_404(full_name: str) -> Page:
+    """Like Django's get_object_or_404, but for Page, and with a custom 404 exception."""
+    page = Page.objects.filter(_full_name=full_name).first()
+    if not page:
+        raise PageNotFound(full_name)
+    return page
 
 
 class PageListView(ListView):
@@ -64,80 +71,57 @@ class PageListView(ListView):
         )
 
 
-class PageView(CanViewMixin, DetailView):
+class BasePageDetailView(CanViewMixin, DetailView):
     model = Page
-    template_name = "core/page/detail.jinja"
-
-    def dispatch(self, request, *args, **kwargs):
-        res = super().dispatch(request, *args, **kwargs)
-        if self.object and self.object.need_club_redirection:
-            return redirect("club:club_view", club_id=self.object.club.id)
-        return res
-
-    def get_object(self):
-        self.page = Page.get_page_by_full_name(self.kwargs["page_name"])
-        return self.page
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if "page" not in context:
-            context["new_page"] = self.kwargs["page_name"]
-        return context
-
-
-class PageHistView(CanViewMixin, DetailView):
-    model = Page
-    template_name = "core/page/history.jinja"
-    slug_field = "_full_name"
     slug_url_kwarg = "page_name"
     _cached_object: Page | None = None
 
     def dispatch(self, request, *args, **kwargs):
         page = self.get_object()
         if page.need_club_redirection:
-            return redirect("club:club_hist", club_id=page.club.id)
+            return redirect("club:club_view", club_id=page.club.id)
         return super().dispatch(request, *args, **kwargs)
 
     def get_object(self, *args, **kwargs):
         if not self._cached_object:
-            self._cached_object = super().get_object()
+            full_name = self.kwargs.get(self.slug_url_kwarg)
+            self._cached_object = get_page_or_404(full_name)
         return self._cached_object
 
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "last_revision": self.object.revisions.last()
+        }
 
-class PageRevView(CanViewMixin, DetailView):
-    model = Page
+
+class PageView(BasePageDetailView):
+    template_name = "core/page/detail.jinja"
+
+
+class PageHistView(BasePageDetailView):
+    template_name = "core/page/history.jinja"
+
+
+class PageRevView(BasePageDetailView):
     template_name = "core/page/detail.jinja"
 
     def dispatch(self, request, *args, **kwargs):
-        res = super().dispatch(request, *args, **kwargs)
-        self.object = self.get_object()
-
-        if self.object is None:
-            return redirect("core:page_create", page_name=self.kwargs["page_name"])
-
-        if self.object.need_club_redirection:
+        page = self.get_object()
+        if page.need_club_redirection:
             return redirect(
-                "club:club_view_rev", club_id=self.object.club.id, rev_id=kwargs["rev"]
+                "club:club_view_rev", club_id=page.club.id, rev_id=kwargs["rev"]
             )
-        return res
-
-    def get_object(self, *args, **kwargs):
-        self.page = Page.get_page_by_full_name(self.kwargs["page_name"])
-        return self.page
+        self.revision = get_object_or_404(page.revisions, id=self.kwargs["rev"])
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if not self.page:
-            return context | {"new_page": self.kwargs["page_name"]}
-        context["page"] = self.page
-        context["rev"] = self.page.revisions.filter(id=self.kwargs["rev"]).first()
-        return context
+        return super().get_context_data(**kwargs) | {"revision": self.revision}
 
 
 class PageCreateView(PermissionRequiredMixin, CreateView):
     model = Page
     form_class = PageForm
-    template_name = "core/page/prop.jinja"
+    template_name = "core/create.jinja"
     permission_required = "core.add_page"
 
     def get_initial(self):
@@ -152,30 +136,28 @@ class PageCreateView(PermissionRequiredMixin, CreateView):
         init["name"] = page_name[-1]
         return init
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["new_page"] = True
-        return context
-
     def form_valid(self, form):
         form.instance.set_lock(self.request.user)
         ret = super().form_valid(form)
         return ret
 
 
+class CanEditPagePropMixin(CanEditPropMixin):
+    def dispatch(self, request, *args, **kwargs):
+        res = super().dispatch(request, *args, **kwargs)
+        if self.object.is_club_page:
+            raise Http404
+        return res
+
+
 class PagePropView(CanEditPagePropMixin, UpdateView):
     model = Page
     form_class = PagePropForm
     template_name = "core/page/prop.jinja"
-    slug_field = "_full_name"
-    slug_url_kwarg = "page_name"
 
     def get_object(self, queryset=None):
-        self.page = super().get_object()
-        try:
-            self.page.set_lock_recursive(self.request.user)
-        except LockError as e:
-            raise e
+        self.page = get_page_or_404(full_name=self.kwargs["page_name"])
+        self.page.set_lock_recursive(self.request.user)
         return self.page
 
 
@@ -187,22 +169,12 @@ class PageEditViewBase(CanEditMixin, UpdateView):
     template_name = "core/page/edit.jinja"
 
     def get_object(self, *args, **kwargs):
-        self.page = Page.get_page_by_full_name(self.kwargs["page_name"])
-        return self._get_revision()
-
-    def _get_revision(self):
-        if self.page is None:
-            return None
+        self.page = get_page_or_404(full_name=self.kwargs["page_name"])
         self.page.set_lock(self.request.user)
         return self.page.revisions.last()
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.page is not None:
-            context["page"] = self.page
-        else:
-            context["new_page"] = self.kwargs["page_name"]
-        return context
+        return super().get_context_data(**kwargs) | {"page": self.page}
 
     def form_valid(self, form):
         # TODO : factor that, but first make some tests
@@ -216,16 +188,14 @@ class PageEditViewBase(CanEditMixin, UpdateView):
 
 class PageEditView(PageEditViewBase):
     def dispatch(self, request, *args, **kwargs):
-        res = super().dispatch(request, *args, **kwargs)
+        self.object = self.get_object()
         if self.object and self.object.page.need_club_redirection:
             return redirect("club:club_edit_page", club_id=self.object.page.club.id)
-        return res
+        return super().dispatch(request, *args, **kwargs)
 
 
 class PageDeleteView(CanEditPagePropMixin, DeleteView):
     model = Page
     template_name = "core/delete_confirm.jinja"
     pk_url_kwarg = "page_id"
-
-    def get_success_url(self, **kwargs):
-        return reverse_lazy("core:page_list")
+    success_url = reverse_lazy("core:page_list")

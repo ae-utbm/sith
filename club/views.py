@@ -228,7 +228,8 @@ class ClubPageEditView(ClubTabsMixin, PageEditViewBase):
 
     def get_object(self):
         self.page = self.club.page
-        return self._get_revision()
+        self.page.set_lock(self.request.user)
+        return self.page.revisions.last()
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("club:club_view", kwargs={"club_id": self.club.id})

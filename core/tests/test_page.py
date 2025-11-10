@@ -4,11 +4,11 @@ from django.contrib.auth.models import Permission
 from django.test import Client
 from django.urls import reverse
 from model_bakery import baker
-from pytest_django.asserts import assertRedirects
+from pytest_django.asserts import assertHTMLEqual, assertRedirects
 
 from core.baker_recipes import board_user, subscriber_user
-from core.models import AnonymousUser, Page, User
-from sith.settings import SITH_GROUP_OLD_SUBSCRIBERS_ID, SITH_GROUP_SUBSCRIBERS_ID
+from core.markdown import markdown
+from core.models import AnonymousUser, Page, PageRev, User
 
 
 @pytest.mark.django_db
@@ -29,15 +29,63 @@ def test_edit_page(client: Client):
     assert revision.content == "Hello World"
 
 
+
+@pytest.mark.django_db
+def test_page_revision(client: Client):
+    page = baker.prepare(Page)
+    page.save(force_lock=True)
+    page.view_groups.add(settings.SITH_GROUP_SUBSCRIBERS_ID)
+    revisions = baker.make(
+        PageRev, page=page, _quantity=3, content=iter(["foo", "bar", "baz"])
+    )
+    client.force_login(subscriber_user.make())
+    url = reverse(
+        "core:page_rev",
+        kwargs={"page_name": page._full_name, "rev": revisions[1].id},
+    )
+    res = client.get(url)
+    assert res.status_code == 200
+    soup = BeautifulSoup(res.text, "lxml")
+    detail_html = soup.find(class_="markdown")
+    assertHTMLEqual(detail_html.decode_contents(), markdown(revisions[1].content))
+
+
+@pytest.mark.django_db
+def test_page_club_redirection(client: Client):
+    club = baker.make(Club)
+    url = reverse("core:page", kwargs={"page_name": club.page._full_name})
+    res = client.get(url)
+    redirection_url = reverse("club:club_view", kwargs={"club_id": club.id})
+    assertRedirects(res, redirection_url)
+
+
+@pytest.mark.django_db
+def test_page_revision_club_redirection(client: Client):
+    client.force_login(subscriber_user.make())
+    club = baker.make(Club)
+    revisions = baker.make(
+        PageRev, page=club.page, _quantity=3, content=iter(["foo", "bar", "baz"])
+    )
+    url = reverse(
+        "core:page_rev",
+        kwargs={"page_name": club.page._full_name, "rev": revisions[1].id},
+    )
+    res = client.get(url)
+    redirection_url = reverse(
+        "club:club_view_rev", kwargs={"club_id": club.id, "rev_id": revisions[1].id}
+    )
+    assertRedirects(res, redirection_url)
+
+
 @pytest.mark.django_db
 def test_viewable_by():
     # remove existing pages to prevent side effect
     Page.objects.all().delete()
     view_groups = [
         [settings.SITH_GROUP_PUBLIC_ID],
-        [settings.SITH_GROUP_PUBLIC_ID, SITH_GROUP_SUBSCRIBERS_ID],
-        [SITH_GROUP_SUBSCRIBERS_ID],
-        [SITH_GROUP_SUBSCRIBERS_ID, SITH_GROUP_OLD_SUBSCRIBERS_ID],
+        [settings.SITH_GROUP_PUBLIC_ID, settings.SITH_GROUP_SUBSCRIBERS_ID],
+        [settings.SITH_GROUP_SUBSCRIBERS_ID],
+        [settings.SITH_GROUP_SUBSCRIBERS_ID, settings.SITH_GROUP_OLD_SUBSCRIBERS_ID],
         [],
     ]
     pages = baker.make(Page, _quantity=len(view_groups), _bulk_create=True)
