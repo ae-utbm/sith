@@ -18,10 +18,10 @@
   </ul>
 {% endmacro %}
 
-{% macro page_edit_form(page, form, url, token) %}
+{% macro page_edit_form(form, url) %}
   <h2>{% trans %}Edit page{% endtrans %}</h2>
   <form action="{{ url }}" method="post">
-    <input type="hidden" name="csrfmiddlewaretoken" value="{{ token }}">
+    {% csrf_token %}
     {{ form.as_p() }}
     <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
   </form>

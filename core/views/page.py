@@ -191,18 +191,10 @@ class PageEditViewBase(CanEditMixin, UpdateView):
         return self._get_revision()
 
     def _get_revision(self):
-        if self.page is not None:
-            # First edit
-            if self.page.revisions.all() is None:
-                rev = PageRev(author=self.request.user)
-                rev.save()
-                self.page.revisions.add(rev)
-            try:
-                self.page.set_lock(self.request.user)
-            except LockError as e:
-                raise e
-            return self.page.revisions.last()
-        return None
+        if self.page is None:
+            return None
+        self.page.set_lock(self.request.user)
+        return self.page.revisions.last()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
