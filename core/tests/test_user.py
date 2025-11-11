@@ -3,6 +3,7 @@ from datetime import timedelta
 import pytest
 from django.conf import settings
 from django.contrib import auth
+from django.contrib.auth.models import Permission
 from django.core.management import call_command
 from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
@@ -18,7 +19,7 @@ from core.baker_recipes import (
     subscriber_user,
     very_old_subscriber_user,
 )
-from core.models import Group, User
+from core.models import AnonymousUser, Group, User
 from core.views import UserTabsMixin
 from counter.baker_recipes import sale_recipe
 from counter.models import Counter, Customer, Refilling, Selling
@@ -368,3 +369,38 @@ class TestRedirectMe:
 def test_promo_has_logo(promo):
     user = baker.make(User, promo=promo)
     assert user.promo_has_logo()
+
+
+@pytest.mark.django_db
+class TestUserQuerySetViewableBy:
+    @pytest.fixture
+    def users(self) -> list[User]:
+        return [
+            baker.make(User),
+            subscriber_user.make(),
+            subscriber_user.make(is_viewable=False),
+        ]
+
+    def test_admin_user(self, users: list[User]):
+        user = baker.make(
+            User,
+            user_permissions=[Permission.objects.get(codename="view_hidden_user")],
+        )
+        viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
+        assert set(viewable) == set(users)
+
+    @pytest.mark.parametrize(
+        "user_factory", [old_subscriber_user.make, subscriber_user.make]
+    )
+    def test_subscriber(self, users: list[User], user_factory):
+        user = user_factory()
+        viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
+        assert set(viewable) == {users[0], users[1]}
+
+    @pytest.mark.parametrize(
+        "user_factory", [lambda: baker.make(User), lambda: AnonymousUser()]
+    )
+    def test_not_subscriber(self, users: list[User], user_factory):
+        user = user_factory()
+        viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
+        assert not viewable.exists()

@@ -116,12 +116,12 @@
     {# All fields #}
     <div class="profile-fields">
       {%- for field in form -%}
-        {%- if field.name in ["quote","profile_pict","avatar_pict","scrub_pict","is_subscriber_viewable","forum_signature"] -%}
+        {%- if field.name in ["quote","profile_pict","avatar_pict","scrub_pict","is_viewable","forum_signature"] -%}
           {%- continue -%}
         {%- endif -%}
 
         <div class="profile-field">
-          <div class="profile-field-label">{{ field.label }}</div>
+          {{ field.label_tag() }}
           <div class="profile-field-content">
             {{ field }}
             {%- if field.errors -%}
@@ -136,7 +136,7 @@
     <div class="profile-fields">
       {%- for field in [form.quote, form.forum_signature] -%}
         <div class="profile-field">
-          <div class="profile-field-label">{{ field.label }}</div>
+          {{ field.label_tag() }}
           <div class="profile-field-content">
             {{ field }}
             {%- if field.errors -%}
@@ -149,8 +149,13 @@
 
     {# Checkboxes #}
     <div class="profile-visible">
-      {{ form.is_subscriber_viewable }}
-      {{ form.is_subscriber_viewable.label }}
+      <div class="row">
+        {{ form.is_viewable }}
+        {{ form.is_viewable.label_tag() }}
+      </div>
+      <span class="helptext">
+        {{ form.is_viewable.help_text }}
+      </span>
     </div>
     <div class="final-actions">
 

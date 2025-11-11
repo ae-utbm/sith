@@ -136,6 +136,15 @@ class UserQuerySet(models.QuerySet):
             Q(Exists(subscriptions)) | Q(Exists(refills)) | Q(Exists(purchases))
         )
 
+    def viewable_by(self, user: User) -> Self:
+        if user.has_perm("core.view_hidden_user"):
+            return self
+        if user.has_perm("core.view_user"):
+            return self.filter(is_viewable=True)
+        if user.is_anonymous:
+            return self.none()
+        return self.filter(id=user.id)
+
 
 class CustomUserManager(UserManager.from_queryset(UserQuerySet)):
     # see https://docs.djangoproject.com/fr/stable/topics/migrations/#model-managers
@@ -271,12 +280,23 @@ class User(AbstractUser):
     parent_address = models.CharField(
         _("parent address"), max_length=128, blank=True, default=""
     )
-    is_subscriber_viewable = models.BooleanField(
-        _("is subscriber viewable"), default=True
+    is_viewable = models.BooleanField(
+        _("Profile visible by subscribers"),
+        help_text=_(
+            "If you disable this option, only admin users "
+            "will be able to see your profile."
+        ),
+        default=True,
     )
     godfathers = models.ManyToManyField("User", related_name="godchildren", blank=True)
 
     objects = CustomUserManager()
+
+    class Meta(AbstractUser.Meta):
+        abstract = False
+        permissions = [
+            ("view_hidden_user", "Can view hidden users"),
+        ]
 
     def __str__(self):
         return self.get_display_name()
@@ -551,8 +571,12 @@ class User(AbstractUser):
     def can_be_edited_by(self, user):
         return user.is_root or user.is_board_member
 
-    def can_be_viewed_by(self, user):
-        return (user.was_subscribed and self.is_subscriber_viewable) or user.is_root
+    def can_be_viewed_by(self, user: User) -> bool:
+        return (
+            user.id == self.id
+            or user.has_perm("core.view_hidden_user")
+            or (user.has_perm("core.view_user") and self.is_viewable)
+        )
 
     def get_mini_item(self):
         return """
