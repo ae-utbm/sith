@@ -42,7 +42,6 @@ from django.forms import (
     Widget,
 )
 from django.utils.timezone import now
-from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from PIL import Image
@@ -84,30 +83,6 @@ class NFCTextInput(TextInput):
             "css": staticfiles_storage.url("core/components/nfc-input.scss"),
         }
         return context
-
-
-class SelectUser(TextInput):
-    def render(self, name, value, attrs=None, renderer=None):
-        if attrs:
-            attrs["class"] = "select_user"
-        else:
-            attrs = {"class": "select_user"}
-        output = (
-            '%(content)s<div name="%(name)s" class="choose_user_widget" title="%(title)s"></div>'
-            % {
-                "content": super().render(name, value, attrs, renderer),
-                "title": _("Choose user"),
-                "name": name,
-            }
-        )
-        output += (
-            '<span name="'
-            + name
-            + '" class="choose_user_button">'
-            + gettext("Choose user")
-            + "</span>"
-        )
-        return output
 
 
 # Fields
