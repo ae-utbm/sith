@@ -104,3 +104,11 @@ def test_viewable_by():
     )
     viewable = Page.objects.viewable_by(root_user).values_list("id", flat=True)
     assert set(viewable) == {p.id for p in pages}
+
+
+@pytest.mark.django_db
+def test_page_list_view(client: Client):
+    baker.make(Page, _quantity=10, _bulk_create=True)
+    client.force_login(subscriber_user.make())
+    res = client.get(reverse("core:page_list"))
+    assert res.status_code == 200
