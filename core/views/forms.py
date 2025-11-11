@@ -20,6 +20,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import difflib
 import re
 from datetime import date, datetime, timedelta
 from io import BytesIO
@@ -385,29 +386,43 @@ class PageRevisionForm(forms.ModelForm):
 
     Notes:
         Saving this form won't always result in a new revision.
-        If the previous revision on the same page was made less
-        than 20 minutes ago by the same author,
+        If the previous revision on the same page was made :
+
+        - less than 20 minutes ago
+        - by the same author
+        - with a diff ratio higher than 20%
+
         then the latter will be edited and the new revision won't be created.
     """
 
-    UPDATE_THRESHOLD = timedelta(minutes=20)
+    TIME_THRESHOLD = timedelta(minutes=20)
+    DIFF_THRESHOLD = 0.2
 
     class Meta:
         model = PageRev
         fields = ["title", "content"]
         widgets = {"content": MarkdownInput}
 
-    def __init__(self, *args, author: User, page: Page, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(
+        self, *args, author: User, page: Page, instance: PageRev | None = None, **kwargs
+    ):
+        super().__init__(*args, instance=instance, **kwargs)
         self.author = author
         self.page = page
+        self.initial_content = instance.content if instance else ""
+
+    def diff_ratio(self, new_str: str) -> float:
+        return difflib.SequenceMatcher(
+            None, self.initial_content, new_str
+        ).quick_ratio()
 
     def save(self, commit=True):  # noqa FBT002
         revision: PageRev = self.instance
         if (
             revision._state.adding
             or revision.author != self.author
-            or revision.date + self.UPDATE_THRESHOLD < now()
+            or revision.date + self.TIME_THRESHOLD < now()
+            or self.diff_ratio(revision.content) < (1 - self.DIFF_THRESHOLD)
         ):
             revision.author = self.author
             revision.page = self.page

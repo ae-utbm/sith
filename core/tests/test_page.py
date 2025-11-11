@@ -43,15 +43,17 @@ class TestEditPage:
         user = baker.make(User, is_superuser=True)
         page = baker.prepare(Page)
         page.save(force_lock=True)
-        first_rev = baker.make(PageRev, author=user, page=page, date=now())
+        first_rev = baker.make(
+            PageRev, author=user, page=page, date=now(), content="Hello World"
+        )
         client.force_login(user)
         url = reverse("core:page_edit", kwargs={"page_name": page._full_name})
-        client.post(url, data={"content": "Hello World"})
+        client.post(url, data={"content": "Hello World!"})
         assert page.revisions.count() == 1
         assert page.revisions.last() == first_rev
         first_rev.refresh_from_db()
         assert first_rev.author == user
-        assert first_rev.content == "Hello World"
+        assert first_rev.content == "Hello World!"
 
     def test_pagerev_not_reused(self, client):
         """Test that a new revision is created if too much time
@@ -71,6 +73,7 @@ class TestEditPage:
 
 @pytest.mark.django_db
 def test_page_revision(client: Client):
+    """Test the GET to request to a specific revision page."""
     page = baker.prepare(Page)
     page.save(force_lock=True)
     page.view_groups.add(settings.SITH_GROUP_SUBSCRIBERS_ID)
