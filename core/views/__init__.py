@@ -21,10 +21,10 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-
 from django.http import (
+    Http404,
+    HttpRequest,
     HttpResponseForbidden,
-    HttpResponseNotFound,
     HttpResponseServerError,
 )
 from django.shortcuts import render
@@ -33,17 +33,20 @@ from django.views.generic.edit import FormView
 from sentry_sdk import last_event_id
 
 from core.views.forms import LoginForm
+from core.views.page import PageNotFound
 
 
-def forbidden(request, exception):
+def forbidden(request: HttpRequest, exception):
     context = {"next": request.path, "form": LoginForm()}
     return HttpResponseForbidden(render(request, "core/403.jinja", context=context))
 
 
-def not_found(request, exception):
-    return HttpResponseNotFound(
-        render(request, "core/404.jinja", context={"exception": exception})
-    )
+def not_found(request: HttpRequest, exception: Http404):
+    if isinstance(exception, PageNotFound):
+        template_name = "core/page/not_found.jinja"
+    else:
+        template_name = "core/404.jinja"
+    return render(request, template_name, context={"exception": exception}, status=404)
 
 
 def internal_servor_error(request):

@@ -319,9 +319,8 @@ class TestPageHandling(TestCase):
     def test_access_page_not_found(self):
         """Should not display a page correctly."""
         response = self.client.get(reverse("core:page", kwargs={"page_name": "swagg"}))
-        assert response.status_code == 200
-        html = response.text
-        self.assertIn('<a href="/page/create/?page=swagg">', html)
+        assert response.status_code == 404
+        assert '<a href="/page/create/?page=swagg">' in response.text
 
     def test_create_page_markdown_safe(self):
         """Should format the markdown and escape html correctly."""

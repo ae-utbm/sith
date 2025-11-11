@@ -1,0 +1,12 @@
+{% extends "core/base.jinja" %}
+
+{% block content %}
+  <h2>{% trans %}Page does not exist{% endtrans %}</h2>
+  <p>
+    {# This template is rendered when a PageNotFound error is raised,
+       so the `exception` context variable should always have a page_name attribute #}
+    <a href="{{ url('core:page_new') }}?page={{ exception.page_name }}">
+      {% trans %}Create it?{% endtrans %}
+    </a>
+  </p>
+{% endblock %}

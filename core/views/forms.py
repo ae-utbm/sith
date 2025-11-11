@@ -20,8 +20,9 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import difflib
 import re
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from io import BytesIO
 
 from captcha.fields import CaptchaField
@@ -47,7 +48,7 @@ from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from PIL import Image
 
 from antispam.forms import AntiSpamEmailField
-from core.models import Gift, Group, Page, SithFile, User
+from core.models import Gift, Group, Page, PageRev, SithFile, User
 from core.utils import resize_image
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
@@ -55,6 +56,7 @@ from core.views.widgets.ajax_select import (
     AutoCompleteSelectMultipleGroup,
     AutoCompleteSelectUser,
 )
+from core.views.widgets.markdown import MarkdownInput
 
 # Widgets
 
@@ -377,6 +379,55 @@ class PageForm(forms.ModelForm):
             .queryset.exclude(name=settings.SITH_CLUB_ROOT_PAGE)
             .filter(club=None)
         )
+
+
+class PageRevisionForm(forms.ModelForm):
+    """Form to add a new revision to a page.
+
+    Notes:
+        Saving this form won't always result in a new revision.
+        If the previous revision on the same page was made :
+
+        - less than 20 minutes ago
+        - by the same author
+        - with a diff ratio higher than 20%
+
+        then the latter will be edited and the new revision won't be created.
+    """
+
+    TIME_THRESHOLD = timedelta(minutes=20)
+    DIFF_THRESHOLD = 0.2
+
+    class Meta:
+        model = PageRev
+        fields = ["title", "content"]
+        widgets = {"content": MarkdownInput}
+
+    def __init__(
+        self, *args, author: User, page: Page, instance: PageRev | None = None, **kwargs
+    ):
+        super().__init__(*args, instance=instance, **kwargs)
+        self.author = author
+        self.page = page
+        self.initial_content = instance.content if instance else ""
+
+    def diff_ratio(self, new_str: str) -> float:
+        return difflib.SequenceMatcher(
+            None, self.initial_content, new_str
+        ).quick_ratio()
+
+    def save(self, commit=True):  # noqa FBT002
+        revision: PageRev = self.instance
+        if (
+            revision._state.adding
+            or revision.author != self.author
+            or revision.date + self.TIME_THRESHOLD < now()
+            or self.diff_ratio(revision.content) < (1 - self.DIFF_THRESHOLD)
+        ):
+            revision.author = self.author
+            revision.page = self.page
+            revision.id = None  # if id is None, Django will create a new record
+        return super().save(commit=commit)
 
 
 class GiftForm(forms.ModelForm):
