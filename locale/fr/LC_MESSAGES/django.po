@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-09 18:03+0100\n"
+"POT-Creation-Date: 2025-11-11 13:52+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -247,8 +247,7 @@ msgstr "description"
 msgid "past member"
 msgstr "ancien membre"
 
-#: club/models.py club/templates/club/club_detail.jinja
-#: com/templates/com/mailing_admin.jinja
+#: club/models.py com/templates/com/mailing_admin.jinja
 #: com/templates/com/news_admin_list.jinja com/templates/com/weekmail.jinja
 #: core/templates/core/user_clubs.jinja
 #: counter/templates/counter/invoices_call.jinja
@@ -471,7 +470,7 @@ msgstr "Méthode de paiement"
 #: core/templates/core/file_detail.jinja
 #: core/templates/core/file_moderation.jinja
 #: core/templates/core/group_detail.jinja core/templates/core/group_list.jinja
-#: core/templates/core/macros.jinja core/templates/core/page_prop.jinja
+#: core/templates/core/macros.jinja core/templates/core/page/prop.jinja
 #: core/templates/core/user_account_detail.jinja
 #: core/templates/core/user_clubs.jinja core/templates/core/user_edit.jinja
 #: counter/templates/counter/fragments/create_student_card.jinja
@@ -547,11 +546,12 @@ msgstr ""
 "Les champs de formulaire suivants sont liées à la description basique d'un "
 "club. Tous les membres du bureau du club peuvent voir et modifier ceux-ci."
 
-#: club/templates/club/edit_club.jinja com/templates/com/news_edit.jinja
-#: com/templates/com/poster_edit.jinja com/templates/com/screen_edit.jinja
-#: com/templates/com/weekmail.jinja core/templates/core/create.jinja
-#: core/templates/core/edit.jinja core/templates/core/file_edit.jinja
-#: core/templates/core/macros_pages.jinja core/templates/core/page_prop.jinja
+#: club/templates/club/edit_club.jinja club/templates/club/pagerev_edit.jinja
+#: com/templates/com/news_edit.jinja com/templates/com/poster_edit.jinja
+#: com/templates/com/screen_edit.jinja com/templates/com/weekmail.jinja
+#: core/templates/core/create.jinja core/templates/core/edit.jinja
+#: core/templates/core/file_edit.jinja core/templates/core/page/edit.jinja
+#: core/templates/core/page/prop.jinja
 #: core/templates/core/user_godfathers.jinja
 #: core/templates/core/user_godfathers_tree.jinja
 #: core/templates/core/user_preferences.jinja
@@ -638,9 +638,9 @@ msgstr "Nouvelle liste de diffusion"
 msgid "Create mailing list"
 msgstr "Créer une liste de diffusion"
 
-#: club/templates/club/page_history.jinja
-msgid "No page existing for this club"
-msgstr "Aucune page n'existe pour ce club"
+#: club/templates/club/pagerev_edit.jinja core/templates/core/page/edit.jinja
+msgid "Edit page"
+msgstr "Éditer la page"
 
 #: club/views.py core/views/user.py sas/templates/sas/picture.jinja
 msgid "Infos"
@@ -654,7 +654,7 @@ msgstr "Membres"
 msgid "Old members"
 msgstr "Anciens membres"
 
-#: club/views.py core/templates/core/page.jinja
+#: club/views.py core/templates/core/page/base.jinja
 msgid "History"
 msgstr "Historique"
 
@@ -666,7 +666,7 @@ msgstr "Outils"
 #: club/views.py com/templates/com/news_admin_list.jinja
 #: com/templates/com/poster_list.jinja com/templates/com/screen_list.jinja
 #: com/templates/com/weekmail.jinja core/templates/core/file.jinja
-#: core/templates/core/group_list.jinja core/templates/core/page.jinja
+#: core/templates/core/group_list.jinja core/templates/core/page/base.jinja
 #: core/templates/core/user_tools.jinja core/views/user.py
 #: counter/templates/counter/cash_summary_list.jinja
 #: counter/templates/counter/counter_list.jinja
@@ -980,7 +980,7 @@ msgid "Dates"
 msgstr "Dates"
 
 #: com/templates/com/news_admin_list.jinja core/templates/core/file.jinja
-#: core/templates/core/page.jinja
+#: core/templates/core/page/base.jinja
 msgid "View"
 msgstr "Voir"
 
@@ -1016,6 +1016,10 @@ msgstr "Événements à modérer"
 #: com/templates/com/news_detail.jinja
 msgid "Back to news"
 msgstr "Retour aux nouvelles"
+
+#: com/templates/com/news_detail.jinja
+msgid "Share on Facebook"
+msgstr "Partager sur Facebook"
 
 #: com/templates/com/news_detail.jinja
 msgid "Author: "
@@ -1956,7 +1960,7 @@ msgstr "Liste de fichiers"
 msgid "New file"
 msgstr "Nouveau fichier"
 
-#: core/templates/core/file.jinja core/templates/core/page.jinja
+#: core/templates/core/file.jinja
 msgid "Not found"
 msgstr "Non trouvé"
 
@@ -1964,7 +1968,7 @@ msgstr "Non trouvé"
 msgid "My files"
 msgstr "Mes fichiers"
 
-#: core/templates/core/file.jinja core/templates/core/page.jinja
+#: core/templates/core/file.jinja core/templates/core/page/base.jinja
 msgid "Prop"
 msgstr "Propriétés"
 
@@ -2103,14 +2107,6 @@ msgid "Create account"
 msgstr "Créer un compte"
 
 #: core/templates/core/macros.jinja
-msgid "Share on Facebook"
-msgstr "Partager sur Facebook"
-
-#: core/templates/core/macros.jinja
-msgid "Tweet"
-msgstr "Tweeter"
-
-#: core/templates/core/macros.jinja
 #, python-format
 msgid "Subscribed until %(subscription_end)s"
 msgstr "Cotisant jusqu'au %(subscription_end)s"
@@ -2130,19 +2126,6 @@ msgstr "Tout sélectionner"
 #: core/templates/core/macros.jinja
 msgid "Unselect All"
 msgstr "Tout désélectionner"
-
-#: core/templates/core/macros_pages.jinja
-#, python-format
-msgid "You're seeing the history of page \"%(page_name)s\""
-msgstr "Vous consultez l'historique de la page \"%(page_name)s\""
-
-#: core/templates/core/macros_pages.jinja
-msgid "last"
-msgstr "actuel"
-
-#: core/templates/core/macros_pages.jinja
-msgid "Edit page"
-msgstr "Éditer la page"
 
 #: core/templates/core/new_user_email.jinja
 msgid ""
@@ -2194,38 +2177,47 @@ msgstr "Nouvelle cotisation à l'Association des Étudiants de l'UTBM"
 msgid "Notification list"
 msgstr "Liste des notifications"
 
-#: core/templates/core/page.jinja core/templates/core/page_list.jinja
-msgid "Page list"
-msgstr "Liste des pages"
+#: core/templates/core/page/base.jinja
+msgid "Page"
+msgstr "Page"
 
-#: core/templates/core/page.jinja
-msgid "Create page"
-msgstr "Créer une page"
-
-#: core/templates/core/page.jinja
+#: core/templates/core/page/base.jinja
 msgid "Return to club management"
 msgstr "Retourner à la gestion du club"
 
-#: core/templates/core/page.jinja
-msgid "Page does not exist"
-msgstr "La page n'existe pas"
-
-#: core/templates/core/page.jinja
-msgid "Create it?"
-msgstr "La créer ?"
-
-#: core/templates/core/page_detail.jinja
+#: core/templates/core/page/detail.jinja
 #, python-format
 msgid "This may not be the last update, you are seeing revision %(rev_id)s!"
 msgstr ""
 "Ceci n'est peut-être pas la dernière version de la page. Vous consultez la "
 "version %(rev_id)s."
 
-#: core/templates/core/page_hist.jinja
+#: core/templates/core/page/history.jinja
 msgid "Page history"
 msgstr "Historique de la page"
 
-#: core/templates/core/page_prop.jinja
+#: core/templates/core/page/list.jinja
+msgid "Page list"
+msgstr "Liste des pages"
+
+#: core/templates/core/page/macros.jinja
+#, python-format
+msgid "You're seeing the history of page \"%(page_name)s\""
+msgstr "Vous consultez l'historique de la page \"%(page_name)s\""
+
+#: core/templates/core/page/macros.jinja
+msgid "last"
+msgstr "actuel"
+
+#: core/templates/core/page/not_found.jinja
+msgid "Page does not exist"
+msgstr "La page n'existe pas"
+
+#: core/templates/core/page/not_found.jinja
+msgid "Create it?"
+msgstr "La créer ?"
+
+#: core/templates/core/page/prop.jinja
 msgid "Page properties"
 msgstr "Propriétés de la page"
 
@@ -2847,10 +2839,6 @@ msgstr "Erreur d'envoi du fichier %(file_name)s : %(msg)s"
 #: core/views/files.py sas/forms.py
 msgid "Apply rights recursively"
 msgstr "Appliquer les droits récursivement"
-
-#: core/views/forms.py
-msgid "Choose user"
-msgstr "Choisir un utilisateur"
 
 #: core/views/forms.py
 msgid "Ensure this timestamp is set in the future"
@@ -5133,9 +5121,9 @@ msgstr "Un jour"
 
 #: sith/settings.py
 #, fuzzy
-#| msgid "GA staff member (2 weeks)"
+#| msgid "GA staff member"
 msgid "GA staff member"
-msgstr "Membre staff GA (2 semaines)"
+msgstr "Membre staff GA"
 
 #: sith/settings.py
 msgid "One semester (-20%)"
