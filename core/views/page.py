@@ -13,26 +13,19 @@
 #
 #
 
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.db.models import F, OuterRef, Subquery
 from django.db.models.functions import Coalesce
-
-# This file contains all the views that concern the page model
-from django.forms.models import modelform_factory
 from django.http import Http404
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.utils.functional import cached_property
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from core.auth.mixins import (
-    CanEditMixin,
-    CanEditPropMixin,
-    CanViewMixin,
-)
+from core.auth.mixins import CanEditPropMixin, CanViewMixin
 from core.models import Page, PageRev
-from core.views.forms import PageForm, PagePropForm
-from core.views.widgets.markdown import MarkdownInput
+from core.views.forms import PageForm, PagePropForm, PageRevisionForm
 
 
 class PageNotFound(Http404):
@@ -161,36 +154,37 @@ class PagePropView(CanEditPagePropMixin, UpdateView):
         return self.page
 
 
-class PageEditViewBase(CanEditMixin, UpdateView):
+class BasePageEditView(UserPassesTestMixin, UpdateView):
     model = PageRev
-    form_class = modelform_factory(
-        model=PageRev, fields=["title", "content"], widgets={"content": MarkdownInput}
-    )
+    form_class = PageRevisionForm
     template_name = "core/page/edit.jinja"
 
+    def test_func(self):
+        return self.request.user.can_edit(self.page)
+
+    @cached_property
+    def page(self) -> Page:
+        page = get_page_or_404(full_name=self.kwargs["page_name"])
+        page.set_lock(self.request.user)
+        return page
+
     def get_object(self, *args, **kwargs):
-        self.page = get_page_or_404(full_name=self.kwargs["page_name"])
-        self.page.set_lock(self.request.user)
         return self.page.revisions.last()
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {"page": self.page}
 
-    def form_valid(self, form):
-        # TODO : factor that, but first make some tests
-        rev = form.instance
-        new_rev = PageRev(title=rev.title, content=rev.content)
-        new_rev.author = self.request.user
-        new_rev.page = self.page
-        form.instance = new_rev
-        return super().form_valid(form)
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {
+            "author": self.request.user,
+            "page": self.page,
+        }
 
 
-class PageEditView(PageEditViewBase):
+class PageEditView(BasePageEditView):
     def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if self.object and self.object.page.need_club_redirection:
-            return redirect("club:club_edit_page", club_id=self.object.page.club.id)
+        if self.page.need_club_redirection:
+            return redirect("club:club_edit_page", club_id=self.page.club.id)
         return super().dispatch(request, *args, **kwargs)
 
 

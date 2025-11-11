@@ -22,12 +22,14 @@
 #
 #
 
+from __future__ import annotations
+
 import csv
 import itertools
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
@@ -36,7 +38,7 @@ from django.http import Http404, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.utils.safestring import SafeString
+from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -61,10 +63,13 @@ from com.views import (
     PosterListBaseView,
 )
 from core.auth.mixins import CanEditMixin, PermissionOrClubBoardRequiredMixin
-from core.models import PageRev
-from core.views import DetailFormView, PageEditViewBase, UseFragmentsMixin
+from core.models import Page, PageRev
+from core.views import BasePageEditView, DetailFormView, UseFragmentsMixin
 from core.views.mixins import FragmentMixin, FragmentRenderer, TabedViewMixin
 from counter.models import Selling
+
+if TYPE_CHECKING:
+    from django.utils.safestring import SafeString
 
 
 class ClubTabsMixin(TabedViewMixin):
@@ -75,6 +80,8 @@ class ClubTabsMixin(TabedViewMixin):
             self.object = self.object.page.club
         elif isinstance(self.object, Poster):
             self.object = self.object.club
+        elif hasattr(self, "club"):
+            self.object = self.club
         return self.object.get_display_name()
 
     def get_list_of_tabs(self):
@@ -202,7 +209,7 @@ class ClubView(ClubTabsMixin, DetailView):
         return kwargs
 
 
-class ClubRevView(ClubView):
+class ClubRevView(LoginRequiredMixin, ClubView):
     """Display a specific page revision."""
 
     def dispatch(self, request, *args, **kwargs):
@@ -216,27 +223,26 @@ class ClubRevView(ClubView):
         return kwargs
 
 
-class ClubPageEditView(ClubTabsMixin, PageEditViewBase):
+class ClubPageEditView(ClubTabsMixin, BasePageEditView):
     template_name = "club/pagerev_edit.jinja"
     current_tab = "page_edit"
 
-    def dispatch(self, request, *args, **kwargs):
-        self.club = get_object_or_404(Club, pk=kwargs["club_id"])
-        if not self.club.page:
-            raise Http404
-        return super().dispatch(request, *args, **kwargs)
+    @cached_property
+    def club(self):
+        return get_object_or_404(Club, pk=self.kwargs["club_id"])
 
-    def get_object(self):
-        self.page = self.club.page
-        self.page.set_lock(self.request.user)
-        return self.page.revisions.last()
+    @cached_property
+    def page(self) -> Page:
+        page = self.club.page
+        page.set_lock(self.request.user)
+        return page
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("club:club_view", kwargs={"club_id": self.club.id})
 
 
 class ClubPageHistView(ClubTabsMixin, PermissionRequiredMixin, DetailView):
-    """Modification hostory of the page."""
+    """Modification history of the page."""
 
     model = Club
     pk_url_kwarg = "club_id"

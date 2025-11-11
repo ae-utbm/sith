@@ -1,33 +1,72 @@
+from datetime import timedelta
+
+import freezegun
 import pytest
+from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.test import Client
 from django.urls import reverse
+from django.utils.timezone import now
 from model_bakery import baker
 from pytest_django.asserts import assertHTMLEqual, assertRedirects
 
+from club.models import Club
 from core.baker_recipes import board_user, subscriber_user
 from core.markdown import markdown
 from core.models import AnonymousUser, Page, PageRev, User
 
 
 @pytest.mark.django_db
-def test_edit_page(client: Client):
-    user = board_user.make()
-    page = baker.prepare(Page)
-    page.save(force_lock=True)
-    page.view_groups.add(user.groups.first())
-    client.force_login(user)
+class TestEditPage:
+    def test_edit_page(self, client: Client):
+        user = board_user.make()
+        page = baker.prepare(Page)
+        page.save(force_lock=True)
+        page.view_groups.add(user.groups.first())
+        page.edit_groups.add(user.groups.first())
+        client.force_login(user)
 
-    url = reverse("core:page_edit", kwargs={"page_name": page._full_name})
-    res = client.get(url)
-    assert res.status_code == 200
+        url = reverse("core:page_edit", kwargs={"page_name": page._full_name})
+        res = client.get(url)
+        assert res.status_code == 200
 
-    res = client.post(url, data={"content": "Hello World"})
-    assertRedirects(res, reverse("core:page", kwargs={"page_name": page._full_name}))
-    revision = page.revisions.last()
-    assert revision.content == "Hello World"
+        res = client.post(url, data={"content": "Hello World"})
+        assertRedirects(
+            res, reverse("core:page", kwargs={"page_name": page._full_name})
+        )
+        revision = page.revisions.last()
+        assert revision.content == "Hello World"
 
+    def test_pagerev_reused(self, client):
+        """Test that the previous revision is edited, if same author and small time diff"""
+        user = baker.make(User, is_superuser=True)
+        page = baker.prepare(Page)
+        page.save(force_lock=True)
+        first_rev = baker.make(PageRev, author=user, page=page, date=now())
+        client.force_login(user)
+        url = reverse("core:page_edit", kwargs={"page_name": page._full_name})
+        client.post(url, data={"content": "Hello World"})
+        assert page.revisions.count() == 1
+        assert page.revisions.last() == first_rev
+        first_rev.refresh_from_db()
+        assert first_rev.author == user
+        assert first_rev.content == "Hello World"
+
+    def test_pagerev_not_reused(self, client):
+        """Test that a new revision is created if too much time
+        passed since the last one.
+        """
+        user = baker.make(User, is_superuser=True)
+        page = baker.prepare(Page)
+        page.save(force_lock=True)
+        first_rev = baker.make(PageRev, author=user, page=page, date=now())
+        client.force_login(user)
+        url = reverse("core:page_edit", kwargs={"page_name": page._full_name})
+        with freezegun.freeze_time(now() + timedelta(minutes=30)):
+            client.post(url, data={"content": "Hello World"})
+        assert page.revisions.count() == 2
+        assert page.revisions.last() != first_rev
 
 
 @pytest.mark.django_db

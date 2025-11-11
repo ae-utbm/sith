@@ -21,7 +21,7 @@
 #
 #
 import re
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from io import BytesIO
 
 from captcha.fields import CaptchaField
@@ -47,7 +47,7 @@ from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from PIL import Image
 
 from antispam.forms import AntiSpamEmailField
-from core.models import Gift, Group, Page, SithFile, User
+from core.models import Gift, Group, Page, PageRev, SithFile, User
 from core.utils import resize_image
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
@@ -55,6 +55,7 @@ from core.views.widgets.ajax_select import (
     AutoCompleteSelectMultipleGroup,
     AutoCompleteSelectUser,
 )
+from core.views.widgets.markdown import MarkdownInput
 
 # Widgets
 
@@ -377,6 +378,41 @@ class PageForm(forms.ModelForm):
             .queryset.exclude(name=settings.SITH_CLUB_ROOT_PAGE)
             .filter(club=None)
         )
+
+
+class PageRevisionForm(forms.ModelForm):
+    """Form to add a new revision to a page.
+
+    Notes:
+        Saving this form won't always result in a new revision.
+        If the previous revision on the same page was made less
+        than 20 minutes ago by the same author,
+        then the latter will be edited and the new revision won't be created.
+    """
+
+    UPDATE_THRESHOLD = timedelta(minutes=20)
+
+    class Meta:
+        model = PageRev
+        fields = ["title", "content"]
+        widgets = {"content": MarkdownInput}
+
+    def __init__(self, *args, author: User, page: Page, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.author = author
+        self.page = page
+
+    def save(self, commit=True):  # noqa FBT002
+        revision: PageRev = self.instance
+        if (
+            revision._state.adding
+            or revision.author != self.author
+            or revision.date + self.UPDATE_THRESHOLD < now()
+        ):
+            revision.author = self.author
+            revision.page = self.page
+            revision.id = None  # if id is None, Django will create a new record
+        return super().save(commit=commit)
 
 
 class GiftForm(forms.ModelForm):
