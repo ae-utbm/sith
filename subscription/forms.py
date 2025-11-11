@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from core.models import User
+from core.utils import get_last_promo
 from core.views.forms import SelectDate, SelectDateTime
 from core.views.widgets.ajax_select import AutoCompleteSelectUser
 from subscription.models import Subscription
@@ -125,8 +126,17 @@ class SubscriptionNewUserForm(SubscriptionForm):
             "deux-semestres",
             "cursus-tronc-commun",
             "cursus-branche",
+            "cursus-alternant",
         ]:
             member.role = "STUDENT"
+            member.school = "UTBM"
+        if self.cleaned_data.get("subscription_type") == "cursus-tronc-commun":
+            member.promo = get_last_promo()
+        if self.cleaned_data.get("subscription_type") in [
+            "cursus-branche",
+            "cursus-alternant",
+        ]:
+            member.promo = get_last_promo() - 2
         member.generate_username()
         member.set_password(secrets.token_urlsafe(nbytes=10))
         self.instance.member = member

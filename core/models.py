@@ -54,6 +54,8 @@ from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 from PIL import Image, ImageOps
 
+from core.utils import get_last_promo
+
 if TYPE_CHECKING:
     from django.core.files.uploadedfile import UploadedFile
     from pydantic import NonNegativeInt
@@ -86,12 +88,11 @@ class Group(AuthGroup):
 
 
 def validate_promo(value: int) -> None:
-    start_year = settings.SITH_SCHOOL_START_YEAR
-    delta = (localdate() + timedelta(days=180)).year - start_year
-    if value < 0 or delta < value:
+    last_promo = get_last_promo()
+    if not 0 < value <= last_promo:
         raise ValidationError(
             _("%(value)s is not a valid promo (between 0 and %(end)s)"),
-            params={"value": value, "end": delta},
+            params={"value": value, "end": last_promo},
         )
 
 

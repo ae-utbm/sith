@@ -112,6 +112,16 @@ def get_semester_code(d: date | None = None) -> str:
     return "P" + str(start.year)[-2:]
 
 
+def get_last_promo() -> int:
+    """Get the latest promo at the time the function is called.
+
+    For example, if called in october 2022 return 24,
+    if called in march 2026 return 27, etc.
+    """
+    start_year = settings.SITH_SCHOOL_START_YEAR
+    return (localdate() + timedelta(days=180)).year - start_year
+
+
 def is_image(file: UploadedFile):
     try:
         im = PIL.Image.open(file.file)
@@ -186,7 +196,7 @@ def exif_auto_rotate(image):
 
 def get_client_ip(request: HttpRequest) -> str | None:
     headers = (
-        "X_FORWARDED_FOR",  # Common header for proixes
+        "X_FORWARDED_FOR",  # Common header for proxies
         "FORWARDED",  # Standard header defined by RFC 7239.
         "REMOTE_ADDR",  # Default IP Address (direct connection)
     )

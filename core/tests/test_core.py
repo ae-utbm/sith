@@ -23,6 +23,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Permission
 from django.core import mail
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
@@ -35,8 +36,8 @@ from pytest_django.asserts import assertInHTML, assertRedirects
 from antispam.models import ToxicDomain
 from club.models import Club, Membership
 from core.markdown import markdown
-from core.models import AnonymousUser, Group, Page, User
-from core.utils import get_semester_code, get_start_of_semester
+from core.models import AnonymousUser, Group, Page, User, validate_promo
+from core.utils import get_last_promo, get_semester_code, get_start_of_semester
 from core.views import AllowFragment
 from counter.models import Customer
 from sith import settings
@@ -521,6 +522,21 @@ class TestDateUtils(TestCase):
             # forward time to the middle of the next semester
             frozen_time.move_to(mid_autumn)
             assert get_start_of_semester() == autumn_2023
+
+
+@pytest.mark.parametrize(
+    ("current_date", "promo"),
+    [("2020-10-01", 22), ("2025-03-01", 26), ("2000-11-11", 2)],
+)
+def test_get_last_promo(current_date: str, promo: int):
+    with freezegun.freeze_time(current_date):
+        assert get_last_promo() == promo
+
+
+@pytest.mark.parametrize("promo", [0, 24])
+def test_promo_validator(promo: int):
+    with freezegun.freeze_time("2021-10-01"), pytest.raises(ValidationError):
+        validate_promo(promo)
 
 
 def test_allow_fragment_mixin():
