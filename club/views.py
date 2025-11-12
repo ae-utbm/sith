@@ -460,15 +460,15 @@ class ClubSellingCSVView(ClubSellingView):
             *row,
             selling.label,
             selling.quantity,
+            selling.unit_price,
             selling.quantity * selling.unit_price,
             selling.get_payment_method_display(),
         ]
         if selling.product:
-            row.append(selling.product.selling_price)
             row.append(selling.product.purchase_price)
-            row.append(selling.product.selling_price - selling.product.purchase_price)
+            row.append(selling.unit_price - selling.product.purchase_price)
         else:
-            row = [*row, "", "", ""]
+            row = [*row, "", ""]
         return row
 
     def get(self, request, *args, **kwargs):
@@ -489,9 +489,9 @@ class ClubSellingCSVView(ClubSellingView):
                 gettext("Customer"),
                 gettext("Label"),
                 gettext("Quantity"),
+                gettext("Unit price"),
                 gettext("Total"),
                 gettext("Payment method"),
-                gettext("Selling price"),
                 gettext("Purchase price"),
                 gettext("Benefit"),
             ],
