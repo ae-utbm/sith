@@ -7,16 +7,20 @@ from club.forms import SellingsForm
 from club.models import Club
 from core.models import User
 from counter.baker_recipes import product_recipe, sale_recipe
-from counter.models import Counter, Customer
+from counter.models import Counter, Customer, Product
 
 
 @pytest.mark.django_db
 def test_sales_page_doesnt_crash(client: Client):
+    """Basic crashtest on club sales view."""
     club = baker.make(Club)
+    product = baker.make(Product, club=club)
     admin = baker.make(User, is_superuser=True)
     client.force_login(admin)
-    response = client.get(reverse("club:club_sellings", kwargs={"club_id": club.id}))
-    assert response.status_code == 200
+    url = reverse("club:club_sellings", kwargs={"club_id": club.id})
+    assert client.get(url).status_code == 200
+    assert client.post(url).status_code == 200
+    assert client.post(url, data={"products": [product.id]}).status_code == 200
 
 
 @pytest.mark.django_db
