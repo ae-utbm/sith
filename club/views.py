@@ -406,33 +406,14 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         kwargs = super().get_context_data(**kwargs)
 
         kwargs["result"] = Selling.objects.none()
-        kwargs["paginated_result"] = kwargs["result"]
         kwargs["total"] = 0
         kwargs["total_quantity"] = 0
         kwargs["benefit"] = 0
 
-        form = self.get_form()
-        if form.is_valid():
-            qs = Selling.objects.filter(club=self.object)
-            if not len([v for v in form.cleaned_data.values() if v is not None]):
-                qs = Selling.objects.none()
-            if form.cleaned_data["begin_date"]:
-                qs = qs.filter(date__gte=form.cleaned_data["begin_date"])
-            if form.cleaned_data["end_date"]:
-                qs = qs.filter(date__lte=form.cleaned_data["end_date"])
-
-            if form.cleaned_data["counters"]:
-                qs = qs.filter(counter__in=form.cleaned_data["counters"])
-
-            selected_products = []
-            if form.cleaned_data["products"]:
-                selected_products.extend(form.cleaned_data["products"])
-            if form.cleaned_data["archived_products"]:
-                selected_products.extend(form.cleaned_data["archived_products"])
-
-            if len(selected_products) > 0:
-                qs = qs.filter(product__in=selected_products)
-
+        form: SellingsForm = self.get_form()
+        if form.is_valid() and any(v for v in form.cleaned_data.values()):
+            filters = form.to_filter_schema()
+            qs = filters.filter(Selling.objects.filter(club=self.object))
             kwargs["total"] = qs.annotate(
                 price=F("quantity") * F("unit_price")
             ).aggregate(total=Sum("price", default=0))["total"]
@@ -479,15 +460,15 @@ class ClubSellingCSVView(ClubSellingView):
             *row,
             selling.label,
             selling.quantity,
+            selling.unit_price,
             selling.quantity * selling.unit_price,
             selling.get_payment_method_display(),
         ]
         if selling.product:
-            row.append(selling.product.selling_price)
             row.append(selling.product.purchase_price)
-            row.append(selling.product.selling_price - selling.product.purchase_price)
+            row.append(selling.unit_price - selling.product.purchase_price)
         else:
-            row = [*row, "", "", ""]
+            row = [*row, "", ""]
         return row
 
     def get(self, request, *args, **kwargs):
@@ -508,9 +489,9 @@ class ClubSellingCSVView(ClubSellingView):
                 gettext("Customer"),
                 gettext("Label"),
                 gettext("Quantity"),
+                gettext("Unit price"),
                 gettext("Total"),
                 gettext("Payment method"),
-                gettext("Selling price"),
                 gettext("Purchase price"),
                 gettext("Benefit"),
             ],

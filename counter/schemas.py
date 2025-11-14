@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated, Self
 
 from annotated_types import MinLen
@@ -100,3 +101,10 @@ class ProductFilterSchema(FilterSchema):
     product_type: set[int] | None = Field(None, q="product_type__in")
     club: set[int] | None = Field(None, q="club__in")
     counter: set[int] | None = Field(None, q="counters__in")
+
+
+class SaleFilterSchema(FilterSchema):
+    before: datetime | None = Field(None, q="date__lt")
+    after: datetime | None = Field(None, q="date__gt")
+    counters: set[int] | None = Field(None, q="counter__in")
+    products: set[int] | None = Field(None, q="product__in")
