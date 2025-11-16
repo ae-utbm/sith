@@ -5,9 +5,6 @@ $text-color: white;
 
 $background-color-hovered: #283747;
 
-$red-text-color: #eb2f06;
-$hovered-red-text-color: #ff4d4d;
-
 .header {
   box-sizing: border-box;
   background-color: $deepblue;
@@ -251,12 +248,15 @@ $hovered-red-text-color: #ff4d4d;
               justify-content: flex-start;
             }
 
+            a {
+              color: $text-color;
+            }
+
             a,
             button {
               font-size: 100%;
               margin: 0;
               text-align: right;
-              color: $text-color;
               margin-top: auto;
 
               &:hover {
@@ -267,19 +267,6 @@ $hovered-red-text-color: #ff4d4d;
             form#logout-form {
               margin: 0;
               display: inline;
-            }
-
-            #logout-form button {
-              color: $red-text-color;
-
-              &:hover {
-                color: $hovered-red-text-color;
-              }
-
-              background: none;
-              border: none;
-              cursor: pointer;
-              padding: 0;
             }
           }
         }
