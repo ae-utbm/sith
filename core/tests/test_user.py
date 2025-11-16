@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest import mock
 
 import pytest
 from django.conf import settings
@@ -23,6 +24,7 @@ from core.models import AnonymousUser, Group, User
 from core.views import UserTabsMixin
 from counter.baker_recipes import sale_recipe
 from counter.models import Counter, Customer, Refilling, Selling
+from counter.utils import is_logged_in_counter
 from eboutic.models import Invoice, InvoiceItem
 
 
@@ -60,7 +62,9 @@ class TestSearchUsersAPI(TestSearchUsers):
         """Test that users are ordered by last login date."""
         self.client.force_login(subscriber_user.make())
 
-        response = self.client.get(reverse("api:search_users") + "?search=First")
+        response = self.client.get(
+            reverse("api:search_users", query={"search": "First"})
+        )
         assert response.status_code == 200
         assert response.json()["count"] == 11
         # The users are ordered by last login date, so we need to reverse the list
@@ -69,7 +73,7 @@ class TestSearchUsersAPI(TestSearchUsers):
         ]
 
     def test_search_case_insensitive(self):
-        """Test that the search is case insensitive."""
+        """Test that the search is case-insensitive."""
         self.client.force_login(subscriber_user.make())
 
         expected = [u.id for u in self.users[::-1]]
@@ -82,14 +86,19 @@ class TestSearchUsersAPI(TestSearchUsers):
             assert [r["id"] for r in response.json()["results"]] == expected
 
     def test_search_nick_name(self):
-        """Test that the search can be done on the nick name."""
+        """Test that the search can be done on the nickname."""
+        # hidden users should not be in the final result,
+        # even when the nickname matches
+        self.users[10].is_viewable = False
+        self.users[10].save()
         self.client.force_login(subscriber_user.make())
 
         # this should return users with nicknames Nick11, Nick10 and Nick1
-        response = self.client.get(reverse("api:search_users") + "?search=Nick1")
+        response = self.client.get(
+            reverse("api:search_users", query={"search": "Nick1"})
+        )
         assert response.status_code == 200
         assert [r["id"] for r in response.json()["results"]] == [
-            self.users[10].id,
             self.users[9].id,
             self.users[0].id,
         ]
@@ -101,9 +110,24 @@ class TestSearchUsersAPI(TestSearchUsers):
         self.client.force_login(subscriber_user.make())
 
         # this should return users with first names First1 and First10
-        response = self.client.get(reverse("api:search_users") + "?search=bél")
+        response = self.client.get(reverse("api:search_users", query={"search": "bél"}))
         assert response.status_code == 200
         assert [r["id"] for r in response.json()["results"]] == [belix.id]
+
+    @mock.create_autospec(is_logged_in_counter, return_value=True)
+    def test_search_as_barman(self):
+        # barmen should also see hidden users
+        self.users[10].is_viewable = False
+        self.users[10].save()
+        response = self.client.get(
+            reverse("api:search_users", query={"search": "Nick1"})
+        )
+        assert response.status_code == 200
+        assert [r["id"] for r in response.json()["results"]] == [
+            self.users[10].id,
+            self.users[9].id,
+            self.users[0].id,
+        ]
 
 
 class TestSearchUsersView(TestSearchUsers):
