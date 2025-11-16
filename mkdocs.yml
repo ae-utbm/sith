@@ -57,6 +57,7 @@ nav:
     - Accueil: explanation/index.md
     - Technologies utilisées: explanation/technos.md
     - Conventions: explanation/conventions.md
+    - Politique IA: explanation/ia.md
     - Archives: explanation/archives.md
   - Tutoriels:
     - Installer le projet: tutorial/install.md
