@@ -2,20 +2,19 @@ from datetime import datetime
 from pathlib import Path
 from typing import Annotated
 
-from annotated_types import MinLen
 from django.urls import reverse
-from ninja import FilterSchema, ModelSchema, Schema
+from ninja import FilterLookup, FilterSchema, ModelSchema, Schema
 from pydantic import Field, NonNegativeInt
 
-from core.schemas import SimpleUserSchema, UserProfileSchema
+from core.schemas import NonEmptyStr, SimpleUserSchema, UserProfileSchema
 from sas.models import Album, Picture, PictureModerationRequest
 
 
 class AlbumFilterSchema(FilterSchema):
-    search: Annotated[str, MinLen(1)] | None = Field(None, q="name__icontains")
-    before_date: datetime | None = Field(None, q="event_date__lte")
-    after_date: datetime | None = Field(None, q="event_date__gte")
-    parent_id: int | None = Field(None, q="parent_id")
+    search: Annotated[NonEmptyStr | None, FilterLookup("name__icontains")] = None
+    before_date: Annotated[datetime | None, FilterLookup("event_date__lte")] = None
+    after_date: Annotated[datetime | None, FilterLookup("event_date__gte")] = None
+    parent_id: Annotated[int | None, FilterLookup("parent_id")] = None
 
 
 class SimpleAlbumSchema(ModelSchema):
@@ -60,10 +59,12 @@ class AlbumAutocompleteSchema(ModelSchema):
 
 
 class PictureFilterSchema(FilterSchema):
-    before_date: datetime | None = Field(None, q="date__lte")
-    after_date: datetime | None = Field(None, q="date__gte")
-    users_identified: set[int] | None = Field(None, q="people__user_id__in")
-    album_id: int | None = Field(None, q="parent_id")
+    before_date: Annotated[datetime | None, FilterLookup("date__lte")] = None
+    after_date: Annotated[datetime | None, FilterLookup("date__gte")] = None
+    users_identified: Annotated[
+        set[int] | None, FilterLookup("people__user_id__in")
+    ] = None
+    album_id: Annotated[int | None, FilterLookup("parent_id")] = None
 
 
 class PictureSchema(ModelSchema):
