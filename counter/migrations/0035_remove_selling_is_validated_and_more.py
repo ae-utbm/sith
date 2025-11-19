@@ -19,6 +19,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RemoveField(model_name="selling", name="is_validated"),
+        migrations.RemoveField(model_name="refilling", name="is_validated"),
         migrations.RenameField(
             model_name="selling",
             old_name="payment_method",

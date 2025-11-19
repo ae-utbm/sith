@@ -755,7 +755,6 @@ class Refilling(models.Model):
     bank = models.CharField(
         _("bank"), max_length=255, choices=settings.SITH_COUNTER_BANK, default="OTHER"
     )
-    is_validated = models.BooleanField(_("is validated"), default=False)
 
     objects = RefillingQuerySet.as_manager()
 
@@ -772,10 +771,9 @@ class Refilling(models.Model):
         if not self.date:
             self.date = timezone.now()
         self.full_clean()
-        if not self.is_validated:
+        if self._state.adding:
             self.customer.amount += self.amount
             self.customer.save()
-            self.is_validated = True
         if self.customer.user.preferences.notify_on_refill:
             Notification(
                 user=self.customer.user,

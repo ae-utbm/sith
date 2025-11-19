@@ -53,7 +53,7 @@ def set_age(user: User, age: int):
 
 
 def force_refill_user(user: User, amount: Decimal | int):
-    baker.make(Refilling, amount=amount, customer=user.customer, is_validated=False)
+    baker.make(Refilling, amount=amount, customer=user.customer)
 
 
 class TestFullClickBase(TestCase):
