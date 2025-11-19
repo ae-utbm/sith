@@ -268,7 +268,6 @@ class Invoice(models.Model):
                     unit_price=i.product_unit_price,
                     quantity=i.quantity,
                     payment_method="CARD",
-                    is_validated=True,
                     date=self.date,
                 )
                 new.save()

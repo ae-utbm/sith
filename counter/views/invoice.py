@@ -75,7 +75,6 @@ class InvoiceCallView(
         kwargs["sum_cb"] += (
             Selling.objects.filter(
                 payment_method="CARD",
-                is_validated=True,
                 date__gte=start_date,
                 date__lte=end_date,
             )

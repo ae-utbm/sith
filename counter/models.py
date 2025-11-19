@@ -856,7 +856,6 @@ class Selling(models.Model):
         choices=[("SITH_ACCOUNT", _("Sith account")), ("CARD", _("Credit card"))],
         default="SITH_ACCOUNT",
     )
-    is_validated = models.BooleanField(_("is validated"), default=False)
 
     objects = SellingQuerySet.as_manager()
 
@@ -875,10 +874,9 @@ class Selling(models.Model):
         if not self.date:
             self.date = timezone.now()
         self.full_clean()
-        if not self.is_validated:
+        if self._state.adding and self.payment_method == "SITH_ACCOUNT":
             self.customer.amount -= self.quantity * self.unit_price
             self.customer.save(allow_negative=allow_negative)
-            self.is_validated = True
         user = self.customer.user
         if user.was_subscribed:
             if (

@@ -119,7 +119,6 @@ class Command(BaseCommand):
                     quantity=1,
                     unit_price=account.amount,
                     date=now(),
-                    is_validated=True,
                 )
                 for account in accounts
             ]

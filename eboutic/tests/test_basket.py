@@ -108,10 +108,13 @@ def test_eboutic_basket_expiry(
 
     client.force_login(customer.user)
 
-    for date in sellings:
-        sale_recipe.make(
-            customer=customer, counter=eboutic, date=date, is_validated=True
-        )
+    sale_recipe.make(
+        customer=customer,
+        counter=eboutic,
+        date=iter(sellings),
+        _quantity=len(sellings),
+        _bulk_create=True,
+    )
     for date in refillings:
         refill_recipe.make(customer=customer, counter=eboutic, date=date)
 
