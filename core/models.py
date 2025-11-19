@@ -23,12 +23,13 @@
 #
 from __future__ import annotations
 
+import difflib
 import string
 import unicodedata
 from datetime import timedelta
 from io import BytesIO
 from pathlib import Path
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Final, Self
 from uuid import uuid4
 
 from django.conf import settings
@@ -1344,6 +1345,9 @@ class PageRev(models.Model):
     The content is in PageRev.title and PageRev.content .
     """
 
+    MERGE_TIME_THRESHOLD: Final[timedelta] = timedelta(minutes=20)
+    MERGE_DIFF_THRESHOLD: Final[float] = 0.2
+
     revision = models.IntegerField(_("revision"))
     title = models.CharField(_("page title"), max_length=255, blank=True)
     content = models.TextField(_("page content"), blank=True)
@@ -1384,6 +1388,32 @@ class PageRev(models.Model):
 
     def is_owned_by(self, user: User) -> bool:
         return any(g.id == self.page.owner_group_id for g in user.cached_groups)
+
+    def similarity_ratio(self, text: str) -> float:
+        """Similarity ratio between this revision's content and the given text.
+
+        The result is a float in [0; 1], 0 meaning the contents are entirely different,
+        and 1 they are strictly the same.
+        """
+        # cf. https://docs.python.org/3/library/difflib.html#difflib.SequenceMatcher.ratio
+        return difflib.SequenceMatcher(None, self.content, text).quick_ratio()
+
+    def should_merge(self, other: Self) -> bool:
+        """Return True if `other` should be merged into `self`, else False.
+
+        It's considered the other revision should be merged into this one if :
+
+        - it was made less than 20 minutes after
+        - by the same author
+        - with a similarity ratio higher than 80%
+        """
+        return (
+            not self._state.adding  # cannot merge if the original rev doesn't exist
+            and self.author == other.author
+            and (other.date - self.date) < self.MERGE_TIME_THRESHOLD
+            and (not other._state.adding or other.revision == self.revision + 1)
+            and self.similarity_ratio(other.content) >= (1 - other.MERGE_DIFF_THRESHOLD)
+        )
 
 
 def get_notification_types():

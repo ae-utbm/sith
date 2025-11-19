@@ -20,9 +20,9 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-import difflib
 import re
-from datetime import date, datetime, timedelta
+from copy import copy
+from datetime import date, datetime
 from io import BytesIO
 
 from captcha.fields import CaptchaField
@@ -390,13 +390,10 @@ class PageRevisionForm(forms.ModelForm):
 
         - less than 20 minutes ago
         - by the same author
-        - with a diff ratio higher than 20%
+        - with a similarity ratio higher than 80%
 
         then the latter will be edited and the new revision won't be created.
     """
-
-    TIME_THRESHOLD = timedelta(minutes=20)
-    DIFF_THRESHOLD = 0.2
 
     class Meta:
         model = PageRev
@@ -409,21 +406,11 @@ class PageRevisionForm(forms.ModelForm):
         super().__init__(*args, instance=instance, **kwargs)
         self.author = author
         self.page = page
-        self.initial_content = instance.content if instance else ""
-
-    def diff_ratio(self, new_str: str) -> float:
-        return difflib.SequenceMatcher(
-            None, self.initial_content, new_str
-        ).quick_ratio()
+        self.initial_obj: PageRev = copy(self.instance)
 
     def save(self, commit=True):  # noqa FBT002
         revision: PageRev = self.instance
-        if (
-            revision._state.adding
-            or revision.author != self.author
-            or revision.date + self.TIME_THRESHOLD < now()
-            or self.diff_ratio(revision.content) < (1 - self.DIFF_THRESHOLD)
-        ):
+        if not self.initial_obj.should_merge(self.instance):
             revision.author = self.author
             revision.page = self.page
             revision.id = None  # if id is None, Django will create a new record
