@@ -44,7 +44,6 @@ from club.models import Club
 from core.fields import ResizedImageField
 from core.models import Group, Notification, User
 from core.utils import get_start_of_semester
-from counter.apps import PAYMENT_METHOD
 from counter.fields import CurrencyField
 from subscription.models import Subscription
 
@@ -732,6 +731,11 @@ class RefillingQuerySet(models.QuerySet):
 class Refilling(models.Model):
     """Handle the refilling."""
 
+    class PaymentMethod(models.IntegerChoices):
+        CARD = 0, _("Credit card")
+        CASH = 1, _("Cash")
+        CHECK = 2, _("Check")
+
     counter = models.ForeignKey(
         Counter, related_name="refillings", blank=False, on_delete=models.CASCADE
     )
@@ -746,8 +750,8 @@ class Refilling(models.Model):
         Customer, related_name="refillings", blank=False, on_delete=models.CASCADE
     )
     date = models.DateTimeField(_("date"))
-    payment_method = models.CharField(
-        _("payment method"), max_length=255, choices=PAYMENT_METHOD, default="CARD"
+    payment_method = models.PositiveSmallIntegerField(
+        _("payment method"), choices=PaymentMethod, default=PaymentMethod.CARD
     )
 
     objects = RefillingQuerySet.as_manager()

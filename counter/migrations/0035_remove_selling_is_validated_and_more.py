@@ -2,16 +2,40 @@
 
 from django.db import migrations, models
 from django.db.migrations.state import StateApps
+from django.db.models import Case, When
 
 
-def migrate_payment_method(apps: StateApps, schema_editor):
+def migrate_selling_payment_method(apps: StateApps, schema_editor):
+    # 0 <=> SITH_ACCOUNT is the default value, so no need to migrate it
     Selling = apps.get_model("counter", "Selling")
     Selling.objects.filter(payment_method_str="CARD").update(payment_method=1)
 
 
-def migrate_payment_method_reverse(apps: StateApps, schema_editor):
+def migrate_selling_payment_method_reverse(apps: StateApps, schema_editor):
     Selling = apps.get_model("counter", "Selling")
     Selling.objects.filter(payment_method=1).update(payment_method_str="CARD")
+
+
+def migrate_refilling_payment_method(apps: StateApps, schema_editor):
+    Refilling = apps.get_model("counter", "Refilling")
+    Refilling.objects.update(
+        payment_method=Case(
+            When(payment_method_str="CARD", then=0),
+            When(payment_method_str="CASH", then=1),
+            When(payment_method_str="CHECK", then=2),
+        )
+    )
+
+
+def migrate_refilling_payment_method_reverse(apps: StateApps, schema_editor):
+    Refilling = apps.get_model("counter", "Refilling")
+    Refilling.objects.update(
+        payment_method_str=Case(
+            When(payment_method=0, then="CARD"),
+            When(payment_method=1, then="CASH"),
+            When(payment_method=2, then="CHECK"),
+        )
+    )
 
 
 class Migration(migrations.Migration):
@@ -35,6 +59,26 @@ class Migration(migrations.Migration):
                 verbose_name="payment method",
             ),
         ),
-        migrations.RunPython(migrate_payment_method, migrate_payment_method_reverse),
+        migrations.RunPython(
+            migrate_selling_payment_method, migrate_selling_payment_method_reverse
+        ),
         migrations.RemoveField(model_name="selling", name="payment_method_str"),
+        migrations.RenameField(
+            model_name="refilling",
+            old_name="payment_method",
+            new_name="payment_method_str",
+        ),
+        migrations.AddField(
+            model_name="refilling",
+            name="payment_method",
+            field=models.PositiveSmallIntegerField(
+                choices=[(0, "Credit card"), (1, "Cash"), (2, "Check")],
+                default=0,
+                verbose_name="payment method",
+            ),
+        ),
+        migrations.RunPython(
+            migrate_refilling_payment_method, migrate_refilling_payment_method_reverse
+        ),
+        migrations.RemoveField(model_name="refilling", name="payment_method_str"),
     ]

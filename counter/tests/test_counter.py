@@ -115,14 +115,10 @@ class TestRefilling(TestFullClickBase):
     ) -> HttpResponse:
         used_client = client if client is not None else self.client
         return used_client.post(
-            reverse(
-                "counter:refilling_create",
-                kwargs={"customer_id": user.pk},
-            ),
-            {"amount": str(amount), "payment_method": "CASH"},
+            reverse("counter:refilling_create", kwargs={"customer_id": user.pk}),
+            {"amount": str(amount), "payment_method": Refilling.PaymentMethod.CASH},
             HTTP_REFERER=reverse(
-                "counter:click",
-                kwargs={"counter_id": counter.id, "user_id": user.pk},
+                "counter:click", kwargs={"counter_id": counter.id, "user_id": user.pk}
             ),
         )
 

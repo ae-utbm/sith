@@ -275,7 +275,9 @@ class EbouticPayWithSith(CanViewMixin, SingleObjectMixin, View):
             return redirect("eboutic:payment_result", "failure")
 
         eboutic = get_eboutic()
-        sales = basket.generate_sales(eboutic, basket.user, Selling.PaymentMethod.SITH_ACCOUNT)
+        sales = basket.generate_sales(
+            eboutic, basket.user, Selling.PaymentMethod.SITH_ACCOUNT
+        )
         try:
             with transaction.atomic():
                 # Selling.save has some important business logic in it.

@@ -136,7 +136,10 @@ class GetUserForm(forms.Form):
 
 
 class RefillForm(forms.ModelForm):
-    allowed_refilling_methods = ["CASH", "CARD"]
+    allowed_refilling_methods = [
+        Refilling.PaymentMethod.CASH,
+        Refilling.PaymentMethod.CARD,
+    ]
 
     error_css_class = "error"
     required_css_class = "required"
