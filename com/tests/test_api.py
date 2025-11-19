@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from datetime import timedelta
 from pathlib import Path
 
@@ -16,16 +15,6 @@ from com.ics_calendar import IcsCalendar
 from com.models import News, NewsDate
 from core.markdown import markdown
 from core.models import User
-
-
-@dataclass
-class MockResponse:
-    ok: bool
-    value: str
-
-    @property
-    def content(self):
-        return self.value.encode("utf8")
 
 
 def accel_redirect_to_file(response: HttpResponse) -> Path | None:

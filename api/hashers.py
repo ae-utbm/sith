@@ -8,7 +8,7 @@ from django.utils.crypto import constant_time_compare
 
 class Sha512ApiKeyHasher(BasePasswordHasher):
     """
-    An API key hasher using the sha256 algorithm.
+    An API key hasher using the sha512 algorithm.
 
     This hasher shouldn't be used in Django's `PASSWORD_HASHERS` setting.
     It is insecure for use in hashing passwords, but is safe for hashing
