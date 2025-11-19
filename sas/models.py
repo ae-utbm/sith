@@ -265,6 +265,15 @@ def sas_notification_callback(notif: Notification):
     notif.param = str(count)
 
 
+class PeoplePictureRelationQuerySet(models.QuerySet):
+    def viewable_by(self, user: User) -> Self:
+        if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
+            return self
+        if user.was_subscribed:
+            return self.filter(Q(user_id=user.id) | Q(user__is_viewable=True))
+        return self.filter(user_id=user.id)
+
+
 class PeoplePictureRelation(models.Model):
     """The PeoplePictureRelation class makes the connection between User and Picture."""
 
@@ -280,6 +289,8 @@ class PeoplePictureRelation(models.Model):
         related_name="people",
         on_delete=models.CASCADE,
     )
+
+    objects = PeoplePictureRelationQuerySet.as_manager()
 
     class Meta:
         unique_together = ["user", "picture"]

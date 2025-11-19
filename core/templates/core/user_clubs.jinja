@@ -17,7 +17,9 @@
         <td>{% trans %}Description{% endtrans %}</td>
         <td>{% trans %}Since{% endtrans %}</td>
         <td></td>
-        <td></td>
+        {% if user.has_perm("club.delete_membership") %}
+          <td></td>
+        {% endif %}
       </tr>
     </thead>
     <tbody>
@@ -28,7 +30,16 @@
           <td>{{ m.description }}</td>
           <td>{{ m.start_date }}</td>
           {% if m.can_be_edited_by(user) %}
-            <td><a href="{{ url('club:membership_set_old', membership_id=m.id) }}">{% trans %}Mark as old{% endtrans %}</a></td>
+            <td>
+              <form
+                method="post"
+                action="{{ url('club:membership_set_old', membership_id=m.id) }}"
+                class="no-margin"
+              >
+                {% csrf_token %}
+                <input type="submit" class="link-like" value="{% trans %}Mark as old{% endtrans %}" />
+              </form>
+            </td>
           {% endif %}
           {% if user.has_perm("club.delete_membership") %}
             <td><a href="{{ url('club:membership_delete', membership_id=m.id) }}">{% trans %}Delete{% endtrans %}</a></td>
@@ -48,7 +59,9 @@
         <td>{% trans %}Description{% endtrans %}</td>
         <td>{% trans %}From{% endtrans %}</td>
         <td>{% trans %}To{% endtrans %}</td>
-
+        {% if user.has_perm("club.delete_membership") %}
+          <td></td>
+        {% endif %}
       </tr>
     </thead>
     <tbody>

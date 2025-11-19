@@ -1,6 +1,6 @@
 from typing import Annotated, Any, Literal
 
-import annotated_types
+from annotated_types import Ge, Le, MinLen
 from django.conf import settings
 from django.db.models import F
 from django.http import HttpResponse
@@ -28,6 +28,7 @@ from core.schemas import (
     UserSchema,
 )
 from core.templatetags.renderer import markdown
+from counter.utils import is_logged_in_counter
 
 
 @api_controller("/markdown")
@@ -72,9 +73,9 @@ class MailingListController(ControllerBase):
 
 @api_controller("/user")
 class UserController(ControllerBase):
-    @route.get("", response=list[UserProfileSchema], permissions=[CanAccessLookup])
+    @route.get("", response=list[UserProfileSchema])
     def fetch_profiles(self, pks: Query[set[int]]):
-        return User.objects.filter(pk__in=pks)
+        return User.objects.viewable_by(self.context.request.user).filter(pk__in=pks)
 
     @route.get("/{int:user_id}", response=UserSchema, permissions=[CanView])
     def fetch_user(self, user_id: int):
@@ -85,13 +86,18 @@ class UserController(ControllerBase):
         "/search",
         response=PaginatedResponseSchema[UserProfileSchema],
         url_name="search_users",
-        permissions=[CanAccessLookup],
+        # logged in barmen aren't authenticated stricto sensu, so no auth here
+        auth=None,
     )
     @paginate(PageNumberPaginationExtra, page_size=20)
     def search_users(self, filters: Query[UserFilterSchema]):
-        return filters.filter(
-            User.objects.order_by(F("last_login").desc(nulls_last=True))
-        )
+        qs = User.objects
+        # the logged in barmen can see all users (even the hidden one),
+        # because they have a temporary administrative function during
+        # which they may have to deal with hidden users
+        if not is_logged_in_counter(self.context.request):
+            qs = qs.viewable_by(self.context.request.user)
+        return filters.filter(qs.order_by(F("last_login").desc(nulls_last=True)))
 
 
 @api_controller("/file")
@@ -103,7 +109,7 @@ class SithFileController(ControllerBase):
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
-    def search_files(self, search: Annotated[str, annotated_types.MinLen(1)]):
+    def search_files(self, search: Annotated[str, MinLen(1)]):
         return SithFile.objects.filter(is_in_sas=False).filter(name__icontains=search)
 
 
@@ -116,11 +122,11 @@ class GroupController(ControllerBase):
         permissions=[CanAccessLookup],
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
-    def search_group(self, search: Annotated[str, annotated_types.MinLen(1)]):
+    def search_group(self, search: Annotated[str, MinLen(1)]):
         return Group.objects.filter(name__icontains=search).values()
 
 
-DepthValue = Annotated[int, annotated_types.Ge(0), annotated_types.Le(10)]
+DepthValue = Annotated[int, Ge(0), Le(10)]
 DEFAULT_DEPTH = 4
 
 

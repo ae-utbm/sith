@@ -23,12 +23,13 @@
 #
 from __future__ import annotations
 
+import difflib
 import string
 import unicodedata
 from datetime import timedelta
 from io import BytesIO
 from pathlib import Path
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Final, Self
 from uuid import uuid4
 
 from django.conf import settings
@@ -53,6 +54,8 @@ from django.utils.timezone import localdate, now
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 from PIL import Image, ImageOps
+
+from core.utils import get_last_promo
 
 if TYPE_CHECKING:
     from django.core.files.uploadedfile import UploadedFile
@@ -86,12 +89,11 @@ class Group(AuthGroup):
 
 
 def validate_promo(value: int) -> None:
-    start_year = settings.SITH_SCHOOL_START_YEAR
-    delta = (localdate() + timedelta(days=180)).year - start_year
-    if value < 0 or delta < value:
+    last_promo = get_last_promo()
+    if not 0 < value <= last_promo:
         raise ValidationError(
             _("%(value)s is not a valid promo (between 0 and %(end)s)"),
-            params={"value": value, "end": delta},
+            params={"value": value, "end": last_promo},
         )
 
 
@@ -135,6 +137,15 @@ class UserQuerySet(models.QuerySet):
         return self.exclude(
             Q(Exists(subscriptions)) | Q(Exists(refills)) | Q(Exists(purchases))
         )
+
+    def viewable_by(self, user: User) -> Self:
+        if user.has_perm("core.view_hidden_user"):
+            return self
+        if user.has_perm("core.view_user"):
+            return self.filter(is_viewable=True)
+        if user.is_anonymous:
+            return self.none()
+        return self.filter(id=user.id)
 
 
 class CustomUserManager(UserManager.from_queryset(UserQuerySet)):
@@ -271,12 +282,23 @@ class User(AbstractUser):
     parent_address = models.CharField(
         _("parent address"), max_length=128, blank=True, default=""
     )
-    is_subscriber_viewable = models.BooleanField(
-        _("is subscriber viewable"), default=True
+    is_viewable = models.BooleanField(
+        _("Profile visible by subscribers"),
+        help_text=_(
+            "If you disable this option, only admin users "
+            "will be able to see your profile."
+        ),
+        default=True,
     )
     godfathers = models.ManyToManyField("User", related_name="godchildren", blank=True)
 
     objects = CustomUserManager()
+
+    class Meta(AbstractUser.Meta):
+        abstract = False
+        permissions = [
+            ("view_hidden_user", "Can view hidden users"),
+        ]
 
     def __str__(self):
         return self.get_display_name()
@@ -551,8 +573,12 @@ class User(AbstractUser):
     def can_be_edited_by(self, user):
         return user.is_root or user.is_board_member
 
-    def can_be_viewed_by(self, user):
-        return (user.was_subscribed and self.is_subscriber_viewable) or user.is_root
+    def can_be_viewed_by(self, user: User) -> bool:
+        return (
+            user.id == self.id
+            or user.has_perm("core.view_hidden_user")
+            or (user.has_perm("core.view_user") and self.is_viewable)
+        )
 
     def get_mini_item(self):
         return """
@@ -1319,6 +1345,9 @@ class PageRev(models.Model):
     The content is in PageRev.title and PageRev.content .
     """
 
+    MERGE_TIME_THRESHOLD: Final[timedelta] = timedelta(minutes=20)
+    MERGE_DIFF_THRESHOLD: Final[float] = 0.2
+
     revision = models.IntegerField(_("revision"))
     title = models.CharField(_("page title"), max_length=255, blank=True)
     content = models.TextField(_("page content"), blank=True)
@@ -1359,6 +1388,32 @@ class PageRev(models.Model):
 
     def is_owned_by(self, user: User) -> bool:
         return any(g.id == self.page.owner_group_id for g in user.cached_groups)
+
+    def similarity_ratio(self, text: str) -> float:
+        """Similarity ratio between this revision's content and the given text.
+
+        The result is a float in [0; 1], 0 meaning the contents are entirely different,
+        and 1 they are strictly the same.
+        """
+        # cf. https://docs.python.org/3/library/difflib.html#difflib.SequenceMatcher.ratio
+        return difflib.SequenceMatcher(None, self.content, text).quick_ratio()
+
+    def should_merge(self, other: Self) -> bool:
+        """Return True if `other` should be merged into `self`, else False.
+
+        It's considered the other revision should be merged into this one if :
+
+        - it was made less than 20 minutes after
+        - by the same author
+        - with a similarity ratio higher than 80%
+        """
+        return (
+            not self._state.adding  # cannot merge if the original rev doesn't exist
+            and self.author == other.author
+            and (other.date - self.date) < self.MERGE_TIME_THRESHOLD
+            and (not other._state.adding or other.revision == self.revision + 1)
+            and self.similarity_ratio(other.content) >= (1 - other.MERGE_DIFF_THRESHOLD)
+        )
 
 
 def get_notification_types():

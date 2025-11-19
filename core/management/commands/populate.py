@@ -150,7 +150,8 @@ class Command(BaseCommand):
 
         Weekmail().save()
 
-        # Here we add a lot of test datas, that are not necessary for the Sith, but that provide a basic development environment
+        # Here we add a lot of test datas, that are not necessary for the Sith,
+        # but that provide a basic development environment
         self.now = timezone.now().replace(hour=12, second=0)
 
         skia = User.objects.create_user(

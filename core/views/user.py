@@ -103,9 +103,7 @@ def password_root_change(request, user_id):
     """Allows a root user to change someone's password."""
     if not request.user.is_root:
         raise PermissionDenied
-    user = User.objects.filter(id=user_id).first()
-    if not user:
-        raise Http404("User not found")
+    user = get_object_or_404(User, id=user_id)
     if request.method == "POST":
         form = views.SetPasswordForm(user=user, data=request.POST)
         if form.is_valid():

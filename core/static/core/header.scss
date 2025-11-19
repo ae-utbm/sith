@@ -5,14 +5,10 @@ $text-color: white;
 
 $background-color-hovered: #283747;
 
-$red-text-color: #eb2f06;
-$hovered-red-text-color: #ff4d4d;
-
 .header {
   box-sizing: border-box;
   background-color: $deepblue;
-  box-shadow: black 0 1px 3px 0,
-              black 0 4px 8px 3px;
+  box-shadow: 3px 3px 3px 0 #dfdfdf;
   border-radius: 0;
   width: 100%;
   display: flex;
@@ -100,7 +96,7 @@ $hovered-red-text-color: #ff4d4d;
         border-radius: 0;
         margin: 0;
         box-sizing: border-box;
-        background-color: transparent;
+        background-color: $deepblue;
         width: 45px;
         height: 25px;
         padding: 0;
@@ -252,12 +248,15 @@ $hovered-red-text-color: #ff4d4d;
               justify-content: flex-start;
             }
 
+            a {
+              color: $text-color;
+            }
+
             a,
             button {
               font-size: 100%;
               margin: 0;
               text-align: right;
-              color: $text-color;
               margin-top: auto;
 
               &:hover {
@@ -268,19 +267,6 @@ $hovered-red-text-color: #ff4d4d;
             form#logout-form {
               margin: 0;
               display: inline;
-            }
-
-            #logout-form button {
-              color: $red-text-color;
-
-              &:hover {
-                color: $hovered-red-text-color;
-              }
-
-              background: none;
-              border: none;
-              cursor: pointer;
-              padding: 0;
             }
           }
         }
@@ -332,7 +318,7 @@ $hovered-red-text-color: #ff4d4d;
           padding: 10px;
           z-index: 100;
           border-radius: 10px;
-          @include shadow;
+          box-shadow: 3px 3px 3px 0 #767676;
 
           >ul {
             list-style-type: none;

@@ -37,6 +37,7 @@ from core.views.widgets.ajax_select import (
     AutoCompleteSelectUser,
 )
 from counter.models import Counter, Selling
+from counter.schemas import SaleFilterSchema
 
 
 class ClubEditForm(forms.ModelForm):
@@ -189,6 +190,18 @@ class SellingsForm(forms.Form):
             club.products.order_by("name").filter(archived=True).all(),
             label=_("Archived products"),
             required=False,
+        )
+
+    def to_filter_schema(self) -> SaleFilterSchema:
+        products = (
+            *self.cleaned_data["products"],
+            *self.cleaned_data["archived_products"],
+        )
+        return SaleFilterSchema(
+            after=self.cleaned_data["begin_date"],
+            before=self.cleaned_data["end_date"],
+            counters={c.id for c in self.cleaned_data["counters"]} or None,
+            products={p.id for p in products} or None,
         )
 
 

@@ -21,6 +21,7 @@
 #
 #
 import re
+from copy import copy
 from datetime import date, datetime
 from io import BytesIO
 
@@ -42,13 +43,12 @@ from django.forms import (
     Widget,
 )
 from django.utils.timezone import now
-from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from PIL import Image
 
 from antispam.forms import AntiSpamEmailField
-from core.models import Gift, Group, Page, SithFile, User
+from core.models import Gift, Group, Page, PageRev, SithFile, User
 from core.utils import resize_image
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
@@ -56,6 +56,7 @@ from core.views.widgets.ajax_select import (
     AutoCompleteSelectMultipleGroup,
     AutoCompleteSelectUser,
 )
+from core.views.widgets.markdown import MarkdownInput
 
 # Widgets
 
@@ -84,30 +85,6 @@ class NFCTextInput(TextInput):
             "css": staticfiles_storage.url("core/components/nfc-input.scss"),
         }
         return context
-
-
-class SelectUser(TextInput):
-    def render(self, name, value, attrs=None, renderer=None):
-        if attrs:
-            attrs["class"] = "select_user"
-        else:
-            attrs = {"class": "select_user"}
-        output = (
-            '%(content)s<div name="%(name)s" class="choose_user_widget" title="%(title)s"></div>'
-            % {
-                "content": super().render(name, value, attrs, renderer),
-                "title": _("Choose user"),
-                "name": name,
-            }
-        )
-        output += (
-            '<span name="'
-            + name
-            + '" class="choose_user_button">'
-            + gettext("Choose user")
-            + "</span>"
-        )
-        return output
 
 
 # Fields
@@ -202,7 +179,7 @@ class UserProfileForm(forms.ModelForm):
             "school",
             "promo",
             "forum_signature",
-            "is_subscriber_viewable",
+            "is_viewable",
         ]
         widgets = {
             "date_of_birth": SelectDate,
@@ -211,8 +188,8 @@ class UserProfileForm(forms.ModelForm):
             "quote": forms.Textarea,
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, label_suffix: str = "", **kwargs):
+        super().__init__(*args, label_suffix=label_suffix, **kwargs)
 
         # Image fields are injected here to override the file field provided by the model
         # This would be better if we could have a SithImage sort of model input instead of a generic SithFile
@@ -402,6 +379,42 @@ class PageForm(forms.ModelForm):
             .queryset.exclude(name=settings.SITH_CLUB_ROOT_PAGE)
             .filter(club=None)
         )
+
+
+class PageRevisionForm(forms.ModelForm):
+    """Form to add a new revision to a page.
+
+    Notes:
+        Saving this form won't always result in a new revision.
+        If the previous revision on the same page was made :
+
+        - less than 20 minutes ago
+        - by the same author
+        - with a similarity ratio higher than 80%
+
+        then the latter will be edited and the new revision won't be created.
+    """
+
+    class Meta:
+        model = PageRev
+        fields = ["title", "content"]
+        widgets = {"content": MarkdownInput}
+
+    def __init__(
+        self, *args, author: User, page: Page, instance: PageRev | None = None, **kwargs
+    ):
+        super().__init__(*args, instance=instance, **kwargs)
+        self.author = author
+        self.page = page
+        self.initial_obj: PageRev = copy(self.instance)
+
+    def save(self, commit=True):  # noqa FBT002
+        revision: PageRev = self.instance
+        if not self.initial_obj.should_merge(self.instance):
+            revision.author = self.author
+            revision.page = self.page
+            revision.id = None  # if id is None, Django will create a new record
+        return super().save(commit=commit)
 
 
 class GiftForm(forms.ModelForm):

@@ -22,25 +22,28 @@
 #
 #
 
+from __future__ import annotations
+
 import csv
 import itertools
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
 from django.db.models import F, Q, Sum
-from django.http import Http404, HttpResponseRedirect, StreamingHttpResponse
+from django.http import Http404, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
-from django.utils.safestring import SafeString
+from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, View
+from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from club.forms import (
@@ -61,10 +64,13 @@ from com.views import (
     PosterListBaseView,
 )
 from core.auth.mixins import CanEditMixin, PermissionOrClubBoardRequiredMixin
-from core.models import PageRev
-from core.views import DetailFormView, PageEditViewBase, UseFragmentsMixin
+from core.models import Page, PageRev
+from core.views import BasePageEditView, DetailFormView, UseFragmentsMixin
 from core.views.mixins import FragmentMixin, FragmentRenderer, TabedViewMixin
 from counter.models import Selling
+
+if TYPE_CHECKING:
+    from django.utils.safestring import SafeString
 
 
 class ClubTabsMixin(TabedViewMixin):
@@ -75,6 +81,8 @@ class ClubTabsMixin(TabedViewMixin):
             self.object = self.object.page.club
         elif isinstance(self.object, Poster):
             self.object = self.object.club
+        elif hasattr(self, "club"):
+            self.object = self.club
         return self.object.get_display_name()
 
     def get_list_of_tabs(self):
@@ -202,7 +210,7 @@ class ClubView(ClubTabsMixin, DetailView):
         return kwargs
 
 
-class ClubRevView(ClubView):
+class ClubRevView(LoginRequiredMixin, ClubView):
     """Display a specific page revision."""
 
     def dispatch(self, request, *args, **kwargs):
@@ -216,26 +224,26 @@ class ClubRevView(ClubView):
         return kwargs
 
 
-class ClubPageEditView(ClubTabsMixin, PageEditViewBase):
+class ClubPageEditView(ClubTabsMixin, BasePageEditView):
     template_name = "club/pagerev_edit.jinja"
     current_tab = "page_edit"
 
-    def dispatch(self, request, *args, **kwargs):
-        self.club = get_object_or_404(Club, pk=kwargs["club_id"])
-        if not self.club.page:
-            raise Http404
-        return super().dispatch(request, *args, **kwargs)
+    @cached_property
+    def club(self):
+        return get_object_or_404(Club, pk=self.kwargs["club_id"])
 
-    def get_object(self):
-        self.page = self.club.page
-        return self._get_revision()
+    @cached_property
+    def page(self) -> Page:
+        page = self.club.page
+        page.set_lock(self.request.user)
+        return page
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("club:club_view", kwargs={"club_id": self.club.id})
 
 
 class ClubPageHistView(ClubTabsMixin, PermissionRequiredMixin, DetailView):
-    """Modification hostory of the page."""
+    """Modification history of the page."""
 
     model = Club
     pk_url_kwarg = "club_id"
@@ -399,33 +407,14 @@ class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
         kwargs = super().get_context_data(**kwargs)
 
         kwargs["result"] = Selling.objects.none()
-        kwargs["paginated_result"] = kwargs["result"]
         kwargs["total"] = 0
         kwargs["total_quantity"] = 0
         kwargs["benefit"] = 0
 
-        form = self.get_form()
-        if form.is_valid():
-            qs = Selling.objects.filter(club=self.object)
-            if not len([v for v in form.cleaned_data.values() if v is not None]):
-                qs = Selling.objects.none()
-            if form.cleaned_data["begin_date"]:
-                qs = qs.filter(date__gte=form.cleaned_data["begin_date"])
-            if form.cleaned_data["end_date"]:
-                qs = qs.filter(date__lte=form.cleaned_data["end_date"])
-
-            if form.cleaned_data["counters"]:
-                qs = qs.filter(counter__in=form.cleaned_data["counters"])
-
-            selected_products = []
-            if form.cleaned_data["products"]:
-                selected_products.extend(form.cleaned_data["products"])
-            if form.cleaned_data["archived_products"]:
-                selected_products.extend(form.cleaned_data["archived_products"])
-
-            if len(selected_products) > 0:
-                qs = qs.filter(product__in=selected_products)
-
+        form: SellingsForm = self.get_form()
+        if form.is_valid() and any(v for v in form.cleaned_data.values()):
+            filters = form.to_filter_schema()
+            qs = filters.filter(Selling.objects.filter(club=self.object))
             kwargs["total"] = qs.annotate(
                 price=F("quantity") * F("unit_price")
             ).aggregate(total=Sum("price", default=0))["total"]
@@ -472,15 +461,15 @@ class ClubSellingCSVView(ClubSellingView):
             *row,
             selling.label,
             selling.quantity,
+            selling.unit_price,
             selling.quantity * selling.unit_price,
             selling.get_payment_method_display(),
         ]
         if selling.product:
-            row.append(selling.product.selling_price)
             row.append(selling.product.purchase_price)
-            row.append(selling.product.selling_price - selling.product.purchase_price)
+            row.append(selling.unit_price - selling.product.purchase_price)
         else:
-            row = [*row, "", "", ""]
+            row = [*row, "", ""]
         return row
 
     def get(self, request, *args, **kwargs):
@@ -501,9 +490,9 @@ class ClubSellingCSVView(ClubSellingView):
                 gettext("Customer"),
                 gettext("Label"),
                 gettext("Quantity"),
+                gettext("Unit price"),
                 gettext("Total"),
                 gettext("Payment method"),
-                gettext("Selling price"),
                 gettext("Purchase price"),
                 gettext("Benefit"),
             ],
@@ -556,33 +545,17 @@ class ClubCreateView(PermissionRequiredMixin, CreateView):
     permission_required = "club.add_club"
 
 
-class MembershipSetOldView(CanEditMixin, DetailView):
-    """Set a membership as beeing old."""
+class MembershipSetOldView(CanEditMixin, SingleObjectMixin, View):
+    """Set a membership as being old."""
 
     model = Membership
     pk_url_kwarg = "membership_id"
 
-    def get(self, request, *args, **kwargs):
+    def post(self, *_args, **_kwargs):
         self.object = self.get_object()
         self.object.end_date = timezone.now()
         self.object.save()
-        return HttpResponseRedirect(
-            reverse(
-                "club:club_members",
-                args=self.args,
-                kwargs={"club_id": self.object.club.id},
-            )
-        )
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return HttpResponseRedirect(
-            reverse(
-                "club:club_members",
-                args=self.args,
-                kwargs={"club_id": self.object.club.id},
-            )
-        )
+        return redirect("core:user_clubs", user_id=self.object.user_id)
 
 
 class MembershipDeleteView(PermissionRequiredMixin, DeleteView):
@@ -594,7 +567,7 @@ class MembershipDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = "club.delete_membership"
 
     def get_success_url(self):
-        return reverse_lazy("core:user_clubs", kwargs={"user_id": self.object.user.id})
+        return reverse_lazy("core:user_clubs", kwargs={"user_id": self.object.user_id})
 
 
 class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):

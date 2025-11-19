@@ -199,7 +199,7 @@ class Galaxy(models.Model):
         cls, picture_count_threshold: int = DEFAULT_PICTURE_COUNT_THRESHOLD
     ) -> QuerySet[User]:
         return (
-            User.objects.filter(is_subscriber_viewable=True)
+            User.objects.filter(is_viewable=True)
             .exclude(subscriptions=None)
             .annotate(
                 pictures_count=Count("pictures"),

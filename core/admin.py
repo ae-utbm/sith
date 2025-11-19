@@ -74,9 +74,19 @@ class UserBanAdmin(admin.ModelAdmin):
     autocomplete_fields = ("user", "ban_group")
 
 
+class GroupInline(admin.TabularInline):
+    model = Group.permissions.through
+    readonly_fields = ("group",)
+    extra = 0
+
+    def has_add_permission(self, request, obj):
+        return False
+
+
 @admin.register(Permission)
 class PermissionAdmin(admin.ModelAdmin):
     search_fields = ("codename",)
+    inlines = (GroupInline,)
 
 
 @admin.register(Page)

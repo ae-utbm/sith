@@ -44,18 +44,6 @@
 
       {% block additional_css %}{% endblock %}
       {% block additional_js %}{% endblock %}
-      <style>
-        {# background image must be declared here, because the static names are
-           changed during the static collection step,
-           which means we must gather them with the `static` template function #}
-        .header {
-          background-image: url("{{ static("core/img/gala25_background.webp") }}");
-          background-position-y: 80%;  {# There are more stars in this part of the picture #}
-        }
-        body {
-          background-image: url("{{ static("core/img/gala25_background.webp") }}");
-        }
-      </style>
     {% endblock %}
   </head>
 

@@ -1,8 +1,10 @@
 from datetime import timedelta
+from unittest import mock
 
 import pytest
 from django.conf import settings
 from django.contrib import auth
+from django.contrib.auth.models import Permission
 from django.core.management import call_command
 from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
@@ -18,10 +20,11 @@ from core.baker_recipes import (
     subscriber_user,
     very_old_subscriber_user,
 )
-from core.models import Group, User
+from core.models import AnonymousUser, Group, User
 from core.views import UserTabsMixin
 from counter.baker_recipes import sale_recipe
 from counter.models import Counter, Customer, Refilling, Selling
+from counter.utils import is_logged_in_counter
 from eboutic.models import Invoice, InvoiceItem
 
 
@@ -59,7 +62,9 @@ class TestSearchUsersAPI(TestSearchUsers):
         """Test that users are ordered by last login date."""
         self.client.force_login(subscriber_user.make())
 
-        response = self.client.get(reverse("api:search_users") + "?search=First")
+        response = self.client.get(
+            reverse("api:search_users", query={"search": "First"})
+        )
         assert response.status_code == 200
         assert response.json()["count"] == 11
         # The users are ordered by last login date, so we need to reverse the list
@@ -68,7 +73,7 @@ class TestSearchUsersAPI(TestSearchUsers):
         ]
 
     def test_search_case_insensitive(self):
-        """Test that the search is case insensitive."""
+        """Test that the search is case-insensitive."""
         self.client.force_login(subscriber_user.make())
 
         expected = [u.id for u in self.users[::-1]]
@@ -81,14 +86,19 @@ class TestSearchUsersAPI(TestSearchUsers):
             assert [r["id"] for r in response.json()["results"]] == expected
 
     def test_search_nick_name(self):
-        """Test that the search can be done on the nick name."""
+        """Test that the search can be done on the nickname."""
+        # hidden users should not be in the final result,
+        # even when the nickname matches
+        self.users[10].is_viewable = False
+        self.users[10].save()
         self.client.force_login(subscriber_user.make())
 
         # this should return users with nicknames Nick11, Nick10 and Nick1
-        response = self.client.get(reverse("api:search_users") + "?search=Nick1")
+        response = self.client.get(
+            reverse("api:search_users", query={"search": "Nick1"})
+        )
         assert response.status_code == 200
         assert [r["id"] for r in response.json()["results"]] == [
-            self.users[10].id,
             self.users[9].id,
             self.users[0].id,
         ]
@@ -100,9 +110,24 @@ class TestSearchUsersAPI(TestSearchUsers):
         self.client.force_login(subscriber_user.make())
 
         # this should return users with first names First1 and First10
-        response = self.client.get(reverse("api:search_users") + "?search=bél")
+        response = self.client.get(reverse("api:search_users", query={"search": "bél"}))
         assert response.status_code == 200
         assert [r["id"] for r in response.json()["results"]] == [belix.id]
+
+    @mock.create_autospec(is_logged_in_counter, return_value=True)
+    def test_search_as_barman(self):
+        # barmen should also see hidden users
+        self.users[10].is_viewable = False
+        self.users[10].save()
+        response = self.client.get(
+            reverse("api:search_users", query={"search": "Nick1"})
+        )
+        assert response.status_code == 200
+        assert [r["id"] for r in response.json()["results"]] == [
+            self.users[10].id,
+            self.users[9].id,
+            self.users[0].id,
+        ]
 
 
 class TestSearchUsersView(TestSearchUsers):
@@ -368,3 +393,38 @@ class TestRedirectMe:
 def test_promo_has_logo(promo):
     user = baker.make(User, promo=promo)
     assert user.promo_has_logo()
+
+
+@pytest.mark.django_db
+class TestUserQuerySetViewableBy:
+    @pytest.fixture
+    def users(self) -> list[User]:
+        return [
+            baker.make(User),
+            subscriber_user.make(),
+            subscriber_user.make(is_viewable=False),
+        ]
+
+    def test_admin_user(self, users: list[User]):
+        user = baker.make(
+            User,
+            user_permissions=[Permission.objects.get(codename="view_hidden_user")],
+        )
+        viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
+        assert set(viewable) == set(users)
+
+    @pytest.mark.parametrize(
+        "user_factory", [old_subscriber_user.make, subscriber_user.make]
+    )
+    def test_subscriber(self, users: list[User], user_factory):
+        user = user_factory()
+        viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
+        assert set(viewable) == {users[0], users[1]}
+
+    @pytest.mark.parametrize(
+        "user_factory", [lambda: baker.make(User), lambda: AnonymousUser()]
+    )
+    def test_not_subscriber(self, users: list[User], user_factory):
+        user = user_factory()
+        viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
+        assert not viewable.exists()

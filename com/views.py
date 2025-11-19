@@ -240,10 +240,11 @@ class NewsListView(TemplateView):
         if not self.request.user.has_perm("core.view_user"):
             return []
         return itertools.groupby(
-            User.objects.filter(
+            User.objects.viewable_by(self.request.user)
+            .filter(
                 date_of_birth__month=localdate().month,
                 date_of_birth__day=localdate().day,
-                is_subscriber_viewable=True,
+                is_viewable=True,
             )
             .filter(role__in=["STUDENT", "FORMER STUDENT"])
             .order_by("-date_of_birth"),

@@ -105,7 +105,7 @@ class SearchFormListView(FormerSubscriberMixin, SingleObjectMixin, ListView):
         self.can_see_hidden = True
         if not (request.user.is_board_member or request.user.is_root):
             self.can_see_hidden = False
-            self.init_query = self.init_query.exclude(is_subscriber_viewable=False)
+            self.init_query = self.init_query.filter(is_viewable=True)
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -130,7 +130,7 @@ class SearchFormListView(FormerSubscriberMixin, SingleObjectMixin, ListView):
                 else:
                     q = []
                 if not self.can_see_hidden and len(q) > 0:
-                    q = [user for user in q if user.is_subscriber_viewable]
+                    q = [user for user in q if user.is_viewable]
             else:
                 search_dict = {}
                 for key, value in self.valid_form.items():

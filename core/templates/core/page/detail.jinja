@@ -1,0 +1,17 @@
+{% extends "core/page/base.jinja" %}
+
+{% block page %}
+  {% if revision and revision.id != last_revision.id %}
+    <h4>
+      {% trans trimmed rev_id=revision.revision %}
+        This may not be the last update, you are seeing revision {{ rev_id }}!
+      {% endtrans %}
+    </h4>
+  {% endif %}
+  {% set current_revision = revision or last_revision %}
+  <h3>{{ current_revision.title }}</h3>
+  <div class="page_content">{{ current_revision.content|markdown }}</div>
+{% endblock %}
+
+
+
