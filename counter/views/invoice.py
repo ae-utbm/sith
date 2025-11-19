@@ -74,7 +74,7 @@ class InvoiceCallView(
         ).aggregate(res=Sum("amount", default=0))["res"]
         kwargs["sum_cb"] += (
             Selling.objects.filter(
-                payment_method="CARD",
+                payment_method=Selling.PaymentMethod.CARD,
                 date__gte=start_date,
                 date__lte=end_date,
             )

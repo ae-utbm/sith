@@ -4,9 +4,35 @@ from django.db import migrations, models
 from django.db.migrations.state import StateApps
 
 
+def migrate_payment_method(apps: StateApps, schema_editor):
+    Selling = apps.get_model("counter", "Selling")
+    Selling.objects.filter(payment_method_str="CARD").update(payment_method=1)
+
+
+def migrate_payment_method_reverse(apps: StateApps, schema_editor):
+    Selling = apps.get_model("counter", "Selling")
+    Selling.objects.filter(payment_method=1).update(payment_method_str="CARD")
+
+
 class Migration(migrations.Migration):
     dependencies = [("counter", "0034_alter_selling_date_selling_date_month_idx")]
 
     operations = [
         migrations.RemoveField(model_name="selling", name="is_validated"),
+        migrations.RenameField(
+            model_name="selling",
+            old_name="payment_method",
+            new_name="payment_method_str",
+        ),
+        migrations.AddField(
+            model_name="selling",
+            name="payment_method",
+            field=models.PositiveSmallIntegerField(
+                choices=[(0, "Sith account"), (1, "Credit card")],
+                default=0,
+                verbose_name="payment method",
+            ),
+        ),
+        migrations.RunPython(migrate_payment_method, migrate_payment_method_reverse),
+        migrations.RemoveField(model_name="selling", name="payment_method_str"),
     ]

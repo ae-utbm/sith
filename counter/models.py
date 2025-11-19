@@ -80,7 +80,8 @@ class CustomerQuerySet(models.QuerySet):
         )
         money_out = Subquery(
             Selling.objects.filter(
-                customer=OuterRef("pk"), payment_method="SITH_ACCOUNT"
+                customer=OuterRef("pk"),
+                payment_method=Selling.PaymentMethod.SITH_ACCOUNT,
             )
             .values("customer_id")
             .annotate(res=Sum(F("unit_price") * F("quantity"), default=0))
@@ -814,6 +815,10 @@ class SellingQuerySet(models.QuerySet):
 class Selling(models.Model):
     """Handle the sellings."""
 
+    class PaymentMethod(models.IntegerChoices):
+        SITH_ACCOUNT = 0, _("Sith account")
+        CARD = 1, _("Credit card")
+
     # We make sure that sellings have a way begger label than any product name is allowed to
     label = models.CharField(_("label"), max_length=128)
     product = models.ForeignKey(
@@ -850,11 +855,8 @@ class Selling(models.Model):
         on_delete=models.SET_NULL,
     )
     date = models.DateTimeField(_("date"), db_index=True)
-    payment_method = models.CharField(
-        _("payment method"),
-        max_length=255,
-        choices=[("SITH_ACCOUNT", _("Sith account")), ("CARD", _("Credit card"))],
-        default="SITH_ACCOUNT",
+    payment_method = models.PositiveSmallIntegerField(
+        _("payment method"), choices=PaymentMethod, default=PaymentMethod.SITH_ACCOUNT
     )
 
     objects = SellingQuerySet.as_manager()
@@ -874,7 +876,10 @@ class Selling(models.Model):
         if not self.date:
             self.date = timezone.now()
         self.full_clean()
-        if self._state.adding and self.payment_method == "SITH_ACCOUNT":
+        if (
+            self._state.adding
+            and self.payment_method == self.PaymentMethod.SITH_ACCOUNT
+        ):
             self.customer.amount -= self.quantity * self.unit_price
             self.customer.save(allow_negative=allow_negative)
         user = self.customer.user
@@ -946,7 +951,9 @@ class Selling(models.Model):
     def is_owned_by(self, user: User) -> bool:
         if user.is_anonymous:
             return False
-        return self.payment_method != "CARD" and user.is_owner(self.counter)
+        return self.payment_method != self.PaymentMethod.CARD and user.is_owner(
+            self.counter
+        )
 
     def can_be_viewed_by(self, user: User) -> bool:
         if (
@@ -956,7 +963,7 @@ class Selling(models.Model):
         return user == self.customer.user
 
     def delete(self, *args, **kwargs):
-        if self.payment_method == "SITH_ACCOUNT":
+        if self.payment_method == Selling.PaymentMethod.SITH_ACCOUNT:
             self.customer.amount += self.quantity * self.unit_price
             self.customer.save()
         super().delete(*args, **kwargs)
