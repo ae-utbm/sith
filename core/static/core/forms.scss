@@ -745,4 +745,32 @@ form {
     background-repeat: no-repeat;
     background-size: var(--nf-input-size);
   }
+
+  &.no-margin {
+    margin:0;
+  }
+
+  // a submit input that should look like a regular <a>
+  input[type="submit"], button {
+    &.link-like {
+      color: $primary-dark-color;
+      &:hover {
+        color: $primary-light-color;
+      }
+
+      &.link-red {
+        color: $red-text-color;
+        &:hover {
+          color: $hovered-red-text-color;
+        }
+      }
+      font-weight: normal;
+      font-size: 100%;
+      margin: auto;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+  }
 }

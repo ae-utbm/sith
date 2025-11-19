@@ -34,7 +34,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
 from django.db.models import F, Q, Sum
-from django.http import Http404, HttpResponseRedirect, StreamingHttpResponse
+from django.http import Http404, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -43,6 +43,7 @@ from django.utils.timezone import now
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, View
+from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from club.forms import (
@@ -544,33 +545,17 @@ class ClubCreateView(PermissionRequiredMixin, CreateView):
     permission_required = "club.add_club"
 
 
-class MembershipSetOldView(CanEditMixin, DetailView):
-    """Set a membership as beeing old."""
+class MembershipSetOldView(CanEditMixin, SingleObjectMixin, View):
+    """Set a membership as being old."""
 
     model = Membership
     pk_url_kwarg = "membership_id"
 
-    def get(self, request, *args, **kwargs):
+    def post(self, *_args, **_kwargs):
         self.object = self.get_object()
         self.object.end_date = timezone.now()
         self.object.save()
-        return HttpResponseRedirect(
-            reverse(
-                "club:club_members",
-                args=self.args,
-                kwargs={"club_id": self.object.club.id},
-            )
-        )
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return HttpResponseRedirect(
-            reverse(
-                "club:club_members",
-                args=self.args,
-                kwargs={"club_id": self.object.club.id},
-            )
-        )
+        return redirect("core:user_clubs", user_id=self.object.user_id)
 
 
 class MembershipDeleteView(PermissionRequiredMixin, DeleteView):
@@ -582,7 +567,7 @@ class MembershipDeleteView(PermissionRequiredMixin, DeleteView):
     permission_required = "club.delete_membership"
 
     def get_success_url(self):
-        return reverse_lazy("core:user_clubs", kwargs={"user_id": self.object.user.id})
+        return reverse_lazy("core:user_clubs", kwargs={"user_id": self.object.user_id})
 
 
 class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):

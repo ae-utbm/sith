@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.core.cache import cache
 from django.db.models import Max
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.timezone import localdate, localtime, now
 from model_bakery import baker
@@ -530,6 +530,35 @@ class TestMembership(TestClub):
         new_board = set(self.club.board_group.users.values_list("id", flat=True))
         assert new_members == initial_members
         assert new_board == initial_board
+
+
+@pytest.mark.django_db
+def test_membership_set_old(client: Client):
+    membership = baker.make(Membership, end_date=None, user=(subscriber_user.make()))
+    client.force_login(membership.user)
+    response = client.post(
+        reverse("club:membership_set_old", kwargs={"membership_id": membership.id})
+    )
+    assertRedirects(
+        response, reverse("core:user_clubs", kwargs={"user_id": membership.user_id})
+    )
+    membership.refresh_from_db()
+    assert membership.end_date == localdate()
+
+
+@pytest.mark.django_db
+def test_membership_delete(client: Client):
+    user = baker.make(User, is_superuser=True)
+    membership = baker.make(Membership)
+    client.force_login(user)
+    url = reverse("club:membership_delete", kwargs={"membership_id": membership.id})
+    response = client.get(url)
+    assert response.status_code == 200
+    response = client.post(url)
+    assertRedirects(
+        response, reverse("core:user_clubs", kwargs={"user_id": membership.user_id})
+    )
+    assert not Membership.objects.filter(id=membership.id).exists()
 
 
 @pytest.mark.django_db
