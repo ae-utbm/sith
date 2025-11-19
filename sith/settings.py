@@ -440,19 +440,6 @@ SITH_SUBSCRIPTION_LOCATIONS = [
 
 SITH_COUNTER_BARS = [(1, "MDE"), (2, "Foyer"), (35, "La Gommette")]
 
-SITH_COUNTER_BANK = [
-    ("OTHER", "Autre"),
-    ("SOCIETE-GENERALE", "Société générale"),
-    ("BANQUE-POPULAIRE", "Banque populaire"),
-    ("BNP", "BNP"),
-    ("CAISSE-EPARGNE", "Caisse d'épargne"),
-    ("CIC", "CIC"),
-    ("CREDIT-AGRICOLE", "Crédit Agricole"),
-    ("CREDIT-MUTUEL", "Credit Mutuel"),
-    ("CREDIT-LYONNAIS", "Credit Lyonnais"),
-    ("LA-POSTE", "La Poste"),
-]
-
 SITH_PEDAGOGY_UV_TYPE = [
     ("FREE", _("Free")),
     ("CS", _("CS")),

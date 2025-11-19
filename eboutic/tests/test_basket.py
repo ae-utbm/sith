@@ -108,12 +108,22 @@ def test_eboutic_basket_expiry(
 
     client.force_login(customer.user)
 
-    for date in sellings:
+    if sellings:
         sale_recipe.make(
-            customer=customer, counter=eboutic, date=date, is_validated=True
+            customer=customer,
+            counter=eboutic,
+            date=iter(sellings),
+            _quantity=len(sellings),
+            _bulk_create=True,
         )
-    for date in refillings:
-        refill_recipe.make(customer=customer, counter=eboutic, date=date)
+    if refillings:
+        refill_recipe.make(
+            customer=customer,
+            counter=eboutic,
+            date=iter(refillings),
+            _quantity=len(refillings),
+            _bulk_create=True,
+        )
 
     assert (
         f'x-data="basket({int(expected.timestamp() * 1000) if expected else "null"})"'

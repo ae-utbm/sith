@@ -24,7 +24,6 @@ from django.views.generic import CreateView, DetailView, TemplateView
 from django.views.generic.edit import FormView
 
 from core.views.group import PermissionGroupsUpdateView
-from counter.apps import PAYMENT_METHOD
 from subscription.forms import (
     SelectionDateForm,
     SubscriptionExistingUserForm,
@@ -129,6 +128,6 @@ class SubscriptionsStatsView(FormView):
             subscription_end__gte=self.end_date, subscription_start__lte=self.start_date
         )
         kwargs["subscriptions_types"] = settings.SITH_SUBSCRIPTIONS
-        kwargs["payment_types"] = PAYMENT_METHOD
+        kwargs["payment_types"] = settings.SITH_SUBSCRIPTION_PAYMENT_METHOD
         kwargs["locations"] = settings.SITH_SUBSCRIPTION_LOCATIONS
         return kwargs

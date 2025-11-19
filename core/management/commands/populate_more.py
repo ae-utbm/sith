@@ -350,7 +350,6 @@ class Command(BaseCommand):
                         date=make_aware(
                             self.faker.date_time_between(customer.since, localdate())
                         ),
-                        is_validated=True,
                     )
                 )
             sales.extend(this_customer_sales)

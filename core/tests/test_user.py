@@ -187,11 +187,7 @@ class TestFilterInactive(TestCase):
         time_inactive = time_active - timedelta(days=3)
         counter, seller = baker.make(Counter), baker.make(User)
         sale_recipe = Recipe(
-            Selling,
-            counter=counter,
-            club=counter.club,
-            seller=seller,
-            is_validated=True,
+            Selling, counter=counter, club=counter.club, seller=seller, unit_price=0
         )
 
         cls.users = [

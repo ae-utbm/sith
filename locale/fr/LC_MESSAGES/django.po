@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-12 21:44+0100\n"
+"POT-Creation-Date: 2025-11-19 21:00+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -2928,18 +2928,6 @@ msgstr "Photos"
 msgid "Account"
 msgstr "Compte"
 
-#: counter/apps.py sith/settings.py
-msgid "Check"
-msgstr "Chèque"
-
-#: counter/apps.py sith/settings.py
-msgid "Cash"
-msgstr "Espèces"
-
-#: counter/apps.py counter/models.py sith/settings.py
-msgid "Credit card"
-msgstr "Carte bancaire"
-
 #: counter/apps.py counter/models.py
 msgid "counter"
 msgstr "comptoir"
@@ -3152,21 +3140,29 @@ msgstr "vendeurs"
 msgid "token"
 msgstr "jeton"
 
+#: counter/models.py sith/settings.py
+msgid "Credit card"
+msgstr "Carte bancaire"
+
+#: counter/models.py sith/settings.py
+msgid "Cash"
+msgstr "Espèces"
+
+#: counter/models.py sith/settings.py
+msgid "Check"
+msgstr "Chèque"
+
 #: counter/models.py subscription/models.py
 msgid "payment method"
 msgstr "méthode de paiement"
 
 #: counter/models.py
-msgid "bank"
-msgstr "banque"
-
-#: counter/models.py
-msgid "is validated"
-msgstr "est validé"
-
-#: counter/models.py
 msgid "refilling"
 msgstr "rechargement"
+
+#: counter/models.py
+msgid "Sith account"
+msgstr "Compte utilisateur"
 
 #: counter/models.py eboutic/models.py
 msgid "unit price"
@@ -3175,10 +3171,6 @@ msgstr "prix unitaire"
 #: counter/models.py eboutic/models.py
 msgid "quantity"
 msgstr "quantité"
-
-#: counter/models.py
-msgid "Sith account"
-msgstr "Compte utilisateur"
 
 #: counter/models.py
 msgid "selling"
@@ -3331,6 +3323,10 @@ msgstr ""
 msgid ""
 "“%(value)s” value has the correct format (YYYY-MM) but it is an invalid date."
 msgstr "La valeur « %(value)s » a le bon format, mais est une date invalide."
+
+#: counter/models.py
+msgid "is validated"
+msgstr "est validé"
 
 #: counter/models.py
 msgid "invoice date"

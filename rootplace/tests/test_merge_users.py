@@ -114,7 +114,6 @@ class TestMergeUser(TestCase):
             seller=self.root,
             unit_price=2,
             quantity=2,
-            payment_method="SITH_ACCOUNT",
         ).save()
         Selling(
             label="barbar",
@@ -125,7 +124,6 @@ class TestMergeUser(TestCase):
             seller=self.root,
             unit_price=2,
             quantity=4,
-            payment_method="SITH_ACCOUNT",
         ).save()
         today = localtime(now()).date()
         # both subscriptions began last month and shall end in 5 months
@@ -197,7 +195,6 @@ class TestMergeUser(TestCase):
             seller=self.root,
             unit_price=2,
             quantity=4,
-            payment_method="SITH_ACCOUNT",
         ).save()
         data = {"user1": self.to_keep.id, "user2": self.to_delete.id}
         res = self.client.post(reverse("rootplace:merge"), data)
@@ -225,7 +222,6 @@ class TestMergeUser(TestCase):
             seller=self.root,
             unit_price=2,
             quantity=4,
-            payment_method="SITH_ACCOUNT",
         ).save()
         data = {"user1": self.to_keep.id, "user2": self.to_delete.id}
         res = self.client.post(reverse("rootplace:merge"), data)
