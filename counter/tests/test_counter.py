@@ -119,11 +119,7 @@ class TestRefilling(TestFullClickBase):
                 "counter:refilling_create",
                 kwargs={"customer_id": user.pk},
             ),
-            {
-                "amount": str(amount),
-                "payment_method": "CASH",
-                "bank": "OTHER",
-            },
+            {"amount": str(amount), "payment_method": "CASH"},
             HTTP_REFERER=reverse(
                 "counter:click",
                 kwargs={"counter_id": counter.id, "user_id": user.pk},
@@ -149,11 +145,7 @@ class TestRefilling(TestFullClickBase):
                     "counter:refilling_create",
                     kwargs={"customer_id": self.customer.pk},
                 ),
-                {
-                    "amount": "10",
-                    "payment_method": "CASH",
-                    "bank": "OTHER",
-                },
+                {"amount": "10", "payment_method": "CASH"},
             )
 
         self.client.force_login(self.club_admin)

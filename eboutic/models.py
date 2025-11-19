@@ -254,7 +254,6 @@ class Invoice(models.Model):
                     operator=self.user,
                     amount=i.product_unit_price * i.quantity,
                     payment_method="CARD",
-                    bank="OTHER",
                     date=self.date,
                 )
                 new.save()

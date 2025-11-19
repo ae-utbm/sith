@@ -747,13 +747,7 @@ class Refilling(models.Model):
     )
     date = models.DateTimeField(_("date"))
     payment_method = models.CharField(
-        _("payment method"),
-        max_length=255,
-        choices=PAYMENT_METHOD,
-        default="CARD",
-    )
-    bank = models.CharField(
-        _("bank"), max_length=255, choices=settings.SITH_COUNTER_BANK, default="OTHER"
+        _("payment method"), max_length=255, choices=PAYMENT_METHOD, default="CARD"
     )
 
     objects = RefillingQuerySet.as_manager()

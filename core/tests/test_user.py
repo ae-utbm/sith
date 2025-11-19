@@ -186,7 +186,9 @@ class TestFilterInactive(TestCase):
         time_active = now() - settings.SITH_ACCOUNT_INACTIVITY_DELTA + timedelta(days=1)
         time_inactive = time_active - timedelta(days=3)
         counter, seller = baker.make(Counter), baker.make(User)
-        sale_recipe = Recipe(Selling, counter=counter, club=counter.club, seller=seller)
+        sale_recipe = Recipe(
+            Selling, counter=counter, club=counter.club, seller=seller, unit_price=0
+        )
 
         cls.users = [
             baker.make(User),

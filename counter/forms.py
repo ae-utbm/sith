@@ -146,7 +146,7 @@ class RefillForm(forms.ModelForm):
 
     class Meta:
         model = Refilling
-        fields = ["amount", "payment_method", "bank"]
+        fields = ["amount", "payment_method"]
         widgets = {"payment_method": forms.RadioSelect}
 
     def __init__(self, *args, **kwargs):
@@ -159,9 +159,6 @@ class RefillForm(forms.ModelForm):
         )
         if self.fields["payment_method"].initial not in self.allowed_refilling_methods:
             self.fields["payment_method"].initial = self.allowed_refilling_methods[0]
-
-        if "CHECK" not in self.allowed_refilling_methods:
-            del self.fields["bank"]
 
 
 class CounterEditForm(forms.ModelForm):
