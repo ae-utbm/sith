@@ -11,8 +11,12 @@ from model_bakery import baker
 
 from core.models import Group, User
 from counter.baker_recipes import counter_recipe, product_recipe
-from counter.forms import ScheduledProductActionForm, ScheduledProductActionFormSet
-from counter.models import ScheduledProductAction
+from counter.forms import (
+    ProductForm,
+    ScheduledProductActionForm,
+    ScheduledProductActionFormSet,
+)
+from counter.models import Product, ScheduledProductAction
 
 
 @pytest.mark.django_db
@@ -32,6 +36,39 @@ def test_edit_product(client: Client):
     # we don't have a 403 or a 500.
     # The actual behaviour will be tested directly on the form.
     assert res.status_code == 200
+
+
+@pytest.mark.django_db
+def test_create_actions_alongside_product():
+    """The form should work when the product and the actions are created alongside."""
+    # non-persisted instance
+    product: Product = product_recipe.prepare(_save_related=True)
+    trigger_at = now() + timedelta(minutes=10)
+    form = ProductForm(
+        data={
+            "name": "foo",
+            "description": "bar",
+            "product_type": product.product_type_id,
+            "club": product.club_id,
+            "code": "FOO",
+            "purchase_price": 1.0,
+            "selling_price": 1.0,
+            "special_selling_price": 1.0,
+            "limit_age": 0,
+            "form-TOTAL_FORMS": "2",
+            "form-INITIAL_FORMS": "0",
+            "form-0-task": "counter.tasks.archive_product",
+            "form-0-trigger_at": trigger_at,
+        },
+    )
+    assert form.is_valid()
+    product = form.save()
+    action = ScheduledProductAction.objects.last()
+    assert action.clocked.clocked_time == trigger_at
+    assert action.enabled is True
+    assert action.one_off is True
+    assert action.task == "counter.tasks.archive_product"
+    assert action.kwargs == json.dumps({"product_id": product.id})
 
 
 @pytest.mark.django_db
