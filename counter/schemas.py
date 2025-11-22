@@ -1,13 +1,12 @@
 from datetime import datetime
 from typing import Annotated, Self
 
-from annotated_types import MinLen
 from django.urls import reverse
-from ninja import Field, FilterSchema, ModelSchema, Schema
+from ninja import FilterLookup, FilterSchema, ModelSchema, Schema
 from pydantic import model_validator
 
 from club.schemas import SimpleClubSchema
-from core.schemas import GroupSchema, SimpleUserSchema
+from core.schemas import GroupSchema, NonEmptyStr, SimpleUserSchema
 from counter.models import Counter, Product, ProductType
 
 
@@ -21,7 +20,7 @@ class CounterSchema(ModelSchema):
 
 
 class CounterFilterSchema(FilterSchema):
-    search: Annotated[str, MinLen(1)] = Field(None, q="name__icontains")
+    search: Annotated[NonEmptyStr | None, FilterLookup("name__icontains")] = None
 
 
 class SimplifiedCounterSchema(ModelSchema):
@@ -93,18 +92,18 @@ class ProductSchema(ModelSchema):
 
 
 class ProductFilterSchema(FilterSchema):
-    search: Annotated[str, MinLen(1)] | None = Field(
-        None, q=["name__icontains", "code__icontains"]
-    )
-    is_archived: bool | None = Field(None, q="archived")
-    buying_groups: set[int] | None = Field(None, q="buying_groups__in")
-    product_type: set[int] | None = Field(None, q="product_type__in")
-    club: set[int] | None = Field(None, q="club__in")
-    counter: set[int] | None = Field(None, q="counters__in")
+    search: Annotated[
+        NonEmptyStr | None, FilterLookup(["name__icontains", "code__icontains"])
+    ] = None
+    is_archived: Annotated[bool | None, FilterLookup("archived")] = None
+    buying_groups: Annotated[set[int] | None, FilterLookup("buying_groups__in")] = None
+    product_type: Annotated[set[int] | None, FilterLookup("product_type__in")] = None
+    club: Annotated[set[int] | None, FilterLookup("club__in")] = None
+    counter: Annotated[set[int] | None, FilterLookup("counters__in")] = None
 
 
 class SaleFilterSchema(FilterSchema):
-    before: datetime | None = Field(None, q="date__lt")
-    after: datetime | None = Field(None, q="date__gt")
-    counters: set[int] | None = Field(None, q="counter__in")
-    products: set[int] | None = Field(None, q="product__in")
+    before: Annotated[datetime | None, FilterLookup("date__lt")] = None
+    after: Annotated[datetime | None, FilterLookup("date__gt")] = None
+    counters: Annotated[set[int] | None, FilterLookup("counter__in")] = None
+    products: Annotated[set[int] | None, FilterLookup("product__in")] = None

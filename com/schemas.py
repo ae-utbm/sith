@@ -1,9 +1,9 @@
 from datetime import datetime
+from typing import Annotated
 
-from ninja import FilterSchema, ModelSchema
+from ninja import FilterLookup, FilterSchema, ModelSchema
 from ninja_extra import service_resolver
 from ninja_extra.context import RouteContext
-from pydantic import Field
 
 from club.schemas import ClubProfileSchema
 from com.models import News, NewsDate
@@ -11,12 +11,12 @@ from core.markdown import markdown
 
 
 class NewsDateFilterSchema(FilterSchema):
-    before: datetime | None = Field(None, q="end_date__lt")
-    after: datetime | None = Field(None, q="start_date__gt")
-    club_id: int | None = Field(None, q="news__club_id")
+    before: Annotated[datetime | None, FilterLookup("end_date__lt")] = None
+    after: Annotated[datetime | None, FilterLookup("start_date__gt")] = None
+    club_id: Annotated[int | None, FilterLookup("news__club_id")] = None
     news_id: int | None = None
-    is_published: bool | None = Field(None, q="news__is_published")
-    title: str | None = Field(None, q="news__title__icontains")
+    is_published: Annotated[bool | None, FilterLookup("news__is_published")] = None
+    title: Annotated[str | None, FilterLookup("news__title__icontains")] = None
 
 
 class NewsSchema(ModelSchema):

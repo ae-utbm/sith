@@ -15,6 +15,8 @@ from pydantic_core.core_schema import ValidationInfo
 from core.models import Group, QuickUploadImage, SithFile, User
 from core.utils import is_image
 
+NonEmptyStr = Annotated[str, MinLen(1)]
+
 
 class UploadedImage(UploadedFile):
     @classmethod

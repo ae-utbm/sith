@@ -1,18 +1,16 @@
 from typing import Annotated
 
-from annotated_types import MinLen
 from django.db.models import Q
-from ninja import Field, FilterSchema, ModelSchema
+from ninja import FilterLookup, FilterSchema, ModelSchema
 
 from club.models import Club, Membership
-from core.schemas import SimpleUserSchema
+from core.schemas import NonEmptyStr, SimpleUserSchema
 
 
 class ClubSearchFilterSchema(FilterSchema):
-    search: Annotated[str, MinLen(1)] | None = Field(None, q="name__icontains")
+    search: Annotated[NonEmptyStr | None, FilterLookup("name__icontains")] = None
     is_active: bool | None = None
     parent_id: int | None = None
-    parent_name: str | None = Field(None, q="parent__name__icontains")
     exclude_ids: set[int] | None = None
 
     def filter_exclude_ids(self, value: set[int] | None):
