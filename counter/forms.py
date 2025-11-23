@@ -1,7 +1,7 @@
 import json
 import math
 import uuid
-from datetime import date
+from datetime import date, datetime, timezone
 
 from dateutil.relativedelta import relativedelta
 from django import forms
@@ -489,13 +489,14 @@ class InvoiceCallForm(forms.Form):
     def __init__(self, *args, month: date, **kwargs):
         super().__init__(*args, **kwargs)
         self.month = month
+        month_start = datetime(month.year, month.month, month.day, tzinfo=timezone.utc)
         self.clubs = list(
             Club.objects.filter(
                 Exists(
                     Selling.objects.filter(
                         club=OuterRef("pk"),
-                        date__gte=month,
-                        date__lte=month + relativedelta(months=1),
+                        date__gte=month_start,
+                        date__lte=month_start + relativedelta(months=1),
                     )
                 )
             ).annotate(

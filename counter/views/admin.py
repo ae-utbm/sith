@@ -12,7 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
@@ -23,6 +23,7 @@ from django.forms.models import modelform_factory
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
+from django.utils.timezone import get_current_timezone
 from django.utils.translation import gettext as _
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
@@ -285,7 +286,13 @@ class CounterStatView(PermissionRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         """Add stats to the context."""
         counter: Counter = self.object
-        semester_start = get_start_of_semester()
+        start_date = get_start_of_semester()
+        semester_start = datetime(
+            start_date.year,
+            start_date.month,
+            start_date.day,
+            tzinfo=get_current_timezone(),
+        )
         office_hours = counter.get_top_barmen()
         kwargs = super().get_context_data(**kwargs)
         kwargs.update(
