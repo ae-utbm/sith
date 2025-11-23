@@ -454,6 +454,24 @@ class Product(models.Model):
         return self.selling_price - self.purchase_price
 
 
+class ProductFormula(models.Model):
+    products = models.ManyToManyField(
+        Product,
+        related_name="formulas",
+        verbose_name=_("products"),
+        help_text=_("The products that constitute this formula."),
+    )
+    result = models.OneToOneField(
+        Product,
+        on_delete=models.CASCADE,
+        verbose_name=_("result product"),
+        help_text=_("The product got with the formula."),
+    )
+
+    def __str__(self):
+        return self.result.name
+
+
 class CounterQuerySet(models.QuerySet):
     def annotate_has_barman(self, user: User) -> Self:
         """Annotate the queryset with the `user_is_barman` field.
