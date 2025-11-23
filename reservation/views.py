@@ -1,0 +1,72 @@
+# Create your views here.
+
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import CreateView, DeleteView, TemplateView, UpdateView
+
+from club.models import Club
+from core.auth.mixins import CanEditMixin
+from core.views import UseFragmentsMixin
+from core.views.mixins import FragmentMixin
+from reservation.forms import ReservationForm, RoomCreateForm, RoomUpdateForm
+from reservation.models import ReservationSlot, Room
+
+
+class ReservationFragment(PermissionRequiredMixin, FragmentMixin, CreateView):
+    model = ReservationSlot
+    form_class = ReservationForm
+    permission_required = "reservation.add_reservationslot"
+    template_name = "reservation/fragments/create_reservation.jinja"
+    success_url = reverse_lazy("reservation:main")
+    reload_on_redirect = True
+    object = None
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"author": self.request.user}
+
+
+class ReservationScheduleView(PermissionRequiredMixin, UseFragmentsMixin, TemplateView):
+    template_name = "reservation/schedule.jinja"
+    permission_required = "reservation.view_reservationslot"
+    fragments = {"add_slot_fragment": ReservationFragment}
+
+
+class RoomCreateView(PermissionRequiredMixin, CreateView):
+    form_class = RoomCreateForm
+    template_name = "core/create.jinja"
+    permission_required = "reservation.add_room"
+
+    def get_initial(self):
+        init = super().get_initial()
+        if "club" in self.request.GET:
+            club_id = self.request.GET["club"]
+            if club_id.isdigit() and int(club_id) > 0:
+                init["club"] = Club.objects.filter(id=int(club_id)).first()
+        return init
+
+    def get_success_url(self):
+        return reverse("club:tools", kwargs={"club_id": self.object.club_id})
+
+
+class RoomUpdateView(SuccessMessageMixin, CanEditMixin, UpdateView):
+    model = Room
+    pk_url_kwarg = "room_id"
+    form_class = RoomUpdateForm
+    template_name = "core/edit.jinja"
+    success_message = _("%(name)s was updated successfully")
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"request_user": self.request.user}
+
+    def get_success_url(self):
+        return self.request.path
+
+
+class RoomDeleteView(PermissionRequiredMixin, DeleteView):
+    model = Room
+    pk_url_kwarg = "room_id"
+    template_name = "core/delete_confirm.jinja"
+    success_url = reverse_lazy("reservation:room_list")
+    permission_required = "reservation.delete_room"

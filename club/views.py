@@ -260,6 +260,12 @@ class ClubToolsView(ClubTabsMixin, CanEditMixin, DetailView):
     template_name = "club/club_tools.jinja"
     current_tab = "tools"
 
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "reservable_rooms": list(self.object.reservable_rooms.all()),
+            "counters": list(self.object.counters.filter(type="OFFICE")),
+        }
+
 
 class ClubAddMembersFragment(
     FragmentMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView

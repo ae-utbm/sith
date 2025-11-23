@@ -21,7 +21,8 @@
     "#core:*": "./core/static/bundled/*",
     "#pedagogy:*": "./pedagogy/static/bundled/*",
     "#counter:*": "./counter/static/bundled/*",
-    "#com:*": "./com/static/bundled/*"
+    "#com:*": "./com/static/bundled/*",
+    "#reservation:*": "./reservation/static/bundled/*"
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
@@ -39,6 +40,7 @@
     "vite-plugin-static-copy": "^3.1.4"
   },
   "dependencies": {
+    "@alpinejs/morph": "^3.14.9",
     "@alpinejs/sort": "^3.15.1",
     "@arendjr/text-clipper": "npm:@jsr/arendjr__text-clipper@^3.0.0",
     "@floating-ui/dom": "^1.7.4",
@@ -46,7 +48,10 @@
     "@fullcalendar/core": "^6.1.19",
     "@fullcalendar/daygrid": "^6.1.19",
     "@fullcalendar/icalendar": "^6.1.19",
+    "@fullcalendar/interaction": "^6.1.19",
     "@fullcalendar/list": "^6.1.19",
+    "@fullcalendar/resource": "^6.1.19",
+    "@fullcalendar/resource-timeline": "^6.1.19",
     "@sentry/browser": "^9.46.0",
     "@zip.js/zip.js": "^2.8.9",
     "3d-force-graph": "^1.79.0",
@@ -60,6 +65,7 @@
     "easymde": "^2.20.0",
     "glob": "^11.0.3",
     "html2canvas": "^1.4.1",
+    "htmx-ext-alpine-morph": "^2.0.1",
     "htmx.org": "^2.0.8",
     "js-cookie": "^3.0.5",
     "lit-html": "^3.3.1",
