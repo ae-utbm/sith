@@ -6,7 +6,7 @@ from django.contrib.auth.models import Permission
 from django.core.exceptions import ValidationError
 from django.test import Client
 from django.urls import reverse
-from django.utils.timezone import localdate
+from django.utils.timezone import now
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
@@ -57,7 +57,7 @@ def test_invoice_call_view(client: Client, query: dict | None):
 @pytest.mark.django_db
 def test_invoice_call_form():
     Selling.objects.all().delete()
-    month = localdate() - relativedelta(months=1)
+    month = now() - relativedelta(months=1)
     clubs = baker.make(Club, _quantity=2)
     recipe = sale_recipe.extend(date=month, customer=baker.make(Customer, amount=10000))
     recipe.make(club=clubs[0], quantity=2, unit_price=200)

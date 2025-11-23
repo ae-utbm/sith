@@ -216,7 +216,7 @@ TEMPLATES = [
         },
     },
 ]
-FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"
+
 
 HAYSTACK_CONNECTIONS = {
     "default": {

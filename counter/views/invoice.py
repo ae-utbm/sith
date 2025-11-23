@@ -12,7 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from datetime import datetime
+from datetime import datetime, timezone
 from urllib.parse import urlencode
 
 from dateutil.relativedelta import relativedelta
@@ -63,7 +63,8 @@ class InvoiceCallView(
         """Add sums to the context."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["months"] = Selling.objects.datetimes("date", "month", order="DESC")
-        start_date = self.get_month()
+        month = self.get_month()
+        start_date = datetime(month.year, month.month, month.day, tzinfo=timezone.utc)
         end_date = start_date + relativedelta(months=1)
 
         kwargs["sum_cb"] = Refilling.objects.filter(
