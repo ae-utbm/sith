@@ -22,7 +22,7 @@
 #
 #
 import itertools
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 
 # This file contains all the views that concern the user model
 from operator import itemgetter
@@ -57,7 +57,6 @@ from honeypot.decorators import check_honeypot
 
 from core.auth.mixins import CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.models import Gift, Preferences, User
-from core.utils import get_start_of_semester
 from core.views.forms import (
     GiftForm,
     LoginForm,
@@ -366,11 +365,6 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
 
-        start = get_start_of_semester()
-        semester_start = datetime(
-            start.year, start.month, start.day, tzinfo=timezone.utc
-        )
-
         kwargs["perm_time"] = list(
             self.object.permanencies.filter(end__isnull=False, counter__type="BAR")
             .values("counter", "counter__name")
@@ -381,9 +375,7 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
             [perm["total"] for perm in kwargs["perm_time"]], start=timedelta(seconds=0)
         )
         kwargs["purchase_sums"] = list(
-            self.object.customer.buyings.filter(
-                date__gte=semester_start, counter__type="BAR"
-            )
+            self.object.customer.buyings.filter(counter__type="BAR")
             .values("counter", "counter__name")
             .annotate(total=Sum(F("unit_price") * F("quantity")))
             .order_by("-total")
