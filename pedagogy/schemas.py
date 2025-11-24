@@ -1,9 +1,9 @@
-from typing import Literal
+from typing import Annotated, Literal
 
 from django.db.models import Q
 from django.utils import html
 from haystack.query import SearchQuerySet
-from ninja import FilterSchema, ModelSchema, Schema
+from ninja import FilterLookup, FilterSchema, ModelSchema, Schema
 from pydantic import AliasPath, ConfigDict, Field, TypeAdapter
 from pydantic.alias_generators import to_camel
 
@@ -114,13 +114,14 @@ class UvSchema(ModelSchema):
 
 
 class UvFilterSchema(FilterSchema):
-    search: str | None = Field(None, q="code__icontains")
+    search: Annotated[str | None, FilterLookup("code__icontains")] = None
     semester: set[Literal["AUTUMN", "SPRING"]] | None = None
-    credit_type: set[Literal["CS", "TM", "EC", "OM", "QC"]] | None = Field(
-        None, q="credit_type__in"
-    )
+    credit_type: Annotated[
+        set[Literal["CS", "TM", "EC", "OM", "QC"]] | None,
+        FilterLookup("credit_type__in"),
+    ] = None
     language: str = "FR"
-    department: set[str] | None = Field(None, q="department__in")
+    department: Annotated[set[str] | None, FilterLookup("department__in")] = None
 
     def filter_search(self, value: str | None) -> Q:
         """Special filter for the search text.
