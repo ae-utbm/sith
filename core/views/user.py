@@ -22,9 +22,9 @@
 #
 #
 import itertools
+from datetime import timedelta
 
 # This file contains all the views that concern the user model
-from datetime import date, timedelta
 from operator import itemgetter
 from smtplib import SMTPException
 
@@ -32,7 +32,7 @@ from django.contrib.auth import login, views
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.db.models import DateField, QuerySet
+from django.db.models import DateField, F, QuerySet, Sum
 from django.db.models.functions import Trunc
 from django.forms.models import modelform_factory
 from django.http import Http404
@@ -66,9 +66,8 @@ from core.views.forms import (
     UserProfileForm,
 )
 from core.views.mixins import TabedViewMixin, UseFragmentsMixin
-from counter.models import Counter, Refilling, Selling
+from counter.models import Refilling, Selling
 from eboutic.models import Invoice
-from subscription.models import Subscription
 from trombi.views import UserTrombiForm
 
 
@@ -353,87 +352,40 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_stats.jinja"
     current_tab = "stats"
+    queryset = User.objects.exclude(customer=None).select_related("customer")
 
     def dispatch(self, request, *arg, **kwargs):
         profile = self.get_object()
-
-        if not hasattr(profile, "customer"):
-            raise Http404
-
         if not (
             profile == request.user or request.user.has_perm("counter.view_customer")
         ):
             raise PermissionDenied
-
         return super().dispatch(request, *arg, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        from django.db.models import Sum
 
-        foyer = Counter.objects.filter(name="Foyer").first()
-        mde = Counter.objects.filter(name="MDE").first()
-        gommette = Counter.objects.filter(name="La Gommette").first()
-        semester_start = Subscription.compute_start(d=date.today(), duration=3)
+        kwargs["perm_time"] = list(
+            self.object.permanencies.filter(end__isnull=False, counter__type="BAR")
+            .values("counter", "counter__name")
+            .annotate(total=Sum(F("end") - F("start"), default=timedelta(seconds=0)))
+            .order_by("-total")
+        )
         kwargs["total_perm_time"] = sum(
-            [p.end - p.start for p in self.object.permanencies.exclude(end=None)],
-            timedelta(),
+            [perm["total"] for perm in kwargs["perm_time"]], start=timedelta(seconds=0)
         )
-        kwargs["total_foyer_time"] = sum(
-            [
-                p.end - p.start
-                for p in self.object.permanencies.filter(counter=foyer).exclude(
-                    end=None
-                )
-            ],
-            timedelta(),
+        kwargs["purchase_sums"] = list(
+            self.object.customer.buyings.filter(counter__type="BAR")
+            .values("counter", "counter__name")
+            .annotate(total=Sum(F("unit_price") * F("quantity")))
+            .order_by("-total")
         )
-        kwargs["total_mde_time"] = sum(
-            [
-                p.end - p.start
-                for p in self.object.permanencies.filter(counter=mde).exclude(end=None)
-            ],
-            timedelta(),
-        )
-        kwargs["total_gommette_time"] = sum(
-            [
-                p.end - p.start
-                for p in self.object.permanencies.filter(counter=gommette).exclude(
-                    end=None
-                )
-            ],
-            timedelta(),
-        )
-        kwargs["total_foyer_buyings"] = sum(
-            [
-                b.unit_price * b.quantity
-                for b in self.object.customer.buyings.filter(
-                    counter=foyer, date__gte=semester_start
-                )
-            ]
-        )
-        kwargs["total_mde_buyings"] = sum(
-            [
-                b.unit_price * b.quantity
-                for b in self.object.customer.buyings.filter(
-                    counter=mde, date__gte=semester_start
-                )
-            ]
-        )
-        kwargs["total_gommette_buyings"] = sum(
-            [
-                b.unit_price * b.quantity
-                for b in self.object.customer.buyings.filter(
-                    counter=gommette, date__gte=semester_start
-                )
-            ]
-        )
+        kwargs["total_purchases"] = sum(s["total"] for s in kwargs["purchase_sums"])
         kwargs["top_product"] = (
             self.object.customer.buyings.values("product__name")
             .annotate(product_sum=Sum("quantity"))
-            .exclude(product_sum=None)
             .order_by("-product_sum")
-            .all()[:10]
+            .all()[:15]
         )
         return kwargs
 
