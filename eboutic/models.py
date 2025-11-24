@@ -110,7 +110,9 @@ class Basket(models.Model):
             )["total"]
         )
 
-    def generate_sales(self, counter, seller: User, payment_method: str):
+    def generate_sales(
+        self, counter, seller: User, payment_method: Selling.PaymentMethod
+    ):
         """Generate a list of sold items corresponding to the items
         of this basket WITHOUT saving them NOR deleting the basket.
 
@@ -251,8 +253,7 @@ class Invoice(models.Model):
                     customer=customer,
                     operator=self.user,
                     amount=i.product_unit_price * i.quantity,
-                    payment_method="CARD",
-                    bank="OTHER",
+                    payment_method=Refilling.PaymentMethod.CARD,
                     date=self.date,
                 )
                 new.save()
@@ -267,8 +268,7 @@ class Invoice(models.Model):
                     customer=customer,
                     unit_price=i.product_unit_price,
                     quantity=i.quantity,
-                    payment_method="CARD",
-                    is_validated=True,
+                    payment_method=Selling.PaymentMethod.CARD,
                     date=self.date,
                 )
                 new.save()

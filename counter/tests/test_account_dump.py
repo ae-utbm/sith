@@ -116,7 +116,6 @@ class TestAccountDumpCommand(TestAccountDump):
             operation: Selling = customer.buyings.order_by("date").last()
             assert operation.unit_price == initial_amount
             assert operation.counter_id == settings.SITH_COUNTER_ACCOUNT_DUMP_ID
-            assert operation.is_validated is True
             dump = customer.dumps.last()
             assert dump.dump_operation == operation
 

@@ -53,7 +53,7 @@ def set_age(user: User, age: int):
 
 
 def force_refill_user(user: User, amount: Decimal | int):
-    baker.make(Refilling, amount=amount, customer=user.customer, is_validated=False)
+    baker.make(Refilling, amount=amount, customer=user.customer)
 
 
 class TestFullClickBase(TestCase):
@@ -115,18 +115,10 @@ class TestRefilling(TestFullClickBase):
     ) -> HttpResponse:
         used_client = client if client is not None else self.client
         return used_client.post(
-            reverse(
-                "counter:refilling_create",
-                kwargs={"customer_id": user.pk},
-            ),
-            {
-                "amount": str(amount),
-                "payment_method": "CASH",
-                "bank": "OTHER",
-            },
+            reverse("counter:refilling_create", kwargs={"customer_id": user.pk}),
+            {"amount": str(amount), "payment_method": Refilling.PaymentMethod.CASH},
             HTTP_REFERER=reverse(
-                "counter:click",
-                kwargs={"counter_id": counter.id, "user_id": user.pk},
+                "counter:click", kwargs={"counter_id": counter.id, "user_id": user.pk}
             ),
         )
 
@@ -149,11 +141,7 @@ class TestRefilling(TestFullClickBase):
                     "counter:refilling_create",
                     kwargs={"customer_id": self.customer.pk},
                 ),
-                {
-                    "amount": "10",
-                    "payment_method": "CASH",
-                    "bank": "OTHER",
-                },
+                {"amount": "10", "payment_method": "CASH"},
             )
 
         self.client.force_login(self.club_admin)

@@ -68,15 +68,13 @@ class InvoiceCallView(
         end_date = start_date + relativedelta(months=1)
 
         kwargs["sum_cb"] = Refilling.objects.filter(
-            payment_method="CARD",
-            is_validated=True,
+            payment_method=Refilling.PaymentMethod.CARD,
             date__gte=start_date,
             date__lte=end_date,
         ).aggregate(res=Sum("amount", default=0))["res"]
         kwargs["sum_cb"] += (
             Selling.objects.filter(
-                payment_method="CARD",
-                is_validated=True,
+                payment_method=Selling.PaymentMethod.CARD,
                 date__gte=start_date,
                 date__lte=end_date,
             )

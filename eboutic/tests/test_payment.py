@@ -114,13 +114,13 @@ class TestPaymentSith(TestPaymentBase):
             "quantity"
         )
         assert len(sellings) == 2
-        assert sellings[0].payment_method == "SITH_ACCOUNT"
+        assert sellings[0].payment_method == Selling.PaymentMethod.SITH_ACCOUNT
         assert sellings[0].quantity == 1
         assert sellings[0].unit_price == self.snack.selling_price
         assert sellings[0].counter.type == "EBOUTIC"
         assert sellings[0].product == self.snack
 
-        assert sellings[1].payment_method == "SITH_ACCOUNT"
+        assert sellings[1].payment_method == Selling.PaymentMethod.SITH_ACCOUNT
         assert sellings[1].quantity == 2
         assert sellings[1].unit_price == self.beer.selling_price
         assert sellings[1].counter.type == "EBOUTIC"
@@ -198,13 +198,13 @@ class TestPaymentCard(TestPaymentBase):
             "quantity"
         )
         assert len(sellings) == 2
-        assert sellings[0].payment_method == "CARD"
+        assert sellings[0].payment_method == Selling.PaymentMethod.CARD
         assert sellings[0].quantity == 1
         assert sellings[0].unit_price == self.snack.selling_price
         assert sellings[0].counter.type == "EBOUTIC"
         assert sellings[0].product == self.snack
 
-        assert sellings[1].payment_method == "CARD"
+        assert sellings[1].payment_method == Selling.PaymentMethod.CARD
         assert sellings[1].quantity == 2
         assert sellings[1].unit_price == self.beer.selling_price
         assert sellings[1].counter.type == "EBOUTIC"

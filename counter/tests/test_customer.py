@@ -298,7 +298,6 @@ def test_update_balance():
             _quantity=len(customers),
             unit_price=10,
             quantity=1,
-            payment_method="SITH_ACCOUNT",
             _save_related=True,
         ),
         *sale_recipe.prepare(
@@ -306,14 +305,12 @@ def test_update_balance():
             _quantity=3,
             unit_price=5,
             quantity=2,
-            payment_method="SITH_ACCOUNT",
             _save_related=True,
         ),
         sale_recipe.prepare(
             customer=customers[4],
             quantity=1,
             unit_price=50,
-            payment_method="SITH_ACCOUNT",
             _save_related=True,
         ),
         *sale_recipe.prepare(
@@ -324,7 +321,7 @@ def test_update_balance():
             _quantity=len(customers),
             unit_price=50,
             quantity=1,
-            payment_method="CARD",
+            payment_method=Selling.PaymentMethod.CARD,
             _save_related=True,
         ),
     ]
