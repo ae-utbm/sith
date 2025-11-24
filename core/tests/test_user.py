@@ -1,3 +1,4 @@
+import itertools
 from datetime import timedelta
 from unittest import mock
 
@@ -23,7 +24,7 @@ from core.baker_recipes import (
 from core.models import AnonymousUser, Group, User
 from core.views import UserTabsMixin
 from counter.baker_recipes import sale_recipe
-from counter.models import Counter, Customer, Refilling, Selling
+from counter.models import Counter, Customer, Permanency, Refilling, Selling
 from counter.utils import is_logged_in_counter
 from eboutic.models import Invoice, InvoiceItem
 
@@ -424,3 +425,28 @@ class TestUserQuerySetViewableBy:
         user = user_factory()
         viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
         assert not viewable.exists()
+
+
+@pytest.mark.django_db
+def test_user_stats(client: Client):
+    user = subscriber_user.make()
+    baker.make(Refilling, customer=user.customer, amount=99999)
+    bars = [b[0] for b in settings.SITH_COUNTER_BARS]
+    baker.make(
+        Permanency,
+        end=now() - timedelta(days=5),
+        start=now() - timedelta(days=5, hours=3),
+        counter_id=itertools.cycle(bars),
+        _quantity=5,
+        _bulk_create=True,
+    )
+    sale_recipe.make(
+        counter_id=itertools.cycle(bars),
+        customer=user.customer,
+        unit_price=1,
+        quantity=1,
+        _quantity=5,
+    )
+    client.force_login(user)
+    response = client.get(reverse("core:user_stats", kwargs={"user_id": user.id}))
+    assert response.status_code == 200

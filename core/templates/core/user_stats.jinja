@@ -11,32 +11,35 @@
 {% block content %}
   <div class="container">
     <div class="row">
-      {% if profile.permanencies %}
+      {% if total_perm_time %}
         <div>
           <h3>{% trans %}Permanencies{% endtrans %}</h3>
           <div class="flexed">
-            <div><span>Foyer :</span><span>{{ total_foyer_time }}</span></div>
-            <div><span>Gommette :</span><span>{{ total_gommette_time }}</span></div>
-            <div><span>MDE :</span><span>{{ total_mde_time }}</span></div>
-            <div><b>Total :</b><b>{{ total_perm_time }}</b></div>
+            {% for perm in perm_time %}
+              <div>
+                <span>{{ perm["counter__name"] }} :</span>
+                <span>{{ perm["total"]|format_timedelta }}</span>
+              </div>
+            {% endfor %}
+            <div><b>Total :</b><b>{{ total_perm_time|format_timedelta }}</b></div>
           </div>
         </div>
       {% endif %}
-
       <div>
         <h3>{% trans %}Buyings{% endtrans %}</h3>
         <div class="flexed">
-          <div><span>Foyer :</span><span>{{ total_foyer_buyings }}&nbsp;€</span></div>
-          <div><span>Gommette :</span><span>{{ total_gommette_buyings }}&nbsp;€</span></div>
-          <div><span>MDE :</span><span>{{ total_mde_buyings }}&nbsp;€</span></div>
-          <div><b>Total :</b><b>{{ total_foyer_buyings + total_gommette_buyings + total_mde_buyings }}&nbsp;€</b>
-          </div>
+          {% for sum in purchase_sums %}
+            <div>
+              <span>{{ sum["counter__name"] }}</span>
+              <span>{{ sum["total"] }} €</span>
+            </div>
+          {% endfor %}
+          <div><b>Total : </b><b>{{ total_purchases }} €</b></div>
         </div>
       </div>
     </div>
-
     <div>
-      <h3>{% trans %}Product top 10{% endtrans %}</h3>
+      <h3>{% trans %}Product top 15{% endtrans %}</h3>
       <table>
         <thead>
           <tr>

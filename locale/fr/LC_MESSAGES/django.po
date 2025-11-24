@@ -2658,8 +2658,8 @@ msgid "Buyings"
 msgstr "Achats"
 
 #: core/templates/core/user_stats.jinja
-msgid "Product top 10"
-msgstr "Top 10 produits"
+msgid "Product top 15"
+msgstr "Top 15 produits"
 
 #: core/templates/core/user_stats.jinja
 msgid "Product"
