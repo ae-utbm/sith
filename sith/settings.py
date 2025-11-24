@@ -177,7 +177,6 @@ TEMPLATES = [
             "filters": {
                 "markdown": "core.templatetags.renderer.markdown",
                 "phonenumber": "core.templatetags.renderer.phonenumber",
-                "truncate_time": "core.templatetags.renderer.truncate_time",
                 "format_timedelta": "core.templatetags.renderer.format_timedelta",
                 "add_attr": "core.templatetags.renderer.add_attr",
             },

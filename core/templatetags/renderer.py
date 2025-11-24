@@ -55,31 +55,17 @@ def phonenumber(
         return value
 
 
-@register.filter(name="truncate_time")
-def truncate_time(value, time_unit):
-    """Remove everything in the time format lower than the specified unit.
-
-    Args:
-        value: the value to truncate
-        time_unit: the lowest unit to display
-    """
-    value = str(value)
-    return {
-        "millis": lambda: value.split(".")[0],
-        "seconds": lambda: value.rsplit(":", maxsplit=1)[0],
-        "minutes": lambda: value.split(":", maxsplit=1)[0],
-        "hours": lambda: value.rsplit(" ")[0],
-    }[time_unit]()
-
-
 @register.filter(name="format_timedelta")
 def format_timedelta(value: datetime.timedelta) -> str:
+    value = value - datetime.timedelta(microseconds=value.microseconds)
     days = value.days
     if days == 0:
         return str(value)
     remainder = value - datetime.timedelta(days=days)
     return ngettext(
-        "%(nb_days)d day, %(remainder)s", "%(nb_days)d days, %(remainder)s", days
+        "%(nb_days)d day, %(remainder)s",
+        "%(nb_days)d days, %(remainder)s",
+        days,
     ) % {"nb_days": days, "remainder": str(remainder)}
 
 
