@@ -24,6 +24,7 @@ from ast import literal_eval
 from enum import Enum
 
 from django import forms
+from django.db.models import F
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -34,7 +35,7 @@ from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
 from core.auth.mixins import FormerSubscriberMixin
 from core.models import User
-from core.views import search_user
+from core.schemas import UserFilterSchema
 from core.views.forms import SelectDate
 
 # Enum to select search type
@@ -126,11 +127,13 @@ class SearchFormListView(FormerSubscriberMixin, SingleObjectMixin, ListView):
                 q = q.filter(phone=self.valid_form["phone"]).all()
             elif self.search_type == SearchType.QUICK:
                 if self.valid_form["quick"].strip():
-                    q = search_user(self.valid_form["quick"])
+                    q = list(
+                        UserFilterSchema(search=self.valid_form["quick"])
+                        .filter(User.objects.viewable_by(self.request.user))
+                        .order_by(F("last_login").desc(nulls_last=True))
+                    )
                 else:
                     q = []
-                if not self.can_see_hidden and len(q) > 0:
-                    q = [user for user in q if user.is_viewable]
             else:
                 search_dict = {}
                 for key, value in self.valid_form.items():

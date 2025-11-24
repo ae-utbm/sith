@@ -35,6 +35,7 @@ from pytest_django.asserts import assertInHTML, assertRedirects
 
 from antispam.models import ToxicDomain
 from club.models import Club, Membership
+from core.baker_recipes import subscriber_user
 from core.markdown import markdown
 from core.models import AnonymousUser, Group, Page, User, validate_promo
 from core.utils import get_last_promo, get_semester_code, get_start_of_semester
@@ -551,3 +552,10 @@ def test_allow_fragment_mixin():
     assert not TestAllowFragmentView.as_view()(request)
     request.headers = {"HX-Request": True, **base_headers}
     assert TestAllowFragmentView.as_view()(request)
+
+
+@pytest.mark.django_db
+def test_search_view(client: Client):
+    client.force_login(subscriber_user.make())
+    response = client.get(reverse("core:search", query={"query": "foo"}))
+    assert response.status_code == 200

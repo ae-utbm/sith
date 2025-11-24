@@ -24,6 +24,7 @@
 from django.urls import path, re_path, register_converter
 from django.views.generic import RedirectView
 
+from com.views import NewsListView
 from core.converters import (
     BooleanStringConverter,
     FourDigitYearConverter,
@@ -53,6 +54,7 @@ from core.views import (
     PagePropView,
     PageRevView,
     PageView,
+    SearchView,
     SithLoginView,
     SithPasswordChangeDoneView,
     SithPasswordChangeView,
@@ -76,13 +78,9 @@ from core.views import (
     UserUpdateProfileView,
     UserView,
     delete_user_godfather,
-    index,
     logout,
     notification,
     password_root_change,
-    search_json,
-    search_user_json,
-    search_view,
     send_file,
 )
 
@@ -91,13 +89,11 @@ register_converter(TwoDigitMonthConverter, "mm")
 register_converter(BooleanStringConverter, "bool")
 
 urlpatterns = [
-    path("", index, name="index"),
+    path("", NewsListView.as_view(), name="index"),
     path("notifications/", NotificationList.as_view(), name="notification_list"),
     path("notification/<int:notif_id>/", notification, name="notification"),
     # Search
-    path("search/", search_view, name="search"),
-    path("search_json/", search_json, name="search_json"),
-    path("search_user/", search_user_json, name="search_user"),
+    path("search/", SearchView.as_view(), name="search"),
     # Login and co
     path("login/", SithLoginView.as_view(), name="login"),
     path("logout/", logout, name="logout"),
