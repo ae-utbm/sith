@@ -417,7 +417,6 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
     form_class = UserProfileForm
     current_tab = "edit"
     edit_once = ["profile_pict", "date_of_birth", "first_name", "last_name"]
-    board_only = []
 
     def remove_restricted_fields(self, request):
         """Removes edit_once and board_only fields."""
@@ -425,9 +424,6 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
             if getattr(self.form.instance, i) and not (
                 request.user.is_board_member or request.user.is_root
             ):
-                self.form.fields.pop(i, None)
-        for i in self.board_only:
-            if not (request.user.is_board_member or request.user.is_root):
                 self.form.fields.pop(i, None)
 
     def get(self, request, *args, **kwargs):
