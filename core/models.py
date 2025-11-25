@@ -38,7 +38,6 @@ from django.contrib.auth.models import AnonymousUser as AuthAnonymousUser
 from django.contrib.auth.models import Group as AuthGroup
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core import validators
-from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.files import File
 from django.core.files.base import ContentFile
@@ -76,16 +75,6 @@ class Group(AuthGroup):
 
     def get_absolute_url(self) -> str:
         return reverse("core:group_list")
-
-    def save(self, *args, **kwargs) -> None:
-        super().save(*args, **kwargs)
-        cache.set(f"sith_group_{self.id}", self)
-        cache.set(f"sith_group_{self.name.replace(' ', '_')}", self)
-
-    def delete(self, *args, **kwargs) -> None:
-        super().delete(*args, **kwargs)
-        cache.delete(f"sith_group_{self.id}")
-        cache.delete(f"sith_group_{self.name.replace(' ', '_')}")
 
 
 def validate_promo(value: int) -> None:
