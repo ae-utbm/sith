@@ -428,6 +428,19 @@ class TestUserQuerySetViewableBy:
 
 
 @pytest.mark.django_db
+def test_user_preferences(client: Client):
+    user = subscriber_user.make()
+    client.force_login(user)
+    url = reverse("core:user_prefs", kwargs={"user_id": user.id})
+    response = client.get(url)
+    assert response.status_code == 200
+    response = client.post(url, {"notify_on_click": "true"})
+    assertRedirects(response, url)
+    user.preferences.refresh_from_db()
+    assert user.preferences.notify_on_click is True
+
+
+@pytest.mark.django_db
 def test_user_stats(client: Client):
     user = subscriber_user.make()
     baker.make(Refilling, customer=user.customer, amount=99999)

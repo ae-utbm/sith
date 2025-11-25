@@ -476,10 +476,10 @@ class UserPreferencesView(UserTabsMixin, UseFragmentsMixin, CanEditMixin, Update
     current_tab = "prefs"
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        pref = self.object.preferences
-        kwargs.update({"instance": pref})
-        return kwargs
+        return super().get_form_kwargs() | {"instance": self.object.preferences}
+
+    def get_success_url(self):
+        return self.request.path
 
     def get_fragment_context_data(self) -> dict[str, SafeString]:
         # Avoid cyclic import error
