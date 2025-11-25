@@ -463,3 +463,20 @@ def test_user_stats(client: Client):
     client.force_login(user)
     response = client.get(reverse("core:user_stats", kwargs={"user_id": user.id}))
     assert response.status_code == 200
+
+
+@pytest.mark.django_db
+class TestChangeUserPassword:
+    def test_as_root(self, client: Client, admin_user: User):
+        client.force_login(admin_user)
+        user = subscriber_user.make()
+        url = reverse("core:password_root_change", kwargs={"user_id": user.id})
+        response = client.get(url)
+        assert response.status_code == 200
+        response = client.post(
+            url, {"new_password1": "poutou", "new_password2": "poutou"}
+        )
+        print(response.text)
+        assertRedirects(response, reverse("core:password_change_done"))
+        user.refresh_from_db()
+        assert user.check_password("poutou") is True

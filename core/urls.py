@@ -54,6 +54,7 @@ from core.views import (
     PagePropView,
     PageRevView,
     PageView,
+    PasswordRootChangeView,
     SearchView,
     SithLoginView,
     SithPasswordChangeDoneView,
@@ -80,7 +81,6 @@ from core.views import (
     delete_user_godfather,
     logout,
     notification,
-    password_root_change,
     send_file,
 )
 
@@ -100,7 +100,7 @@ urlpatterns = [
     path("password_change/", SithPasswordChangeView.as_view(), name="password_change"),
     path(
         "password_change/<int:user_id>/",
-        password_root_change,
+        PasswordRootChangeView.as_view(),
         name="password_root_change",
     ),
     path(

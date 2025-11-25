@@ -29,8 +29,8 @@ from operator import itemgetter
 from smtplib import SMTPException
 
 from django.contrib.auth import login, views
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import DateField, F, QuerySet, Sum
 from django.db.models.functions import Trunc
@@ -38,7 +38,6 @@ from django.forms.models import modelform_factory
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
-from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.safestring import SafeString
@@ -98,21 +97,23 @@ def logout(request):
     return views.logout_then_login(request)
 
 
-def password_root_change(request, user_id):
+class PasswordRootChangeView(UserPassesTestMixin, FormView):
     """Allows a root user to change someone's password."""
-    if not request.user.is_root:
-        raise PermissionDenied
-    user = get_object_or_404(User, id=user_id)
-    if request.method == "POST":
-        form = views.SetPasswordForm(user=user, data=request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("core:password_change_done")
-    else:
-        form = views.SetPasswordForm(user=user)
-    return TemplateResponse(
-        request, "core/password_change.jinja", {"form": form, "target": user}
-    )
+
+    template_name = "core/password_change.jinja"
+    form_class = SetPasswordForm
+    success_url = reverse_lazy("core:password_change_done")
+
+    def test_func(self):
+        return self.request.user.is_root
+
+    def get_form_kwargs(self):
+        user = get_object_or_404(User, id=self.kwargs["user_id"])
+        return super().get_form_kwargs() | {"user": user}
+
+    def form_valid(self, form: SetPasswordForm):
+        form.save()
+        return super().form_valid(form)
 
 
 @method_decorator(check_honeypot, name="post")
