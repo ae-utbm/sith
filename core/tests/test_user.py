@@ -476,7 +476,55 @@ class TestChangeUserPassword:
         response = client.post(
             url, {"new_password1": "poutou", "new_password2": "poutou"}
         )
-        print(response.text)
         assertRedirects(response, reverse("core:password_change_done"))
         user.refresh_from_db()
         assert user.check_password("poutou") is True
+
+
+@pytest.mark.django_db
+class TestUserGodfather:
+    @pytest.mark.parametrize("godfather", [True, False])
+    def test_add_family(self, client: Client, godfather):
+        user = subscriber_user.make()
+        other_user = subscriber_user.make()
+        client.force_login(user)
+        url = reverse("core:user_godfathers", kwargs={"user_id": user.id})
+        response = client.get(url)
+        assert response.status_code == 200
+        response = client.post(
+            url,
+            {"type": "godfather" if godfather else "godchild", "user": other_user.id},
+        )
+        assertRedirects(response, url)
+        if godfather:
+            assert user.godfathers.contains(other_user)
+        else:
+            assert user.godchildren.contains(other_user)
+
+    def test_tree(self, client: Client):
+        user = subscriber_user.make()
+        client.force_login(user)
+        response = client.get(
+            reverse("core:user_godfathers_tree", kwargs={"user_id": user.id})
+        )
+        assert response.status_code == 200
+
+    def test_remove_family(self, client: Client):
+        user = subscriber_user.make()
+        other_user = subscriber_user.make()
+        user.godfathers.add(other_user)
+        client.force_login(user)
+        response = client.post(
+            reverse(
+                "core:user_godfathers_delete",
+                kwargs={
+                    "user_id": user.id,
+                    "godfather_id": other_user.id,
+                    "is_father": True,
+                },
+            )
+        )
+        assertRedirects(
+            response, reverse("core:user_godfathers", kwargs={"user_id": user.id})
+        )
+        assert not user.godfathers.contains(other_user)

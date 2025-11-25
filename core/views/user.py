@@ -29,6 +29,7 @@ from operator import itemgetter
 from smtplib import SMTPException
 
 from django.contrib.auth import login, views
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
@@ -42,6 +43,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.safestring import SafeString
 from django.utils.translation import gettext as _
+from django.views.decorators.http import require_POST
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -288,10 +290,12 @@ class UserView(UserTabsMixin, CanViewMixin, DetailView):
         return kwargs
 
 
+@require_POST
+@login_required
 def delete_user_godfather(request, user_id, godfather_id, is_father):
     user_is_admin = request.user.is_root or request.user.is_board_member
     if user_id != request.user.id and not user_is_admin:
-        raise PermissionDenied()
+        raise PermissionDenied
     user = get_object_or_404(User, id=user_id)
     to_remove = get_object_or_404(User, id=godfather_id)
     if is_father:
