@@ -10,12 +10,12 @@
   float: right;
 }
 
-.basket-error-container {
+.basket-message-container {
   position: relative;
   display: block
 }
 
-.basket-error {
+.basket-message {
   z-index: 10; // to get on top of tomselect
   text-align: center;
   position: absolute;
