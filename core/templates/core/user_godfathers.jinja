@@ -29,7 +29,16 @@
             <a href="{{ url('core:user_godfathers', user_id=u.id) }}" class="mini_profile_link">
               {{ u.get_mini_item() | safe }}
             </a>
-            {{ delete_godfather(user, profile, u, True) }}
+            {% if user == profile or user.is_root or user.is_board_member %}
+              <form
+                method="post"
+                class="no-margin"
+                action="{{ url("core:user_godfathers_delete", user_id=profile.id, godfather_id=u.id, is_father=True) }}"
+              >
+                {% csrf_token %}
+                <input type="submit" class="link-like" value="{% trans %}Delete{% endtrans %}">
+              </form>
+            {% endif %}
           </li>
         {% endfor %}
       </ul>
@@ -46,7 +55,16 @@
             <a href="{{ url('core:user_godfathers', user_id=u.id) }}" class="mini_profile_link">
               {{ u.get_mini_item()|safe }}
             </a>
-            {{ delete_godfather(user, profile, u, False) }}
+            {% if user == profile or user.is_root or user.is_board_member %}
+              <form
+                method="post"
+                class="no-margin"
+                action="{{ url("core:user_godfathers_delete", user_id=profile.id, godfather_id=u.id, is_father=False) }}"
+              >
+                {% csrf_token %}
+                <input type="submit" class="link-like link-red" value="{% trans %}Delete{% endtrans %}">
+              </form>
+            {% endif %}
           </li>
         {% endfor %}
       </ul>
