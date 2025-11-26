@@ -32,13 +32,11 @@
   <div id="bar-ui" x-data="counter({
                            customerBalance: {{ customer.amount }},
                            products: products,
+                           formulas: formulas,
                            customerId: {{ customer.pk }},
                            formInitial: formInitial,
                            cancelUrl: '{{ cancel_url }}',
                            })">
-    <noscript>
-      <p class="important">Javascript is required for the counter UI.</p>
-    </noscript>
 
     <div id="user_info">
       <h5>{% trans %}Customer{% endtrans %}</h5>
@@ -88,11 +86,12 @@
 
           <form x-cloak method="post" action="" x-ref="basketForm">
 
-            <div class="basket-error-container">
+            <div class="basket-message-container">
               <div
                 x-cloak
-                class="alert alert-red basket-error"
-                x-show="alertMessage.show"
+                class="alert basket-message"
+                :class="alertMessage.success ? 'alert-green' : 'alert-red'"
+                x-show="alertMessage.open"
                 x-transition.duration.500ms
                 x-text="alertMessage.content"
               ></div>
@@ -111,9 +110,9 @@
                     </div>
                   </template>
 
-                  <button @click.prevent="addToBasketWithMessage(item.product.id, -1)">-</button>
+                  <button @click.prevent="addToBasket(item.product.id, -1)">-</button>
                   <span class="quantity" x-text="item.quantity"></span>
-                  <button @click.prevent="addToBasketWithMessage(item.product.id, 1)">+</button>
+                  <button @click.prevent="addToBasket(item.product.id, 1)">+</button>
 
                   <span x-text="item.product.name"></span> :
                   <span x-text="item.sum().toLocaleString(undefined, { minimumFractionDigits: 2 })">€</span>
@@ -213,7 +212,7 @@
                 <h5 class="margin-bottom">{{ category }}</h5>
                 <div class="row gap-2x">
                   {% for product in categories[category] -%}
-                    <button class="card shadow" @click="addToBasketWithMessage('{{ product.id }}', 1)">
+                    <button class="card shadow" @click="addToBasket('{{ product.id }}', 1)">
                       <img
                         class="card-image"
                         alt="image de {{ product.name }}"
@@ -252,6 +251,18 @@
         },
       {%- endfor -%}
     };
+    const formulas = [
+      {%- for formula in formulas -%}
+        {
+          result: {{ formula.result_id }},
+          products: [
+            {%- for product in formula.products.all() -%}
+              {{ product.id }},
+            {%- endfor -%}
+          ]
+        },
+      {%- endfor -%}
+    ];
     const formInitial = [
       {%- for f in form -%}
         {%- if f.cleaned_data -%}

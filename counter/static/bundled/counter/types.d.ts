@@ -7,10 +7,16 @@ export interface InitialFormData {
   errors?: string[];
 }
 
+export interface ProductFormula {
+  result: number;
+  products: number[];
+}
+
 export interface CounterConfig {
   customerBalance: number;
   customerId: number;
   products: Record<string, Product>;
+  formulas: ProductFormula[];
   formInitial: InitialFormData[];
   cancelUrl: string;
 }

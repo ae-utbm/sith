@@ -12,6 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from collections import defaultdict
 
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -31,6 +32,7 @@ from counter.forms import BasketForm, RefillForm
 from counter.models import (
     Counter,
     Customer,
+    ProductFormula,
     ReturnableProduct,
     Selling,
 )
@@ -206,12 +208,13 @@ class CounterClick(
         """Add customer to the context."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["products"] = self.products
-        kwargs["categories"] = {}
+        kwargs["formulas"] = ProductFormula.objects.filter(
+            result__in=self.products
+        ).prefetch_related("products")
+        kwargs["categories"] = defaultdict(list)
         for product in kwargs["products"]:
             if product.product_type:
-                kwargs["categories"].setdefault(product.product_type, []).append(
-                    product
-                )
+                kwargs["categories"][product.product_type].append(product)
         kwargs["customer"] = self.customer
         kwargs["cancel_url"] = self.get_success_url()
 
