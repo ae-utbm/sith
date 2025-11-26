@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-23 15:30+0200\n"
+"POT-Creation-Date: 2025-11-26 15:45+0100\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -207,6 +207,10 @@ msgid "Not enough money"
 msgstr "Pas assez d'argent"
 
 #: counter/static/bundled/counter/counter-click-index.ts
+msgid "Formula %(formula)s applied"
+msgstr "Formule %(formula)s appliquée"
+
+#: counter/static/bundled/counter/counter-click-index.ts
 msgid "You can't send an empty basket."
 msgstr "Vous ne pouvez pas envoyer un panier vide."
 
@@ -262,3 +266,9 @@ msgstr "Il n'a pas été possible de modérer l'image"
 #: sas/static/bundled/sas/viewer-index.ts
 msgid "Couldn't delete picture"
 msgstr "Il n'a pas été possible de supprimer l'image"
+
+#: timetable/static/bundled/timetable/generator-index.ts
+msgid ""
+"Wrong timetable format. Make sure you copied if from your student folder."
+msgstr ""
+"Mauvais format d'emploi du temps. Assurez-vous que vous l'avez copié depuis votre dossier étudiants."
