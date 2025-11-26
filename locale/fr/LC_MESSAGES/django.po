@@ -388,7 +388,7 @@ msgstr "Montrer"
 
 #: club/templates/club/club_sellings.jinja
 #: counter/templates/counter/product_list.jinja
-msgid "Download as cvs"
+msgid "Download as csv"
 msgstr "Télécharger en CSV"
 
 #: club/templates/club/club_sellings.jinja
