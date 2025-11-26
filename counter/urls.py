@@ -25,6 +25,10 @@ from counter.views.admin import (
     CounterStatView,
     ProductCreateView,
     ProductEditView,
+    ProductFormulaCreateView,
+    ProductFormulaDeleteView,
+    ProductFormulaEditView,
+    ProductFormulaListView,
     ProductListView,
     ProductTypeCreateView,
     ProductTypeEditView,
@@ -115,6 +119,24 @@ urlpatterns = [
         "admin/product/<int:product_id>/",
         ProductEditView.as_view(),
         name="product_edit",
+    ),
+    path(
+        "admin/formula/", ProductFormulaListView.as_view(), name="product_formula_list"
+    ),
+    path(
+        "admin/formula/new/",
+        ProductFormulaCreateView.as_view(),
+        name="product_formula_create",
+    ),
+    path(
+        "admin/formula/<int:formula_id>/edit",
+        ProductFormulaEditView.as_view(),
+        name="product_formula_edit",
+    ),
+    path(
+        "admin/formula/<int:formula_id>/delete",
+        ProductFormulaDeleteView.as_view(),
+        name="product_formula_delete",
     ),
     path(
         "admin/product-type/list/",
