@@ -5,6 +5,7 @@ from datetime import date, datetime, timezone
 
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Q
 from django.forms import BaseModelFormSet
 from django.utils.timezone import now
@@ -34,6 +35,7 @@ from counter.models import (
     Eticket,
     InvoiceCall,
     Product,
+    ProductFormula,
     Refilling,
     ReturnableProduct,
     ScheduledProductAction,
@@ -349,13 +351,33 @@ class ProductForm(forms.ModelForm):
         return product
 
 
+class ProductFormulaForm(forms.ModelForm):
+    class Meta:
+        model = ProductFormula
+        fields = ["products", "result"]
+        widgets = {
+            "products": AutoCompleteSelectMultipleProduct,
+            "result": AutoCompleteSelectProduct,
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        prices = [p.selling_price for p in cleaned_data["products"]]
+        selling_price = cleaned_data["result"].selling_price
+        if selling_price > sum(prices):
+            raise ValidationError(
+                _("This formula is more expensive than its constituant products.")
+            )
+        return cleaned_data
+
+
 class ReturnableProductForm(forms.ModelForm):
     class Meta:
         model = ReturnableProduct
         fields = ["product", "returned_product", "max_return"]
         widgets = {
-            "product": AutoCompleteSelectProduct(),
-            "returned_product": AutoCompleteSelectProduct(),
+            "product": AutoCompleteSelectProduct,
+            "returned_product": AutoCompleteSelectProduct,
         }
 
     def save(self, commit: bool = True) -> ReturnableProduct:  # noqa FBT

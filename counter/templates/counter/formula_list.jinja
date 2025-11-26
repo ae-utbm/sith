@@ -1,0 +1,35 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+  {% trans %}Product formulas{% endtrans %}
+{% endblock %}
+
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("core/components/card.scss") }}">
+  <link rel="stylesheet" href="{{ static("counter/css/admin.scss") }}">
+{% endblock %}
+
+{% block content %}
+  <main>
+    <h3 class="margin-bottom">{% trans %}Product formulas{% endtrans %}</h3>
+    <p>
+      <a href="{{ url('counter:product_formula_create') }}" class="btn btn-blue">
+        {% trans %}New formula{% endtrans %}
+        <i class="fa fa-plus"></i>
+      </a>
+    </p>
+    <ul class="product-group">
+      {%- for formula in object_list -%}
+        <li>
+          <a href="{{ url('counter:product_formula_edit', formula_id=formula.id) }}">
+            {{ formula.result.name }}
+          </a>
+          <a href="{{ url('counter:product_formula_delete', formula_id=formula.id) }}">
+            <i class="fa fa-trash delete-action"></i>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+  </main>
+{% endblock %}
