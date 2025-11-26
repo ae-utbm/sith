@@ -463,6 +463,7 @@ class ProductFormula(models.Model):
     )
     result = models.OneToOneField(
         Product,
+        related_name="formula",
         on_delete=models.CASCADE,
         verbose_name=_("result product"),
         help_text=_("The product got with the formula."),
@@ -470,6 +471,18 @@ class ProductFormula(models.Model):
 
     def __str__(self):
         return self.result.name
+
+    @cached_property
+    def max_selling_price(self) -> float:
+        # iterating over all products is less efficient than doing
+        # a simple aggregation, but this method is likely to be used in
+        # coordination with `max_special_selling_price`,
+        # and Django caches the result of the `all` queryset.
+        return sum(p.selling_price for p in self.products.all())
+
+    @cached_property
+    def max_special_selling_price(self) -> float:
+        return sum(p.special_selling_price for p in self.products.all())
 
 
 class CounterQuerySet(models.QuerySet):
