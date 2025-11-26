@@ -18,7 +18,8 @@
       "#core:*": ["./core/static/bundled/*"],
       "#pedagogy:*": ["./pedagogy/static/bundled/*"],
       "#counter:*": ["./counter/static/bundled/*"],
-      "#com:*": ["./com/static/bundled/*"]
+      "#com:*": ["./com/static/bundled/*"],
+      "#reservation:*": ["./reservation/static/bundled/*"]
     }
   }
 }

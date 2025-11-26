@@ -1,6 +1,7 @@
 import random
 from datetime import date, timedelta
 from datetime import timezone as tz
+from math import ceil
 from typing import Iterator
 
 from dateutil.relativedelta import relativedelta
@@ -24,6 +25,7 @@ from counter.models import (
 )
 from forum.models import Forum, ForumMessage, ForumTopic
 from pedagogy.models import UV
+from reservation.models import ReservationSlot, Room
 from subscription.models import Subscription
 
 
@@ -40,45 +42,20 @@ class Command(BaseCommand):
 
         self.stdout.write("Creating users...")
         users = self.create_users()
+        # len(subscribers) is approximately 480
         subscribers = random.sample(users, k=int(0.8 * len(users)))
         self.stdout.write("Creating subscriptions...")
         self.create_subscriptions(subscribers)
         self.stdout.write("Creating club memberships...")
-        users_qs = User.objects.filter(id__in=[s.id for s in subscribers])
-        subscribers_now = list(
-            users_qs.annotate(
-                filter=Exists(
-                    Subscription.objects.filter(
-                        member_id=OuterRef("pk"), subscription_end__gte=now()
-                    )
-                )
-            )
-        )
-        old_subscribers = list(
-            users_qs.annotate(
-                filter=Exists(
-                    Subscription.objects.filter(
-                        member_id=OuterRef("pk"), subscription_end__lt=now()
-                    )
-                )
-            )
-        )
-        self.make_club(
-            Club.objects.get(id=settings.SITH_MAIN_CLUB_ID),
-            random.sample(subscribers_now, k=min(30, len(subscribers_now))),
-            random.sample(old_subscribers, k=min(60, len(old_subscribers))),
-        )
-        self.make_club(
-            Club.objects.get(name="Troll Penché"),
-            random.sample(subscribers_now, k=min(20, len(subscribers_now))),
-            random.sample(old_subscribers, k=min(80, len(old_subscribers))),
-        )
+        self.create_club_memberships(subscribers)
+        self.stdout.write("Creating rooms and reservation...")
+        self.create_resources_and_reservations(random.sample(subscribers, k=40))
         self.stdout.write("Creating uvs...")
         self.create_uvs()
         self.stdout.write("Creating products...")
         self.create_products()
         self.stdout.write("Creating sales and refills...")
-        sellers = random.sample(list(User.objects.all()), 100)
+        sellers = list(User.objects.order_by("?")[:100])
         self.create_sales(sellers)
         self.stdout.write("Creating permanences...")
         self.create_permanences(sellers)
@@ -191,6 +168,97 @@ class Command(BaseCommand):
             )
         memberships = Membership.objects.bulk_create(memberships)
         Membership._add_club_groups(memberships)
+
+    def create_club_memberships(self, users: list[User]):
+        users_qs = User.objects.filter(id__in=[s.id for s in users])
+        subscribers_now = list(
+            users_qs.annotate(
+                filter=Exists(
+                    Subscription.objects.filter(
+                        member_id=OuterRef("pk"), subscription_end__gte=now()
+                    )
+                )
+            )
+        )
+        old_subscribers = list(
+            users_qs.annotate(
+                filter=Exists(
+                    Subscription.objects.filter(
+                        member_id=OuterRef("pk"), subscription_end__lt=now()
+                    )
+                )
+            )
+        )
+        self.make_club(
+            Club.objects.get(id=settings.SITH_MAIN_CLUB_ID),
+            random.sample(subscribers_now, k=min(30, len(subscribers_now))),
+            random.sample(old_subscribers, k=min(60, len(old_subscribers))),
+        )
+        self.make_club(
+            Club.objects.get(name="Troll Penché"),
+            random.sample(subscribers_now, k=min(20, len(subscribers_now))),
+            random.sample(old_subscribers, k=min(80, len(old_subscribers))),
+        )
+
+    def create_resources_and_reservations(self, users: list[User]):
+        """Generate reservable rooms and reservations slots for those rooms.
+
+        Contrary to the other data generator,
+        this one generates more data than what is expected on the real db.
+        """
+        ae = Club.objects.get(id=settings.SITH_MAIN_CLUB_ID)
+        pdf = Club.objects.get(id=settings.SITH_PDF_CLUB_ID)
+        troll = Club.objects.get(name="Troll Penché")
+        rooms = [
+            Room(
+                name=name,
+                club=club,
+                location=location,
+                description=self.faker.text(100),
+            )
+            for name, club, location in [
+                ("Champi", ae, "BELFORT"),
+                ("Muzik", ae, "BELFORT"),
+                ("Pôle Tech", ae, "BELFORT"),
+                ("Jolly", troll, "BELFORT"),
+                ("Cookut", pdf, "BELFORT"),
+                ("Lucky", pdf, "BELFORT"),
+                ("Potards", pdf, "SEVENANS"),
+                ("Bureau AE", ae, "SEVENANS"),
+            ]
+        ]
+        rooms = Room.objects.bulk_create(rooms)
+        reservations = []
+        for room in rooms:
+            # how much people use this room.
+            # The higher the number, the more reservations exist,
+            # the smaller the interval between two slot is,
+            # and the more future reservations have already been made ahead of time
+            affluence = random.randint(2, 6)
+            slot_start = make_aware(self.faker.past_datetime("-5y").replace(minute=0))
+            generate_until = make_aware(
+                self.faker.future_datetime(timedelta(days=1) * affluence**2)
+            )
+            while slot_start < generate_until:
+                if slot_start.hour < 8:
+                    # if a reservation would start in the middle of the night
+                    # make it start the next morning instead
+                    slot_start += timedelta(hours=10 - slot_start.hour)
+                duration = timedelta(minutes=15) * (1 + int(random.gammavariate(3, 2)))
+                reservations.append(
+                    ReservationSlot(
+                        room=room,
+                        author=random.choice(users),
+                        start_at=slot_start,
+                        end_at=slot_start + duration,
+                        created_at=slot_start - self.faker.time_delta("+7d"),
+                    )
+                )
+                slot_start += duration + (
+                    timedelta(minutes=15) * ceil(random.expovariate(affluence / 192))
+                )
+        reservations.sort(key=lambda slot: slot.created_at)
+        ReservationSlot.objects.bulk_create(reservations)
 
     def create_uvs(self):
         root = User.objects.get(username="root")
@@ -388,7 +456,7 @@ class Command(BaseCommand):
         Permanency.objects.bulk_create(perms)
 
     def create_forums(self):
-        forumers = random.sample(list(User.objects.all()), 100)
+        forumers = list(User.objects.order_by("?")[:100])
         most_actives = random.sample(forumers, 10)
         categories = list(Forum.objects.filter(is_category=True))
         new_forums = [
@@ -406,7 +474,7 @@ class Command(BaseCommand):
             for _ in range(100)
         ]
         ForumTopic.objects.bulk_create(new_topics)
-        topics = list(ForumTopic.objects.all())
+        topics = list(ForumTopic.objects.values_list("id", flat=True))
 
         def get_author():
             if random.random() > 0.5:
@@ -414,7 +482,7 @@ class Command(BaseCommand):
             return random.choice(forumers)
 
         messages = []
-        for t in topics:
+        for topic_id in topics:
             nb_messages = max(1, int(random.normalvariate(mu=90, sigma=50)))
             dates = sorted(
                 [
@@ -426,7 +494,7 @@ class Command(BaseCommand):
             messages.extend(
                 [
                     ForumMessage(
-                        topic=t,
+                        topic_id=topic_id,
                         author=get_author(),
                         date=d,
                         message="\n\n".join(

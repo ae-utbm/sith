@@ -40,9 +40,8 @@ from django.forms import (
     DateInput,
     DateTimeInput,
     TextInput,
-    Widget,
 )
-from django.utils.timezone import now
+from django.utils.timezone import localtime, now
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from PIL import Image
@@ -100,8 +99,8 @@ class FutureDateTimeField(forms.DateTimeField):
 
     default_validators = [validate_future_timestamp]
 
-    def widget_attrs(self, widget: Widget) -> dict[str, str]:
-        return {"min": widget.format_value(now())}
+    def widget_attrs(self, widget: forms.Widget) -> dict[str, str]:
+        return {"min": widget.format_value(localtime())}
 
 
 # Forms
