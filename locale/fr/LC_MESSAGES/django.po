@@ -2958,6 +2958,38 @@ msgstr ""
 "détails dessus, comme la date (en incluant l'année)."
 
 #: counter/forms.py
+#, python-format
+msgid ""
+"This product is a formula. Its price cannot be greater than the price of the "
+"products constituting it, which is %(price)s €"
+msgstr ""
+"Ce produit est une formule. Son prix ne peut pas être supérieur au prix des "
+"produits qui la constituent, soit %(price)s €."
+
+#: counter/forms.py
+#, python-format
+msgid ""
+"This product is a formula. Its special price cannot be greater than the "
+"price of the products constituting it, which is %(price)s €"
+msgstr ""
+"Ce produit est une formule. Son prix spécial ne peut pas être supérieur au "
+"prix des produits qui la constituent, soit %(price)s €."
+
+#: counter/forms.py
+msgid ""
+"The same product cannot be at the same time the result and a part of the "
+"formula."
+msgstr ""
+"Un même produit ne peut pas être à la fois le résultat et un élément de la "
+"formule."
+
+#: counter/forms.py
+msgid ""
+"The result cannot be more expensive than the total of the other products."
+msgstr ""
+"Le résultat ne peut pas être plus cher que le total des autres produits."
+
+#: counter/forms.py
 msgid "Refound this account"
 msgstr "Rembourser ce compte"
 
@@ -3116,6 +3148,18 @@ msgstr "produit"
 #: counter/models.py
 msgid "products"
 msgstr "produits"
+
+#: counter/models.py
+msgid "The products that constitute this formula."
+msgstr "Les produits qui constituent cette formule."
+
+#: counter/models.py
+msgid "result product"
+msgstr "produit résultat"
+
+#: counter/models.py
+msgid "The product got with the formula."
+msgstr "Le produit obtenu par la formule."
 
 #: counter/models.py
 msgid "counter type"
@@ -3537,6 +3581,14 @@ msgstr "Nouveau eticket"
 msgid "There is no eticket in this website."
 msgstr "Il n'y a pas de eticket sur ce site web."
 
+#: counter/templates/counter/formula_list.jinja
+msgid "Product formulas"
+msgstr "Formules de produits"
+
+#: counter/templates/counter/formula_list.jinja
+msgid "New formula"
+msgstr "Nouvelle formule"
+
 #: counter/templates/counter/fragments/create_student_card.jinja
 msgid "No student card registered."
 msgstr "Aucune carte étudiante enregistrée."
@@ -3875,6 +3927,10 @@ msgstr "Dernières opérations"
 #: counter/views/mixins.py
 msgid "Counter administration"
 msgstr "Administration des comptoirs"
+
+#: counter/views/mixins.py
+msgid "Formulas"
+msgstr "Formules"
 
 #: counter/views/mixins.py
 msgid "Product types"
