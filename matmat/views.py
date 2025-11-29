@@ -30,59 +30,18 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView, View
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import FormView
-from phonenumber_field.widgets import RegionalPhoneNumberWidget
+from django.views.generic.edit import FormMixin, FormView
 
 from core.auth.mixins import FormerSubscriberMixin
 from core.models import User
 from core.schemas import UserFilterSchema
-from core.views.forms import SelectDate
-
-# Enum to select search type
+from matmat.forms import SearchForm
 
 
 class SearchType(Enum):
     NORMAL = 1
     REVERSE = 2
     QUICK = 3
-
-
-# Custom form
-
-
-class SearchForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = [
-            "first_name",
-            "last_name",
-            "nick_name",
-            "role",
-            "department",
-            "semester",
-            "promo",
-            "date_of_birth",
-            "phone",
-        ]
-        widgets = {
-            "date_of_birth": SelectDate,
-            "phone": RegionalPhoneNumberWidget,
-        }
-
-    quick = forms.CharField(label=_("Last/First name or nickname"), max_length=255)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for key in self.fields:
-            self.fields[key].required = False
-
-    @property
-    def cleaned_data_json(self):
-        data = self.cleaned_data
-        for key, val in data.items():
-            if key in ("date_of_birth", "phone") and val is not None:
-                data[key] = str(val)
-        return data
 
 
 # Views
