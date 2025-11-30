@@ -23,16 +23,8 @@
 
 from django.urls import path
 
-from matmat.views import (
-    SearchClearFormView,
-    SearchNormalFormView,
-    SearchQuickFormView,
-    SearchReverseFormView,
-)
+from matmat.views import MatmatronchView
 
 urlpatterns = [
-    path("", SearchNormalFormView.as_view(), name="search"),
-    path("reverse/", SearchReverseFormView.as_view(), name="search_reverse"),
-    path("quick/", SearchQuickFormView.as_view(), name="search_quick"),
-    path("clear/", SearchClearFormView.as_view(), name="search_clear"),
+    path("", MatmatronchView.as_view(), name="search"),
 ]

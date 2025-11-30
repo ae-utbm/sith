@@ -1,12 +1,13 @@
 {% extends "core/base.jinja" %}
 {% from "core/macros.jinja" import user_mini_profile, paginate_jinja %}
+{% from "core/macros.jinja" import user_mini_profile, paginate_jinja with context %}
 
 {% block title %}
   {% trans %}Search user{% endtrans %}
 {% endblock %}
 
 {% block content %}
-  {% if result_exists %}
+  {% if paginator.count > 0 %}
     <h2>{% trans %}Results{% endtrans %}</h2>
     <div class="matmat_results">
       {% for user in object_list %}
@@ -24,42 +25,8 @@
     <hr>
   {% endif %}
   <h2>{% trans %}Search user{% endtrans %}</h2>
-  <h3>{% trans %}Search by profile{% endtrans %}</h3>
-  <form action="{{ url('matmat:search') }}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {% for field in form %}
-      {% if field.name not in ('phone', 'quick') %}
-        <p>
-          {{ field.errors }}
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-        </p>
-      {% endif %}
-    {% endfor %}
-    <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
+  <form action="{{ url('matmat:search') }}" method="get">
+    {{ form }}
+    <input type="submit" value="{% trans %}Search{% endtrans %}" />
   </form>
-  <h3>{% trans %}Inverted search{% endtrans %}</h3>
-  <form action="{{ url('matmat:search_reverse') }}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <p>
-      {{ form.phone.errors }}
-      <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
-      {{ form.phone }}
-      <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
-    </p>
-  </form>
-  <h3>{% trans %}Quick search{% endtrans %}</h3>
-  <form action="{{ url('matmat:search_quick') }}" method="post">
-    {% csrf_token %}
-    <p>
-      {{ form.quick.errors }}
-      <label for="{{ form.quick.id_for_label }}">{{ form.quick.label }}</label>
-      {{ form.quick }}
-      <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
-    </p>
-  </form>
-{% endblock %}
-
-{% block script %}
-  {{ super() }}
 {% endblock %}

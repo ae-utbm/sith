@@ -20,6 +20,8 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+from typing import Any
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
@@ -30,29 +32,17 @@ from core.views.forms import SelectDate
 class SearchForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = [
-            "first_name",
-            "last_name",
-            "nick_name",
-            "role",
-            "department",
-            "semester",
-            "promo",
-            "date_of_birth",
-            "phone",
-        ]
+        fields = ["promo", "role", "department", "semester", "date_of_birth"]
         widgets = {"date_of_birth": SelectDate}
 
-    quick = forms.CharField(label=_("Last/First name or nickname"), max_length=255)
+    name = forms.CharField(
+        label=_("Last/First name or nickname"), min_length=1, max_length=255
+    )
+    field_order = ["name", "promo", "role", "department", "semester", "date_of_birth"]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, initial: dict[str, Any], **kwargs):
+        super().__init__(*args, initial=initial, **kwargs)
         for key in self.fields:
             self.fields[key].required = False
-
-    @property
-    def cleaned_data_json(self):
-        data = self.cleaned_data
-        if "date_of_birth" in data and data["date_of_birth"] is not None:
-            data["date_of_birth"] = str(data["date_of_birth"])
-        return data
+            if key not in initial:
+                self.fields[key].initial = None
