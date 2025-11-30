@@ -157,12 +157,12 @@
     {% if current_page.has_previous() %}
       <a
         {% if use_htmx -%}
-          hx-get="?page={{ current_page.previous_page_number() }}"
+          hx-get="?{{ querystring(page=current_page.previous_page_number()) }}"
           hx-swap="innerHTML"
           hx-target="#content"
           hx-push-url="true"
         {%- else -%}
-          href="?page={{ current_page.previous_page_number() }}"
+          href="?{{ querystring(page=current_page.previous_page_number()) }}"
         {%- endif -%}
       >
         <button>
@@ -180,12 +180,12 @@
       {% else %}
         <a
           {% if use_htmx -%}
-            hx-get="?page={{ i }}"
+            hx-get="?{{ querystring(page=i) }}"
             hx-swap="innerHTML"
             hx-target="#content"
             hx-push-url="true"
           {%- else -%}
-            href="?page={{ i }}"
+            href="?{{ querystring(page=i) }}"
           {%- endif -%}
         >
           <button>{{ i }}</button>
@@ -195,12 +195,12 @@
     {% if current_page.has_next() %}
       <a
         {% if use_htmx -%}
-          hx-get="?page={{ current_page.next_page_number() }}"
+          hx-get="?querystring(page=current_page.next_page_number())"
           hx-swap="innerHTML"
           hx-target="#content"
           hx-push-url="true"
         {%- else -%}
-          href="?page={{ current_page.next_page_number() }}"
+          href="?querystring(page=current_page.next_page_number())"
         {%- endif -%}
       ><button>
         <i class="fa fa-caret-right"></i>
@@ -248,4 +248,18 @@
                  {% endfor %}
                  }"></div>
   {% endif %}
+{% endmacro %}
+
+
+{% macro querystring() %}
+  {%- for key, values in request.GET.lists() -%}
+    {%- if key not in kwargs -%}
+      {%- for value in values -%}
+        {{ key }}={{ value }}&amp;
+      {%- endfor -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- for key, value in kwargs.items() -%}
+    {{ key }}={{ value }}&amp;
+  {%- endfor -%}
 {% endmacro %}
