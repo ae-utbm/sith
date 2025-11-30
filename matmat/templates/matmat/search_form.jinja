@@ -26,7 +26,11 @@
   {% endif %}
   <h2>{% trans %}Search user{% endtrans %}</h2>
   <form action="{{ url('matmat:search') }}" method="get">
-    {{ form }}
-    <input type="submit" value="{% trans %}Search{% endtrans %}" />
+    <fieldset class="fields-centered">
+      {{ form }}
+    </fieldset>
+    <div class="fields-centered">
+      <input class="btn btn-blue" type="submit" value="{% trans %}Search{% endtrans %}" />
+    </div>
   </form>
 {% endblock %}
