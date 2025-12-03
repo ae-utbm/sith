@@ -4,15 +4,16 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.syndication.views import add_domain
-from django.db.models import F, QuerySet
+from django.db.models import Count, OuterRef, QuerySet, Subquery
 from django.http import HttpRequest
 from django.urls import reverse
 from django.utils import timezone
 from ical.calendar import Calendar
 from ical.calendar_stream import IcsCalendarStream
 from ical.event import Event
+from ical.types import Frequency, Recur
 
-from com.models import NewsDate
+from com.models import News, NewsDate
 from core.models import User
 
 
@@ -42,9 +43,9 @@ class IcsCalendar:
         with open(cls._INTERNAL_CALENDAR, "wb") as f:
             _ = f.write(
                 cls.ics_from_queryset(
-                    NewsDate.objects.filter(
-                        news__is_published=True,
-                        end_date__gte=timezone.now() - (relativedelta(months=6)),
+                    News.objects.filter(
+                        is_published=True,
+                        dates__end_date__gte=timezone.now() - relativedelta(months=6),
                     )
                 )
             )
@@ -53,24 +54,35 @@ class IcsCalendar:
     @classmethod
     def get_unpublished(cls, user: User) -> bytes:
         return cls.ics_from_queryset(
-            NewsDate.objects.viewable_by(user).filter(
-                news__is_published=False,
-                end_date__gte=timezone.now() - (relativedelta(months=6)),
-            ),
+            News.objects.viewable_by(user).filter(
+                is_published=False,
+                dates__end_date__gte=timezone.now() - relativedelta(months=6),
+            )
         )
 
     @classmethod
-    def ics_from_queryset(cls, queryset: QuerySet[NewsDate]) -> bytes:
+    def ics_from_queryset(cls, queryset: QuerySet[News]) -> bytes:
         calendar = Calendar()
-        for news_date in queryset.annotate(news_title=F("news__title")):
+        date_subquery = NewsDate.objects.filter(news=OuterRef("pk")).order_by(
+            "start_date"
+        )
+        queryset = queryset.annotate(
+            start=Subquery(date_subquery.values("start_date")[:1]),
+            end=Subquery(date_subquery.values("end_date")[:1]),
+            nb_dates=Count("dates"),
+        )
+        for news in queryset:
             event = Event(
-                summary=news_date.news_title,
-                start=news_date.start_date,
-                end=news_date.end_date,
+                summary=news.title,
+                description=news.summary,
+                dtstart=news.start,
+                dtend=news.end,
                 url=as_absolute_url(
-                    reverse("com:news_detail", kwargs={"news_id": news_date.news_id})
+                    reverse("com:news_detail", kwargs={"news_id": news.id})
                 ),
             )
+            if news.nb_dates > 1:
+                event.rrule = Recur(freq=Frequency.WEEKLY, count=news.nb_dates)
             calendar.events.append(event)
 
         return IcsCalendarStream.calendar_to_ics(calendar).encode("utf-8")
