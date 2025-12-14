@@ -326,7 +326,7 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
     def _generate_image_mode(
         self, p, banned_users, width, height, selected_date, ban_group=None
     ):
-        """Generate PDF in image mode: grid of profile pictures."""
+        """Generate PDF in image mode: grid of profile pictures with names below each image."""
         from reportlab.lib.units import cm
         from reportlab.lib.utils import ImageReader
 
@@ -362,10 +362,18 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
             else:
                 self._draw_placeholder(p, x_pos, y_pos - img_size, img_size)
 
+            # Draw user name below the image
+            p.setFont("Helvetica", 10)
+            name_text = f"{user.first_name} {user.last_name}"
+            text_width = p.stringWidth(name_text, "Helvetica", 10)
+            name_x = x_pos + (img_size / 2) - (text_width / 2)
+            name_y = y_pos - img_size - 0.4 * cm
+            p.drawString(name_x, name_y, name_text)
+
             if count % images_per_row == 0:
                 # New row
                 x_pos = margin
-                y_pos -= img_size + spacing
+                y_pos -= img_size + spacing + 0.7 * cm  # Add extra space for the name
 
                 # Check if we need a new page
                 if y_pos - img_size < 2 * cm:

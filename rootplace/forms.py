@@ -64,8 +64,8 @@ class BanReportForm(forms.Form):
     """Form to generate a PDF report of banned users at a specific date."""
 
     DISPLAY_MODES = [
-        ("image", _("Images only (profile pictures)")),
-        ("desc", _("Detailed (name, reason and image)")),
+        ("image", _("Images (profile pictures and names below)")),
+        ("desc", _("Detailed (name, type and profile picture)")),
     ]
 
     LANGUAGES = [

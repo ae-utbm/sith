@@ -8,7 +8,7 @@
   <h3>{% trans %}Generate a PDF report of banned users{% endtrans %}</h3>
   <p>{% trans %}Select a date to view all users banned on that day.{% endtrans %}</p>
 
-  <form action="" method="post">
+  <form id="ban-report-form" action="" method="post">
     {% csrf_token %}
     {{ form.as_p() }}
     <p><input type="submit" value="{% trans %}Generate PDF{% endtrans %}" class="btn btn-blue" /></p>
@@ -17,5 +17,13 @@
   <a href="{{ url('rootplace:ban_list') }}" class="btn">
     {% trans %}Back to ban list{% endtrans %}
   </a>
-{% endblock %}
 
+  <script>
+    document.getElementById('ban-report-form').addEventListener('submit', function(e) {
+      const msg = {% trans %}"This PDF is intended for legitimate use cases only. You must destroy any copies of this report after you have finished using it. Do you wish to proceed?"{% endtrans %};
+      if (!confirm(msg)) {
+        e.preventDefault();
+      }
+    });
+  </script>
+{% endblock %}

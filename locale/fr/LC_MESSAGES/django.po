@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-14 15:54+0100\n"
+"POT-Creation-Date: 2025-12-14 17:51+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4698,12 +4698,12 @@ msgid "User to be selected"
 msgstr "Utilisateur à sélectionner"
 
 #: rootplace/forms.py
-msgid "Images only (profile pictures)"
-msgstr "Images seulement (photos de profil)"
+msgid "Images (profile pictures and names below)"
+msgstr "Images (photos de profil et noms en dessous)"
 
 #: rootplace/forms.py
-msgid "Detailed (name, reason and image)"
-msgstr "Détaillé (nom, raison et image)"
+msgid "Detailed (name, type and profile picture)"
+msgstr "Détaillé (nom, type et photo de profil)"
 
 #: rootplace/forms.py sith/settings.py
 msgid "French"
@@ -4767,6 +4767,15 @@ msgstr "Générer le PDF"
 #| msgid "Back to list"
 msgid "Back to ban list"
 msgstr "Retour à la liste"
+
+#: rootplace/templates/rootplace/ban_report.jinja
+msgid ""
+"\"This PDF is intended for legitimate use cases only. You must destroy any "
+"copies of this report after you have finished using it. Do you wish to "
+"proceed?\""
+msgstr "\"Ce PDF est destiné à des usages légitimes uniquement. "
+"Vous devez détruire une fois que vous avez fini de l'utiliser. "
+"Souhaitez-vous continuer ?\""
 
 #: rootplace/templates/rootplace/delete_user_messages.jinja
 msgid "Delete all forum messages from an user"
