@@ -276,14 +276,17 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
         banned_users = UserBan.objects.filter(
             created_at__date__lte=selected_date
         ).filter(
-            models.Q(expires_at__isnull=True) | models.Q(expires_at__date__gte=selected_date)
+            models.Q(expires_at__isnull=True)
+            | models.Q(expires_at__date__gte=selected_date)
         )
 
         # Apply optional ban_group filter
         if ban_group:
             banned_users = banned_users.filter(ban_group=ban_group)
 
-        banned_users = banned_users.select_related("user", "user__profile_pict", "ban_group")
+        banned_users = banned_users.select_related(
+            "user", "user__profile_pict", "ban_group"
+        )
 
         # Create PDF response
         response = HttpResponse(content_type="application/pdf")
@@ -307,16 +310,22 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
 
         if mode == "image":
             # Image mode: Grid of profile pictures
-            self._generate_image_mode(p, banned_users, width, height, selected_date, ban_group)
+            self._generate_image_mode(
+                p, banned_users, width, height, selected_date, ban_group
+            )
         else:
             # Desc mode: Detailed list with name, reason and image
-            self._generate_desc_mode(p, banned_users, width, height, selected_date, ban_group)
+            self._generate_desc_mode(
+                p, banned_users, width, height, selected_date, ban_group
+            )
 
         p.showPage()
         p.save()
         return response
 
-    def _generate_image_mode(self, p, banned_users, width, height, selected_date, ban_group=None):
+    def _generate_image_mode(
+        self, p, banned_users, width, height, selected_date, ban_group=None
+    ):
         """Generate PDF in image mode: grid of profile pictures."""
         from reportlab.lib.units import cm
         from reportlab.lib.utils import ImageReader
@@ -325,7 +334,9 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
         margin = 1 * cm
         spacing = 0.5 * cm
         images_per_row = 5
-        start_y = height - 5 * cm  # Increased from 4cm to 5cm to avoid overlapping with title and date
+        start_y = (
+            height - 5 * cm
+        )  # Increased from 4cm to 5cm to avoid overlapping with title and date
 
         x_pos = margin
         y_pos = start_y
@@ -337,7 +348,15 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
             if user.profile_pict:
                 try:
                     im = ImageReader(user.profile_pict.file)
-                    p.drawImage(im, x_pos, y_pos - img_size, img_size, img_size, preserveAspectRatio=True, mask='auto')
+                    p.drawImage(
+                        im,
+                        x_pos,
+                        y_pos - img_size,
+                        img_size,
+                        img_size,
+                        preserveAspectRatio=True,
+                        mask="auto",
+                    )
                 except Exception:
                     self._draw_placeholder(p, x_pos, y_pos - img_size, img_size)
             else:
@@ -346,14 +365,16 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
             if count % images_per_row == 0:
                 # New row
                 x_pos = margin
-                y_pos -= (img_size + spacing)
+                y_pos -= img_size + spacing
 
                 # Check if we need a new page
                 if y_pos - img_size < 2 * cm:
                     p.showPage()
                     # Redraw title on new page
                     p.setFont("Helvetica-Bold", 20)
-                    p.drawCentredString(width / 2, height - 2 * cm, str(_("Banned users")))
+                    p.drawCentredString(
+                        width / 2, height - 2 * cm, str(_("Banned users"))
+                    )
                     p.setFont("Helvetica", 14)
                     title_text = selected_date.strftime("%d/%m/%Y")
                     if ban_group:
@@ -362,9 +383,11 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
                     y_pos = height - 5 * cm
                     x_pos = margin
             else:
-                x_pos += (img_size + spacing)
+                x_pos += img_size + spacing
 
-    def _generate_desc_mode(self, p, banned_users, width, height, selected_date, ban_group=None):
+    def _generate_desc_mode(
+        self, p, banned_users, width, height, selected_date, ban_group=None
+    ):
         """Generate PDF in desc mode: detailed list with name, reason and image."""
         from reportlab.lib.units import cm
         from reportlab.lib.utils import ImageReader
@@ -394,7 +417,15 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
             if user.profile_pict:
                 try:
                     im = ImageReader(user.profile_pict.file)
-                    p.drawImage(im, margin, y_pos - img_size, img_size, img_size, preserveAspectRatio=True, mask='auto')
+                    p.drawImage(
+                        im,
+                        margin,
+                        y_pos - img_size,
+                        img_size,
+                        img_size,
+                        preserveAspectRatio=True,
+                        mask="auto",
+                    )
                 except Exception:
                     self._draw_placeholder(p, margin, y_pos - img_size, img_size)
             else:
@@ -403,14 +434,18 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
             # Draw user information
             text_x = margin + img_size + 0.5 * cm
             p.setFont("Helvetica-Bold", 12)
-            p.drawString(text_x, y_pos - 0.5 * cm, f"{user.first_name} {user.last_name}")
+            p.drawString(
+                text_x, y_pos - 0.5 * cm, f"{user.first_name} {user.last_name}"
+            )
 
             p.setFont("Helvetica", 10)
             ban_type = ban.ban_group.name if ban.ban_group else "N/A"
             p.drawString(text_x, y_pos - 1 * cm, f"{_('Ban type')!s} : {ban_type}")
 
             # Draw reason (truncate if too long)
-            reason_text = ban.reason[:80] + "..." if len(ban.reason) > 80 else ban.reason
+            reason_text = (
+                ban.reason[:80] + "..." if len(ban.reason) > 80 else ban.reason
+            )
             p.setFont("Helvetica-Oblique", 9)
             p.drawString(text_x, y_pos - 1.5 * cm, f"{_('Reason')!s}: {reason_text}")
 
