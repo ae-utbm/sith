@@ -4726,8 +4726,6 @@ msgid "Filter by ban type. Leave empty to show all bans."
 msgstr "Filtrer par type de ban. Laisser vide pour afficher tous les bans."
 
 #: rootplace/forms.py
-#, fuzzy
-#| msgid "ban type"
 msgid "All ban types"
 msgstr "type de ban"
 
