@@ -30,6 +30,7 @@ from django.http import HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.timezone import localdate
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView, ListView
 from django.views.generic.edit import CreateView, FormView
 
@@ -258,6 +259,7 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
     form_class = BanReportForm
 
     def form_valid(self, form):
+        from django.utils.translation import activate, gettext as _t
         from reportlab.lib.pagesizes import A4
         from reportlab.lib.units import cm
         from reportlab.pdfgen import canvas
@@ -265,6 +267,10 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
         selected_date = form.cleaned_data["date"]
         mode = form.cleaned_data["mode"]
         ban_group = form.cleaned_data.get("ban_group")
+        language = form.cleaned_data.get("language", "fr")
+
+        # Activate the selected language for translations
+        activate(language)
 
         # Get bans active on the selected date
         banned_users = UserBan.objects.filter(
@@ -288,11 +294,11 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
         # Create PDF canvas
         p = canvas.Canvas(response, pagesize=A4)
         width, height = A4
-        p.setTitle(f"Utilisateurs bannis - {selected_date}")
+        p.setTitle(f"{str(_('Banned users'))} - {selected_date}")
 
         # Title
         p.setFont("Helvetica-Bold", 20)
-        p.drawCentredString(width / 2, height - 2 * cm, "Utilisateurs bannis")
+        p.drawCentredString(width / 2, height - 2 * cm, str(_("Banned users")))
         p.setFont("Helvetica", 14)
         title_text = selected_date.strftime("%d/%m/%Y")
         if ban_group:
@@ -312,6 +318,7 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
 
     def _generate_image_mode(self, p, banned_users, width, height, selected_date, ban_group=None):
         """Generate PDF in image mode: grid of profile pictures."""
+        from django.utils.translation import gettext as _t
         from reportlab.lib.units import cm
         from reportlab.lib.utils import ImageReader
 
@@ -347,7 +354,7 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
                     p.showPage()
                     # Redraw title on new page
                     p.setFont("Helvetica-Bold", 20)
-                    p.drawCentredString(width / 2, height - 2 * cm, "Utilisateurs bannis")
+                    p.drawCentredString(width / 2, height - 2 * cm, str(_("Banned users")))
                     p.setFont("Helvetica", 14)
                     title_text = selected_date.strftime("%d/%m/%Y")
                     if ban_group:
@@ -360,6 +367,7 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
 
     def _generate_desc_mode(self, p, banned_users, width, height, selected_date, ban_group=None):
         """Generate PDF in desc mode: detailed list with name, reason and image."""
+        from django.utils.translation import gettext as _t
         from reportlab.lib.units import cm
         from reportlab.lib.utils import ImageReader
 
@@ -376,7 +384,7 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
                 p.showPage()
                 # Redraw title on new page
                 p.setFont("Helvetica-Bold", 20)
-                p.drawCentredString(width / 2, height - 2 * cm, "Utilisateurs bannis")
+                p.drawCentredString(width / 2, height - 2 * cm, str(_("Banned users")))
                 p.setFont("Helvetica", 14)
                 title_text = selected_date.strftime("%d/%m/%Y")
                 if ban_group:
@@ -401,20 +409,21 @@ class BanReportPDFView(PermissionRequiredMixin, FormView):
 
             p.setFont("Helvetica", 10)
             ban_type = ban.ban_group.name if ban.ban_group else "N/A"
-            p.drawString(text_x, y_pos - 1 * cm, f"Type de ban : {ban_type}")
+            p.drawString(text_x, y_pos - 1 * cm, f"{str(_('Ban type'))} : {ban_type}")
 
             # Draw reason (truncate if too long)
             reason_text = ban.reason[:80] + "..." if len(ban.reason) > 80 else ban.reason
             p.setFont("Helvetica-Oblique", 9)
-            p.drawString(text_x, y_pos - 1.5 * cm, f"Raison: {reason_text}")
+            p.drawString(text_x, y_pos - 1.5 * cm, f"{str(_('Reason'))}: {reason_text}")
 
             y_pos -= line_height
 
     def _draw_placeholder(self, p, x, y, size):
         """Draw a placeholder rectangle when no profile picture is available."""
+        from django.utils.translation import gettext as _t
+
         p.setFillColorRGB(0.9, 0.9, 0.9)
         p.rect(x, y, size, size, fill=1)
         p.setFillColorRGB(0, 0, 0)
         p.setFont("Helvetica", 8)
-        p.drawCentredString(x + size / 2, y + size / 2, "Pas de photo")
-
+        p.drawCentredString(x + size / 2, y + size / 2, str(_("No picture")))

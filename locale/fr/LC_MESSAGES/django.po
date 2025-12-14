@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-12 21:44+0100\n"
+"POT-Creation-Date: 2025-12-14 15:54+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -412,7 +412,7 @@ msgstr "Bénéfice : "
 #: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/cash_summary_list.jinja
 #: counter/templates/counter/last_ops.jinja
-#: counter/templates/counter/refilling_list.jinja
+#: counter/templates/counter/refilling_list.jinja rootplace/forms.py
 #: rootplace/templates/rootplace/logs.jinja sas/forms.py
 #: trombi/templates/trombi/user_profile.jinja
 msgid "Date"
@@ -4576,7 +4576,7 @@ msgid "UV comment moderation"
 msgstr "Modération des commentaires d'UV"
 
 #: pedagogy/templates/pedagogy/moderation.jinja
-#: rootplace/templates/rootplace/userban.jinja sas/models.py
+#: rootplace/templates/rootplace/userban.jinja rootplace/views.py sas/models.py
 msgid "Reason"
 msgstr "Raison"
 
@@ -4697,6 +4697,79 @@ msgstr "Vous ne pouvez pas fusionner deux utilisateurs identiques."
 msgid "User to be selected"
 msgstr "Utilisateur à sélectionner"
 
+#: rootplace/forms.py
+msgid "Images only (profile pictures)"
+msgstr "Images seulement (photos de profil)"
+
+#: rootplace/forms.py
+msgid "Detailed (name, reason and image)"
+msgstr "Détaillé (nom, raison et image)"
+
+#: rootplace/forms.py sith/settings.py
+msgid "French"
+msgstr "Français"
+
+#: rootplace/forms.py sith/settings.py
+msgid "English"
+msgstr "Anglais"
+
+#: rootplace/forms.py
+msgid "Select the date to view banned users"
+msgstr "Sélectionnez la date pour voir les utilisateurs bannis"
+
+#: rootplace/forms.py
+msgid "Ban type (optional)"
+msgstr "Type de ban (optionnel)"
+
+#: rootplace/forms.py
+msgid "Filter by ban type. Leave empty to show all bans."
+msgstr "Filtrer par type de ban. Laisser vide pour afficher tous les bans."
+
+#: rootplace/forms.py
+#, fuzzy
+#| msgid "ban type"
+msgid "All ban types"
+msgstr "type de ban"
+
+#: rootplace/forms.py
+msgid "Language"
+msgstr "Langue"
+
+#: rootplace/forms.py
+msgid "Language for the PDF report"
+msgstr "Langue pour le rapport PDF"
+
+#: rootplace/forms.py
+#, fuzzy
+#| msgid "display time"
+msgid "Display mode"
+msgstr "Type d'affichage"
+
+#: rootplace/templates/rootplace/ban_report.jinja
+#, fuzzy
+#| msgid "report"
+msgid "Ban report"
+msgstr "signaler"
+
+#: rootplace/templates/rootplace/ban_report.jinja
+msgid "Generate a PDF report of banned users"
+msgstr "Générer un rapport PDF des utilisateurs bannis"
+
+#: rootplace/templates/rootplace/ban_report.jinja
+msgid "Select a date to view all users banned on that day."
+msgstr ""
+"Sélectionnez une date pour voir tous les utilisateurs bannis ce jour-là."
+
+#: rootplace/templates/rootplace/ban_report.jinja
+msgid "Generate PDF"
+msgstr "Générer le PDF"
+
+#: rootplace/templates/rootplace/ban_report.jinja
+#, fuzzy
+#| msgid "Back to list"
+msgid "Back to ban list"
+msgstr "Retour à la liste"
+
 #: rootplace/templates/rootplace/delete_user_messages.jinja
 msgid "Delete all forum messages from an user"
 msgstr "Supprimer tous les messages forum d'un utilisateur"
@@ -4735,6 +4808,10 @@ msgid "Ban a user"
 msgstr "Bannir un utilisateur"
 
 #: rootplace/templates/rootplace/userban.jinja
+msgid "Generate ban report"
+msgstr "Générer un rapport de ban"
+
+#: rootplace/templates/rootplace/userban.jinja
 msgid "Until"
 msgstr "Jusqu'à"
 
@@ -4749,6 +4826,18 @@ msgstr "Retirer le ban"
 #: rootplace/templates/rootplace/userban.jinja
 msgid "No active ban."
 msgstr "Pas de ban actif"
+
+#: rootplace/views.py
+msgid "Banned users"
+msgstr "Utrilisateurs bannis"
+
+#: rootplace/views.py
+msgid "Ban type"
+msgstr "Type de ban"
+
+#: rootplace/views.py
+msgid "No picture"
+msgstr "Pas de photo"
 
 #: sas/forms.py
 msgid "Add a new album"
@@ -4886,14 +4975,6 @@ msgstr "Photos de %(user_name)s"
 #: sas/templates/sas/user_pictures.jinja
 msgid "Download all my pictures"
 msgstr "Télécharger toutes mes photos"
-
-#: sith/settings.py
-msgid "English"
-msgstr "Anglais"
-
-#: sith/settings.py
-msgid "French"
-msgstr "Français"
 
 #: sith/settings.py
 msgid "TC"

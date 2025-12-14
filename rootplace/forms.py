@@ -68,6 +68,11 @@ class BanReportForm(forms.Form):
         ("desc", _("Detailed (name, reason and image)")),
     ]
 
+    LANGUAGES = [
+        ("fr", _("French")),
+        ("en", _("English")),
+    ]
+
     date = forms.DateField(
         label=_("Date"),
         help_text=_("Select the date to view banned users"),
@@ -80,6 +85,12 @@ class BanReportForm(forms.Form):
         required=False,
         queryset=BanGroup.objects.all(),
         empty_label=_("All ban types"),
+    )
+    language = forms.ChoiceField(
+        label=_("Language"),
+        choices=LANGUAGES,
+        initial="fr",
+        help_text=_("Language for the PDF report"),
     )
     mode = forms.ChoiceField(
         label=_("Display mode"),
