@@ -1,0 +1,21 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+  {% trans %}Ban report{% endtrans %}
+{% endblock %}
+
+{% block content %}
+  <h3>{% trans %}Generate a PDF report of banned users{% endtrans %}</h3>
+  <p>{% trans %}Select a date to view all users banned on that day.{% endtrans %}</p>
+
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p() }}
+    <p><input type="submit" value="{% trans %}Generate PDF{% endtrans %}" class="btn btn-blue" /></p>
+  </form>
+
+  <a href="{{ url('rootplace:ban_list') }}" class="btn">
+    {% trans %}Back to ban list{% endtrans %}
+  </a>
+{% endblock %}
+
