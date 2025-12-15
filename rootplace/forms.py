@@ -98,4 +98,3 @@ class BanReportForm(forms.Form):
         initial="desc",
         widget=forms.RadioSelect,
     )
-

@@ -116,16 +116,20 @@ class UserController(ControllerBase):
         # which they may have to deal with hidden users
         if not is_logged_in_counter(self.context.request):
             qs = qs.viewable_by(self.context.request.user)
-        return qs.annotate(
-            full_name=Concat("first_name", Value(" "), "last_name"),
-            reverse_full_name=Concat("last_name", Value(" "), "first_name"),
-        ).filter(
-            Q(first_name__icontains=search)
-            | Q(last_name__icontains=search)
-            | Q(nick_name__icontains=search)
-            | Q(full_name__icontains=search)
-            | Q(reverse_full_name__icontains=search)
-        ).order_by(F("last_login").desc(nulls_last=True))
+        return (
+            qs.annotate(
+                full_name=Concat("first_name", Value(" "), "last_name"),
+                reverse_full_name=Concat("last_name", Value(" "), "first_name"),
+            )
+            .filter(
+                Q(first_name__icontains=search)
+                | Q(last_name__icontains=search)
+                | Q(nick_name__icontains=search)
+                | Q(full_name__icontains=search)
+                | Q(reverse_full_name__icontains=search)
+            )
+            .order_by(F("last_login").desc(nulls_last=True))
+        )
 
 
 @api_controller("/file")

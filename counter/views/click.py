@@ -213,7 +213,6 @@ class CounterClick(
         return res
 
     def get_context_data(self, **kwargs):
-
         """Add customer to the context."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["products"] = self.products

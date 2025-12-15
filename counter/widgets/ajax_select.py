@@ -1,5 +1,7 @@
 from pydantic import TypeAdapter
 
+from core.models import User
+from core.schemas import UserProfileSchema
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
     AutoCompleteSelectMultiple,
@@ -10,8 +12,6 @@ from counter.schemas import (
     SimpleProductSchema,
     SimplifiedCounterSchema,
 )
-from core.models import User
-from core.schemas import UserProfileSchema
 
 _js = ["bundled/counter/components/ajax-select-index.ts"]
 
