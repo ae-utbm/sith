@@ -61,3 +61,44 @@
     background: white;
   }
 }
+
+.alert-ban {
+  background-color: red;
+  color: white;
+  padding: 1em;
+  border-radius: 5px;
+  margin: 0.2em;
+  flex: auto;
+  min-width: 350px;
+
+  h4 {
+    margin-top: 0;
+    color: white;
+  }
+
+  ul {
+    margin-bottom: 0;
+    padding-left: 1.5em;
+  }
+
+  @media (max-width: 600px) {
+    min-width: auto;
+  }
+}
+
+.ban-reason{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin: 40px 0;
+  flex-direction: column;
+
+  strong {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+  }
+  p {
+    text-align: center;
+    font-size: 1.2em;
+  }
+}

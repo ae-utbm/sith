@@ -10,8 +10,17 @@ from counter.schemas import (
     SimpleProductSchema,
     SimplifiedCounterSchema,
 )
+from core.models import User
+from core.schemas import UserProfileSchema
 
 _js = ["bundled/counter/components/ajax-select-index.ts"]
+
+
+class AutoCompleteSelectUserCounter(AutoCompleteSelect):
+    component_name = "user-counter-ajax-select"
+    model = User
+    adapter = TypeAdapter(list[UserProfileSchema])
+    js = _js
 
 
 class AutoCompleteSelectCounter(AutoCompleteSelect):

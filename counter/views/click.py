@@ -25,6 +25,7 @@ from django.views.generic.detail import SingleObjectMixin
 from ninja.main import HttpRequest
 
 from core.auth.mixins import CanViewMixin
+from core.enum import BanTypes
 from core.models import User
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
 from counter.forms import BasketForm, RefillForm
@@ -79,7 +80,7 @@ class CounterClick(
         self.customer = get_object_or_404(Customer, user__id=self.kwargs["user_id"])
         obj: Counter = self.get_object()
 
-        if not self.customer.can_buy or self.customer.user.is_banned_counter:
+        if not self.customer.can_buy:
             return redirect(obj)  # Redirect to counter
 
         if obj.type == "OFFICE" and (
@@ -110,6 +111,15 @@ class CounterClick(
 
         if len(formset) == 0:
             return ret
+
+        bans = self.customer.user.bans.select_related("ban_group")
+        is_blocked = any(
+            ban.ban_group.id
+            in [BanTypes.counter.value, BanTypes.ae.value, BanTypes.alcool.value]
+            for ban in bans
+        )
+        if is_blocked:
+            raise PermissionDenied
 
         operator = get_operator(self.request, self.object, self.customer)
         with transaction.atomic():
@@ -203,6 +213,7 @@ class CounterClick(
         return res
 
     def get_context_data(self, **kwargs):
+
         """Add customer to the context."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["products"] = self.products
@@ -213,6 +224,15 @@ class CounterClick(
                     product
                 )
         kwargs["customer"] = self.customer
+        bans = self.customer.user.bans.select_related("ban_group")
+        kwargs["bans"] = bans
+        kwargs["is_blocked"] = any(
+            ban.ban_group.id in [BanTypes.counter.value, BanTypes.ae.value]
+            for ban in bans
+        )
+        kwargs["has_site_ban"] = any(
+            ban.ban_group.id == BanTypes.ae.value for ban in bans
+        )
         kwargs["cancel_url"] = self.get_success_url()
 
         # To get all forms errors to the javascript, we create a list of error list

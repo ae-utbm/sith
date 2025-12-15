@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-14 17:51+0100\n"
+"POT-Creation-Date: 2025-12-15 23:07+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3406,6 +3406,38 @@ msgid "There is no cash register summary in this website."
 msgstr "Il n'y a pas de relevé de caisse dans ce site web."
 
 #: counter/templates/counter/counter_click.jinja
+msgid "This customer is banned"
+msgstr "Ce client est banni"
+
+#: counter/templates/counter/counter_click.jinja
+msgid "Please make this person go out"
+msgstr "Veuillez faire sortir cette personne"
+
+#: counter/templates/counter/counter_click.jinja
+msgid " This person is banned from the AE "
+msgstr "Cette personne est bannie de l'AE "
+
+#: counter/templates/counter/counter_click.jinja
+msgid ""
+" If you are not conformable to make it go out, pretend a sith failure and "
+"ask a fellow barman to help you. "
+msgstr ""
+"Si vous n'êtes pas à l'aise pour le faire sortir, prétextez une panne "
+"de sith et demandez à un autre barman de vous aider."
+
+#: counter/templates/counter/counter_click.jinja
+msgid "Please dont serve this person"
+msgstr "Veuillez ne pas servir cette personne"
+
+#: counter/templates/counter/counter_click.jinja
+msgid " This person is banned from this counter "
+msgstr "Cette personne est bannie de ce comptoir "
+
+#: counter/templates/counter/counter_click.jinja
+msgid "You cannot serve him/her/them until the ban is lifted."
+msgstr "Vous ne pouvez pas le/la/les servir tant que le ban n'est pas levé."
+
+#: counter/templates/counter/counter_click.jinja
 msgid "Selling"
 msgstr "Vente"
 
@@ -4773,9 +4805,9 @@ msgid ""
 "\"This PDF is intended for legitimate use cases only. You must destroy any "
 "copies of this report after you have finished using it. Do you wish to "
 "proceed?\""
-msgstr "\"Ce PDF est destiné à des usages légitimes uniquement. "
-"Vous devez détruire une fois que vous avez fini de l'utiliser. "
-"Souhaitez-vous continuer ?\""
+msgstr ""
+"\"Ce PDF est destiné à des usages légitimes uniquement. Vous devez détruire "
+"une fois que vous avez fini de l'utiliser. Souhaitez-vous continuer ?\""
 
 #: rootplace/templates/rootplace/delete_user_messages.jinja
 msgid "Delete all forum messages from an user"
