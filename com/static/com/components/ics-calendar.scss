@@ -18,6 +18,8 @@
   --event-details-border-radius: 4px;
   --event-details-box-shadow: 0px 6px 20px 4px rgb(0 0 0 / 16%);
   --event-details-max-width: 600px;
+  --event-recurring-internal-color: #6f69cd;
+  --event-recurring-unpublished-color: orange;
 }
 
 ics-calendar {
@@ -146,4 +148,29 @@ ics-calendar {
 .tooltip.calendar-copy-tooltip.text-copied {
   opacity: 0;
   transition: opacity 500ms ease-out;
+}
+
+// We have to override the color set by the lib in the html
+// Hence the !important tag everywhere
+.internal.recurring {
+  .fc-daygrid-event-dot {
+    border-color: var(--event-recurring-internal-color) !important;
+  }
+
+  &.fc-daygrid-block-event {
+    background-color: var(--event-recurring-internal-color) !important;
+    border-color: var(--event-recurring-internal-color) !important;
+  }
+
+}
+
+.unpublished.recurring {
+  .fc-daygrid-event-dot {
+    border-color: var(--event-recurring-unpublished-color) !important;
+  }
+
+  &.fc-daygrid-block-event {
+    background-color: var(--event-recurring-unpublished-color) !important;
+    border-color: var(--event-recurring-unpublished-color) !important;
+  }
 }
