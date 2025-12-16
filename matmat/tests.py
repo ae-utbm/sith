@@ -33,3 +33,27 @@ class TestMatmatronch(TestCase):
         )
         assert response.status_code == 200
         assert list(response.context_data["object_list"]) == [self.users[2]]
+
+    def test_empty_search(self):
+        self.client.force_login(subscriber_user.make())
+        response = self.client.get(reverse("matmat:search"))
+        assert response.status_code == 200
+        assert list(response.context_data["object_list"]) == []
+        assert not response.context_data["form"].is_valid()
+
+        response = self.client.get(
+            reverse(
+                "matmat:search",
+                query={
+                    "promo": "",
+                    "role": "",
+                    "department": "",
+                    "semester": "",
+                    "date_of_birth": "",
+                },
+            )
+        )
+        assert response.status_code == 200
+        assert list(response.context_data["object_list"]) == []
+        assert not response.context_data["form"].is_valid()
+        assert "Recherche vide" in response.context_data["form"].non_field_errors()

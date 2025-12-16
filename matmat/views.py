@@ -16,7 +16,7 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
@@ -28,10 +28,11 @@ from django.views.generic.edit import FormMixin
 from core.auth.mixins import FormerSubscriberMixin
 from core.models import User, UserQuerySet
 from core.schemas import UserFilterSchema
+from core.views.mixins import AllowFragment
 from matmat.forms import SearchForm
 
 
-class MatmatronchView(FormerSubscriberMixin, FormMixin, ListView):
+class MatmatronchView(AllowFragment, FormerSubscriberMixin, FormMixin, ListView):
     model = User
     paginate_by = 20
     template_name = "matmat/search_form.jinja"

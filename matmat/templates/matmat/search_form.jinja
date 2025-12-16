@@ -1,6 +1,11 @@
-{% extends "core/base.jinja" %}
-{% from "core/macros.jinja" import user_mini_profile, paginate_jinja %}
-{% from "core/macros.jinja" import user_mini_profile, paginate_jinja with context %}
+{% if is_fragment %}
+  {% extends "core/base_fragment.jinja" %}
+{% else %}
+  {% extends "core/base.jinja" %}
+{% endif %}
+
+{% from "core/macros.jinja" import user_mini_profile, paginate_htmx with context %}
+
 
 {% block title %}
   {% trans %}Search user{% endtrans %}
@@ -20,7 +25,7 @@
       {% endfor %}
     </div>
     {% if page_obj.has_other_pages() %}
-      {{ paginate_jinja(page_obj, paginator) }}
+      {{ paginate_htmx(page_obj, paginator) }}
     {% endif %}
     <hr>
   {% endif %}

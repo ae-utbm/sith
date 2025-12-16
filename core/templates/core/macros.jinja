@@ -161,6 +161,7 @@
           hx-swap="innerHTML"
           hx-target="#content"
           hx-push-url="true"
+          hx-trigger="click, keyup[key=='ArrowLeft'] from:body"
         {%- else -%}
           href="?{{ querystring(page=current_page.previous_page_number()) }}"
         {%- endif -%}
@@ -195,12 +196,13 @@
     {% if current_page.has_next() %}
       <a
         {% if use_htmx -%}
-          hx-get="?querystring(page=current_page.next_page_number())"
+          hx-get="?{{querystring(page=current_page.next_page_number())}}"
           hx-swap="innerHTML"
           hx-target="#content"
           hx-push-url="true"
+          hx-trigger="click, keyup[key=='ArrowRight'] from:body"
         {%- else -%}
-          href="?querystring(page=current_page.next_page_number())"
+          href="?{{querystring(page=current_page.next_page_number())}}"
         {%- endif -%}
       ><button>
         <i class="fa fa-caret-right"></i>

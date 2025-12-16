@@ -16,13 +16,14 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
 from typing import Any
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from core.models import User
@@ -46,3 +47,8 @@ class SearchForm(forms.ModelForm):
             self.fields[key].required = False
             if key not in initial:
                 self.fields[key].initial = None
+
+    def clean(self):
+        data = self.cleaned_data
+        if all(data[key] in self.fields[key].empty_values for key in self.fields):
+            raise ValidationError(_("Empty search"))
