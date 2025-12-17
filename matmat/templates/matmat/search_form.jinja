@@ -31,8 +31,15 @@
   {% endif %}
   <h2>{% trans %}Search user{% endtrans %}</h2>
   <form action="{{ url('matmat:search') }}" method="get">
+    {{ form.non_field_errors() }}
     <fieldset class="fields-centered">
-      {{ form }}
+      {% for field in form %}
+        <div>
+          {{ field.label_tag() }}
+          {{ field }}
+          {{ field.errors }}
+        </div>
+      {% endfor %}
     </fieldset>
     <div class="fields-centered">
       <input class="btn btn-blue" type="submit" value="{% trans %}Search{% endtrans %}" />
