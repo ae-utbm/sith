@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-24 11:05+0100\n"
+"POT-Creation-Date: 2025-12-17 00:03+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4384,6 +4384,14 @@ msgstr "Galaxie de %(user_name)s"
 msgid "This citizen has not yet joined the galaxy"
 msgstr "Ce citoyen n'a pas encore rejoint la galaxie"
 
+#: matmat/forms.py
+msgid "Last/First name or nickname"
+msgstr "Nom de famille, prénom ou surnom"
+
+#: matmat/forms.py
+msgid "Empty search"
+msgstr "Recherche vide"
+
 #: matmat/templates/matmat/search_form.jinja
 msgid "Search user"
 msgstr "Rechercher un utilisateur"
@@ -4391,22 +4399,6 @@ msgstr "Rechercher un utilisateur"
 #: matmat/templates/matmat/search_form.jinja
 msgid "Results"
 msgstr "Résultats"
-
-#: matmat/templates/matmat/search_form.jinja
-msgid "Search by profile"
-msgstr "Recherche par profil"
-
-#: matmat/templates/matmat/search_form.jinja
-msgid "Inverted search"
-msgstr "Recherche inversée"
-
-#: matmat/templates/matmat/search_form.jinja
-msgid "Quick search"
-msgstr "Recherche rapide"
-
-#: matmat/views.py
-msgid "Last/First name or nickname"
-msgstr "Nom de famille, prénom ou surnom"
 
 #: pedagogy/forms.py
 msgid "Do not vote"

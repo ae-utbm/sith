@@ -114,7 +114,7 @@
 
 
     {# All fields #}
-    <div class="profile-fields">
+    <div class="fields-centered">
       {%- for field in form -%}
         {%- if field.name in ["quote","profile_pict","avatar_pict","scrub_pict","is_viewable","forum_signature"] -%}
           {%- continue -%}
@@ -133,7 +133,7 @@
     </div>
 
     {# Textareas #}
-    <div class="profile-fields">
+    <div class="fields-centered">
       {%- for field in [form.quote, form.forum_signature] -%}
         <div class="profile-field">
           {{ field.label_tag() }}

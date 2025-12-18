@@ -1,12 +1,18 @@
-{% extends "core/base.jinja" %}
-{% from "core/macros.jinja" import user_mini_profile, paginate_jinja %}
+{% if is_fragment %}
+  {% extends "core/base_fragment.jinja" %}
+{% else %}
+  {% extends "core/base.jinja" %}
+{% endif %}
+
+{% from "core/macros.jinja" import user_mini_profile, paginate_htmx with context %}
+
 
 {% block title %}
   {% trans %}Search user{% endtrans %}
 {% endblock %}
 
 {% block content %}
-  {% if result_exists %}
+  {% if paginator.count > 0 %}
     <h2>{% trans %}Results{% endtrans %}</h2>
     <div class="matmat_results">
       {% for user in object_list %}
@@ -19,47 +25,24 @@
       {% endfor %}
     </div>
     {% if page_obj.has_other_pages() %}
-      {{ paginate_jinja(page_obj, paginator) }}
+      {{ paginate_htmx(page_obj, paginator) }}
     {% endif %}
     <hr>
   {% endif %}
   <h2>{% trans %}Search user{% endtrans %}</h2>
-  <h3>{% trans %}Search by profile{% endtrans %}</h3>
-  <form action="{{ url('matmat:search') }}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {% for field in form %}
-      {% if field.name not in ('phone', 'quick') %}
-        <p>
-          {{ field.errors }}
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+  <form action="{{ url('matmat:search') }}" method="get">
+    {{ form.non_field_errors() }}
+    <fieldset class="fields-centered">
+      {% for field in form %}
+        <div>
+          {{ field.label_tag() }}
           {{ field }}
-        </p>
-      {% endif %}
-    {% endfor %}
-    <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
+          {{ field.errors }}
+        </div>
+      {% endfor %}
+    </fieldset>
+    <div class="fields-centered">
+      <input class="btn btn-blue" type="submit" value="{% trans %}Search{% endtrans %}" />
+    </div>
   </form>
-  <h3>{% trans %}Inverted search{% endtrans %}</h3>
-  <form action="{{ url('matmat:search_reverse') }}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <p>
-      {{ form.phone.errors }}
-      <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
-      {{ form.phone }}
-      <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
-    </p>
-  </form>
-  <h3>{% trans %}Quick search{% endtrans %}</h3>
-  <form action="{{ url('matmat:search_quick') }}" method="post">
-    {% csrf_token %}
-    <p>
-      {{ form.quick.errors }}
-      <label for="{{ form.quick.id_for_label }}">{{ form.quick.label }}</label>
-      {{ form.quick }}
-      <p><input type="submit" value="{% trans %}Search{% endtrans %}" /></p>
-    </p>
-  </form>
-{% endblock %}
-
-{% block script %}
-  {{ super() }}
 {% endblock %}

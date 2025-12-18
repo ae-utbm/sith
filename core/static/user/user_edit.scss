@@ -114,15 +114,6 @@
     }
   }
 
-  &-fields {
-    padding: 10px 10px 0;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: var(--nf-input-size) 10px;
-    justify-content: center;
-  }
-
   &-field {
     display: flex;
     flex-wrap: wrap;
