@@ -833,9 +833,6 @@ class SithFile(models.Model):
         on_delete=models.CASCADE,
     )
     asked_for_removal = models.BooleanField(_("asked for removal"), default=False)
-    is_in_sas = models.BooleanField(
-        _("is in the SAS"), default=False, db_index=True
-    )  # Allows to query this flag, updated at each call to save()
 
     class Meta:
         verbose_name = _("file")
@@ -844,22 +841,10 @@ class SithFile(models.Model):
         return self.get_parent_path() + "/" + self.name
 
     def save(self, *args, **kwargs):
-        sas = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
-        self.is_in_sas = sas in self.get_parent_list() or self == sas
         adding = self._state.adding
         super().save(*args, **kwargs)
         if adding:
             self.copy_rights()
-        if self.is_in_sas:
-            for user in User.objects.filter(
-                groups__id__in=[settings.SITH_GROUP_SAS_ADMIN_ID]
-            ):
-                Notification(
-                    user=user,
-                    url=reverse("sas:moderation"),
-                    type="SAS_MODERATION",
-                    param="1",
-                ).save()
 
     def is_owned_by(self, user: User) -> bool:
         if user.is_anonymous:
@@ -871,8 +856,6 @@ class SithFile(models.Model):
             # and profile pictures may only be edited by board members
             return user.is_board_member
         if user.is_com_admin:
-            return True
-        if self.is_in_sas and user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
             return True
         return user.id == self.owner_id
 
@@ -900,8 +883,6 @@ class SithFile(models.Model):
         super().clean()
         if "/" in self.name:
             raise ValidationError(_("Character '/' not authorized in name"))
-        if self == self.parent:
-            raise ValidationError(_("Loop in folder tree"), code="loop")
         if self == self.parent or (
             self.parent is not None and self in self.get_parent_list()
         ):
@@ -981,18 +962,6 @@ class SithFile(models.Model):
     @property
     def is_file(self):
         return not self.is_folder
-
-    @cached_property
-    def as_picture(self):
-        from sas.models import Picture
-
-        return Picture.objects.filter(id=self.id).first()
-
-    @cached_property
-    def as_album(self):
-        from sas.models import Album
-
-        return Album.objects.filter(id=self.id).first()
 
     def get_parent_list(self):
         parents = []

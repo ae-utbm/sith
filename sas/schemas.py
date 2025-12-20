@@ -55,7 +55,12 @@ class AlbumAutocompleteSchema(ModelSchema):
 
     @staticmethod
     def resolve_path(obj: Album) -> str:
-        return str(Path(obj.get_parent_path()) / obj.name)
+        return str(Path(obj.parent_path) / obj.name)
+
+
+class MoveAlbumSchema(Schema):
+    id: int
+    new_parent_id: int
 
 
 class PictureFilterSchema(FilterSchema):
@@ -70,7 +75,7 @@ class PictureFilterSchema(FilterSchema):
 class PictureSchema(ModelSchema):
     class Meta:
         model = Picture
-        fields = ["id", "name", "date", "size", "is_moderated", "asked_for_removal"]
+        fields = ["id", "name", "created_at", "is_moderated", "asked_for_removal"]
 
     owner: UserProfileSchema
     sas_url: str

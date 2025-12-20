@@ -12,18 +12,23 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-
+from dataclasses import dataclass
 from datetime import date, timedelta
 
 # Image utils
 from io import BytesIO
-from typing import Final
+from typing import Any, Final, Unpack
 
 import PIL
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import UploadedFile
-from django.http import HttpRequest
+from django.db import models
+from django.forms import BaseForm
+from django.http import Http404, HttpRequest
+from django.shortcuts import get_list_or_404
+from django.template.loader import render_to_string
+from django.utils.safestring import SafeString
 from django.utils.timezone import localdate
 from PIL import ExifTags
 from PIL.Image import Image, Resampling
@@ -40,6 +45,21 @@ RED_PIXEL_PNG: Final[bytes] = (
 Can be used in tests and in dev, when there is a need
 to generate a dummy image that is considered valid nonetheless
 """
+
+
+@dataclass
+class FormFragmentTemplateData[T: BaseForm]:
+    """Dataclass used to pre-render form fragments"""
+
+    form: T
+    template: str
+    context: dict[str, Any]
+
+    def render(self, request: HttpRequest) -> SafeString:
+        # Request is needed for csrf_tokens
+        return render_to_string(
+            self.template, context={"form": self.form, **self.context}, request=request
+        )
 
 
 def get_start_of_semester(today: date | None = None) -> date:
@@ -205,3 +225,56 @@ def get_client_ip(request: HttpRequest) -> str | None:
             return ip
 
     return None
+
+
+Filterable = models.Model | models.QuerySet | models.Manager
+ListFilter = dict[str, list | tuple | set]
+
+
+def get_list_exact_or_404(klass: Filterable, **kwargs: Unpack[ListFilter]) -> list:
+    """Use filter() to return a list of objects from a list of unique keys (like ids)
+    or raises Http404 if the list has not the same length as the given one.
+
+    Work like `get_object_or_404()` but for lists of objects, with some caveats :
+
+    - The filter must be a list, a tuple or a set.
+    - There can't be more than exactly one filter.
+    - There must be no duplicate in the filter.
+    - The filter should consist in unique keys (like ids), or it could fail randomly.
+
+    klass may be a Model, Manager, or QuerySet object. All other passed
+    arguments and keyword arguments are used in the filter() query.
+
+    Raises:
+        Http404: If the list is empty or doesn't have as many elements as the keys list.
+        ValueError: If the first argument is not a Model, Manager, or QuerySet object.
+        ValueError: If more than one filter is passed.
+        TypeError: If the given filter is not a list, a tuple or a set.
+
+    Examples:
+        Get all the products with ids 1, 2, 3: ::
+
+            products = get_list_exact_or_404(Product, id__in=[1, 2, 3])
+
+        Don't work with duplicate ids: ::
+
+            products = get_list_exact_or_404(Product, id__in=[1, 2, 3, 3])
+            # Raises Http404: "The list of keys must contain no duplicates."
+    """
+    if len(kwargs) > 1:
+        raise ValueError("get_list_exact_or_404() only accepts one filter.")
+    key, list_filter = next(iter(kwargs.items()))
+    if not isinstance(list_filter, (list, tuple, set)):
+        raise TypeError(
+            f"The given filter must be a list, a tuple or a set, not {type(list_filter)}"
+        )
+    if len(list_filter) != len(set(list_filter)):
+        raise ValueError("The list of keys must contain no duplicates.")
+    kwargs = {key: list_filter}
+    obj_list = get_list_or_404(klass, **kwargs)
+    if len(obj_list) != len(list_filter):
+        raise Http404(
+            "The given list of keys doesn't match the number of objects found."
+            f"Expected {len(list_filter)} items, got {len(obj_list)}."
+        )
+    return obj_list
