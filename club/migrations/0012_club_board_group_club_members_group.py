@@ -2,11 +2,14 @@
 
 import django.db.models.deletion
 import django.db.models.functions.datetime
-from django.conf import settings
 from django.db import migrations, models
 from django.db.migrations.state import StateApps
 from django.db.models import Q
 from django.utils.timezone import localdate
+
+# Before the club role rework, the maximum free role
+# was the hardcoded highest non-board role
+MAXIMUM_FREE_ROLE = 1
 
 
 def migrate_meta_groups(apps: StateApps, schema_editor):
@@ -46,10 +49,7 @@ def migrate_meta_groups(apps: StateApps, schema_editor):
         ).select_related("user")
         club.members_group.users.set([m.user for m in memberships])
         club.board_group.users.set(
-            [
-                m.user
-                for m in memberships.filter(role__gt=settings.SITH_MAXIMUM_FREE_ROLE)
-            ]
+            [m.user for m in memberships.filter(role__gt=MAXIMUM_FREE_ROLE)]
         )
 
 
