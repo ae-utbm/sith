@@ -26,7 +26,6 @@ from __future__ import annotations
 from typing import Iterable, Self
 
 from django.conf import settings
-from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import RegexValidator, validate_email
 from django.db import models, transaction
@@ -187,9 +186,6 @@ class Club(models.Model):
         self.page.save(force_lock=True)
 
     def delete(self, *args, **kwargs) -> tuple[int, dict[str, int]]:
-        # Invalidate the cache of this club and of its memberships
-        for membership in self.members.ongoing().select_related("user"):
-            cache.delete(f"membership_{self.id}_{membership.user.id}")
         self.board_group.delete()
         self.members_group.delete()
         return super().delete(*args, **kwargs)
@@ -210,24 +206,15 @@ class Club(models.Model):
         """Method to see if that object can be edited by the given user."""
         return self.has_rights_in_club(user)
 
-    def get_membership_for(self, user: User) -> Membership | None:
-        """Return the current membership the given user.
+    @cached_property
+    def current_members(self) -> list[Membership]:
+        return list(self.members.ongoing().select_related("user").order_by("-role"))
 
-        Note:
-            The result is cached.
-        """
+    def get_membership_for(self, user: User) -> Membership | None:
+        """Return the current membership of the given user."""
         if user.is_anonymous:
             return None
-        membership = cache.get(f"membership_{self.id}_{user.id}")
-        if membership == "not_member":
-            return None
-        if membership is None:
-            membership = self.members.filter(user=user, end_date=None).first()
-            if membership is None:
-                cache.set(f"membership_{self.id}_{user.id}", "not_member")
-            else:
-                cache.set(f"membership_{self.id}_{user.id}", membership)
-        return membership
+        return next((m for m in self.current_members if m.user_id == user.id), None)
 
     def has_rights_in_club(self, user: User) -> bool:
         return user.is_in_group(pk=self.board_group_id)
@@ -295,28 +282,20 @@ class MembershipQuerySet(models.QuerySet):
         and add them in the club groups they should be in.
 
         Be aware that this adds three db queries :
-        one to retrieve the updated memberships,
-        one to perform group removal and one to perform
-        group attribution.
+
+        - one to retrieve the updated memberships
+        - one to perform group removal
+        - and one to perform group attribution.
         """
         nb_rows = super().update(**kwargs)
         if nb_rows == 0:
-            # if no row was affected, no need to refresh the cache
+            # if no row was affected, no need to edit club groups
             return 0
 
-        cache_memberships = {}
         memberships = set(self.select_related("club"))
         # delete all User-Group relations and recreate the necessary ones
-        # It's more concise to write and more reliable
         Membership._remove_club_groups(memberships)
         Membership._add_club_groups(memberships)
-        for member in memberships:
-            cache_key = f"membership_{member.club_id}_{member.user_id}"
-            if member.end_date is None:
-                cache_memberships[cache_key] = member
-            else:
-                cache_memberships[cache_key] = "not_member"
-        cache.set_many(cache_memberships)
         return nb_rows
 
     def delete(self) -> tuple[int, dict[str, int]]:
@@ -339,12 +318,6 @@ class MembershipQuerySet(models.QuerySet):
         nb_rows, rows_counts = super().delete()
         if nb_rows > 0:
             Membership._remove_club_groups(memberships)
-            cache.set_many(
-                {
-                    f"membership_{m.club_id}_{m.user_id}": "not_member"
-                    for m in memberships
-                }
-            )
         return nb_rows, rows_counts
 
 
@@ -408,9 +381,6 @@ class Membership(models.Model):
         self._remove_club_groups([self])
         if self.end_date is None:
             self._add_club_groups([self])
-            cache.set(f"membership_{self.club_id}_{self.user_id}", self)
-        else:
-            cache.set(f"membership_{self.club_id}_{self.user_id}", "not_member")
 
     def get_absolute_url(self):
         return reverse("club:club_members", kwargs={"club_id": self.club_id})
@@ -431,7 +401,6 @@ class Membership(models.Model):
     def delete(self, *args, **kwargs):
         self._remove_club_groups([self])
         super().delete(*args, **kwargs)
-        cache.delete(f"membership_{self.club_id}_{self.user_id}")
 
     @staticmethod
     def _remove_club_groups(
