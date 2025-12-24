@@ -1,6 +1,7 @@
 from typing import Annotated, Literal
 
 from django.db.models import Q
+from django.urls import reverse
 from django.utils import html
 from haystack.query import SearchQuerySet
 from ninja import FilterLookup, FilterSchema, ModelSchema, Schema
@@ -84,6 +85,22 @@ class SimpleUeSchema(ModelSchema):
             "semester",
             "department",
         ]
+
+    detail_url: str
+    edit_url: str
+    delete_url: str
+
+    @staticmethod
+    def resolve_detail_url(obj: UE) -> str:
+        return reverse("pedagogy:ue_detail", kwargs={"ue_id": obj.id})
+
+    @staticmethod
+    def resolve_edit_url(obj: UE) -> str:
+        return reverse("pedagogy:ue_update", kwargs={"ue_id": obj.id})
+
+    @staticmethod
+    def resolve_delete_url(obj: UE) -> str:
+        return reverse("pedagogy:ue_delete", kwargs={"ue_id": obj.id})
 
 
 class UeSchema(ModelSchema):
