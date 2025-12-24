@@ -177,7 +177,7 @@ from django.conf import settings
 class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("pedagogy", "0003_alter_uv_language"),
+        ("pedagogy", "0003_alter_ue_language"),
     ]
 
     operations = [
@@ -215,11 +215,12 @@ On modifie donc le modèle :
 ```python
 from django.db import models
 from core.models import User
-from pedagogy.models import UV
+from pedagogy.models import UE
+
 
 class UserUe(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    ue = models.ForeignKey(UV, on_delete=models.CASCADE)
+    ue = models.ForeignKey(UE, on_delete=models.CASCADE)
 ```
 
 On refait la commande `makemigrations` et on obtient :
@@ -237,7 +238,7 @@ class Migration(migrations.Migration):
             model_name="userue",
             name="ue",
             field=models.ForeignKey(
-                on_delete=models.deletion.CASCADE, to="pedagogy.uv"
+                on_delete=models.deletion.CASCADE, to="pedagogy.ue"
             ),
         ),
     ]
@@ -280,7 +281,7 @@ python ./manage.py squasmigrations <app> <migration de début (incluse)> <migrat
 Par exemple, dans notre cas, ça donnera :
 
 ```bash
-python ./manage.py squasmigrations pedagogy 0004 0005 
+python ./manage.py squashmigrations pedagogy 0004 0005 
 ```
 
 La commande vous donnera ceci :
@@ -292,7 +293,7 @@ class Migration(migrations.Migration):
     replaces = [("pedagogy", "0004_userue"), ("pedagogy", "0005_alter_userue_ue")]
 
     dependencies = [
-        ("pedagogy", "0003_alter_uv_language"),
+        ("pedagogy", "0003_alter_ue_language"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -312,7 +313,7 @@ class Migration(migrations.Migration):
                 (
                     "ue",
                     models.ForeignKey(
-                        on_delete=models.deletion.CASCADE, to="pedagogy.uv"
+                        on_delete=models.deletion.CASCADE, to="pedagogy.ue"
                     ),
                 ),
                 (

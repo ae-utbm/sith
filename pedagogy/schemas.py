@@ -7,11 +7,11 @@ from ninja import FilterLookup, FilterSchema, ModelSchema, Schema
 from pydantic import AliasPath, ConfigDict, Field, TypeAdapter
 from pydantic.alias_generators import to_camel
 
-from pedagogy.models import UV
+from pedagogy.models import UE
 
 
-class UtbmShortUvSchema(Schema):
-    """Short representation of an UV in the UTBM API.
+class UtbmShortUeSchema(Schema):
+    """Short representation of an UE in the UTBM API.
 
     Notes:
         This schema holds only the fields we actually need.
@@ -35,8 +35,8 @@ class WorkloadSchema(Schema):
     nbh: int
 
 
-class SemesterUvState(Schema):
-    """The state of the UV during either autumn or spring semester"""
+class SemesterUeState(Schema):
+    """The state of the UE during either autumn or spring semester"""
 
     model_config = ConfigDict(alias_generator=to_camel)
 
@@ -44,11 +44,11 @@ class SemesterUvState(Schema):
     ouvert: bool
 
 
-ShortUvList = TypeAdapter(list[UtbmShortUvSchema])
+ShortUeList = TypeAdapter(list[UtbmShortUeSchema])
 
 
-class UtbmFullUvSchema(Schema):
-    """Long representation of an UV in the UTBM API."""
+class UtbmFullUeSchema(Schema):
+    """Long representation of an UE in the UTBM API."""
 
     model_config = ConfigDict(alias_generator=to_camel)
 
@@ -71,11 +71,11 @@ class UtbmFullUvSchema(Schema):
     )
 
 
-class SimpleUvSchema(ModelSchema):
-    """Our minimal representation of an UV."""
+class SimpleUeSchema(ModelSchema):
+    """Our minimal representation of an UE."""
 
     class Meta:
-        model = UV
+        model = UE
         fields = [
             "id",
             "title",
@@ -86,11 +86,11 @@ class SimpleUvSchema(ModelSchema):
         ]
 
 
-class UvSchema(ModelSchema):
-    """Our complete representation of an UV"""
+class UeSchema(ModelSchema):
+    """Our complete representation of an UE"""
 
     class Meta:
-        model = UV
+        model = UE
         fields = [
             "id",
             "title",
@@ -113,7 +113,7 @@ class UvSchema(ModelSchema):
         ]
 
 
-class UvFilterSchema(FilterSchema):
+class UeFilterSchema(FilterSchema):
     search: Annotated[str | None, FilterLookup("code__icontains")] = None
     semester: set[Literal["AUTUMN", "SPRING"]] | None = None
     credit_type: Annotated[
@@ -132,12 +132,12 @@ class UvFilterSchema(FilterSchema):
             return Q()
 
         if len(value) < 3 or (len(value) < 5 and any(c.isdigit() for c in value)):
-            # Likely to be an UV code
+            # Likely to be an UE code
             return Q(code__istartswith=value)
 
         qs = list(
             SearchQuerySet()
-            .models(UV)
+            .models(UE)
             .autocomplete(auto=html.escape(value))
             .values_list("pk", flat=True)
         )
@@ -147,7 +147,7 @@ class UvFilterSchema(FilterSchema):
     def filter_semester(self, value: set[str] | None) -> Q:
         """Special filter for the semester.
 
-        If either "SPRING" or "AUTUMN" is given, UV that are available
+        If either "SPRING" or "AUTUMN" is given, UE that are available
         during "AUTUMN_AND_SPRING" will be filtered.
         """
         if not value:

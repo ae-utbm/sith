@@ -184,18 +184,18 @@
         </div>
       {% endif %}
 
-      {% if user.has_perm("pedagogy.add_uv") or user.has_perm("pedagogy.delete_uvcomment") %}
+      {% if user.has_perm("pedagogy.add_ue") or user.has_perm("pedagogy.delete_uecomment") %}
         <div>
           <h4>{% trans %}Pedagogy{% endtrans %}</h4>
           <ul>
-            {% if user.has_perm("pedagogy.add_uv") %}
+            {% if user.has_perm("pedagogy.add_ue") %}
               <li>
-                <a href="{{ url("pedagogy:uv_create") }}">
-                  {% trans %}Create UV{% endtrans %}
+                <a href="{{ url("pedagogy:ue_create") }}">
+                  {% trans %}Create UE{% endtrans %}
                 </a>
               </li>
             {% endif %}
-            {% if user.has_perm("pedagogy.delete_uvcomment") %}
+            {% if user.has_perm("pedagogy.delete_uecomment") %}
               <li>
                 <a href="{{ url("pedagogy:moderation") }}">
                   {% trans %}Moderate comments{% endtrans %}

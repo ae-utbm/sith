@@ -7,12 +7,12 @@
 {% endblock %}
 
 {% block title %}
-  {% trans %}UV Details{% endtrans %}
+  {% trans %}UE Details{% endtrans %}
 {% endblock %}
 
 {% block content %}
   <div class="pedagogy">
-    <div id="uv_detail">
+    <div id="ue_detail">
       <button onclick='(function(){
                        // If comes from the guide page, go back with history
                        if (document.referrer.replace(/\?(.+)/gm,"").endsWith(`{{ url("pedagogy:guide") }}`)){
@@ -25,7 +25,7 @@
 
       <h1>{{ object.code }} - {{ object.title }}</h1>
       <br>
-      <div class="uv-quick-info-container">
+      <div class="ue-quick-info-container">
         <div class="hours-cm">
           <b>{% trans %}CM: {% endtrans %}</b>{{ object.hours_CM }}
         </div>
@@ -55,7 +55,7 @@
 
       <br>
 
-      <div class="uv-details-container">
+      <div class="ue-details-container">
         <div class="grade">
           <p>{% trans %}Global grade{% endtrans %}</p>
           <p>{% trans %}Utility{% endtrans %}</p>
@@ -70,7 +70,7 @@
           <p>{{ display_star(object.grade_teaching_average) }}</p>
           <p>{{ display_star(object.grade_work_load_average) }}</p>
         </div>
-        <div class="uv-infos">
+        <div class="ue-infos">
           <p><b>{% trans %}Objectives{% endtrans %}</b></p>
           <p>{{ object.objectives|markdown }}</p>
           <p><b>{% trans %}Program{% endtrans %}</b></p>
@@ -86,21 +86,21 @@
       <br>
       {% if object.has_user_already_commented(user) %}
         <div id="leave_comment_not_allowed">
-          <p>{% trans %}You already posted a comment on this UV. If you want to comment again, please modify or delete your previous comment.{% endtrans %}</p>
+          <p>{% trans %}You already posted a comment on this UE. If you want to comment again, please modify or delete your previous comment.{% endtrans %}</p>
         </div>
-      {% elif user.has_perm("pedagogy.add_uvcomment") %}
+      {% elif user.has_perm("pedagogy.add_uecomment") %}
         <details class="accordion" id="leave_comment">
           <summary>{% trans %}Leave comment{% endtrans %}</summary>
           <div class="accordion-content">
-            <form action="{{ url('pedagogy:uv_detail', uv_id=object.id) }}" method="post" enctype="multipart/form-data">
+            <form action="{{ url('pedagogy:ue_detail', ue_id=object.id) }}" method="post" enctype="multipart/form-data">
               {% csrf_token %}
               <div class="leave-comment-grid-container">
                 <div class="form-stars">
                   {{ form.author.errors }}
-                  {{ form.uv.errors }}
+                  {{ form.ue.errors }}
 
                   {{ form.author }}
-                  {{ form.uv }}
+                  {{ form.ue }}
 
                   <div class="input-stars">
                     <label for="{{ form.grade_global.id_for_label }}">{{ form.grade_global.label }} :</label>
@@ -170,7 +170,7 @@
 
             <div class="comment">
               <div class="anchor">
-                <a href="{{ url('pedagogy:uv_detail', uv_id=uv.id) }}#{{ comment.id }}"><i class="fa fa-paragraph"></i></a>
+                <a href="{{ url('pedagogy:ue_detail', ue_id=ue.id) }}#{{ comment.id }}"><i class="fa fa-paragraph"></i></a>
               </div>
               {{ comment.comment|markdown }}
             </div>

@@ -24,40 +24,40 @@
 from django.urls import path
 
 from pedagogy.views import (
-    UVCommentDeleteView,
-    UVCommentReportCreateView,
-    UVCommentUpdateView,
-    UVCreateView,
-    UVDeleteView,
-    UVDetailFormView,
-    UVGuideView,
-    UVModerationFormView,
-    UVUpdateView,
+    UECommentDeleteView,
+    UECommentReportCreateView,
+    UECommentUpdateView,
+    UECreateView,
+    UEDeleteView,
+    UEDetailFormView,
+    UEGuideView,
+    UEModerationFormView,
+    UEUpdateView,
 )
 
 urlpatterns = [
     # Urls displaying the actual application for visitors
-    path("", UVGuideView.as_view(), name="guide"),
-    path("uv/<int:uv_id>/", UVDetailFormView.as_view(), name="uv_detail"),
+    path("", UEGuideView.as_view(), name="guide"),
+    path("ue/<int:ue_id>/", UEDetailFormView.as_view(), name="ue_detail"),
     path(
         "comment/<int:comment_id>/edit/",
-        UVCommentUpdateView.as_view(),
+        UECommentUpdateView.as_view(),
         name="comment_update",
     ),
     path(
         "comment/<int:comment_id>/delete/",
-        UVCommentDeleteView.as_view(),
+        UECommentDeleteView.as_view(),
         name="comment_delete",
     ),
     path(
         "comment/<int:comment_id>/report/",
-        UVCommentReportCreateView.as_view(),
+        UECommentReportCreateView.as_view(),
         name="comment_report",
     ),
     # Moderation
-    path("moderation/", UVModerationFormView.as_view(), name="moderation"),
+    path("moderation/", UEModerationFormView.as_view(), name="moderation"),
     # Administration : Create Update Delete Edit
-    path("uv/create/", UVCreateView.as_view(), name="uv_create"),
-    path("uv/<int:uv_id>/delete/", UVDeleteView.as_view(), name="uv_delete"),
-    path("uv/<int:uv_id>/edit/", UVUpdateView.as_view(), name="uv_update"),
+    path("ue/create/", UECreateView.as_view(), name="ue_create"),
+    path("ue/<int:ue_id>/delete/", UEDeleteView.as_view(), name="ue_delete"),
+    path("ue/<int:ue_id>/edit/", UEUpdateView.as_view(), name="ue_update"),
 ]
