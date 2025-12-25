@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-25 19:35+0100\n"
+"POT-Creation-Date: 2025-12-25 20:39+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3369,24 +3369,42 @@ msgstr "Le comptoir est ouvert, et il y a au moins un barman connecté"
 msgid "counter is not open : no one is connected"
 msgstr "Le comptoir est fermé"
 
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
 #: counter/templates/counter/admin/ban_user_try_use.jinja
 msgid "Banned user access attempt"
 msgstr "Tentative d'accès d'un utilisateur banni"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
 #: counter/templates/counter/admin/ban_user_try_use.jinja
 msgid "Profile photo"
 msgstr "Photo de profil"
 
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
 #: counter/templates/counter/admin/ban_user_try_use.jinja
 msgid "Attempt time:"
 msgstr "Heure de la tentative :"
 
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
 #: counter/templates/counter/admin/ban_user_try_use.jinja
 msgid "Ban reason:"
 msgstr "Raison du ban :"
 
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
 #: counter/templates/counter/admin/ban_user_try_use.jinja
 msgid "Counter:"
 msgstr "Comptoir :"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid "Remove this user from counter"
+msgstr "Enlever cette utilisateur du comptoire"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid ""
+"A banned user has permission on a counter. Please check the situation and "
+"take action if needed."
+msgstr ""
+"Un utilisateur banni a des permissions sur le comptoir. Veuillez vérifier la "
+"situation et prendre les mesures nécessaires."
 
 #: counter/templates/counter/admin/ban_user_try_use.jinja
 msgid ""
@@ -3400,7 +3418,7 @@ msgstr ""
 msgid "Profile of the barman on duty:"
 msgstr "Profil du barman de service :"
 
-#: counter/templates/counter/ban.jinja
+#: counter/templates/counter/ban.jinja counter/views/click.py
 msgid "Banned"
 msgstr "Banni"
 
@@ -3923,27 +3941,8 @@ msgid "Check quantity"
 msgstr "Nombre de chèque"
 
 #: counter/views/click.py
-msgid ""
-"This person is banned from the association. Please make it go out of the "
-"association premises. If you're not felling well to do this, ask help of a "
-"fellow barman."
-msgstr ""
-"Cette personne est bannie de l'association. Veuillez la faire sortir des "
-"locaux de l'association. Si vous ne vous sentez pas à l'aise pour cela, "
-"demandez de l'aide à un autre barman."
-
-#: counter/views/click.py
-#, fuzzy
-#| msgid " This person is banned from this counter "
-msgid "This person is banned from the counter. You cannot sell them anything."
-msgstr ""
-"Cette personne est bannie de ce comptoir. Vous ne pouvez rien lui vendre."
-
-#: counter/views/click.py
-#, fuzzy
-#| msgid " This person is banned from this counter "
-msgid "This person is banned. You cannot sell them anything."
-msgstr "Cette personne est bannie de ce comptoir "
+msgid "You are banned from making purchases on this counter."
+msgstr "Vous êtes banni. Vous ne pouvez pas faire d'achats."
 
 #: counter/views/eticket.py
 msgid "people(s)"
@@ -5371,6 +5370,10 @@ msgstr "Curieux⸱euse"
 #, python-format
 msgid "%s tries to use a counter"
 msgstr "%s a essaié d'utiliser un comptoir"
+
+#: sith/settings.py
+msgid "%s has counter permissions"
+msgstr "%s a des permissions sur un comptoir"
 
 #: sith/settings.py
 msgid "A new poster needs to be moderated"
