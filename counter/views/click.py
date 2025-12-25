@@ -282,7 +282,6 @@ class CounterClick(
 
         admin_group_ids = [settings.SITH_GROUP_ROOT_ID]
         notif_type = "BANNED_COUNTER_ATTEMPT"
-        # Récupère le counter de façon sûre
         counter = self.get_object()
         if barman is not None and hasattr(barman, 'id') and barman.id is not None:
             notif_url = reverse("counter:admin_ban_user_try_use", kwargs={"counter_id": counter.id, "user_id": ban_user.id, "barman_id": barman.id})
@@ -297,7 +296,7 @@ class CounterClick(
         ).distinct():
             notif = Notification.objects.create(
                 user=user,
-                url=notif_url,  # la notif pointe vers la page admin
+                url=notif_url,
                 type=notif_type,
                 param=str(ban_user.get_display_name()),
             )
@@ -315,7 +314,6 @@ class CounterClick(
 
         admin_group_ids = [settings.SITH_GROUP_ROOT_ID]
         notif_type = "BANNED_HAS_COUNTER_PERMISSION"
-        # Récupère le counter de façon sûre
         counter = self.get_object()
         notif_url = reverse("counter:admin_ban_user_has_counter_permission",
                             kwargs={"counter_id": counter.id, "user_id": ban_user.id})
@@ -328,7 +326,7 @@ class CounterClick(
         ).distinct():
             notif = Notification.objects.create(
                 user=user,
-                url=notif_url,  # la notif pointe vers la page admin
+                url=notif_url,
                 type=notif_type,
                 param=str(ban_user.get_display_name()),
             )
