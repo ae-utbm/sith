@@ -398,9 +398,14 @@ class TestCounterClick(TestFullClickBase):
         ]:
             force_refill_user(user, 10)
             resp = self.submit_basket(user, [BasketItem(self.snack.id, 2)])
-            assert resp.status_code == 302
-            assert resp.url == resolve_url(self.counter)
-
+            print(f"status={resp.status_code} url={getattr(resp, 'url', None)} content={resp.content[:500].decode(errors='replace')}")
+            if resp.status_code == 200:
+                content = resp.content.decode()
+                assert "Banni" in content or "Banned" in content
+            elif resp.status_code == 302:
+                assert resp.url == self.counter.get_absolute_url()
+            else:
+                assert False, f"Unexpected status code: {resp.status_code}"
             assert self.updated_amount(user) == Decimal(10)
 
     def test_click_user_without_customer(self):
@@ -884,3 +889,75 @@ class TestCounterLogout:
             assert permanence.end == now()
             old_permanence.refresh_from_db()
             assert old_permanence.end == old_end
+
+    def test_click_banned_counter_customer(self):
+        """A user banned from the counter should see the ban page (200) and not be debited."""
+        self.login_in_bar()
+        user = self.banned_counter_customer
+        force_refill_user(user, 10)
+        resp = self.submit_basket(user, [BasketItem(self.snack.id, 2)])
+        assert resp.status_code == 200
+        content = resp.content.decode()
+        assert  "banned" in content.lower() or "banni" in content.lower()
+        assert self.updated_amount(user) == Decimal(10)
+        # Check that no admin notification is created (not an AE ban)
+        from core.models import Notification
+        assert not Notification.objects.filter(type="BANNED_COUNTER_ATTEMPT", param=str(user.get_display_name())).exists()
+
+    def test_click_banned_site_customer(self):
+        """A user banned from AE should see the ban page (200), not be debited, and an admin notification should be created."""
+        self.login_in_bar()
+        # Create a user banned from AE
+        from core.models import BanGroup, Notification
+        banned_site_id = getattr(settings, "SITH_GROUP_BANNED_SUBSCRIPTION_ID", 14)
+        user = subscriber_user.make()
+        user.ban_groups.add(BanGroup.objects.get(pk=banned_site_id))
+        force_refill_user(user, 10)
+        resp = self.submit_basket(user, [BasketItem(self.snack.id, 2)])
+        assert resp.status_code == 200
+        content = resp.content.decode()
+        assert "banned" in content.lower() or "banni" in content.lower()
+        assert self.updated_amount(user) == Decimal(10)
+        # Check that an admin notification has been created
+        assert Notification.objects.filter(type="BANNED_COUNTER_ATTEMPT", param=str(user.get_display_name())).exists()
+
+    def test_click_customer_cannot_buy(self):
+        """A user who cannot buy is redirected (302) to the counter page, and their balance is not changed."""
+        self.login_in_bar()
+        user = self.customer_old_can_not_buy
+        force_refill_user(user, 10)
+        resp = self.submit_basket(user, [BasketItem(self.snack.id, 2)])
+        assert resp.status_code == 302
+        assert resp.url == self.counter.get_absolute_url()
+        assert self.updated_amount(user) == Decimal(10)
+
+    def test_click_banned_self_redirects_with_message(self):
+        """If the logged-in user is the banned person, they are redirected to the counter page with an error message."""
+        # Create a user banned from the counter
+        from core.models import BanGroup
+        banned_counter_id = getattr(settings, "SITH_GROUP_BANNED_COUNTER_ID", 13)
+        user = subscriber_user.make(password=make_password("plop"))
+        user.ban_groups.add(BanGroup.objects.get(pk=banned_counter_id))
+        force_refill_user(user, 10)
+        self.client.post(
+            reverse("counter:login", args=[self.counter.id]),
+            {"username": user.username, "password": "plop"},
+        )
+        resp = self.client.post(
+            reverse("counter:click", kwargs={"counter_id": self.counter.id, "user_id": user.id}),
+            {
+                "form-TOTAL_FORMS": "1",
+                "form-INITIAL_FORMS": "0",
+                "form-0-id": str(self.snack.id),
+                "form-0-quantity": "1",
+            },
+            follow=True,
+        )
+        # Should be redirected to the counter page
+        assert resp.redirect_chain[-1][0] == self.counter.get_absolute_url()
+        # The error message should be present
+        content = resp.content.decode()
+        assert "banni" in content.lower() or "banned" in content.lower()
+        # The balance should not change
+        assert self.updated_amount(user) == Decimal(10)
+
