@@ -36,7 +36,7 @@ from counter.views.admin import (
     ReturnableProductDeleteView,
     ReturnableProductListView,
     ReturnableProductUpdateView,
-    SellingDeleteView,
+    SellingDeleteView, BanUserHasCounterPermission, admin_remove_user_from_counter,
 )
 from counter.views.auth import counter_login, counter_logout
 from counter.views.cash import (
@@ -177,5 +177,15 @@ urlpatterns = [
         "admin/ban-try/<int:counter_id>/<int:user_id>/<int:barman_id>/",
         BanUserTryUseView.as_view(),
         name="admin_ban_user_try_use",
+    ),
+    path(
+        "admin/ban-try/<int:counter_id>/<int:user_id>/",
+        BanUserHasCounterPermission.as_view(),
+        name="admin_ban_user_has_counter_permission",
+    ),
+    path(
+        "admin/remove-user/<int:counter_id>/<int:user_id>/",
+        admin_remove_user_from_counter,
+        name="admin_remove_user_from_counter",
     ),
 ]

@@ -15,12 +15,14 @@
 from datetime import timedelta
 
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test, login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.forms import CheckboxSelectMultiple
 from django.forms.models import modelform_factory
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -396,3 +398,42 @@ class BanUserTryUseView(CounterAdminMixin, TemplateView):
         )
         return self.render_to_response(context)
 
+class BanUserHasCounterPermission(CounterAdminMixin, TemplateView):
+    template_name = "counter/admin/ban_user_has_counter_permission.jinja"
+
+    def get(self, request, *args, **kwargs):
+        from django.utils.timezone import timezone
+        user_id = self.kwargs["user_id"]
+        counter_id = self.kwargs["counter_id"]
+        notif_id = self.request.GET.get("notif_id")
+        user = User.objects.get(pk=user_id)
+        counter = Counter.objects.get(pk=counter_id)
+        # On prend le dernier ban actif
+        user_ban = user.bans.select_related("ban_group").filter(
+            ban_group_id=settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID
+        ).first()
+        ban_reason = user_ban.reason if user_ban else ""
+        attempt_time = None
+        if notif_id:
+            notif = Notification.objects.filter(id=notif_id).first()
+            if notif:
+                attempt_time = notif.date
+        if not attempt_time:
+            attempt_time = timezone.now()
+        context = self.get_context_data(
+            ban_user=user,
+            counter=counter,
+            ban_reason=ban_reason,
+            attempt_time=attempt_time,
+        )
+        return self.render_to_response(context)
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser or u.groups.filter(id=getattr(settings, "SITH_GROUP_ROOT_ID", 1)).exists())
+def admin_remove_user_from_counter(request, counter_id, user_id):
+    counter = get_object_or_404(Counter, id=counter_id)
+    user = get_object_or_404(User, id=user_id)
+    if request.method == "POST":
+        counter.sellers.remove(user)
+        messages.success(request, _(f"{user.get_display_name()} has been removed from sellers of {counter}"))
+    return redirect(reverse("counter:admin", args=[counter.id]))

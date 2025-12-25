@@ -117,6 +117,13 @@ class CounterClick(
             )
             if has_site_ban:
                 self.alert_admin_unwanted_user(self.customer.user, obj, request.user)
+            # If the banned user is trying to access his own ban page, we redirect him directly
+            if self.customer.user.pk == request.user.pk:
+                self.alert_admin_unwanted_user_has_counter_sell(self.customer.user, obj)
+                from django.contrib import messages
+                messages.error(request, _("You are banned from making purchases on this counter."))
+                return redirect(obj)
+            # Sinon, page de ban classique
             return render(
                 request,
                 "counter/ban.jinja",
@@ -152,11 +159,10 @@ class CounterClick(
             banned_site_id = getattr(settings, "SITH_GROUP_BANNED_SUBSCRIPTION_ID", 14)
             if banned_site_id in ban_types:
                 self.alert_admin_unwanted_user(self.customer.user, self.object, self.request.user)
-                raise PermissionDenied(_("This person is banned from the association. Please make it go out of the association premises. If you're not felling well to do this, ask help of a fellow barman."))
-            elif banned_counter_id in ban_types:
-                raise PermissionDenied(_("This person is banned from the counter. You cannot sell them anything."))
-            else:
-                raise PermissionDenied(_("This person is banned. You cannot sell them anything."))
+            # Correction ici : compare bien les User.id
+            if self.customer.user.pk == self.request.user.pk:
+                self.alert_admin_unwanted_user_has_counter_sell(self.customer.user, self.object)
+            raise PermissionDenied(_("Banned"))
         operator = get_operator(self.request, self.object, self.customer)
         with transaction.atomic():
             self.request.session["last_basket"] = []
@@ -285,6 +291,36 @@ class CounterClick(
         for user in User.objects.filter(
             ~Exists(unread_notif_subquery),
             groups__id__in=admin_group_ids,
+        ).distinct():
+            notif = Notification.objects.create(
+                user=user,
+                url=notif_url,  # la notif pointe vers la page admin
+                type=notif_type,
+                param=str(ban_user.get_display_name()),
+            )
+            notif.url = f"{notif_url}?notif_id={notif.id}"
+            notif.date = timezone.now()
+            notif.save()
+
+    def alert_admin_unwanted_user_has_counter_sell(self, ban_user: User, counter: Counter):
+        """Alerte les admins AE via une notification interne si un utilisateur banni AE a les droit de vendre sur un counter."""
+        from core.models import Notification, User
+        from django.urls import reverse
+        from django.conf import settings
+        from django.db.models import Exists, OuterRef
+
+        admin_group_ids = [settings.SITH_GROUP_ROOT_ID]
+        notif_type = "BANNED_HAS_COUNTER_PERMISSION"
+        # Récupère le counter de façon sûre
+        counter = self.get_object()
+        notif_url = reverse("counter:admin_ban_user_has_counter_permission",
+                            kwargs={"counter_id": counter.id, "user_id": ban_user.id})
+        unread_notif_subquery = Notification.objects.filter(
+            user=OuterRef("pk"), type=notif_type, viewed=False, param=str(self.customer.user.id)
+        )
+        for user in User.objects.filter(
+                ~Exists(unread_notif_subquery),
+                groups__id__in=admin_group_ids,
         ).distinct():
             notif = Notification.objects.create(
                 user=user,
