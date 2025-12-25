@@ -21,6 +21,8 @@
       </div>
     </div>
     <p style="margin-top:1em">{% trans %}A banned user tried to use the counter. Please check the situation and take action if needed.{% endtrans %}</p>
-    <a href="{{ url('core:user_profile', barman.id) }}">{% trans %}Profile of the barman on duty:{% endtrans %} {{ barman.get_display_name() }}</a>
+    {% if barman %}
+      <a href="{{ url('core:user_profile', barman.id) }}">{% trans %}Profile of the barman on duty:{% endtrans %} {{ barman.get_display_name() }}</a>
+    {% endif %}
   </div>
 {% endblock %}

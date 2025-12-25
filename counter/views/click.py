@@ -20,12 +20,12 @@ from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render, resolve_url
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.safestring import SafeString
+from django.utils.translation import gettext as _
 from django.views.generic import FormView
 from django.views.generic.detail import SingleObjectMixin
 from ninja.main import HttpRequest
-from django.utils.translation import gettext as _
-from django.utils import timezone
 
 from core.auth.mixins import CanViewMixin
 from core.models import User
@@ -123,7 +123,7 @@ class CounterClick(
                 from django.contrib import messages
                 messages.error(request, _("You are banned from making purchases on this counter."))
                 return redirect(obj)
-            # Sinon, page de ban classique
+            # Otherwise, we show the ban page
             return render(
                 request,
                 "counter/ban.jinja",
@@ -145,21 +145,20 @@ class CounterClick(
             return ret
 
         bans = self.customer.user.bans.select_related("ban_group")
+        banned_counter_id = settings.SITH_GROUP_BANNED_COUNTER_ID
+        banned_site_id = settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID
         is_blocked = any(
             ban.ban_group.id
             in [
-                getattr(settings, "SITH_GROUP_BANNED_COUNTER_ID", 13),
-                getattr(settings, "SITH_GROUP_BANNED_SUBSCRIPTION_ID", 14),
+                banned_counter_id,
+                banned_site_id,
             ]
             for ban in bans
         )
         if is_blocked:
             ban_types = [ban.ban_group.id for ban in bans]
-            banned_counter_id = getattr(settings, "SITH_GROUP_BANNED_COUNTER_ID", 13)
-            banned_site_id = getattr(settings, "SITH_GROUP_BANNED_SUBSCRIPTION_ID", 14)
             if banned_site_id in ban_types:
                 self.alert_admin_unwanted_user(self.customer.user, self.object, self.request.user)
-            # Correction ici : compare bien les User.id
             if self.customer.user.pk == self.request.user.pk:
                 self.alert_admin_unwanted_user_has_counter_sell(self.customer.user, self.object)
             raise PermissionDenied(_("Banned"))
@@ -275,16 +274,20 @@ class CounterClick(
 
     def alert_admin_unwanted_user(self, ban_user: User, counter: Counter, barman: User):
         """Alerte les admins AE via une notification interne si un utilisateur banni AE tente d'acheter."""
-        from core.models import Notification, User
-        from django.urls import reverse
         from django.conf import settings
         from django.db.models import Exists, OuterRef
+        from django.urls import reverse
+
+        from core.models import Notification, User
 
         admin_group_ids = [settings.SITH_GROUP_ROOT_ID]
         notif_type = "BANNED_COUNTER_ATTEMPT"
         # Récupère le counter de façon sûre
         counter = self.get_object()
-        notif_url = reverse("counter:admin_ban_user_try_use", kwargs={"counter_id": counter.id, "user_id": ban_user.id, "barman_id": barman.id})
+        if barman is not None and hasattr(barman, 'id') and barman.id is not None:
+            notif_url = reverse("counter:admin_ban_user_try_use", kwargs={"counter_id": counter.id, "user_id": ban_user.id, "barman_id": barman.id})
+        else:
+            notif_url = reverse("counter:admin_ban_user_try_use_no_barman", kwargs={"counter_id": counter.id, "user_id": ban_user.id})
         unread_notif_subquery = Notification.objects.filter(
             user=OuterRef("pk"), type=notif_type, viewed=False, param=str(self.customer.user.id)
         )
@@ -304,10 +307,11 @@ class CounterClick(
 
     def alert_admin_unwanted_user_has_counter_sell(self, ban_user: User, counter: Counter):
         """Alerte les admins AE via une notification interne si un utilisateur banni AE a les droit de vendre sur un counter."""
-        from core.models import Notification, User
-        from django.urls import reverse
         from django.conf import settings
         from django.db.models import Exists, OuterRef
+        from django.urls import reverse
+
+        from core.models import Notification, User
 
         admin_group_ids = [settings.SITH_GROUP_ROOT_ID]
         notif_type = "BANNED_HAS_COUNTER_PERMISSION"

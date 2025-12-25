@@ -16,7 +16,7 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import user_passes_test, login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -30,7 +30,6 @@ from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
 from core.auth.mixins import CanViewMixin
-from core.models import User, Notification
 from core.utils import get_semester_code, get_start_of_semester
 from counter.forms import (
     CloseCustomerAccountForm,
@@ -40,6 +39,7 @@ from counter.forms import (
 )
 from counter.models import (
     Counter,
+    Notification,
     Product,
     ProductType,
     Refilling,
@@ -370,13 +370,13 @@ class BanUserTryUseView(CounterAdminMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         from django.utils.timezone import timezone
-        barman_id = self.kwargs["barman_id"]
+        barman_id = self.kwargs.get("barman_id")
         user_id = self.kwargs["user_id"]
         counter_id = self.kwargs["counter_id"]
         notif_id = self.request.GET.get("notif_id")
         user = User.objects.get(pk=user_id)
         counter = Counter.objects.get(pk=counter_id)
-        barman = User.objects.get(pk=barman_id)
+        barman = User.objects.get(pk=barman_id) if barman_id else None
         # On prend le dernier ban actif
         user_ban = user.bans.select_related("ban_group").filter(
             ban_group_id=settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID
@@ -435,5 +435,5 @@ def admin_remove_user_from_counter(request, counter_id, user_id):
     user = get_object_or_404(User, id=user_id)
     if request.method == "POST":
         counter.sellers.remove(user)
-        messages.success(request, _(f"{user.get_display_name()} has been removed from sellers of {counter}"))
+        messages.success(request, _("%s has been removed from sellers of %s.") % (user.get_display_name(), counter.name))
     return redirect(reverse("counter:admin", args=[counter.id]))

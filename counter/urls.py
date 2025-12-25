@@ -16,6 +16,7 @@
 from django.urls import path
 
 from counter.views.admin import (
+    BanUserHasCounterPermission,
     BanUserTryUseView,
     CounterCreateView,
     CounterDeleteView,
@@ -36,7 +37,8 @@ from counter.views.admin import (
     ReturnableProductDeleteView,
     ReturnableProductListView,
     ReturnableProductUpdateView,
-    SellingDeleteView, BanUserHasCounterPermission, admin_remove_user_from_counter,
+    SellingDeleteView,
+    admin_remove_user_from_counter,
 )
 from counter.views.auth import counter_login, counter_logout
 from counter.views.cash import (
@@ -174,12 +176,17 @@ urlpatterns = [
     ),
     path("admin/refound/", RefoundAccountView.as_view(), name="account_refound"),
     path(
+        "admin/ban-try/<int:counter_id>/<int:user_id>/",
+        BanUserTryUseView.as_view(),
+        name="admin_ban_user_try_use_no_barman",
+    ),
+    path(
         "admin/ban-try/<int:counter_id>/<int:user_id>/<int:barman_id>/",
         BanUserTryUseView.as_view(),
         name="admin_ban_user_try_use",
     ),
     path(
-        "admin/ban-try/<int:counter_id>/<int:user_id>/",
+        "admin/ban-has-perm/<int:counter_id>/<int:user_id>/",
         BanUserHasCounterPermission.as_view(),
         name="admin_ban_user_has_counter_permission",
     ),

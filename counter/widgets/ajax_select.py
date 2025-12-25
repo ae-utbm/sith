@@ -1,7 +1,5 @@
 from pydantic import TypeAdapter
 
-from core.models import User
-from core.schemas import UserProfileSchema
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
     AutoCompleteSelectMultiple,
