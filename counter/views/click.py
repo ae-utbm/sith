@@ -13,19 +13,21 @@
 #
 #
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Q
 from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect, resolve_url
+from django.shortcuts import get_object_or_404, redirect, render, resolve_url
 from django.urls import reverse
 from django.utils.safestring import SafeString
 from django.views.generic import FormView
 from django.views.generic.detail import SingleObjectMixin
 from ninja.main import HttpRequest
+from django.utils.translation import gettext as _
+from django.utils import timezone
 
 from core.auth.mixins import CanViewMixin
-from core.enum import BanTypes
 from core.models import User
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
 from counter.forms import BasketForm, RefillForm
@@ -102,6 +104,29 @@ class CounterClick(
         ):
             return redirect(obj)  # Redirect to counter
 
+        bans = self.customer.user.bans.select_related("ban_group")
+        banned_counter_id = getattr(settings, "SITH_GROUP_BANNED_COUNTER_ID", 13)
+        banned_site_id = getattr(settings, "SITH_GROUP_BANNED_SUBSCRIPTION_ID", 14)
+        is_blocked = any(
+            ban.ban_group.id in [banned_counter_id, banned_site_id]
+            for ban in bans
+        )
+        if is_blocked:
+            has_site_ban = any(
+                ban.ban_group.id == banned_site_id for ban in bans
+            )
+            if has_site_ban:
+                self.alert_admin_unwanted_user(self.customer.user, obj, request.user)
+            return render(
+                request,
+                "counter/ban.jinja",
+                {
+                    "customer": self.customer,
+                    "has_site_ban": has_site_ban,
+                    "counter": obj,
+                },
+            )
+
         self.products = obj.get_products_for(self.customer)
 
         return super().dispatch(request, *args, **kwargs)
@@ -115,12 +140,23 @@ class CounterClick(
         bans = self.customer.user.bans.select_related("ban_group")
         is_blocked = any(
             ban.ban_group.id
-            in [BanTypes.counter.value, BanTypes.ae.value, BanTypes.alcool.value]
+            in [
+                getattr(settings, "SITH_GROUP_BANNED_COUNTER_ID", 13),
+                getattr(settings, "SITH_GROUP_BANNED_SUBSCRIPTION_ID", 14),
+            ]
             for ban in bans
         )
         if is_blocked:
-            raise PermissionDenied
-
+            ban_types = [ban.ban_group.id for ban in bans]
+            banned_counter_id = getattr(settings, "SITH_GROUP_BANNED_COUNTER_ID", 13)
+            banned_site_id = getattr(settings, "SITH_GROUP_BANNED_SUBSCRIPTION_ID", 14)
+            if banned_site_id in ban_types:
+                self.alert_admin_unwanted_user(self.customer.user, self.object, self.request.user)
+                raise PermissionDenied(_("This person is banned from the association. Please make it go out of the association premises. If you're not felling well to do this, ask help of a fellow barman."))
+            elif banned_counter_id in ban_types:
+                raise PermissionDenied(_("This person is banned from the counter. You cannot sell them anything."))
+            else:
+                raise PermissionDenied(_("This person is banned. You cannot sell them anything."))
         operator = get_operator(self.request, self.object, self.customer)
         with transaction.atomic():
             self.request.session["last_basket"] = []
@@ -223,15 +259,6 @@ class CounterClick(
                     product
                 )
         kwargs["customer"] = self.customer
-        bans = self.customer.user.bans.select_related("ban_group")
-        kwargs["bans"] = bans
-        kwargs["is_blocked"] = any(
-            ban.ban_group.id in [BanTypes.counter.value, BanTypes.ae.value]
-            for ban in bans
-        )
-        kwargs["has_site_ban"] = any(
-            ban.ban_group.id == BanTypes.ae.value for ban in bans
-        )
         kwargs["cancel_url"] = self.get_success_url()
 
         # To get all forms errors to the javascript, we create a list of error list
@@ -239,6 +266,35 @@ class CounterClick(
             list(field_error.values()) for field_error in kwargs["form"].errors
         ]
         return kwargs
+
+    def alert_admin_unwanted_user(self, ban_user: User, counter: Counter, barman: User):
+        """Alerte les admins AE via une notification interne si un utilisateur banni AE tente d'acheter."""
+        from core.models import Notification, User
+        from django.urls import reverse
+        from django.conf import settings
+        from django.db.models import Exists, OuterRef
+
+        admin_group_ids = [settings.SITH_GROUP_ROOT_ID]
+        notif_type = "BANNED_COUNTER_ATTEMPT"
+        # Récupère le counter de façon sûre
+        counter = self.get_object()
+        notif_url = reverse("counter:admin_ban_user_try_use", kwargs={"counter_id": counter.id, "user_id": ban_user.id, "barman_id": barman.id})
+        unread_notif_subquery = Notification.objects.filter(
+            user=OuterRef("pk"), type=notif_type, viewed=False, param=str(self.customer.user.id)
+        )
+        for user in User.objects.filter(
+            ~Exists(unread_notif_subquery),
+            groups__id__in=admin_group_ids,
+        ).distinct():
+            notif = Notification.objects.create(
+                user=user,
+                url=notif_url,  # la notif pointe vers la page admin
+                type=notif_type,
+                param=str(ban_user.get_display_name()),
+            )
+            notif.url = f"{notif_url}?notif_id={notif.id}"
+            notif.date = timezone.now()
+            notif.save()
 
 
 class RefillingCreateView(FragmentMixin, FormView):

@@ -373,6 +373,67 @@ body {
     }
   }
 
+  .col {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+
+    $col-gap : 1rem;
+    $row-gap : $col-gap / 3;
+
+    &.gap {
+      column-gap: $col-gap;
+      row-gap: $row-gap;
+    }
+
+    @for $i from 2 through 5 {
+      &.gap-#{$i}x {
+        column-gap: $i * $col-gap;
+        row-gap: $i * $row-gap;
+      }
+    }
+
+    // Make an element of the column take as much space as needed
+    &.grow {
+        flex: 1;
+    }
+
+    &.center {
+      align-items: center;
+    }
+
+    &.start {
+      align-items: flex-start;
+    }
+
+    &.end {
+      align-items: flex-end;
+    }
+
+    &.stretch {
+      align-items: stretch;
+    }
+
+    &.full-width {
+      width: 100%;
+    }
+
+
+    // Positionner les enfants individuellement
+    > .at-start {
+      align-self: flex-start !important;
+    }
+    > .at-center {
+      align-self: center !important;
+    }
+    > .at-end {
+      align-self: flex-end !important;
+    }
+    > .at-stretch {
+      align-self: stretch !important;
+    }
+  }
+
   .row {
     display: flex;
     flex-wrap: wrap;

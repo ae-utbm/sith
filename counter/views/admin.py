@@ -28,6 +28,7 @@ from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
 from core.auth.mixins import CanViewMixin
+from core.models import User, Notification
 from core.utils import get_semester_code, get_start_of_semester
 from counter.forms import (
     CloseCustomerAccountForm,
@@ -42,6 +43,7 @@ from counter.models import (
     Refilling,
     ReturnableProduct,
     Selling,
+    User,
 )
 from counter.utils import is_logged_in_counter
 from counter.views.mixins import CounterAdminMixin, CounterAdminTabsMixin
@@ -359,3 +361,38 @@ class RefoundAccountView(UserPassesTestMixin, FormView):
                 product=Product.objects.get(id=settings.SITH_PRODUCT_REFOUND_ID),
             )
             s.save()
+
+
+class BanUserTryUseView(CounterAdminMixin, TemplateView):
+    template_name = "counter/admin/ban_user_try_use.jinja"
+
+    def get(self, request, *args, **kwargs):
+        from django.utils.timezone import timezone
+        barman_id = self.kwargs["barman_id"]
+        user_id = self.kwargs["user_id"]
+        counter_id = self.kwargs["counter_id"]
+        notif_id = self.request.GET.get("notif_id")
+        user = User.objects.get(pk=user_id)
+        counter = Counter.objects.get(pk=counter_id)
+        barman = User.objects.get(pk=barman_id)
+        # On prend le dernier ban actif
+        user_ban = user.bans.select_related("ban_group").filter(
+            ban_group_id=settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID
+        ).first()
+        ban_reason = user_ban.reason if user_ban else ""
+        attempt_time = None
+        if notif_id:
+            notif = Notification.objects.filter(id=notif_id).first()
+            if notif:
+                attempt_time = notif.date
+        if not attempt_time:
+            attempt_time = timezone.now()
+        context = self.get_context_data(
+            ban_user=user,
+            barman=barman,
+            counter=counter,
+            ban_reason=ban_reason,
+            attempt_time=attempt_time,
+        )
+        return self.render_to_response(context)
+

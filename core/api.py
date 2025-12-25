@@ -100,36 +100,6 @@ class UserController(ControllerBase):
             qs = qs.viewable_by(self.context.request.user)
         return filters.filter(qs.order_by(F("last_login").desc(nulls_last=True)))
 
-    @route.get(
-        "/search-counter",
-        response=PaginatedResponseSchema[UserProfileSchema],
-        url_name="search_users_",
-        # logged in barmen aren't authenticated stricto sensu, so no auth here
-        auth=None,
-    )
-    @paginate(PageNumberPaginationExtra, page_size=20)
-    def search_users_counter(self, search: Annotated[str, MinLen(1)]):
-        """Fetch users for counter usage (barmen), return also banned users."""
-        qs = User.objects
-        # the logged in barmen can see all users (even the hidden one),
-        # because they have a temporary administrative function during
-        # which they may have to deal with hidden users
-        if not is_logged_in_counter(self.context.request):
-            qs = qs.viewable_by(self.context.request.user)
-        return (
-            qs.annotate(
-                full_name=Concat("first_name", Value(" "), "last_name"),
-                reverse_full_name=Concat("last_name", Value(" "), "first_name"),
-            )
-            .filter(
-                Q(first_name__icontains=search)
-                | Q(last_name__icontains=search)
-                | Q(nick_name__icontains=search)
-                | Q(full_name__icontains=search)
-                | Q(reverse_full_name__icontains=search)
-            )
-            .order_by(F("last_login").desc(nulls_last=True))
-        )
 
 
 @api_controller("/file")

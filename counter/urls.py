@@ -16,6 +16,7 @@
 from django.urls import path
 
 from counter.views.admin import (
+    BanUserTryUseView,
     CounterCreateView,
     CounterDeleteView,
     CounterEditPropView,
@@ -172,4 +173,9 @@ urlpatterns = [
         name="refilling_list",
     ),
     path("admin/refound/", RefoundAccountView.as_view(), name="account_refound"),
+    path(
+        "admin/ban-try/<int:counter_id>/<int:user_id>/<int:barman_id>/",
+        BanUserTryUseView.as_view(),
+        name="admin_ban_user_try_use",
+    ),
 ]

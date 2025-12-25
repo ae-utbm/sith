@@ -45,7 +45,6 @@ from counter.widgets.ajax_select import (
     AutoCompleteSelectMultipleCounter,
     AutoCompleteSelectMultipleProduct,
     AutoCompleteSelectProduct,
-    AutoCompleteSelectUserCounter,
 )
 
 
@@ -102,7 +101,7 @@ class GetUserForm(forms.Form):
     id = forms.CharField(
         label=_("Select user"),
         help_text=None,
-        widget=AutoCompleteSelectUserCounter,
+        widget=AutoCompleteSelectUser,
         required=False,
     )
 

@@ -51,31 +51,6 @@
         </span>
       </p>
     </div>
-
-    {% if is_blocked %}
-      <div class="alert-ban">
-        <h4>{% trans %}This customer is banned{% endtrans %}</h4>
-        <div class="ban-reason">
-          {% if has_site_ban %}
-            <strong>{% trans %}Please make this person go out{% endtrans %}</strong>
-            <p>
-              {% trans %} This person is banned from the AE {% endtrans %}
-            </p>
-            <p>
-              {% trans %} If you are not conformable to make it go out, pretend a sith failure and ask a fellow barman to help you. {% endtrans %}
-            </p>
-          {% else %}
-            <strong>{% trans %}Please dont serve this person{% endtrans %}</strong>
-            <p>
-              {% trans %} This person is banned from this counter {% endtrans %}
-            </p>
-            <p>
-              {% trans %}You cannot serve him/her/them until the ban is lifted.{% endtrans %}
-            </p>
-          {% endif %}
-        </div>
-      </div>
-    {% else %}
       <div id="click-form">
         <details class="accordion" id="selling-accordion" name="selling" open>
           <summary>{% trans %}Selling{% endtrans %}</summary>
@@ -260,7 +235,6 @@
           {% endif %}
         </div>
       </div>
-    {% endif %}
 {% endblock content %}
 
 {% block script %}
