@@ -403,7 +403,7 @@ class TestCounterClick(TestFullClickBase):
             elif resp.status_code == 302:
                 assert resp.url == self.counter.get_absolute_url()
             else:
-                raise AssertionError( f"Unexpected status code: {resp.status_code}")
+                raise AssertionError(f"Unexpected status code: {resp.status_code}")
             assert self.updated_amount(user) == Decimal(10)
 
     def test_click_user_without_customer(self):
@@ -604,16 +604,20 @@ class TestCounterClick(TestFullClickBase):
         resp = self.submit_basket(user, [BasketItem(self.snack.id, 2)])
         assert resp.status_code == 200
         content = resp.content.decode()
-        assert  "banned" in content.lower() or "banni" in content.lower()
+        assert "banned" in content.lower() or "banni" in content.lower()
         assert self.updated_amount(user) == Decimal(10)
         # Check that no admin notification is created (not an AE ban)
         from core.models import Notification
-        assert not Notification.objects.filter(type="BANNED_COUNTER_ATTEMPT", param=str(user.get_display_name())).exists()
+
+        assert not Notification.objects.filter(
+            type="BANNED_COUNTER_ATTEMPT", param=str(user.get_display_name())
+        ).exists()
 
     def test_click_banned_site_customer(self):
         """A user banned from AE should see the ban page (200), not be debited, and an admin notification should be created with the correct URL if an admin exists."""
         self.login_in_bar()  # Authentifie un barman (self.barmen)
         from core.models import BanGroup, Notification, User
+
         banned_site_id = getattr(settings, "SITH_GROUP_BANNED_SUBSCRIPTION_ID", 14)
         user = subscriber_user.make()
         user.ban_groups.add(BanGroup.objects.get(pk=banned_site_id))
@@ -624,7 +628,10 @@ class TestCounterClick(TestFullClickBase):
             admin_user = baker.make(User, is_superuser=True)
             admin_user.groups.add(admin_group_id)
         resp = self.client.post(
-            reverse("counter:click", kwargs={"counter_id": self.counter.id, "user_id": user.id}),
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": user.id},
+            ),
             {
                 "form-TOTAL_FORMS": "1",
                 "form-INITIAL_FORMS": "0",
@@ -634,12 +641,25 @@ class TestCounterClick(TestFullClickBase):
         )
         assert resp.status_code == 200
         content = resp.content.decode()
-        assert "This customer is banned" in content or "banned" in content.lower() or "banni" in content.lower()
+        assert (
+            "This customer is banned" in content
+            or "banned" in content.lower()
+            or "banni" in content.lower()
+        )
         assert self.updated_amount(user) == Decimal(10)
         # Verify that an admin notification is created with the correct URL
-        notif = Notification.objects.filter(type="BANNED_COUNTER_ATTEMPT", param=str(user.get_display_name())).order_by("-date").first()
+        notif = (
+            Notification.objects.filter(
+                type="BANNED_COUNTER_ATTEMPT", param=str(user.get_display_name())
+            )
+            .order_by("-date")
+            .first()
+        )
         assert notif is not None
-        expected_url = reverse("counter:admin_ban_user_try_use_no_barman", kwargs={"counter_id": self.counter.id, "user_id": user.id})
+        expected_url = reverse(
+            "counter:admin_ban_user_try_use_no_barman",
+            kwargs={"counter_id": self.counter.id, "user_id": user.id},
+        )
         assert notif.url.startswith(expected_url)
 
     def test_click_customer_cannot_buy(self):
@@ -656,6 +676,7 @@ class TestCounterClick(TestFullClickBase):
         """If the logged-in user is the banned person, they are redirected to the counter page with an error message."""
         # Create a user banned from the counter
         from core.models import BanGroup
+
         banned_counter_id = getattr(settings, "SITH_GROUP_BANNED_COUNTER_ID", 13)
         user = subscriber_user.make(password=make_password("plop"))
         user.ban_groups.add(BanGroup.objects.get(pk=banned_counter_id))
@@ -665,7 +686,10 @@ class TestCounterClick(TestFullClickBase):
             {"username": user.username, "password": "plop"},
         )
         resp = self.client.post(
-            reverse("counter:click", kwargs={"counter_id": self.counter.id, "user_id": user.id}),
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": user.id},
+            ),
             {
                 "form-TOTAL_FORMS": "1",
                 "form-INITIAL_FORMS": "0",
@@ -678,7 +702,6 @@ class TestCounterClick(TestFullClickBase):
         assert resp.redirect_chain[-1][0] == self.counter.get_absolute_url()
         # The balance should not change
         assert self.updated_amount(user) == Decimal(10)
-
 
 
 class TestCounterStats(TestCase):

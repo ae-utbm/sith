@@ -100,7 +100,6 @@ class UserController(ControllerBase):
         return filters.filter(qs.order_by(F("last_login").desc(nulls_last=True)))
 
 
-
 @api_controller("/file")
 class SithFileController(ControllerBase):
     @route.get(

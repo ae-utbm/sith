@@ -108,20 +108,20 @@ class CounterClick(
         banned_counter_id = getattr(settings, "SITH_GROUP_BANNED_COUNTER_ID", 13)
         banned_site_id = getattr(settings, "SITH_GROUP_BANNED_SUBSCRIPTION_ID", 14)
         is_blocked = any(
-            ban.ban_group.id in [banned_counter_id, banned_site_id]
-            for ban in bans
+            ban.ban_group.id in [banned_counter_id, banned_site_id] for ban in bans
         )
         if is_blocked:
-            has_site_ban = any(
-                ban.ban_group.id == banned_site_id for ban in bans
-            )
+            has_site_ban = any(ban.ban_group.id == banned_site_id for ban in bans)
             if has_site_ban:
                 self.alert_admin_unwanted_user(self.customer.user, obj, request.user)
             # If the banned user is trying to access his own ban page, we redirect him directly
             if self.customer.user.pk == request.user.pk:
                 self.alert_admin_unwanted_user_has_counter_sell(self.customer.user, obj)
                 from django.contrib import messages
-                messages.error(request, _("You are banned from making purchases on this counter."))
+
+                messages.error(
+                    request, _("You are banned from making purchases on this counter.")
+                )
                 return redirect(obj)
             # Otherwise, we show the ban page
             return render(
@@ -158,9 +158,13 @@ class CounterClick(
         if is_blocked:
             ban_types = [ban.ban_group.id for ban in bans]
             if banned_site_id in ban_types:
-                self.alert_admin_unwanted_user(self.customer.user, self.object, self.request.user)
+                self.alert_admin_unwanted_user(
+                    self.customer.user, self.object, self.request.user
+                )
             if self.customer.user.pk == self.request.user.pk:
-                self.alert_admin_unwanted_user_has_counter_sell(self.customer.user, self.object)
+                self.alert_admin_unwanted_user_has_counter_sell(
+                    self.customer.user, self.object
+                )
             raise PermissionDenied(_("Banned"))
         operator = get_operator(self.request, self.object, self.customer)
         with transaction.atomic():
@@ -283,12 +287,25 @@ class CounterClick(
         admin_group_ids = [settings.SITH_GROUP_ROOT_ID]
         notif_type = "BANNED_COUNTER_ATTEMPT"
         counter = self.get_object()
-        if barman is not None and hasattr(barman, 'id') and barman.id is not None:
-            notif_url = reverse("counter:admin_ban_user_try_use", kwargs={"counter_id": counter.id, "user_id": ban_user.id, "barman_id": barman.id})
+        if barman is not None and hasattr(barman, "id") and barman.id is not None:
+            notif_url = reverse(
+                "counter:admin_ban_user_try_use",
+                kwargs={
+                    "counter_id": counter.id,
+                    "user_id": ban_user.id,
+                    "barman_id": barman.id,
+                },
+            )
         else:
-            notif_url = reverse("counter:admin_ban_user_try_use_no_barman", kwargs={"counter_id": counter.id, "user_id": ban_user.id})
+            notif_url = reverse(
+                "counter:admin_ban_user_try_use_no_barman",
+                kwargs={"counter_id": counter.id, "user_id": ban_user.id},
+            )
         unread_notif_subquery = Notification.objects.filter(
-            user=OuterRef("pk"), type=notif_type, viewed=False, param=str(self.customer.user.id)
+            user=OuterRef("pk"),
+            type=notif_type,
+            viewed=False,
+            param=str(self.customer.user.id),
         )
         for user in User.objects.filter(
             ~Exists(unread_notif_subquery),
@@ -304,7 +321,9 @@ class CounterClick(
             notif.date = timezone.now()
             notif.save()
 
-    def alert_admin_unwanted_user_has_counter_sell(self, ban_user: User, counter: Counter):
+    def alert_admin_unwanted_user_has_counter_sell(
+        self, ban_user: User, counter: Counter
+    ):
         """Alerte les admins AE via une notification interne si un utilisateur banni AE a les droit de vendre sur un counter."""
         from django.conf import settings
         from django.db.models import Exists, OuterRef
@@ -315,14 +334,19 @@ class CounterClick(
         admin_group_ids = [settings.SITH_GROUP_ROOT_ID]
         notif_type = "BANNED_HAS_COUNTER_PERMISSION"
         counter = self.get_object()
-        notif_url = reverse("counter:admin_ban_user_has_counter_permission",
-                            kwargs={"counter_id": counter.id, "user_id": ban_user.id})
+        notif_url = reverse(
+            "counter:admin_ban_user_has_counter_permission",
+            kwargs={"counter_id": counter.id, "user_id": ban_user.id},
+        )
         unread_notif_subquery = Notification.objects.filter(
-            user=OuterRef("pk"), type=notif_type, viewed=False, param=str(self.customer.user.id)
+            user=OuterRef("pk"),
+            type=notif_type,
+            viewed=False,
+            param=str(self.customer.user.id),
         )
         for user in User.objects.filter(
-                ~Exists(unread_notif_subquery),
-                groups__id__in=admin_group_ids,
+            ~Exists(unread_notif_subquery),
+            groups__id__in=admin_group_ids,
         ).distinct():
             notif = Notification.objects.create(
                 user=user,
