@@ -1,26 +1,26 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-  {{ counter }} - Banned user access attempt
+  {{ counter }} - {% trans %}Banned user access attempt{% endtrans %}
 {% endblock %}
 
 {% block content %}
   <div class="alert alert-red col center">
-    <h2>Banned user access attempt</h2>
+    <h2>{% trans %}Banned user access attempt{% endtrans %}</h2>
     <div class="row gap">
       <div>
         <a href="{{ url('core:user_profile', ban_user.id) }}">
-          <img src="{{ ban_user.profile_pict.get_download_url() if ban_user.profile_pict else static('core/img/unknown.jpg') }}" alt="Profile photo" style="max-width:120px;max-height:120px;border-radius:8px;">
+          <img src="{{ ban_user.profile_pict.get_download_url() if ban_user.profile_pict else static('core/img/unknown.jpg') }}" alt="{% trans %}Profile photo{% endtrans %}" style="max-width:120px;max-height:120px;border-radius:8px;">
         </a>
       </div>
       <div>
         <a href="{{ url('core:user_profile', ban_user.id) }}"><strong>{{ ban_user.get_display_name() }}</strong></a><br>
-        <em>Attempt time: {{ attempt_time|date('SHORT_DATETIME_FORMAT') }}</em><br>
-        <em>Ban reason: {{ ban_reason }}</em><br>
-        <em>Counter: {{ counter }}</em>
+        <em>{% trans %}Attempt time:{% endtrans %} {{ attempt_time|date('SHORT_DATETIME_FORMAT') }}</em><br>
+        <em>{% trans %}Ban reason:{% endtrans %} {{ ban_reason }}</em><br>
+        <em>{% trans %}Counter:{% endtrans %} {{ counter }}</em>
       </div>
     </div>
-    <p style="margin-top:1em">A banned user tried to use the counter. Please check the situation and take action if needed.</p>
-    <a href="{{ url('core:user_profile', barman.id) }}">Profile of the barman on duty: {{ barman.get_display_name() }}</a>
+    <p style="margin-top:1em">{% trans %}A banned user tried to use the counter. Please check the situation and take action if needed.{% endtrans %}</p>
+    <a href="{{ url('core:user_profile', barman.id) }}">{% trans %}Profile of the barman on duty:{% endtrans %} {{ barman.get_display_name() }}</a>
   </div>
 {% endblock %}
