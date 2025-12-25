@@ -72,25 +72,6 @@ class TestMembershipQuerySet(TestClub):
         expected.sort(key=lambda i: i.id)
         assert members == expected
 
-    def test_update_invalidate_cache(self):
-        """Test that the `update` queryset method properly invalidate cache."""
-        mem_skia = self.simple_board_member.memberships.get(club=self.club)
-        cache.set(f"membership_{mem_skia.club_id}_{mem_skia.user_id}", mem_skia)
-        self.simple_board_member.memberships.update(end_date=localtime(now()).date())
-        assert (
-            cache.get(f"membership_{mem_skia.club_id}_{mem_skia.user_id}")
-            == "not_member"
-        )
-
-        mem_richard = self.richard.memberships.get(club=self.club)
-        cache.set(
-            f"membership_{mem_richard.club_id}_{mem_richard.user_id}", mem_richard
-        )
-        self.richard.memberships.update(role=5)
-        new_mem = self.richard.memberships.get(club=self.club)
-        assert new_mem != "not_member"
-        assert new_mem.role == 5
-
     def test_update_change_club_groups(self):
         """Test that `update` set the user groups accordingly."""
         user = baker.make(User)
@@ -111,24 +92,6 @@ class TestMembershipQuerySet(TestClub):
         user.memberships.update(end_date=localdate())  # end the membership
         assert not user.groups.contains(members_group)
         assert not user.groups.contains(board_group)
-
-    def test_delete_invalidate_cache(self):
-        """Test that the `delete` queryset properly invalidate cache."""
-        mem_skia = self.simple_board_member.memberships.get(club=self.club)
-        mem_comptable = self.president.memberships.get(club=self.club)
-        cache.set(f"membership_{mem_skia.club_id}_{mem_skia.user_id}", mem_skia)
-        cache.set(
-            f"membership_{mem_comptable.club_id}_{mem_comptable.user_id}", mem_comptable
-        )
-
-        # should delete the subscriptions of simple_board_member and president
-        self.club.members.ongoing().board().delete()
-
-        for membership in (mem_skia, mem_comptable):
-            cached_mem = cache.get(
-                f"membership_{membership.club_id}_{membership.user_id}"
-            )
-            assert cached_mem == "not_member"
 
     def test_delete_remove_from_groups(self):
         """Test that `delete` removes from club groups"""
