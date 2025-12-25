@@ -50,4 +50,4 @@ class UeController(ControllerBase):
     )
     @paginate(PageNumberPaginationExtra, page_size=100)
     def fetch_ue_list(self, search: Query[UeFilterSchema]):
-        return search.filter(UE.objects.order_by("code").values())
+        return search.filter(UE.objects.order_by("code"))

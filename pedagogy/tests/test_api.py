@@ -107,6 +107,13 @@ class TestUESearch(TestCase):
                     "credit_type": ue.credit_type,
                     "semester": ue.semester,
                     "department": ue.department,
+                    "detail_url": reverse(
+                        "pedagogy:ue_detail", kwargs={"ue_id": ue.id}
+                    ),
+                    "edit_url": reverse("pedagogy:ue_update", kwargs={"ue_id": ue.id}),
+                    "delete_url": reverse(
+                        "pedagogy:ue_delete", kwargs={"ue_id": ue.id}
+                    ),
                 }
             ],
         }

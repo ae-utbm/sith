@@ -109,7 +109,7 @@
       <tbody :aria-busy="loading">
         <template x-for="ue in ues.results" :key="ue.id">
           <tr
-            @click="window.location.href = `/pedagogy/ue/${ue.id}`"
+            @click="window.location.href = ue.detail_url"
             class="clickable"
             :class="{closed: ue.semester === 'CLOSED'}"
           >
@@ -122,10 +122,10 @@
             <td><i :class="ue.semester.includes('AUTUMN') && 'fa fa-leaf'"></i></td>
             <td><i :class="ue.semester.includes('SPRING') && 'fa-regular fa-sun'"></i></td>
             {%- if user.has_perm("pedagogy.change_ue") -%}
-              <td><a :href="`/pedagogy/ue/${ue.id}/edit`">{% trans %}Edit{% endtrans %}</a></td>
+              <td><a :href="ue.edit_url">{% trans %}Edit{% endtrans %}</a></td>
             {%- endif -%}
             {%- if user.has_perm("pedagogy.delete_ue") -%}
-              <td><a :href="`/pedagogy/ue/${ue.id}/delete`">{% trans %}Delete{% endtrans %}</a></td>
+              <td><a :href="ue.delete_url">{% trans %}Delete{% endtrans %}</a></td>
             {%- endif -%}
           </tr>
         </template>
