@@ -104,7 +104,7 @@
             </div>
             <ul>
               <li x-show="getBasketSize() === 0">{% trans %}This basket is empty{% endtrans %}</li>
-              <template x-for="(item, index) in Object.values(basket)">
+              <template x-for="(item, index) in Object.values(basket)" :key="item.product.id">
                 <li>
                   <template x-for="error in item.errors">
                     <div class="alert alert-red" x-text="error">
