@@ -472,12 +472,14 @@ class Command(BaseCommand):
 
     def ban_random_users(self, x):
         """Ban users with id 1 to x, each with a random ban group for 15 days, only if not already banned."""
-        from core.models import UserBan, BanGroup
         from django.utils import timezone
+
+        from core.models import UserBan
+
         ban_groups = [
             settings.SITH_GROUP_BANNED_COUNTER_ID,
             settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID,
-            settings.SITH_GROUP_BANNED_ALCOHOL_ID
+            settings.SITH_GROUP_BANNED_ALCOHOL_ID,
         ]
         ban_groups = [g for g in ban_groups if g]
         end_date = timezone.now() + timedelta(days=15)
@@ -489,12 +491,8 @@ class Command(BaseCommand):
             already_banned = UserBan.objects.filter(
                 user=user,
                 ban_group_id=group_id,
-            ).filter(
-                expires_at__isnull=True
-            ) | UserBan.objects.filter(
-                user=user,
-                ban_group_id=group_id,
-                expires_at__gt=timezone.now()
+            ).filter(expires_at__isnull=True) | UserBan.objects.filter(
+                user=user, ban_group_id=group_id, expires_at__gt=timezone.now()
             )
             if already_banned.exists():
                 continue
@@ -508,4 +506,6 @@ class Command(BaseCommand):
                 )
             )
         UserBan.objects.bulk_create(bans)
-        self.stdout.write(f"Banned {len(bans)} users (id 1 to {x}) for 15 days (no duplicates).")
+        self.stdout.write(
+            f"Banned {len(bans)} users (id 1 to {x}) for 15 days (no duplicates)."
+        )

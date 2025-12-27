@@ -185,7 +185,9 @@ urlpatterns = [
     ),
     path(
         "admin/ban-has-perm/<int:counter_id>/<int:user_id>/",
-        BanUserUnwanted.as_view(template_name="counter/admin/ban_user_has_counter_permission.jinja"),
+        BanUserUnwanted.as_view(
+            template_name="counter/admin/ban_user_has_counter_permission.jinja"
+        ),
         name="admin_ban_user_has_counter_permission",
     ),
 ]

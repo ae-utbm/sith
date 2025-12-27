@@ -68,9 +68,18 @@ def test_remove_ban(client: Client, operator: User):
         ("desc", "en", None, ["Test User"], [], "Test"),
         ("desc", "fr", "filter", ["Filtered User"], ["Other User"], "First group"),
         ("image", "fr", None, [], [], None),  # no banned users
-    ]
+    ],
 )
-def test_ban_report_pdf_parametrized(client: Client, operator: User, mode, language, ban_group, expected_names, unexpected_names, expected_reason):
+def test_ban_report_pdf_parametrized(
+    client: Client,
+    operator: User,
+    mode,
+    language,
+    ban_group,
+    expected_names,
+    unexpected_names,
+    expected_reason,
+):
     """Test PDF generation for various modes, languages, and ban_group filters."""
     client.force_login(operator)
     today = localdate()
@@ -80,24 +89,63 @@ def test_ban_report_pdf_parametrized(client: Client, operator: User, mode, langu
         ban_group_obj = BanGroup.objects.first()
         user1 = baker.make(User, first_name="John", last_name="Doe")
         user2 = baker.make(User, first_name="Jane", last_name="Smith")
-        baker.make(UserBan, user=user1, ban_group=ban_group_obj, reason="Test reason 1", created_at=now - timedelta(days=1), expires_at=None)
-        baker.make(UserBan, user=user2, ban_group=ban_group_obj, reason="Test reason 2", created_at=now - timedelta(days=1), expires_at=now + timedelta(days=30))
+        baker.make(
+            UserBan,
+            user=user1,
+            ban_group=ban_group_obj,
+            reason="Test reason 1",
+            created_at=now - timedelta(days=1),
+            expires_at=None,
+        )
+        baker.make(
+            UserBan,
+            user=user2,
+            ban_group=ban_group_obj,
+            reason="Test reason 2",
+            created_at=now - timedelta(days=1),
+            expires_at=now + timedelta(days=30),
+        )
     elif mode == "desc" and expected_names == ["Alice Wonder"]:
         ban_group_obj = BanGroup.objects.first()
         user = baker.make(User, first_name="Alice", last_name="Wonder")
-        baker.make(UserBan, user=user, ban_group=ban_group_obj, reason="Detailed test reason", created_at=now - timedelta(days=5), expires_at=now + timedelta(days=10))
+        baker.make(
+            UserBan,
+            user=user,
+            ban_group=ban_group_obj,
+            reason="Detailed test reason",
+            created_at=now - timedelta(days=5),
+            expires_at=now + timedelta(days=10),
+        )
     elif mode == "desc" and expected_names == ["Test User"]:
         ban_group_obj = BanGroup.objects.first()
         user = baker.make(User, first_name="Test", last_name="User")
-        baker.make(UserBan, user=user, ban_group=ban_group_obj, reason="Test", created_at=now - timedelta(days=1))
+        baker.make(
+            UserBan,
+            user=user,
+            ban_group=ban_group_obj,
+            reason="Test",
+            created_at=now - timedelta(days=1),
+        )
     elif mode == "desc" and ban_group == "filter":
         ban_groups = list(BanGroup.objects.all()[:2])
         if len(ban_groups) < 2:
             pytest.skip("Need at least 2 ban groups for this test")
         user1 = baker.make(User, first_name="Filtered", last_name="User")
         user2 = baker.make(User, first_name="Other", last_name="User")
-        baker.make(UserBan, user=user1, ban_group=ban_groups[0], reason="First group", created_at=now - timedelta(days=1))
-        baker.make(UserBan, user=user2, ban_group=ban_groups[1], reason="Second group", created_at=now - timedelta(days=1))
+        baker.make(
+            UserBan,
+            user=user1,
+            ban_group=ban_groups[0],
+            reason="First group",
+            created_at=now - timedelta(days=1),
+        )
+        baker.make(
+            UserBan,
+            user=user2,
+            ban_group=ban_groups[1],
+            reason="Second group",
+            created_at=now - timedelta(days=1),
+        )
     # pas de bans pour le cas "no banned users"
     # Construction des données du POST
     post_data = {

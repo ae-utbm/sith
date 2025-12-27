@@ -24,57 +24,57 @@
         </div>
         <script>
         // Le bouton est toujours visible, le message s"affiche selon le retour de l"API
-        document.addEventListener("DOMContentLoaded", function() {
-          const btn = document.getElementById("remove-user-btn");
-          const msg = document.getElementById("remove-user-message");
-          btn.onclick = async function() {
-            btn.disabled = true;
-            btn.textContent = "{% trans %}Processing...{% endtrans %}";
-            msg.style.display = "none";
-            msg.className = "alert";
-            const resp = await fetch("/api/counter/{{ counter.id }}/seller/remove", {
-              method: "POST",
-              headers: {
-                "X-CSRFToken": "{{ csrf_token }}",
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({ user_ids: [{{ ban_user.id }}]})
-            });
-            let data = {};
-            try { data = await resp.json(); } catch(e) {}
-            msg.style.display = "block";
-            msg.classList.remove("alert-green", "alert-yellow", "alert-red");
-            if (!resp.ok) {
-              btn.disabled = false;
-              btn.textContent = "{% trans %}Remove this user from counter{% endtrans %}";
-              if (resp.status === 403) {
-                msg.classList.add("alert-red");
-                msg.textContent = "{% trans %}You do not have permission to perform this action.{% endtrans %}";
-              } else if (resp.status === 404) {
+          document.addEventListener("DOMContentLoaded", function() {
+            const btn = document.getElementById("remove-user-btn");
+            const msg = document.getElementById("remove-user-message");
+            btn.onclick = async function() {
+              btn.disabled = true;
+              btn.textContent = "{% trans %}Processing...{% endtrans %}";
+              msg.style.display = "none";
+              msg.className = "alert";
+              const resp = await fetch("/api/counter/{{ counter.id }}/seller/remove", {
+                method: "POST",
+                headers: {
+                  "X-CSRFToken": "{{ csrf_token }}",
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ user_ids: [{{ ban_user.id }}]})
+              });
+              let data = {};
+              try { data = await resp.json(); } catch(e) {}
+              msg.style.display = "block";
+              msg.classList.remove("alert-green", "alert-yellow", "alert-red");
+              if (!resp.ok) {
+                btn.disabled = false;
+                btn.textContent = "{% trans %}Remove this user from counter{% endtrans %}";
+                if (resp.status === 403) {
+                  msg.classList.add("alert-red");
+                  msg.textContent = "{% trans %}You do not have permission to perform this action.{% endtrans %}";
+                } else if (resp.status === 404) {
                   if (data.code === "1")
                     msg.textContent = "{% trans %}Counter not found.{% endtrans %}";
                   else{
                     msg.textContent = "{% trans %}User already remove.{% endtrans %}";
                   }
-                msg.classList.add("alert-yellow");
+                  msg.classList.add("alert-yellow");
+                } else {
+                  msg.textContent = data.detail || "{% trans %}An error occurred while removing the user.{% endtrans %}";
+                  msg.classList.add("alert-yellow");
+                }
               } else {
-                msg.textContent = data.detail || "{% trans %}An error occurred while removing the user.{% endtrans %}";
-                msg.classList.add("alert-yellow");
+                if (data.removed_ids && data.removed_ids.includes({{ ban_user.id }})) {
+                  msg.textContent = "{% trans %}User removed successfully.{% endtrans %}";
+                  msg.classList.add("alert-green");
+                  btn.style.display = "none";
+                } else {
+                  msg.textContent = "{% trans %}User was not removed. They may not have had permission on this counter or being already removed.{% endtrans %}"; // Non vendeur ou déjà retiré
+                  msg.classList.add("alert-yellow");
+                  btn.disabled = false;
+                  btn.textContent = "{% trans %}Remove this user from counter{% endtrans %}";
+                }
               }
-            } else {
-              if (data.removed_ids && data.removed_ids.includes({{ ban_user.id }})) {
-                msg.textContent = "{% trans %}User removed successfully.{% endtrans %}";
-                msg.classList.add("alert-green");
-                btn.style.display = "none";
-              } else {
-                msg.textContent = "{% trans %}User was not removed. They may not have had permission on this counter or being already removed.{% endtrans %}"; // Non vendeur ou déjà retiré
-                msg.classList.add("alert-yellow");
-                btn.disabled = false;
-                btn.textContent = "{% trans %}Remove this user from counter{% endtrans %}";
-              }
-            }
-          };
-        });
+            };
+          });
         </script>
       </div>
     </div>
