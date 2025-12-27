@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-25 20:39+0100\n"
+"POT-Creation-Date: 2025-12-27 18:58+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3399,6 +3399,38 @@ msgid "Remove this user from counter"
 msgstr "Enlever cette utilisateur du comptoire"
 
 #: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid "Processing..."
+msgstr "En cours..."
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid "You do not have permission to perform this action."
+msgstr "Vous n'avez pas la permission de faire cela"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid "Counter not found."
+msgstr "Utilisateur non trouvé"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid "User already remove."
+msgstr "Utilisateur déjà retiré du comptoire"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid "An error occurred while removing the user."
+msgstr "Une erreur est survenue lors de l'opération"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid "User removed successfully."
+msgstr "Utilisateur enlevé avec succès"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid ""
+"User was not removed. They may not have had permission on this counter or "
+"being already removed."
+msgstr ""
+"L'utilisateur n'a pas été supprimé. Il se peut qu'il n'ait pas eu l'autorisation"
+"d'accéder à ce compteur ou qu'il ait déjà été supprimé."
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
 msgid ""
 "A banned user has permission on a counter. Please check the situation and "
 "take action if needed."
@@ -5372,6 +5404,7 @@ msgid "%s tries to use a counter"
 msgstr "%s a essaié d'utiliser un comptoir"
 
 #: sith/settings.py
+#, python-format
 msgid "%s has counter permissions"
 msgstr "%s a des permissions sur un comptoir"
 

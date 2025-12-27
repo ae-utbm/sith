@@ -365,7 +365,7 @@ class RefoundAccountView(UserPassesTestMixin, FormView):
             s.save()
 
 
-class BanUserTryUseView(CounterAdminMixin, TemplateView):
+class BanUserUnwanted(CounterAdminMixin, TemplateView):
     template_name = "counter/admin/ban_user_try_use.jinja"
 
     def get(self, request, *args, **kwargs):
@@ -378,7 +378,6 @@ class BanUserTryUseView(CounterAdminMixin, TemplateView):
         user = User.objects.get(pk=user_id)
         counter = Counter.objects.get(pk=counter_id)
         barman = User.objects.get(pk=barman_id) if barman_id else None
-        # On prend le dernier ban actif
         user_ban = (
             user.bans.select_related("ban_group")
             .filter(ban_group_id=settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID)
@@ -400,55 +399,3 @@ class BanUserTryUseView(CounterAdminMixin, TemplateView):
             attempt_time=attempt_time,
         )
         return self.render_to_response(context)
-
-
-class BanUserHasCounterPermission(CounterAdminMixin, TemplateView):
-    template_name = "counter/admin/ban_user_has_counter_permission.jinja"
-
-    def get(self, request, *args, **kwargs):
-        from django.utils.timezone import timezone
-
-        user_id = self.kwargs["user_id"]
-        counter_id = self.kwargs["counter_id"]
-        notif_id = self.request.GET.get("notif_id")
-        user = User.objects.get(pk=user_id)
-        counter = Counter.objects.get(pk=counter_id)
-        # On prend le dernier ban actif
-        user_ban = (
-            user.bans.select_related("ban_group")
-            .filter(ban_group_id=settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID)
-            .first()
-        )
-        ban_reason = user_ban.reason if user_ban else ""
-        attempt_time = None
-        if notif_id:
-            notif = Notification.objects.filter(id=notif_id).first()
-            if notif:
-                attempt_time = notif.date
-        if not attempt_time:
-            attempt_time = timezone.now()
-        context = self.get_context_data(
-            ban_user=user,
-            counter=counter,
-            ban_reason=ban_reason,
-            attempt_time=attempt_time,
-        )
-        return self.render_to_response(context)
-
-
-@login_required
-@user_passes_test(
-    lambda u: u.is_superuser
-    or u.groups.filter(id=getattr(settings, "SITH_GROUP_ROOT_ID", 1)).exists()
-)
-def admin_remove_user_from_counter(request, counter_id, user_id):
-    counter = get_object_or_404(Counter, id=counter_id)
-    user = get_object_or_404(User, id=user_id)
-    if request.method == "POST":
-        counter.sellers.remove(user)
-        messages.success(
-            request,
-            _("%s has been removed from sellers of %s.")
-            % (user.get_display_name(), counter.name),
-        )
-    return redirect(reverse("counter:admin", args=[counter.id]))

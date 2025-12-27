@@ -16,8 +16,7 @@
 from django.urls import path
 
 from counter.views.admin import (
-    BanUserHasCounterPermission,
-    BanUserTryUseView,
+    BanUserUnwanted,
     CounterCreateView,
     CounterDeleteView,
     CounterEditPropView,
@@ -38,7 +37,6 @@ from counter.views.admin import (
     ReturnableProductListView,
     ReturnableProductUpdateView,
     SellingDeleteView,
-    admin_remove_user_from_counter,
 )
 from counter.views.auth import counter_login, counter_logout
 from counter.views.cash import (
@@ -177,22 +175,17 @@ urlpatterns = [
     path("admin/refound/", RefoundAccountView.as_view(), name="account_refound"),
     path(
         "admin/ban-try/<int:counter_id>/<int:user_id>/",
-        BanUserTryUseView.as_view(),
+        BanUserUnwanted.as_view(template_name="counter/admin/ban_user_try_use.jinja"),
         name="admin_ban_user_try_use_no_barman",
     ),
     path(
         "admin/ban-try/<int:counter_id>/<int:user_id>/<int:barman_id>/",
-        BanUserTryUseView.as_view(),
+        BanUserUnwanted.as_view(template_name="counter/admin/ban_user_try_use.jinja"),
         name="admin_ban_user_try_use",
     ),
     path(
         "admin/ban-has-perm/<int:counter_id>/<int:user_id>/",
-        BanUserHasCounterPermission.as_view(),
+        BanUserUnwanted.as_view(template_name="counter/admin/ban_user_has_counter_permission.jinja"),
         name="admin_ban_user_has_counter_permission",
-    ),
-    path(
-        "admin/remove-user/<int:counter_id>/<int:user_id>/",
-        admin_remove_user_from_counter,
-        name="admin_remove_user_from_counter",
     ),
 ]
