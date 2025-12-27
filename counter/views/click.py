@@ -82,28 +82,7 @@ class CounterClick(
         self.customer = get_object_or_404(Customer, user__id=self.kwargs["user_id"])
         obj: Counter = self.get_object()
 
-        if not self.customer.can_buy:
-            return redirect(obj)  # Redirect to counter
-
-        if obj.type == "OFFICE" and (
-            request.user.is_anonymous
-            or not (
-                obj.sellers.contains(request.user)
-                or obj.club.has_rights_in_club(request.user)
-            )
-        ):
-            # To be able to click on an office counter,
-            # a user must either be in the board of the club that own the counter
-            # or a seller of this counter.
-            raise PermissionDenied
-
-        if obj.type == "BAR" and (
-            not obj.is_open
-            or "counter_token" not in request.session
-            or request.session["counter_token"] != obj.token
-        ):
-            return redirect(obj)  # Redirect to counter
-
+        # BAN CHECK FIRST
         bans = self.customer.user.bans.select_related("ban_group")
         banned_counter_id = getattr(settings, "SITH_GROUP_BANNED_COUNTER_ID", 13)
         banned_site_id = getattr(settings, "SITH_GROUP_BANNED_SUBSCRIPTION_ID", 14)
@@ -133,6 +112,30 @@ class CounterClick(
                     "counter": obj,
                 },
             )
+
+        # THEN CHECK can_buy
+        if not self.customer.can_buy:
+            return redirect(obj)  # Redirect to counter
+
+        # THEN CHECK TOKEN/SESSION
+        if obj.type == "OFFICE" and (
+            request.user.is_anonymous
+            or not (
+                obj.sellers.contains(request.user)
+                or obj.club.has_rights_in_club(request.user)
+            )
+        ):
+            # To be able to click on an office counter,
+            # a user must either be in the board of the club that own the counter
+            # or a seller of this counter.
+            raise PermissionDenied
+
+        if obj.type == "BAR" and (
+            not obj.is_open
+            or "counter_token" not in request.session
+            or request.session["counter_token"] != obj.token
+        ):
+            return redirect(obj)  # Redirect to counter
 
         self.products = obj.get_products_for(self.customer)
 

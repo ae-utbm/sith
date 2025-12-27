@@ -9,13 +9,13 @@
     <h2>{% trans %}Banned user access attempt{% endtrans %}</h2>
     <div class="row gap">
       <div>
-        <a href="{{ url('core:user_profile', ban_user.id) }}">
-          <img src="{{ ban_user.profile_pict.get_download_url() if ban_user.profile_pict else static('core/img/unknown.jpg') }}" alt="{% trans %}Profile photo{% endtrans %}" style="max-width:120px;max-height:120px;border-radius:8px;">
+        <a href="{{ url("core:user_profile", ban_user.id) }}">
+          <img src="{{ ban_user.profile_pict.get_download_url() if ban_user.profile_pict else static("core/img/unknown.jpg") }}" alt="{% trans %}Profile photo{% endtrans %}" style="max-width:120px;max-height:120px;border-radius:8px;">
         </a>
       </div>
       <div>
-        <a href="{{ url('core:user_profile', ban_user.id) }}"><strong>{{ ban_user.get_display_name() }}</strong></a><br>
-        <em>{% trans %}Attempt time:{% endtrans %} {{ attempt_time|date('SHORT_DATETIME_FORMAT') }}</em><br>
+        <a href="{{ url("core:user_profile", ban_user.id) }}"><strong>{{ ban_user.get_display_name() }}</strong></a><br>
+        <em>{% trans %}Attempt time:{% endtrans %} {{ attempt_time|date("SHORT_DATETIME_FORMAT") }}</em><br>
         <em>{% trans %}Ban reason:{% endtrans %} {{ ban_reason }}</em><br>
         <em>{% trans %}Counter:{% endtrans %} {{ counter }}</em>
         <div id="js-messages">
@@ -23,54 +23,54 @@
           <div id="remove-user-message" class="alert" style="display: none"></div>
         </div>
         <script>
-        // Le bouton est toujours visible, le message s'affiche selon le retour de l'API
-        document.addEventListener('DOMContentLoaded', function() {
-          const btn = document.getElementById('remove-user-btn');
-          const msg = document.getElementById('remove-user-message');
+        // Le bouton est toujours visible, le message s"affiche selon le retour de l"API
+        document.addEventListener("DOMContentLoaded", function() {
+          const btn = document.getElementById("remove-user-btn");
+          const msg = document.getElementById("remove-user-message");
           btn.onclick = async function() {
             btn.disabled = true;
-            btn.textContent = '{% trans %}Processing...{% endtrans %}';
-            msg.style.display = 'none';
-            msg.className = 'alert';
-            const resp = await fetch('/api/counter/{{ counter.id }}/seller/remove', {
-              method: 'POST',
+            btn.textContent = "{% trans %}Processing...{% endtrans %}";
+            msg.style.display = "none";
+            msg.className = "alert";
+            const resp = await fetch("/api/counter/{{ counter.id }}/seller/remove", {
+              method: "POST",
               headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/json'
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/json"
               },
               body: JSON.stringify({ user_ids: [{{ ban_user.id }}]})
             });
             let data = {};
             try { data = await resp.json(); } catch(e) {}
-            msg.style.display = 'block';
-            msg.classList.remove('alert-green', 'alert-yellow', 'alert-red');
+            msg.style.display = "block";
+            msg.classList.remove("alert-green", "alert-yellow", "alert-red");
             if (!resp.ok) {
               btn.disabled = false;
-              btn.textContent = '{% trans %}Remove this user from counter{% endtrans %}';
+              btn.textContent = "{% trans %}Remove this user from counter{% endtrans %}";
               if (resp.status === 403) {
-                msg.classList.add('alert-red');
-                msg.textContent = '{% trans %}You do not have permission to perform this action.{% endtrans %}'; // Erreur permission
+                msg.classList.add("alert-red");
+                msg.textContent = "{% trans %}You do not have permission to perform this action.{% endtrans %}";
               } else if (resp.status === 404) {
-                  if (data.code === '1')
-                    msg.textContent = '{% trans %}Counter not found.{% endtrans %}';
+                  if (data.code === "1")
+                    msg.textContent = "{% trans %}Counter not found.{% endtrans %}";
                   else{
-                    msg.textContent = '{% trans %}User already remove.{% endtrans %}';
+                    msg.textContent = "{% trans %}User already remove.{% endtrans %}";
                   }
-                msg.classList.add('alert-yellow');
+                msg.classList.add("alert-yellow");
               } else {
-                msg.textContent = data.detail || '{% trans %}An error occurred while removing the user.{% endtrans %}'; // Erreur générique
-                msg.classList.add('alert-yellow');
+                msg.textContent = data.detail || "{% trans %}An error occurred while removing the user.{% endtrans %}";
+                msg.classList.add("alert-yellow");
               }
             } else {
               if (data.removed_ids && data.removed_ids.includes({{ ban_user.id }})) {
-                msg.textContent = '{% trans %}User removed successfully.{% endtrans %}';
-                msg.classList.add('alert-green');
-                btn.style.display = 'none';
+                msg.textContent = "{% trans %}User removed successfully.{% endtrans %}";
+                msg.classList.add("alert-green");
+                btn.style.display = "none";
               } else {
-                msg.textContent = '{% trans %}User was not removed. They may not have had permission on this counter or being already removed.{% endtrans %}'; // Non vendeur ou déjà retiré
-                msg.classList.add('alert-yellow');
+                msg.textContent = "{% trans %}User was not removed. They may not have had permission on this counter or being already removed.{% endtrans %}"; // Non vendeur ou déjà retiré
+                msg.classList.add("alert-yellow");
                 btn.disabled = false;
-                btn.textContent = '{% trans %}Remove this user from counter{% endtrans %}';
+                btn.textContent = "{% trans %}Remove this user from counter{% endtrans %}";
               }
             }
           };

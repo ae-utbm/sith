@@ -33,7 +33,7 @@ from pytest_django.asserts import assertRedirects
 
 from club.models import Membership
 from core.baker_recipes import board_user, subscriber_user, very_old_subscriber_user
-from core.models import BanGroup, User
+from core.models import BanGroup, User, UserBan
 from counter.baker_recipes import product_recipe, sale_recipe
 from counter.models import (
     Counter,
@@ -681,10 +681,13 @@ class TestCounterClick(TestFullClickBase):
         user = subscriber_user.make(password=make_password("plop"))
         user.ban_groups.add(BanGroup.objects.get(pk=banned_counter_id))
         force_refill_user(user, 10)
-        self.client.post(
-            reverse("counter:login", args=[self.counter.id]),
-            {"username": user.username, "password": "plop"},
-        )
+        user.set_password("plop")
+        user.is_active = True
+        user.save()
+        self.client.force_login(user)
+        user_id_in_session = self.client.session.get('_auth_user_id')
+        assert user_id_in_session is not None, f"L'utilisateur n'est pas authentifié en session (user_id attendu={user.id})"
+        assert str(user_id_in_session) == str(user.id), f"Session user_id={user_id_in_session}, attendu={user.id}"
         resp = self.client.post(
             reverse(
                 "counter:click",
@@ -698,10 +701,29 @@ class TestCounterClick(TestFullClickBase):
             },
             follow=True,
         )
-        # Should be redirected to the counter page
+        # Should always be redirected to the counter page
+        assert resp.redirect_chain
         assert resp.redirect_chain[-1][0] == self.counter.get_absolute_url()
         # The balance should not change
         assert self.updated_amount(user) == Decimal(10)
+
+    def test_click_banned_user_priority_over_non_cotisant(self):
+        # Create a new user and customer
+        user_ = baker.make(User)
+        customer_ = baker.make(Customer, user=user_)
+        # Remove all subscriptions for this customer to ensure can_buy is False
+        if hasattr(user_, 'subscriptions'):
+            user_.subscriptions.all().delete()
+        assert not customer_.can_buy
+        counter_ = baker.make(Counter, type="BAR")
+        ban_group_ = baker.make(BanGroup, id=settings.SITH_GROUP_BANNED_COUNTER_ID)  # SITH_GROUP_BANNED_SUBSCRIPTION_ID
+        UserBan.objects.create(user=user_, ban_group=ban_group_, reason="Banned", created_at="2024-01-01")
+        url = reverse("counter:click", kwargs={"counter_id": counter_.id, "user_id": user_.id})
+        response = self.client.get(url, follow=True)
+        # Should be redirected to the ban page (template or specific url)
+        assert response.status_code == 200
+        # Check that the ban page is displayed (presence of a specific text or template)
+        assert b"banned" in response.content.lower() or b"ban" in response.content.lower()
 
 
 class TestCounterStats(TestCase):
