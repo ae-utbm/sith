@@ -2,8 +2,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from core.models import User, UserBan
-from core.views.forms import FutureDateTimeField, SelectDateTime
+from core.models import BanGroup, User, UserBan
+from core.views.forms import FutureDateTimeField, SelectDate, SelectDateTime
 from core.views.widgets.ajax_select import AutoCompleteSelectUser
 
 
@@ -58,3 +58,43 @@ class BanForm(forms.ModelForm):
             "ban_group": forms.RadioSelect,
             "expires_at": SelectDateTime,
         }
+
+
+class BanReportForm(forms.Form):
+    """Form to generate a PDF report of banned users at a specific date."""
+
+    DISPLAY_MODES = [
+        ("image", _("Images (profile pictures and names below)")),
+        ("desc", _("Detailed (name, type and profile picture)")),
+    ]
+
+    LANGUAGES = [
+        ("fr", _("French")),
+        ("en", _("English")),
+    ]
+
+    date = forms.DateField(
+        label=_("Date"),
+        help_text=_("Select the date to view banned users"),
+        required=True,
+        widget=SelectDate,
+    )
+    ban_group = forms.ModelChoiceField(
+        label=_("Ban type (optional)"),
+        help_text=_("Filter by ban type. Leave empty to show all bans."),
+        required=False,
+        queryset=BanGroup.objects.all(),
+        empty_label=_("All ban types"),
+    )
+    language = forms.ChoiceField(
+        label=_("Language"),
+        choices=LANGUAGES,
+        initial="fr",
+        help_text=_("Language for the PDF report"),
+    )
+    mode = forms.ChoiceField(
+        label=_("Display mode"),
+        choices=DISPLAY_MODES,
+        initial="desc",
+        widget=forms.RadioSelect,
+    )

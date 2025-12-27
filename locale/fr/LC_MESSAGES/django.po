@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-12 21:44+0100\n"
+"POT-Creation-Date: 2025-12-27 18:58+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -412,7 +412,7 @@ msgstr "Bénéfice : "
 #: core/templates/core/user_account_detail.jinja
 #: counter/templates/counter/cash_summary_list.jinja
 #: counter/templates/counter/last_ops.jinja
-#: counter/templates/counter/refilling_list.jinja
+#: counter/templates/counter/refilling_list.jinja rootplace/forms.py
 #: rootplace/templates/rootplace/logs.jinja sas/forms.py
 #: trombi/templates/trombi/user_profile.jinja
 msgid "Date"
@@ -3369,6 +3369,127 @@ msgstr "Le comptoir est ouvert, et il y a au moins un barman connecté"
 msgid "counter is not open : no one is connected"
 msgstr "Le comptoir est fermé"
 
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+#: counter/templates/counter/admin/ban_user_try_use.jinja
+msgid "Banned user access attempt"
+msgstr "Tentative d'accès d'un utilisateur banni"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+#: counter/templates/counter/admin/ban_user_try_use.jinja
+msgid "Profile photo"
+msgstr "Photo de profil"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+#: counter/templates/counter/admin/ban_user_try_use.jinja
+msgid "Attempt time:"
+msgstr "Heure de la tentative :"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+#: counter/templates/counter/admin/ban_user_try_use.jinja
+msgid "Ban reason:"
+msgstr "Raison du ban :"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+#: counter/templates/counter/admin/ban_user_try_use.jinja
+msgid "Counter:"
+msgstr "Comptoir :"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid "Remove this user from counter"
+msgstr "Enlever cette utilisateur du comptoire"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid "Processing..."
+msgstr "En cours..."
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid "You do not have permission to perform this action."
+msgstr "Vous n'avez pas la permission de faire cela"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid "Counter not found."
+msgstr "Utilisateur non trouvé"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid "User already remove."
+msgstr "Utilisateur déjà retiré du comptoire"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid "An error occurred while removing the user."
+msgstr "Une erreur est survenue lors de l'opération"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid "User removed successfully."
+msgstr "Utilisateur enlevé avec succès"
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid ""
+"User was not removed. They may not have had permission on this counter or "
+"being already removed."
+msgstr ""
+"L'utilisateur n'a pas été supprimé. Il se peut qu'il n'ait pas eu l'autorisation"
+"d'accéder à ce compteur ou qu'il ait déjà été supprimé."
+
+#: counter/templates/counter/admin/ban_user_has_counter_permission.jinja
+msgid ""
+"A banned user has permission on a counter. Please check the situation and "
+"take action if needed."
+msgstr ""
+"Un utilisateur banni a des permissions sur le comptoir. Veuillez vérifier la "
+"situation et prendre les mesures nécessaires."
+
+#: counter/templates/counter/admin/ban_user_try_use.jinja
+msgid ""
+"A banned user tried to use the counter. Please check the situation and take "
+"action if needed."
+msgstr ""
+"Un utilisateur banni a essayé d'utiliser le comptoir. Veuillez vérifier la "
+"situation et prendre les mesures nécessaires."
+
+#: counter/templates/counter/admin/ban_user_try_use.jinja
+msgid "Profile of the barman on duty:"
+msgstr "Profil du barman de service :"
+
+#: counter/templates/counter/ban.jinja counter/views/click.py
+msgid "Banned"
+msgstr "Banni"
+
+#: counter/templates/counter/ban.jinja
+msgid "This customer is banned"
+msgstr "Ce client est banni"
+
+#: counter/templates/counter/ban.jinja
+msgid "Please make this person go out"
+msgstr "Veuillez faire sortir cette personne"
+
+#: counter/templates/counter/ban.jinja
+msgid " This person is banned from the AE "
+msgstr "Cette personne est bannie de l'AE "
+
+#: counter/templates/counter/ban.jinja
+msgid ""
+" If you are not conformable to make it go out, pretend a sith failure and "
+"ask a fellow barman to help you. "
+msgstr ""
+"Si vous n'êtes pas à l'aise pour le faire sortir, prétextez une panne de "
+"sith et demandez à un autre barman de vous aider."
+
+#: counter/templates/counter/ban.jinja
+msgid "Please dont serve this person"
+msgstr "Veuillez ne pas servir cette personne"
+
+#: counter/templates/counter/ban.jinja
+msgid " This person is banned from this counter "
+msgstr "Cette personne est bannie de ce comptoir "
+
+#: counter/templates/counter/ban.jinja
+msgid "You cannot serve him/her/them until the ban is lifted."
+msgstr "Vous ne pouvez pas le/la/les servir tant que le ban n'est pas levé."
+
+#: counter/templates/counter/ban.jinja
+msgid "Back to counter"
+msgstr "Retour au comptoir"
+
 #: counter/templates/counter/cash_register_summary.jinja
 msgid "Make a cash register summary"
 msgstr "Faire un relevé de caisse"
@@ -3850,6 +3971,10 @@ msgstr "Montant du chèque"
 #: counter/views/cash.py
 msgid "Check quantity"
 msgstr "Nombre de chèque"
+
+#: counter/views/click.py
+msgid "You are banned from making purchases on this counter."
+msgstr "Vous êtes banni. Vous ne pouvez pas faire d'achats."
 
 #: counter/views/eticket.py
 msgid "people(s)"
@@ -4576,7 +4701,7 @@ msgid "UV comment moderation"
 msgstr "Modération des commentaires d'UV"
 
 #: pedagogy/templates/pedagogy/moderation.jinja
-#: rootplace/templates/rootplace/userban.jinja sas/models.py
+#: rootplace/templates/rootplace/userban.jinja rootplace/views.py sas/models.py
 msgid "Reason"
 msgstr "Raison"
 
@@ -4697,6 +4822,86 @@ msgstr "Vous ne pouvez pas fusionner deux utilisateurs identiques."
 msgid "User to be selected"
 msgstr "Utilisateur à sélectionner"
 
+#: rootplace/forms.py
+msgid "Images (profile pictures and names below)"
+msgstr "Images (photos de profil et noms en dessous)"
+
+#: rootplace/forms.py
+msgid "Detailed (name, type and profile picture)"
+msgstr "Détaillé (nom, type et photo de profil)"
+
+#: rootplace/forms.py sith/settings.py
+msgid "French"
+msgstr "Français"
+
+#: rootplace/forms.py sith/settings.py
+msgid "English"
+msgstr "Anglais"
+
+#: rootplace/forms.py
+msgid "Select the date to view banned users"
+msgstr "Sélectionnez la date pour voir les utilisateurs bannis"
+
+#: rootplace/forms.py
+msgid "Ban type (optional)"
+msgstr "Type de ban (optionnel)"
+
+#: rootplace/forms.py
+msgid "Filter by ban type. Leave empty to show all bans."
+msgstr "Filtrer par type de ban. Laisser vide pour afficher tous les bans."
+
+#: rootplace/forms.py
+msgid "All ban types"
+msgstr "type de ban"
+
+#: rootplace/forms.py
+msgid "Language"
+msgstr "Langue"
+
+#: rootplace/forms.py
+msgid "Language for the PDF report"
+msgstr "Langue pour le rapport PDF"
+
+#: rootplace/forms.py
+#, fuzzy
+#| msgid "display time"
+msgid "Display mode"
+msgstr "Type d'affichage"
+
+#: rootplace/templates/rootplace/ban_report.jinja
+#, fuzzy
+#| msgid "report"
+msgid "Ban report"
+msgstr "signaler"
+
+#: rootplace/templates/rootplace/ban_report.jinja
+msgid "Generate a PDF report of banned users"
+msgstr "Générer un rapport PDF des utilisateurs bannis"
+
+#: rootplace/templates/rootplace/ban_report.jinja
+msgid "Select a date to view all users banned on that day."
+msgstr ""
+"Sélectionnez une date pour voir tous les utilisateurs bannis ce jour-là."
+
+#: rootplace/templates/rootplace/ban_report.jinja
+msgid "Generate PDF"
+msgstr "Générer le PDF"
+
+#: rootplace/templates/rootplace/ban_report.jinja
+#, fuzzy
+#| msgid "Back to list"
+msgid "Back to ban list"
+msgstr "Retour à la liste"
+
+#: rootplace/templates/rootplace/ban_report.jinja
+msgid ""
+"\"This PDF is intended for legitimate use cases only. You must destroy any "
+"copies of this report after you have finished using it. Do you wish to "
+"proceed?\""
+msgstr ""
+"\"Ce PDF est destiné à des usages légitimes uniquement. Vous devez détruire "
+"une fois que vous avez fini de l'utiliser. Souhaitez-vous continuer ?\""
+
 #: rootplace/templates/rootplace/delete_user_messages.jinja
 msgid "Delete all forum messages from an user"
 msgstr "Supprimer tous les messages forum d'un utilisateur"
@@ -4735,6 +4940,10 @@ msgid "Ban a user"
 msgstr "Bannir un utilisateur"
 
 #: rootplace/templates/rootplace/userban.jinja
+msgid "Generate ban report"
+msgstr "Générer un rapport de ban"
+
+#: rootplace/templates/rootplace/userban.jinja
 msgid "Until"
 msgstr "Jusqu'à"
 
@@ -4749,6 +4958,18 @@ msgstr "Retirer le ban"
 #: rootplace/templates/rootplace/userban.jinja
 msgid "No active ban."
 msgstr "Pas de ban actif"
+
+#: rootplace/views.py
+msgid "Banned users"
+msgstr "Utrilisateurs bannis"
+
+#: rootplace/views.py
+msgid "Ban type"
+msgstr "Type de ban"
+
+#: rootplace/views.py
+msgid "No picture"
+msgstr "Pas de photo"
 
 #: sas/forms.py
 msgid "Add a new album"
@@ -4886,14 +5107,6 @@ msgstr "Photos de %(user_name)s"
 #: sas/templates/sas/user_pictures.jinja
 msgid "Download all my pictures"
 msgstr "Télécharger toutes mes photos"
-
-#: sith/settings.py
-msgid "English"
-msgstr "Anglais"
-
-#: sith/settings.py
-msgid "French"
-msgstr "Français"
 
 #: sith/settings.py
 msgid "TC"
@@ -5184,6 +5397,16 @@ msgstr "Membre actif⸱ve"
 #: sith/settings.py
 msgid "Curious"
 msgstr "Curieux⸱euse"
+
+#: sith/settings.py
+#, python-format
+msgid "%s tries to use a counter"
+msgstr "%s a essaié d'utiliser un comptoir"
+
+#: sith/settings.py
+#, python-format
+msgid "%s has counter permissions"
+msgstr "%s a des permissions sur un comptoir"
 
 #: sith/settings.py
 msgid "A new poster needs to be moderated"

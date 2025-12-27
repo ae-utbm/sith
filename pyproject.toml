@@ -79,6 +79,7 @@ tests = [
     "model-bakery<2.0.0,>=1.20.4",
     "beautifulsoup4>=4.14.3,<5",
     "lxml>=6.0.2,<7",
+    "pypdf>=5.2.1,<6.0.0",
 ]
 docs = [
     "mkdocs<2.0.0,>=1.6.1",
