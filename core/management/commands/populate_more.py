@@ -10,9 +10,10 @@ from django.core.management.base import BaseCommand
 from django.db.models import Count, Exists, Min, OuterRef, Subquery
 from django.utils.timezone import localdate, make_aware, now
 from faker import Faker
+from django.utils import timezone
 
 from club.models import Club, Membership
-from core.models import Group, User
+from core.models import Group, User, UserBan
 from counter.models import (
     Counter,
     Customer,
@@ -34,25 +35,16 @@ class Command(BaseCommand):
         super().__init__(*args, **kwargs)
         self.faker = Faker("fr_FR")
 
-    def add_arguments(self, parser):
-        super().add_arguments(parser)
-        parser.add_argument(
-            "--ban-x-users",
-            type=int,
-            default=0,
-            help="Ban X users (id 1 to X) randomly for 15 days among the 3 ban groups.",
-        )
 
     def handle(self, *args, **options):
         if not settings.DEBUG:
             raise Exception("Never call this command in prod. Never.")
 
-        ban_x = options.get("ban_x_users", 0)
-        if ban_x:
-            self.ban_random_users(ban_x)
-
         self.stdout.write("Creating users...")
         users = self.create_users()
+        users_to_ban = users[0:30]
+        self.stdout.write("Banning Users...")
+        self.create_bans(users_to_ban)
         subscribers = random.sample(users, k=int(0.8 * len(users)))
         self.stdout.write("Creating subscriptions...")
         self.create_subscriptions(subscribers)
@@ -470,42 +462,22 @@ class Command(BaseCommand):
             f.set_last_message()
             f.set_topic_number()
 
-    def ban_random_users(self, x):
-        """Ban users with id 1 to x, each with a random ban group for 15 days, only if not already banned."""
-        from django.utils import timezone
-
-        from core.models import UserBan
-
+    def create_bans(self, users: list[User]):
         ban_groups = [
             settings.SITH_GROUP_BANNED_COUNTER_ID,
             settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID,
             settings.SITH_GROUP_BANNED_ALCOHOL_ID,
         ]
-        ban_groups = [g for g in ban_groups if g]
-        end_date = timezone.now() + timedelta(days=15)
-        users = User.objects.filter(id__gte=1, id__lte=x)
         bans = []
         for user in users:
-            group_id = random.choice(ban_groups)
-            # Vérifie s'il existe déjà un ban actif pour ce user/groupe
-            already_banned = UserBan.objects.filter(
-                user=user,
-                ban_group_id=group_id,
-            ).filter(expires_at__isnull=True) | UserBan.objects.filter(
-                user=user, ban_group_id=group_id, expires_at__gt=timezone.now()
-            )
-            if already_banned.exists():
-                continue
-            bans.append(
+            ids = random.sample(ban_groups, k=random.randint(1, len(ban_groups)))
+            bans.extend(
                 UserBan(
                     user=user,
-                    ban_group_id=group_id,
-                    reason=f"Random ban for test (group {group_id})",
-                    created_at=timezone.now(),
-                    expires_at=end_date,
+                    ban_group_id=i,
+                    reason=self.faker.sentence(),
+                    expires_at=timezone.now() + relativedelta(years=1),
                 )
+                for i in ids
             )
         UserBan.objects.bulk_create(bans)
-        self.stdout.write(
-            f"Banned {len(bans)} users (id 1 to {x}) for 15 days (no duplicates)."
-        )
