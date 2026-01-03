@@ -14,10 +14,11 @@
 #
 from enum import IntEnum
 from typing import List
+from pydantic import BaseModel
 
 from django.conf import settings
 from django.db.models import F
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from ninja import Query, Schema
 from ninja.security import SessionAuth
 from ninja_extra import ControllerBase, api_controller, paginate, route
@@ -45,37 +46,8 @@ IsCounterAdmin = (
 )
 
 
-class SellerIdsSchema(Schema):
-    user_ids: List[int]
-
-
-class SellerIdsResponse(Schema):
-    added_ids: List[int]
-    not_existing_ids: List[int]
-
-
-class SellerIdsRemoveResponse(Schema):
-    removed_ids: List[int]
-    not_existing_ids: List[int]
-
-
-class SellerCounterOrUserNotFoundErrorCode(IntEnum):
-    COUNTER_NOT_FOUND = 1  # 404: Counter not found
-    USER_NOT_FOUND = 2  # 404: User(s) not found or not sellers
-
-
-class SellerCounterOrUserNotFoundResponse(Schema):
-    """
-    Response schema for not found errors.
-    code (SellerCounterOrUserNotFoundErrorCode):
-      COUNTER_NOT_FOUND (1): Counter not found (404)
-      USER_NOT_FOUND (2): User(s) not found or not sellers (404)
-    detail (str): Human readable error message.
-    """
-
-    code: SellerCounterOrUserNotFoundErrorCode
-    detail: str
-
+class SellerIds(BaseModel):
+    users_id: List[int]
 
 @api_controller("/counter")
 class CounterController(ControllerBase):
@@ -89,84 +61,32 @@ class CounterController(ControllerBase):
             Counter.objects.annotate_is_open(), pk=counter_id
         )
 
-    @route.post(
+    @route.put(
         "{counter_id}/seller/add",
-        response={200: SellerIdsResponse, 404: SellerCounterOrUserNotFoundResponse},
         permissions=[IsCounterAdmin],
         summary="Add sellers to a counter",
-        description="Add one or more users as sellers to the specified counter.\n\n"
-        "Error codes:\n\n"
-        "- 404: Counter not found (code=1).\n\n"
-        "- 404: User(s) not found or not sellers (code=2).",
     )
-    def add_sellers_to_counter(self, request, counter_id: int, data: SellerIdsSchema):
-        try:
-            counter = Counter.objects.get(pk=counter_id)
-        except Counter.DoesNotExist:
-            return 404, {
-                "detail": "Counter does not exist.",
-                "code": SellerCounterOrUserNotFoundErrorCode.COUNTER_NOT_FOUND,
-            }
-        added = []
-        not_existing = []
-        for user_id in data.user_ids:
-            try:
-                user = User.objects.get(pk=user_id)
-                counter.sellers.add(user)
-                added.append(user_id)
-            except User.DoesNotExist:
-                not_existing.append(user_id)
-                continue
-        if not added and not_existing:
-            return 404, {
-                "detail": "No sellers were added. All user IDs not found.",
-                "code": SellerCounterOrUserNotFoundErrorCode.USER_NOT_FOUND,
-            }
-        return {"added_ids": added, "not_existing_ids": not_existing}
+    def add_sellers_to_counter(self, counter_id : int, payload: SellerIds):
+        users_id = payload.users_id
+        counter = get_object_or_404(Counter, pk=counter_id)
+        seller_ids = counter.sellers.values_list('id', flat=True)
+        users = User.objects.exclude(id__in=seller_ids, pk__in=users_id)
+        counter.sellers.add(*users)
 
-    @route.post(
+    @route.delete(
         "{counter_id}/seller/remove",
-        response={
-            200: SellerIdsRemoveResponse,
-            404: SellerCounterOrUserNotFoundResponse,
-        },
         permissions=[IsCounterAdmin],
         summary="Remove sellers from a counter",
-        description="Remove one or more users from the sellers of the specified counter.\n\n"
-        "Error codes:\n\n"
-        "- 404: Counter not found (code=1).\n\n",
     )
     def remove_sellers_from_counter(
-        self, request, counter_id: int, data: SellerIdsSchema
+        self, counter_id: int, payload: SellerIds
     ):
-        try:
-            counter = Counter.objects.get(pk=counter_id)
-        except Counter.DoesNotExist:
-            return 404, {
-                "detail": "Counter does not exist.",
-                "code": SellerCounterOrUserNotFoundErrorCode.COUNTER_NOT_FOUND,
-            }
-        removed = []
-        not_existing = []
-        for user_id in data.user_ids:
-            try:
-                user = User.objects.get(pk=user_id)
-                if counter.sellers.filter(pk=user.pk).exists():
-                    counter.sellers.remove(
-                        user
-                    )  # On retire juste le lien seller<->counter
-                    removed.append(user_id)
-                else:
-                    not_existing.append(user_id)
-            except User.DoesNotExist:
-                not_existing.append(user_id)
-                continue
-        if not removed and not_existing:
-            return 404, {
-                "detail": "No sellers were removed. All user IDs not found or not sellers.",
-                "code": SellerCounterOrUserNotFoundErrorCode.USER_NOT_FOUND,
-            }
-        return {"removed_ids": removed, "not_existing_ids": not_existing}
+        users_id = payload.users_id
+        counter = get_object_or_404(Counter, pk=counter_id)
+        users = counter.sellers.filter(pk__in=users_id)
+        counter.sellers.remove(*users)
+
+
 
     @route.get("bar/", response=list[CounterSchema], permissions=[CanView])
     def fetch_bars(self):

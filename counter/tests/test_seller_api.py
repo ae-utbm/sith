@@ -1,244 +1,155 @@
 import pytest
+import json
 from django.test import Client
 from model_bakery import baker
 
-from counter.api import SellerCounterOrUserNotFoundErrorCode
 from counter.models import Counter, User
 
 
 class TestCounterBulkRoutes:
     def setup_method(self):
         self.admin = baker.make(User, is_superuser=True)
-        self.user = baker.make(User)
         self.counter = baker.make(Counter)
         self.client = Client()
-        # Add the base user as a seller of the counter
-        self.counter.sellers.add(self.user)
+        self.client.force_login(self.admin)
 
     @pytest.mark.django_db
     @pytest.mark.parametrize(
-        "route,method,setup_users,post_ids,expected_status,expected_added,expected_removed,expected_not_existing,expected_code,expected_detail",
+        "users_number,already_in_number,invalid_users_number,expected_code,invalid_counter",
         [
-            # Add a new seller
-            (
-                "add",
-                "post",
-                ["new"],
-                lambda self: [self.new_seller.id],
-                200,
-                lambda self: [self.new_seller.id],
-                None,
-                lambda self: [],
-                None,
-                None,
-            ),
-            # Add a non-existent seller
-            (
-                "add",
-                "post",
-                [],
-                lambda self: [99999],
-                404,
-                lambda self: [],
-                None,
-                lambda self: [99999],
-                SellerCounterOrUserNotFoundErrorCode.USER_NOT_FOUND,
-                "No sellers were added. All user IDs not found.",
-            ),
-            # Add on a non-existent counter
-            (
-                "add",
-                "post",
-                [],
-                lambda self: [self.user.id],
-                404,
-                lambda self: [],
-                None,
-                lambda self: [self.user.id],
-                SellerCounterOrUserNotFoundErrorCode.COUNTER_NOT_FOUND,
-                "Counter does not exist.",
-            ),
-            # Add a seller already present
-            (
-                "add",
-                "post",
-                [],
-                lambda self: [self.user.id],
-                200,
-                lambda self: [self.user.id],
-                None,
-                lambda self: [],
-                None,
-                None,
-            ),
-            # Add multiple sellers (mixed)
-            (
-                "add",
-                "post",
-                ["new", "new2"],
-                lambda self: [self.new_seller.id, self.new_seller2.id, 99999],
-                200,
-                lambda self: [self.new_seller.id, self.new_seller2.id],
-                None,
-                lambda self: [99999],
-                None,
-                None,
-            ),
-            # No sellers added (all invalid)
-            (
-                "add",
-                "post",
-                [],
-                lambda self: [99999, 88888],
-                404,
-                lambda self: [],
-                None,
-                lambda self: [99999, 88888],
-                SellerCounterOrUserNotFoundErrorCode.USER_NOT_FOUND,
-                None,
-            ),
-            # Remove an existing seller
-            (
-                "remove",
-                "post",
-                [],
-                lambda self: [self.user.id],
-                200,
-                None,
-                lambda self: [self.user.id],
-                lambda self: [],
-                None,
-                None,
-            ),
-            # Remove a non-existent seller
-            (
-                "remove",
-                "post",
-                [],
-                lambda self: [99999],
-                404,
-                None,
-                lambda self: [],
-                lambda self: [99999],
-                SellerCounterOrUserNotFoundErrorCode.USER_NOT_FOUND,
-                None,
-            ),
-            # Remove on a non-existent counter
-            (
-                "remove",
-                "post",
-                [],
-                lambda self: [self.user.id],
-                404,
-                None,
-                lambda self: [],
-                lambda self: [self.user.id],
-                SellerCounterOrUserNotFoundErrorCode.COUNTER_NOT_FOUND,
-                None,
-            ),
-            # Remove a seller not present
-            (
-                "remove",
-                "post",
-                ["new"],
-                lambda self: [self.new_seller.id],
-                404,
-                None,
-                lambda self: [],
-                lambda self: [self.new_seller.id],
-                SellerCounterOrUserNotFoundErrorCode.USER_NOT_FOUND,
-                None,
-            ),
-            # Remove multiple sellers (mixed)
-            (
-                "remove",
-                "post",
-                ["new", "new2"],
-                lambda self: [self.user.id, self.new_seller.id, 99999],
-                200,
-                None,
-                lambda self: [self.user.id, self.new_seller.id],
-                lambda self: [99999],
-                None,
-                None,
-            ),
-            # No sellers removed (all invalid)
-            (
-                "remove",
-                "post",
-                [],
-                lambda self: [99999, 88888],
-                404,
-                None,
-                lambda self: [],
-                lambda self: [99999, 88888],
-                SellerCounterOrUserNotFoundErrorCode.USER_NOT_FOUND,
-                None,
-            ),
-        ],
+            (1, 0, 0, 200, False),
+            (4, 0, 0, 200, False),
+            (0, 1, 0, 200, False),
+            (0, 4, 0, 200, False),
+            (2, 2, 0, 200, False),
+            (2, 2, 2, 200, False),
+            (0, 0, 1, 200, False),
+            (0, 0, 4, 200, False),
+            (1, 0, 0, 404, True),
+        ]
     )
-    def test_counter_bulk_routes(
+    def test_counter_create_bulk(
         self,
-        route,
-        method,
-        setup_users,
-        post_ids,
-        expected_status,
-        expected_added,
-        expected_removed,
-        expected_not_existing,
+        users_number,
+        already_in_number,
+        invalid_users_number,
         expected_code,
-        expected_detail,
+        invalid_counter
     ):
-        self.client.force_login(self.admin)
-        # Prepare additional users if needed
-        if "new" in setup_users:
-            self.new_seller = baker.make(User)
-        if "new2" in setup_users:
-            self.new_seller2 = baker.make(User)
-        # Special case: for 'remove' with multiple sellers, add them as sellers
-        if route == "remove" and "new" in setup_users and "new2" in setup_users:
-            self.counter.sellers.add(self.new_seller)
-            self.counter.sellers.add(self.new_seller2)
-        # Build the URL
-        if route == "add":
-            url = f"/api/counter/{self.counter.id}/seller/add"
+        if invalid_counter:
+            counter_id = 9999
         else:
-            url = f"/api/counter/{self.counter.id}/seller/remove"
-        # Case: non-existent counter
-        if expected_code == SellerCounterOrUserNotFoundErrorCode.COUNTER_NOT_FOUND:
-            url = f"/api/counter/99999/seller/{route}"
-        # Build the IDs to post
-        ids = post_ids(self) if callable(post_ids) else post_ids
-        # Resolve any nested lambdas for ids
-        ids = [i(self) if callable(i) else i for i in ids]
-        data = {"user_ids": ids}
-        response = self.client.post(url, data, content_type="application/json")
-        self.counter.refresh_from_db()
-        assert response.status_code == expected_status
-        json = response.json()
-        if expected_status == 200:
-            if expected_added is not None:
-                added = (
-                    expected_added(self) if callable(expected_added) else expected_added
-                )
-                assert set(json["added_ids"]) == set(added)
-            if expected_removed is not None:
-                removed = (
-                    expected_removed(self)
-                    if callable(expected_removed)
-                    else expected_removed
-                )
-                assert set(json["removed_ids"]) == set(removed)
-            if expected_not_existing is not None:
-                not_existing = (
-                    expected_not_existing(self)
-                    if callable(expected_not_existing)
-                    else expected_not_existing
-                )
-                assert set(json["not_existing_ids"]) == set(not_existing)
-        else:
-            if expected_code:
-                assert json["code"] == expected_code
-            if expected_detail:
-                assert json["detail"] == expected_detail
+            counter_id = self.counter.id
+
+        user_id_list = []
+
+        valid_users_id = []
+        for i in range(users_number):
+            user = baker.make(User)
+            user_id_list.append(user.id)
+            valid_users_id.append(user.id)
+
+        user_to_add = []
+        for i in range(already_in_number):
+            user = baker.make(User)
+            user_id_list.append(user.id)
+            user_to_add.append(user)
+            valid_users_id.append(user.id)
+        self.counter.sellers.add(*user_to_add)
+
+        for i in range(invalid_users_number):
+            user_id_list.append(9999 + i)
+
+        response = self.client.put(
+            f"/api/counter/{counter_id}/seller/add",
+            content_type="application/json",
+            data=json.dumps({"users_id": user_id_list}),
+        )
+
+        assert response.status_code == expected_code
+
+        if response.status_code == 200:
+            for user_id in valid_users_id:
+                assert self.counter.sellers.filter(pk=user_id).exists()
+
+            for i in range(invalid_users_number):
+                assert not self.counter.sellers.filter(pk=9999 + i).exists()
+
+    class TestCounterBulkDeleteRoutes:
+        def setup_method(self):
+            self.admin = baker.make(User, is_superuser=True)
+            self.counter = baker.make(Counter)
+            self.client = Client()
+            self.client.force_login(self.admin)
+
+        @pytest.mark.django_db
+        @pytest.mark.parametrize(
+            "users_number,already_in_number,invalid_users_number,expected_code,invalid_counter",
+            [
+                (1, 0, 0, 200, False),
+                (4, 0, 0, 200, False),
+                (0, 1, 0, 200, False),
+                (0, 4, 0, 200, False),
+                (2, 2, 0, 200, False),
+                (2, 2, 2, 200, False),
+                (0, 0, 1, 200, False),
+                (0, 0, 4, 200, False),
+                (1, 0, 0, 404, True),
+            ]
+        )
+        def test_counter_remove_bulk(
+                self,
+                users_number,
+                already_in_number,
+                invalid_users_number,
+                expected_code,
+                invalid_counter
+        ):
+            if invalid_counter:
+                counter_id = 9999
+            else:
+                counter_id = self.counter.id
+
+            user_id_list = []
+
+            valid_user_ids = []
+
+            for i in range(users_number):
+                user = baker.make(User)
+                user_id_list.append(user.id)
+
+            user_to_add = []
+            for i in range(already_in_number):
+                user = baker.make(User)
+                user_id_list.append(user.id)
+                user_to_add.append(user)
+            self.counter.sellers.add(*user_to_add)
+            valid_user_ids.extend([u.id for u in user_to_add])
+
+            for i in range(invalid_users_number):
+                user_id_list.append(9999 + i)
+
+            users_to_add_all = []
+            for uid in user_id_list:
+                u = User.objects.filter(pk=uid).first()
+                if u:
+                    users_to_add_all.append(u)
+            self.counter.sellers.add(*users_to_add_all)
+
+            response = self.client.delete(
+                f"/api/counter/{counter_id}/seller/remove",
+                data=json.dumps({"users_id": user_id_list}),
+                content_type="application/json",
+            )
+
+            assert response.status_code == expected_code
+
+            if response.status_code == 200:
+                for user_id in user_id_list:
+                    assert not self.counter.sellers.filter(pk=user_id).exists()
+
+                for i in range(invalid_users_number):
+                    assert not self.counter.sellers.filter(pk=9999 + i).exists()
+
+
+

@@ -84,8 +84,8 @@ class CounterClick(
 
         # BAN CHECK FIRST
         bans = self.customer.user.bans.select_related("ban_group")
-        banned_counter_id = getattr(settings, "SITH_GROUP_BANNED_COUNTER_ID", 13)
-        banned_site_id = getattr(settings, "SITH_GROUP_BANNED_SUBSCRIPTION_ID", 14)
+        banned_counter_id =settings.SITH_GROUP_BANNED_COUNTER_ID
+        banned_site_id = settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID
         is_blocked = any(
             ban.ban_group.id in [banned_counter_id, banned_site_id] for ban in bans
         )
