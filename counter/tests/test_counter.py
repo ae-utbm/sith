@@ -22,7 +22,6 @@ from django.conf import settings
 from django.contrib.auth.models import Permission, make_password
 from django.core.cache import cache
 from django.http import HttpResponse
-from django.shortcuts import resolve_url
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -34,7 +33,7 @@ from pytest_django.asserts import assertRedirects
 
 from club.models import Membership
 from core.baker_recipes import board_user, subscriber_user, very_old_subscriber_user
-from core.models import BanGroup, User
+from core.models import BanGroup, User, UserBan
 from counter.baker_recipes import product_recipe, sale_recipe
 from counter.models import (
     Counter,
@@ -398,9 +397,13 @@ class TestCounterClick(TestFullClickBase):
         ]:
             force_refill_user(user, 10)
             resp = self.submit_basket(user, [BasketItem(self.snack.id, 2)])
-            assert resp.status_code == 302
-            assert resp.url == resolve_url(self.counter)
-
+            if resp.status_code == 200:
+                content = resp.content.decode()
+                assert "Banni" in content or "Banned" in content
+            elif resp.status_code == 302:
+                assert resp.url == self.counter.get_absolute_url()
+            else:
+                raise AssertionError(f"Unexpected status code: {resp.status_code}")
             assert self.updated_amount(user) == Decimal(10)
 
     def test_click_user_without_customer(self):
@@ -592,6 +595,147 @@ class TestCounterClick(TestFullClickBase):
         )
         customer_products = counter.get_products_for(customer)
         assert unarchived_products == customer_products
+
+    def test_click_banned_counter_customer(self):
+        """A user banned from the counter should see the ban page (200) and not be debited."""
+        self.login_in_bar()
+        user = self.banned_counter_customer
+        force_refill_user(user, 10)
+        resp = self.submit_basket(user, [BasketItem(self.snack.id, 2)])
+        assert resp.status_code == 200
+        content = resp.content.decode()
+        assert "banned" in content.lower() or "banni" in content.lower()
+        assert self.updated_amount(user) == Decimal(10)
+        # Check that no admin notification is created (not an AE ban)
+        from core.models import Notification
+
+        assert not Notification.objects.filter(
+            type="BANNED_COUNTER_ATTEMPT", param=str(user.get_display_name())
+        ).exists()
+
+    def test_click_banned_site_customer(self):
+        """A user banned from AE should see the ban page (200), not be debited, and an admin notification should be created with the correct URL if an admin exists."""
+        self.login_in_bar()  # Authentifie un barman (self.barmen)
+        from core.models import BanGroup, Notification, User
+
+        banned_site_id = getattr(settings, "SITH_GROUP_BANNED_SUBSCRIPTION_ID", 14)
+        user = subscriber_user.make()
+        user.ban_groups.add(BanGroup.objects.get(pk=banned_site_id))
+        force_refill_user(user, 10)
+        # Create an admin user if none exists
+        admin_group_id = getattr(settings, "SITH_GROUP_ROOT_ID", 1)
+        if not User.objects.filter(groups__id=admin_group_id).exists():
+            admin_user = baker.make(User, is_superuser=True)
+            admin_user.groups.add(admin_group_id)
+        resp = self.client.post(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": user.id},
+            ),
+            {
+                "form-TOTAL_FORMS": "1",
+                "form-INITIAL_FORMS": "0",
+                "form-0-id": str(self.snack.id),
+                "form-0-quantity": "2",
+            },
+        )
+        assert resp.status_code == 200
+        content = resp.content.decode()
+        assert (
+            "This customer is banned" in content
+            or "banned" in content.lower()
+            or "banni" in content.lower()
+        )
+        assert self.updated_amount(user) == Decimal(10)
+        # Verify that an admin notification is created with the correct URL
+        notif = (
+            Notification.objects.filter(
+                type="BANNED_COUNTER_ATTEMPT", param=str(user.get_display_name())
+            )
+            .order_by("-date")
+            .first()
+        )
+        assert notif is not None
+        expected_url = reverse(
+            "counter:admin_ban_user_try_use_no_barman",
+            kwargs={"counter_id": self.counter.id, "user_id": user.id},
+        )
+        assert notif.url.startswith(expected_url)
+
+    def test_click_customer_cannot_buy(self):
+        """A user who cannot buy is redirected (302) to the counter page, and their balance is not changed."""
+        self.login_in_bar()
+        user = self.customer_old_can_not_buy
+        force_refill_user(user, 10)
+        resp = self.submit_basket(user, [BasketItem(self.snack.id, 2)])
+        assert resp.status_code == 302
+        assert resp.url == self.counter.get_absolute_url()
+        assert self.updated_amount(user) == Decimal(10)
+
+    def test_click_banned_self_redirects_with_message(self):
+        """If the logged-in user is the banned person, they are redirected to the counter page with an error message."""
+        # Create a user banned from the counter
+        from core.models import BanGroup
+
+        banned_counter_id = getattr(settings, "SITH_GROUP_BANNED_COUNTER_ID", 13)
+        user = subscriber_user.make(password=make_password("plop"))
+        user.ban_groups.add(BanGroup.objects.get(pk=banned_counter_id))
+        force_refill_user(user, 10)
+        user.set_password("plop")
+        user.is_active = True
+        user.save()
+        self.client.force_login(user)
+        user_id_in_session = self.client.session.get("_auth_user_id")
+        assert user_id_in_session is not None, (
+            f"L'utilisateur n'est pas authentifié en session (user_id attendu={user.id})"
+        )
+        assert str(user_id_in_session) == str(user.id), (
+            f"Session user_id={user_id_in_session}, attendu={user.id}"
+        )
+        resp = self.client.post(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": user.id},
+            ),
+            {
+                "form-TOTAL_FORMS": "1",
+                "form-INITIAL_FORMS": "0",
+                "form-0-id": str(self.snack.id),
+                "form-0-quantity": "1",
+            },
+            follow=True,
+        )
+        # Should always be redirected to the counter page
+        assert resp.redirect_chain
+        assert resp.redirect_chain[-1][0] == self.counter.get_absolute_url()
+        # The balance should not change
+        assert self.updated_amount(user) == Decimal(10)
+
+    def test_click_banned_user_priority_over_non_cotisant(self):
+        # Create a new user and customer
+        user_ = baker.make(User)
+        customer_ = baker.make(Customer, user=user_)
+        # Remove all subscriptions for this customer to ensure can_buy is False
+        if hasattr(user_, "subscriptions"):
+            user_.subscriptions.all().delete()
+        assert not customer_.can_buy
+        counter_ = baker.make(Counter, type="BAR")
+        ban_group_ = baker.make(
+            BanGroup, id=settings.SITH_GROUP_BANNED_COUNTER_ID
+        )  # SITH_GROUP_BANNED_SUBSCRIPTION_ID
+        UserBan.objects.create(
+            user=user_, ban_group=ban_group_, reason="Banned", created_at="2024-01-01"
+        )
+        url = reverse(
+            "counter:click", kwargs={"counter_id": counter_.id, "user_id": user_.id}
+        )
+        response = self.client.get(url, follow=True)
+        # Should be redirected to the ban page (template or specific url)
+        assert response.status_code == 200
+        # Check that the ban page is displayed (presence of a specific text or template)
+        assert (
+            b"banned" in response.content.lower() or b"ban" in response.content.lower()
+        )
 
 
 class TestCounterStats(TestCase):

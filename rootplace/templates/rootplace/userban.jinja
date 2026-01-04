@@ -13,6 +13,10 @@
       {% trans %}Ban a user{% endtrans %}
     </a>
   {% endif %}
+  <a href="{{ url("rootplace:ban_report") }}" class="btn btn-blue margin-bottom">
+    <i class="fa fa-file-pdf"></i>
+    {% trans %}Generate ban report{% endtrans %}
+  </a>
   {% for user_ban in user_bans %}
     <div class="card card-row margin-bottom">
       <img

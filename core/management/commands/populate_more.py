@@ -8,11 +8,12 @@ from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.core.management.base import BaseCommand
 from django.db.models import Count, Exists, Min, OuterRef, Subquery
+from django.utils import timezone
 from django.utils.timezone import localdate, make_aware, now
 from faker import Faker
 
 from club.models import Club, Membership
-from core.models import Group, User
+from core.models import Group, User, UserBan
 from counter.models import (
     Counter,
     Customer,
@@ -40,6 +41,9 @@ class Command(BaseCommand):
 
         self.stdout.write("Creating users...")
         users = self.create_users()
+        users_to_ban = users[0:30]
+        self.stdout.write("Banning Users...")
+        self.create_bans(users_to_ban)
         subscribers = random.sample(users, k=int(0.8 * len(users)))
         self.stdout.write("Creating subscriptions...")
         self.create_subscriptions(subscribers)
@@ -456,3 +460,23 @@ class Command(BaseCommand):
             # would result in a big whibbly-woobly hacky queryset
             f.set_last_message()
             f.set_topic_number()
+
+    def create_bans(self, users: list[User]):
+        ban_groups = [
+            settings.SITH_GROUP_BANNED_COUNTER_ID,
+            settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID,
+            settings.SITH_GROUP_BANNED_ALCOHOL_ID,
+        ]
+        bans = []
+        for user in users:
+            ids = random.sample(ban_groups, k=random.randint(1, len(ban_groups)))
+            bans.extend(
+                UserBan(
+                    user=user,
+                    ban_group_id=i,
+                    reason=self.faker.sentence(),
+                    expires_at=timezone.now() + relativedelta(years=1),
+                )
+                for i in ids
+            )
+        UserBan.objects.bulk_create(bans)

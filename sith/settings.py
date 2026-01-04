@@ -659,6 +659,8 @@ with open(
     SITH_EBOUTIC_PUB_KEY = f.read()
 
 SITH_NOTIFICATIONS = [
+    ("BANNED_COUNTER_ATTEMPT", _("%s tries to use a counter")),
+    ("BANNED_HAS_COUNTER_PERMISSION", _("%s has counter permissions")),
     ("POSTER_MODERATION", _("A new poster needs to be moderated")),
     ("MAILING_MODERATION", _("A new mailing list needs to be moderated")),
     (

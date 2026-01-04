@@ -1,0 +1,35 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+  {{ counter }} - {% trans %}Banned{% endtrans %}
+{% endblock %}
+
+{% block content %}
+  <div class="alert alert-red">
+    <div class="col full-width gap center">
+      <h4>{{ counter }}</h4>
+      <img src="{{ customer.user.profile_pict.get_download_url() if customer.user.profile_pict else '/static/core/img/unknown.jpg' }}" alt="Photo" class="profile-pict" style="max-width:120px;max-height:120px;"/>
+      <h4>{% trans %}This customer is banned{% endtrans %}</h4>
+      {% if has_site_ban %}
+        <strong>{% trans %}Please make this person go out{% endtrans %}</strong>
+        <p>
+          {% trans %} This person is banned from the AE {% endtrans %}
+        </p>
+        <p>
+          {% trans %} If you are not conformable to make it go out, pretend a sith failure and ask a fellow barman to help you. {% endtrans %}
+        </p>
+      {% else %}
+        <strong>{% trans %}Please dont serve this person{% endtrans %}</strong>
+        <p>
+          {% trans %} This person is banned from this counter {% endtrans %}
+        </p>
+        <p>
+          {% trans %}You cannot serve him/her/them until the ban is lifted.{% endtrans %}
+        </p>
+      {% endif %}
+
+      <a href="{{ url('counter:details', counter.pk) }}" class="btn btn-blue at-end">{% trans %}Back to counter{% endtrans %}</a>
+    </div>
+
+  </div>
+{% endblock %}

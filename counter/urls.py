@@ -16,6 +16,7 @@
 from django.urls import path
 
 from counter.views.admin import (
+    BanUserUnwanted,
     CounterCreateView,
     CounterDeleteView,
     CounterEditPropView,
@@ -172,4 +173,21 @@ urlpatterns = [
         name="refilling_list",
     ),
     path("admin/refound/", RefoundAccountView.as_view(), name="account_refound"),
+    path(
+        "admin/ban-try/<int:counter_id>/<int:user_id>/",
+        BanUserUnwanted.as_view(template_name="counter/admin/ban_user_try_use.jinja"),
+        name="admin_ban_user_try_use_no_barman",
+    ),
+    path(
+        "admin/ban-try/<int:counter_id>/<int:user_id>/<int:barman_id>/",
+        BanUserUnwanted.as_view(template_name="counter/admin/ban_user_try_use.jinja"),
+        name="admin_ban_user_try_use",
+    ),
+    path(
+        "admin/ban-has-perm/<int:counter_id>/<int:user_id>/",
+        BanUserUnwanted.as_view(
+            template_name="counter/admin/ban_user_has_counter_permission.jinja"
+        ),
+        name="admin_ban_user_has_counter_permission",
+    ),
 ]

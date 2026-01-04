@@ -1,0 +1,45 @@
+{% extends "core/base.jinja" %}
+
+{% block additional_js %}
+  <script type="module" src="{{ static('bundled/counter/admin-index.ts') }}"></script>
+{% endblock %}
+
+{% block title %}
+  {{ counter }} - {% trans %}Banned user access attempt{% endtrans %}
+{% endblock %}
+
+{% block content %}
+  <div class="alert alert-red col center">
+    <h2>{% trans %}Banned user access attempt{% endtrans %}</h2>
+    <div class="row gap">
+      <div>
+        <a href="{{ url("core:user_profile", ban_user.id) }}">
+          <img src="{{ ban_user.profile_pict.get_download_url() if ban_user.profile_pict else static("core/img/unknown.jpg") }}" alt="{% trans %}Profile photo{% endtrans %}" style="max-width:120px;max-height:120px">
+        </a>
+      </div>
+      <div>
+        <a href="{{ url("core:user_profile", ban_user.id) }}"><strong>{{ ban_user.get_display_name() }}</strong></a><br>
+        <em>{% trans %}Attempt time:{% endtrans %} {{ attempt_time|date("SHORT_DATETIME_FORMAT") }}</em><br>
+        <em>{% trans %}Ban reason:{% endtrans %} {{ ban_reason }}</em><br>
+        <em>{% trans %}Counter:{% endtrans %} {{ counter }}</em>
+        <div id="js-messages" x-data="window.removeUserFromCounter({{ counter.id }}, {{ ban_user.id }})">
+          <template x-if="!removed">
+            <button id="remove-user-btn"
+                    class="btn btn-blue"
+                    x-on:click="remove"
+                    x-bind:disabled="loading">
+              {% trans %}Remove this user from counter{% endtrans %}
+            </button>
+          </template>
+          <div id="remove-user-message"
+               class="alert"
+               x-show="message"
+               x-text="message"
+               :class="success ? 'alert-green' : 'alert-red'"
+               style="display: none"></div>
+        </div>
+      </div>
+    </div>
+    <p>{% trans %}A banned user has permission on a counter. Please check the situation and take action if needed.{% endtrans %}</p>
+  </div>
+{% endblock %}

@@ -12,6 +12,8 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from typing import List
+
 from django.conf import settings
 from django.db.models import F
 from django.shortcuts import get_object_or_404
@@ -20,10 +22,11 @@ from ninja.security import SessionAuth
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
+from pydantic import BaseModel
 
 from api.auth import ApiKeyAuth
 from api.permissions import CanAccessLookup, CanView, IsInGroup, IsRoot
-from counter.models import Counter, Product, ProductType
+from counter.models import Counter, Product, ProductType, User
 from counter.schemas import (
     CounterFilterSchema,
     CounterSchema,
@@ -42,6 +45,10 @@ IsCounterAdmin = (
 )
 
 
+class SellerIds(BaseModel):
+    users_id: List[int]
+
+
 @api_controller("/counter")
 class CounterController(ControllerBase):
     @route.get("", response=list[CounterSchema], permissions=[IsRoot])
@@ -53,6 +60,29 @@ class CounterController(ControllerBase):
         return self.get_object_or_exception(
             Counter.objects.annotate_is_open(), pk=counter_id
         )
+
+    @route.put(
+        "{counter_id}/seller/add",
+        permissions=[IsCounterAdmin],
+        summary="Add sellers to a counter",
+    )
+    def add_sellers_to_counter(self, counter_id: int, payload: SellerIds):
+        users_id = payload.users_id
+        counter = get_object_or_404(Counter, pk=counter_id)
+        seller_ids = counter.sellers.values_list("id", flat=True)
+        users = User.objects.exclude(id__in=seller_ids, pk__in=users_id)
+        counter.sellers.add(*users)
+
+    @route.delete(
+        "{counter_id}/seller/remove",
+        permissions=[IsCounterAdmin],
+        summary="Remove sellers from a counter",
+    )
+    def remove_sellers_from_counter(self, counter_id: int, payload: SellerIds):
+        users_id = payload.users_id
+        counter = get_object_or_404(Counter, pk=counter_id)
+        users = counter.sellers.filter(pk__in=users_id)
+        counter.sellers.remove(*users)
 
     @route.get("bar/", response=list[CounterSchema], permissions=[CanView])
     def fetch_bars(self):

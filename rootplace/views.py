@@ -25,9 +25,12 @@ import logging
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.db import models
+from django.http import HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.timezone import localdate
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView, ListView
 from django.views.generic.edit import CreateView, FormView
 
@@ -35,7 +38,7 @@ from core.models import OperationLog, SithFile, User, UserBan
 from core.views import CanEditPropMixin
 from counter.models import Customer
 from forum.models import ForumMessageMeta
-from rootplace.forms import BanForm, MergeForm, SelectUserForm
+from rootplace.forms import BanForm, BanReportForm, MergeForm, SelectUserForm
 
 
 def __merge_subscriptions(u1: User, u2: User):
@@ -241,3 +244,226 @@ class BanDeleteView(PermissionRequiredMixin, DeleteView):
     model = UserBan
     template_name = "core/delete_confirm.jinja"
     success_url = reverse_lazy("rootplace:ban_list")
+
+
+class BanReportPDFView(PermissionRequiredMixin, FormView):
+    """Generate a PDF report of banned users at a specific date.
+
+    Shows banned users for a selected date with two display modes:
+    - image: Only profile pictures in a grid
+    - desc: Detailed list with name, first name, reason, and profile picture
+    """
+
+    permission_required = "core.view_userban"
+    template_name = "rootplace/ban_report.jinja"
+    form_class = BanReportForm
+
+    def form_valid(self, form):
+        from django.utils.translation import activate
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.units import cm
+        from reportlab.pdfgen import canvas
+
+        selected_date = form.cleaned_data["date"]
+        mode = form.cleaned_data["mode"]
+        ban_group = form.cleaned_data.get("ban_group")
+        language = form.cleaned_data.get("language", "fr")
+
+        # Activate the selected language for translations
+        activate(language)
+
+        # Get bans active on the selected date
+        banned_users = UserBan.objects.filter(
+            created_at__date__lte=selected_date
+        ).filter(
+            models.Q(expires_at__isnull=True)
+            | models.Q(expires_at__date__gte=selected_date)
+        )
+
+        # Apply optional ban_group filter
+        if ban_group:
+            banned_users = banned_users.filter(ban_group=ban_group)
+
+        banned_users = banned_users.select_related(
+            "user", "user__profile_pict", "ban_group"
+        )
+
+        # Create PDF response
+        response = HttpResponse(content_type="application/pdf")
+        response["Content-Disposition"] = (
+            f'attachment; filename="banned_users_{selected_date}.pdf"'
+        )
+
+        # Create PDF canvas
+        p = canvas.Canvas(response, pagesize=A4)
+        width, height = A4
+        p.setTitle(f"{_('Banned users')!s} - {selected_date}")
+
+        # Title
+        p.setFont("Helvetica-Bold", 20)
+        p.drawCentredString(width / 2, height - 2 * cm, str(_("Banned users")))
+        p.setFont("Helvetica", 14)
+        title_text = selected_date.strftime("%d/%m/%Y")
+        if ban_group:
+            title_text += f" - {ban_group.name}"
+        p.drawCentredString(width / 2, height - 2.8 * cm, title_text)
+
+        if mode == "image":
+            # Image mode: Grid of profile pictures
+            self._generate_image_mode(
+                p, banned_users, width, height, selected_date, ban_group
+            )
+        else:
+            # Desc mode: Detailed list with name, reason and image
+            self._generate_desc_mode(
+                p, banned_users, width, height, selected_date, ban_group
+            )
+
+        p.showPage()
+        p.save()
+        return response
+
+    def _generate_image_mode(
+        self, p, banned_users, width, height, selected_date, ban_group=None
+    ):
+        """Generate PDF in image mode: grid of profile pictures with names below each image."""
+        from reportlab.lib.units import cm
+        from reportlab.lib.utils import ImageReader
+
+        img_size = 3 * cm
+        margin = 1 * cm
+        spacing = 0.5 * cm
+        images_per_row = 5
+        start_y = (
+            height - 5 * cm
+        )  # Increased from 4cm to 5cm to avoid overlapping with title and date
+
+        x_pos = margin
+        y_pos = start_y
+
+        for count, ban in enumerate(banned_users, start=1):
+            user = ban.user
+
+            # Draw profile picture or placeholder
+            if user.profile_pict:
+                try:
+                    im = ImageReader(user.profile_pict.file)
+                    p.drawImage(
+                        im,
+                        x_pos,
+                        y_pos - img_size,
+                        img_size,
+                        img_size,
+                        preserveAspectRatio=True,
+                        mask="auto",
+                    )
+                except Exception:
+                    self._draw_placeholder(p, x_pos, y_pos - img_size, img_size)
+            else:
+                self._draw_placeholder(p, x_pos, y_pos - img_size, img_size)
+
+            # Draw user name below the image
+            p.setFont("Helvetica", 10)
+            name_text = f"{user.first_name} {user.last_name}"
+            text_width = p.stringWidth(name_text, "Helvetica", 10)
+            name_x = x_pos + (img_size / 2) - (text_width / 2)
+            name_y = y_pos - img_size - 0.4 * cm
+            p.drawString(name_x, name_y, name_text)
+
+            if count % images_per_row == 0:
+                # New row
+                x_pos = margin
+                y_pos -= img_size + spacing + 0.7 * cm  # Add extra space for the name
+
+                # Check if we need a new page
+                if y_pos - img_size < 2 * cm:
+                    p.showPage()
+                    # Redraw title on new page
+                    p.setFont("Helvetica-Bold", 20)
+                    p.drawCentredString(
+                        width / 2, height - 2 * cm, str(_("Banned users"))
+                    )
+                    p.setFont("Helvetica", 14)
+                    title_text = selected_date.strftime("%d/%m/%Y")
+                    if ban_group:
+                        title_text += f" - {ban_group.name}"
+                    p.drawCentredString(width / 2, height - 2.8 * cm, title_text)
+                    y_pos = height - 5 * cm
+                    x_pos = margin
+            else:
+                x_pos += img_size + spacing
+
+    def _generate_desc_mode(
+        self, p, banned_users, width, height, selected_date, ban_group=None
+    ):
+        """Generate PDF in desc mode: detailed list with name, reason and image."""
+        from reportlab.lib.units import cm
+        from reportlab.lib.utils import ImageReader
+
+        img_size = 2 * cm
+        margin = 1.5 * cm
+        line_height = 2.5 * cm
+        y_pos = height - 4 * cm
+
+        for ban in banned_users:
+            user = ban.user
+
+            # Check if we need a new page
+            if y_pos < 3 * cm:
+                p.showPage()
+                # Redraw title on new page
+                p.setFont("Helvetica-Bold", 20)
+                p.drawCentredString(width / 2, height - 2 * cm, str(_("Banned users")))
+                p.setFont("Helvetica", 14)
+                title_text = selected_date.strftime("%d/%m/%Y")
+                if ban_group:
+                    title_text += f" - {ban_group.name}"
+                p.drawCentredString(width / 2, height - 2.8 * cm, title_text)
+                y_pos = height - 4 * cm
+
+            # Draw profile picture
+            if user.profile_pict:
+                try:
+                    im = ImageReader(user.profile_pict.file)
+                    p.drawImage(
+                        im,
+                        margin,
+                        y_pos - img_size,
+                        img_size,
+                        img_size,
+                        preserveAspectRatio=True,
+                        mask="auto",
+                    )
+                except Exception:
+                    self._draw_placeholder(p, margin, y_pos - img_size, img_size)
+            else:
+                self._draw_placeholder(p, margin, y_pos - img_size, img_size)
+
+            # Draw user information
+            text_x = margin + img_size + 0.5 * cm
+            p.setFont("Helvetica-Bold", 12)
+            p.drawString(
+                text_x, y_pos - 0.5 * cm, f"{user.first_name} {user.last_name}"
+            )
+
+            p.setFont("Helvetica", 10)
+            ban_type = ban.ban_group.name if ban.ban_group else "N/A"
+            p.drawString(text_x, y_pos - 1 * cm, f"{_('Ban type')!s} : {ban_type}")
+
+            # Draw reason (truncate if too long)
+            reason_text = (
+                ban.reason[:80] + "..." if len(ban.reason) > 80 else ban.reason
+            )
+            p.setFont("Helvetica-Oblique", 9)
+            p.drawString(text_x, y_pos - 1.5 * cm, f"{_('Reason')!s}: {reason_text}")
+
+            y_pos -= line_height
+
+    def _draw_placeholder(self, p, x, y, size):
+        """Draw a placeholder rectangle when no profile picture is available."""
+
+        p.setFillColorRGB(0.9, 0.9, 0.9)
+        p.rect(x, y, size, size, fill=1)
+        p.setFillColorRGB(0, 0, 0)
+        p.setFont("Helvetica", 8)
+        p.drawCentredString(x + size / 2, y + size / 2, str(_("No picture")))
