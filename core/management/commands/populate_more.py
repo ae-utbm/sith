@@ -8,9 +8,9 @@ from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.core.management.base import BaseCommand
 from django.db.models import Count, Exists, Min, OuterRef, Subquery
+from django.utils import timezone
 from django.utils.timezone import localdate, make_aware, now
 from faker import Faker
-from django.utils import timezone
 
 from club.models import Club, Membership
 from core.models import Group, User, UserBan
@@ -34,7 +34,6 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.faker = Faker("fr_FR")
-
 
     def handle(self, *args, **options):
         if not settings.DEBUG:

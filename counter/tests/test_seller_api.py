@@ -1,5 +1,6 @@
-import pytest
 import json
+
+import pytest
 from django.test import Client
 from model_bakery import baker
 
@@ -26,7 +27,7 @@ class TestCounterBulkRoutes:
             (0, 0, 1, 200, False),
             (0, 0, 4, 200, False),
             (1, 0, 0, 404, True),
-        ]
+        ],
     )
     def test_counter_create_bulk(
         self,
@@ -34,23 +35,20 @@ class TestCounterBulkRoutes:
         already_in_number,
         invalid_users_number,
         expected_code,
-        invalid_counter
+        invalid_counter,
     ):
-        if invalid_counter:
-            counter_id = 9999
-        else:
-            counter_id = self.counter.id
+        counter_id = 9999 if invalid_counter else self.counter.id
 
         user_id_list = []
 
         valid_users_id = []
-        for i in range(users_number):
+        for _ in range(users_number):
             user = baker.make(User)
             user_id_list.append(user.id)
             valid_users_id.append(user.id)
 
         user_to_add = []
-        for i in range(already_in_number):
+        for _ in range(already_in_number):
             user = baker.make(User)
             user_id_list.append(user.id)
             user_to_add.append(user)
@@ -58,7 +56,7 @@ class TestCounterBulkRoutes:
         self.counter.sellers.add(*user_to_add)
 
         for i in range(invalid_users_number):
-            user_id_list.append(9999 + i)
+            user_id_list.extend(9999 + i)
 
         response = self.client.put(
             f"/api/counter/{counter_id}/seller/add",
@@ -95,31 +93,28 @@ class TestCounterBulkRoutes:
                 (0, 0, 1, 200, False),
                 (0, 0, 4, 200, False),
                 (1, 0, 0, 404, True),
-            ]
+            ],
         )
         def test_counter_remove_bulk(
-                self,
-                users_number,
-                already_in_number,
-                invalid_users_number,
-                expected_code,
-                invalid_counter
+            self,
+            users_number,
+            already_in_number,
+            invalid_users_number,
+            expected_code,
+            invalid_counter,
         ):
-            if invalid_counter:
-                counter_id = 9999
-            else:
-                counter_id = self.counter.id
+            counter_id = 9999 if invalid_counter else self.counter.id
 
             user_id_list = []
 
             valid_user_ids = []
 
-            for i in range(users_number):
+            for _ in range(users_number):
                 user = baker.make(User)
                 user_id_list.append(user.id)
 
             user_to_add = []
-            for i in range(already_in_number):
+            for _ in range(already_in_number):
                 user = baker.make(User)
                 user_id_list.append(user.id)
                 user_to_add.append(user)
@@ -127,7 +122,7 @@ class TestCounterBulkRoutes:
             valid_user_ids.extend([u.id for u in user_to_add])
 
             for i in range(invalid_users_number):
-                user_id_list.append(9999 + i)
+                user_id_list.extend(9999 + i)
 
             users_to_add_all = []
             for uid in user_id_list:
@@ -150,6 +145,3 @@ class TestCounterBulkRoutes:
 
                 for i in range(invalid_users_number):
                     assert not self.counter.sellers.filter(pk=9999 + i).exists()
-
-
-

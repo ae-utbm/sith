@@ -84,7 +84,7 @@ class CounterClick(
 
         # BAN CHECK FIRST
         bans = self.customer.user.bans.select_related("ban_group")
-        banned_counter_id =settings.SITH_GROUP_BANNED_COUNTER_ID
+        banned_counter_id = settings.SITH_GROUP_BANNED_COUNTER_ID
         banned_site_id = settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID
         is_blocked = any(
             ban.ban_group.id in [banned_counter_id, banned_site_id] for ban in bans
@@ -282,7 +282,6 @@ class CounterClick(
     def alert_admin_unwanted_user(self, ban_user: User, counter: Counter, barman: User):
         """Alerte les admins AE via une notification interne si un utilisateur banni AE tente d'acheter."""
         from django.conf import settings
-        from django.db.models import Exists, OuterRef
         from django.urls import reverse
 
         from core.models import Notification, User
@@ -322,7 +321,6 @@ class CounterClick(
     ):
         """Alerte les admins AE via une notification interne si un utilisateur banni AE a les droit de vendre sur un counter."""
         from django.conf import settings
-        from django.db.models import Exists, OuterRef
         from django.urls import reverse
 
         from core.models import Notification, User
