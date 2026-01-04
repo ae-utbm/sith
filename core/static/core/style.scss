@@ -419,18 +419,18 @@ body {
     }
 
 
-    // Positionner les enfants individuellement
+    // Positioning of children
     > .at-start {
-      align-self: flex-start !important;
+      align-self: flex-start;
     }
     > .at-center {
-      align-self: center !important;
+      align-self: center;
     }
     > .at-end {
-      align-self: flex-end !important;
+      align-self: flex-end;
     }
     > .at-stretch {
-      align-self: stretch !important;
+      align-self: stretch;
     }
   }
 
