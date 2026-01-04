@@ -26,7 +26,6 @@
           <template x-if="!removed">
             <button id="remove-user-btn"
                     class="btn btn-blue"
-                    style="margin-top:1em;"
                     x-on:click="remove"
                     x-bind:disabled="loading">
               {% trans %}Remove this user from counter{% endtrans %}

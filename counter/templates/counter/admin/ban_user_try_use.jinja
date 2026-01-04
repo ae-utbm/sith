@@ -20,7 +20,7 @@
         <em>{% trans %}Counter:{% endtrans %} {{ counter }}</em>
       </div>
     </div>
-    <p style="margin-top:1em">{% trans %}A banned user tried to use the counter. Please check the situation and take action if needed.{% endtrans %}</p>
+    <p>{% trans %}A banned user tried to use the counter. Please check the situation and take action if needed.{% endtrans %}</p>
     {% if barman %}
       <a href="{{ url('core:user_profile', barman.id) }}">{% trans %}Profile of the barman on duty:{% endtrans %} {{ barman.get_display_name() }}</a>
     {% endif %}
