@@ -1,5 +1,9 @@
 {% extends "core/base.jinja" %}
 
+{% block additional_js %}
+    <script type="module" src="{{ static('bundled/counter/admin-index.ts') }}"></script>
+{% endblock %}
+
 {% block title %}
   {{ counter }} - {% trans %}Banned user access attempt{% endtrans %}
 {% endblock %}
@@ -10,7 +14,7 @@
     <div class="row gap">
       <div>
         <a href="{{ url("core:user_profile", ban_user.id) }}">
-          <img src="{{ ban_user.profile_pict.get_download_url() if ban_user.profile_pict else static("core/img/unknown.jpg") }}" alt="{% trans %}Profile photo{% endtrans %}" style="max-width:120px;max-height:120px;border-radius:8px;">
+          <img src="{{ ban_user.profile_pict.get_download_url() if ban_user.profile_pict else static("core/img/unknown.jpg") }}" alt="{% trans %}Profile photo{% endtrans %}" style="max-width:120px;max-height:120px">
         </a>
       </div>
       <div>
@@ -18,64 +22,23 @@
         <em>{% trans %}Attempt time:{% endtrans %} {{ attempt_time|date("SHORT_DATETIME_FORMAT") }}</em><br>
         <em>{% trans %}Ban reason:{% endtrans %} {{ ban_reason }}</em><br>
         <em>{% trans %}Counter:{% endtrans %} {{ counter }}</em>
-        <div id="js-messages">
-          <button id="remove-user-btn" class="btn btn-blue" style="margin-top:1em;">{% trans %}Remove this user from counter{% endtrans %}</button>
-          <div id="remove-user-message" class="alert" style="display: none"></div>
+        <div id="js-messages" x-data="window.removeUserFromCounter({{ counter.id }}, {{ ban_user.id }})">
+          <template x-if="!removed">
+            <button id="remove-user-btn"
+                    class="btn btn-blue"
+                    style="margin-top:1em;"
+                    x-on:click="remove"
+                    x-bind:disabled="loading">
+              {% trans %}Remove this user from counter{% endtrans %}
+            </button>
+          </template>
+          <div id="remove-user-message"
+               class="alert"
+               x-show="message"
+               x-text="message"
+               :class="success ? 'alert-green' : 'alert-red'"
+               style="display: none"></div>
         </div>
-        <script>
-        // Le bouton est toujours visible, le message s"affiche selon le retour de l"API
-          document.addEventListener("DOMContentLoaded", function() {
-            const btn = document.getElementById("remove-user-btn");
-            const msg = document.getElementById("remove-user-message");
-            btn.onclick = async function() {
-              btn.disabled = true;
-              btn.textContent = "{% trans %}Processing...{% endtrans %}";
-              msg.style.display = "none";
-              msg.className = "alert";
-              const resp = await fetch("/api/counter/{{ counter.id }}/seller/remove", {
-                method: "POST",
-                headers: {
-                  "X-CSRFToken": "{{ csrf_token }}",
-                  "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ user_ids: [{{ ban_user.id }}]})
-              });
-              let data = {};
-              try { data = await resp.json(); } catch(e) {}
-              msg.style.display = "block";
-              msg.classList.remove("alert-green", "alert-yellow", "alert-red");
-              if (!resp.ok) {
-                btn.disabled = false;
-                btn.textContent = "{% trans %}Remove this user from counter{% endtrans %}";
-                if (resp.status === 403) {
-                  msg.classList.add("alert-red");
-                  msg.textContent = "{% trans %}You do not have permission to perform this action.{% endtrans %}";
-                } else if (resp.status === 404) {
-                  if (data.code === "1")
-                    msg.textContent = "{% trans %}Counter not found.{% endtrans %}";
-                  else{
-                    msg.textContent = "{% trans %}User already remove.{% endtrans %}";
-                  }
-                  msg.classList.add("alert-yellow");
-                } else {
-                  msg.textContent = data.detail || "{% trans %}An error occurred while removing the user.{% endtrans %}";
-                  msg.classList.add("alert-yellow");
-                }
-              } else {
-                if (data.removed_ids && data.removed_ids.includes({{ ban_user.id }})) {
-                  msg.textContent = "{% trans %}User removed successfully.{% endtrans %}";
-                  msg.classList.add("alert-green");
-                  btn.style.display = "none";
-                } else {
-                  msg.textContent = "{% trans %}User was not removed. They may not have had permission on this counter or being already removed.{% endtrans %}"; // Non vendeur ou déjà retiré
-                  msg.classList.add("alert-yellow");
-                  btn.disabled = false;
-                  btn.textContent = "{% trans %}Remove this user from counter{% endtrans %}";
-                }
-              }
-            };
-          });
-        </script>
       </div>
     </div>
     <p style="margin-top:1em">{% trans %}A banned user has permission on a counter. Please check the situation and take action if needed.{% endtrans %}</p>
