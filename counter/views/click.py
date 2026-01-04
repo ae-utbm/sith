@@ -304,14 +304,7 @@ class CounterClick(
                 "counter:admin_ban_user_try_use_no_barman",
                 kwargs={"counter_id": counter.id, "user_id": ban_user.id},
             )
-        unread_notif_subquery = Notification.objects.filter(
-            user=OuterRef("pk"),
-            type=notif_type,
-            viewed=False,
-            param=str(self.customer.user.id),
-        )
         for user in User.objects.filter(
-            ~Exists(unread_notif_subquery),
             groups__id__in=admin_group_ids,
         ).distinct():
             notif = Notification.objects.create(
@@ -341,14 +334,7 @@ class CounterClick(
             "counter:admin_ban_user_has_counter_permission",
             kwargs={"counter_id": counter.id, "user_id": ban_user.id},
         )
-        unread_notif_subquery = Notification.objects.filter(
-            user=OuterRef("pk"),
-            type=notif_type,
-            viewed=False,
-            param=str(self.customer.user.id),
-        )
         for user in User.objects.filter(
-            ~Exists(unread_notif_subquery),
             groups__id__in=admin_group_ids,
         ).distinct():
             notif = Notification.objects.create(
