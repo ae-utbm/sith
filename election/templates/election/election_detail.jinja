@@ -14,6 +14,11 @@
 
 {% block content %}
   <h3 class="election__title">{{ election.title }}</h3>
+  {% if user.is_anonymous %}
+    <div class="alert alert-red">
+      {% trans %}You are not logged in, candidate pictures won't display for privacy reasons.{% endtrans %}
+    </div>
+  {% endif %}
   <p class="election__description">{{ election.description }}</p>
   <hr>
   <section class="election_details">
@@ -117,7 +122,7 @@
                 {%- if role.max_choice == 1 and show_vote_buttons %}
                   <div class="radio-btn">
                     {% set input_id = "blank_vote_" + role.id|string %}
-                    <input id="{{ input_id }}" type="radio" name="{{ role.title }}">
+                    <input id="{{ input_id }}" type="radio" name="{{ role.title }}" value="" checked>
                     <label for="{{ input_id }}">
                       <span>{% trans %}Choose blank vote{% endtrans %}</span>
                     </label>
@@ -185,26 +190,28 @@
       </table>
     </form>
   </section>
-  <section class="buttons">
-    {%- if (election.can_candidate(user) and election.is_candidature_active) or (user.can_edit(election) and election.is_vote_editable) %}
-      <a class="button" href="{{ url('election:candidate', election_id=object.id) }}">{% trans %}Candidate{% endtrans %}</a>
-    {%- endif %}
-    {%- if election.is_vote_editable %}
-      <a class="button" href="{{ url('election:create_list', election_id=object.id) }}">{% trans %}Add a new list{% endtrans %}</a>
-    {%- endif %}
-    {%- if user.can_edit(election) %}
-      {% if election.is_vote_editable %}
-        <a  class="button" href="{{ url('election:create_role', election_id=object.id) }}">{% trans %}Add a new role{% endtrans %}</a>
-      {% endif %}
-      <a  class="button" href="{{ url('election:update', election_id=object.id) }}">{% trans %}Edit{% endtrans %}</a>
-    {%- endif %}
-    {%- if user.is_root %}
-      <a  class="button" href="{{ url('election:delete', election_id=object.id) }}">{% trans %}Delete{% endtrans %}</a>
-    {%- endif %}
-  </section>
-  {%- if show_vote_buttons %}
+  {% if not user.is_anonymous %}
     <section class="buttons">
-      <button class="button button_send" form="vote-form">{% trans %}Submit the vote !{% endtrans %}</button>
+      {%- if (election.can_candidate(user) and election.is_candidature_active) or (user.can_edit(election) and election.is_vote_editable) %}
+        <a class="button" href="{{ url('election:candidate', election_id=object.id) }}">{% trans %}Candidate{% endtrans %}</a>
+      {%- endif %}
+      {%- if election.is_vote_editable %}
+        <a class="button" href="{{ url('election:create_list', election_id=object.id) }}">{% trans %}Add a new list{% endtrans %}</a>
+      {%- endif %}
+      {%- if user.can_edit(election) %}
+        {% if election.is_vote_editable %}
+          <a  class="button" href="{{ url('election:create_role', election_id=object.id) }}">{% trans %}Add a new role{% endtrans %}</a>
+        {% endif %}
+        <a  class="button" href="{{ url('election:update', election_id=object.id) }}">{% trans %}Edit{% endtrans %}</a>
+      {%- endif %}
+      {%- if user.is_root %}
+        <a  class="button" href="{{ url('election:delete', election_id=object.id) }}">{% trans %}Delete{% endtrans %}</a>
+      {%- endif %}
     </section>
-  {%- endif %}
+    {%- if show_vote_buttons %}
+      <section class="buttons">
+        <button class="button button_send" form="vote-form">{% trans %}Submit the vote !{% endtrans %}</button>
+      </section>
+    {%- endif %}
+  {% endif %}
 {% endblock %}

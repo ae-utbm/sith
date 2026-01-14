@@ -60,8 +60,6 @@ class CandidateForm(forms.ModelForm):
 class VoteForm(forms.Form):
     def __init__(self, election: Election, user: User, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if not election.can_vote(user):
-            return
         for role in election.roles.all():
             cand = role.candidatures
             if role.max_choice > 1:
@@ -74,6 +72,7 @@ class VoteForm(forms.Form):
                     required=False,
                     widget=forms.RadioSelect(),
                     empty_label=_("Blank vote"),
+                    blank=True,
                 )
 
 
