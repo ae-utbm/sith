@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 
 from cryptography.utils import cached_property
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
     PermissionRequiredMixin,
@@ -10,8 +11,9 @@ from django.contrib.auth.mixins import (
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import QuerySet
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
@@ -53,7 +55,7 @@ class ElectionListArchivedView(CanViewMixin, ListView):
 
 
 class ElectionDetailView(CanViewMixin, DetailView):
-    """Details an election responsability by responsability."""
+    """Details an election responsibility by responsibility."""
 
     model = Election
     template_name = "election/election_detail.jinja"
@@ -83,7 +85,7 @@ class ElectionDetailView(CanViewMixin, DetailView):
         return super().get(request, *arg, **kwargs)
 
     def get_context_data(self, **kwargs):
-        """Add additionnal data to the template."""
+        """Add additional data to the template."""
         user: User = self.request.user
         return super().get_context_data(**kwargs) | {
             "election_form": VoteForm(self.object, user),
@@ -101,7 +103,7 @@ class ElectionDetailView(CanViewMixin, DetailView):
 
 
 class VoteFormView(LoginRequiredMixin, UserPassesTestMixin, FormView):
-    """Alows users to vote."""
+    """Allows users to vote."""
 
     form_class = VoteForm
     template_name = "election/election_detail.jinja"
@@ -111,6 +113,9 @@ class VoteFormView(LoginRequiredMixin, UserPassesTestMixin, FormView):
         return get_object_or_404(Election, pk=self.kwargs["election_id"])
 
     def test_func(self):
+        if not self.election.can_vote(self.request.user):
+            return False
+
         groups = set(self.election.vote_groups.values_list("id", flat=True))
         if (
             settings.SITH_GROUP_SUBSCRIBERS_ID in groups
@@ -150,11 +155,17 @@ class VoteFormView(LoginRequiredMixin, UserPassesTestMixin, FormView):
         self.vote(data)
         return super().form_valid(form)
 
+    def form_invalid(self, form):
+        messages.error(self.request, _("Form is invalid"))
+        return redirect(
+            reverse("election:detail", kwargs={"election_id": self.election.id}),
+        )
+
     def get_success_url(self, **kwargs):
         return reverse_lazy("election:detail", kwargs={"election_id": self.election.id})
 
     def get_context_data(self, **kwargs):
-        """Add additionnal data to the template."""
+        """Add additional data to the template."""
         kwargs = super().get_context_data(**kwargs)
         kwargs["object"] = self.election
         kwargs["election"] = self.election
