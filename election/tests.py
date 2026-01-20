@@ -115,3 +115,72 @@ def test_election_results():
             "total vote": 100,
         },
     }
+
+
+@pytest.mark.django_db
+def test_election_form(client : Client):
+    election = baker.make(
+        Election, 
+        end_date = now() + timedelta(days=1),
+    )
+    group = baker.make(Group)
+    election.vote_groups.add(group)
+    lists = baker.make(ElectionList, election=election, _quantity=2, _bulk_create=True)
+    roles = baker.make(Role, election=election, _quantity=2, _bulk_create=True)
+    users = baker.make(User, _quantity=4, _bulk_create=True)
+    cand = [
+        baker.make(Candidature, role=roles[0], user=users[0], election_list=lists[0]),
+        baker.make(Candidature, role=roles[0], user=users[1], election_list=lists[1]),
+        baker.make(Candidature, role=roles[1], user=users[2], election_list=lists[0]),
+        baker.make(Candidature, role=roles[1], user=users[3], election_list=lists[1]),
+    ]
+    url = reverse("election:vote", kwargs={"election_id": election.id})
+
+    votes = [
+        {
+            roles[0].title : "", 
+            roles[1].title : str(cand[2].id),
+            },
+
+        {
+            roles[0].title : "", 
+            roles[1].title : "",
+            },
+
+        {
+            roles[0].title : str(cand[0].id), 
+            roles[1].title : str(cand[2].id),
+            },
+
+        {
+            roles[0].title : str(cand[0].id), 
+            roles[1].title : str(cand[3].id),
+            },
+    ]
+
+    NB_VOTER = len(votes)
+    voters = [subscriber_user.make() for _ in range(NB_VOTER)] 
+    
+    for i in range(NB_VOTER):
+        voter = voters[i]
+        voter.groups.add(group)
+        if not election.can_vote(voter):
+            assert False
+        client.force_login(voter)
+        reponse = client.post(url, data = votes[i])
+        assert reponse.status_code == 302
+
+    assert election.results == {
+        roles[0].title: {
+            cand[0].user.username: {"percent": 50.0, "vote": 2},
+            cand[1].user.username: {"percent": 0.0, "vote": 0},
+            "blank vote": {"percent": 50.0, "vote": 2},
+            "total vote": 4,
+        },
+        roles[1].title: {
+            cand[2].user.username: {"percent": 50.0, "vote": 2},
+            cand[3].user.username: {"percent": 25.0, "vote": 1},
+            "blank vote": {"percent": 25.0, "vote": 1},
+            "total vote": 4,
+        },
+    }
