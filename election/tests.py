@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 import pytest
+from pytest_django.asserts import assertRedirects
 from django.conf import settings
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -118,13 +119,14 @@ def test_election_results():
 
 
 @pytest.mark.django_db
-def test_election_form(client : Client):
+def test_election_good_form(client : Client):
     election = baker.make(
         Election, 
         end_date = now() + timedelta(days=1),
     )
     group = baker.make(Group)
     election.vote_groups.add(group)
+    election.edit_groups.add(group)
     lists = baker.make(ElectionList, election=election, _quantity=2, _bulk_create=True)
     roles = baker.make(Role, election=election, _quantity=2, _bulk_create=True)
     users = baker.make(User, _quantity=4, _bulk_create=True)
@@ -158,18 +160,19 @@ def test_election_form(client : Client):
             },
     ]
 
-    NB_VOTER = len(votes)
-    voters = [subscriber_user.make() for _ in range(NB_VOTER)] 
+    voters = subscriber_user.make(_quantity=len(votes), _bulk_create=True)
+    group.users.set(voters)
     
-    for i in range(NB_VOTER):
-        voter = voters[i]
-        voter.groups.add(group)
-        if not election.can_vote(voter):
-            assert False
+    for voter, vote in zip(voters, votes):
+        assert election.can_vote(voter)
         client.force_login(voter)
-        reponse = client.post(url, data = votes[i])
-        assert reponse.status_code == 302
-
+        response = client.post(url, data = vote)
+        assertRedirects(
+            response,
+            reverse("election:detail", kwargs={"election_id": election.id})
+        )
+    
+    assert set(election.voters.all()) == set(voters)
     assert election.results == {
         roles[0].title: {
             cand[0].user.username: {"percent": 50.0, "vote": 2},
@@ -184,3 +187,71 @@ def test_election_form(client : Client):
             "total vote": 4,
         },
     }
+
+
+@pytest.mark.django_db
+def test_election_bad_form(client : Client):
+    election = baker.make(
+        Election, 
+        end_date = now() + timedelta(days=1),
+    )
+    group = baker.make(Group)
+    election.vote_groups.add(group)
+    election.edit_groups.add(group)
+    lists = baker.make(ElectionList, election=election, _quantity=2, _bulk_create=True)
+    roles = baker.make(Role, election=election, _quantity=2, _bulk_create=True)
+    users = baker.make(User, _quantity=5, _bulk_create=True)
+    cand = [
+        baker.make(Candidature, role=roles[0], user=users[0], election_list=lists[0]),
+        baker.make(Candidature, role=roles[0], user=users[1], election_list=lists[1]),
+        baker.make(Candidature, role=roles[1], user=users[2], election_list=lists[0]),
+        baker.make(Candidature, role=roles[1], user=users[3], election_list=lists[1]),
+    ]
+    url = reverse("election:vote", kwargs={"election_id": election.id})
+
+    votes = [
+        {
+            roles[0].title : "", 
+            roles[1].title : str(cand[0].id), #wrong candidate
+            },
+
+        {
+            roles[0].title : "",
+            },
+
+        {
+            roles[0].title : "0123456789", #unkwon users
+            roles[1].title : str(users[4].id), #not a candidate
+            },
+
+        {
+            },
+    ]
+
+    voters = subscriber_user.make(_quantity=len(votes), _bulk_create=True)
+    group.users.set(voters)
+
+    for voter, vote in zip(voters, votes):
+        assert election.can_vote(voter)
+        client.force_login(voter)
+        response = client.post(url, data = vote)
+        assertRedirects(
+            response,
+            reverse("election:detail", kwargs={"election_id": election.id})
+        )
+
+    assert election.results == {
+        roles[0].title: {
+            cand[0].user.username: {"percent": 0.0, "vote": 0},
+            cand[1].user.username: {"percent": 0.0, "vote": 0},
+            "blank vote": {"percent": 100.0, "vote": 2},
+            "total vote": 2,
+        },
+        roles[1].title: {
+            cand[2].user.username: {"percent": 0.0, "vote": 0},
+            cand[3].user.username: {"percent": 0.0, "vote": 0},
+            "blank vote": {"percent": 100.0, "vote": 2},
+            "total vote": 2,
+        },
+    }
+    
