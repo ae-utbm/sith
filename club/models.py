@@ -232,7 +232,7 @@ class MembershipQuerySet(models.QuerySet):
         are included, even if there are no more members.
 
         If you want to get the users who are currently in the board,
-        mind combining this with the :meth:`ongoing` queryset method
+        mind combining this with the `ongoing` queryset method
         """
         return self.filter(role__gt=settings.SITH_MAXIMUM_FREE_ROLE)
 
@@ -275,10 +275,7 @@ class MembershipQuerySet(models.QuerySet):
         )
 
     def update(self, **kwargs) -> int:
-        """Refresh the cache and edit group ownership.
-
-        Update the cache, when necessary, remove
-        users from club groups they are no more in
+        """Remove users from club groups they are no more in
         and add them in the club groups they should be in.
 
         Be aware that this adds three db queries :
@@ -300,9 +297,7 @@ class MembershipQuerySet(models.QuerySet):
 
     def delete(self) -> tuple[int, dict[str, int]]:
         """Work just like the default Django's delete() method,
-        but add a cache invalidation for the elements of the queryset
-        before the deletion,
-        and a removal of the user from the club groups.
+        but also remove the concerned users from the club groups.
 
         Be aware that this adds some db queries :
 
