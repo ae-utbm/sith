@@ -118,9 +118,9 @@ class TestFileModerationView:
             (lambda: None, 403),  # Anonymous user
             (lambda: baker.make(User, is_superuser=True), 200),
             (lambda: baker.make(User), 403),
-            (lambda: subscriber_user.make(), 403),
-            (lambda: old_subscriber_user.make(), 403),
-            (lambda: board_user.make(), 403),
+            (subscriber_user.make, 403),
+            (old_subscriber_user.make, 403),
+            (board_user.make, 403),
         ],
     )
     def test_view_access(
@@ -262,7 +262,7 @@ def test_apply_rights_recursively():
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    ("user_receipe", "file", "expected_status"),
+    ("user_recipe", "file", "expected_status"),
     [
         (
             lambda: None,
@@ -279,21 +279,21 @@ def test_apply_rights_recursively():
             403,
         ),
         (
-            lambda: subscriber_user.make(),
+            subscriber_user.make,
             SimpleUploadedFile(
                 "test.jpg", content=RED_PIXEL_PNG, content_type="image/jpg"
             ),
             200,
         ),
         (
-            lambda: old_subscriber_user.make(),
+            old_subscriber_user.make,
             SimpleUploadedFile(
                 "test.jpg", content=RED_PIXEL_PNG, content_type="image/jpg"
             ),
             200,
         ),
         (
-            lambda: old_subscriber_user.make(),
+            old_subscriber_user.make,
             SimpleUploadedFile(
                 "ttesttesttesttesttesttesttesttesttesttesttesttesttesttesttestesttesttesttesttesttesttesttesttesttesttesttest.jpg",
                 content=RED_PIXEL_PNG,
@@ -302,21 +302,21 @@ def test_apply_rights_recursively():
             200,
         ),  # very long file name
         (
-            lambda: old_subscriber_user.make(),
+            old_subscriber_user.make,
             SimpleUploadedFile(
                 "test.jpg", content=b"invalid", content_type="image/jpg"
             ),
             422,
         ),
         (
-            lambda: old_subscriber_user.make(),
+            old_subscriber_user.make,
             SimpleUploadedFile(
                 "test.jpg", content=RED_PIXEL_PNG, content_type="invalid"
             ),
             200,  # PIL can guess
         ),
         (
-            lambda: old_subscriber_user.make(),
+            old_subscriber_user.make,
             SimpleUploadedFile("test.jpg", content=b"invalid", content_type="invalid"),
             422,
         ),
@@ -324,11 +324,11 @@ def test_apply_rights_recursively():
 )
 def test_quick_upload_image(
     client: Client,
-    user_receipe: Callable[[], User | None],
+    user_recipe: Callable[[], User | None],
     file: UploadedFile | None,
     expected_status: int,
 ):
-    if (user := user_receipe()) is not None:
+    if (user := user_recipe()) is not None:
         client.force_login(user)
     resp = client.post(
         reverse("api:quick_upload_image"), {"file": file} if file is not None else {}
