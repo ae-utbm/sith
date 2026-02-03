@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-19 23:10+0100\n"
+"POT-Creation-Date: 2026-02-03 10:03+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4109,6 +4109,12 @@ msgid "Candidature are closed for this election"
 msgstr "Les candidatures sont fermées pour cette élection"
 
 #: election/templates/election/election_detail.jinja
+msgid "Candidate pictures won't display for privacy reasons."
+msgstr ""
+"La photo du candidat ne s'affiche pas pour "
+"des raisons de respect de la vie privée."
+
+#: election/templates/election/election_detail.jinja
 msgid "Polls close "
 msgstr "Votes fermés"
 
@@ -4182,6 +4188,10 @@ msgstr "au"
 #: election/templates/election/election_list.jinja
 msgid "Polls open from"
 msgstr "Votes ouverts du"
+
+#: election/views.py
+msgid "Form is invalid"
+msgstr "Formulaire invalide"
 
 #: forum/models.py
 msgid "is a category"
