@@ -65,10 +65,10 @@ class Command(BaseCommand):
         """Fetch the users which have a pending account dump."""
         threshold = now() - settings.SITH_ACCOUNT_DUMP_DELTA
         ongoing_dump_operations: QuerySet[AccountDump] = (
-            AccountDump.objects.ongoing()
-            .filter(customer__user=OuterRef("pk"), warning_mail_sent_at__lt=threshold)
-        )  # fmt: off
-        # cf. https://github.com/astral-sh/ruff/issues/14103
+            AccountDump.objects.ongoing().filter(
+                customer__user=OuterRef("pk"), warning_mail_sent_at__lt=threshold
+            )
+        )
         return (
             User.objects.filter(Exists(ongoing_dump_operations))
             .annotate(

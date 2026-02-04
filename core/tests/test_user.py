@@ -418,9 +418,7 @@ class TestUserQuerySetViewableBy:
         viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
         assert set(viewable) == {users[0], users[1]}
 
-    @pytest.mark.parametrize(
-        "user_factory", [lambda: baker.make(User), lambda: AnonymousUser()]
-    )
+    @pytest.mark.parametrize("user_factory", [lambda: baker.make(User), AnonymousUser])
     def test_not_subscriber(self, users: list[User], user_factory):
         user = user_factory()
         viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
