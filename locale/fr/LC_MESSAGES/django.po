@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-03 10:03+0100\n"
+"POT-Creation-Date: 2026-02-08 16:14+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3943,6 +3943,16 @@ msgstr "Solde restant : "
 #: eboutic/templates/eboutic/eboutic_checkout.jinja
 msgid "Pay with credit card"
 msgstr "Payer avec une carte bancaire"
+
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
+msgid ""
+"Credit card payments are currently disabled on the eboutic. You may still "
+"refill your account in one of the AE counters. Please excuse for the "
+"disagreement."
+msgstr ""
+"Les paiements par carte bancaire sont actuellement désactivés sur l'eboutic. "
+"Vous pouvez cependant toujours recharger votre compte dans un des lieux de vie de l'AE. "
+"Veuillez nous excuser pour le désagrément."
 
 #: eboutic/templates/eboutic/eboutic_checkout.jinja
 msgid ""
