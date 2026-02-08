@@ -52,7 +52,137 @@ class TestElectionUpdateView(TestElection):
         )
         assert response.status_code == 403
 
+class TestElectionForm(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.election = baker.make(
+            Election, 
+            end_date = now() + timedelta(days=1),
+        )
+        cls.group = baker.make(Group)
+        cls.election.vote_groups.add(cls.group)
+        cls.election.edit_groups.add(cls.group)
+        lists = baker.make(ElectionList, election=cls.election, _quantity=2, _bulk_create=True)
+        cls.roles = baker.make(Role, election=cls.election, _quantity=2, _bulk_create=True)
+        users = baker.make(User, _quantity=4, _bulk_create=True)
+        cls.cand = [
+            baker.make(Candidature, role=cls.roles[0], user=users[0], election_list=lists[0]),
+            baker.make(Candidature, role=cls.roles[0], user=users[1], election_list=lists[1]),
+            baker.make(Candidature, role=cls.roles[1], user=users[2], election_list=lists[0]),
+            baker.make(Candidature, role=cls.roles[1], user=users[3], election_list=lists[1]),
+        ]
+        cls.url = reverse("election:vote", kwargs={"election_id": cls.election.id})
 
+    def test_election_good_form(self):
+        election = self.election
+        group = self.group
+        roles = self.roles
+        cand = self.cand
+    
+        votes = [
+            {
+                roles[0].title : "", 
+                roles[1].title : str(cand[2].id),
+                },
+
+            {
+                roles[0].title : "", 
+                roles[1].title : "",
+                },
+
+            {
+                roles[0].title : str(cand[0].id), 
+                roles[1].title : str(cand[2].id),
+                },
+
+            {
+                roles[0].title : str(cand[0].id), 
+                roles[1].title : str(cand[3].id),
+                },
+        ]
+
+        voters = subscriber_user.make(_quantity=len(votes), _bulk_create=True)
+        group.users.set(voters)
+        
+        for voter, vote in zip(voters, votes):
+            assert election.can_vote(voter)
+            self.client.force_login(voter)
+            response = self.client.post(self.url, data = vote)
+            assertRedirects(
+                response,
+                reverse("election:detail", kwargs={"election_id": election.id})
+            )
+        
+        assert set(election.voters.all()) == set(voters)
+        assert election.results == {
+            roles[0].title: {
+                cand[0].user.username: {"percent": 50.0, "vote": 2},
+                cand[1].user.username: {"percent": 0.0, "vote": 0},
+                "blank vote": {"percent": 50.0, "vote": 2},
+                "total vote": 4,
+            },
+            roles[1].title: {
+                cand[2].user.username: {"percent": 50.0, "vote": 2},
+                cand[3].user.username: {"percent": 25.0, "vote": 1},
+                "blank vote": {"percent": 25.0, "vote": 1},
+                "total vote": 4,
+            },
+        }
+
+    def test_election_bad_form(self):
+        election = self.election
+        group = self.group
+        roles = self.roles
+        cand = self.cand
+        unknow_user = baker.make(User, _quantity=1, _bulk_create=True)
+
+        votes = [
+            {
+                roles[0].title : "", 
+                roles[1].title : str(cand[0].id), #wrong candidate
+                },
+
+            {
+                roles[0].title : "",
+                },
+
+            {
+                roles[0].title : "0123456789", #unknow users
+                roles[1].title : str(unknow_user[0].id), #not a candidate
+                },
+
+            {
+                },
+        ]
+
+        voters = subscriber_user.make(_quantity=len(votes), _bulk_create=True)
+        group.users.set(voters)
+
+        for voter, vote in zip(voters, votes):
+            assert election.can_vote(voter)
+            self.client.force_login(voter)
+            response = self.client.post(self.url, data = vote)
+            assertRedirects(
+                response,
+                reverse("election:detail", kwargs={"election_id": election.id})
+            )
+
+        assert election.results == {
+            roles[0].title: {
+                cand[0].user.username: {"percent": 0.0, "vote": 0},
+                cand[1].user.username: {"percent": 0.0, "vote": 0},
+                "blank vote": {"percent": 100.0, "vote": 2},
+                "total vote": 2,
+            },
+            roles[1].title: {
+                cand[2].user.username: {"percent": 0.0, "vote": 0},
+                cand[3].user.username: {"percent": 0.0, "vote": 0},
+                "blank vote": {"percent": 100.0, "vote": 2},
+                "total vote": 2,
+            },
+        }
+    
+        
 @pytest.mark.django_db
 def test_election_create_list_permission(client: Client):
     election = baker.make(Election, end_candidature=now() + timedelta(hours=1))
@@ -116,142 +246,3 @@ def test_election_results():
             "total vote": 100,
         },
     }
-
-
-@pytest.mark.django_db
-def test_election_good_form(client : Client):
-    election = baker.make(
-        Election, 
-        end_date = now() + timedelta(days=1),
-    )
-    group = baker.make(Group)
-    election.vote_groups.add(group)
-    election.edit_groups.add(group)
-    lists = baker.make(ElectionList, election=election, _quantity=2, _bulk_create=True)
-    roles = baker.make(Role, election=election, _quantity=2, _bulk_create=True)
-    users = baker.make(User, _quantity=4, _bulk_create=True)
-    cand = [
-        baker.make(Candidature, role=roles[0], user=users[0], election_list=lists[0]),
-        baker.make(Candidature, role=roles[0], user=users[1], election_list=lists[1]),
-        baker.make(Candidature, role=roles[1], user=users[2], election_list=lists[0]),
-        baker.make(Candidature, role=roles[1], user=users[3], election_list=lists[1]),
-    ]
-    url = reverse("election:vote", kwargs={"election_id": election.id})
-
-    votes = [
-        {
-            roles[0].title : "", 
-            roles[1].title : str(cand[2].id),
-            },
-
-        {
-            roles[0].title : "", 
-            roles[1].title : "",
-            },
-
-        {
-            roles[0].title : str(cand[0].id), 
-            roles[1].title : str(cand[2].id),
-            },
-
-        {
-            roles[0].title : str(cand[0].id), 
-            roles[1].title : str(cand[3].id),
-            },
-    ]
-
-    voters = subscriber_user.make(_quantity=len(votes), _bulk_create=True)
-    group.users.set(voters)
-    
-    for voter, vote in zip(voters, votes):
-        assert election.can_vote(voter)
-        client.force_login(voter)
-        response = client.post(url, data = vote)
-        assertRedirects(
-            response,
-            reverse("election:detail", kwargs={"election_id": election.id})
-        )
-    
-    assert set(election.voters.all()) == set(voters)
-    assert election.results == {
-        roles[0].title: {
-            cand[0].user.username: {"percent": 50.0, "vote": 2},
-            cand[1].user.username: {"percent": 0.0, "vote": 0},
-            "blank vote": {"percent": 50.0, "vote": 2},
-            "total vote": 4,
-        },
-        roles[1].title: {
-            cand[2].user.username: {"percent": 50.0, "vote": 2},
-            cand[3].user.username: {"percent": 25.0, "vote": 1},
-            "blank vote": {"percent": 25.0, "vote": 1},
-            "total vote": 4,
-        },
-    }
-
-
-@pytest.mark.django_db
-def test_election_bad_form(client : Client):
-    election = baker.make(
-        Election, 
-        end_date = now() + timedelta(days=1),
-    )
-    group = baker.make(Group)
-    election.vote_groups.add(group)
-    election.edit_groups.add(group)
-    lists = baker.make(ElectionList, election=election, _quantity=2, _bulk_create=True)
-    roles = baker.make(Role, election=election, _quantity=2, _bulk_create=True)
-    users = baker.make(User, _quantity=5, _bulk_create=True)
-    cand = [
-        baker.make(Candidature, role=roles[0], user=users[0], election_list=lists[0]),
-        baker.make(Candidature, role=roles[0], user=users[1], election_list=lists[1]),
-        baker.make(Candidature, role=roles[1], user=users[2], election_list=lists[0]),
-        baker.make(Candidature, role=roles[1], user=users[3], election_list=lists[1]),
-    ]
-    url = reverse("election:vote", kwargs={"election_id": election.id})
-
-    votes = [
-        {
-            roles[0].title : "", 
-            roles[1].title : str(cand[0].id), #wrong candidate
-            },
-
-        {
-            roles[0].title : "",
-            },
-
-        {
-            roles[0].title : "0123456789", #unkwon users
-            roles[1].title : str(users[4].id), #not a candidate
-            },
-
-        {
-            },
-    ]
-
-    voters = subscriber_user.make(_quantity=len(votes), _bulk_create=True)
-    group.users.set(voters)
-
-    for voter, vote in zip(voters, votes):
-        assert election.can_vote(voter)
-        client.force_login(voter)
-        response = client.post(url, data = vote)
-        assertRedirects(
-            response,
-            reverse("election:detail", kwargs={"election_id": election.id})
-        )
-
-    assert election.results == {
-        roles[0].title: {
-            cand[0].user.username: {"percent": 0.0, "vote": 0},
-            cand[1].user.username: {"percent": 0.0, "vote": 0},
-            "blank vote": {"percent": 100.0, "vote": 2},
-            "total vote": 2,
-        },
-        roles[1].title: {
-            cand[2].user.username: {"percent": 0.0, "vote": 0},
-            cand[3].user.username: {"percent": 0.0, "vote": 0},
-            "blank vote": {"percent": 100.0, "vote": 2},
-            "total vote": 2,
-        },
-    }
-    
