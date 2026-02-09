@@ -43,12 +43,13 @@ def get_eboutic_products(user: User) -> list[Product]:
     products = (
         get_eboutic()
         .products.filter(product_type__isnull=False)
-        .filter(archived=False)
-        .filter(limit_age__lte=user.age)
-        .annotate(order=F("product_type__order"))
-        .annotate(category=F("product_type__name"))
-        .annotate(category_comment=F("product_type__comment"))
-        .annotate(price=F("selling_price"))  # <-- selected price for basket validation
+        .filter(archived=False, limit_age__lte=user.age)
+        .annotate(
+            order=F("product_type__order"),
+            category=F("product_type__name"),
+            category_comment=F("product_type__comment"),
+            price=F("selling_price"),  # <-- selected price for basket validation
+        )
         .prefetch_related("buying_groups")  # <-- used in `Product.can_be_sold_to`
     )
     return [p for p in products if p.can_be_sold_to(user)]
