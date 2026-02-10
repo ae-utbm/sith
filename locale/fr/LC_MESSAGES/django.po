@@ -1566,7 +1566,7 @@ msgstr "Visiteur"
 msgid "ban type"
 msgstr "type de ban"
 
-#: core/models.py
+#: core/models.py counter/models.py
 msgid "created at"
 msgstr "créé le"
 
@@ -3110,6 +3110,10 @@ msgid "archived"
 msgstr "archivé"
 
 #: counter/models.py
+msgid "updated at"
+msgstr "mis à jour le"
+
+#: counter/models.py
 msgid "product"
 msgstr "produit"
 
@@ -3663,6 +3667,14 @@ msgstr ""
 #, python-format
 msgid "Edit product %(name)s"
 msgstr "Édition du produit %(name)s"
+
+#: counter/templates/counter/product_form.jinja
+msgid "Creation date"
+msgstr "Date de création"
+
+#: counter/templates/counter/product_form.jinja
+msgid "Last update"
+msgstr "Dernière mise à jour"
 
 #: counter/templates/counter/product_form.jinja
 msgid "Product creation"
