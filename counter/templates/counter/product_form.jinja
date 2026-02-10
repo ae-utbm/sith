@@ -3,6 +3,8 @@
 {% block content %}
   {% if object %}
     <h2>{% trans name=object %}Edit product {{ name }}{% endtrans %}</h2>
+    <p><i>{% trans %}Creation date{% endtrans %} : {{ object.created_at|date }}</i></p>
+    <p><i>{% trans %}Last update{% endtrans %} : {{ object.updated_at|date }}</i></p>
   {% else %}
     <h2>{% trans %}Product creation{% endtrans %}</h2>
   {% endif %}
