@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-08 16:14+0100\n"
+"POT-Creation-Date: 2026-02-13 12:13+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3586,8 +3586,42 @@ msgid "Product formulas"
 msgstr "Formules de produits"
 
 #: counter/templates/counter/formula_list.jinja
+msgid ""
+"Formulas allow you to associate a group of products with a result product "
+"(the formula itself)."
+msgstr ""
+"Les formules permettent d'associer un groupe de produits à un produit "
+"résultat (la formule en elle-même)."
+
+#: counter/templates/counter/formula_list.jinja
+msgid ""
+"If the product of a formula is available on a counter, it will be "
+"automatically applied if all the products that make it up are added to the "
+"basket."
+msgstr ""
+"Si le produit d'une formule est disponible sur un comptoir, celle-ci sera "
+"automatiquement appliquée si tous les produits qui la constituent sont "
+"ajoutés au panier."
+
+#: counter/templates/counter/formula_list.jinja
+msgid ""
+"For example, if there is a formula that combines a \"Sandwich Formula\" "
+"product with the \"Sandwich\" and \"Soft Drink\" products, then, if a person "
+"orders a sandwich and a soft drink, the formula will be applied and the "
+"basket will then contain a sandwich formula instead."
+msgstr ""
+"Par exemple s'il existe une formule associant un produit « Formule "
+"sandwich » aux produits « Sandwich » et « Soft », alors, si une personne "
+"commande un sandwich et un soft, la formule sera appliquée et le panier "
+"contiendra alors une formule sandwich à la place."
+
+#: counter/templates/counter/formula_list.jinja
 msgid "New formula"
 msgstr "Nouvelle formule"
+
+#: counter/templates/counter/formula_list.jinja
+msgid "instead of"
+msgstr "au lieu de"
 
 #: counter/templates/counter/fragments/create_student_card.jinja
 msgid "No student card registered."
@@ -4021,8 +4055,8 @@ msgid ""
 "inconvenience."
 msgstr ""
 "Les paiements par carte bancaire sont actuellement désactivés sur l'eboutic. "
-"Vous pouvez cependant toujours recharger votre compte dans un des lieux de vie de l'AE. "
-"Veuillez nous excuser pour le désagrément."
+"Vous pouvez cependant toujours recharger votre compte dans un des lieux de "
+"vie de l'AE. Veuillez nous excuser pour le désagrément."
 
 #: eboutic/templates/eboutic/eboutic_checkout.jinja
 msgid ""
@@ -4191,8 +4225,8 @@ msgstr "Les candidatures sont fermées pour cette élection"
 #: election/templates/election/election_detail.jinja
 msgid "Candidate pictures won't display for privacy reasons."
 msgstr ""
-"La photo du candidat ne s'affiche pas pour "
-"des raisons de respect de la vie privée."
+"La photo du candidat ne s'affiche pas pour des raisons de respect de la vie "
+"privée."
 
 #: election/templates/election/election_detail.jinja
 msgid "Polls close "
