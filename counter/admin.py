@@ -39,8 +39,9 @@ class ProductAdmin(SearchModelAdmin):
         "code",
         "product_type",
         "selling_price",
-        "profit",
         "archived",
+        "created_at",
+        "updated_at",
     )
     list_select_related = ("product_type",)
     search_fields = ("name", "code")
