@@ -21,6 +21,8 @@
   <h2>{% trans %}Delete confirmation{% endtrans %}</h2>
   <form action="" method="post">{% csrf_token %}
     <p>{% trans name=object_name %}Are you sure you want to delete "{{ name }}"?{% endtrans %}</p>
+    {% if help_text %}<p><em>{{ help_text }}</em></p>{% endif %}
+    <br/>
     <input type="submit" value="{% trans %}Confirm{% endtrans %}" />
   </form>
   <form method="GET" action="javascript:history.back();">

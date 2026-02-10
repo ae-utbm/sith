@@ -3845,6 +3845,20 @@ msgstr "Top 100 barman %(counter_name)s (tous les semestres)"
 
 #: counter/views/admin.py
 #, python-format
+msgid "%(formula)s (formula)"
+msgstr "%(formula)s (formule)"
+
+#: counter/views/admin.py
+#, python-format
+msgid ""
+"This action will only delete the formula, but not the %(product)s product "
+"itself."
+msgstr ""
+"Cette action supprimera seulement la formule, mais pas le produit "
+"%(product)s en lui-même."
+
+#: counter/views/admin.py
+#, python-format
 msgid "returnable product : %(returnable)s -> %(returned)s"
 msgstr "produit consigné : %(returnable)s -> %(returned)s"
 

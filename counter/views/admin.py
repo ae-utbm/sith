@@ -166,7 +166,9 @@ class ProductEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
 
 class ProductFormulaListView(CounterAdminTabsMixin, PermissionRequiredMixin, ListView):
     model = ProductFormula
-    queryset = ProductFormula.objects.select_related("result")
+    queryset = ProductFormula.objects.select_related("result").prefetch_related(
+        "products"
+    )
     template_name = "counter/formula_list.jinja"
     current_tab = "formulas"
     permission_required = "counter.view_productformula"
@@ -205,6 +207,17 @@ class ProductFormulaDeleteView(
     current_tab = "formulas"
     success_url = reverse_lazy("counter:product_formula_list")
     permission_required = "counter.delete_productformula"
+
+    def get_context_data(self, **kwargs):
+        obj_name = self.object.result.name
+        return super().get_context_data(**kwargs) | {
+            "object_name": _("%(formula)s (formula)") % {"formula": obj_name},
+            "help_text": _(
+                "This action will only delete the formula, "
+                "but not the %(product)s product itself."
+            )
+            % {"product": obj_name},
+        }
 
 
 class ReturnableProductListView(
