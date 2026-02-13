@@ -8,7 +8,6 @@
 
 // This has been modified to not trigger biome linting
 
-// biome-ignore lint/correctness/noUnusedVariables: this is the official definition
 interface Window {
   // biome-ignore lint/style/useNamingConvention: this is the official API name
   NDEFMessage: NDEFMessage;
@@ -28,7 +27,6 @@ declare interface NDEFMessageInit {
 // biome-ignore lint/style/useNamingConvention: this is the official API name
 declare type NDEFRecordDataSource = string | BufferSource | NDEFMessageInit;
 
-// biome-ignore lint/correctness/noUnusedVariables: this is the official definition
 interface Window {
   // biome-ignore lint/style/useNamingConvention: this is the official API name
   NDEFRecord: NDEFRecord;
@@ -74,7 +72,6 @@ declare class NDEFReader extends EventTarget {
   makeReadOnly: (options?: NDEFMakeReadOnlyOptions) => Promise<void>;
 }
 
-// biome-ignore lint/correctness/noUnusedVariables: this is the official definition
 interface Window {
   // biome-ignore lint/style/useNamingConvention: this is the official API name
   NDEFReadingEvent: NDEFReadingEvent;
