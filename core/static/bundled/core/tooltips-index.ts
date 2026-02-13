@@ -1,9 +1,9 @@
 import {
-  type Placement,
   autoPlacement,
   computePosition,
   flip,
   offset,
+  type Placement,
   size,
 } from "@floating-ui/dom";
 

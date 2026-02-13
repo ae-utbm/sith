@@ -26,7 +26,7 @@ function showMore(element: HTMLElement) {
   const fullContent = element.innerHTML;
   const clippedContent = clip(
     element.innerHTML,
-    Number.parseInt(element.getAttribute("show-more") as string),
+    Number.parseInt(element.getAttribute("show-more") as string, 10),
     {
       html: true,
     },

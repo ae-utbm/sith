@@ -1,4 +1,8 @@
-import { History, getCurrentUrlParams, updateQueryString } from "#core:utils/history";
+import {
+  getCurrentUrlParams,
+  History,
+  updateQueryString,
+} from "#core:utils/history.ts";
 import { ueFetchUeList } from "#openapi";
 
 const pageDefault = 1;
@@ -31,8 +35,8 @@ document.addEventListener("alpine:init", () => {
       const url = getCurrentUrlParams();
       this.pushstate = History.Replace;
 
-      this.page = Number.parseInt(url.get("page")) || pageDefault;
-      this.page_size = Number.parseInt(url.get("page_size")) || pageSizeDefault;
+      this.page = Number.parseInt(url.get("page"), 10) || pageDefault;
+      this.page_size = Number.parseInt(url.get("page_size"), 10) || pageSizeDefault;
       this.search = url.get("search") || "";
       this.department = url.getAll("department");
       this.credit_type = url.getAll("credit_type");

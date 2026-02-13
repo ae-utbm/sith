@@ -56,7 +56,7 @@ export function limitedChoices(Alpine: AlpineType) {
       effect(() => {
         getMaxChoices((value: string) => {
           const previousValue = maxChoices;
-          maxChoices = Number.parseInt(value);
+          maxChoices = Number.parseInt(value, 10);
           if (maxChoices < previousValue) {
             // The maximum number of selectable items has been lowered.
             // Some currently selected elements may need to be removed

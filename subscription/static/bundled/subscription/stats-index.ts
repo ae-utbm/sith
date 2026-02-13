@@ -1,4 +1,5 @@
 import { BarController, BarElement, CategoryScale, Chart, LinearScale } from "chart.js";
+
 Chart.register(BarController, BarElement, CategoryScale, LinearScale);
 
 function getRandomColor() {
@@ -18,13 +19,11 @@ function getRandomColorUniq(list: string[]) {
 }
 function hexToRgb(hex: string) {
   // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-  // biome-ignore lint/performance/useTopLevelRegex: Performance impact is minimal
   const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
   const hexrgb = hex.replace(shorthandRegex, (_m, r, g, b) => {
     return r + r + g + g + b + b;
   });
 
-  // biome-ignore lint/performance/useTopLevelRegex: Performance impact is minimal
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hexrgb);
   return result
     ? {

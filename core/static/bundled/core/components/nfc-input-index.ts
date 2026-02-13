@@ -1,4 +1,4 @@
-import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
+import { inheritHtmlElement, registerComponent } from "#core:utils/web-components.ts";
 
 @registerComponent("nfc-input")
 export class NfcInput extends inheritHtmlElement("input") {

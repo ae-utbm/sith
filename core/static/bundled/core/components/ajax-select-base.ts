@@ -1,4 +1,3 @@
-import { inheritHtmlElement } from "#core:utils/web-components";
 import TomSelect from "tom-select";
 import type {
   RecursivePartial,
@@ -7,6 +6,7 @@ import type {
   TomSettings,
 } from "tom-select/dist/types/types";
 import type { escape_html } from "tom-select/dist/types/utils";
+import { inheritHtmlElement } from "#core:utils/web-components.ts";
 
 export class AutoCompleteSelectBase extends inheritHtmlElement("select") {
   static observedAttributes = [
@@ -29,7 +29,7 @@ export class AutoCompleteSelectBase extends inheritHtmlElement("select") {
   ) {
     switch (name) {
       case "delay": {
-        this.delay = Number.parseInt(newValue) ?? null;
+        this.delay = Number.parseInt(newValue, 10) ?? null;
         break;
       }
       case "placeholder": {
@@ -37,11 +37,11 @@ export class AutoCompleteSelectBase extends inheritHtmlElement("select") {
         break;
       }
       case "max": {
-        this.max = Number.parseInt(newValue) ?? null;
+        this.max = Number.parseInt(newValue, 10) ?? null;
         break;
       }
       case "min-characters-for-search": {
-        this.minCharNumberForSearch = Number.parseInt(newValue) ?? 0;
+        this.minCharNumberForSearch = Number.parseInt(newValue, 10) ?? 0;
         break;
       }
       default: {

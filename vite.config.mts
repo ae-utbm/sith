@@ -2,8 +2,8 @@
 import { parse, resolve } from "node:path";
 import inject from "@rollup/plugin-inject";
 import { glob } from "glob";
-import { type AliasOptions, type UserConfig, defineConfig } from "vite";
 import type { Rollup } from "vite";
+import { type AliasOptions, defineConfig, type UserConfig } from "vite";
 import tsconfig from "./tsconfig.json";
 
 const outDir = resolve(__dirname, "./staticfiles/generated/bundled");

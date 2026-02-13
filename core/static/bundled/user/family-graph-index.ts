@@ -1,4 +1,3 @@
-import { History, initialUrlParams, updateQueryString } from "#core:utils/history";
 import cytoscape, {
   type ElementDefinition,
   type NodeSingular,
@@ -6,7 +5,8 @@ import cytoscape, {
 } from "cytoscape";
 import cxtmenu from "cytoscape-cxtmenu";
 import klay, { type KlayLayoutOptions } from "cytoscape-klay";
-import { type UserProfileSchema, familyGetFamilyGraph } from "#openapi";
+import { History, initialUrlParams, updateQueryString } from "#core:utils/history.ts";
+import { familyGetFamilyGraph, type UserProfileSchema } from "#openapi";
 
 cytoscape.use(klay);
 cytoscape.use(cxtmenu);
@@ -200,7 +200,7 @@ document.addEventListener("alpine:init", () => {
     isZoomEnabled: !isMobile(),
 
     getInitialDepth(prop: string) {
-      const value = Number.parseInt(initialUrlParams.get(prop));
+      const value = Number.parseInt(initialUrlParams.get(prop), 10);
       if (Number.isNaN(value) || value < config.depthMin || value > config.depthMax) {
         return defaultDepth;
       }

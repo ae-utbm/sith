@@ -30,8 +30,8 @@ document.addEventListener("alpine:init", () => {
       const zipWriter = new ZipWriter(await fileHandle.createWritable());
 
       await Promise.all(
-        this.downloadPictures.map(async (p: PictureSchema) => {
-          const imgName = `${p.album.name}/IMG_${p.id}_${p.date.replace(/[:\-]/g, "_")}${p.name.slice(p.name.lastIndexOf("."))}`;
+        this.downloadPictures.map((p: PictureSchema) => {
+          const imgName = `${p.album.name}/IMG_${p.id}_${p.date.replace(/[:-]/g, "_")}${p.name.slice(p.name.lastIndexOf("."))}`;
           return zipWriter.add(imgName, new HttpReader(p.full_size_url), {
             level: 9,
             lastModDate: new Date(p.date),
