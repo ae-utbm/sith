@@ -1,6 +1,10 @@
 import { AlertMessage } from "#core:utils/alert-message.ts";
 import { BasketItem } from "#counter:counter/basket.ts";
-import type { CounterConfig, ErrorMessage } from "#counter:counter/types.ts";
+import type {
+  CounterConfig,
+  ErrorMessage,
+  ProductFormula,
+} from "#counter:counter/types.ts";
 import type { CounterProductSelect } from "./components/counter-product-select-index.ts";
 
 document.addEventListener("alpine:init", () => {
@@ -47,15 +51,43 @@ document.addEventListener("alpine:init", () => {
 
       this.basket[id] = item;
 
+      this.checkFormulas();
+
       if (this.sumBasket() > this.customerBalance) {
         item.quantity = oldQty;
         if (item.quantity === 0) {
           delete this.basket[id];
         }
-        return gettext("Not enough money");
+        this.alertMessage.display(gettext("Not enough money"), { success: false });
       }
+    },
 
-      return "";
+    checkFormulas() {
+      const products = new Set(
+        Object.keys(this.basket).map((i: string) => Number.parseInt(i)),
+      );
+      const formula: ProductFormula = config.formulas.find((f: ProductFormula) => {
+        return f.products.every((p: number) => products.has(p));
+      });
+      if (formula === undefined) {
+        return;
+      }
+      for (const product of formula.products) {
+        const key = product.toString();
+        this.basket[key].quantity -= 1;
+        if (this.basket[key].quantity <= 0) {
+          this.removeFromBasket(key);
+        }
+      }
+      this.alertMessage.display(
+        interpolate(
+          gettext("Formula %(formula)s applied"),
+          { formula: config.products[formula.result.toString()].name },
+          true,
+        ),
+        { success: true },
+      );
+      this.addToBasket(formula.result.toString(), 1);
     },
 
     getBasketSize() {
@@ -70,14 +102,7 @@ document.addEventListener("alpine:init", () => {
         (acc: number, cur: BasketItem) => acc + cur.sum(),
         0,
       ) as number;
-      return total;
-    },
-
-    addToBasketWithMessage(id: string, quantity: number) {
-      const message = this.addToBasket(id, quantity);
-      if (message.length > 0) {
-        this.alertMessage.display(message, { success: false });
-      }
+      return Math.round(total * 100) / 100;
     },
 
     onRefillingSuccess(event: CustomEvent) {
@@ -116,7 +141,7 @@ document.addEventListener("alpine:init", () => {
           this.finish();
         }
       } else {
-        this.addToBasketWithMessage(code, quantity);
+        this.addToBasket(code, quantity);
       }
       this.codeField.widget.clear();
       this.codeField.widget.focus();

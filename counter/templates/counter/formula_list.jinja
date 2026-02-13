@@ -1,0 +1,78 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+  {% trans %}Product formulas{% endtrans %}
+{% endblock %}
+
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("core/components/card.scss") }}">
+  <link rel="stylesheet" href="{{ static("counter/css/admin.scss") }}">
+{% endblock %}
+
+{% block content %}
+  <main>
+    <h3 class="margin-bottom">{% trans %}Product formulas{% endtrans %}</h3>
+    <p>
+      {%- trans trimmed -%}
+        Formulas allow you to associate a group of products
+        with a result product (the formula itself).
+      {%- endtrans -%}
+    </p>
+    <p>
+      {%- trans trimmed -%}
+        If the product of a formula is available on a counter,
+        it will be automatically applied if all the products that
+        make it up are added to the basket.
+      {%- endtrans -%}
+    </p>
+    <p>
+      {%- trans trimmed -%}
+        For example, if there is a formula that combines a "Sandwich Formula" product
+        with the "Sandwich" and "Soft Drink" products,
+        then, if a person orders a sandwich and a soft drink,
+        the formula will be applied and the basket will then contain a sandwich formula instead.
+      {%- endtrans -%}
+    </p>
+    <p class="margin-bottom">
+      <a href="{{ url('counter:product_formula_create') }}" class="btn btn-blue">
+        {% trans %}New formula{% endtrans %}
+        <i class="fa fa-plus"></i>
+      </a>
+    </p>
+    <div class="product-group">
+      {%- for formula in object_list -%}
+        <a
+          class="card card-row shadow clickable"
+          href="{{ url('counter:product_formula_edit', formula_id=formula.id) }}"
+        >
+          <div class="card-content">
+            <strong class="card-title">{{ formula.result.name }}</strong>
+            <p>
+              {% for p in formula.products.all() %}
+                <i>{{ p.code }} ({{ p.selling_price }} €)</i>
+                {% if not loop.last %}+{% endif %}
+              {% endfor %}
+            </p>
+            <p>
+              {{ formula.result.selling_price }} €
+              ({% trans %}instead of{% endtrans %} {{ formula.max_selling_price}} €)
+            </p>
+          </div>
+          {% if user.has_perm("counter.delete_productformula") %}
+            <button
+              x-data
+              class="btn btn-red btn-no-text card-top-left"
+              @click.prevent="document.location.href = '{{ url('counter:product_formula_delete', formula_id=formula.id) }}'"
+            >
+            {# The delete link is a button with a JS event listener
+               instead of a proper <a> element,
+               because the enclosing card is already a <a>,
+               and HTML forbids nested <a> #}
+              <i class="fa fa-trash"></i>
+            </button>
+          {% endif %}
+        </a>
+      {%- endfor -%}
+    </div>
+  </main>
+{% endblock %}

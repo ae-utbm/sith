@@ -5,6 +5,7 @@ from datetime import date, datetime, timezone
 
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.core.validators import MaxValueValidator
 from django.db.models import Exists, OuterRef, Q
 from django.forms import BaseModelFormSet
 from django.utils.timezone import now
@@ -34,6 +35,7 @@ from counter.models import (
     Eticket,
     InvoiceCall,
     Product,
+    ProductFormula,
     Refilling,
     ReturnableProduct,
     ScheduledProductAction,
@@ -316,7 +318,6 @@ class ProductForm(forms.ModelForm):
         }
 
     counters = forms.ModelMultipleChoiceField(
-        help_text=None,
         label=_("Counters"),
         required=False,
         widget=AutoCompleteSelectMultipleCounter,
@@ -327,9 +328,30 @@ class ProductForm(forms.ModelForm):
         super().__init__(*args, instance=instance, **kwargs)
         if self.instance.id:
             self.fields["counters"].initial = self.instance.counters.all()
+            if hasattr(self.instance, "formula"):
+                self.formula_init(self.instance.formula)
         self.action_formset = ScheduledProductActionFormSet(
             *args, product=self.instance, **kwargs
         )
+
+    def formula_init(self, formula: ProductFormula):
+        """Part of the form initialisation specific to formula products."""
+        self.fields["selling_price"].help_text = _(
+            "This product is a formula. "
+            "Its price cannot be greater than the price "
+            "of the products constituting it, which is %(price)s €"
+        ) % {"price": formula.max_selling_price}
+        self.fields["special_selling_price"].help_text = _(
+            "This product is a formula. "
+            "Its special price cannot be greater than the price "
+            "of the products constituting it, which is %(price)s €"
+        ) % {"price": formula.max_special_selling_price}
+        for key, price in (
+            ("selling_price", formula.max_selling_price),
+            ("special_selling_price", formula.max_special_selling_price),
+        ):
+            self.fields[key].widget.attrs["max"] = price
+            self.fields[key].validators.append(MaxValueValidator(price))
 
     def is_valid(self):
         return super().is_valid() and self.action_formset.is_valid()
@@ -349,13 +371,47 @@ class ProductForm(forms.ModelForm):
         return product
 
 
+class ProductFormulaForm(forms.ModelForm):
+    class Meta:
+        model = ProductFormula
+        fields = ["products", "result"]
+        widgets = {
+            "products": AutoCompleteSelectMultipleProduct,
+            "result": AutoCompleteSelectProduct,
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data["result"] in cleaned_data["products"]:
+            self.add_error(
+                None,
+                _(
+                    "The same product cannot be at the same time "
+                    "the result and a part of the formula."
+                ),
+            )
+        prices = [p.selling_price for p in cleaned_data["products"]]
+        special_prices = [p.special_selling_price for p in cleaned_data["products"]]
+        selling_price = cleaned_data["result"].selling_price
+        special_selling_price = cleaned_data["result"].special_selling_price
+        if selling_price > sum(prices) or special_selling_price > sum(special_prices):
+            self.add_error(
+                "result",
+                _(
+                    "The result cannot be more expensive "
+                    "than the total of the other products."
+                ),
+            )
+        return cleaned_data
+
+
 class ReturnableProductForm(forms.ModelForm):
     class Meta:
         model = ReturnableProduct
         fields = ["product", "returned_product", "max_return"]
         widgets = {
-            "product": AutoCompleteSelectProduct(),
-            "returned_product": AutoCompleteSelectProduct(),
+            "product": AutoCompleteSelectProduct,
+            "returned_product": AutoCompleteSelectProduct,
         }
 
     def save(self, commit: bool = True) -> ReturnableProduct:  # noqa FBT

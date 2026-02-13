@@ -35,7 +35,7 @@ TODO : rewrite the pagination used in this template an Alpine one
     {% csrf_token %}
     {{ form }}
     <p><input type="submit" value="{% trans %}Show{% endtrans %}" /></p>
-    <p><input type="submit" value="{% trans %}Download as cvs{% endtrans %}" formaction="{{ url('club:sellings_csv', club_id=object.id) }}"/></p>
+    <p><input type="submit" value="{% trans %}Download as csv{% endtrans %}" formaction="{{ url('club:sellings_csv', club_id=object.id) }}"/></p>
   </form>
   <p>
     {% trans %}Quantity: {% endtrans %}{{ total_quantity }} {% trans %}units{% endtrans %}<br/>
