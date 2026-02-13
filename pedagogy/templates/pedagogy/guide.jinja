@@ -23,10 +23,10 @@
 {% endblock head %}
 
 {% block content %}
-  {% if user.has_perm("pedagogy.add_uv") %}
+  {% if user.has_perm("pedagogy.add_ue") %}
     <div class="action-bar">
       <p>
-        <a href="{{ url('pedagogy:uv_create') }}">{% trans %}Create UV{% endtrans %}</a>
+        <a href="{{ url('pedagogy:ue_create') }}">{% trans %}Create UE{% endtrans %}</a>
       </p>
       <p>
         <a href="{{ url('pedagogy:moderation') }}">{% trans %}Moderate comments{% endtrans %}</a>
@@ -34,7 +34,7 @@
     </div>
     <br/>
   {% endif %}
-  <div class="pedagogy" x-data="uv_search" x-cloak>
+  <div class="pedagogy" x-data="ue_search" x-cloak>
     <form id="search_form">
       <div class="search-form-container">
         <div class="search-bar">
@@ -89,43 +89,43 @@
         </div>
       </div>
     </form>
-    <table id="uv-list">
+    <table id="ue-list">
       <thead>
         <tr>
-          <td>{% trans %}UV{% endtrans %}</td>
+          <td>{% trans %}UE{% endtrans %}</td>
           <td>{% trans %}Title{% endtrans %}</td>
           <td>{% trans %}Department{% endtrans %}</td>
           <td>{% trans %}Credit type{% endtrans %}</td>
           <td><i class="fa fa-leaf"></i></td>
           <td><i class="fa-regular fa-sun"></i></td>
-          {%- if user.has_perm("pedagogy.change_uv") -%}
+          {%- if user.has_perm("pedagogy.change_ue") -%}
             <td>{% trans %}Edit{% endtrans %}</td>
           {%- endif -%}
-          {%- if user.has_perm("pedagogy.delete_uv") -%}
+          {%- if user.has_perm("pedagogy.delete_ue") -%}
             <td>{% trans %}Delete{% endtrans %}</td>
           {% endif %}
         </tr>
       </thead>
       <tbody :aria-busy="loading">
-        <template x-for="uv in uvs.results" :key="uv.id">
+        <template x-for="ue in ues.results" :key="ue.id">
           <tr
-            @click="window.location.href = `/pedagogy/uv/${uv.id}`"
+            @click="window.location.href = ue.detail_url"
             class="clickable"
-            :class="{closed: uv.semester === 'CLOSED'}"
+            :class="{closed: ue.semester === 'CLOSED'}"
           >
-            <td><a :href="`/pedagogy/uv/${uv.id}`" x-text="uv.code"></a></td>
+            <td><a :href="`/pedagogy/ue/${ue.id}`" x-text="ue.code"></a></td>
             <td class="title"
-                x-text="uv.title + (uv.semester === 'CLOSED' ? ' ({% trans %}closed uv{% endtrans %})' : '')"
+                x-text="ue.title + (ue.semester === 'CLOSED' ? ' ({% trans %}closed ue{% endtrans %})' : '')"
             ></td>
-            <td x-text="uv.department"></td>
-            <td x-text="uv.credit_type"></td>
-            <td><i :class="uv.semester.includes('AUTUMN') && 'fa fa-leaf'"></i></td>
-            <td><i :class="uv.semester.includes('SPRING') && 'fa-regular fa-sun'"></i></td>
-            {%- if user.has_perm("pedagogy.change_uv") -%}
-              <td><a :href="`/pedagogy/uv/${uv.id}/edit`">{% trans %}Edit{% endtrans %}</a></td>
+            <td x-text="ue.department"></td>
+            <td x-text="ue.credit_type"></td>
+            <td><i :class="ue.semester.includes('AUTUMN') && 'fa fa-leaf'"></i></td>
+            <td><i :class="ue.semester.includes('SPRING') && 'fa-regular fa-sun'"></i></td>
+            {%- if user.has_perm("pedagogy.change_ue") -%}
+              <td><a :href="ue.edit_url">{% trans %}Edit{% endtrans %}</a></td>
             {%- endif -%}
-            {%- if user.has_perm("pedagogy.delete_uv") -%}
-              <td><a :href="`/pedagogy/uv/${uv.id}/delete`">{% trans %}Delete{% endtrans %}</a></td>
+            {%- if user.has_perm("pedagogy.delete_ue") -%}
+              <td><a :href="ue.delete_url">{% trans %}Delete{% endtrans %}</a></td>
             {%- endif -%}
           </tr>
         </template>

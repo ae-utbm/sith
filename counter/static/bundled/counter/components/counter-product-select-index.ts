@@ -1,13 +1,13 @@
-import { AutoCompleteSelectBase } from "#core:core/components/ajax-select-base";
-import { registerComponent } from "#core:utils/web-components";
 import type { RecursivePartial, TomSettings } from "tom-select/dist/types/types";
+import { AutoCompleteSelectBase } from "#core:core/components/ajax-select-base.ts";
+import { registerComponent } from "#core:utils/web-components.ts";
 
 const productParsingRegex = /^(\d+x)?(.*)/i;
 const codeParsingRegex = / \((\w+)\)$/;
 
 function parseProduct(query: string): [number, string] {
   const parsed = productParsingRegex.exec(query);
-  return [Number.parseInt(parsed[1] || "1"), parsed[2]];
+  return [Number.parseInt(parsed[1] || "1", 10), parsed[2]];
 }
 
 @registerComponent("counter-product-select")
@@ -80,9 +80,9 @@ export class CounterProductSelect extends AutoCompleteSelectBase {
       // We need to manually set weights or it results on an inconsistent
       // behavior between production and development environment
       searchField: [
-        // @ts-ignore documentation says it's fine, specified type is wrong
+        // @ts-expect-error documentation says it's fine, specified type is wrong
         { field: "code", weight: 2 },
-        // @ts-ignore documentation says it's fine, specified type is wrong
+        // @ts-expect-error documentation says it's fine, specified type is wrong
         { field: "text", weight: 0.5 },
       ],
     };

@@ -1,6 +1,6 @@
 import { default as ForceGraph3D } from "3d-force-graph";
 import { forceX, forceY, forceZ } from "d3-force-3d";
-// biome-ignore lint/style/noNamespaceImport: This is how it should be imported
+// biome-ignore lint/performance/noNamespaceImport: This is how it should be imported
 import * as Three from "three";
 import SpriteText from "three-spritetext";
 

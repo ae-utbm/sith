@@ -43,12 +43,13 @@ def get_eboutic_products(user: User) -> list[Product]:
     products = (
         get_eboutic()
         .products.filter(product_type__isnull=False)
-        .filter(archived=False)
-        .filter(limit_age__lte=user.age)
-        .annotate(order=F("product_type__order"))
-        .annotate(category=F("product_type__name"))
-        .annotate(category_comment=F("product_type__comment"))
-        .annotate(price=F("selling_price"))  # <-- selected price for basket validation
+        .filter(archived=False, limit_age__lte=user.age)
+        .annotate(
+            order=F("product_type__order"),
+            category=F("product_type__name"),
+            category_comment=F("product_type__comment"),
+            price=F("selling_price"),  # <-- selected price for basket validation
+        )
         .prefetch_related("buying_groups")  # <-- used in `Product.can_be_sold_to`
     )
     return [p for p in products if p.can_be_sold_to(user)]
@@ -110,7 +111,9 @@ class Basket(models.Model):
             )["total"]
         )
 
-    def generate_sales(self, counter, seller: User, payment_method: str):
+    def generate_sales(
+        self, counter, seller: User, payment_method: Selling.PaymentMethod
+    ):
         """Generate a list of sold items corresponding to the items
         of this basket WITHOUT saving them NOR deleting the basket.
 
@@ -251,8 +254,7 @@ class Invoice(models.Model):
                     customer=customer,
                     operator=self.user,
                     amount=i.product_unit_price * i.quantity,
-                    payment_method="CARD",
-                    bank="OTHER",
+                    payment_method=Refilling.PaymentMethod.CARD,
                     date=self.date,
                 )
                 new.save()
@@ -267,8 +269,7 @@ class Invoice(models.Model):
                     customer=customer,
                     unit_price=i.product_unit_price,
                     quantity=i.quantity,
-                    payment_method="CARD",
-                    is_validated=True,
+                    payment_method=Selling.PaymentMethod.CARD,
                     date=self.date,
                 )
                 new.save()

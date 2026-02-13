@@ -33,14 +33,14 @@ from pytest_django.asserts import assertRedirects
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import Notification, User
-from pedagogy.models import UV, UVComment, UVCommentReport
+from pedagogy.models import UE, UEComment, UECommentReport
 
 
-def create_uv_template(user_id, code="IFC1", exclude_list=None):
-    """Factory to help UV creation/update in post requests."""
+def create_ue_template(user_id, code="IFC1", exclude_list=None):
+    """Factory to help UE creation/update in post requests."""
     if exclude_list is None:
         exclude_list = []
-    uv = {
+    ue = {
         "code": code,
         "author": user_id,
         "credit_type": "TM",
@@ -74,15 +74,15 @@ def create_uv_template(user_id, code="IFC1", exclude_list=None):
 * Chaînes de caractères""",
     }
     for excluded in exclude_list:
-        uv.pop(excluded)
-    return uv
+        ue.pop(excluded)
+    return ue
 
 
-# UV class tests
+# UE class tests
 
 
-class TestUVCreation(TestCase):
-    """Test uv creation."""
+class TestUECreation(TestCase):
+    """Test ue creation."""
 
     @classmethod
     def setUpTestData(cls):
@@ -90,62 +90,62 @@ class TestUVCreation(TestCase):
         cls.tutu = User.objects.get(username="tutu")
         cls.sli = User.objects.get(username="sli")
         cls.guy = User.objects.get(username="guy")
-        cls.create_uv_url = reverse("pedagogy:uv_create")
+        cls.create_ue_url = reverse("pedagogy:ue_create")
 
-    def test_create_uv_admin_success(self):
+    def test_create_ue_admin_success(self):
         self.client.force_login(self.bibou)
         response = self.client.post(
-            self.create_uv_url, create_uv_template(self.bibou.id)
+            self.create_ue_url, create_ue_template(self.bibou.id)
         )
         assert response.status_code == 302
-        assert UV.objects.filter(code="IFC1").exists()
+        assert UE.objects.filter(code="IFC1").exists()
 
-    def test_create_uv_pedagogy_admin_success(self):
+    def test_create_ue_pedagogy_admin_success(self):
         self.client.force_login(self.tutu)
         response = self.client.post(
-            self.create_uv_url, create_uv_template(self.tutu.id)
+            self.create_ue_url, create_ue_template(self.tutu.id)
         )
         assert response.status_code == 302
-        assert UV.objects.filter(code="IFC1").exists()
+        assert UE.objects.filter(code="IFC1").exists()
 
-    def test_create_uv_unauthorized_fail(self):
+    def test_create_ue_unauthorized_fail(self):
         # Test with anonymous user
-        response = self.client.post(self.create_uv_url, create_uv_template(0))
+        response = self.client.post(self.create_ue_url, create_ue_template(0))
         assertRedirects(
-            response, reverse("core:login", query={"next": self.create_uv_url})
+            response, reverse("core:login", query={"next": self.create_ue_url})
         )
 
         # Test with subscribed user
         self.client.force_login(self.sli)
-        response = self.client.post(self.create_uv_url, create_uv_template(self.sli.id))
+        response = self.client.post(self.create_ue_url, create_ue_template(self.sli.id))
         assert response.status_code == 403
 
         # Test with non subscribed user
         self.client.force_login(self.guy)
-        response = self.client.post(self.create_uv_url, create_uv_template(self.guy.id))
+        response = self.client.post(self.create_ue_url, create_ue_template(self.guy.id))
         assert response.status_code == 403
 
-        # Check that the UV has never been created
-        assert not UV.objects.filter(code="IFC1").exists()
+        # Check that the UE has never been created
+        assert not UE.objects.filter(code="IFC1").exists()
 
-    def test_create_uv_bad_request_fail(self):
+    def test_create_ue_bad_request_fail(self):
         self.client.force_login(self.tutu)
 
         # Test with wrong user id (if someone cheats on the hidden input)
         response = self.client.post(
-            self.create_uv_url, create_uv_template(self.bibou.id)
+            self.create_ue_url, create_ue_template(self.bibou.id)
         )
         assert response.status_code == 200
 
         # Remove a required field
         response = self.client.post(
-            self.create_uv_url,
-            create_uv_template(self.tutu.id, exclude_list=["title"]),
+            self.create_ue_url,
+            create_ue_template(self.tutu.id, exclude_list=["title"]),
         )
         assert response.status_code == 200
 
-        # Check that the UV hase never been created
-        assert not UV.objects.filter(code="IFC1").exists()
+        # Check that the UE has never been created
+        assert not UE.objects.filter(code="IFC1").exists()
 
 
 @pytest.mark.django_db
@@ -171,8 +171,8 @@ def test_guide_anonymous_permission_denied(client: Client):
     assert res.status_code == 302
 
 
-class TestUVDelete(TestCase):
-    """Test UV deletion rights."""
+class TestUEDelete(TestCase):
+    """Test UE deletion rights."""
 
     @classmethod
     def setUpTestData(cls):
@@ -180,37 +180,37 @@ class TestUVDelete(TestCase):
         cls.tutu = User.objects.get(username="tutu")
         cls.sli = User.objects.get(username="sli")
         cls.guy = User.objects.get(username="guy")
-        cls.uv = UV.objects.get(code="PA00")
-        cls.delete_uv_url = reverse("pedagogy:uv_delete", kwargs={"uv_id": cls.uv.id})
+        cls.ue = UE.objects.get(code="PA00")
+        cls.delete_ue_url = reverse("pedagogy:ue_delete", kwargs={"ue_id": cls.ue.id})
 
-    def test_uv_delete_root_success(self):
+    def test_ue_delete_root_success(self):
         self.client.force_login(self.bibou)
-        self.client.post(self.delete_uv_url)
-        assert not UV.objects.filter(pk=self.uv.pk).exists()
+        self.client.post(self.delete_ue_url)
+        assert not UE.objects.filter(pk=self.ue.pk).exists()
 
-    def test_uv_delete_pedagogy_admin_success(self):
+    def test_ue_delete_pedagogy_admin_success(self):
         self.client.force_login(self.tutu)
-        self.client.post(self.delete_uv_url)
-        assert not UV.objects.filter(pk=self.uv.pk).exists()
+        self.client.post(self.delete_ue_url)
+        assert not UE.objects.filter(pk=self.ue.pk).exists()
 
-    def test_uv_delete_pedagogy_unauthorized_fail(self):
+    def test_ue_delete_pedagogy_unauthorized_fail(self):
         # Anonymous user
-        response = self.client.post(self.delete_uv_url)
+        response = self.client.post(self.delete_ue_url)
         assertRedirects(
-            response, reverse("core:login", query={"next": self.delete_uv_url})
+            response, reverse("core:login", query={"next": self.delete_ue_url})
         )
-        assert UV.objects.filter(pk=self.uv.pk).exists()
+        assert UE.objects.filter(pk=self.ue.pk).exists()
 
         for user in baker.make(User), subscriber_user.make():
             with self.subTest():
                 self.client.force_login(user)
-                response = self.client.post(self.delete_uv_url)
+                response = self.client.post(self.delete_ue_url)
                 assert response.status_code == 403
-                assert UV.objects.filter(pk=self.uv.pk).exists()
+                assert UE.objects.filter(pk=self.ue.pk).exists()
 
 
-class TestUVUpdate(TestCase):
-    """Test UV update rights."""
+class TestUEUpdate(TestCase):
+    """Test UE update rights."""
 
     @classmethod
     def setUpTestData(cls):
@@ -218,79 +218,79 @@ class TestUVUpdate(TestCase):
         cls.tutu = User.objects.get(username="tutu")
         cls.sli = User.objects.get(username="sli")
         cls.guy = User.objects.get(username="guy")
-        cls.uv = UV.objects.get(code="PA00")
-        cls.update_uv_url = reverse("pedagogy:uv_update", kwargs={"uv_id": cls.uv.id})
+        cls.ue = UE.objects.get(code="PA00")
+        cls.update_ue_url = reverse("pedagogy:ue_update", kwargs={"ue_id": cls.ue.id})
 
-    def test_uv_update_root_success(self):
+    def test_ue_update_root_success(self):
         self.client.force_login(self.bibou)
         self.client.post(
-            self.update_uv_url, create_uv_template(self.bibou.id, code="PA00")
+            self.update_ue_url, create_ue_template(self.bibou.id, code="PA00")
         )
-        self.uv.refresh_from_db()
-        assert self.uv.credit_type == "TM"
+        self.ue.refresh_from_db()
+        assert self.ue.credit_type == "TM"
 
-    def test_uv_update_pedagogy_admin_success(self):
+    def test_ue_update_pedagogy_admin_success(self):
         self.client.force_login(self.tutu)
         self.client.post(
-            self.update_uv_url, create_uv_template(self.bibou.id, code="PA00")
+            self.update_ue_url, create_ue_template(self.bibou.id, code="PA00")
         )
-        self.uv.refresh_from_db()
-        assert self.uv.credit_type == "TM"
+        self.ue.refresh_from_db()
+        assert self.ue.credit_type == "TM"
 
-    def test_uv_update_original_author_does_not_change(self):
+    def test_ue_update_original_author_does_not_change(self):
         self.client.force_login(self.tutu)
         response = self.client.post(
-            self.update_uv_url,
-            create_uv_template(self.tutu.id, code="PA00"),
+            self.update_ue_url,
+            create_ue_template(self.tutu.id, code="PA00"),
         )
         assert response.status_code == 200
-        self.uv.refresh_from_db()
-        assert self.uv.author == self.bibou
+        self.ue.refresh_from_db()
+        assert self.ue.author == self.bibou
 
-    def test_uv_update_pedagogy_unauthorized_fail(self):
+    def test_ue_update_pedagogy_unauthorized_fail(self):
         # Anonymous user
         response = self.client.post(
-            self.update_uv_url, create_uv_template(self.bibou.id, code="PA00")
+            self.update_ue_url, create_ue_template(self.bibou.id, code="PA00")
         )
         assertRedirects(
-            response, reverse("core:login", query={"next": self.update_uv_url})
+            response, reverse("core:login", query={"next": self.update_ue_url})
         )
 
         # Not subscribed user
         self.client.force_login(self.guy)
         response = self.client.post(
-            self.update_uv_url, create_uv_template(self.bibou.id, code="PA00")
+            self.update_ue_url, create_ue_template(self.bibou.id, code="PA00")
         )
         assert response.status_code == 403
 
         # Simply subscribed user
         self.client.force_login(self.sli)
         response = self.client.post(
-            self.update_uv_url, create_uv_template(self.bibou.id, code="PA00")
+            self.update_ue_url, create_ue_template(self.bibou.id, code="PA00")
         )
         assert response.status_code == 403
 
-        # Check that the UV has not changed
-        self.uv.refresh_from_db()
-        assert self.uv.credit_type == "OM"
+        # Check that the UE has not changed
+        self.ue.refresh_from_db()
+        assert self.ue.credit_type == "OM"
 
 
-# UVComment class tests
+# UEComment class tests
 
 
-def create_uv_comment_template(user_id, uv_code="PA00", exclude_list=None):
-    """Factory to help UVComment creation/update in post requests."""
+def create_ue_comment_template(user_id, ue_code="PA00", exclude_list=None):
+    """Factory to help UEComment creation/update in post requests."""
     if exclude_list is None:
         exclude_list = []
     comment = {
         "author": user_id,
-        "uv": UV.objects.get(code=uv_code).id,
+        "ue": UE.objects.get(code=ue_code).id,
         "grade_global": 4,
         "grade_utility": 4,
         "grade_interest": 4,
         "grade_teaching": -1,
         "grade_work_load": 2,
-        "comment": "Superbe UV qui fait vivre la vie associative de l'école",
+        "comment": "Superbe UE qui fait vivre la vie associative de l'école",
     }
     for excluded in exclude_list:
         comment.pop(excluded)
@@ -298,7 +298,7 @@ def create_uv_comment_template(user_id, uv_code="PA00", exclude_list=None):
 
 
 class TestUVCommentCreationAndDisplay(TestCase):
-    """Test UVComment creation and its display.
+    """Test UEComment creation and its display.
 
     Display and creation are the same view.
     """
@@ -309,124 +309,124 @@ class TestUVCommentCreationAndDisplay(TestCase):
         cls.tutu = User.objects.get(username="tutu")
         cls.sli = User.objects.get(username="sli")
         cls.guy = User.objects.get(username="guy")
-        cls.uv = UV.objects.get(code="PA00")
-        cls.uv_url = reverse("pedagogy:uv_detail", kwargs={"uv_id": cls.uv.id})
+        cls.ue = UE.objects.get(code="PA00")
+        cls.ue_url = reverse("pedagogy:ue_detail", kwargs={"ue_id": cls.ue.id})
 
-    def test_create_uv_comment_admin_success(self):
+    def test_create_ue_comment_admin_success(self):
         self.client.force_login(self.bibou)
         response = self.client.post(
-            self.uv_url, create_uv_comment_template(self.bibou.id)
+            self.ue_url, create_ue_comment_template(self.bibou.id)
         )
-        assertRedirects(response, self.uv_url)
-        response = self.client.get(self.uv_url)
-        self.assertContains(response, text="Superbe UV")
+        assertRedirects(response, self.ue_url)
+        response = self.client.get(self.ue_url)
+        self.assertContains(response, text="Superbe UE")
 
-    def test_create_uv_comment_pedagogy_admin_success(self):
+    def test_create_ue_comment_pedagogy_admin_success(self):
         self.client.force_login(self.tutu)
         response = self.client.post(
-            self.uv_url, create_uv_comment_template(self.tutu.id)
+            self.ue_url, create_ue_comment_template(self.tutu.id)
         )
-        self.assertRedirects(response, self.uv_url)
-        response = self.client.get(self.uv_url)
-        self.assertContains(response, text="Superbe UV")
+        self.assertRedirects(response, self.ue_url)
+        response = self.client.get(self.ue_url)
+        self.assertContains(response, text="Superbe UE")
 
-    def test_create_uv_comment_subscriber_success(self):
+    def test_create_ue_comment_subscriber_success(self):
         self.client.force_login(self.sli)
         response = self.client.post(
-            self.uv_url, create_uv_comment_template(self.sli.id)
+            self.ue_url, create_ue_comment_template(self.sli.id)
         )
-        self.assertRedirects(response, self.uv_url)
-        response = self.client.get(self.uv_url)
-        self.assertContains(response, text="Superbe UV")
+        self.assertRedirects(response, self.ue_url)
+        response = self.client.get(self.ue_url)
+        self.assertContains(response, text="Superbe UE")
 
-    def test_create_uv_comment_unauthorized_fail(self):
-        nb_comments = self.uv.comments.count()
+    def test_create_ue_comment_unauthorized_fail(self):
+        nb_comments = self.ue.comments.count()
         # Test with anonymous user
-        response = self.client.post(self.uv_url, create_uv_comment_template(0))
-        assertRedirects(response, reverse("core:login", query={"next": self.uv_url}))
+        response = self.client.post(self.ue_url, create_ue_comment_template(0))
+        assertRedirects(response, reverse("core:login", query={"next": self.ue_url}))
 
         # Test with non subscribed user
         self.client.force_login(self.guy)
         response = self.client.post(
-            self.uv_url, create_uv_comment_template(self.guy.id)
+            self.ue_url, create_ue_comment_template(self.guy.id)
         )
         assert response.status_code == 403
 
         # Check that no comment has been created
-        assert self.uv.comments.count() == nb_comments
+        assert self.ue.comments.count() == nb_comments
 
-    def test_create_uv_comment_bad_form_fail(self):
-        nb_comments = self.uv.comments.count()
+    def test_create_ue_comment_bad_form_fail(self):
+        nb_comments = self.ue.comments.count()
         self.client.force_login(self.bibou)
         response = self.client.post(
-            self.uv_url,
-            create_uv_comment_template(self.bibou.id, exclude_list=["grade_global"]),
+            self.ue_url,
+            create_ue_comment_template(self.bibou.id, exclude_list=["grade_global"]),
         )
 
         assert response.status_code == 200
-        assert self.uv.comments.count() == nb_comments
+        assert self.ue.comments.count() == nb_comments
 
-    def test_create_uv_comment_twice_fail(self):
+    def test_create_ue_comment_twice_fail(self):
         # Checks that the has_user_already_commented method works proprely
-        assert not self.uv.has_user_already_commented(self.bibou)
+        assert not self.ue.has_user_already_commented(self.bibou)
 
         # Create a first comment
         self.client.force_login(self.bibou)
-        self.client.post(self.uv_url, create_uv_comment_template(self.bibou.id))
+        self.client.post(self.ue_url, create_ue_comment_template(self.bibou.id))
 
         # Checks that the has_user_already_commented method works proprely
-        assert self.uv.has_user_already_commented(self.bibou)
+        assert self.ue.has_user_already_commented(self.bibou)
 
         # Create the second comment
-        comment = create_uv_comment_template(self.bibou.id)
+        comment = create_ue_comment_template(self.bibou.id)
         comment["comment"] = "Twice"
-        response = self.client.post(self.uv_url, comment)
+        response = self.client.post(self.ue_url, comment)
         assert response.status_code == 200
-        assert UVComment.objects.filter(comment__contains="Superbe UV").exists()
-        assert not UVComment.objects.filter(comment__contains="Twice").exists()
+        assert UEComment.objects.filter(comment__contains="Superbe UE").exists()
+        assert not UEComment.objects.filter(comment__contains="Twice").exists()
         self.assertContains(
             response,
             _(
-                "You already posted a comment on this UV. "
+                "You already posted a comment on this UE. "
                 "If you want to comment again, "
                 "please modify or delete your previous comment."
             ),
         )
 
-        # Ensure that there is no crash when no uv or no author is given
+        # Ensure that there is no crash when no ue or no author is given
         self.client.post(
-            self.uv_url, create_uv_comment_template(self.bibou.id, exclude_list=["uv"])
+            self.ue_url, create_ue_comment_template(self.bibou.id, exclude_list=["ue"])
         )
         assert response.status_code == 200
         self.client.post(
-            self.uv_url,
-            create_uv_comment_template(self.bibou.id, exclude_list=["author"]),
+            self.ue_url,
+            create_ue_comment_template(self.bibou.id, exclude_list=["author"]),
         )
         assert response.status_code == 200
 
 
 class TestUVCommentDelete(TestCase):
-    """Test UVComment deletion rights."""
+    """Test UEComment deletion rights."""
 
     @classmethod
     def setUpTestData(cls):
-        cls.comment = baker.make(UVComment)
+        cls.comment = baker.make(UEComment)
 
-    def test_uv_comment_delete_success(self):
+    def test_ue_comment_delete_success(self):
         url = reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
         for user in (
             baker.make(User, is_superuser=True),
             baker.make(
-                User, user_permissions=[Permission.objects.get(codename="view_uv")]
+                User, user_permissions=[Permission.objects.get(codename="view_ue")]
             ),
             self.comment.author,
         ):
             with self.subTest():
                 self.client.force_login(user)
                 self.client.post(url)
-                assert not UVComment.objects.filter(id=self.comment.id).exists()
+                assert not UEComment.objects.filter(id=self.comment.id).exists()
 
-    def test_uv_comment_delete_unauthorized_fail(self):
+    def test_ue_comment_delete_unauthorized_fail(self):
         url = reverse("pedagogy:comment_delete", kwargs={"comment_id": self.comment.id})
 
         # Anonymous user
@@ -441,11 +441,11 @@ class TestUVCommentDelete(TestCase):
                 assert response.status_code == 403
 
         # Check that the comment still exists
-        assert UVComment.objects.filter(id=self.comment.id).exists()
+        assert UEComment.objects.filter(id=self.comment.id).exists()
 
 
 class TestUVCommentUpdate(TestCase):
-    """Test UVComment update rights."""
+    """Test UEComment update rights."""
 
     @classmethod
     def setUpTestData(cls):
@@ -457,17 +457,17 @@ class TestUVCommentUpdate(TestCase):
 
     def setUp(self):
         # Prepare a comment
-        comment_kwargs = create_uv_comment_template(self.krophil.id)
+        comment_kwargs = create_ue_comment_template(self.krophil.id)
         comment_kwargs["author"] = self.krophil
-        comment_kwargs["uv"] = UV.objects.get(id=comment_kwargs["uv"])
-        self.comment = UVComment(**comment_kwargs)
+        comment_kwargs["ue"] = UE.objects.get(id=comment_kwargs["ue"])
+        self.comment = UEComment(**comment_kwargs)
         self.comment.save()
 
         # Prepare edit of this comment for post requests
-        self.comment_edit = create_uv_comment_template(self.krophil.id)
+        self.comment_edit = create_ue_comment_template(self.krophil.id)
         self.comment_edit["comment"] = "Edited"
 
-    def test_uv_comment_update_root_success(self):
+    def test_ue_comment_update_root_success(self):
         self.client.force_login(self.bibou)
         response = self.client.post(
             reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
@@ -477,7 +477,7 @@ class TestUVCommentUpdate(TestCase):
         self.comment.refresh_from_db()
         self.assertEqual(self.comment.comment, self.comment_edit["comment"])
 
-    def test_uv_comment_update_author_success(self):
+    def test_ue_comment_update_author_success(self):
         self.client.force_login(self.krophil)
         response = self.client.post(
             reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id}),
@@ -487,7 +487,7 @@ class TestUVCommentUpdate(TestCase):
         self.comment.refresh_from_db()
         self.assertEqual(self.comment.comment, self.comment_edit["comment"])
 
-    def test_uv_comment_update_unauthorized_fail(self):
+    def test_ue_comment_update_unauthorized_fail(self):
         url = reverse("pedagogy:comment_update", kwargs={"comment_id": self.comment.id})
         # Anonymous user
         response = self.client.post(url, self.comment_edit)
@@ -506,7 +506,7 @@ class TestUVCommentUpdate(TestCase):
         self.comment.refresh_from_db()
         self.assertNotEqual(self.comment.comment, self.comment_edit["comment"])
 
-    def test_uv_comment_update_original_author_does_not_change(self):
+    def test_ue_comment_update_original_author_does_not_change(self):
         self.client.force_login(self.bibou)
         self.comment_edit["author"] = User.objects.get(username="root").id
 
@@ -531,31 +531,31 @@ class TestUVModerationForm(TestCase):
 
     def setUp(self):
         # Prepare a comment
-        comment_kwargs = create_uv_comment_template(self.krophil.id)
+        comment_kwargs = create_ue_comment_template(self.krophil.id)
         comment_kwargs["author"] = self.krophil
-        comment_kwargs["uv"] = UV.objects.get(id=comment_kwargs["uv"])
-        self.comment_1 = UVComment(**comment_kwargs)
+        comment_kwargs["ue"] = UE.objects.get(id=comment_kwargs["ue"])
+        self.comment_1 = UEComment(**comment_kwargs)
         self.comment_1.save()
 
         # Prepare another comment
-        comment_kwargs = create_uv_comment_template(self.krophil.id)
+        comment_kwargs = create_ue_comment_template(self.krophil.id)
         comment_kwargs["author"] = self.krophil
-        comment_kwargs["uv"] = UV.objects.get(id=comment_kwargs["uv"])
-        self.comment_2 = UVComment(**comment_kwargs)
+        comment_kwargs["ue"] = UE.objects.get(id=comment_kwargs["ue"])
+        self.comment_2 = UEComment(**comment_kwargs)
         self.comment_2.save()
 
         # Prepare a comment report for comment 1
-        self.report_1 = UVCommentReport(
+        self.report_1 = UECommentReport(
             comment=self.comment_1, reporter=self.krophil, reason="C'est moche"
         )
         self.report_1.save()
-        self.report_1_bis = UVCommentReport(
+        self.report_1_bis = UECommentReport(
             comment=self.comment_1, reporter=self.krophil, reason="C'est moche 2"
         )
         self.report_1_bis.save()
 
         # Prepare a comment report for comment 2
-        self.report_2 = UVCommentReport(
+        self.report_2 = UECommentReport(
             comment=self.comment_2, reporter=self.krophil, reason="C'est moche"
         )
         self.report_2.save()
@@ -593,11 +593,11 @@ class TestUVModerationForm(TestCase):
         assert response.status_code == 302
 
         # Test that nothing has changed
-        assert UVCommentReport.objects.filter(id=self.report_1.id).exists()
-        assert UVComment.objects.filter(id=self.comment_1.id).exists()
-        assert UVCommentReport.objects.filter(id=self.report_1_bis.id).exists()
-        assert UVCommentReport.objects.filter(id=self.report_2.id).exists()
-        assert UVComment.objects.filter(id=self.comment_2.id).exists()
+        assert UECommentReport.objects.filter(id=self.report_1.id).exists()
+        assert UEComment.objects.filter(id=self.comment_1.id).exists()
+        assert UECommentReport.objects.filter(id=self.report_1_bis.id).exists()
+        assert UECommentReport.objects.filter(id=self.report_2.id).exists()
+        assert UEComment.objects.filter(id=self.comment_2.id).exists()
 
     def test_delete_comment(self):
         self.client.force_login(self.bibou)
@@ -607,14 +607,14 @@ class TestUVModerationForm(TestCase):
         assert response.status_code == 302
 
         # Test that the comment and it's associated report has been deleted
-        assert not UVCommentReport.objects.filter(id=self.report_1.id).exists()
-        assert not UVComment.objects.filter(id=self.comment_1.id).exists()
+        assert not UECommentReport.objects.filter(id=self.report_1.id).exists()
+        assert not UEComment.objects.filter(id=self.comment_1.id).exists()
         # Test that the bis report has been deleted
-        assert not UVCommentReport.objects.filter(id=self.report_1_bis.id).exists()
+        assert not UECommentReport.objects.filter(id=self.report_1_bis.id).exists()
 
         # Test that the other comment and report still exists
-        assert UVCommentReport.objects.filter(id=self.report_2.id).exists()
-        assert UVComment.objects.filter(id=self.comment_2.id).exists()
+        assert UECommentReport.objects.filter(id=self.report_2.id).exists()
+        assert UEComment.objects.filter(id=self.comment_2.id).exists()
 
     def test_delete_comment_bulk(self):
         self.client.force_login(self.bibou)
@@ -625,12 +625,12 @@ class TestUVModerationForm(TestCase):
         assert response.status_code == 302
 
         # Test that comments and their associated reports has been deleted
-        assert not UVCommentReport.objects.filter(id=self.report_1.id).exists()
-        assert not UVComment.objects.filter(id=self.comment_1.id).exists()
-        assert not UVCommentReport.objects.filter(id=self.report_2.id).exists()
-        assert not UVComment.objects.filter(id=self.comment_2.id).exists()
+        assert not UECommentReport.objects.filter(id=self.report_1.id).exists()
+        assert not UEComment.objects.filter(id=self.comment_1.id).exists()
+        assert not UECommentReport.objects.filter(id=self.report_2.id).exists()
+        assert not UEComment.objects.filter(id=self.comment_2.id).exists()
         # Test that the bis report has been deleted
-        assert not UVCommentReport.objects.filter(id=self.report_1_bis.id).exists()
+        assert not UECommentReport.objects.filter(id=self.report_1_bis.id).exists()
 
     def test_delete_comment_with_bis(self):
         # Test case if two reports targets the same comment and are both deleted
@@ -642,10 +642,10 @@ class TestUVModerationForm(TestCase):
         assert response.status_code == 302
 
         # Test that the comment and it's associated report has been deleted
-        assert not UVCommentReport.objects.filter(id=self.report_1.id).exists()
-        assert not UVComment.objects.filter(id=self.comment_1.id).exists()
+        assert not UECommentReport.objects.filter(id=self.report_1.id).exists()
+        assert not UEComment.objects.filter(id=self.comment_1.id).exists()
         # Test that the bis report has been deleted
-        assert not UVCommentReport.objects.filter(id=self.report_1_bis.id).exists()
+        assert not UECommentReport.objects.filter(id=self.report_1_bis.id).exists()
 
     def test_delete_report(self):
         self.client.force_login(self.bibou)
@@ -655,14 +655,14 @@ class TestUVModerationForm(TestCase):
         assert response.status_code == 302
 
         # Test that the report has been deleted and that the comment still exists
-        assert not UVCommentReport.objects.filter(id=self.report_1.id).exists()
-        assert UVComment.objects.filter(id=self.comment_1.id).exists()
+        assert not UECommentReport.objects.filter(id=self.report_1.id).exists()
+        assert UEComment.objects.filter(id=self.comment_1.id).exists()
         # Test that the bis report is still there
-        assert UVCommentReport.objects.filter(id=self.report_1_bis.id).exists()
+        assert UECommentReport.objects.filter(id=self.report_1_bis.id).exists()
 
         # Test that the other comment and report still exists
-        assert UVCommentReport.objects.filter(id=self.report_2.id).exists()
-        assert UVComment.objects.filter(id=self.comment_2.id).exists()
+        assert UECommentReport.objects.filter(id=self.report_2.id).exists()
+        assert UEComment.objects.filter(id=self.comment_2.id).exists()
 
     def test_delete_report_bulk(self):
         self.client.force_login(self.bibou)
@@ -679,12 +679,12 @@ class TestUVModerationForm(TestCase):
         assert response.status_code == 302
 
         # Test that every reports has been deleted
-        assert not UVCommentReport.objects.filter(id=self.report_1.id).exists()
-        assert not UVCommentReport.objects.filter(id=self.report_1_bis.id).exists()
-        assert not UVCommentReport.objects.filter(id=self.report_2.id).exists()
+        assert not UECommentReport.objects.filter(id=self.report_1.id).exists()
+        assert not UECommentReport.objects.filter(id=self.report_1_bis.id).exists()
+        assert not UECommentReport.objects.filter(id=self.report_2.id).exists()
         # Test that comments still exists
-        assert UVComment.objects.filter(id=self.comment_1.id).exists()
-        assert UVComment.objects.filter(id=self.comment_2.id).exists()
+        assert UEComment.objects.filter(id=self.comment_1.id).exists()
+        assert UEComment.objects.filter(id=self.comment_2.id).exists()
 
     def test_delete_mixed(self):
         self.client.force_login(self.bibou)
@@ -698,15 +698,15 @@ class TestUVModerationForm(TestCase):
         assert response.status_code == 302
 
         # Test that report 2 and his comment has been deleted
-        assert not UVCommentReport.objects.filter(id=self.report_2.id).exists()
-        assert not UVComment.objects.filter(id=self.comment_2.id).exists()
+        assert not UECommentReport.objects.filter(id=self.report_2.id).exists()
+        assert not UEComment.objects.filter(id=self.comment_2.id).exists()
 
         # Test that report 1 has been deleted and it's comment still exists
-        assert not UVCommentReport.objects.filter(id=self.report_1.id).exists()
-        assert UVComment.objects.filter(id=self.comment_1.id).exists()
+        assert not UECommentReport.objects.filter(id=self.report_1.id).exists()
+        assert UEComment.objects.filter(id=self.comment_1.id).exists()
 
         # Test that report 1 bis is still there
-        assert UVCommentReport.objects.filter(id=self.report_1_bis.id).exists()
+        assert UECommentReport.objects.filter(id=self.report_1_bis.id).exists()
 
     def test_delete_mixed_with_bis(self):
         self.client.force_login(self.bibou)
@@ -720,16 +720,16 @@ class TestUVModerationForm(TestCase):
         assert response.status_code == 302
 
         # Test that report 1 and 1 bis has been deleted
-        assert not UVCommentReport.objects.filter(
+        assert not UECommentReport.objects.filter(
             id__in=[self.report_1.id, self.report_1_bis.id]
         ).exists()
 
         # Test that comment 1 has been deleted
-        assert not UVComment.objects.filter(id=self.comment_1.id).exists()
+        assert not UEComment.objects.filter(id=self.comment_1.id).exists()
 
         # Test that report and comment 2 still exists
-        assert UVCommentReport.objects.filter(id=self.report_2.id).exists()
-        assert UVComment.objects.filter(id=self.comment_2.id).exists()
+        assert UECommentReport.objects.filter(id=self.report_2.id).exists()
+        assert UEComment.objects.filter(id=self.comment_2.id).exists()
 
 
 class TestUVCommentReportCreate(TestCase):
@@ -743,10 +743,10 @@ class TestUVCommentReportCreate(TestCase):
         self.tutu = User.objects.get(username="tutu")
 
         # Prepare a comment
-        comment_kwargs = create_uv_comment_template(self.krophil.id)
+        comment_kwargs = create_ue_comment_template(self.krophil.id)
         comment_kwargs["author"] = self.krophil
-        comment_kwargs["uv"] = UV.objects.get(id=comment_kwargs["uv"])
-        self.comment = UVComment(**comment_kwargs)
+        comment_kwargs["ue"] = UE.objects.get(id=comment_kwargs["ue"])
+        self.comment = UEComment(**comment_kwargs)
         self.comment.save()
 
     def create_report_test(self, username: str, *, success: bool):
@@ -763,7 +763,7 @@ class TestUVCommentReportCreate(TestCase):
             assert response.status_code == 302
         else:
             assert response.status_code == 403
-        self.assertEqual(UVCommentReport.objects.all().exists(), success)
+        self.assertEqual(UECommentReport.objects.all().exists(), success)
 
     def test_create_report_root_success(self):
         self.create_report_test("root", success=True)
@@ -783,7 +783,7 @@ class TestUVCommentReportCreate(TestCase):
             url, {"comment": self.comment.id, "reporter": 0, "reason": "C'est moche"}
         )
         assertRedirects(response, reverse("core:login", query={"next": url}))
-        assert not UVCommentReport.objects.all().exists()
+        assert not UECommentReport.objects.all().exists()
 
     def test_notifications(self):
         assert not self.tutu.notifications.filter(type="PEDAGOGY_MODERATION").exists()

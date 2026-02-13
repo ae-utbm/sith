@@ -44,7 +44,7 @@ from core.utils import resize_image
 from counter.models import Counter, Product, ProductType, ReturnableProduct, StudentCard
 from election.models import Candidature, Election, ElectionList, Role
 from forum.models import Forum
-from pedagogy.models import UV
+from pedagogy.models import UE
 from sas.models import Album, PeoplePictureRelation, Picture
 from subscription.models import Subscription
 
@@ -661,20 +661,20 @@ class Command(BaseCommand):
 
         # Create some data for pedagogy
 
-        UV(
+        UE(
             code="PA00",
             author=User.objects.get(id=0),
-            credit_type=settings.SITH_PEDAGOGY_UV_TYPE[3][0],
+            credit_type=settings.SITH_PEDAGOGY_UE_TYPE[3][0],
             manager="Laurent HEYBERGER",
-            semester=settings.SITH_PEDAGOGY_UV_SEMESTER[3][0],
-            language=settings.SITH_PEDAGOGY_UV_LANGUAGE[0][0],
+            semester=settings.SITH_PEDAGOGY_UE_SEMESTER[3][0],
+            language=settings.SITH_PEDAGOGY_UE_LANGUAGE[0][0],
             department=settings.SITH_PROFILE_DEPARTMENTS[-2][0],
             credits=5,
             title="Participation dans une association étudiante",
             objectives="* Permettre aux étudiants de réaliser, pendant un semestre, un projet culturel ou associatif et de le valoriser.",
             program="""* Semestre précédent proposition d'un projet et d'un cahier des charges
 * Evaluation par un jury de six membres
-* Si accord réalisation dans le cadre de l'UV
+* Si accord réalisation dans le cadre de l'UE
 * Compte-rendu de l'expérience
 * Présentation""",
             skills="""* Gérer un projet associatif ou une action éducative en autonomie:
@@ -790,16 +790,16 @@ class Command(BaseCommand):
 
         subscribers = Group.objects.create(name="Cotisants")
         subscribers.permissions.add(
-            *list(perms.filter(codename__in=["add_news", "add_uvcomment"]))
+            *list(perms.filter(codename__in=["add_news", "add_uecomment"]))
         )
         old_subscribers = Group.objects.create(name="Anciens cotisants")
         old_subscribers.permissions.add(
             *list(
                 perms.filter(
                     codename__in=[
-                        "view_uv",
-                        "view_uvcomment",
-                        "add_uvcommentreport",
+                        "view_ue",
+                        "view_uecomment",
+                        "add_uecommentreport",
                         "view_user",
                         "view_picture",
                         "view_album",
@@ -875,7 +875,7 @@ class Command(BaseCommand):
         pedagogy_admin.permissions.add(
             *list(
                 perms.filter(content_type__app_label="pedagogy")
-                .exclude(codename__in=["change_uvcomment"])
+                .exclude(codename__in=["change_uecomment"])
                 .values_list("pk", flat=True)
             )
         )

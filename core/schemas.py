@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Any
 
@@ -8,12 +9,14 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 from haystack.query import SearchQuerySet
-from ninja import FilterSchema, ModelSchema, Schema, UploadedFile
-from pydantic import AliasChoices, Field
+from ninja import FilterLookup, FilterSchema, ModelSchema, Schema, UploadedFile
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_core.core_schema import ValidationInfo
 
 from core.models import Group, QuickUploadImage, SithFile, User
-from core.utils import is_image
+from core.utils import get_last_promo, is_image
+
+NonEmptyStr = Annotated[str, MinLen(1)]
 
 
 class UploadedImage(UploadedFile):
@@ -107,7 +110,11 @@ class GroupSchema(ModelSchema):
 
 
 class UserFilterSchema(FilterSchema):
-    search: Annotated[str, MinLen(1)]
+    search: Annotated[str, MinLen(1)] | None = None
+    role: Annotated[str, FilterLookup("role__icontains")] | None = None
+    department: str | None = None
+    promo: int | None = None
+    date_of_birth: datetime | None = None
     exclude: list[int] | None = Field(
         None, validation_alias=AliasChoices("exclude", "exclude[]")
     )
@@ -135,6 +142,13 @@ class UserFilterSchema(FilterSchema):
         if not value:
             return Q()
         return ~Q(id__in=value)
+
+    @field_validator("promo", mode="after")
+    @classmethod
+    def validate_promo(cls, value: int) -> int:
+        if not 0 < value <= get_last_promo():
+            raise ValueError(f"{value} is not a valid promo")
+        return value
 
 
 class MarkdownSchema(Schema):

@@ -143,6 +143,15 @@ form {
   line-height: 1;
   white-space: nowrap;
 
+  .fields-centered {
+    padding: 10px 10px 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--nf-input-size) 10px;
+    justify-content: center;
+  }
+
   .helptext {
     margin-top: .25rem;
     margin-bottom: .25rem;

@@ -23,7 +23,7 @@ from counter.models import (
     Selling,
 )
 from forum.models import Forum, ForumMessage, ForumTopic
-from pedagogy.models import UV
+from pedagogy.models import UE
 from subscription.models import Subscription
 
 
@@ -74,7 +74,7 @@ class Command(BaseCommand):
             random.sample(old_subscribers, k=min(80, len(old_subscribers))),
         )
         self.stdout.write("Creating uvs...")
-        self.create_uvs()
+        self.create_ues()
         self.stdout.write("Creating products...")
         self.create_products()
         self.stdout.write("Creating sales and refills...")
@@ -192,7 +192,7 @@ class Command(BaseCommand):
         memberships = Membership.objects.bulk_create(memberships)
         Membership._add_club_groups(memberships)
 
-    def create_uvs(self):
+    def create_ues(self):
         root = User.objects.get(username="root")
         categories = ["CS", "TM", "OM", "QC", "EC"]
         branches = ["TC", "GMC", "GI", "EDIM", "E", "IMSI", "HUMA"]
@@ -207,7 +207,7 @@ class Command(BaseCommand):
                 + str(random.randint(10, 90))
             )
             uvs.append(
-                UV(
+                UE(
                     code=code,
                     author=root,
                     manager=random.choice(teachers),
@@ -229,7 +229,7 @@ class Command(BaseCommand):
                     hours_TE=random.randint(15, 40),
                 )
             )
-        UV.objects.bulk_create(uvs, ignore_conflicts=True)
+        UE.objects.bulk_create(uvs, ignore_conflicts=True)
 
     def create_products(self):
         categories = [
@@ -350,7 +350,6 @@ class Command(BaseCommand):
                         date=make_aware(
                             self.faker.date_time_between(customer.since, localdate())
                         ),
-                        is_validated=True,
                     )
                 )
             sales.extend(this_customer_sales)

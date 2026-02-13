@@ -9,19 +9,17 @@
 {% block content %}
   <h4>{% trans %}Users{% endtrans %}</h4>
   <ul>
-    {% for i in result.users %}
-      {% if user.can_view(i) %}
-        <li>
-          {{ user_link_with_pict(i) }}
-        </li>
-      {% endif %}
+    {% for user in users %}
+      <li>
+        {{ user_link_with_pict(user) }}
+      </li>
     {% endfor %}
   </ul>
   <h4>{% trans %}Clubs{% endtrans %}</h4>
   <ul>
-    {% for i in result.clubs %}
+    {% for club in clubs %}
       <li>
-        <a href="{{ url("club:club_view", club_id=i.id) }}">{{ i }}</a>
+        <a href="{{ url("club:club_view", club_id=club.id) }}">{{ club }}</a>
       </li>
     {% endfor %}
   </ul>

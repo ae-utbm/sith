@@ -1,7 +1,7 @@
 {% extends "core/base.jinja" %}
 
 {% block title %}
-  {% trans %}UV comment moderation{% endtrans %}
+  {% trans %}UE comment moderation{% endtrans %}
 {% endblock title %}
 
 {% block content %}
@@ -9,7 +9,7 @@
   <table>
     <thead>
       <tr>
-        <td>{% trans %}UV{% endtrans %}</td>
+        <td>{% trans %}UE{% endtrans %}</td>
         <td>{% trans %}Comment{% endtrans %}</td>
         <td>{% trans %}Reason{% endtrans %}</td>
         <td>{% trans %}Action{% endtrans %}</td>
@@ -22,7 +22,7 @@
         <form action="{{ url('pedagogy:moderation') }}" method="post" enctype="multipart/form-data">
           {% csrf_token %}
           <tr>
-            <td><a href="{{ url('pedagogy:uv_detail', uv_id=report.comment.uv.id) }}#{{ report.comment.uv.id }}">{{ report.comment.uv }}</a></td>
+            <td><a href="{{ url('pedagogy:ue_detail', ue_id=report.comment.ue_id) }}#{{ report.comment.ue_id }}">{{ report.comment.ue }}</a></td>
             <td>{{ report.comment.comment|markdown }}</td>
             <td>{{ report.reason|markdown }}</td>
             <td>

@@ -1,4 +1,4 @@
-import { paginated } from "#core:utils/api";
+import { paginated } from "#core:utils/api.ts";
 import {
   type PictureSchema,
   type PicturesFetchPicturesData,
@@ -27,7 +27,7 @@ document.addEventListener("alpine:init", () => {
       const lastCachedNumber = localStorage.getItem(localStorageInvalidationKey);
       if (
         lastCachedNumber !== null &&
-        Number.parseInt(lastCachedNumber) === config.nbPictures
+        Number.parseInt(lastCachedNumber, 10) === config.nbPictures
       ) {
         return JSON.parse(localStorage.getItem(localStorageKey));
       }

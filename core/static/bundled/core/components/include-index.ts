@@ -1,4 +1,4 @@
-import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
+import { inheritHtmlElement, registerComponent } from "#core:utils/web-components.ts";
 
 /**
  * Web component used to import css files only once

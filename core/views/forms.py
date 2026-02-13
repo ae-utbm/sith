@@ -303,7 +303,6 @@ class UserGodfathersForm(forms.Form):
     )
     user = forms.ModelChoiceField(
         label=_("Select user"),
-        help_text=None,
         required=True,
         widget=AutoCompleteSelectUser,
         queryset=User.objects.all(),
@@ -315,8 +314,6 @@ class UserGodfathersForm(forms.Form):
 
     def clean_user(self):
         other_user = self.cleaned_data.get("user")
-        if not other_user:
-            raise ValidationError(_("This user does not exist"))
         if other_user == self.target_user:
             raise ValidationError(_("You cannot be related to yourself"))
         return other_user

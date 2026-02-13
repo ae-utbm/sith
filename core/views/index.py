@@ -22,106 +22,49 @@
 #
 #
 
-import json
-
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.core import serializers
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import F
 from django.db.models.query import QuerySet
-from django.http import JsonResponse
-from django.shortcuts import redirect, render
-from django.utils import html
-from django.utils.text import slugify
-from django.views.generic import ListView
-from haystack.query import SearchQuerySet
+from django.http import HttpRequest
+from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import ListView, TemplateView
 
 from club.models import Club
 from core.models import Notification, User
+from core.schemas import UserFilterSchema
 
 
-def index(request, context=None):
-    from com.views import NewsListView
-
-    return NewsListView.as_view()(request)
-
-
-class NotificationList(ListView):
+class NotificationList(LoginRequiredMixin, ListView):
     model = Notification
     template_name = "core/notification_list.jinja"
 
     def get_queryset(self) -> QuerySet[Notification]:
-        if self.request.user.is_anonymous:
-            return Notification.objects.none()
-        # TODO: Bulk update in django 2.2
         if "see_all" in self.request.GET:
             self.request.user.notifications.filter(viewed=False).update(viewed=True)
         return self.request.user.notifications.order_by("-date")[:20]
 
 
-def notification(request, notif_id):
-    notif = Notification.objects.filter(id=notif_id).first()
-    if notif:
-        if notif.type not in settings.SITH_PERMANENT_NOTIFICATIONS:
-            notif.viewed = True
-        else:
-            notif.callback()
-        notif.save()
-        return redirect(notif.url)
-    return redirect("/")
+def notification(request: HttpRequest, notif_id: int):
+    notif = get_object_or_404(Notification, id=notif_id)
+    if notif.type not in settings.SITH_PERMANENT_NOTIFICATIONS:
+        notif.viewed = True
+    else:
+        notif.callback()
+    notif.save()
+    return redirect(notif.url)
 
 
-def search_user(query):
-    try:
-        # slugify turns everything into ascii and every whitespace into -
-        # it ends by removing duplicate - (so ' - ' will turn into '-')
-        # replace('-', ' ') because search is whitespace based
-        query = slugify(query).replace("-", " ")
-        # TODO: is this necessary?
-        query = html.escape(query)
-        res = (
-            SearchQuerySet()
-            .models(User)
-            .autocomplete(auto=query)
-            .order_by("-last_login")
-            .load_all()[:20]
-        )
-        return [r.object for r in res]
-    except TypeError:
-        return []
+class SearchView(LoginRequiredMixin, TemplateView):
+    template_name = "core/search.jinja"
 
-
-def search_club(query, *, as_json=False):
-    clubs = []
-    if query:
-        clubs = Club.objects.filter(name__icontains=query).all()
-        clubs = clubs[:5]
-        if as_json:
-            # Re-loads json to avoid double encoding by JsonResponse, but still benefit from serializers
-            clubs = json.loads(serializers.serialize("json", clubs, fields=("name")))
-        else:
-            clubs = list(clubs)
-    return clubs
-
-
-@login_required
-def search_view(request):
-    result = {
-        "users": search_user(request.GET.get("query", "")),
-        "clubs": search_club(request.GET.get("query", "")),
-    }
-    return render(request, "core/search.jinja", context={"result": result})
-
-
-@login_required
-def search_user_json(request):
-    result = {"users": search_user(request.GET.get("query", ""))}
-    return JsonResponse(result)
-
-
-@login_required
-def search_json(request):
-    result = {
-        "users": search_user(request.GET.get("query", "")),
-        "clubs": search_club(request.GET.get("query", ""), as_json=True),
-    }
-    return JsonResponse(result)
+    def get_context_data(self, **kwargs):
+        users, clubs = [], []
+        if query := self.request.GET.get("query"):
+            users = list(
+                UserFilterSchema(search=query)
+                .filter(User.objects.viewable_by(self.request.user))
+                .order_by(F("last_login").desc(nulls_last=True))
+            )
+            clubs = list(Club.objects.filter(name__icontains=query)[:5])
+        return super().get_context_data(**kwargs) | {"users": users, "clubs": clubs}

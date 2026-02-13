@@ -22,19 +22,18 @@ from bs4 import BeautifulSoup
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Permission
 from django.core import mail
-from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
-from django.utils.timezone import now
 from django.views.generic import View
 from django.views.generic.base import ContextMixin
 from model_bakery import baker
 from pytest_django.asserts import assertInHTML, assertRedirects
 
 from antispam.models import ToxicDomain
-from club.models import Club, Membership
+from club.models import Club
+from core.baker_recipes import subscriber_user
 from core.markdown import markdown
 from core.models import AnonymousUser, Group, Page, User, validate_promo
 from core.utils import get_last_promo, get_semester_code, get_start_of_semester
@@ -435,23 +434,6 @@ class TestUserIsInGroup(TestCase):
         with self.assertNumQueries(0):
             self.public_user.is_in_group(pk=group_not_in.id)
 
-    def test_cache_properly_cleared_membership(self):
-        """Test that when the membership of a user end,
-        the cache is properly invalidated.
-        """
-        membership = baker.make(Membership, club=self.club, user=self.public_user)
-        cache.clear()
-        self.club.get_membership_for(self.public_user)  # this should populate the cache
-        assert membership == cache.get(
-            f"membership_{self.club.id}_{self.public_user.id}"
-        )
-        membership.end_date = now() - timedelta(minutes=5)
-        membership.save()
-        cached_membership = cache.get(
-            f"membership_{self.club.id}_{self.public_user.id}"
-        )
-        assert cached_membership == "not_member"
-
     def test_not_existing_group(self):
         """Test that searching for a not existing group
         returns False.
@@ -551,3 +533,10 @@ def test_allow_fragment_mixin():
     assert not TestAllowFragmentView.as_view()(request)
     request.headers = {"HX-Request": True, **base_headers}
     assert TestAllowFragmentView.as_view()(request)
+
+
+@pytest.mark.django_db
+def test_search_view(client: Client):
+    client.force_login(subscriber_user.make())
+    response = client.get(reverse("core:search", query={"query": "foo"}))
+    assert response.status_code == 200

@@ -63,10 +63,10 @@ function parseSlots(s: string): TimetableSlot[] {
       }
       const [startHour, startMin] = parsed.groups.startHour
         .split(":")
-        .map((i) => Number.parseInt(i));
+        .map((i) => Number.parseInt(i, 10));
       const [endHour, endMin] = parsed.groups.endHour
         .split(":")
-        .map((i) => Number.parseInt(i));
+        .map((i) => Number.parseInt(i, 10));
       return {
         ...parsed.groups,
         startSlot: Math.floor((startHour * 60 + startMin) / MINUTES_PER_SLOT),
@@ -157,6 +157,7 @@ document.addEventListener("alpine:init", () => {
           .map((c: TimetableSlot) => c.startHour)
           .reduce((res: string, hour: string) => (hour < res ? hour : res), "24:00")
           .split(":")[0],
+        10,
       );
       const res: [string, object][] = [];
       for (let i = 0; i <= this.endSlot - this.startSlot; i += 60 / MINUTES_PER_SLOT) {

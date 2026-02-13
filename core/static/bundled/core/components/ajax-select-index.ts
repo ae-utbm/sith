@@ -1,20 +1,19 @@
 import "tom-select/dist/css/tom-select.default.css";
-import { registerComponent } from "#core:utils/web-components";
 import type { TomOption } from "tom-select/dist/types/types";
 import type { escape_html } from "tom-select/dist/types/utils";
 import {
-  type GroupSchema,
-  type SithFileSchema,
-  type UserProfileSchema,
-  groupSearchGroup,
-  sithfileSearchFiles,
-  userSearchUsers,
-} from "#openapi";
-
-import {
   AjaxSelect,
   AutoCompleteSelectBase,
-} from "#core:core/components/ajax-select-base";
+} from "#core:core/components/ajax-select-base.ts";
+import { registerComponent } from "#core:utils/web-components.ts";
+import {
+  type GroupSchema,
+  groupSearchGroup,
+  type SithFileSchema,
+  sithfileSearchFiles,
+  type UserProfileSchema,
+  userSearchUsers,
+} from "#openapi";
 
 @registerComponent("autocomplete-select")
 export class AutoCompleteSelect extends AutoCompleteSelectBase {}

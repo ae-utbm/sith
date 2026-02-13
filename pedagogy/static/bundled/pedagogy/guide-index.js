@@ -1,12 +1,16 @@
-import { History, getCurrentUrlParams, updateQueryString } from "#core:utils/history";
-import { uvFetchUvList } from "#openapi";
+import {
+  getCurrentUrlParams,
+  History,
+  updateQueryString,
+} from "#core:utils/history.ts";
+import { ueFetchUeList } from "#openapi";
 
 const pageDefault = 1;
 const pageSizeDefault = 100;
 
 document.addEventListener("alpine:init", () => {
-  Alpine.data("uv_search", () => ({
-    uvs: {
+  Alpine.data("ue_search", () => ({
+    ues: {
       count: 0,
       next: null,
       previous: null,
@@ -31,8 +35,8 @@ document.addEventListener("alpine:init", () => {
       const url = getCurrentUrlParams();
       this.pushstate = History.Replace;
 
-      this.page = Number.parseInt(url.get("page")) || pageDefault;
-      this.page_size = Number.parseInt(url.get("page_size")) || pageSizeDefault;
+      this.page = Number.parseInt(url.get("page"), 10) || pageDefault;
+      this.page_size = Number.parseInt(url.get("page_size"), 10) || pageSizeDefault;
       this.search = url.get("search") || "";
       this.department = url.getAll("department");
       this.credit_type = url.getAll("credit_type");
@@ -103,16 +107,12 @@ document.addEventListener("alpine:init", () => {
           args[param] = value;
         }
       }
-      this.uvs = (
-        await uvFetchUvList({
-          query: args,
-        })
-      ).data;
+      this.ues = (await ueFetchUeList({ query: args })).data;
       this.loading = false;
     },
 
     maxPage() {
-      return Math.ceil(this.uvs.count / this.page_size);
+      return Math.ceil(this.ues.count / this.page_size);
     },
   }));
 });

@@ -1,12 +1,12 @@
-import { paginated } from "#core:utils/api";
-import { History, initialUrlParams, updateQueryString } from "#core:utils/history";
+import { paginated } from "#core:utils/api.ts";
+import { History, initialUrlParams, updateQueryString } from "#core:utils/history.ts";
 import {
   type AlbumFetchAlbumData,
   type AlbumSchema,
+  albumFetchAlbum,
   type PictureSchema,
   type PicturesFetchPicturesData,
   type PicturesUploadPictureErrors,
-  albumFetchAlbum,
   picturesFetchPictures,
   picturesUploadPicture,
 } from "#openapi";
@@ -23,7 +23,7 @@ interface SubAlbumsConfig {
 document.addEventListener("alpine:init", () => {
   Alpine.data("pictures", (config: AlbumPicturesConfig) => ({
     pictures: [] as PictureSchema[],
-    page: Number.parseInt(initialUrlParams.get("page")) || 1,
+    page: Number.parseInt(initialUrlParams.get("page"), 10) || 1,
     pushstate: History.Push /* Used to avoid pushing a state on a back action */,
     loading: false,
 
@@ -38,7 +38,10 @@ document.addEventListener("alpine:init", () => {
       window.addEventListener("popstate", () => {
         this.pushstate = History.Replace;
         this.page =
-          Number.parseInt(new URLSearchParams(window.location.search).get("page")) || 1;
+          Number.parseInt(
+            new URLSearchParams(window.location.search).get("page"),
+            10,
+          ) || 1;
       });
     },
 

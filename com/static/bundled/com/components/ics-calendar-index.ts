@@ -1,6 +1,4 @@
-import { makeUrl } from "#core:utils/api";
-import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
-import { Calendar, type EventClickArg } from "@fullcalendar/core";
+import { Calendar, type EventClickArg, type EventContentArg } from "@fullcalendar/core";
 import type { EventImpl } from "@fullcalendar/core/internal";
 import enLocale from "@fullcalendar/core/locales/en-gb";
 import frLocale from "@fullcalendar/core/locales/fr";
@@ -8,6 +6,8 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import iCalendarPlugin from "@fullcalendar/icalendar";
 import listPlugin from "@fullcalendar/list";
 import { type HTMLTemplateResult, html, render } from "lit-html";
+import { makeUrl } from "#core:utils/api.ts";
+import { inheritHtmlElement, registerComponent } from "#core:utils/web-components.ts";
 import {
   calendarCalendarInternal,
   calendarCalendarUnpublished,
@@ -24,6 +24,11 @@ export class IcsCalendar extends inheritHtmlElement("div") {
   private canModerate = false;
   private canDelete = false;
   private helpUrl = "";
+
+  // Hack variable to detect recurring events
+  // The underlying ics library doesn't include any info about rrules
+  // That's why we have to detect those events ourselves
+  private recurrenceMap: Map<string, EventImpl> = new Map();
 
   attributeChangedCallback(name: string, _oldValue?: string, newValue?: string) {
     if (name === "locale") {
@@ -90,11 +95,13 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         .split("/")
         .filter((s) => s) // Remove blank characters
         .pop(),
+      10,
     );
   }
 
   refreshEvents() {
     this.click(); // Remove focus from popup
+    this.recurrenceMap.clear(); // Avoid double detection of the same non recurring event
     this.calendar.refetchEvents();
   }
 
@@ -153,12 +160,24 @@ export class IcsCalendar extends inheritHtmlElement("div") {
   }
 
   async getEventSources() {
+    const tagRecurringEvents = (eventData: EventImpl) => {
+      // This functions tags events with a similar event url
+      // We rely on the fact that the event url is always the same
+      // for recurring events and always different for single events
+      const firstEvent = this.recurrenceMap.get(eventData.url);
+      if (firstEvent !== undefined) {
+        eventData.extendedProps.isRecurring = true;
+        firstEvent.extendedProps.isRecurring = true; // Don't forget the first event
+      }
+      this.recurrenceMap.set(eventData.url, eventData);
+    };
     return [
       {
         url: `${await makeUrl(calendarCalendarInternal)}`,
         format: "ics",
         className: "internal",
         cache: false,
+        eventDataTransform: tagRecurringEvents,
       },
       {
         url: `${await makeUrl(calendarCalendarUnpublished)}`,
@@ -166,6 +185,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         color: "red",
         className: "unpublished",
         cache: false,
+        eventDataTransform: tagRecurringEvents,
       },
     ];
   }
@@ -360,6 +380,14 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         // Don't auto-follow events URLs
         event.jsEvent.preventDefault();
         this.createEventDetailPopup(event);
+      },
+      eventClassNames: (classNamesEvent: EventContentArg) => {
+        const classes: string[] = [];
+        if (classNamesEvent.event.extendedProps?.isRecurring) {
+          classes.push("recurring");
+        }
+
+        return classes;
       },
     });
     this.calendar.render();

@@ -1,21 +1,21 @@
-import type { UserAjaxSelect } from "#core:core/components/ajax-select-index";
-import { paginated } from "#core:utils/api";
-import { exportToHtml } from "#core:utils/globals";
-import { History } from "#core:utils/history";
 import type TomSelect from "tom-select";
+import type { UserAjaxSelect } from "#core:core/components/ajax-select-index.ts";
+import { paginated } from "#core:utils/api.ts";
+import { exportToHtml } from "#core:utils/globals.ts";
+import { History } from "#core:utils/history.ts";
 import {
   type IdentifiedUserSchema,
   type ModerationRequestSchema,
   type PictureSchema,
   type PicturesFetchIdentificationsResponse,
   type PicturesFetchPicturesData,
-  type UserProfileSchema,
   picturesDeletePicture,
   picturesFetchIdentifications,
   picturesFetchModerationRequests,
   picturesFetchPictures,
   picturesIdentifyUsers,
   picturesModeratePicture,
+  type UserProfileSchema,
   usersidentifiedDeleteRelation,
 } from "#openapi";
 
@@ -208,7 +208,8 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
           }
           this.pushstate = History.Replace;
           this.currentPicture = this.pictures.find(
-            (i: PictureSchema) => i.id === Number.parseInt(event.state.sasPictureId),
+            (i: PictureSchema) =>
+              i.id === Number.parseInt(event.state.sasPictureId, 10),
           );
         });
         this.pushstate = History.Replace; /* Avoid first url push */
@@ -301,7 +302,7 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
             // biome-ignore lint/style/useNamingConvention: api is in snake_case
             picture_id: this.currentPicture.id,
           },
-          body: widget.items.map((i: string) => Number.parseInt(i)),
+          body: widget.items.map((i: string) => Number.parseInt(i, 10)),
         });
         // refresh the identified users list
         await this.currentPicture.loadIdentifications({ forceReload: true });

@@ -177,7 +177,6 @@ TEMPLATES = [
             "filters": {
                 "markdown": "core.templatetags.renderer.markdown",
                 "phonenumber": "core.templatetags.renderer.phonenumber",
-                "truncate_time": "core.templatetags.renderer.truncate_time",
                 "format_timedelta": "core.templatetags.renderer.format_timedelta",
                 "add_attr": "core.templatetags.renderer.add_attr",
             },
@@ -216,7 +215,7 @@ TEMPLATES = [
         },
     },
 ]
-FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"
+
 
 HAYSTACK_CONNECTIONS = {
     "default": {
@@ -440,20 +439,7 @@ SITH_SUBSCRIPTION_LOCATIONS = [
 
 SITH_COUNTER_BARS = [(1, "MDE"), (2, "Foyer"), (35, "La Gommette")]
 
-SITH_COUNTER_BANK = [
-    ("OTHER", "Autre"),
-    ("SOCIETE-GENERALE", "Société générale"),
-    ("BANQUE-POPULAIRE", "Banque populaire"),
-    ("BNP", "BNP"),
-    ("CAISSE-EPARGNE", "Caisse d'épargne"),
-    ("CIC", "CIC"),
-    ("CREDIT-AGRICOLE", "Crédit Agricole"),
-    ("CREDIT-MUTUEL", "Credit Mutuel"),
-    ("CREDIT-LYONNAIS", "Credit Lyonnais"),
-    ("LA-POSTE", "La Poste"),
-]
-
-SITH_PEDAGOGY_UV_TYPE = [
+SITH_PEDAGOGY_UE_TYPE = [
     ("FREE", _("Free")),
     ("CS", _("CS")),
     ("TM", _("TM")),
@@ -465,21 +451,21 @@ SITH_PEDAGOGY_UV_TYPE = [
     ("EXT", _("EXT")),
 ]
 
-SITH_PEDAGOGY_UV_SEMESTER = [
+SITH_PEDAGOGY_UE_SEMESTER = [
     ("CLOSED", _("Closed")),
     ("AUTUMN", _("Autumn")),
     ("SPRING", _("Spring")),
     ("AUTUMN_AND_SPRING", _("Autumn and spring")),
 ]
 
-SITH_PEDAGOGY_UV_LANGUAGE = [
+SITH_PEDAGOGY_UE_LANGUAGE = [
     ("FR", _("French")),
     ("EN", _("English")),
     ("DE", _("German")),
     ("SP", _("Spanish")),
 ]
 
-SITH_PEDAGOGY_UV_RESULT_GRADE = [
+SITH_PEDAGOGY_UE_RESULT_GRADE = [
     ("A", _("A")),
     ("B", _("B")),
     ("C", _("C")),

@@ -1,4 +1,4 @@
-import { exportToHtml } from "#core:utils/globals";
+import { exportToHtml } from "#core:utils/globals.ts";
 import { newsDeleteNews, newsFetchNewsDates, newsPublishNews } from "#openapi";
 
 // This will be used in jinja templates,

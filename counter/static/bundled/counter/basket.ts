@@ -1,4 +1,4 @@
-import type { Product } from "#counter:counter/types";
+import type { Product } from "#counter:counter/types.ts";
 
 export class BasketItem {
   quantity: number;

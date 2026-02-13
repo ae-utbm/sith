@@ -1,3 +1,4 @@
+import itertools
 from datetime import timedelta
 from unittest import mock
 
@@ -23,7 +24,7 @@ from core.baker_recipes import (
 from core.models import AnonymousUser, Group, User
 from core.views import UserTabsMixin
 from counter.baker_recipes import sale_recipe
-from counter.models import Counter, Customer, Refilling, Selling
+from counter.models import Counter, Customer, Permanency, Refilling, Selling
 from counter.utils import is_logged_in_counter
 from eboutic.models import Invoice, InvoiceItem
 
@@ -187,11 +188,7 @@ class TestFilterInactive(TestCase):
         time_inactive = time_active - timedelta(days=3)
         counter, seller = baker.make(Counter), baker.make(User)
         sale_recipe = Recipe(
-            Selling,
-            counter=counter,
-            club=counter.club,
-            seller=seller,
-            is_validated=True,
+            Selling, counter=counter, club=counter.club, seller=seller, unit_price=0
         )
 
         cls.users = [
@@ -421,10 +418,111 @@ class TestUserQuerySetViewableBy:
         viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
         assert set(viewable) == {users[0], users[1]}
 
-    @pytest.mark.parametrize(
-        "user_factory", [lambda: baker.make(User), lambda: AnonymousUser()]
-    )
+    @pytest.mark.parametrize("user_factory", [lambda: baker.make(User), AnonymousUser])
     def test_not_subscriber(self, users: list[User], user_factory):
         user = user_factory()
         viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
         assert not viewable.exists()
+
+
+@pytest.mark.django_db
+def test_user_preferences(client: Client):
+    user = subscriber_user.make()
+    client.force_login(user)
+    url = reverse("core:user_prefs", kwargs={"user_id": user.id})
+    response = client.get(url)
+    assert response.status_code == 200
+    response = client.post(url, {"notify_on_click": "true"})
+    assertRedirects(response, url)
+    user.preferences.refresh_from_db()
+    assert user.preferences.notify_on_click is True
+
+
+@pytest.mark.django_db
+def test_user_stats(client: Client):
+    user = subscriber_user.make()
+    baker.make(Refilling, customer=user.customer, amount=99999)
+    bars = [b[0] for b in settings.SITH_COUNTER_BARS]
+    baker.make(
+        Permanency,
+        end=now() - timedelta(days=5),
+        start=now() - timedelta(days=5, hours=3),
+        counter_id=itertools.cycle(bars),
+        _quantity=5,
+        _bulk_create=True,
+    )
+    sale_recipe.make(
+        counter_id=itertools.cycle(bars),
+        customer=user.customer,
+        unit_price=1,
+        quantity=1,
+        _quantity=5,
+    )
+    client.force_login(user)
+    response = client.get(reverse("core:user_stats", kwargs={"user_id": user.id}))
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+class TestChangeUserPassword:
+    def test_as_root(self, client: Client, admin_user: User):
+        client.force_login(admin_user)
+        user = subscriber_user.make()
+        url = reverse("core:password_root_change", kwargs={"user_id": user.id})
+        response = client.get(url)
+        assert response.status_code == 200
+        response = client.post(
+            url, {"new_password1": "poutou", "new_password2": "poutou"}
+        )
+        assertRedirects(response, reverse("core:password_change_done"))
+        user.refresh_from_db()
+        assert user.check_password("poutou") is True
+
+
+@pytest.mark.django_db
+class TestUserGodfather:
+    @pytest.mark.parametrize("godfather", [True, False])
+    def test_add_family(self, client: Client, godfather):
+        user = subscriber_user.make()
+        other_user = subscriber_user.make()
+        client.force_login(user)
+        url = reverse("core:user_godfathers", kwargs={"user_id": user.id})
+        response = client.get(url)
+        assert response.status_code == 200
+        response = client.post(
+            url,
+            {"type": "godfather" if godfather else "godchild", "user": other_user.id},
+        )
+        assertRedirects(response, url)
+        if godfather:
+            assert user.godfathers.contains(other_user)
+        else:
+            assert user.godchildren.contains(other_user)
+
+    def test_tree(self, client: Client):
+        user = subscriber_user.make()
+        client.force_login(user)
+        response = client.get(
+            reverse("core:user_godfathers_tree", kwargs={"user_id": user.id})
+        )
+        assert response.status_code == 200
+
+    def test_remove_family(self, client: Client):
+        user = subscriber_user.make()
+        other_user = subscriber_user.make()
+        user.godfathers.add(other_user)
+        client.force_login(user)
+        response = client.post(
+            reverse(
+                "core:user_godfathers_delete",
+                kwargs={
+                    "user_id": user.id,
+                    "godfather_id": other_user.id,
+                    "is_father": True,
+                },
+            )
+        )
+        assertRedirects(
+            response, reverse("core:user_godfathers", kwargs={"user_id": user.id})
+        )
+        assert not user.godfathers.contains(other_user)

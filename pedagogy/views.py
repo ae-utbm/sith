@@ -38,39 +38,39 @@ from core.auth.mixins import PermissionOrAuthorRequiredMixin
 from core.models import Notification, User
 from core.views import DetailFormView
 from pedagogy.forms import (
-    UVCommentForm,
-    UVCommentModerationForm,
-    UVCommentReportForm,
-    UVForm,
+    UECommentForm,
+    UECommentModerationForm,
+    UECommentReportForm,
+    UEForm,
 )
-from pedagogy.models import UV, UVComment, UVCommentReport
+from pedagogy.models import UE, UEComment, UECommentReport
 
 
-class UVDetailFormView(PermissionRequiredMixin, DetailFormView):
-    """Display every comment of an UV and detailed infos about it.
+class UEDetailFormView(PermissionRequiredMixin, DetailFormView):
+    """Display every comment of an UE and detailed infos about it.
 
-    Allow to comment the UV.
+    Allow to comment the UE.
     """
 
-    model = UV
-    pk_url_kwarg = "uv_id"
-    template_name = "pedagogy/uv_detail.jinja"
-    form_class = UVCommentForm
-    permission_required = "pedagogy.view_uv"
+    model = UE
+    pk_url_kwarg = "ue_id"
+    template_name = "pedagogy/ue_detail.jinja"
+    form_class = UECommentForm
+    permission_required = "pedagogy.view_ue"
 
     def has_permission(self):
         if self.request.method == "POST" and not self.request.user.has_perm(
-            "pedagogy.add_uvcomment"
+            "pedagogy.add_uecomment"
         ):
-            # if it's a POST request, the user is trying to add a new UVComment
-            # thus he also needs the "add_uvcomment" permission
+            # if it's a POST request, the user is trying to add a new UEComment
+            # thus he also needs the "add_uecomment" permission
             return False
         return super().has_permission()
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["author_id"] = self.request.user.id
-        kwargs["uv_id"] = self.object.id
+        kwargs["ue_id"] = self.object.id
         kwargs["is_creation"] = True
         return kwargs
 
@@ -89,68 +89,68 @@ class UVDetailFormView(PermissionRequiredMixin, DetailFormView):
         }
 
     def get_success_url(self):
-        # once the new uv comment has been saved
+        # once the new ue comment has been saved
         # redirect to the same page we are currently
         return self.request.path
 
 
-class UVCommentUpdateView(PermissionOrAuthorRequiredMixin, UpdateView):
+class UECommentUpdateView(PermissionOrAuthorRequiredMixin, UpdateView):
     """Allow edit of a given comment."""
 
-    model = UVComment
-    form_class = UVCommentForm
+    model = UEComment
+    form_class = UECommentForm
     pk_url_kwarg = "comment_id"
     template_name = "core/edit.jinja"
-    permission_required = "pedagogy.change_uvcomment"
+    permission_required = "pedagogy.change_uecomment"
     author_field = "author"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["author_id"] = self.object.author_id
-        kwargs["uv_id"] = self.object.uv_id
+        kwargs["ue_id"] = self.object.ue_id
         kwargs["is_creation"] = False
         return kwargs
 
     def get_success_url(self):
-        return reverse("pedagogy:uv_detail", kwargs={"uv_id": self.object.uv_id})
+        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.object.ue_id})
 
 
-class UVCommentDeleteView(PermissionOrAuthorRequiredMixin, DeleteView):
-    """Allow delete of a given comment."""
+class UECommentDeleteView(PermissionOrAuthorRequiredMixin, DeleteView):
+    """Allow to delete a given comment."""
 
-    model = UVComment
+    model = UEComment
     pk_url_kwarg = "comment_id"
     template_name = "core/delete_confirm.jinja"
-    permission_required = "pedagogy.delete_uvcomment"
+    permission_required = "pedagogy.delete_uecomment"
     author_field = "author"
 
     def get_success_url(self):
-        return reverse("pedagogy:uv_detail", kwargs={"uv_id": self.object.uv_id})
+        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.object.ue_id})
 
 
-class UVGuideView(PermissionRequiredMixin, TemplateView):
-    """UV guide main page."""
+class UEGuideView(PermissionRequiredMixin, TemplateView):
+    """UE guide main page."""
 
     template_name = "pedagogy/guide.jinja"
-    permission_required = "pedagogy.view_uv"
+    permission_required = "pedagogy.view_ue"
 
 
-class UVCommentReportCreateView(PermissionRequiredMixin, CreateView):
-    """Create a new report for an inapropriate comment."""
+class UECommentReportCreateView(PermissionRequiredMixin, CreateView):
+    """Create a new report for an inappropriate comment."""
 
-    model = UVCommentReport
-    form_class = UVCommentReportForm
+    model = UECommentReport
+    form_class = UECommentReportForm
     template_name = "core/edit.jinja"
-    permission_required = "pedagogy.add_uvcommentreport"
+    permission_required = "pedagogy.add_uecommentreport"
 
     def dispatch(self, request, *args, **kwargs):
-        self.uv_comment = get_object_or_404(UVComment, pk=kwargs["comment_id"])
+        self.ue_comment = get_object_or_404(UEComment, pk=kwargs["comment_id"])
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["reporter_id"] = self.request.user.id
-        kwargs["comment_id"] = self.uv_comment.id
+        kwargs["comment_id"] = self.ue_comment.id
         return kwargs
 
     def form_valid(self, form):
@@ -172,35 +172,35 @@ class UVCommentReportCreateView(PermissionRequiredMixin, CreateView):
         return resp
 
     def get_success_url(self):
-        return reverse("pedagogy:uv_detail", kwargs={"uv_id": self.uv_comment.uv_id})
+        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.ue_comment.ue_id})
 
 
-class UVModerationFormView(PermissionRequiredMixin, FormView):
+class UEModerationFormView(PermissionRequiredMixin, FormView):
     """Moderation interface (Privileged)."""
 
-    form_class = UVCommentModerationForm
+    form_class = UECommentModerationForm
     template_name = "pedagogy/moderation.jinja"
-    permission_required = "pedagogy.delete_uvcomment"
+    permission_required = "pedagogy.delete_uecomment"
     success_url = reverse_lazy("pedagogy:moderation")
 
     def form_valid(self, form):
         form_clean = form.clean()
         accepted = form_clean.get("accepted_reports", [])
         if len(accepted) > 0:  # delete the reported comments
-            UVComment.objects.filter(reports__in=accepted).delete()
+            UEComment.objects.filter(reports__in=accepted).delete()
         denied = form_clean.get("denied_reports", [])
         if len(denied) > 0:  # delete the comments themselves
-            UVCommentReport.objects.filter(id__in={d.id for d in denied}).delete()
+            UECommentReport.objects.filter(id__in={d.id for d in denied}).delete()
         return super().form_valid(form)
 
 
-class UVCreateView(PermissionRequiredMixin, CreateView):
-    """Add a new UV (Privileged)."""
+class UECreateView(PermissionRequiredMixin, CreateView):
+    """Add a new UE (Privileged)."""
 
-    model = UV
-    form_class = UVForm
-    template_name = "pedagogy/uv_edit.jinja"
-    permission_required = "pedagogy.add_uv"
+    model = UE
+    form_class = UEForm
+    template_name = "pedagogy/ue_edit.jinja"
+    permission_required = "pedagogy.add_ue"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -208,24 +208,24 @@ class UVCreateView(PermissionRequiredMixin, CreateView):
         return kwargs
 
 
-class UVDeleteView(PermissionRequiredMixin, DeleteView):
-    """Allow to delete an UV (Privileged)."""
+class UEDeleteView(PermissionRequiredMixin, DeleteView):
+    """Allow to delete an UE (Privileged)."""
 
-    model = UV
-    pk_url_kwarg = "uv_id"
+    model = UE
+    pk_url_kwarg = "ue_id"
     template_name = "core/delete_confirm.jinja"
-    permission_required = "pedagogy.delete_uv"
+    permission_required = "pedagogy.delete_ue"
     success_url = reverse_lazy("pedagogy:guide")
 
 
-class UVUpdateView(PermissionRequiredMixin, UpdateView):
-    """Allow to edit an UV (Privilegied)."""
+class UEUpdateView(PermissionRequiredMixin, UpdateView):
+    """Allow to edit an UE (Privilegied)."""
 
-    model = UV
-    form_class = UVForm
-    pk_url_kwarg = "uv_id"
-    template_name = "pedagogy/uv_edit.jinja"
-    permission_required = "pedagogy.change_uv"
+    model = UE
+    form_class = UEForm
+    pk_url_kwarg = "ue_id"
+    template_name = "pedagogy/ue_edit.jinja"
+    permission_required = "pedagogy.change_ue"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

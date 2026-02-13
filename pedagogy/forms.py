@@ -26,14 +26,14 @@ from django.utils.translation import gettext_lazy as _
 
 from core.models import User
 from core.views.widgets.markdown import MarkdownInput
-from pedagogy.models import UV, UVComment, UVCommentReport
+from pedagogy.models import UE, UEComment, UECommentReport
 
 
-class UVForm(forms.ModelForm):
-    """Form handeling creation and edit of an UV."""
+class UEForm(forms.ModelForm):
+    """Form handeling creation and edit of an UE."""
 
     class Meta:
-        model = UV
+        model = UE
         fields = (
             "code",
             "author",
@@ -82,14 +82,14 @@ class StarList(forms.NumberInput):
         return context
 
 
-class UVCommentForm(forms.ModelForm):
-    """Form handeling creation and edit of an UVComment."""
+class UECommentForm(forms.ModelForm):
+    """Form handeling creation and edit of an UEComment."""
 
     class Meta:
-        model = UVComment
+        model = UEComment
         fields = (
             "author",
-            "uv",
+            "ue",
             "grade_global",
             "grade_utility",
             "grade_interest",
@@ -100,7 +100,7 @@ class UVCommentForm(forms.ModelForm):
         widgets = {
             "comment": MarkdownInput,
             "author": forms.HiddenInput,
-            "uv": forms.HiddenInput,
+            "ue": forms.HiddenInput,
             "grade_global": StarList(5),
             "grade_utility": StarList(5),
             "grade_interest": StarList(5),
@@ -108,35 +108,35 @@ class UVCommentForm(forms.ModelForm):
             "grade_work_load": StarList(5),
         }
 
-    def __init__(self, author_id, uv_id, is_creation, *args, **kwargs):
+    def __init__(self, author_id, ue_id, is_creation, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["author"].queryset = User.objects.filter(id=author_id).all()
         self.fields["author"].initial = author_id
-        self.fields["uv"].queryset = UV.objects.filter(id=uv_id).all()
-        self.fields["uv"].initial = uv_id
+        self.fields["ue"].queryset = UE.objects.filter(id=ue_id).all()
+        self.fields["ue"].initial = ue_id
         self.is_creation = is_creation
 
     def clean(self):
         self.cleaned_data = super().clean()
-        uv = self.cleaned_data.get("uv")
+        ue = self.cleaned_data.get("ue")
         author = self.cleaned_data.get("author")
 
-        if self.is_creation and uv and author and uv.has_user_already_commented(author):
+        if self.is_creation and ue and author and ue.has_user_already_commented(author):
             self.add_error(
                 None,
                 forms.ValidationError(
-                    _("This user has already commented on this UV"), code="invalid"
+                    _("This user has already commented on this UE"), code="invalid"
                 ),
             )
 
         return self.cleaned_data
 
 
-class UVCommentReportForm(forms.ModelForm):
-    """Form handeling creation and edit of an UVReport."""
+class UECommentReportForm(forms.ModelForm):
+    """Form handeling creation and edit of an UEReport."""
 
     class Meta:
-        model = UVCommentReport
+        model = UECommentReport
         fields = ("comment", "reporter", "reason")
         widgets = {
             "comment": forms.HiddenInput,
@@ -148,22 +148,22 @@ class UVCommentReportForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["reporter"].queryset = User.objects.filter(id=reporter_id).all()
         self.fields["reporter"].initial = reporter_id
-        self.fields["comment"].queryset = UVComment.objects.filter(id=comment_id).all()
+        self.fields["comment"].queryset = UEComment.objects.filter(id=comment_id).all()
         self.fields["comment"].initial = comment_id
 
 
-class UVCommentModerationForm(forms.Form):
+class UECommentModerationForm(forms.Form):
     """Form handeling bulk comment deletion."""
 
     accepted_reports = forms.ModelMultipleChoiceField(
-        UVCommentReport.objects.all(),
+        UECommentReport.objects.all(),
         label=_("Accepted reports"),
         widget=forms.CheckboxSelectMultiple,
         required=False,
     )
 
     denied_reports = forms.ModelMultipleChoiceField(
-        UVCommentReport.objects.all(),
+        UECommentReport.objects.all(),
         label=_("Denied reports"),
         widget=forms.CheckboxSelectMultiple,
         required=False,

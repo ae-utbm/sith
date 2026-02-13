@@ -1,5 +1,5 @@
+import { client, type Options } from "#openapi";
 import type { Client, RequestResult, TDataShape } from "#openapi:client";
-import { type Options, client } from "#openapi";
 
 export interface PaginatedResponse<T> {
   count: number;

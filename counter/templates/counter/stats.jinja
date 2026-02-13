@@ -51,7 +51,7 @@
           <td>{{ loop.index }}</td>
           <td>{{ barman.name }} {% if barman.nickname %}({{ barman.nickname }}){% endif %}</td>
           <td>{{ barman.promo or '' }}</td>
-          <td>{{ barman.perm_sum|format_timedelta|truncate_time("millis") }}</td>
+          <td>{{ barman.perm_sum|format_timedelta }}</td>
         </tr>
       {% endfor %}
     </tbody>
@@ -73,7 +73,7 @@
           <td>{{ loop.index }}</td>
           <td>{{ barman.name }} {% if barman.nickname %}({{ barman.nickname }}){% endif %}</td>
           <td>{{ barman.promo or '' }}</td>
-          <td>{{ barman.perm_sum|format_timedelta|truncate_time("millis") }}</td>
+          <td>{{ barman.perm_sum|format_timedelta }}</td>
         </tr>
       {% endfor %}
     </tbody>

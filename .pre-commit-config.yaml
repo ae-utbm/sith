@@ -1,7 +1,7 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.14.4
+    rev: v0.15.0
     hooks:
       - id: ruff-check  # just check the code, and print the errors
       - id: ruff-check  # actually fix the fixable errors, but print nothing
@@ -12,7 +12,7 @@ repos:
     rev: v0.6.1
     hooks:
       - id: biome-check
-        additional_dependencies: ["@biomejs/biome@1.9.4"]
+        additional_dependencies: ["@biomejs/biome@2.3.14"]
   - repo: https://github.com/rtts/djhtml
     rev: 3.0.10
     hooks:

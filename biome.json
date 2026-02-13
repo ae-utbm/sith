@@ -7,20 +7,34 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["*.min.*", "staticfiles/generated"]
+    "includes": ["**/static/**"]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "lineWidth": 88
   },
-  "organizeImports": {
-    "enabled": true
-  },
   "linter": {
     "enabled": true,
     "rules": {
-      "all": true
+      "recommended": true,
+      "style": {
+        "useNamingConvention": "error"
+      },
+      "performance": {
+        "noNamespaceImport": "error"
+      },
+      "suspicious": {
+        "noConsole": {
+          "level": "error",
+          "options": { "allow": ["error", "warn"] }
+        }
+      },
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUndeclaredVariables": "error",
+        "noUndeclaredDependencies": "error"
+      }
     }
   },
   "javascript": {

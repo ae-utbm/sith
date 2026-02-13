@@ -195,18 +195,18 @@
           }
         }
       }
+    }
 
-      &.delete {
-        margin-top: 10px;
-        display: block;
-        text-align: center;
-        color: orangered;
+    form .link-like {
+      margin-top: 10px;
+      display: block;
+      text-align: center;
+      color: orangered;
 
-        @media (max-width: 375px) {
-          position: absolute;
-          bottom: 0;
-          right: 0;
-        }
+      @media (max-width: 375px) {
+        position: absolute;
+        bottom: 0;
+        right: 0;
       }
     }
   }

@@ -22,27 +22,28 @@
 #
 #
 import itertools
+from datetime import timedelta
 
 # This file contains all the views that concern the user model
-from datetime import date, timedelta
 from operator import itemgetter
 from smtplib import SMTPException
 
 from django.contrib.auth import login, views
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.db.models import DateField, QuerySet
+from django.db.models import DateField, F, QuerySet, Sum
 from django.db.models.functions import Trunc
 from django.forms.models import modelform_factory
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
-from django.template.response import TemplateResponse
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.safestring import SafeString
 from django.utils.translation import gettext as _
+from django.views.decorators.http import require_POST
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -66,9 +67,8 @@ from core.views.forms import (
     UserProfileForm,
 )
 from core.views.mixins import TabedViewMixin, UseFragmentsMixin
-from counter.models import Counter, Refilling, Selling
+from counter.models import Refilling, Selling
 from eboutic.models import Invoice
-from subscription.models import Subscription
 from trombi.views import UserTrombiForm
 
 
@@ -99,21 +99,23 @@ def logout(request):
     return views.logout_then_login(request)
 
 
-def password_root_change(request, user_id):
+class PasswordRootChangeView(UserPassesTestMixin, FormView):
     """Allows a root user to change someone's password."""
-    if not request.user.is_root:
-        raise PermissionDenied
-    user = get_object_or_404(User, id=user_id)
-    if request.method == "POST":
-        form = views.SetPasswordForm(user=user, data=request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("core:password_change_done")
-    else:
-        form = views.SetPasswordForm(user=user)
-    return TemplateResponse(
-        request, "core/password_change.jinja", {"form": form, "target": user}
-    )
+
+    template_name = "core/password_change.jinja"
+    form_class = SetPasswordForm
+    success_url = reverse_lazy("core:password_change_done")
+
+    def test_func(self):
+        return self.request.user.is_root
+
+    def get_form_kwargs(self):
+        user = get_object_or_404(User, id=self.kwargs["user_id"])
+        return super().get_form_kwargs() | {"user": user}
+
+    def form_valid(self, form: SetPasswordForm):
+        form.save()
+        return super().form_valid(form)
 
 
 @method_decorator(check_honeypot, name="post")
@@ -288,10 +290,12 @@ class UserView(UserTabsMixin, CanViewMixin, DetailView):
         return kwargs
 
 
+@require_POST
+@login_required
 def delete_user_godfather(request, user_id, godfather_id, is_father):
     user_is_admin = request.user.is_root or request.user.is_board_member
     if user_id != request.user.id and not user_is_admin:
-        raise PermissionDenied()
+        raise PermissionDenied
     user = get_object_or_404(User, id=user_id)
     to_remove = get_object_or_404(User, id=godfather_id)
     if is_father:
@@ -353,87 +357,40 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_stats.jinja"
     current_tab = "stats"
+    queryset = User.objects.exclude(customer=None).select_related("customer")
 
     def dispatch(self, request, *arg, **kwargs):
         profile = self.get_object()
-
-        if not hasattr(profile, "customer"):
-            raise Http404
-
         if not (
             profile == request.user or request.user.has_perm("counter.view_customer")
         ):
             raise PermissionDenied
-
         return super().dispatch(request, *arg, **kwargs)
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        from django.db.models import Sum
 
-        foyer = Counter.objects.filter(name="Foyer").first()
-        mde = Counter.objects.filter(name="MDE").first()
-        gommette = Counter.objects.filter(name="La Gommette").first()
-        semester_start = Subscription.compute_start(d=date.today(), duration=3)
+        kwargs["perm_time"] = list(
+            self.object.permanencies.filter(end__isnull=False, counter__type="BAR")
+            .values("counter", "counter__name")
+            .annotate(total=Sum(F("end") - F("start"), default=timedelta(seconds=0)))
+            .order_by("-total")
+        )
         kwargs["total_perm_time"] = sum(
-            [p.end - p.start for p in self.object.permanencies.exclude(end=None)],
-            timedelta(),
+            [perm["total"] for perm in kwargs["perm_time"]], start=timedelta(seconds=0)
         )
-        kwargs["total_foyer_time"] = sum(
-            [
-                p.end - p.start
-                for p in self.object.permanencies.filter(counter=foyer).exclude(
-                    end=None
-                )
-            ],
-            timedelta(),
+        kwargs["purchase_sums"] = list(
+            self.object.customer.buyings.filter(counter__type="BAR")
+            .values("counter", "counter__name")
+            .annotate(total=Sum(F("unit_price") * F("quantity")))
+            .order_by("-total")
         )
-        kwargs["total_mde_time"] = sum(
-            [
-                p.end - p.start
-                for p in self.object.permanencies.filter(counter=mde).exclude(end=None)
-            ],
-            timedelta(),
-        )
-        kwargs["total_gommette_time"] = sum(
-            [
-                p.end - p.start
-                for p in self.object.permanencies.filter(counter=gommette).exclude(
-                    end=None
-                )
-            ],
-            timedelta(),
-        )
-        kwargs["total_foyer_buyings"] = sum(
-            [
-                b.unit_price * b.quantity
-                for b in self.object.customer.buyings.filter(
-                    counter=foyer, date__gte=semester_start
-                )
-            ]
-        )
-        kwargs["total_mde_buyings"] = sum(
-            [
-                b.unit_price * b.quantity
-                for b in self.object.customer.buyings.filter(
-                    counter=mde, date__gte=semester_start
-                )
-            ]
-        )
-        kwargs["total_gommette_buyings"] = sum(
-            [
-                b.unit_price * b.quantity
-                for b in self.object.customer.buyings.filter(
-                    counter=gommette, date__gte=semester_start
-                )
-            ]
-        )
+        kwargs["total_purchases"] = sum(s["total"] for s in kwargs["purchase_sums"])
         kwargs["top_product"] = (
             self.object.customer.buyings.values("product__name")
             .annotate(product_sum=Sum("quantity"))
-            .exclude(product_sum=None)
             .order_by("-product_sum")
-            .all()[:10]
+            .all()[:15]
         )
         return kwargs
 
@@ -465,7 +422,6 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
     form_class = UserProfileForm
     current_tab = "edit"
     edit_once = ["profile_pict", "date_of_birth", "first_name", "last_name"]
-    board_only = []
 
     def remove_restricted_fields(self, request):
         """Removes edit_once and board_only fields."""
@@ -473,9 +429,6 @@ class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
             if getattr(self.form.instance, i) and not (
                 request.user.is_board_member or request.user.is_root
             ):
-                self.form.fields.pop(i, None)
-        for i in self.board_only:
-            if not (request.user.is_board_member or request.user.is_root):
                 self.form.fields.pop(i, None)
 
     def get(self, request, *args, **kwargs):
@@ -528,10 +481,10 @@ class UserPreferencesView(UserTabsMixin, UseFragmentsMixin, CanEditMixin, Update
     current_tab = "prefs"
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        pref = self.object.preferences
-        kwargs.update({"instance": pref})
-        return kwargs
+        return super().get_form_kwargs() | {"instance": self.object.preferences}
+
+    def get_success_url(self):
+        return self.request.path
 
     def get_fragment_context_data(self) -> dict[str, SafeString]:
         # Avoid cyclic import error

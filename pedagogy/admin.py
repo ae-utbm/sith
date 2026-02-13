@@ -23,35 +23,35 @@
 from django.contrib import admin
 from haystack.admin import SearchModelAdmin
 
-from pedagogy.models import UV, UVComment, UVCommentReport
+from pedagogy.models import UE, UEComment, UECommentReport
 
 
-@admin.register(UV)
-class UVAdmin(admin.ModelAdmin):
+@admin.register(UE)
+class UEAdmin(admin.ModelAdmin):
     list_display = ("code", "title", "credit_type", "credits", "department")
     search_fields = ("code", "title", "department")
     autocomplete_fields = ("author",)
 
 
-@admin.register(UVComment)
-class UVCommentAdmin(admin.ModelAdmin):
-    list_display = ("author", "uv", "grade_global", "publish_date")
+@admin.register(UEComment)
+class UECommentAdmin(admin.ModelAdmin):
+    list_display = ("author", "ue", "grade_global", "publish_date")
     search_fields = (
         "author__username",
         "author__first_name",
         "author__last_name",
-        "uv__code",
+        "ue__code",
     )
     autocomplete_fields = ("author",)
 
 
-@admin.register(UVCommentReport)
-class UVCommentReportAdmin(SearchModelAdmin):
-    list_display = ("reporter", "uv")
+@admin.register(UECommentReport)
+class UECommentReportAdmin(SearchModelAdmin):
+    list_display = ("reporter", "ue")
     search_fields = (
         "reporter__username",
         "reporter__first_name",
         "reporter__last_name",
-        "comment__uv__code",
+        "comment__ue__code",
     )
     autocomplete_fields = ("reporter",)

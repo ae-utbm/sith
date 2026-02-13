@@ -1,7 +1,7 @@
-import { AjaxSelect } from "#core:core/components/ajax-select-base";
-import { registerComponent } from "#core:utils/web-components";
 import type { TomOption } from "tom-select/dist/types/types";
 import type { escape_html } from "tom-select/dist/types/utils";
+import { AjaxSelect } from "#core:core/components/ajax-select-base.ts";
+import { registerComponent } from "#core:utils/web-components.ts";
 import { type AlbumAutocompleteSchema, albumAutocompleteAlbum } from "#openapi";
 
 @registerComponent("album-ajax-select")

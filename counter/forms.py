@@ -1,7 +1,7 @@
 import json
 import math
 import uuid
-from datetime import date
+from datetime import date, datetime, timezone
 
 from dateutil.relativedelta import relativedelta
 from django import forms
@@ -136,7 +136,10 @@ class GetUserForm(forms.Form):
 
 
 class RefillForm(forms.ModelForm):
-    allowed_refilling_methods = ["CASH", "CARD"]
+    allowed_refilling_methods = [
+        Refilling.PaymentMethod.CASH,
+        Refilling.PaymentMethod.CARD,
+    ]
 
     error_css_class = "error"
     required_css_class = "required"
@@ -146,7 +149,7 @@ class RefillForm(forms.ModelForm):
 
     class Meta:
         model = Refilling
-        fields = ["amount", "payment_method", "bank"]
+        fields = ["amount", "payment_method"]
         widgets = {"payment_method": forms.RadioSelect}
 
     def __init__(self, *args, **kwargs):
@@ -159,9 +162,6 @@ class RefillForm(forms.ModelForm):
         )
         if self.fields["payment_method"].initial not in self.allowed_refilling_methods:
             self.fields["payment_method"].initial = self.allowed_refilling_methods[0]
-
-        if "CHECK" not in self.allowed_refilling_methods:
-            del self.fields["bank"]
 
 
 class CounterEditForm(forms.ModelForm):
@@ -234,6 +234,19 @@ class ScheduledProductActionForm(forms.ModelForm):
             f"{self.cleaned_data['task']} - {self.product} - {uuid.uuid4()}"
         )
         return super().clean()
+
+    def set_product(self, product: Product):
+        """Set the product to which this form's instance is linked.
+
+        When this form is linked to a ProductForm in the case of a product's creation,
+        the product doesn't exist yet, so saving this form as is will result
+        in having `{"product_id": null}` in the action kwargs.
+        For the creation to be useful, it may be needed to inject the newly created
+        product into this form, before saving the latter.
+        """
+        self.product = product
+        kwargs = json.loads(self.instance.kwargs) | {"product_id": self.product.id}
+        self.instance.kwargs = json.dumps(kwargs)
 
 
 class BaseScheduledProductActionFormSet(BaseModelFormSet):
@@ -321,11 +334,19 @@ class ProductForm(forms.ModelForm):
     def is_valid(self):
         return super().is_valid() and self.action_formset.is_valid()
 
-    def save(self, *args, **kwargs):
-        ret = super().save(*args, **kwargs)
-        self.instance.counters.set(self.cleaned_data["counters"])
+    def save(self, *args, **kwargs) -> Product:
+        product = super().save(*args, **kwargs)
+        product.counters.set(self.cleaned_data["counters"])
+        for form in self.action_formset:
+            # if it's a creation, the product given in the formset
+            # wasn't a persisted instance.
+            # So if we tried to persist the scheduled actions in the current state,
+            # they would be linked to no product, thus be completely useless
+            # To make it work, we have to replace
+            # the initial product with a persisted one
+            form.set_product(product)
         self.action_formset.save()
-        return ret
+        return product
 
 
 class ReturnableProductForm(forms.ModelForm):
@@ -369,7 +390,6 @@ class EticketForm(forms.ModelForm):
 class CloseCustomerAccountForm(forms.Form):
     user = forms.ModelChoiceField(
         label=_("Refound this account"),
-        help_text=None,
         required=True,
         widget=AutoCompleteSelectUser,
         queryset=User.objects.all(),
@@ -489,13 +509,14 @@ class InvoiceCallForm(forms.Form):
     def __init__(self, *args, month: date, **kwargs):
         super().__init__(*args, **kwargs)
         self.month = month
+        month_start = datetime(month.year, month.month, month.day, tzinfo=timezone.utc)
         self.clubs = list(
             Club.objects.filter(
                 Exists(
                     Selling.objects.filter(
                         club=OuterRef("pk"),
-                        date__gte=month,
-                        date__lte=month + relativedelta(months=1),
+                        date__gte=month_start,
+                        date__lte=month_start + relativedelta(months=1),
                     )
                 )
             ).annotate(

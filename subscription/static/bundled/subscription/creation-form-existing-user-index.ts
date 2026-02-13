@@ -8,9 +8,9 @@ document.addEventListener("alpine:init", () => {
     async init() {
       const userSelect = document.getElementById("id_member") as HTMLSelectElement;
       userSelect.addEventListener("change", async () => {
-        await this.loadProfile(Number.parseInt(userSelect.value));
+        await this.loadProfile(Number.parseInt(userSelect.value, 10));
       });
-      await this.loadProfile(Number.parseInt(userSelect.value));
+      await this.loadProfile(Number.parseInt(userSelect.value, 10));
     },
 
     async loadProfile(userId: number) {
