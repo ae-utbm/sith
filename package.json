@@ -15,7 +15,9 @@
   "keywords": [],
   "author": "",
   "license": "GPL-3.0-only",
-  "sideEffects": [".css"],
+  "sideEffects": [
+    ".css"
+  ],
   "imports": {
     "#openapi": "./staticfiles/generated/openapi/client/index.ts",
     "#core:*": "./core/static/bundled/*",

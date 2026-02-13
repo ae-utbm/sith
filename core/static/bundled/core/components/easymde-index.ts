@@ -1,14 +1,14 @@
 // biome-ignore lint/correctness/noUndeclaredDependencies: shipped by easymde
 import "codemirror/lib/codemirror.css";
 import "easymde/src/css/easymde.css";
-import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
 // biome-ignore lint/correctness/noUndeclaredDependencies: Imported by EasyMDE
 import type CodeMirror from "codemirror";
 // biome-ignore lint/style/useNamingConvention: This is how they called their namespace
 import EasyMDE from "easymde";
+import { inheritHtmlElement, registerComponent } from "#core:utils/web-components.ts";
 import {
-  type UploadUploadImageErrors,
   markdownRenderMarkdown,
+  type UploadUploadImageErrors,
   uploadUploadImage,
 } from "#openapi";
 

@@ -1,5 +1,5 @@
-import { AlertMessage } from "#core:utils/alert-message";
 import Alpine from "alpinejs";
+import { AlertMessage } from "#core:utils/alert-message.ts";
 import { producttypeReorder } from "#openapi";
 
 document.addEventListener("alpine:init", () => {
@@ -22,7 +22,7 @@ document.addEventListener("alpine:init", () => {
       const productTypes = this.$refs.productTypes
         .childNodes as NodeListOf<HTMLLIElement>;
       const getId = (elem: HTMLLIElement) =>
-        Number.parseInt(elem.getAttribute("x-sort:item"));
+        Number.parseInt(elem.getAttribute("x-sort:item"), 10);
       const query =
         newPosition === 0
           ? { above: getId(productTypes.item(1)) }

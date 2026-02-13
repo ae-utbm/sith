@@ -1,4 +1,4 @@
-import { exportToHtml } from "#core:utils/globals";
+import { exportToHtml } from "#core:utils/globals.ts";
 
 exportToHtml("showMenu", () => {
   const navbar = document.getElementById("navbar-content");

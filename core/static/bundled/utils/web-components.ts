@@ -10,7 +10,6 @@ export function registerComponent(name: string, options?: ElementDefinitionOptio
       window.customElements.define(name, component, options);
     } catch (e) {
       if (e instanceof DOMException) {
-        // biome-ignore lint/suspicious/noConsole: it's handy to troobleshot
         console.warn(e.message);
         return;
       }

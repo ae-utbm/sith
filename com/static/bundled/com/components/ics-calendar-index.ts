@@ -1,5 +1,3 @@
-import { makeUrl } from "#core:utils/api";
-import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
 import { Calendar, type EventClickArg, type EventContentArg } from "@fullcalendar/core";
 import type { EventImpl } from "@fullcalendar/core/internal";
 import enLocale from "@fullcalendar/core/locales/en-gb";
@@ -8,6 +6,8 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import iCalendarPlugin from "@fullcalendar/icalendar";
 import listPlugin from "@fullcalendar/list";
 import { type HTMLTemplateResult, html, render } from "lit-html";
+import { makeUrl } from "#core:utils/api.ts";
+import { inheritHtmlElement, registerComponent } from "#core:utils/web-components.ts";
 import {
   calendarCalendarInternal,
   calendarCalendarUnpublished,
@@ -95,6 +95,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         .split("/")
         .filter((s) => s) // Remove blank characters
         .pop(),
+      10,
     );
   }
 

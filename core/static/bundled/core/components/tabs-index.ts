@@ -1,6 +1,6 @@
-import { registerComponent } from "#core:utils/web-components";
 import { html, render } from "lit-html";
 import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
+import { registerComponent } from "#core:utils/web-components.ts";
 
 @registerComponent("ui-tab")
 export class Tab extends HTMLElement {

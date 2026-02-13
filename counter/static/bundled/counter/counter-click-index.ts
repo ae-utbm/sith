@@ -1,6 +1,6 @@
-import { AlertMessage } from "#core:utils/alert-message";
-import { BasketItem } from "#counter:counter/basket";
-import type { CounterConfig, ErrorMessage } from "#counter:counter/types";
+import { AlertMessage } from "#core:utils/alert-message.ts";
+import { BasketItem } from "#counter:counter/basket.ts";
+import type { CounterConfig, ErrorMessage } from "#counter:counter/types.ts";
 import type { CounterProductSelect } from "./components/counter-product-select-index.ts";
 
 document.addEventListener("alpine:init", () => {

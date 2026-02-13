@@ -21,7 +21,7 @@ document.addEventListener("alpine:init", () => {
       if (lastPurchaseTime !== null && localStorage.basketTimestamp !== undefined) {
         if (
           new Date(lastPurchaseTime) >=
-          new Date(Number.parseInt(localStorage.basketTimestamp))
+          new Date(Number.parseInt(localStorage.basketTimestamp, 10))
         ) {
           this.basket = [];
         }
