@@ -12,7 +12,7 @@ export default defineConfig({
     {
       name: "@hey-api/client-fetch",
       baseUrl: false,
-      runtimeConfigPath: "./openapi-csrf.ts",
+      runtimeConfigPath: resolve(__dirname, "./openapi-csrf.ts"),
       exportFromIndex: true,
     },
   ],

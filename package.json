@@ -29,7 +29,7 @@
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.0",
     "@biomejs/biome": "^2.3.14",
-    "@hey-api/openapi-ts": "^0.73.0",
+    "@hey-api/openapi-ts": "^0.92.4",
     "@rollup/plugin-inject": "^5.0.5",
     "@types/alpinejs": "^3.13.11",
     "@types/cytoscape-cxtmenu": "^3.4.5",
