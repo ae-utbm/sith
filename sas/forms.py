@@ -48,13 +48,12 @@ class PictureEditForm(forms.ModelForm):
 class AlbumEditForm(forms.ModelForm):
     class Meta:
         model = Album
-        fields = ["name", "date", "file", "parent", "edit_groups"]
+        fields = ["name", "date", "thumbnail", "parent", "edit_groups"]
         widgets = {
             "parent": AutoCompleteSelectAlbum,
             "edit_groups": AutoCompleteSelectMultipleGroup,
         }
 
-    name = forms.CharField(max_length=Album.NAME_MAX_LENGTH, label=_("file name"))
     date = forms.DateField(label=_("Date"), widget=SelectDate, required=True)
     recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
 

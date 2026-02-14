@@ -20,9 +20,9 @@ from sas.models import Album, PeoplePictureRelation, Picture, PictureModerationR
 
 @admin.register(Picture)
 class PictureAdmin(admin.ModelAdmin):
-    list_display = ("name", "parent", "date", "size", "is_moderated")
+    list_display = ("name", "parent", "is_moderated")
     search_fields = ("name",)
-    autocomplete_fields = ("owner", "parent", "edit_groups", "view_groups", "moderator")
+    autocomplete_fields = ("owner", "parent", "moderator")
 
 
 @admin.register(PeoplePictureRelation)
@@ -33,9 +33,9 @@ class PeoplePictureRelationAdmin(admin.ModelAdmin):
 
 @admin.register(Album)
 class AlbumAdmin(admin.ModelAdmin):
-    list_display = ("name", "parent", "date", "owner", "is_moderated")
+    list_display = ("name", "parent")
     search_fields = ("name",)
-    autocomplete_fields = ("owner", "parent", "edit_groups", "view_groups")
+    autocomplete_fields = ("parent", "edit_groups", "view_groups")
 
 
 @admin.register(PictureModerationRequest)

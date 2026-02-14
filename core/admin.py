@@ -98,9 +98,9 @@ class PageAdmin(admin.ModelAdmin):
 
 @admin.register(SithFile)
 class SithFileAdmin(admin.ModelAdmin):
-    list_display = ("name", "owner", "size", "date", "is_in_sas")
+    list_display = ("name", "owner", "size", "date")
     autocomplete_fields = ("parent", "owner", "moderator")
-    search_fields = ("name", "parent__name")
+    search_fields = ("name",)
 
 
 @admin.register(OperationLog)

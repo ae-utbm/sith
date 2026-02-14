@@ -12,6 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from pathlib import Path
 from typing import Any
 
 from django.conf import settings
@@ -22,12 +23,12 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.safestring import SafeString
 from django.views.generic import CreateView, DetailView, TemplateView
-from django.views.generic.edit import FormView, UpdateView
+from django.views.generic.edit import FormMixin, FormView, UpdateView
 
 from core.auth.mixins import CanEditMixin, CanViewMixin
 from core.models import SithFile, User
-from core.views import UseFragmentsMixin
-from core.views.files import FileView, send_file
+from core.views import FileView, UseFragmentsMixin
+from core.views.files import send_raw_file
 from core.views.mixins import FragmentMixin, FragmentRenderer
 from core.views.user import UserTabsMixin
 from sas.forms import (
@@ -63,6 +64,7 @@ class AlbumCreateFragment(FragmentMixin, CreateView):
 
 
 class SASMainView(UseFragmentsMixin, TemplateView):
+    form_class = AlbumCreateForm
     template_name = "sas/main.jinja"
 
     def get_fragments(self) -> dict[str, FragmentRenderer]:
@@ -79,12 +81,26 @@ class SASMainView(UseFragmentsMixin, TemplateView):
         root_user = User.objects.get(pk=settings.SITH_ROOT_USER_ID)
         return {"album_create_fragment": {"owner": root_user}}
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == "POST" and not self.request.user.has_perm("sas.add_album"):
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+        if not self.request.user.has_perm("sas.add_album"):
+            return None
+        return super().get_form(form_class)
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {
+            "owner": User.objects.get(pk=settings.SITH_ROOT_USER_ID),
+            "parent": None,
+        }
+
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         albums_qs = Album.objects.viewable_by(self.request.user)
-        kwargs["categories"] = list(
-            albums_qs.filter(parent_id=settings.SITH_SAS_ROOT_DIR_ID).order_by("id")
-        )
+        kwargs["categories"] = list(albums_qs.filter(parent=None).order_by("id"))
         kwargs["latest"] = list(albums_qs.order_by("-id")[:5])
         return kwargs
 
@@ -93,6 +109,9 @@ class PictureView(CanViewMixin, DetailView):
     model = Picture
     pk_url_kwarg = "picture_id"
     template_name = "sas/picture.jinja"
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("parent")
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -103,31 +122,42 @@ class PictureView(CanViewMixin, DetailView):
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
-            "album": Album.objects.get(children=self.object)
-        }
+        return super().get_context_data(**kwargs) | {"album": self.object.parent}
 
 
 def send_album(request, album_id):
-    return send_file(request, album_id, Album)
+    album = get_object_or_404(Album, id=album_id)
+    if not album.can_be_viewed_by(request.user):
+        raise PermissionDenied
+    return send_raw_file(Path(album.thumbnail.path))
 
 
 def send_pict(request, picture_id):
-    return send_file(request, picture_id, Picture)
+    picture = get_object_or_404(Picture, id=picture_id)
+    if not picture.can_be_viewed_by(request.user):
+        raise PermissionDenied
+    return send_raw_file(Path(picture.original.path))
 
 
 def send_compressed(request, picture_id):
-    return send_file(request, picture_id, Picture, "compressed")
+    picture = get_object_or_404(Picture, id=picture_id)
+    if not picture.can_be_viewed_by(request.user):
+        raise PermissionDenied
+    return send_raw_file(Path(picture.compressed.path))
 
 
 def send_thumb(request, picture_id):
-    return send_file(request, picture_id, Picture, "thumbnail")
+    picture = get_object_or_404(Picture, id=picture_id)
+    if not picture.can_be_viewed_by(request.user):
+        raise PermissionDenied
+    return send_raw_file(Path(picture.thumbnail.path))
 
 
-class AlbumView(CanViewMixin, UseFragmentsMixin, DetailView):
+class AlbumView(CanViewMixin, UseFragmentsMixin, FormMixin, DetailView):
     model = Album
     pk_url_kwarg = "album_id"
     template_name = "sas/album.jinja"
+    form_class = PictureUploadForm
 
     def get_fragments(self) -> dict[str, FragmentRenderer]:
         return {
@@ -142,27 +172,32 @@ class AlbumView(CanViewMixin, UseFragmentsMixin, DetailView):
         except ValueError as e:
             raise Http404 from e
         if "clipboard" not in request.session:
-            request.session["clipboard"] = []
+            request.session["clipboard"] = {"albums": [], "pictures": []}
         return super().dispatch(request, *args, **kwargs)
+
+    def get_form(self, *args, **kwargs):
+        if not self.request.user.can_edit(self.object):
+            return None
+        return super().get_form(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if not self.object.file:
-            self.object.generate_thumbnail()
-        if request.user.can_edit(self.object):  # Handle the copy-paste functions
-            FileView.handle_clipboard(request, self.object)
-        return HttpResponseRedirect(self.request.path)
+        form = self.get_form()
+        if not form:
+            # the form is reserved for users that can edit this album.
+            # If there is no form, it means the user has no right to do a POST
+            raise PermissionDenied
+        FileView.handle_clipboard(self.request, self.object)
+        if not form.is_valid():
+            return self.form_invalid(form)
+        return self.form_valid(form)
 
     def get_fragment_data(self) -> dict[str, dict[str, Any]]:
         return {"album_create_fragment": {"owner": self.request.user}}
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        if ids := self.request.session.get("clipboard", None):
-            kwargs["clipboard"] = SithFile.objects.filter(id__in=ids)
-        kwargs["upload_form"] = PictureUploadForm()
-        # if True, the albums will be fetched with a request to the API
-        # if False, the section won't be displayed at all
+        kwargs["clipboard"] = {}
         kwargs["show_albums"] = (
             Album.objects.viewable_by(self.request.user)
             .filter(parent_id=self.object.id)
@@ -215,7 +250,7 @@ class ModerationView(TemplateView):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         kwargs["albums_to_moderate"] = Album.objects.filter(
-            is_moderated=False, is_in_sas=True, is_folder=True
+            is_moderated=False
         ).order_by("id")
         pictures = Picture.objects.filter(is_moderated=False).select_related("parent")
         kwargs["pictures"] = pictures

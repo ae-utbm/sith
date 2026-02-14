@@ -2,8 +2,10 @@ from typing import Any, Literal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.shortcuts import get_list_or_404
 from django.urls import reverse
-from ninja import Body, File, Query
+from ninja import Body, Query, UploadedFile
+from ninja.errors import HttpError
 from ninja.security import SessionAuth
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import NotFound, PermissionDenied
@@ -16,11 +18,12 @@ from api.permissions import (
     CanAccessLookup,
     CanEdit,
     CanView,
+    HasPerm,
     IsInGroup,
     IsRoot,
 )
 from core.models import Notification, User
-from core.schemas import UploadedImage
+from core.utils import get_list_exact_or_404
 from sas.models import Album, PeoplePictureRelation, Picture
 from sas.schemas import (
     AlbumAutocompleteSchema,
@@ -28,6 +31,7 @@ from sas.schemas import (
     AlbumSchema,
     IdentifiedUserSchema,
     ModerationRequestSchema,
+    MoveAlbumSchema,
     PictureFilterSchema,
     PictureSchema,
 )
@@ -69,6 +73,48 @@ class AlbumController(ControllerBase):
             Album.objects.viewable_by(self.context.request.user).order_by("-date")
         )
 
+    @route.patch("/parent", permissions=[IsAuthenticated])
+    def change_album_parent(self, payload: list[MoveAlbumSchema]):
+        """Change parents of albums
+
+        Note:
+            For this operation to work, the user must be authorized
+            to edit both the moved albums and their new parent.
+        """
+        user: User = self.context.request.user
+        albums: list[Album] = get_list_exact_or_404(
+            Album, pk__in={a.id for a in payload}
+        )
+        if not user.has_perm("sas.change_album"):
+            unauthorized = [a.id for a in albums if not user.can_edit(a)]
+            raise PermissionDenied(
+                f"You can't move the following albums : {unauthorized}"
+            )
+        parents: list[Album] = get_list_exact_or_404(
+            Album, pk__in={a.new_parent_id for a in payload}
+        )
+        if not user.has_perm("sas.change_album"):
+            unauthorized = [a.id for a in parents if not user.can_edit(a)]
+            raise PermissionDenied(
+                f"You can't move to the following albums : {unauthorized}"
+            )
+        id_to_new_parent = {i.id: i.new_parent_id for i in payload}
+        for album in albums:
+            album.parent_id = id_to_new_parent[album.id]
+        # known caveat : moving an album won't move it's thumbnail.
+        # E.g. if the album foo/bar is moved to foo/baz,
+        # the thumbnail will still be foo/bar/thumb.webp
+        # This has no impact for the end user
+        # and doing otherwise would be hard for us to implement,
+        # because we would then have to manage rollbacks on fail.
+        Album.objects.bulk_update(albums, fields=["parent_id"])
+
+    @route.delete("", permissions=[HasPerm("sas.delete_album")])
+    def delete_album(self, album_ids: list[int]):
+        # known caveat : deleting an album doesn't delete the pictures on the disk.
+        # It's a db only operation.
+        albums: list[Album] = get_list_or_404(Album, pk__in=album_ids)
+
 
 @api_controller("/sas/picture")
 class PicturesController(ControllerBase):
@@ -96,7 +142,7 @@ class PicturesController(ControllerBase):
         return (
             filters.filter(Picture.objects.viewable_by(user))
             .distinct()
-            .order_by("-parent__date", "date")
+            .order_by("-parent__event_date", "created_at")
             .select_related("owner", "parent")
         )
 
@@ -110,27 +156,25 @@ class PicturesController(ControllerBase):
         },
         url_name="upload_picture",
     )
-    def upload_picture(self, album_id: Body[int], picture: File[UploadedImage]):
+    def upload_picture(self, album_id: Body[int], picture: UploadedFile):
         album = self.get_object_or_exception(Album, pk=album_id)
         user = self.context.request.user
         self_moderate = user.has_perm("sas.moderate_sasfile")
         new = Picture(
             parent=album,
             name=picture.name,
-            file=picture,
+            original=picture,
             owner=user,
             is_moderated=self_moderate,
-            is_folder=False,
-            mime_type=picture.content_type,
         )
         if self_moderate:
             new.moderator = user
+        new.generate_thumbnails()
         try:
-            new.generate_thumbnails()
             new.full_clean()
-            new.save()
         except ValidationError as e:
-            return self.create_response({"detail": dict(e)}, status_code=409)
+            raise HttpError(status_code=409, message=str(e)) from e
+        new.save()
 
     @route.get(
         "/{picture_id}/identified",

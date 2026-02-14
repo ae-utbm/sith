@@ -374,7 +374,7 @@ class FileDeleteView(AllowFragment, CanEditPropMixin, DeleteView):
 class FileModerationView(AllowFragment, ListView):
     model = SithFile
     template_name = "core/file_moderation.jinja"
-    queryset = SithFile.objects.filter(is_moderated=False, is_in_sas=False)
+    queryset = SithFile.objects.filter(is_moderated=False)
     ordering = "id"
     paginate_by = 100
 
