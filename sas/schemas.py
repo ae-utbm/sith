@@ -26,18 +26,9 @@ class SimpleAlbumSchema(ModelSchema):
 class AlbumSchema(ModelSchema):
     class Meta:
         model = Album
-        fields = ["id", "name", "is_moderated"]
+        fields = ["id", "name", "is_moderated", "thumbnail"]
 
-    thumbnail: str | None
     sas_url: str
-
-    @staticmethod
-    def resolve_thumbnail(obj: Album) -> str | None:
-        # Album thumbnails aren't stored in `Album.thumbnail` but in `Album.file`
-        # Don't ask me why.
-        if not obj.file:
-            return None
-        return obj.get_download_url()
 
     @staticmethod
     def resolve_sas_url(obj: Album) -> str:
