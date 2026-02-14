@@ -227,7 +227,7 @@ def get_client_ip(request: HttpRequest) -> str | None:
     return None
 
 
-Filterable = models.Model | models.QuerySet | models.Manager
+Filterable = type[models.Model] | models.QuerySet | models.Manager
 ListFilter = dict[str, list | tuple | set]
 
 

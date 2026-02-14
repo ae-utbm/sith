@@ -2,7 +2,6 @@ from typing import Any, Literal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.shortcuts import get_list_or_404
 from django.urls import reverse
 from ninja import Body, Query, UploadedFile
 from ninja.errors import HttpError
@@ -73,7 +72,7 @@ class AlbumController(ControllerBase):
             Album.objects.viewable_by(self.context.request.user).order_by("-date")
         )
 
-    @route.patch("/parent", permissions=[IsAuthenticated])
+    @route.patch("/parent")
     def change_album_parent(self, payload: list[MoveAlbumSchema]):
         """Change parents of albums
 
@@ -87,17 +86,19 @@ class AlbumController(ControllerBase):
         )
         if not user.has_perm("sas.change_album"):
             unauthorized = [a.id for a in albums if not user.can_edit(a)]
-            raise PermissionDenied(
-                f"You can't move the following albums : {unauthorized}"
-            )
+            if unauthorized:
+                raise PermissionDenied(
+                    f"You can't move the following albums : {unauthorized}"
+                )
         parents: list[Album] = get_list_exact_or_404(
             Album, pk__in={a.new_parent_id for a in payload}
         )
         if not user.has_perm("sas.change_album"):
             unauthorized = [a.id for a in parents if not user.can_edit(a)]
-            raise PermissionDenied(
-                f"You can't move to the following albums : {unauthorized}"
-            )
+            if unauthorized:
+                raise PermissionDenied(
+                    f"You can't move to the following albums : {unauthorized}"
+                )
         id_to_new_parent = {i.id: i.new_parent_id for i in payload}
         for album in albums:
             album.parent_id = id_to_new_parent[album.id]
@@ -108,12 +109,6 @@ class AlbumController(ControllerBase):
         # and doing otherwise would be hard for us to implement,
         # because we would then have to manage rollbacks on fail.
         Album.objects.bulk_update(albums, fields=["parent_id"])
-
-    @route.delete("", permissions=[HasPerm("sas.delete_album")])
-    def delete_album(self, album_ids: list[int]):
-        # known caveat : deleting an album doesn't delete the pictures on the disk.
-        # It's a db only operation.
-        albums: list[Album] = get_list_or_404(Album, pk__in=album_ids)
 
 
 @api_controller("/sas/picture")
@@ -259,9 +254,9 @@ class UsersIdentifiedController(ControllerBase):
         relation = self.get_object_or_exception(PeoplePictureRelation, pk=relation_id)
         user: User = self.context.request.user
         if (
-            relation.user_id != user.id
-            and not user.is_root
-            and not user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
+                relation.user_id != user.id
+                and not user.is_root
+                and not user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID)
         ):
             raise PermissionDenied
         relation.delete()
