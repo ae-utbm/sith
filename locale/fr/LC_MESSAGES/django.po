@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-08 16:14+0100\n"
+"POT-Creation-Date: 2026-02-14 15:21+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -388,7 +388,7 @@ msgstr "Montrer"
 
 #: club/templates/club/club_sellings.jinja
 #: counter/templates/counter/product_list.jinja
-msgid "Download as cvs"
+msgid "Download as CSV"
 msgstr "Télécharger en CSV"
 
 #: club/templates/club/club_sellings.jinja
@@ -3951,8 +3951,8 @@ msgid ""
 "inconvenience."
 msgstr ""
 "Les paiements par carte bancaire sont actuellement désactivés sur l'eboutic. "
-"Vous pouvez cependant toujours recharger votre compte dans un des lieux de vie de l'AE. "
-"Veuillez nous excuser pour le désagrément."
+"Vous pouvez cependant toujours recharger votre compte dans un des lieux de "
+"vie de l'AE. Veuillez nous excuser pour le désagrément."
 
 #: eboutic/templates/eboutic/eboutic_checkout.jinja
 msgid ""
@@ -4121,8 +4121,8 @@ msgstr "Les candidatures sont fermées pour cette élection"
 #: election/templates/election/election_detail.jinja
 msgid "Candidate pictures won't display for privacy reasons."
 msgstr ""
-"La photo du candidat ne s'affiche pas pour "
-"des raisons de respect de la vie privée."
+"La photo du candidat ne s'affiche pas pour des raisons de respect de la vie "
+"privée."
 
 #: election/templates/election/election_detail.jinja
 msgid "Polls close "
