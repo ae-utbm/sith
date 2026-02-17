@@ -399,6 +399,8 @@ class Product(models.Model):
         Group, related_name="products", verbose_name=_("buying groups"), blank=True
     )
     archived = models.BooleanField(_("archived"), default=False)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("updated at"), auto_now=True)
 
     class Meta:
         verbose_name = _("product")
