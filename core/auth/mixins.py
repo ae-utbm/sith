@@ -308,5 +308,5 @@ class PermissionOrClubBoardRequiredMixin(PermissionRequiredMixin):
         if super().has_permission():
             return True
         return self.club is not None and any(
-            g.id == self.club.board_group_id for g in self.request.user.cached_groups
+            g.id == self.club.board_group_id for g in self.request.user.all_groups
         )
