@@ -17,10 +17,8 @@
 
 {% from "sas/macros.jinja" import print_path %}
 
-{% set user_is_sas_admin = user.is_root or user.is_in_group(pk = settings.SITH_GROUP_SAS_ADMIN_ID) %}
-
 {% block content %}
-  <main x-data="picture_viewer">
+  <main x-data="picture_viewer(config)">
     <code>
       <a href="{{ url('sas:main') }}">SAS</a> / {{ print_path(album) }} <span x-text="currentPicture.name"></span>
     </code>
@@ -50,15 +48,13 @@
               It will be hidden to other users until it has been moderated.
             {% endtrans %}
           </p>
-          {% if user_is_sas_admin %}
+          {% if user.has_perm("sas.moderate_sasfile") %}
             <template x-if="currentPicture.asked_for_removal">
               <div>
                 <h5>{% trans %}The following issues have been raised:{% endtrans %}</h5>
                 <template x-for="req in (currentPicture.moderationRequests ?? [])" :key="req.id">
                   <div>
-                    <h6
-                      x-text="`${req.author.first_name} ${req.author.last_name}`"
-                    ></h6>
+                    <h6 x-text="`${req.author.first_name} ${req.author.last_name}`"></h6>
                     <i x-text="Intl.DateTimeFormat(
                                '{{ LANGUAGE_CODE }}',
                                {dateStyle: 'long', timeStyle: 'short'}
@@ -70,7 +66,7 @@
             </template>
           {% endif %}
         </div>
-        {% if user_is_sas_admin %}
+        {% if user.has_perm("sas.moderate_sasfile") %}
           <div class="alert-aside">
             <button class="btn btn-blue" @click="moderatePicture()">
               {% trans %}Moderate{% endtrans %}
@@ -204,16 +200,13 @@
 {% endblock %}
 
 {% block script %}
-  {{ super() }}
   <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      loadViewer({
-        albumId: {{ album.id }} ,
-        albumUrl: "{{ album.get_absolute_url() }}",
-        firstPictureId: {{ picture.id }},  {# id of the first picture to show after page load #}
-        userId: {{ user.id }},
-        userIsSasAdmin: {{ user_is_sas_admin|tojson }}
-      });
-    })
+    const config = {
+      albumId: {{ album.id }},
+      albumUrl: "{{ album.get_absolute_url() }}",
+      firstPictureId: {{ picture.id }},  {# id of the first picture to show after page load #}
+      userId: {{ user.id }},
+      userCanModerate: {{ user.has_perm("sas.moderate_sasfile")|tojson }}
+    }
   </script>
 {% endblock %}

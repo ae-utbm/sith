@@ -15,10 +15,10 @@
 from typing import Any
 
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Count, OuterRef, Subquery
 from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.safestring import SafeString
 from django.views.generic import CreateView, DetailView, TemplateView
@@ -191,26 +191,21 @@ class UserPicturesView(UserTabsMixin, CanViewMixin, DetailView):
 # Admin views
 
 
-class ModerationView(TemplateView):
+class ModerationView(PermissionRequiredMixin, TemplateView):
     template_name = "sas/moderation.jinja"
-
-    def get(self, request, *args, **kwargs):
-        if request.user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
-            return super().get(request, *args, **kwargs)
-        raise PermissionDenied
+    permission_required = "sas.moderate_sasfile"
 
     def post(self, request, *args, **kwargs):
         if "album_id" not in request.POST:
             raise Http404
-        if request.user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID):
-            album = get_object_or_404(Album, pk=request.POST["album_id"])
-            if "moderate" in request.POST:
-                album.moderator = request.user
-                album.is_moderated = True
-                album.save()
-            elif "delete" in request.POST:
-                album.delete()
-        return super().get(request, *args, **kwargs)
+        album = get_object_or_404(Album, pk=request.POST["album_id"])
+        if "moderate" in request.POST:
+            album.moderator = request.user
+            album.is_moderated = True
+            album.save()
+        elif "delete" in request.POST:
+            album.delete()
+        return redirect(self.request.path)
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
