@@ -17,12 +17,12 @@ from __future__ import annotations
 import hmac
 from datetime import datetime
 from enum import Enum
-from typing import Any, Self
+from typing import Self
 
 from dict2xml import dict2xml
 from django.conf import settings
 from django.db import DataError, models
-from django.db.models import F, OuterRef, Subquery, Sum
+from django.db.models import F, OuterRef, Q, Subquery, Sum
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -30,8 +30,8 @@ from core.models import User
 from counter.fields import CurrencyField
 from counter.models import (
     BillingInfo,
-    Counter,
     Customer,
+    Price,
     Product,
     Refilling,
     Selling,
@@ -39,20 +39,28 @@ from counter.models import (
 )
 
 
-def get_eboutic_products(user: User) -> list[Product]:
-    products = (
-        get_eboutic()
-        .products.filter(product_type__isnull=False)
-        .filter(archived=False, limit_age__lte=user.age)
-        .annotate(
-            order=F("product_type__order"),
-            category=F("product_type__name"),
-            category_comment=F("product_type__comment"),
-            price=F("selling_price"),  # <-- selected price for basket validation
+def get_eboutic_prices(user: User) -> list[Price]:
+    return list(
+        Price.objects.filter(
+            Q(is_always_shown=True, groups__in=user.all_groups)
+            | Q(
+                id=Subquery(
+                    Price.objects.filter(
+                        product_id=OuterRef("product_id"), groups__in=user.all_groups
+                    )
+                    .order_by("amount")
+                    .values("id")[:1]
+                )
+            ),
+            product__product_type__isnull=False,
+            product__archived=False,
+            product__limit_age__lte=user.age,
+            product__counters=get_eboutic(),
         )
-        .prefetch_related("buying_groups")  # <-- used in `Product.can_be_sold_to`
+        .select_related("product", "product__product_type")
+        .order_by("product__product_type__order", "product_id", "amount")
+        .distinct()
     )
-    return [p for p in products if p.can_be_sold_to(user)]
 
 
 class BillingInfoState(Enum):
@@ -94,21 +102,21 @@ class Basket(models.Model):
     def __str__(self):
         return f"{self.user}'s basket ({self.items.all().count()} items)"
 
-    def can_be_viewed_by(self, user):
+    def can_be_viewed_by(self, user: User):
         return self.user == user
 
     @cached_property
     def contains_refilling_item(self) -> bool:
         return self.items.filter(
-            type_id=settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
+            product__product_type_id=settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
         ).exists()
 
     @cached_property
     def total(self) -> float:
         return float(
-            self.items.aggregate(
-                total=Sum(F("quantity") * F("product_unit_price"), default=0)
-            )["total"]
+            self.items.aggregate(total=Sum(F("quantity") * F("unit_price"), default=0))[
+                "total"
+            ]
         )
 
     def generate_sales(
@@ -120,7 +128,8 @@ class Basket(models.Model):
         Example:
             ```python
             counter = Counter.objects.get(name="Eboutic")
-            sales = basket.generate_sales(counter, "SITH_ACCOUNT")
+            user = User.objects.get(username="bibou")
+            sales = basket.generate_sales(counter, user, Selling.PaymentMethod.SITH_ACCOUNT)
             # here the basket is in the same state as before the method call
 
             with transaction.atomic():
@@ -131,31 +140,23 @@ class Basket(models.Model):
                 # thus only the sales remain
             ```
         """
-        # I must proceed with two distinct requests instead of
-        # only one with a join because the AbstractBaseItem model has been
-        # poorly designed. If you refactor the model, please refactor this too.
-        items = self.items.order_by("product_id")
-        ids = [item.product_id for item in items]
-        products = Product.objects.filter(id__in=ids).order_by("id")
-        # items and products are sorted in the same order
-        sales = []
-        for item, product in zip(items, products, strict=False):
-            sales.append(
-                Selling(
-                    label=product.name,
-                    counter=counter,
-                    club=product.club,
-                    product=product,
-                    seller=seller,
-                    customer=Customer.get_or_create(self.user)[0],
-                    unit_price=item.product_unit_price,
-                    quantity=item.quantity,
-                    payment_method=payment_method,
-                )
+        customer = Customer.get_or_create(self.user)[0]
+        return [
+            Selling(
+                label=item.label,
+                counter=counter,
+                club_id=item.product.club_id,
+                product=item.product,
+                seller=seller,
+                customer=customer,
+                unit_price=item.unit_price,
+                quantity=item.quantity,
+                payment_method=payment_method,
             )
-        return sales
+            for item in self.items.select_related("product")
+        ]
 
-    def get_e_transaction_data(self) -> list[tuple[str, Any]]:
+    def get_e_transaction_data(self) -> list[tuple[str, str]]:
         user = self.user
         if not hasattr(user, "customer"):
             raise Customer.DoesNotExist
@@ -201,7 +202,7 @@ class InvoiceQueryset(models.QuerySet):
     def annotate_total(self) -> Self:
         """Annotate the queryset with the total amount of each invoice.
 
-        The total amount is the sum of (product_unit_price * quantity)
+        The total amount is the sum of (unit_price * quantity)
         for all items related to the invoice.
         """
         # aggregates within subqueries require a little bit of black magic,
@@ -211,7 +212,7 @@ class InvoiceQueryset(models.QuerySet):
             total=Subquery(
                 InvoiceItem.objects.filter(invoice_id=OuterRef("pk"))
                 .values("invoice_id")
-                .annotate(total=Sum(F("product_unit_price") * F("quantity")))
+                .annotate(total=Sum(F("unit_price") * F("quantity")))
                 .values("total")
             )
         )
@@ -221,11 +222,7 @@ class Invoice(models.Model):
     """Invoices are generated once the payment has been validated."""
 
     user = models.ForeignKey(
-        User,
-        related_name="invoices",
-        verbose_name=_("user"),
-        blank=False,
-        on_delete=models.CASCADE,
+        User, related_name="invoices", verbose_name=_("user"), on_delete=models.CASCADE
     )
     date = models.DateTimeField(_("date"), auto_now=True)
     validated = models.BooleanField(_("validated"), default=False)
@@ -246,53 +243,44 @@ class Invoice(models.Model):
         if self.validated:
             raise DataError(_("Invoice already validated"))
         customer, _created = Customer.get_or_create(user=self.user)
-        eboutic = Counter.objects.filter(type="EBOUTIC").first()
-        for i in self.items.all():
-            if i.type_id == settings.SITH_COUNTER_PRODUCTTYPE_REFILLING:
-                new = Refilling(
-                    counter=eboutic,
-                    customer=customer,
-                    operator=self.user,
-                    amount=i.product_unit_price * i.quantity,
-                    payment_method=Refilling.PaymentMethod.CARD,
-                    date=self.date,
+        kwargs = {
+            "counter": get_eboutic(),
+            "customer": customer,
+            "date": self.date,
+            "payment_method": Selling.PaymentMethod.CARD,
+        }
+        for i in self.items.select_related("product"):
+            if i.product.product_type_id == settings.SITH_COUNTER_PRODUCTTYPE_REFILLING:
+                Refilling.objects.create(
+                    **kwargs, operator=self.user, amount=i.unit_price * i.quantity
                 )
-                new.save()
             else:
-                product = Product.objects.filter(id=i.product_id).first()
-                new = Selling(
-                    label=i.product_name,
-                    counter=eboutic,
-                    club=product.club,
-                    product=product,
+                Selling.objects.create(
+                    **kwargs,
+                    label=i.label,
+                    club_id=i.product.club_id,
+                    product=i.product,
                     seller=self.user,
-                    customer=customer,
-                    unit_price=i.product_unit_price,
+                    unit_price=i.unit_price,
                     quantity=i.quantity,
-                    payment_method=Selling.PaymentMethod.CARD,
-                    date=self.date,
                 )
-                new.save()
         self.validated = True
         self.save()
 
 
 class AbstractBaseItem(models.Model):
-    product_id = models.IntegerField(_("product id"))
-    product_name = models.CharField(_("product name"), max_length=255)
-    type_id = models.IntegerField(_("product type id"))
-    product_unit_price = CurrencyField(_("unit price"))
+    product = models.ForeignKey(
+        Product, verbose_name=_("product"), on_delete=models.PROTECT
+    )
+    label = models.CharField(_("product name"), max_length=255)
+    unit_price = CurrencyField(_("unit price"))
     quantity = models.PositiveIntegerField(_("quantity"))
 
     class Meta:
         abstract = True
 
     def __str__(self):
-        return "Item: %s (%s) x%d" % (
-            self.product_name,
-            self.product_unit_price,
-            self.quantity,
-        )
+        return "Item: %s (%s) x%d" % (self.product.name, self.unit_price, self.quantity)
 
 
 class BasketItem(AbstractBaseItem):
@@ -301,21 +289,16 @@ class BasketItem(AbstractBaseItem):
     )
 
     @classmethod
-    def from_product(cls, product: Product, quantity: int, basket: Basket):
+    def from_price(cls, price: Price, quantity: int, basket: Basket):
         """Create a BasketItem with the same characteristics as the
-        product passed in parameters, with the specified quantity.
-
-        Warning:
-            the basket field is not filled, so you must set
-            it yourself before saving the model.
+        product price passed in parameters, with the specified quantity.
         """
         return cls(
             basket=basket,
-            product_id=product.id,
-            product_name=product.name,
-            type_id=product.product_type_id,
+            label=price.full_label,
+            product_id=price.product_id,
             quantity=quantity,
-            product_unit_price=product.selling_price,
+            unit_price=price.amount,
         )
 
 
