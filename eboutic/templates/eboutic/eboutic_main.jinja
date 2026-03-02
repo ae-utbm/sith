@@ -41,7 +41,7 @@
           </div>
         {% endif %}
         <ul class="item-list">
-                  {# Starting money #}
+          {# Starting money #}
           <li>
             <span class="item-name">
               <strong>{% trans %}Current account amount: {% endtrans %}</strong>
@@ -51,15 +51,15 @@
             </span>
           </li>
 
-          <template x-for="(item, index) in Object.values(basket)" :key="item.id">
+          <template x-for="(item, index) in Object.values(basket)" :key="item.priceId">
             <li class="item-row" x-show="item.quantity > 0">
               <div class="item-quantity">
-                <i class="fa fa-minus fa-xs" @click="remove(item.id)"></i>
+                <i class="fa fa-minus fa-xs" @click="remove(item.priceId)"></i>
                 <span x-text="item.quantity"></span>
                 <i class="fa fa-plus" @click="add(item)"></i>
               </div>
               <span class="item-name" x-text="item.name"></span>
-              <span class="item-price" x-text="(item.unit_price * item.quantity).toFixed(2) + ' €'"></span>
+              <span class="item-price" x-text="(item.unitPrice * item.quantity).toFixed(2) + ' €'"></span>
 
               <input
                 type="hidden"
@@ -71,16 +71,16 @@
               >
               <input
                 type="hidden"
-                :value="item.id"
-                :id="`id_form-${index}-id`"
-                :name="`form-${index}-id`"
+                :value="item.priceId"
+                :id="`id_form-${index}-price_id`"
+                :name="`form-${index}-price_id`"
                 required
                 readonly
               >
 
             </li>
           </template>
-                  {# Total price #}
+          {# Total price #}
           <li style="margin-top: 20px">
             <span class="item-name"><strong>{% trans %}Basket amount: {% endtrans %}</strong></span>
             <span x-text="getTotal().toFixed(2) + ' €'" class="item-price"></span>
@@ -166,45 +166,40 @@
           {% endif %}
         </div>
       </section>
-      {% for priority_groups in products|groupby('order') %}
-        {% for category, items in priority_groups.list|groupby('category') %}
-          {% if items|count > 0 %}
-            <section>
-                            {# I would have wholeheartedly directly used the header element instead
-                            but it has already been made messy in core/style.scss #}
-              <div class="category-header">
-                <h3>{{ category }}</h3>
-                {% if items[0].category_comment %}
-                  <p><i>{{ items[0].category_comment }}</i></p>
-                {% endif %}
-              </div>
-              <div class="product-group">
-                {% for p in items %}
-                  <button
-                    id="{{ p.id }}"
-                    class="card product-button clickable shadow"
-                    :class="{selected: basket.some((i) => i.id === {{ p.id }})}"
-                    @click='addFromCatalog({{ p.id }}, {{ p.name|tojson }}, {{ p.selling_price }})'
+      {% for prices in categories %}
+        {% set category = prices[0].product.product_type %}
+        <section>
+          <div class="category-header">
+            <h3>{{ category.name }}</h3>
+            {% if category.comment %}
+              <p><i>{{ category.comment }}</i></p>
+            {% endif %}
+          </div>
+          <div class="product-group">
+            {% for price in prices %}
+              <button
+                id="{{ price.id }}"
+                class="card product-button clickable shadow"
+                :class="{selected: basket.some((i) => i.priceId === {{ price.id }})}"
+                @click='addFromCatalog({{ price.id }}, {{ price.full_label|tojson }}, {{ price.amount }})'
+              >
+                {% if price.product.icon %}
+                  <img
+                    class="card-image"
+                    src="{{ price.product.icon.url }}"
+                    alt="image de {{ price.full_label }}"
                   >
-                    {% if p.icon %}
-                      <img
-                        class="card-image"
-                        src="{{ p.icon.url }}"
-                        alt="image de {{ p.name }}"
-                      >
-                    {% else %}
-                      <i class="fa-regular fa-image fa-2x card-image"></i>
-                    {% endif %}
-                    <div class="card-content">
-                      <h4 class="card-title">{{ p.name }}</h4>
-                      <p>{{ p.selling_price }} €</p>
-                    </div>
-                  </button>
-                {% endfor %}
-              </div>
-            </section>
-          {% endif %}
-        {% endfor %}
+                {% else %}
+                  <i class="fa-regular fa-image fa-2x card-image"></i>
+                {% endif %}
+                <div class="card-content">
+                  <h4 class="card-title">{{ price.full_label }}</h4>
+                  <p>{{ price.amount }} €</p>
+                </div>
+              </button>
+            {% endfor %}
+          </div>
+        </section>
       {% else %}
         <p>{% trans %}There are no items available for sale{% endtrans %}</p>
       {% endfor %}
