@@ -456,6 +456,78 @@ class Product(models.Model):
         return self.selling_price - self.purchase_price
 
 
+class PriceQuerySet(models.QuerySet):
+    def for_user(self, user: User) -> Self:
+        age = user.age
+        if user.is_banned_alcohol:
+            age = min(age, 17)
+        return self.filter(
+            Q(is_always_shown=True, groups__in=user.all_groups)
+            | Q(
+                id=Subquery(
+                    Price.objects.filter(
+                        product_id=OuterRef("product_id"), groups__in=user.all_groups
+                    )
+                    .order_by("amount")
+                    .values("id")[:1]
+                )
+            ),
+            product__archived=False,
+            product__limit_age__lte=age,
+        )
+
+
+class Price(models.Model):
+    amount = CurrencyField(_("amount"))
+    product = models.ForeignKey(
+        Product,
+        verbose_name=_("product"),
+        related_name="prices",
+        on_delete=models.CASCADE,
+    )
+    groups = models.ManyToManyField(
+        Group, verbose_name=_("groups"), related_name="prices"
+    )
+    is_always_shown = models.BooleanField(
+        _("always show"),
+        help_text=_(
+            "If this option is enabled, "
+            "people will see this price and be able to pay it, "
+            "even if another cheaper price exists. "
+            "Else it will visible only if it is the cheapest available price."
+        ),
+        default=False,
+    )
+    label = models.CharField(
+        _("label"),
+        help_text=_(
+            "A short label for easier differentiation "
+            "if a user can see multiple prices."
+        ),
+        max_length=32,
+        default="",
+        blank=True,
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("updated at"), auto_now=True)
+
+    objects = PriceQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("price")
+
+    def __str__(self):
+        if not self.label:
+            return f"{self.product.name} ({self.amount}€)"
+        return f"{self.product.name} {self.label} ({self.amount}€)"
+
+    @property
+    def full_label(self):
+        if not self.label:
+            return self.product.name
+        return f"{self.product.name} \u2013 {self.label}"
+
+
 class ProductFormula(models.Model):
     products = models.ManyToManyField(
         Product,
@@ -1025,7 +1097,9 @@ class Selling(models.Model):
         event = self.product.eticket.event_title or _("Unknown event")
         subject = _("Eticket bought for the event %(event)s") % {"event": event}
         message_html = _(
-            "You bought an eticket for the event %(event)s.\nYou can download it directly from this link %(eticket)s.\nYou can also retrieve all your e-tickets on your account page %(url)s."
+            "You bought an eticket for the event %(event)s.\n"
+            "You can download it directly from this link %(eticket)s.\n"
+            "You can also retrieve all your e-tickets on your account page %(url)s."
         ) % {
             "event": event,
             "url": (

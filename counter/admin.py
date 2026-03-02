@@ -24,6 +24,7 @@ from counter.models import (
     Eticket,
     InvoiceCall,
     Permanency,
+    Price,
     Product,
     ProductType,
     Refilling,
@@ -32,19 +33,24 @@ from counter.models import (
 )
 
 
+class PriceInline(admin.TabularInline):
+    model = Price
+    autocomplete_fields = ("groups",)
+
+
 @admin.register(Product)
 class ProductAdmin(SearchModelAdmin):
     list_display = (
         "name",
         "code",
         "product_type",
-        "selling_price",
         "archived",
         "created_at",
         "updated_at",
     )
     list_select_related = ("product_type",)
     search_fields = ("name", "code")
+    inlines = [PriceInline]
 
 
 @admin.register(ReturnableProduct)
