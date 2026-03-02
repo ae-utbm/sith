@@ -21,11 +21,15 @@ export interface CounterConfig {
   cancelUrl: string;
 }
 
+interface Price {
+  id: number;
+  amount: number;
+}
+
 export interface Product {
-  id: string;
   code: string;
   name: string;
-  price: number;
+  price: Price;
   hasTrayPrice: boolean;
   quantityForTrayPrice: number;
 }

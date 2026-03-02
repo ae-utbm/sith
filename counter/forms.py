@@ -546,48 +546,47 @@ class CloseCustomerAccountForm(forms.Form):
     )
 
 
-class BasketProductForm(forms.Form):
+class BasketItemForm(forms.Form):
     quantity = forms.IntegerField(min_value=1, required=True)
-    id = forms.IntegerField(min_value=0, required=True)
+    price_id = forms.IntegerField(min_value=0, required=True)
 
     def __init__(
         self,
         customer: Customer,
         counter: Counter,
-        allowed_products: dict[int, Product],
+        allowed_prices: dict[int, Price],
         *args,
         **kwargs,
     ):
         self.customer = customer  # Used by formset
         self.counter = counter  # Used by formset
-        self.allowed_products = allowed_products
+        self.allowed_prices = allowed_prices
         super().__init__(*args, **kwargs)
 
-    def clean_id(self):
-        data = self.cleaned_data["id"]
+    def clean_price_id(self):
+        data = self.cleaned_data["price_id"]
 
-        # We store self.product so we can use it later on the formset validation
+        # We store self.price so we can use it later on the formset validation
         # And also in the global clean
-        self.product = self.allowed_products.get(data, None)
-        if self.product is None:
+        self.price = self.allowed_prices.get(data, None)
+        if self.price is None:
             raise forms.ValidationError(
                 _("The selected product isn't available for this user")
             )
-
         return data
 
     def clean(self):
         cleaned_data = super().clean()
         if len(self.errors) > 0:
-            return
+            return cleaned_data
 
         # Compute prices
         cleaned_data["bonus_quantity"] = 0
-        if self.product.tray:
+        if self.price.product.tray:
             cleaned_data["bonus_quantity"] = math.floor(
                 cleaned_data["quantity"] / Product.QUANTITY_FOR_TRAY_PRICE
             )
-        cleaned_data["total_price"] = self.product.price * (
+        cleaned_data["total_price"] = self.price.amount * (
             cleaned_data["quantity"] - cleaned_data["bonus_quantity"]
         )
 
@@ -611,8 +610,8 @@ class BaseBasketForm(forms.BaseFormSet):
             raise forms.ValidationError(_("Submitted basket is invalid"))
 
     def _check_product_are_unique(self):
-        product_ids = {form.cleaned_data["id"] for form in self.forms}
-        if len(product_ids) != len(self.forms):
+        price_ids = {form.cleaned_data["price_id"] for form in self.forms}
+        if len(price_ids) != len(self.forms):
             raise forms.ValidationError(_("Duplicated product entries."))
 
     def _check_enough_money(self, counter: Counter, customer: Customer):
@@ -622,10 +621,9 @@ class BaseBasketForm(forms.BaseFormSet):
 
     def _check_recorded_products(self, customer: Customer):
         """Check for, among other things, ecocups and pitchers"""
-        items = {
-            form.cleaned_data["id"]: form.cleaned_data["quantity"]
-            for form in self.forms
-        }
+        items = defaultdict(int)
+        for form in self.forms:
+            items[form.price.product_id] += form.cleaned_data["quantity"]
         ids = list(items.keys())
         returnables = list(
             ReturnableProduct.objects.filter(
@@ -651,7 +649,7 @@ class BaseBasketForm(forms.BaseFormSet):
 
 
 BasketForm = forms.formset_factory(
-    BasketProductForm, formset=BaseBasketForm, absolute_max=None, min_num=1
+    BasketItemForm, formset=BaseBasketForm, absolute_max=None, min_num=1
 )
 
 

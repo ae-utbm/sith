@@ -788,35 +788,13 @@ class Counter(models.Model):
         # but they share the same primary key
         return self.type == "BAR" and any(b.pk == customer.pk for b in self.barmen_list)
 
-    def get_products_for(self, customer: Customer) -> list[Product]:
-        """
-        Get all allowed products for the provided customer on this counter
-        Prices will be annotated
-        """
-
-        products = (
-            self.products.filter(archived=False)
-            .select_related("product_type")
-            .prefetch_related("buying_groups")
+    def get_prices_for(self, customer: Customer) -> list[Price]:
+        return list(
+            Price.objects.filter(product__counters=self)
+            .for_user(customer.user)
+            .select_related("product", "product__product_type")
+            .prefetch_related("groups")
         )
-
-        # Only include age appropriate products
-        age = customer.user.age
-        if customer.user.is_banned_alcohol:
-            age = min(age, 17)
-        products = products.filter(limit_age__lte=age)
-
-        # Compute special price for customer if he is a barmen on that bar
-        if self.customer_is_barman(customer):
-            products = products.annotate(price=F("special_selling_price"))
-        else:
-            products = products.annotate(price=F("selling_price"))
-
-        return [
-            product
-            for product in products.all()
-            if product.can_be_sold_to(customer.user)
-        ]
 
 
 class CounterSellers(models.Model):
