@@ -6,8 +6,8 @@ from ninja import FilterLookup, FilterSchema, ModelSchema, Schema
 from pydantic import model_validator
 
 from club.schemas import SimpleClubSchema
-from core.schemas import GroupSchema, NonEmptyStr, SimpleUserSchema
-from counter.models import Counter, Product, ProductType
+from core.schemas import NonEmptyStr, SimpleUserSchema
+from counter.models import Counter, Price, Product, ProductType
 
 
 class CounterSchema(ModelSchema):
@@ -66,6 +66,12 @@ class SimpleProductSchema(ModelSchema):
         fields = ["id", "name", "code"]
 
 
+class ProductPriceSchema(ModelSchema):
+    class Meta:
+        model = Price
+        fields = ["amount", "groups"]
+
+
 class ProductSchema(ModelSchema):
     class Meta:
         model = Product
@@ -75,13 +81,12 @@ class ProductSchema(ModelSchema):
             "code",
             "description",
             "purchase_price",
-            "selling_price",
             "icon",
             "limit_age",
             "archived",
         ]
 
-    buying_groups: list[GroupSchema]
+    prices: list[ProductPriceSchema]
     club: SimpleClubSchema
     product_type: SimpleProductTypeSchema | None
     url: str
