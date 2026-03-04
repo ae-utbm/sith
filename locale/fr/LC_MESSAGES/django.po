@@ -4219,12 +4219,12 @@ msgid "I have read and accept"
 msgstr "J'ai lu et j'accepte"
 
 #: eboutic/views.py
-msgid "the general terms and condition"
-msgstr "les conditions générale de vente"
+msgid "the general terms and conditions"
+msgstr "les conditions générales de vente"
 
 #: eboutic/views.py
-msgid "of the student assosiation of the UTBM"
-msgstr "de l'Association des étudiant de l'UTBM"
+msgid "of the student assosiation of UTBM"
+msgstr "de l'Association des étudiants de l'UTBM"
 
 #: election/forms.py
 msgid "You have selected too many candidates."
