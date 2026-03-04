@@ -34,11 +34,13 @@ from counter.forms import (
     CloseCustomerAccountForm,
     CounterEditForm,
     ProductForm,
+    ProductFormulaForm,
     ReturnableProductForm,
 )
 from counter.models import (
     Counter,
     Product,
+    ProductFormula,
     ProductType,
     Refilling,
     ReturnableProduct,
@@ -160,6 +162,62 @@ class ProductEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     pk_url_kwarg = "product_id"
     template_name = "counter/product_form.jinja"
     current_tab = "products"
+
+
+class ProductFormulaListView(CounterAdminTabsMixin, PermissionRequiredMixin, ListView):
+    model = ProductFormula
+    queryset = ProductFormula.objects.select_related("result").prefetch_related(
+        "products"
+    )
+    template_name = "counter/formula_list.jinja"
+    current_tab = "formulas"
+    permission_required = "counter.view_productformula"
+
+
+class ProductFormulaCreateView(
+    CounterAdminTabsMixin, PermissionRequiredMixin, CreateView
+):
+    model = ProductFormula
+    form_class = ProductFormulaForm
+    pk_url_kwarg = "formula_id"
+    template_name = "core/create.jinja"
+    current_tab = "formulas"
+    success_url = reverse_lazy("counter:product_formula_list")
+    permission_required = "counter.add_productformula"
+
+
+class ProductFormulaEditView(
+    CounterAdminTabsMixin, PermissionRequiredMixin, UpdateView
+):
+    model = ProductFormula
+    form_class = ProductFormulaForm
+    pk_url_kwarg = "formula_id"
+    template_name = "core/edit.jinja"
+    current_tab = "formulas"
+    success_url = reverse_lazy("counter:product_formula_list")
+    permission_required = "counter.change_productformula"
+
+
+class ProductFormulaDeleteView(
+    CounterAdminTabsMixin, PermissionRequiredMixin, DeleteView
+):
+    model = ProductFormula
+    pk_url_kwarg = "formula_id"
+    template_name = "core/delete_confirm.jinja"
+    current_tab = "formulas"
+    success_url = reverse_lazy("counter:product_formula_list")
+    permission_required = "counter.delete_productformula"
+
+    def get_context_data(self, **kwargs):
+        obj_name = self.object.result.name
+        return super().get_context_data(**kwargs) | {
+            "object_name": _("%(formula)s (formula)") % {"formula": obj_name},
+            "help_text": _(
+                "This action will only delete the formula, "
+                "but not the %(product)s product itself."
+            )
+            % {"product": obj_name},
+        }
 
 
 class ReturnableProductListView(
