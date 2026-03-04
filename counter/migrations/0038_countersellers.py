@@ -69,5 +69,20 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-        )
+        ),
+        migrations.AddField(
+            model_name="countersellers",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True,
+                default=django.utils.timezone.now,
+                verbose_name="created at",
+            ),
+            preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name="countersellers",
+            name="is_regular",
+            field=models.BooleanField(default=False, verbose_name="regular barman"),
+        ),
     ]

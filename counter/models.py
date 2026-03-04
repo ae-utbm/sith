@@ -748,11 +748,14 @@ class Counter(models.Model):
 
 
 class CounterSellers(models.Model):
+    """Custom through model for the counter-sellers M2M relationship."""
+
     counter = models.ForeignKey(Counter, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_regular = models.BooleanField("regular barman", default=False)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
     class Meta:
-        verbose_name = _("counter seller")
         constraints = [
             models.UniqueConstraint(
                 fields=["counter", "user"],
