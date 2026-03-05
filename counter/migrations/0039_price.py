@@ -72,7 +72,10 @@ class Migration(migrations.Migration):
                     "label",
                     models.CharField(
                         default="",
-                        help_text="A short label for easier differentiation if a user can see multiple prices.",
+                        help_text=(
+                            "A short label for easier differentiation "
+                            "if a user can see multiple prices."
+                        ),
                         max_length=32,
                         verbose_name="label",
                         blank=True,
@@ -104,5 +107,16 @@ class Migration(migrations.Migration):
             ],
             options={"verbose_name": "price"},
         ),
+        migrations.AlterField(
+            model_name="product",
+            name="tray",
+            field=models.BooleanField(
+                default=False,
+                help_text="Buy five, get the sixth free",
+                verbose_name="tray price",
+            ),
+        ),
         migrations.RunPython(migrate_prices, reverse_code=migrations.RunPython.noop),
+        migrations.RemoveField(model_name="product", name="selling_price"),
+        migrations.RemoveField(model_name="product", name="special_selling_price"),
     ]

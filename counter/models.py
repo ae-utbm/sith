@@ -377,11 +377,6 @@ class Product(models.Model):
         _("purchase price"),
         help_text=_("Initial cost of purchasing the product"),
     )
-    selling_price = CurrencyField(_("selling price"))
-    special_selling_price = CurrencyField(
-        _("special selling price"),
-        help_text=_("Price for barmen during their permanence"),
-    )
     icon = ResizedImageField(
         height=70,
         force_format="WEBP",
@@ -394,7 +389,9 @@ class Product(models.Model):
         Club, related_name="products", verbose_name=_("club"), on_delete=models.CASCADE
     )
     limit_age = models.IntegerField(_("limit age"), default=0)
-    tray = models.BooleanField(_("tray price"), default=False)
+    tray = models.BooleanField(
+        _("tray price"), help_text=_("Buy five, get the sixth free"), default=False
+    )
     buying_groups = models.ManyToManyField(
         Group, related_name="products", verbose_name=_("buying groups"), blank=True
     )
