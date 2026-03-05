@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.forms import CheckboxSelectMultiple
@@ -58,7 +59,9 @@ class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView):
     current_tab = "counters"
 
 
-class CounterEditView(CounterAdminTabsMixin, UserPassesTestMixin, UpdateView):
+class CounterEditView(
+    CounterAdminTabsMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView
+):
     """Edit a counter's main informations (for the counter's manager)."""
 
     model = Counter
@@ -66,6 +69,7 @@ class CounterEditView(CounterAdminTabsMixin, UserPassesTestMixin, UpdateView):
     pk_url_kwarg = "counter_id"
     template_name = "core/edit.jinja"
     current_tab = "counters"
+    success_message = _("Counter update done")
 
     def test_func(self):
         if self.request.user.has_perm("counter.change_counter"):
