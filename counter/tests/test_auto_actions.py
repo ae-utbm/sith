@@ -55,10 +55,12 @@ def test_create_actions_alongside_product():
             "selling_price": 1.0,
             "special_selling_price": 1.0,
             "limit_age": 0,
-            "form-TOTAL_FORMS": "2",
-            "form-INITIAL_FORMS": "0",
-            "form-0-task": "counter.tasks.archive_product",
-            "form-0-trigger_at": trigger_at,
+            "price-TOTAL_FORMS": "0",
+            "price-INITIAL_FORMS": "0",
+            "action-TOTAL_FORMS": "1",
+            "action-INITIAL_FORMS": "0",
+            "action-0-task": "counter.tasks.archive_product",
+            "action-0-trigger_at": trigger_at,
         },
     )
     assert form.is_valid()
