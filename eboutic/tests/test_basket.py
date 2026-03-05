@@ -11,7 +11,12 @@ from pytest_django.asserts import assertRedirects
 
 from core.baker_recipes import subscriber_user
 from core.models import Group, User
-from counter.baker_recipes import product_recipe, refill_recipe, sale_recipe
+from counter.baker_recipes import (
+    price_recipe,
+    product_recipe,
+    refill_recipe,
+    sale_recipe,
+)
 from counter.models import (
     Counter,
     Customer,
@@ -147,29 +152,29 @@ class TestEboutic(TestCase):
 
         product_type = baker.make(ProductType)
 
-        cls.snack = product_recipe.make(
-            selling_price=1.5, special_selling_price=1, product_type=product_type
+        cls.snack = price_recipe.make(
+            amount=1.5, product=product_recipe.make(product_type=product_type)
         )
-        cls.beer = product_recipe.make(
-            limit_age=18,
-            selling_price=2.5,
-            special_selling_price=1,
-            product_type=product_type,
+        cls.beer = price_recipe.make(
+            product=product_recipe.make(limit_age=18, product_type=product_type),
+            amount=2.5,
         )
-        cls.not_in_counter = product_recipe.make(
-            selling_price=3.5, product_type=product_type
+        cls.not_in_counter = price_recipe.make(
+            product=product_recipe.make(product_type=product_type), amount=3.5
         )
-        cls.cotiz = product_recipe.make(selling_price=10, product_type=product_type)
+        cls.cotiz = price_recipe.make(
+            amount=10, product=product_recipe.make(product_type=product_type)
+        )
 
-        cls.group_public.products.add(cls.snack, cls.beer, cls.not_in_counter)
-        cls.group_cotiz.products.add(cls.cotiz)
+        cls.group_public.prices.add(cls.snack, cls.beer, cls.not_in_counter)
+        cls.group_cotiz.prices.add(cls.cotiz)
 
         cls.subscriber.groups.add(cls.group_cotiz, cls.group_public)
         cls.new_customer.groups.add(cls.group_public)
         cls.new_customer_adult.groups.add(cls.group_public)
 
         cls.eboutic = get_eboutic()
-        cls.eboutic.products.add(cls.cotiz, cls.beer, cls.snack)
+        cls.eboutic.products.add(cls.cotiz.product, cls.beer.product, cls.snack.product)
 
     @classmethod
     def set_age(cls, user: User, age: int):
@@ -253,7 +258,7 @@ class TestEboutic(TestCase):
             self.submit_basket([BasketItem(self.snack.id, 2)]),
             reverse("eboutic:checkout", kwargs={"basket_id": 1}),
         )
-        assert Basket.objects.get(id=1).total == self.snack.selling_price * 2
+        assert Basket.objects.get(id=1).total == self.snack.amount * 2
 
         self.client.force_login(self.new_customer_adult)
         assertRedirects(
@@ -263,8 +268,7 @@ class TestEboutic(TestCase):
             reverse("eboutic:checkout", kwargs={"basket_id": 2}),
         )
         assert (
-            Basket.objects.get(id=2).total
-            == self.snack.selling_price * 2 + self.beer.selling_price
+            Basket.objects.get(id=2).total == self.snack.amount * 2 + self.beer.amount
         )
 
         self.client.force_login(self.subscriber)
@@ -280,7 +284,5 @@ class TestEboutic(TestCase):
         )
         assert (
             Basket.objects.get(id=3).total
-            == self.snack.selling_price * 2
-            + self.beer.selling_price
-            + self.cotiz.selling_price
+            == self.snack.amount * 2 + self.beer.amount + self.cotiz.amount
         )

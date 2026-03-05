@@ -15,9 +15,8 @@ from pytest_django.asserts import assertNumQueries, assertRedirects
 from club.models import Club
 from core.baker_recipes import board_user, subscriber_user
 from core.models import Group, User
-from counter.baker_recipes import product_recipe
 from counter.forms import ProductForm
-from counter.models import Product, ProductFormula, ProductType
+from counter.models import Product, ProductType
 
 
 @pytest.mark.django_db
@@ -81,11 +80,11 @@ def test_fetch_product_access(
 def test_fetch_product_nb_queries(client: Client):
     client.force_login(baker.make(User, is_superuser=True))
     cache.clear()
-    with assertNumQueries(5):
+    with assertNumQueries(6):
         # - 2 for authentication
         # - 1 for pagination
         # - 1 for the actual request
-        # - 1 to prefetch the related buying_groups
+        # - 2 to prefetch the related prices and groups
         client.get(reverse("api:search_products_detailed"))
 
 
@@ -107,8 +106,10 @@ class TestCreateProduct(TestCase):
             "selling_price": 1.0,
             "special_selling_price": 1.0,
             "limit_age": 0,
-            "form-TOTAL_FORMS": 0,
-            "form-INITIAL_FORMS": 0,
+            "price-TOTAL_FORMS": 0,
+            "price-INITIAL_FORMS": 0,
+            "action-TOTAL_FORMS": 0,
+            "action-INITIAL_FORMS": 0,
         }
 
     def test_form(self):
@@ -118,35 +119,6 @@ class TestCreateProduct(TestCase):
         assert instance.club == self.club
         assert instance.product_type == self.product_type
         assert instance.name == "foo"
-        assert instance.selling_price == 1.0
-
-    def test_form_with_product_from_formula(self):
-        """Test when the edited product is a result of a formula."""
-        self.client.force_login(self.counter_admin)
-        products = product_recipe.make(
-            selling_price=iter([1.5, 1, 1]),
-            special_selling_price=iter([1.4, 0.9, 0.9]),
-            _quantity=3,
-            _bulk_create=True,
-        )
-        baker.make(ProductFormula, result=products[0], products=products[1:])
-
-        data = self.data | {"selling_price": 1.7, "special_selling_price": 1.5}
-        form = ProductForm(data=data, instance=products[0])
-        assert form.is_valid()
-
-        # it shouldn't be possible to give a price higher than the formula's products
-        data = self.data | {"selling_price": 2.1, "special_selling_price": 1.9}
-        form = ProductForm(data=data, instance=products[0])
-        assert not form.is_valid()
-        assert form.errors == {
-            "selling_price": [
-                "Assurez-vous que cette valeur est inférieure ou égale à 2.00."
-            ],
-            "special_selling_price": [
-                "Assurez-vous que cette valeur est inférieure ou égale à 1.80."
-            ],
-        }
 
     def test_view(self):
         self.client.force_login(self.counter_admin)
