@@ -1,6 +1,7 @@
 import json
 import math
 import uuid
+from collections import defaultdict
 from datetime import date, datetime, timezone
 
 from dateutil.relativedelta import relativedelta
@@ -37,6 +38,7 @@ from counter.models import (
     Customer,
     Eticket,
     InvoiceCall,
+    Price,
     Product,
     ProductFormula,
     Refilling,
@@ -374,7 +376,21 @@ ScheduledProductActionFormSet = forms.modelformset_factory(
     can_delete=True,
     can_delete_extra=False,
     extra=0,
+)
+
+
+ProductPriceFormSet = forms.inlineformset_factory(
+    parent_model=Product,
+    model=Price,
+    fields=["amount", "label", "groups", "is_always_shown"],
+    widgets={
+        "groups": AutoCompleteSelectMultipleGroup,
+        "is_always_shown": forms.CheckboxInput(attrs={"class": "switch"}),
+    },
+    absolute_max=None,
+    can_delete_extra=False,
     min_num=1,
+    extra=0,
 )
 
 
@@ -389,10 +405,7 @@ class ProductForm(forms.ModelForm):
             "description",
             "product_type",
             "code",
-            "buying_groups",
             "purchase_price",
-            "selling_price",
-            "special_selling_price",
             "icon",
             "club",
             "limit_age",
@@ -407,8 +420,8 @@ class ProductForm(forms.ModelForm):
         }
         widgets = {
             "product_type": AutoCompleteSelect,
-            "buying_groups": AutoCompleteSelectMultipleGroup,
             "club": AutoCompleteSelectClub,
+            "tray": forms.CheckboxInput(attrs={"class": "switch"}),
         }
 
     counters = forms.ModelMultipleChoiceField(
@@ -418,14 +431,18 @@ class ProductForm(forms.ModelForm):
         queryset=Counter.objects.all(),
     )
 
-    def __init__(self, *args, instance=None, **kwargs):
-        super().__init__(*args, instance=instance, **kwargs)
+    def __init__(self, *args, prefix: str | None = None, instance=None, **kwargs):
+        super().__init__(*args, prefix=prefix, instance=instance, **kwargs)
+        self.fields["name"].widget.attrs["autofocus"] = "autofocus"
         if self.instance.id:
             self.fields["counters"].initial = self.instance.counters.all()
             if hasattr(self.instance, "formula"):
                 self.formula_init(self.instance.formula)
+        self.price_formset = ProductPriceFormSet(
+            *args, instance=self.instance, prefix="price", **kwargs
+        )
         self.action_formset = ScheduledProductActionFormSet(
-            *args, product=self.instance, **kwargs
+            *args, product=self.instance, prefix="action", **kwargs
         )
 
     def formula_init(self, formula: ProductFormula):
@@ -448,20 +465,25 @@ class ProductForm(forms.ModelForm):
             self.fields[key].validators.append(MaxValueValidator(price))
 
     def is_valid(self):
-        return super().is_valid() and self.action_formset.is_valid()
+        return (
+            super().is_valid()
+            and self.price_formset.is_valid()
+            and self.action_formset.is_valid()
+        )
 
     def save(self, *args, **kwargs) -> Product:
         product = super().save(*args, **kwargs)
         product.counters.set(self.cleaned_data["counters"])
+        # if it's a creation, the product given in the formset
+        # wasn't a persisted instance.
+        # So if we tried to persist the related objects in the current state,
+        # they would be linked to no product, thus be completely useless
+        # To make it work, we have to replace
+        # the initial product with a persisted one
         for form in self.action_formset:
-            # if it's a creation, the product given in the formset
-            # wasn't a persisted instance.
-            # So if we tried to persist the scheduled actions in the current state,
-            # they would be linked to no product, thus be completely useless
-            # To make it work, we have to replace
-            # the initial product with a persisted one
             form.set_product(product)
         self.action_formset.save()
+        self.price_formset.save()
         return product
 
 
