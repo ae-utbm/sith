@@ -752,7 +752,7 @@ class CounterSellers(models.Model):
 
     counter = models.ForeignKey(Counter, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    is_regular = models.BooleanField("regular barman", default=False)
+    is_regular = models.BooleanField(_("regular barman"), default=False)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
 
     class Meta:
