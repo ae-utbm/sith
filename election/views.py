@@ -115,7 +115,7 @@ class VoteFormView(LoginRequiredMixin, UserPassesTestMixin, FormView):
         if not self.election.can_vote(self.request.user):
             return False
         return self.election.vote_groups.filter(
-            id__in=[g.id for g in self.request.user.all_groups]
+            id__in=self.request.user.all_groups
         ).exists()
 
     def vote(self, election_data):
@@ -231,7 +231,7 @@ class RoleCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         if self.request.user.has_perm("election.add_role"):
             return True
         return self.election.edit_groups.filter(
-            id__in=[g.id for g in self.request.user.all_groups]
+            id__in=self.request.user.all_groups
         ).exists()
 
     def get_initial(self):
@@ -265,7 +265,7 @@ class ElectionListCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView
             .union(self.election.edit_groups.values("id"))
             .values_list("id", flat=True)
         )
-        return not groups.isdisjoint({g.id for g in self.request.user.all_groups})
+        return not groups.isdisjoint(self.request.user.all_groups.keys())
 
     def get_initial(self):
         return {"election": self.election}
