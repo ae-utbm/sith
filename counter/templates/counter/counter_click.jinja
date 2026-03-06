@@ -202,7 +202,7 @@
       </div>
 
       <div id="products">
-        {% if not products %}
+        {% if not prices %}
           <div class="alert alert-red">
             {% trans %}No products available on this counter for this user{% endtrans %}
           </div>
@@ -242,9 +242,11 @@
   {{ super() }}
   <script>
     const products = {
-      {%- for price in products -%}
+      {%- for price in prices -%}
         {{ price.id }}: {
+          productId: {{ price.product_id }},
           price: { id: "{{ price.id }}", amount: {{ price.amount }} },
+          code: "{{ price.product.code }}",
           name: "{{ price.full_label }}",
           hasTrayPrice: {{ price.product.tray | tojson }},
           quantityForTrayPrice: {{ price.product.QUANTITY_FOR_TRAY_PRICE }},

@@ -1,11 +1,11 @@
-import type { Product } from "#counter:counter/types";
+import type { CounterItem } from "#counter:counter/types";
 
 export class BasketItem {
   quantity: number;
-  product: Product;
+  product: CounterItem;
   errors: string[];
 
-  constructor(product: Product, quantity: number) {
+  constructor(product: CounterItem, quantity: number) {
     this.quantity = quantity;
     this.product = product;
     this.errors = [];

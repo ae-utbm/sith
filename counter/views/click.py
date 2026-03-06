@@ -73,7 +73,7 @@ class CounterClick(
         kwargs["form_kwargs"] = {
             "customer": self.customer,
             "counter": self.object,
-            "allowed_prices": {price.id: price for price in self.products},
+            "allowed_prices": {price.id: price for price in self.prices},
         }
         return kwargs
 
@@ -103,7 +103,7 @@ class CounterClick(
         ):
             return redirect(obj)  # Redirect to counter
 
-        self.products = obj.get_prices_for(self.customer)
+        self.prices = obj.get_prices_for(self.customer)
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -206,12 +206,12 @@ class CounterClick(
     def get_context_data(self, **kwargs):
         """Add customer to the context."""
         kwargs = super().get_context_data(**kwargs)
-        kwargs["products"] = self.products
+        kwargs["prices"] = self.prices
         kwargs["formulas"] = ProductFormula.objects.filter(
-            result__in=self.products
+            result__in=[p.product_id for p in self.prices]
         ).prefetch_related("products")
         kwargs["categories"] = defaultdict(list)
-        for price in kwargs["products"]:
+        for price in self.prices:
             kwargs["categories"][price.product.product_type].append(price)
         kwargs["customer"] = self.customer
         kwargs["cancel_url"] = self.get_success_url()
