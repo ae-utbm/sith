@@ -448,10 +448,6 @@ class Product(models.Model):
             return True
         return any(user.is_in_group(pk=group.id) for group in buying_groups)
 
-    @property
-    def profit(self):
-        return self.selling_price - self.purchase_price
-
 
 class PriceQuerySet(models.QuerySet):
     def for_user(self, user: User) -> Self:
@@ -542,18 +538,6 @@ class ProductFormula(models.Model):
 
     def __str__(self):
         return self.result.name
-
-    @cached_property
-    def max_selling_price(self) -> float:
-        # iterating over all products is less efficient than doing
-        # a simple aggregation, but this method is likely to be used in
-        # coordination with `max_special_selling_price`,
-        # and Django caches the result of the `all` queryset.
-        return sum(p.selling_price for p in self.products.all())
-
-    @cached_property
-    def max_special_selling_price(self) -> float:
-        return sum(p.special_selling_price for p in self.products.all())
 
 
 class CounterQuerySet(models.QuerySet):

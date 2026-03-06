@@ -7,7 +7,6 @@ from datetime import date, datetime, timezone
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator
 from django.db.models import Exists, OuterRef, Q
 from django.forms import BaseModelFormSet
 from django.utils.timezone import now
@@ -445,25 +444,6 @@ class ProductForm(forms.ModelForm):
             *args, product=self.instance, prefix="action", **kwargs
         )
 
-    def formula_init(self, formula: ProductFormula):
-        """Part of the form initialisation specific to formula products."""
-        self.fields["selling_price"].help_text = _(
-            "This product is a formula. "
-            "Its price cannot be greater than the price "
-            "of the products constituting it, which is %(price)s €"
-        ) % {"price": formula.max_selling_price}
-        self.fields["special_selling_price"].help_text = _(
-            "This product is a formula. "
-            "Its special price cannot be greater than the price "
-            "of the products constituting it, which is %(price)s €"
-        ) % {"price": formula.max_special_selling_price}
-        for key, price in (
-            ("selling_price", formula.max_selling_price),
-            ("special_selling_price", formula.max_special_selling_price),
-        ):
-            self.fields[key].widget.attrs["max"] = price
-            self.fields[key].validators.append(MaxValueValidator(price))
-
     def is_valid(self):
         return (
             super().is_valid()
@@ -504,18 +484,6 @@ class ProductFormulaForm(forms.ModelForm):
                 _(
                     "The same product cannot be at the same time "
                     "the result and a part of the formula."
-                ),
-            )
-        prices = [p.selling_price for p in cleaned_data["products"]]
-        special_prices = [p.special_selling_price for p in cleaned_data["products"]]
-        selling_price = cleaned_data["result"].selling_price
-        special_selling_price = cleaned_data["result"].special_selling_price
-        if selling_price > sum(prices) or special_selling_price > sum(special_prices):
-            self.add_error(
-                "result",
-                _(
-                    "The result cannot be more expensive "
-                    "than the total of the other products."
                 ),
             )
         return cleaned_data
