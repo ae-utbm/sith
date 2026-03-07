@@ -3758,6 +3758,10 @@ msgstr ""
 "aucune conséquence autre que le retrait de l'argent de votre compte."
 
 #: counter/templates/counter/product_form.jinja
+msgid "Remove this action"
+msgstr "Retirer cette action"
+
+#: counter/templates/counter/product_form.jinja
 #, python-format
 msgid "Edit product %(name)s"
 msgstr "Édition du produit %(name)s"
@@ -3783,6 +3787,10 @@ msgid "Automatic actions allows to schedule product changes ahead of time."
 msgstr ""
 "Les actions automatiques vous permettent de planifier des modifications du "
 "produit à l'avance."
+
+#: counter/templates/counter/product_form.jinja
+msgid "Add action"
+msgstr "Ajouter une action"
 
 #: counter/templates/counter/product_list.jinja
 msgid "Product list"

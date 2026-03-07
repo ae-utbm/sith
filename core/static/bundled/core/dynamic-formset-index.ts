@@ -21,6 +21,9 @@ document.addEventListener("alpine:init", () => {
    * - a button with `@click="addForm"`
    * - you may also have one or more buttons with `@click="removeForm(element)"`,
    *   where `element` is the HTML element containing the form.
+   *
+   * For an example of how this is used, you can have a look to
+   * `counter/templates/counter/product_form.jinja`
    */
   Alpine.data("dynamicFormSet", (config?: Config) => ({
     init() {

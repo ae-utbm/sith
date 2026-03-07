@@ -291,7 +291,8 @@ ScheduledProductActionFormSet = forms.modelformset_factory(
     absolute_max=None,
     can_delete=True,
     can_delete_extra=False,
-    extra=2,
+    extra=0,
+    min_num=1,
 )
 
 
