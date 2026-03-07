@@ -58,7 +58,7 @@ class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView):
     current_tab = "counters"
 
 
-class CounterEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
+class CounterEditView(CounterAdminTabsMixin, UserPassesTestMixin, UpdateView):
     """Edit a counter's main informations (for the counter's manager)."""
 
     model = Counter
@@ -67,10 +67,14 @@ class CounterEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     template_name = "core/edit.jinja"
     current_tab = "counters"
 
-    def dispatch(self, request, *args, **kwargs):
-        obj = self.get_object()
-        self.edit_club.append(obj.club)
-        return super().dispatch(request, *args, **kwargs)
+    def test_func(self):
+        if self.request.user.has_perm("counter.change_counter"):
+            return True
+        obj = self.get_object(queryset=self.get_queryset().select_related("club"))
+        return obj.club.has_rights_in_club(self.request.user)
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"user": self.request.user}
 
     def get_success_url(self):
         return reverse_lazy("counter:admin", kwargs={"counter_id": self.object.id})

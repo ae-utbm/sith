@@ -24,6 +24,7 @@ from core.views.forms import (
 )
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
+    AutoCompleteSelectMultiple,
     AutoCompleteSelectMultipleGroup,
     AutoCompleteSelectMultipleUser,
     AutoCompleteSelectUser,
@@ -170,11 +171,21 @@ class CounterEditForm(forms.ModelForm):
     class Meta:
         model = Counter
         fields = ["sellers", "products"]
+        widgets = {"sellers": AutoCompleteSelectMultipleUser}
 
-        widgets = {
-            "sellers": AutoCompleteSelectMultipleUser,
-            "products": AutoCompleteSelectMultipleProduct,
-        }
+    def __init__(self, *args, user: User, instance: Counter, **kwargs):
+        super().__init__(*args, instance=instance, **kwargs)
+        if user.has_perm("counter.change_counter"):
+            self.fields["products"].widget = AutoCompleteSelectMultipleProduct()
+        else:
+            self.fields["products"].widget = AutoCompleteSelectMultiple()
+            self.fields["products"].queryset = Product.objects.filter(
+                Q(club_id=instance.club_id) | Q(counters=instance), archived=False
+            ).distinct()
+            self.fields["products"].help_text = _(
+                "If you want to add a product that is not owned by "
+                "your club to this counter, you should ask an admin."
+            )
 
 
 class ScheduledProductActionForm(forms.ModelForm):
