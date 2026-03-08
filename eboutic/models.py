@@ -22,7 +22,7 @@ from typing import Self
 from dict2xml import dict2xml
 from django.conf import settings
 from django.db import DataError, models
-from django.db.models import F, OuterRef, Q, Subquery, Sum
+from django.db.models import F, OuterRef, Subquery, Sum
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -37,30 +37,6 @@ from counter.models import (
     Selling,
     get_eboutic,
 )
-
-
-def get_eboutic_prices(user: User) -> list[Price]:
-    return list(
-        Price.objects.filter(
-            Q(is_always_shown=True, groups__in=user.all_groups)
-            | Q(
-                id=Subquery(
-                    Price.objects.filter(
-                        product_id=OuterRef("product_id"), groups__in=user.all_groups
-                    )
-                    .order_by("amount")
-                    .values("id")[:1]
-                )
-            ),
-            product__product_type__isnull=False,
-            product__archived=False,
-            product__limit_age__lte=user.age,
-            product__counters=get_eboutic(),
-        )
-        .select_related("product", "product__product_type")
-        .order_by("product__product_type__order", "product_id", "amount")
-        .distinct()
-    )
 
 
 class BillingInfoState(Enum):
