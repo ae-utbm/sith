@@ -551,27 +551,27 @@ SITH_SUBSCRIPTIONS = {
     # Discount subscriptions
     "un-semestre-reduction": {
         "name": _("One semester (-20%)"),
-        "price": 12,
+        "price": 16,
         "duration": 1,
     },
     "deux-semestres-reduction": {
         "name": _("Two semesters (-20%)"),
-        "price": 22,
+        "price": 28,
         "duration": 2,
     },
     "cursus-tronc-commun-reduction": {
         "name": _("Common core cursus (-20%)"),
-        "price": 36,
+        "price": 48,
         "duration": 4,
     },
     "cursus-branche-reduction": {
         "name": _("Branch cursus (-20%)"),
-        "price": 36,
+        "price": 48,
         "duration": 6,
     },
     "cursus-alternant-reduction": {
         "name": _("Alternating cursus (-20%)"),
-        "price": 24,
+        "price": 28,
         "duration": 6,
     },
     # CA special offer
