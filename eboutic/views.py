@@ -29,9 +29,7 @@ from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import (
-    LoginRequiredMixin,
-)
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.db import DatabaseError, transaction
@@ -58,14 +56,7 @@ from counter.models import (
     Selling,
     get_eboutic,
 )
-from eboutic.models import (
-    Basket,
-    BasketItem,
-    BillingInfoState,
-    Invoice,
-    InvoiceItem,
-    get_eboutic_prices,
-)
+from eboutic.models import Basket, BasketItem, BillingInfoState, Invoice, InvoiceItem
 
 if TYPE_CHECKING:
     from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
@@ -125,7 +116,10 @@ class EbouticMainView(LoginRequiredMixin, FormView):
 
     @cached_property
     def prices(self) -> list[Price]:
-        return get_eboutic_prices(self.request.user)
+        return get_eboutic().get_prices_for(
+            self.customer,
+            order_by=["product__product_type__order", "product_id", "amount"],
+        )
 
     @cached_property
     def customer(self) -> Customer:

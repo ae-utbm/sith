@@ -39,6 +39,7 @@ from counter.models import (
     Counter,
     Customer,
     Permanency,
+    ProductType,
     Refilling,
     ReturnableProduct,
     Selling,
@@ -238,31 +239,38 @@ class TestCounterClick(TestFullClickBase):
         old_subscriber_group = Group.objects.get(
             id=settings.SITH_GROUP_OLD_SUBSCRIBERS_ID
         )
+        _product_recipe = product_recipe.extend(product_type=baker.make(ProductType))
 
-        cls.gift = price_recipe.make(amount=-1.5, groups=[subscriber_group])
+        cls.gift = price_recipe.make(
+            amount=-1.5, groups=[subscriber_group], product=_product_recipe.make()
+        )
         cls.beer = price_recipe.make(
             groups=[subscriber_group],
             amount=1.5,
-            product=product_recipe.make(limit_age=18),
+            product=_product_recipe.make(limit_age=18),
         )
         cls.beer_tap = price_recipe.make(
             groups=[subscriber_group],
             amount=1.5,
-            product=product_recipe.make(limit_age=18, tray=True),
+            product=_product_recipe.make(limit_age=18, tray=True),
         )
         cls.snack = price_recipe.make(
             groups=[subscriber_group, old_subscriber_group],
             amount=1.5,
-            product=product_recipe.make(limit_age=0),
+            product=_product_recipe.make(limit_age=0),
         )
         cls.stamps = price_recipe.make(
             groups=[subscriber_group],
             amount=1.5,
-            product=product_recipe.make(limit_age=0),
+            product=_product_recipe.make(limit_age=0),
         )
         ReturnableProduct.objects.all().delete()
-        cls.cons = price_recipe.make(amount=1, groups=[subscriber_group])
-        cls.dcons = price_recipe.make(amount=-1, groups=[subscriber_group])
+        cls.cons = price_recipe.make(
+            amount=1, groups=[subscriber_group], product=_product_recipe.make()
+        )
+        cls.dcons = price_recipe.make(
+            amount=-1, groups=[subscriber_group], product=_product_recipe.make()
+        )
         baker.make(
             ReturnableProduct,
             product=cls.cons.product,
@@ -575,18 +583,17 @@ class TestCounterClick(TestFullClickBase):
         group = baker.make(Group)
         customer = baker.make(Customer)
         group.users.add(customer.user)
+        _product_recipe = product_recipe.extend(
+            counters=[counter], product_type=baker.make(ProductType)
+        )
         price_recipe.make(
             _quantity=2,
-            product=iter(
-                product_recipe.make(archived=True, counters=[counter], _quantity=2)
-            ),
+            product=iter(_product_recipe.make(archived=True, _quantity=2)),
             groups=[group],
         )
         unarchived_prices = price_recipe.make(
             _quantity=2,
-            product=iter(
-                product_recipe.make(archived=False, counters=[counter], _quantity=2)
-            ),
+            product=iter(_product_recipe.make(archived=False, _quantity=2)),
             groups=[group],
         )
         customer_prices = counter.get_prices_for(customer)
