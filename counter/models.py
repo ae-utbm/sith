@@ -157,14 +157,7 @@ class Customer(models.Model):
 
     @property
     def can_buy(self) -> bool:
-        """Check if whether this customer has the right to purchase any item.
-
-        This must be not confused with the Product.can_be_sold_to(user)
-        method as the present method returns an information
-        about a customer whereas the other tells something
-        about the relation between a User (not a Customer,
-        don't mix them) and a Product.
-        """
+        """Check if whether this customer has the right to purchase any item."""
         subscription = self.user.subscriptions.order_by("subscription_end").last()
         if subscription is None:
             return False
@@ -415,38 +408,6 @@ class Product(models.Model):
         return user.is_in_group(
             pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
         ) or user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
-
-    def can_be_sold_to(self, user: User) -> bool:
-        """Check if whether the user given in parameter has the right to buy
-        this product or not.
-
-        This must be not confused with the Customer.can_buy()
-        method as the present method returns an information
-        about the relation between a User and a Product,
-        whereas the other tells something about a Customer
-        (and not a user, they are not the same model).
-
-        Returns:
-            True if the user can buy this product else False
-
-        Warning:
-            This performs a db query, thus you can quickly have
-            a N+1 queries problem if you call it in a loop.
-            Hopefully, you can avoid that if you prefetch the buying_groups :
-
-            ```python
-            user = User.objects.get(username="foobar")
-            products = [
-                p
-                for p in Product.objects.prefetch_related("buying_groups")
-                if p.can_be_sold_to(user)
-            ]
-            ```
-        """
-        buying_groups = list(self.buying_groups.all())
-        if not buying_groups:
-            return True
-        return any(user.is_in_group(pk=group.id) for group in buying_groups)
 
 
 class PriceQuerySet(models.QuerySet):
