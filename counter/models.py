@@ -22,7 +22,7 @@ import string
 from datetime import date, datetime, timedelta
 from datetime import timezone as tz
 from decimal import Decimal
-from typing import Literal, Self
+from typing import TYPE_CHECKING, Literal, Self
 
 from dict2xml import dict2xml
 from django.conf import settings
@@ -46,6 +46,9 @@ from core.models import Group, Notification, User
 from core.utils import get_start_of_semester
 from counter.fields import CurrencyField
 from subscription.models import Subscription
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 def get_eboutic() -> Counter:
@@ -356,13 +359,13 @@ class Product(models.Model):
     QUANTITY_FOR_TRAY_PRICE = 6
 
     name = models.CharField(_("name"), max_length=64)
-    description = models.TextField(_("description"), default="")
+    description = models.TextField(_("description"), blank=True, default="")
     product_type = models.ForeignKey(
         ProductType,
         related_name="products",
         verbose_name=_("product type"),
         null=True,
-        blank=True,
+        blank=False,
         on_delete=models.SET_NULL,
     )
     code = models.CharField(_("code"), max_length=16, blank=True)
@@ -730,13 +733,20 @@ class Counter(models.Model):
         # but they share the same primary key
         return self.type == "BAR" and any(b.pk == customer.pk for b in self.barmen_list)
 
-    def get_prices_for(self, customer: Customer) -> list[Price]:
-        return list(
-            Price.objects.filter(product__counters=self)
+    def get_prices_for(
+        self, customer: Customer, *, order_by: Sequence[str] | None = None
+    ) -> list[Price]:
+        qs = (
+            Price.objects.filter(
+                product__counters=self, product__product_type__isnull=False
+            )
             .for_user(customer.user)
             .select_related("product", "product__product_type")
             .prefetch_related("groups")
         )
+        if order_by:
+            qs = qs.order_by(*order_by)
+        return list(qs)
 
 
 class CounterSellers(models.Model):

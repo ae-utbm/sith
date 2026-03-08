@@ -119,4 +119,31 @@ class Migration(migrations.Migration):
         migrations.RunPython(migrate_prices, reverse_code=migrations.RunPython.noop),
         migrations.RemoveField(model_name="product", name="selling_price"),
         migrations.RemoveField(model_name="product", name="special_selling_price"),
+        migrations.AlterField(
+            model_name="product",
+            name="description",
+            field=models.TextField(blank=True, default="", verbose_name="description"),
+        ),
+        migrations.AlterField(
+            model_name="product",
+            name="product_type",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="products",
+                to="counter.producttype",
+                verbose_name="product type",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="productformula",
+            name="result",
+            field=models.OneToOneField(
+                help_text="The product got with the formula.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="formula",
+                to="counter.product",
+                verbose_name="result product",
+            ),
+        ),
     ]

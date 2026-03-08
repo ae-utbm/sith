@@ -16,7 +16,7 @@ from counter.forms import (
     ScheduledProductActionForm,
     ScheduledProductActionFormSet,
 )
-from counter.models import Product, ScheduledProductAction
+from counter.models import Product, ProductType, ScheduledProductAction
 
 
 @pytest.mark.django_db
@@ -47,8 +47,7 @@ def test_create_actions_alongside_product():
     form = ProductForm(
         data={
             "name": "foo",
-            "description": "bar",
-            "product_type": product.product_type_id,
+            "product_type": ProductType.objects.first(),
             "club": product.club_id,
             "code": "FOO",
             "purchase_price": 1.0,
