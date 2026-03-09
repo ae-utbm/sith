@@ -55,7 +55,8 @@ class UserClubController(ControllerBase):
         permissions=[CanView],
         url_name="fetch_user_clubs",
     )
-    def search_club(self, user_id: int):
+    def fetch_user_clubs(self, user_id: int):
+        """Get all the active memberships of the given user."""
         user = self.get_object_or_exception(User, id=user_id)
         return (
             Membership.objects.ongoing()
