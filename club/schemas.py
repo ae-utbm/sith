@@ -40,6 +40,8 @@ class ClubProfileSchema(ModelSchema):
 
 
 class ClubMemberSchema(ModelSchema):
+    """A schema to represent all memberships in a club."""
+
     class Meta:
         model = Membership
         fields = ["start_date", "end_date", "role", "description"]
@@ -53,3 +55,13 @@ class ClubSchema(ModelSchema):
         fields = ["id", "name", "logo", "is_active", "short_description", "address"]
 
     members: list[ClubMemberSchema]
+
+
+class UserMembershipSchema(ModelSchema):
+    """A schema to represent the active club memberships of a user."""
+
+    class Meta:
+        model = Membership
+        fields = ["id", "start_date", "role", "description"]
+
+    club: SimpleClubSchema

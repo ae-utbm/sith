@@ -6,9 +6,15 @@ from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
 from api.auth import ApiKeyAuth
-from api.permissions import CanAccessLookup, HasPerm
+from api.permissions import CanAccessLookup, CanView, HasPerm
 from club.models import Club, Membership
-from club.schemas import ClubSchema, ClubSearchFilterSchema, SimpleClubSchema
+from club.schemas import (
+    ClubSchema,
+    ClubSearchFilterSchema,
+    SimpleClubSchema,
+    UserMembershipSchema,
+)
+from core.models import User
 
 
 @api_controller("/club")
@@ -37,4 +43,23 @@ class ClubController(ControllerBase):
         )
         return self.get_object_or_exception(
             Club.objects.prefetch_related(prefetch), id=club_id
+        )
+
+
+@api_controller("/user/{int:user_id}/club")
+class UserClubController(ControllerBase):
+    @route.get(
+        "",
+        response=list[UserMembershipSchema],
+        auth=[ApiKeyAuth(), SessionAuth()],
+        permissions=[CanView],
+        url_name="fetch_user_clubs",
+    )
+    def fetch_user_clubs(self, user_id: int):
+        """Get all the active memberships of the given user."""
+        user = self.get_object_or_exception(User, id=user_id)
+        return (
+            Membership.objects.ongoing()
+            .filter(user=user)
+            .select_related("club", "user")
         )
