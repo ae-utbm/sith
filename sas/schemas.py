@@ -26,18 +26,9 @@ class SimpleAlbumSchema(ModelSchema):
 class AlbumSchema(ModelSchema):
     class Meta:
         model = Album
-        fields = ["id", "name", "is_moderated"]
+        fields = ["id", "name", "is_moderated", "thumbnail"]
 
-    thumbnail: str | None
     sas_url: str
-
-    @staticmethod
-    def resolve_thumbnail(obj: Album) -> str | None:
-        # Album thumbnails aren't stored in `Album.thumbnail` but in `Album.file`
-        # Don't ask me why.
-        if not obj.file:
-            return None
-        return obj.get_download_url()
 
     @staticmethod
     def resolve_sas_url(obj: Album) -> str:
@@ -55,7 +46,12 @@ class AlbumAutocompleteSchema(ModelSchema):
 
     @staticmethod
     def resolve_path(obj: Album) -> str:
-        return str(Path(obj.get_parent_path()) / obj.name)
+        return str(Path(obj.parent_path) / obj.name)
+
+
+class MoveAlbumSchema(Schema):
+    id: int
+    new_parent_id: int
 
 
 class PictureFilterSchema(FilterSchema):
@@ -70,7 +66,7 @@ class PictureFilterSchema(FilterSchema):
 class PictureSchema(ModelSchema):
     class Meta:
         model = Picture
-        fields = ["id", "name", "date", "size", "is_moderated", "asked_for_removal"]
+        fields = ["id", "name", "created_at", "is_moderated", "asked_for_removal"]
 
     owner: UserProfileSchema
     sas_url: str

@@ -142,7 +142,8 @@ exportToHtml("loadViewer", (config: ViewerConfig) => {
         // biome-ignore lint/style/useNamingConvention: api is in snake_case
         full_size_url: "",
         owner: "",
-        date: new Date(),
+        // biome-ignore lint/style/useNamingConvention: api is in snake_case
+        created_at: new Date(),
         identifications: [] as IdentifiedUserSchema[],
       },
       /**
