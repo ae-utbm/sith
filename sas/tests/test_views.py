@@ -161,15 +161,21 @@ class TestSasModeration(TestCase):
         assert len(res.context_data["pictures"]) == 1
         assert res.context_data["pictures"][0] == self.to_moderate
 
-        res = self.client.post(
-            reverse("sas:moderation"),
-            data={"album_id": self.to_moderate.id, "picture_id": self.to_moderate.id},
-        )
-
     def test_moderation_page_forbidden(self):
         self.client.force_login(self.simple_user)
         res = self.client.get(reverse("sas:moderation"))
         assert res.status_code == 403
+
+    def test_moderate_album(self):
+        self.client.force_login(self.moderator)
+        url = reverse("sas:moderation")
+        album = baker.make(
+            Album, is_moderated=False, parent_id=settings.SITH_SAS_ROOT_DIR_ID
+        )
+        res = self.client.post(url, data={"album_id": album.id, "moderate": ""})
+        assertRedirects(res, url)
+        album.refresh_from_db()
+        assert album.is_moderated
 
     def test_moderate_picture(self):
         self.client.force_login(self.moderator)

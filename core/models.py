@@ -356,23 +356,27 @@ class User(AbstractUser):
         )
         if group_id is None:
             return False
-        if group_id == settings.SITH_GROUP_SUBSCRIBERS_ID:
-            return self.is_subscribed
-        if group_id == settings.SITH_GROUP_ROOT_ID:
-            return self.is_root
-        return any(g.id == group_id for g in self.cached_groups)
+        return group_id in self.all_groups
 
     @cached_property
-    def cached_groups(self) -> list[Group]:
+    def all_groups(self) -> dict[int, Group]:
         """Get the list of groups this user is in."""
-        return list(self.groups.all())
+        additional_groups = []
+        if self.is_subscribed:
+            additional_groups.append(settings.SITH_GROUP_SUBSCRIBERS_ID)
+        if self.is_superuser:
+            additional_groups.append(settings.SITH_GROUP_ROOT_ID)
+        qs = self.groups.all()
+        if additional_groups:
+            # This is somewhat counter-intuitive, but this query runs way faster with
+            # a UNION rather than a OR (in average, 0.25ms vs 14ms).
+            # For the why, cf. https://dba.stackexchange.com/questions/293836/why-is-an-or-statement-slower-than-union
+            qs = qs.union(Group.objects.filter(id__in=additional_groups))
+        return {g.id: g for g in qs}
 
     @cached_property
     def is_root(self) -> bool:
-        if self.is_superuser:
-            return True
-        root_id = settings.SITH_GROUP_ROOT_ID
-        return any(g.id == root_id for g in self.cached_groups)
+        return self.is_superuser or settings.SITH_GROUP_ROOT_ID in self.all_groups
 
     @cached_property
     def is_board_member(self) -> bool:
@@ -1099,10 +1103,7 @@ class PageQuerySet(models.QuerySet):
             return self.filter(view_groups=settings.SITH_GROUP_PUBLIC_ID)
         if user.has_perm("core.view_page"):
             return self.all()
-        groups_ids = [g.id for g in user.cached_groups]
-        if user.is_subscribed:
-            groups_ids.append(settings.SITH_GROUP_SUBSCRIBERS_ID)
-        return self.filter(view_groups__in=groups_ids)
+        return self.filter(view_groups__in=user.all_groups)
 
 
 # This function prevents generating migration upon settings change
@@ -1376,7 +1377,7 @@ class PageRev(models.Model):
         return self.page.can_be_edited_by(user)
 
     def is_owned_by(self, user: User) -> bool:
-        return any(g.id == self.page.owner_group_id for g in user.cached_groups)
+        return self.page.owner_group_id in user.all_groups
 
     def similarity_ratio(self, text: str) -> float:
         """Similarity ratio between this revision's content and the given text.
