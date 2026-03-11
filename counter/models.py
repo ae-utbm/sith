@@ -551,7 +551,11 @@ class Counter(models.Model):
         choices=[("BAR", _("Bar")), ("OFFICE", _("Office")), ("EBOUTIC", _("Eboutic"))],
     )
     sellers = models.ManyToManyField(
-        User, verbose_name=_("sellers"), related_name="counters", blank=True
+        User,
+        verbose_name=_("sellers"),
+        related_name="counters",
+        blank=True,
+        through="CounterSellers",
     )
     edit_groups = models.ManyToManyField(
         Group, related_name="editable_counters", blank=True
@@ -741,6 +745,26 @@ class Counter(models.Model):
             for product in products.all()
             if product.can_be_sold_to(customer.user)
         ]
+
+
+class CounterSellers(models.Model):
+    """Custom through model for the counter-sellers M2M relationship."""
+
+    counter = models.ForeignKey(Counter, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_regular = models.BooleanField(_("regular barman"), default=False)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["counter", "user"],
+                name="counter_counter_sellers_counter_id_subscriber_id_key",
+            )
+        ]
+
+    def __str__(self):
+        return f"counter {self.counter_id} - user {self.user_id}"
 
 
 class RefillingQuerySet(models.QuerySet):

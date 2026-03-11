@@ -5,6 +5,7 @@ from datetime import date, datetime, timezone
 
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.db.models import Exists, OuterRef, Q
 from django.forms import BaseModelFormSet
@@ -15,7 +16,7 @@ from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
 from club.models import Club
 from club.widgets.ajax_select import AutoCompleteSelectClub
-from core.models import User
+from core.models import User, UserQuerySet
 from core.views.forms import (
     FutureDateTimeField,
     NFCTextInput,
@@ -32,6 +33,7 @@ from core.views.widgets.ajax_select import (
 from counter.models import (
     BillingInfo,
     Counter,
+    CounterSellers,
     Customer,
     Eticket,
     InvoiceCall,
@@ -170,14 +172,39 @@ class RefillForm(forms.ModelForm):
 class CounterEditForm(forms.ModelForm):
     class Meta:
         model = Counter
-        fields = ["sellers", "products"]
-        widgets = {"sellers": AutoCompleteSelectMultipleUser}
+        fields = ["products"]
+
+    sellers_regular = forms.ModelMultipleChoiceField(
+        label=_("Regular barmen"),
+        help_text=_(
+            "Barmen having regular permanences "
+            "or frequently giving a hand throughout the semester."
+        ),
+        queryset=User.objects.all(),
+        widget=AutoCompleteSelectMultipleUser,
+        required=False,
+    )
+    sellers_temporary = forms.ModelMultipleChoiceField(
+        label=_("Temporary barmen"),
+        help_text=_(
+            "Barmen who will be there only for a limited period (e.g. for one evening)"
+        ),
+        queryset=User.objects.all(),
+        widget=AutoCompleteSelectMultipleUser,
+        required=False,
+    )
+    field_order = ["sellers_regular", "sellers_temporary", "products"]
 
     def __init__(self, *args, user: User, instance: Counter, **kwargs):
         super().__init__(*args, instance=instance, **kwargs)
+        # if the user is an admin, he will have access to all products,
+        # else only to active products owned by the counter's club
+        # or already on the counter
         if user.has_perm("counter.change_counter"):
             self.fields["products"].widget = AutoCompleteSelectMultipleProduct()
         else:
+            # updating the queryset of the field also updates the choices of
+            # the widget, so it's important to set the queryset after the widget
             self.fields["products"].widget = AutoCompleteSelectMultiple()
             self.fields["products"].queryset = Product.objects.filter(
                 Q(club_id=instance.club_id) | Q(counters=instance), archived=False
@@ -186,6 +213,61 @@ class CounterEditForm(forms.ModelForm):
                 "If you want to add a product that is not owned by "
                 "your club to this counter, you should ask an admin."
             )
+        self.fields["sellers_regular"].initial = self.instance.sellers.filter(
+            countersellers__is_regular=True
+        ).all()
+        self.fields["sellers_temporary"].initial = self.instance.sellers.filter(
+            countersellers__is_regular=False
+        ).all()
+
+    def clean(self):
+        regular: UserQuerySet = self.cleaned_data["sellers_regular"]
+        temporary: UserQuerySet = self.cleaned_data["sellers_temporary"]
+        duplicates = list(regular.intersection(temporary))
+        if duplicates:
+            raise ValidationError(
+                _(
+                    "A user cannot be a regular and a temporary barman "
+                    "at the same time, "
+                    "but the following users have been defined as both : %(users)s"
+                )
+                % {"users": ", ".join([u.get_display_name() for u in duplicates])}
+            )
+        return self.cleaned_data
+
+    def save_sellers(self):
+        sellers = []
+        for users, is_regular in (
+            (self.cleaned_data["sellers_regular"], True),
+            (self.cleaned_data["sellers_temporary"], False),
+        ):
+            sellers.extend(
+                [
+                    CounterSellers(counter=self.instance, user=u, is_regular=is_regular)
+                    for u in users
+                ]
+            )
+        # start by deleting removed CounterSellers objects
+        user_ids = [seller.user.id for seller in sellers]
+        CounterSellers.objects.filter(
+            ~Q(user_id__in=user_ids), counter=self.instance
+        ).delete()
+
+        # then create or update the new barmen
+        CounterSellers.objects.bulk_create(
+            sellers,
+            update_conflicts=True,
+            update_fields=["is_regular"],
+            unique_fields=["user", "counter"],
+        )
+
+    def save(self, commit=True):  # noqa: FBT002
+        self.instance = super().save(commit=commit)
+        if commit and any(
+            key in self.changed_data for key in ("sellers_regular", "sellers_temporary")
+        ):
+            self.save_sellers()
+        return self.instance
 
 
 class ScheduledProductActionForm(forms.ModelForm):
