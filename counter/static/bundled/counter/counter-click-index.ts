@@ -64,7 +64,7 @@ document.addEventListener("alpine:init", () => {
 
     checkFormulas() {
       const products = new Set(
-        Object.keys(this.basket).map((i: string) => Number.parseInt(i)),
+        Object.keys(this.basket).map((i: string) => Number.parseInt(i, 10)),
       );
       const formula: ProductFormula = config.formulas.find((f: ProductFormula) => {
         return f.products.every((p: number) => products.has(p));
