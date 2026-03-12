@@ -15,8 +15,9 @@ from pytest_django.asserts import assertNumQueries, assertRedirects
 from club.models import Club
 from core.baker_recipes import board_user, subscriber_user
 from core.models import Group, User
+from counter.baker_recipes import product_recipe
 from counter.forms import ProductForm
-from counter.models import Product, ProductType
+from counter.models import Product, ProductFormula, ProductType
 
 
 @pytest.mark.django_db
@@ -93,6 +94,9 @@ class TestCreateProduct(TestCase):
     def setUpTestData(cls):
         cls.product_type = baker.make(ProductType)
         cls.club = baker.make(Club)
+        cls.counter_admin = baker.make(
+            User, groups=[Group.objects.get(id=settings.SITH_GROUP_COUNTER_ADMIN_ID)]
+        )
         cls.data = {
             "name": "foo",
             "description": "bar",
@@ -116,13 +120,36 @@ class TestCreateProduct(TestCase):
         assert instance.name == "foo"
         assert instance.selling_price == 1.0
 
-    def test_view(self):
-        self.client.force_login(
-            baker.make(
-                User,
-                groups=[Group.objects.get(id=settings.SITH_GROUP_COUNTER_ADMIN_ID)],
-            )
+    def test_form_with_product_from_formula(self):
+        """Test when the edited product is a result of a formula."""
+        self.client.force_login(self.counter_admin)
+        products = product_recipe.make(
+            selling_price=iter([1.5, 1, 1]),
+            special_selling_price=iter([1.4, 0.9, 0.9]),
+            _quantity=3,
+            _bulk_create=True,
         )
+        baker.make(ProductFormula, result=products[0], products=products[1:])
+
+        data = self.data | {"selling_price": 1.7, "special_selling_price": 1.5}
+        form = ProductForm(data=data, instance=products[0])
+        assert form.is_valid()
+
+        # it shouldn't be possible to give a price higher than the formula's products
+        data = self.data | {"selling_price": 2.1, "special_selling_price": 1.9}
+        form = ProductForm(data=data, instance=products[0])
+        assert not form.is_valid()
+        assert form.errors == {
+            "selling_price": [
+                "Assurez-vous que cette valeur est inférieure ou égale à 2.00."
+            ],
+            "special_selling_price": [
+                "Assurez-vous que cette valeur est inférieure ou égale à 1.80."
+            ],
+        }
+
+    def test_view(self):
+        self.client.force_login(self.counter_admin)
         url = reverse("counter:new_product")
         response = self.client.get(url)
         assert response.status_code == 200

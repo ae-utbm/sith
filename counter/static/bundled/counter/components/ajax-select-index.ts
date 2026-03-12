@@ -18,7 +18,10 @@ export class ProductAjaxSelect extends AjaxSelect {
   protected searchField = ["code", "name"];
 
   protected async search(query: string): Promise<TomOption[]> {
-    const resp = await productSearchProducts({ query: { search: query } });
+    const resp = await productSearchProducts({
+      // biome-ignore lint/style/useNamingConvention: API is snake_case
+      query: { search: query, is_archived: false },
+    });
     if (resp.data) {
       return resp.data.results;
     }

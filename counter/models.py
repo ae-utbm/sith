@@ -399,6 +399,8 @@ class Product(models.Model):
         Group, related_name="products", verbose_name=_("buying groups"), blank=True
     )
     archived = models.BooleanField(_("archived"), default=False)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("updated at"), auto_now=True)
 
     class Meta:
         verbose_name = _("product")
@@ -452,6 +454,37 @@ class Product(models.Model):
     @property
     def profit(self):
         return self.selling_price - self.purchase_price
+
+
+class ProductFormula(models.Model):
+    products = models.ManyToManyField(
+        Product,
+        related_name="formulas",
+        verbose_name=_("products"),
+        help_text=_("The products that constitute this formula."),
+    )
+    result = models.OneToOneField(
+        Product,
+        related_name="formula",
+        on_delete=models.CASCADE,
+        verbose_name=_("result product"),
+        help_text=_("The product got with the formula."),
+    )
+
+    def __str__(self):
+        return self.result.name
+
+    @cached_property
+    def max_selling_price(self) -> float:
+        # iterating over all products is less efficient than doing
+        # a simple aggregation, but this method is likely to be used in
+        # coordination with `max_special_selling_price`,
+        # and Django caches the result of the `all` queryset.
+        return sum(p.selling_price for p in self.products.all())
+
+    @cached_property
+    def max_special_selling_price(self) -> float:
+        return sum(p.special_selling_price for p in self.products.all())
 
 
 class CounterQuerySet(models.QuerySet):
@@ -518,7 +551,11 @@ class Counter(models.Model):
         choices=[("BAR", _("Bar")), ("OFFICE", _("Office")), ("EBOUTIC", _("Eboutic"))],
     )
     sellers = models.ManyToManyField(
-        User, verbose_name=_("sellers"), related_name="counters", blank=True
+        User,
+        verbose_name=_("sellers"),
+        related_name="counters",
+        blank=True,
+        through="CounterSellers",
     )
     edit_groups = models.ManyToManyField(
         Group, related_name="editable_counters", blank=True
@@ -708,6 +745,26 @@ class Counter(models.Model):
             for product in products.all()
             if product.can_be_sold_to(customer.user)
         ]
+
+
+class CounterSellers(models.Model):
+    """Custom through model for the counter-sellers M2M relationship."""
+
+    counter = models.ForeignKey(Counter, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_regular = models.BooleanField(_("regular barman"), default=False)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["counter", "user"],
+                name="counter_counter_sellers_counter_id_subscriber_id_key",
+            )
+        ]
+
+    def __str__(self):
+        return f"counter {self.counter_id} - user {self.user_id}"
 
 
 class RefillingQuerySet(models.QuerySet):

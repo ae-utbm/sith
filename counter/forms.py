@@ -5,6 +5,8 @@ from datetime import date, datetime, timezone
 
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator
 from django.db.models import Exists, OuterRef, Q
 from django.forms import BaseModelFormSet
 from django.utils.timezone import now
@@ -14,7 +16,7 @@ from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
 from club.models import Club
 from club.widgets.ajax_select import AutoCompleteSelectClub
-from core.models import User
+from core.models import User, UserQuerySet
 from core.views.forms import (
     FutureDateTimeField,
     NFCTextInput,
@@ -23,6 +25,7 @@ from core.views.forms import (
 )
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
+    AutoCompleteSelectMultiple,
     AutoCompleteSelectMultipleGroup,
     AutoCompleteSelectMultipleUser,
     AutoCompleteSelectUser,
@@ -30,10 +33,12 @@ from core.views.widgets.ajax_select import (
 from counter.models import (
     BillingInfo,
     Counter,
+    CounterSellers,
     Customer,
     Eticket,
     InvoiceCall,
     Product,
+    ProductFormula,
     Refilling,
     ReturnableProduct,
     ScheduledProductAction,
@@ -167,12 +172,102 @@ class RefillForm(forms.ModelForm):
 class CounterEditForm(forms.ModelForm):
     class Meta:
         model = Counter
-        fields = ["sellers", "products"]
+        fields = ["products"]
 
-        widgets = {
-            "sellers": AutoCompleteSelectMultipleUser,
-            "products": AutoCompleteSelectMultipleProduct,
-        }
+    sellers_regular = forms.ModelMultipleChoiceField(
+        label=_("Regular barmen"),
+        help_text=_(
+            "Barmen having regular permanences "
+            "or frequently giving a hand throughout the semester."
+        ),
+        queryset=User.objects.all(),
+        widget=AutoCompleteSelectMultipleUser,
+        required=False,
+    )
+    sellers_temporary = forms.ModelMultipleChoiceField(
+        label=_("Temporary barmen"),
+        help_text=_(
+            "Barmen who will be there only for a limited period (e.g. for one evening)"
+        ),
+        queryset=User.objects.all(),
+        widget=AutoCompleteSelectMultipleUser,
+        required=False,
+    )
+    field_order = ["sellers_regular", "sellers_temporary", "products"]
+
+    def __init__(self, *args, user: User, instance: Counter, **kwargs):
+        super().__init__(*args, instance=instance, **kwargs)
+        # if the user is an admin, he will have access to all products,
+        # else only to active products owned by the counter's club
+        # or already on the counter
+        if user.has_perm("counter.change_counter"):
+            self.fields["products"].widget = AutoCompleteSelectMultipleProduct()
+        else:
+            # updating the queryset of the field also updates the choices of
+            # the widget, so it's important to set the queryset after the widget
+            self.fields["products"].widget = AutoCompleteSelectMultiple()
+            self.fields["products"].queryset = Product.objects.filter(
+                Q(club_id=instance.club_id) | Q(counters=instance), archived=False
+            ).distinct()
+            self.fields["products"].help_text = _(
+                "If you want to add a product that is not owned by "
+                "your club to this counter, you should ask an admin."
+            )
+        self.fields["sellers_regular"].initial = self.instance.sellers.filter(
+            countersellers__is_regular=True
+        ).all()
+        self.fields["sellers_temporary"].initial = self.instance.sellers.filter(
+            countersellers__is_regular=False
+        ).all()
+
+    def clean(self):
+        regular: UserQuerySet = self.cleaned_data["sellers_regular"]
+        temporary: UserQuerySet = self.cleaned_data["sellers_temporary"]
+        duplicates = list(regular.intersection(temporary))
+        if duplicates:
+            raise ValidationError(
+                _(
+                    "A user cannot be a regular and a temporary barman "
+                    "at the same time, "
+                    "but the following users have been defined as both : %(users)s"
+                )
+                % {"users": ", ".join([u.get_display_name() for u in duplicates])}
+            )
+        return self.cleaned_data
+
+    def save_sellers(self):
+        sellers = []
+        for users, is_regular in (
+            (self.cleaned_data["sellers_regular"], True),
+            (self.cleaned_data["sellers_temporary"], False),
+        ):
+            sellers.extend(
+                [
+                    CounterSellers(counter=self.instance, user=u, is_regular=is_regular)
+                    for u in users
+                ]
+            )
+        # start by deleting removed CounterSellers objects
+        user_ids = [seller.user.id for seller in sellers]
+        CounterSellers.objects.filter(
+            ~Q(user_id__in=user_ids), counter=self.instance
+        ).delete()
+
+        # then create or update the new barmen
+        CounterSellers.objects.bulk_create(
+            sellers,
+            update_conflicts=True,
+            update_fields=["is_regular"],
+            unique_fields=["user", "counter"],
+        )
+
+    def save(self, commit=True):  # noqa: FBT002
+        self.instance = super().save(commit=commit)
+        if commit and any(
+            key in self.changed_data for key in ("sellers_regular", "sellers_temporary")
+        ):
+            self.save_sellers()
+        return self.instance
 
 
 class ScheduledProductActionForm(forms.ModelForm):
@@ -278,7 +373,8 @@ ScheduledProductActionFormSet = forms.modelformset_factory(
     absolute_max=None,
     can_delete=True,
     can_delete_extra=False,
-    extra=2,
+    extra=0,
+    min_num=1,
 )
 
 
@@ -316,7 +412,6 @@ class ProductForm(forms.ModelForm):
         }
 
     counters = forms.ModelMultipleChoiceField(
-        help_text=None,
         label=_("Counters"),
         required=False,
         widget=AutoCompleteSelectMultipleCounter,
@@ -327,9 +422,30 @@ class ProductForm(forms.ModelForm):
         super().__init__(*args, instance=instance, **kwargs)
         if self.instance.id:
             self.fields["counters"].initial = self.instance.counters.all()
+            if hasattr(self.instance, "formula"):
+                self.formula_init(self.instance.formula)
         self.action_formset = ScheduledProductActionFormSet(
             *args, product=self.instance, **kwargs
         )
+
+    def formula_init(self, formula: ProductFormula):
+        """Part of the form initialisation specific to formula products."""
+        self.fields["selling_price"].help_text = _(
+            "This product is a formula. "
+            "Its price cannot be greater than the price "
+            "of the products constituting it, which is %(price)s €"
+        ) % {"price": formula.max_selling_price}
+        self.fields["special_selling_price"].help_text = _(
+            "This product is a formula. "
+            "Its special price cannot be greater than the price "
+            "of the products constituting it, which is %(price)s €"
+        ) % {"price": formula.max_special_selling_price}
+        for key, price in (
+            ("selling_price", formula.max_selling_price),
+            ("special_selling_price", formula.max_special_selling_price),
+        ):
+            self.fields[key].widget.attrs["max"] = price
+            self.fields[key].validators.append(MaxValueValidator(price))
 
     def is_valid(self):
         return super().is_valid() and self.action_formset.is_valid()
@@ -349,13 +465,47 @@ class ProductForm(forms.ModelForm):
         return product
 
 
+class ProductFormulaForm(forms.ModelForm):
+    class Meta:
+        model = ProductFormula
+        fields = ["products", "result"]
+        widgets = {
+            "products": AutoCompleteSelectMultipleProduct,
+            "result": AutoCompleteSelectProduct,
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if cleaned_data["result"] in cleaned_data["products"]:
+            self.add_error(
+                None,
+                _(
+                    "The same product cannot be at the same time "
+                    "the result and a part of the formula."
+                ),
+            )
+        prices = [p.selling_price for p in cleaned_data["products"]]
+        special_prices = [p.special_selling_price for p in cleaned_data["products"]]
+        selling_price = cleaned_data["result"].selling_price
+        special_selling_price = cleaned_data["result"].special_selling_price
+        if selling_price > sum(prices) or special_selling_price > sum(special_prices):
+            self.add_error(
+                "result",
+                _(
+                    "The result cannot be more expensive "
+                    "than the total of the other products."
+                ),
+            )
+        return cleaned_data
+
+
 class ReturnableProductForm(forms.ModelForm):
     class Meta:
         model = ReturnableProduct
         fields = ["product", "returned_product", "max_return"]
         widgets = {
-            "product": AutoCompleteSelectProduct(),
-            "returned_product": AutoCompleteSelectProduct(),
+            "product": AutoCompleteSelectProduct,
+            "returned_product": AutoCompleteSelectProduct,
         }
 
     def save(self, commit: bool = True) -> ReturnableProduct:  # noqa FBT

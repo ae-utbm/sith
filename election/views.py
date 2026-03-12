@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING
 
 from cryptography.utils import cached_property
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
@@ -115,16 +114,9 @@ class VoteFormView(LoginRequiredMixin, UserPassesTestMixin, FormView):
     def test_func(self):
         if not self.election.can_vote(self.request.user):
             return False
-
-        groups = set(self.election.vote_groups.values_list("id", flat=True))
-        if (
-            settings.SITH_GROUP_SUBSCRIBERS_ID in groups
-            and self.request.user.is_subscribed
-        ):
-            # the subscriber group isn't truly attached to users,
-            # so it must be dealt with separately
-            return True
-        return self.request.user.groups.filter(id__in=groups).exists()
+        return self.election.vote_groups.filter(
+            id__in=self.request.user.all_groups
+        ).exists()
 
     def vote(self, election_data):
         with transaction.atomic():
@@ -238,15 +230,9 @@ class RoleCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             return False
         if self.request.user.has_perm("election.add_role"):
             return True
-        groups = set(self.election.edit_groups.values_list("id", flat=True))
-        if (
-            settings.SITH_GROUP_SUBSCRIBERS_ID in groups
-            and self.request.user.is_subscribed
-        ):
-            # the subscriber group isn't truly attached to users,
-            # so it must be dealt with separately
-            return True
-        return self.request.user.groups.filter(id__in=groups).exists()
+        return self.election.edit_groups.filter(
+            id__in=self.request.user.all_groups
+        ).exists()
 
     def get_initial(self):
         return {"election": self.election}
@@ -279,14 +265,7 @@ class ElectionListCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView
             .union(self.election.edit_groups.values("id"))
             .values_list("id", flat=True)
         )
-        if (
-            settings.SITH_GROUP_SUBSCRIBERS_ID in groups
-            and self.request.user.is_subscribed
-        ):
-            # the subscriber group isn't truly attached to users,
-            # so it must be dealt with separately
-            return True
-        return self.request.user.groups.filter(id__in=groups).exists()
+        return not groups.isdisjoint(self.request.user.all_groups.keys())
 
     def get_initial(self):
         return {"election": self.election}

@@ -16,6 +16,7 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.forms import CheckboxSelectMultiple
@@ -34,11 +35,13 @@ from counter.forms import (
     CloseCustomerAccountForm,
     CounterEditForm,
     ProductForm,
+    ProductFormulaForm,
     ReturnableProductForm,
 )
 from counter.models import (
     Counter,
     Product,
+    ProductFormula,
     ProductType,
     Refilling,
     ReturnableProduct,
@@ -56,7 +59,9 @@ class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView):
     current_tab = "counters"
 
 
-class CounterEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
+class CounterEditView(
+    CounterAdminTabsMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView
+):
     """Edit a counter's main informations (for the counter's manager)."""
 
     model = Counter
@@ -64,11 +69,16 @@ class CounterEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     pk_url_kwarg = "counter_id"
     template_name = "core/edit.jinja"
     current_tab = "counters"
+    success_message = _("Counter update done")
 
-    def dispatch(self, request, *args, **kwargs):
-        obj = self.get_object()
-        self.edit_club.append(obj.club)
-        return super().dispatch(request, *args, **kwargs)
+    def test_func(self):
+        if self.request.user.has_perm("counter.change_counter"):
+            return True
+        obj = self.get_object(queryset=self.get_queryset().select_related("club"))
+        return obj.club.has_rights_in_club(self.request.user)
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"user": self.request.user}
 
     def get_success_url(self):
         return reverse_lazy("counter:admin", kwargs={"counter_id": self.object.id})
@@ -160,6 +170,62 @@ class ProductEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     pk_url_kwarg = "product_id"
     template_name = "counter/product_form.jinja"
     current_tab = "products"
+
+
+class ProductFormulaListView(CounterAdminTabsMixin, PermissionRequiredMixin, ListView):
+    model = ProductFormula
+    queryset = ProductFormula.objects.select_related("result").prefetch_related(
+        "products"
+    )
+    template_name = "counter/formula_list.jinja"
+    current_tab = "formulas"
+    permission_required = "counter.view_productformula"
+
+
+class ProductFormulaCreateView(
+    CounterAdminTabsMixin, PermissionRequiredMixin, CreateView
+):
+    model = ProductFormula
+    form_class = ProductFormulaForm
+    pk_url_kwarg = "formula_id"
+    template_name = "core/create.jinja"
+    current_tab = "formulas"
+    success_url = reverse_lazy("counter:product_formula_list")
+    permission_required = "counter.add_productformula"
+
+
+class ProductFormulaEditView(
+    CounterAdminTabsMixin, PermissionRequiredMixin, UpdateView
+):
+    model = ProductFormula
+    form_class = ProductFormulaForm
+    pk_url_kwarg = "formula_id"
+    template_name = "core/edit.jinja"
+    current_tab = "formulas"
+    success_url = reverse_lazy("counter:product_formula_list")
+    permission_required = "counter.change_productformula"
+
+
+class ProductFormulaDeleteView(
+    CounterAdminTabsMixin, PermissionRequiredMixin, DeleteView
+):
+    model = ProductFormula
+    pk_url_kwarg = "formula_id"
+    template_name = "core/delete_confirm.jinja"
+    current_tab = "formulas"
+    success_url = reverse_lazy("counter:product_formula_list")
+    permission_required = "counter.delete_productformula"
+
+    def get_context_data(self, **kwargs):
+        obj_name = self.object.result.name
+        return super().get_context_data(**kwargs) | {
+            "object_name": _("%(formula)s (formula)") % {"formula": obj_name},
+            "help_text": _(
+                "This action will only delete the formula, "
+                "but not the %(product)s product itself."
+            )
+            % {"product": obj_name},
+        }
 
 
 class ReturnableProductListView(

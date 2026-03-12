@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-08 16:14+0100\n"
+"POT-Creation-Date: 2026-03-10 10:28+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -388,7 +388,7 @@ msgstr "Montrer"
 
 #: club/templates/club/club_sellings.jinja
 #: counter/templates/counter/product_list.jinja
-msgid "Download as cvs"
+msgid "Download as CSV"
 msgstr "Télécharger en CSV"
 
 #: club/templates/club/club_sellings.jinja
@@ -1566,7 +1566,7 @@ msgstr "Visiteur"
 msgid "ban type"
 msgstr "type de ban"
 
-#: core/models.py
+#: core/models.py counter/models.py
 msgid "created at"
 msgstr "créé le"
 
@@ -2938,6 +2938,47 @@ msgid "User not found"
 msgstr "Utilisateur non trouvé"
 
 #: counter/forms.py
+msgid "Regular barmen"
+msgstr "Barmen réguliers"
+
+#: counter/forms.py
+msgid ""
+"Barmen having regular permanences or frequently giving a hand throughout the "
+"semester."
+msgstr ""
+"Les barmen assurant des permanences régulières ou donnant régulièrement un "
+"coup de main au cours du semestre."
+
+#: counter/forms.py
+msgid "Temporary barmen"
+msgstr "Barmen temporaires"
+
+#: counter/forms.py
+msgid ""
+"Barmen who will be there only for a limited period (e.g. for one evening)"
+msgstr ""
+"Les barmen qui seront là uniquement pour une durée limitée (par exemple, le "
+"temps d'une soirée)"
+
+#: counter/forms.py
+msgid ""
+"If you want to add a product that is not owned by your club to this counter, "
+"you should ask an admin."
+msgstr ""
+"Si vous souhaitez ajouter sur ce comptoir un produit qui n'appartient pas à "
+"votre club, vous devriez demander à un admin."
+
+#: counter/forms.py
+#, python-format
+msgid ""
+"A user cannot be a regular and a temporary barman at the same time, but the "
+"following users have been defined as both : %(users)s"
+msgstr ""
+"Un utilisateur ne peut pas être un barman régulier et temporaire en même "
+"temps, mais les utilisateurs suivants ont été définis comme les deux : "
+"%(users)s"
+
+#: counter/forms.py
 msgid "Date and time of action"
 msgstr "Date et heure de l'action"
 
@@ -2956,6 +2997,38 @@ msgid ""
 msgstr ""
 "Décrivez le produit. Si c'est un click pour un évènement, donnez quelques "
 "détails dessus, comme la date (en incluant l'année)."
+
+#: counter/forms.py
+#, python-format
+msgid ""
+"This product is a formula. Its price cannot be greater than the price of the "
+"products constituting it, which is %(price)s €"
+msgstr ""
+"Ce produit est une formule. Son prix ne peut pas être supérieur au prix des "
+"produits qui la constituent, soit %(price)s €."
+
+#: counter/forms.py
+#, python-format
+msgid ""
+"This product is a formula. Its special price cannot be greater than the "
+"price of the products constituting it, which is %(price)s €"
+msgstr ""
+"Ce produit est une formule. Son prix spécial ne peut pas être supérieur au "
+"prix des produits qui la constituent, soit %(price)s €."
+
+#: counter/forms.py
+msgid ""
+"The same product cannot be at the same time the result and a part of the "
+"formula."
+msgstr ""
+"Un même produit ne peut pas être à la fois le résultat et un élément de la "
+"formule."
+
+#: counter/forms.py
+msgid ""
+"The result cannot be more expensive than the total of the other products."
+msgstr ""
+"Le résultat ne peut pas être plus cher que le total des autres produits."
 
 #: counter/forms.py
 msgid "Refound this account"
@@ -3110,12 +3183,28 @@ msgid "archived"
 msgstr "archivé"
 
 #: counter/models.py
+msgid "updated at"
+msgstr "mis à jour le"
+
+#: counter/models.py
 msgid "product"
 msgstr "produit"
 
 #: counter/models.py
 msgid "products"
 msgstr "produits"
+
+#: counter/models.py
+msgid "The products that constitute this formula."
+msgstr "Les produits qui constituent cette formule."
+
+#: counter/models.py
+msgid "result product"
+msgstr "produit résultat"
+
+#: counter/models.py
+msgid "The product got with the formula."
+msgstr "Le produit obtenu par la formule."
 
 #: counter/models.py
 msgid "counter type"
@@ -3136,6 +3225,10 @@ msgstr "vendeurs"
 #: counter/models.py
 msgid "token"
 msgstr "jeton"
+
+#: counter/models.py
+msgid "regular barman"
+msgstr "barman régulier"
 
 #: counter/models.py sith/settings.py
 msgid "Credit card"
@@ -3537,6 +3630,48 @@ msgstr "Nouveau eticket"
 msgid "There is no eticket in this website."
 msgstr "Il n'y a pas de eticket sur ce site web."
 
+#: counter/templates/counter/formula_list.jinja
+msgid "Product formulas"
+msgstr "Formules de produits"
+
+#: counter/templates/counter/formula_list.jinja
+msgid ""
+"Formulas allow you to associate a group of products with a result product "
+"(the formula itself)."
+msgstr ""
+"Les formules permettent d'associer un groupe de produits à un produit "
+"résultat (la formule en elle-même)."
+
+#: counter/templates/counter/formula_list.jinja
+msgid ""
+"If the product of a formula is available on a counter, it will be "
+"automatically applied if all the products that make it up are added to the "
+"basket."
+msgstr ""
+"Si le produit d'une formule est disponible sur un comptoir, celle-ci sera "
+"automatiquement appliquée si tous les produits qui la constituent sont "
+"ajoutés au panier."
+
+#: counter/templates/counter/formula_list.jinja
+msgid ""
+"For example, if there is a formula that combines a \"Sandwich Formula\" "
+"product with the \"Sandwich\" and \"Soft Drink\" products, then, if a person "
+"orders a sandwich and a soft drink, the formula will be applied and the "
+"basket will then contain a sandwich formula instead."
+msgstr ""
+"Par exemple s'il existe une formule associant un produit « Formule "
+"sandwich » aux produits « Sandwich » et « Soft », alors, si une personne "
+"commande un sandwich et un soft, la formule sera appliquée et le panier "
+"contiendra alors une formule sandwich à la place."
+
+#: counter/templates/counter/formula_list.jinja
+msgid "New formula"
+msgstr "Nouvelle formule"
+
+#: counter/templates/counter/formula_list.jinja
+msgid "instead of"
+msgstr "au lieu de"
+
 #: counter/templates/counter/fragments/create_student_card.jinja
 msgid "No student card registered."
 msgstr "Aucune carte étudiante enregistrée."
@@ -3660,9 +3795,21 @@ msgstr ""
 "aucune conséquence autre que le retrait de l'argent de votre compte."
 
 #: counter/templates/counter/product_form.jinja
+msgid "Remove this action"
+msgstr "Retirer cette action"
+
+#: counter/templates/counter/product_form.jinja
 #, python-format
 msgid "Edit product %(name)s"
 msgstr "Édition du produit %(name)s"
+
+#: counter/templates/counter/product_form.jinja
+msgid "Creation date"
+msgstr "Date de création"
+
+#: counter/templates/counter/product_form.jinja
+msgid "Last update"
+msgstr "Dernière mise à jour"
 
 #: counter/templates/counter/product_form.jinja
 msgid "Product creation"
@@ -3677,6 +3824,10 @@ msgid "Automatic actions allows to schedule product changes ahead of time."
 msgstr ""
 "Les actions automatiques vous permettent de planifier des modifications du "
 "produit à l'avance."
+
+#: counter/templates/counter/product_form.jinja
+msgid "Add action"
+msgstr "Ajouter une action"
 
 #: counter/templates/counter/product_list.jinja
 msgid "Product list"
@@ -3792,6 +3943,24 @@ msgid "Top 100 barman %(counter_name)s (all semesters)"
 msgstr "Top 100 barman %(counter_name)s (tous les semestres)"
 
 #: counter/views/admin.py
+msgid "Counter update done"
+msgstr "Mise à jour du comptoir effectuée"
+
+#: counter/views/admin.py
+#, python-format
+msgid "%(formula)s (formula)"
+msgstr "%(formula)s (formule)"
+
+#: counter/views/admin.py
+#, python-format
+msgid ""
+"This action will only delete the formula, but not the %(product)s product "
+"itself."
+msgstr ""
+"Cette action supprimera seulement la formule, mais pas le produit "
+"%(product)s en lui-même."
+
+#: counter/views/admin.py
 #, python-format
 msgid "returnable product : %(returnable)s -> %(returned)s"
 msgstr "produit consigné : %(returnable)s -> %(returned)s"
@@ -3877,6 +4046,10 @@ msgid "Counter administration"
 msgstr "Administration des comptoirs"
 
 #: counter/views/mixins.py
+msgid "Formulas"
+msgstr "Formules"
+
+#: counter/views/mixins.py
 msgid "Product types"
 msgstr "Types de produit"
 
@@ -3951,8 +4124,8 @@ msgid ""
 "inconvenience."
 msgstr ""
 "Les paiements par carte bancaire sont actuellement désactivés sur l'eboutic. "
-"Vous pouvez cependant toujours recharger votre compte dans un des lieux de vie de l'AE. "
-"Veuillez nous excuser pour le désagrément."
+"Vous pouvez cependant toujours recharger votre compte dans un des lieux de "
+"vie de l'AE. Veuillez nous excuser pour le désagrément."
 
 #: eboutic/templates/eboutic/eboutic_checkout.jinja
 msgid ""
@@ -4121,8 +4294,8 @@ msgstr "Les candidatures sont fermées pour cette élection"
 #: election/templates/election/election_detail.jinja
 msgid "Candidate pictures won't display for privacy reasons."
 msgstr ""
-"La photo du candidat ne s'affiche pas pour "
-"des raisons de respect de la vie privée."
+"La photo du candidat ne s'affiche pas pour des raisons de respect de la vie "
+"privée."
 
 #: election/templates/election/election_detail.jinja
 msgid "Polls close "
@@ -5121,8 +5294,6 @@ msgid "One day"
 msgstr "Un jour"
 
 #: sith/settings.py
-#, fuzzy
-#| msgid "GA staff member"
 msgid "GA staff member"
 msgstr "Membre staff GA"
 

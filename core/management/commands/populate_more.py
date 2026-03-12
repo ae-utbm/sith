@@ -12,7 +12,7 @@ from django.utils.timezone import localdate, make_aware, now
 from faker import Faker
 
 from club.models import Club, Membership
-from core.models import Group, User
+from core.models import Group, User, UserBan
 from counter.models import (
     Counter,
     Customer,
@@ -40,6 +40,7 @@ class Command(BaseCommand):
 
         self.stdout.write("Creating users...")
         users = self.create_users()
+        self.create_bans(random.sample(users, k=len(users) // 200))  # 0.5% of users
         subscribers = random.sample(users, k=int(0.8 * len(users)))
         self.stdout.write("Creating subscriptions...")
         self.create_subscriptions(subscribers)
@@ -88,6 +89,8 @@ class Command(BaseCommand):
         self.stdout.write("Done")
 
     def create_users(self) -> list[User]:
+        # Create a single password hash for all users to make it faster.
+        # It's insecure as hell, but it's ok since it's only for dev purposes.
         password = make_password("plop")
         users = [
             User(
@@ -114,14 +117,33 @@ class Command(BaseCommand):
         public_group.users.add(*users)
         return users
 
+    def create_bans(self, users: list[User]):
+        ban_groups = [
+            settings.SITH_GROUP_BANNED_COUNTER_ID,
+            settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID,
+            settings.SITH_GROUP_BANNED_ALCOHOL_ID,
+        ]
+        UserBan.objects.bulk_create(
+            [
+                UserBan(
+                    user=user,
+                    ban_group_id=i,
+                    reason=self.faker.sentence(),
+                    expires_at=make_aware(self.faker.future_datetime("+1y")),
+                )
+                for user in users
+                for i in random.sample(ban_groups, k=random.randint(1, len(ban_groups)))
+            ]
+        )
+
     def create_subscriptions(self, users: list[User]):
         def prepare_subscription(_user: User, start_date: date) -> Subscription:
             payment_method = random.choice(settings.SITH_SUBSCRIPTION_PAYMENT_METHOD)[0]
             duration = random.randint(1, 4)
-            sub = Subscription(member=_user, payment_method=payment_method)
-            sub.subscription_start = sub.compute_start(d=start_date, duration=duration)
-            sub.subscription_end = sub.compute_end(duration)
-            return sub
+            s = Subscription(member=_user, payment_method=payment_method)
+            s.subscription_start = s.compute_start(d=start_date, duration=duration)
+            s.subscription_end = s.compute_end(duration)
+            return s
 
         subscriptions = []
         customers = []
