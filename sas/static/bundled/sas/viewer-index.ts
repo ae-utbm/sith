@@ -1,7 +1,6 @@
 import type TomSelect from "tom-select";
 import type { UserAjaxSelect } from "#core:core/components/ajax-select-index.ts";
 import { paginated } from "#core:utils/api.ts";
-import { exportToHtml } from "#core:utils/globals.ts";
 import { History } from "#core:utils/history.ts";
 import {
   type IdentifiedUserSchema,
