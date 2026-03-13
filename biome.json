@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**/static/**"]
+    "includes": ["**/static/**", "vite.config.mts"]
   },
   "formatter": {
     "enabled": true,
