@@ -26,7 +26,6 @@ export class NfcInput extends inheritHtmlElement("input") {
         window.alert(gettext("Unsupported NFC card"));
       });
 
-      // biome-ignore lint/correctness/noUndeclaredVariables: browser API
       ndef.addEventListener("reading", (event: NDEFReadingEvent) => {
         this.removeAttribute("scan");
         this.node.value = event.serialNumber.replace(/:/g, "").toUpperCase();

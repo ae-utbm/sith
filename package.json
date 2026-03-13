@@ -8,8 +8,6 @@
     "compile-dev": "vite build --mode development",
     "serve": "vite build --mode development --watch --minify false",
     "openapi": "openapi-ts",
-    "analyse-dev": "vite-bundle-visualizer --mode development",
-    "analyse-prod": "vite-bundle-visualizer --mode production",
     "check": "tsc && biome check --write"
   },
   "keywords": [],
@@ -35,10 +33,9 @@
     "@types/cytoscape-cxtmenu": "^3.4.5",
     "@types/cytoscape-klay": "^3.1.5",
     "@types/js-cookie": "^3.0.6",
+    "rollup-plugin-visualizer": "^7.0.1",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1",
-    "vite-bundle-visualizer": "^1.2.1",
-    "vite-plugin-static-copy": "^3.2.0"
+    "vite": "^8.0.0"
   },
   "dependencies": {
     "@alpinejs/sort": "^3.15.8",

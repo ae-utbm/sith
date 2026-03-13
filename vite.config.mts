@@ -1,14 +1,17 @@
-// biome-ignore lint/correctness/noNodejsModules: this is backend side
 import { parse, resolve } from "node:path";
 import inject from "@rollup/plugin-inject";
 import { glob } from "glob";
-import type { Rollup } from "vite";
-import { type AliasOptions, defineConfig, type UserConfig } from "vite";
+import { visualizer } from "rollup-plugin-visualizer";
+import {
+  type AliasOptions,
+  defineConfig,
+  type PluginOption,
+  type Rollup,
+  type UserConfig,
+} from "vite";
 import tsconfig from "./tsconfig.json";
 
 const outDir = resolve(__dirname, "./staticfiles/generated/bundled");
-const vendored = resolve(outDir, "vendored");
-const nodeModules = resolve(__dirname, "node_modules");
 const collectedFiles = glob.sync(
   "./!(static)/static/bundled/**/*?(-)index.?(m)[j|t]s?(x)",
 );
@@ -42,7 +45,6 @@ function getRelativeAssetPath(path: string): string {
   return relativePath.join("/");
 }
 
-// biome-ignore lint/style/noDefaultExport: this is recommended by documentation
 export default defineConfig((config: UserConfig) => {
   return {
     base: "/static/bundled/",
@@ -86,6 +88,7 @@ export default defineConfig((config: UserConfig) => {
         Alpine: "alpinejs",
         htmx: "htmx.org",
       }),
+      visualizer({ filename: ".bundle-size-report.html" }) as PluginOption,
     ],
   } satisfies UserConfig;
 });

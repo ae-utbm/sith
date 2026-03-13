@@ -24,6 +24,9 @@ node_modules/
 # compiled documentation
 site/
 
+# rollup-bundle-visualizer report
+.bundle-size-report.html
+
 ### Redis ###
 
 # Ignore redis binary dump (dump.rdb) files
