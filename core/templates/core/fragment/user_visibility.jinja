@@ -1,0 +1,33 @@
+<form
+  hx-post="{{ url("core:user_visibility_fragment", user_id=form.instance.id) }}"
+  hx-disabled-elt="find input[type='submit']"
+  hx-swap="outerHTML" x-data="{ isViewable: {{ form.is_viewable.value()|tojson }} }"
+>
+  {% for message in messages %}
+    {% if message.extra_tags=="visibility" %}
+      <div class="alert alert-success">
+        {{ message }}
+      </div>
+    {% endif %}
+  {% endfor %}
+  {% csrf_token %}
+  {{ form.non_field_errors() }}
+  <fieldset class="form-group">
+    {{ form.is_viewable|add_attr("x-model=isViewable") }}
+    {{ form.is_viewable.label_tag() }}
+    <span class="helptext">{{ form.is_viewable.help_text }}</span>
+    {{ form.is_viewable.errors }}
+  </fieldset>
+  <fieldset class="form-group" x-show="!isViewable">
+    {{ form.whitelisted_users.as_field_group() }}
+  </fieldset>
+  <fieldset class="form-group" x-show="isViewable">
+    {{ form.show_my_stats }}
+    {{ form.show_my_stats.label_tag() }}
+    <span class="helptext">
+      {{ form.show_my_stats.help_text }}
+    </span>
+    {{ form.show_my_stats.errors }}
+  </fieldset>
+  <input type="submit" class="btn btn-blue" value="{% trans %}Save{% endtrans %}">
+</form>

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-10 10:28+0100\n"
+"POT-Creation-Date: 2026-03-14 23:09+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -551,8 +551,9 @@ msgstr ""
 #: com/templates/com/news_edit.jinja com/templates/com/poster_edit.jinja
 #: com/templates/com/screen_edit.jinja com/templates/com/weekmail.jinja
 #: core/templates/core/create.jinja core/templates/core/edit.jinja
-#: core/templates/core/file_edit.jinja core/templates/core/page/edit.jinja
-#: core/templates/core/page/prop.jinja
+#: core/templates/core/file_edit.jinja
+#: core/templates/core/fragment/user_visibility.jinja
+#: core/templates/core/page/edit.jinja core/templates/core/page/prop.jinja
 #: core/templates/core/user_godfathers.jinja
 #: core/templates/core/user_godfathers_tree.jinja
 #: core/templates/core/user_preferences.jinja
@@ -1548,6 +1549,17 @@ msgstr ""
 "Si vous désactivez cette option, seuls les admins pourront voir votre profil."
 
 #: core/models.py
+msgid "whitelisted users"
+msgstr "utilisateurs whitelistés"
+
+#: core/models.py
+msgid ""
+"Even if this profile is hidden, the users in this list will still be able to see "
+"it."
+msgstr ""
+"Même si ce profil est caché, les utilisateurs sur cette liste pourront toujours le voir."
+
+#: core/models.py
 msgid "A user with that username already exists"
 msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 
@@ -1602,6 +1614,10 @@ msgstr "recevoir le Weekmail"
 #: core/models.py
 msgid "show your stats to others"
 msgstr "montrez vos statistiques aux autres"
+
+#: core/models.py
+msgid "Allow subscribers to access your AE account stats."
+msgstr "Autoriser les cotisants à accéder aux statistiques de votre compte AE"
 
 #: core/models.py
 msgid "get a notification for every click"
@@ -2612,21 +2628,12 @@ msgid "Preferences"
 msgstr "Préférences"
 
 #: core/templates/core/user_preferences.jinja
-msgid "General"
-msgstr "Général"
-
-#: core/templates/core/user_preferences.jinja trombi/views.py
-msgid "Trombi"
-msgstr "Trombi"
+msgid "Notifications"
+msgstr "Notifications"
 
 #: core/templates/core/user_preferences.jinja
-#, python-format
-msgid "You already choose to be in that Trombi: %(trombi)s."
-msgstr "Vous avez déjà choisi ce Trombi: %(trombi)s."
-
-#: core/templates/core/user_preferences.jinja
-msgid "Go to my Trombi tools"
-msgstr "Allez à mes outils de Trombi"
+msgid "Visibility"
+msgstr "Visibilité"
 
 #: core/templates/core/user_preferences.jinja
 #: counter/templates/counter/counter_click.jinja
@@ -2644,6 +2651,19 @@ msgstr ""
 "vous même ici. Si vous voulez l'ajouter manuellement par vous même, vous "
 "aurez besoin d'un lecteur NFC. Nous enregistrons l'UID de la carte qui fait "
 "14 caractères de long."
+
+#: core/templates/core/user_preferences.jinja trombi/views.py
+msgid "Trombi"
+msgstr "Trombi"
+
+#: core/templates/core/user_preferences.jinja
+#, python-format
+msgid "You already choose to be in that Trombi: %(trombi)s."
+msgstr "Vous avez déjà choisi ce Trombi: %(trombi)s."
+
+#: core/templates/core/user_preferences.jinja
+msgid "Go to my Trombi tools"
+msgstr "Allez à mes outils de Trombi"
 
 #: core/templates/core/user_stats.jinja
 #, python-format
@@ -2924,6 +2944,10 @@ msgstr "Photos"
 #: core/views/user.py
 msgid "Account"
 msgstr "Compte"
+
+#: core/views/user.py
+msgid "Visibility parameters updated."
+msgstr "Paramètres de visibilité mis à jour."
 
 #: counter/apps.py counter/models.py
 msgid "counter"

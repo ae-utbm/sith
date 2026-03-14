@@ -1,7 +1,13 @@
 {% extends "core/base.jinja" %}
 
+{%- block additional_js -%}
+  <script type="module" src="{{ static("bundled/core/components/ajax-select-index.ts") }}"></script>
+{%- endblock -%}
+
 {%- block additional_css -%}
   <link rel="stylesheet" href="{{ static('user/user_preferences.scss') }}">
+  <link rel="stylesheet" href="{{ static("bundled/core/components/ajax-select-index.css") }}">
+  <link rel="stylesheet" href="{{ static("core/components/ajax-select.scss") }}">
 {%- endblock -%}
 
 {% block title %}
@@ -11,36 +17,44 @@
 {% block content %}
   <div class="main">
     <h2>{% trans %}Preferences{% endtrans %}</h2>
-    <h3>{% trans %}General{% endtrans %}</h3>
-    <form class="form form-general" action="" method="post" enctype="multipart/form-data">
+    <br />
+    <h3>{% trans %}Notifications{% endtrans %}</h3>
+    <form action="" method="post" enctype="multipart/form-data">
       {% csrf_token %}
-      {{ form.as_p() }}
-      <input class="form-submit-btn" type="submit" value="{% trans %}Save{% endtrans %}" />
+      <div class="form form-general">
+        {{ form.as_p() }}
+      </div>
+      <input class="btn btn-blue" type="submit" value="{% trans %}Save{% endtrans %}" />
     </form>
 
-    <h3>{% trans %}Trombi{% endtrans %}</h3>
+    <br />
+    <h3>{% trans %}Visibility{% endtrans %}</h3>
 
-    {% if trombi_form %}
-      <form class="form form-trombi" action="{{ url('trombi:user_tools') }}" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ trombi_form.as_p() }}
-        <input class="form-submit-btn" type="submit" value="{% trans %}Save{% endtrans %}" />
-      </form>
+    {{ user_visibility_fragment }}
 
-    {% else %}
-      <p>{% trans trombi=profile.trombi_user.trombi %}You already choose to be in that Trombi: {{ trombi }}.{% endtrans %}
-        <br />
-        <a href="{{ url('trombi:user_tools') }}">{% trans %}Go to my Trombi tools{% endtrans %}</a>
-      </p>
-    {% endif %}
-
-
+    <br />
     {% if student_card_fragment %}
       <h3>{% trans %}Student card{% endtrans %}</h3>
       {{ student_card_fragment }}
       <p class="justify">
         {% trans %}You can add a card by asking at a counter or add it yourself here. If you want to manually
           add a student card yourself, you'll need a NFC reader. We store the UID of the card which is 14 characters long.{% endtrans %}
+      </p>
+    {% endif %}
+
+    <br />
+    <h3>{% trans %}Trombi{% endtrans %}</h3>
+
+    {% if trombi_form %}
+      <form action="{{ url('trombi:user_tools') }}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ trombi_form.as_p() }}
+        <input class="btn btn-blue" type="submit" value="{% trans %}Save{% endtrans %}" />
+      </form>
+    {% else %}
+      <p>{% trans trombi=profile.trombi_user.trombi %}You already choose to be in that Trombi: {{ trombi }}.{% endtrans %}
+        <br />
+        <a href="{{ url('trombi:user_tools') }}">{% trans %}Go to my Trombi tools{% endtrans %}</a>
       </p>
     {% endif %}
   </div>

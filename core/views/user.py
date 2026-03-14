@@ -28,10 +28,12 @@ from datetime import timedelta
 from operator import itemgetter
 from smtplib import SMTPException
 
+from django.contrib import messages
 from django.contrib.auth import login, views
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import DateField, F, QuerySet, Sum
 from django.db.models.functions import Trunc
@@ -48,7 +50,6 @@ from django.views.generic import (
     CreateView,
     DeleteView,
     DetailView,
-    ListView,
     RedirectView,
     TemplateView,
 )
@@ -65,8 +66,9 @@ from core.views.forms import (
     UserGodfathersForm,
     UserGroupsForm,
     UserProfileForm,
+    UserVisibilityForm,
 )
-from core.views.mixins import TabedViewMixin, UseFragmentsMixin
+from core.views.mixins import FragmentMixin, TabedViewMixin, UseFragmentsMixin
 from counter.models import Refilling, Selling
 from eboutic.models import Invoice
 from trombi.views import UserTrombiForm
@@ -404,13 +406,6 @@ class UserMiniView(CanViewMixin, DetailView):
     template_name = "core/user_mini.jinja"
 
 
-class UserListView(ListView, CanEditPropMixin):
-    """Displays the user list."""
-
-    model = User
-    template_name = "core/user_list.jinja"
-
-
 # FIXME: the edit_once fields aren't displayed to the user (as expected).
 #  However, if the user re-add them manually in the form, they are saved.
 class UserUpdateProfileView(UserTabsMixin, CanEditMixin, UpdateView):
@@ -468,6 +463,30 @@ class UserClubView(UserTabsMixin, CanViewMixin, DetailView):
     current_tab = "clubs"
 
 
+class UserVisibilityFormFragment(FragmentMixin, SuccessMessageMixin, UpdateView):
+    model = User
+    form_class = UserVisibilityForm
+    template_name = "core/fragment/user_visibility.jinja"
+    pk_url_kwarg = "user_id"
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"label_suffix": ""}
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(
+            self.request, _("Visibility parameters updated."), extra_tags="visibility"
+        )
+        return response
+
+    def render_fragment(self, request, **kwargs) -> SafeString:
+        self.object = kwargs.get("user")
+        return super().render_fragment(request, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return self.request.path
+
+
 class UserPreferencesView(UserTabsMixin, UseFragmentsMixin, CanEditMixin, UpdateView):
     """Edit a user's preferences."""
 
@@ -481,7 +500,10 @@ class UserPreferencesView(UserTabsMixin, UseFragmentsMixin, CanEditMixin, Update
     current_tab = "prefs"
 
     def get_form_kwargs(self):
-        return super().get_form_kwargs() | {"instance": self.object.preferences}
+        return super().get_form_kwargs() | {
+            "instance": self.object.preferences,
+            "label_suffix": "",
+        }
 
     def get_success_url(self):
         return self.request.path
@@ -491,6 +513,9 @@ class UserPreferencesView(UserTabsMixin, UseFragmentsMixin, CanEditMixin, Update
         from counter.views.student_card import StudentCardFormFragment
 
         res = super().get_fragment_context_data()
+        res["user_visibility_fragment"] = UserVisibilityFormFragment.as_fragment()(
+            self.request, user=self.object
+        )
         if hasattr(self.object, "customer"):
             res["student_card_fragment"] = StudentCardFormFragment.as_fragment()(
                 self.request, customer=self.object.customer

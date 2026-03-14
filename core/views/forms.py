@@ -48,12 +48,13 @@ from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from PIL import Image
 
 from antispam.forms import AntiSpamEmailField
-from core.models import Gift, Group, Page, PageRev, SithFile, User
+from core.models import Gift, Group, Page, PageRev, Preferences, SithFile, User
 from core.utils import resize_image
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
     AutoCompleteSelectGroup,
     AutoCompleteSelectMultipleGroup,
+    AutoCompleteSelectMultipleUser,
     AutoCompleteSelectUser,
 )
 from core.views.widgets.markdown import MarkdownInput
@@ -179,7 +180,6 @@ class UserProfileForm(forms.ModelForm):
             "school",
             "promo",
             "forum_signature",
-            "is_viewable",
         ]
         widgets = {
             "date_of_birth": SelectDate,
@@ -262,6 +262,38 @@ class UserProfileForm(forms.ModelForm):
                         },
                     )
         self._post_clean()
+
+
+class UserVisibilityForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["is_viewable", "whitelisted_users"]
+        widgets = {
+            "is_viewable": forms.CheckboxInput(attrs={"class": "switch"}),
+            "whitelisted_users": AutoCompleteSelectMultipleUser,
+        }
+
+    __preferences_fields = forms.fields_for_model(
+        Preferences,
+        ["show_my_stats"],
+        widgets={"show_my_stats": forms.CheckboxInput(attrs={"class": "switch"})},
+    )
+    show_my_stats = __preferences_fields["show_my_stats"]
+
+    def __init__(
+        self, *args, initial: dict | None = None, instance: User | None = None, **kwargs
+    ):
+        if instance:
+            initial = initial or {}
+            initial["show_my_stats"] = instance.preferences.show_my_stats
+        super().__init__(*args, initial=initial, instance=instance, **kwargs)
+
+    def save(self, commit=True) -> User:  # noqa: FBT002
+        instance = super().save(commit=commit)
+        if commit:
+            instance.preferences.show_my_stats = self.cleaned_data["show_my_stats"]
+            instance.preferences.save()
+        return instance
 
 
 class UserGroupsForm(forms.ModelForm):
