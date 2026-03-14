@@ -157,6 +157,7 @@ form {
     margin-bottom: .25rem;
     font-size: 80%;
     display: block;
+    max-width: calc(100% - calc(var(--nf-input-size) * 2))
   }
 
   fieldset {
