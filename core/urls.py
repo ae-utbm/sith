@@ -77,6 +77,7 @@ from core.views import (
     UserUpdateGroupView,
     UserUpdateProfileView,
     UserView,
+    UserVisibilityFormFragment,
     delete_user_godfather,
     logout,
     notification,
@@ -135,6 +136,11 @@ urlpatterns = [
         "group/<int:group_id>/detail/", GroupTemplateView.as_view(), name="group_detail"
     ),
     # User views
+    path(
+        "fragment/user/<int:user_id>/",
+        UserVisibilityFormFragment.as_view(),
+        name="user_visibility_fragment",
+    ),
     path(
         "user/me/<path:remaining_path>/",
         UserMeRedirect.as_view(),
