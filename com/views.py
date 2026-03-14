@@ -244,9 +244,8 @@ class NewsListView(TemplateView):
             .filter(
                 date_of_birth__month=localdate().month,
                 date_of_birth__day=localdate().day,
-                is_viewable=True,
+                role__in=["STUDENT", "FORMER STUDENT"],
             )
-            .filter(role__in=["STUDENT", "FORMER STUDENT"])
             .order_by("-date_of_birth"),
             key=lambda u: u.date_of_birth.year,
         )

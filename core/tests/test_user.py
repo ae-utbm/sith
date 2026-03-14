@@ -399,13 +399,12 @@ class TestUserQuerySetViewableBy:
         return [
             baker.make(User),
             subscriber_user.make(),
-            subscriber_user.make(is_viewable=False),
+            *subscriber_user.make(is_viewable=False, _quantity=2),
         ]
 
     def test_admin_user(self, users: list[User]):
         user = baker.make(
-            User,
-            user_permissions=[Permission.objects.get(codename="view_hidden_user")],
+            User, user_permissions=[Permission.objects.get(codename="view_hidden_user")]
         )
         viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
         assert set(viewable) == set(users)
@@ -417,6 +416,12 @@ class TestUserQuerySetViewableBy:
         user = user_factory()
         viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
         assert set(viewable) == {users[0], users[1]}
+
+    def test_whitelist(self, users: list[User]):
+        user = subscriber_user.make()
+        users[3].whitelisted_users.add(user)
+        viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
+        assert set(viewable) == {users[0], users[1], users[3]}
 
     @pytest.mark.parametrize("user_factory", [lambda: baker.make(User), AnonymousUser])
     def test_not_subscriber(self, users: list[User], user_factory):
