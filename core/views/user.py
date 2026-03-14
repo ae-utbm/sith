@@ -48,7 +48,6 @@ from django.views.generic import (
     CreateView,
     DeleteView,
     DetailView,
-    ListView,
     RedirectView,
     TemplateView,
 )
@@ -409,13 +408,6 @@ class UserMiniView(CanViewMixin, DetailView):
     pk_url_kwarg = "user_id"
     context_object_name = "profile"
     template_name = "core/user_mini.jinja"
-
-
-class UserListView(ListView, CanEditPropMixin):
-    """Displays the user list."""
-
-    model = User
-    template_name = "core/user_list.jinja"
 
 
 # FIXME: the edit_once fields aren't displayed to the user (as expected).

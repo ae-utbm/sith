@@ -69,7 +69,6 @@ from core.views import (
     UserCreationView,
     UserGodfathersTreeView,
     UserGodfathersView,
-    UserListView,
     UserMeRedirect,
     UserMiniView,
     UserPreferencesView,
@@ -136,7 +135,6 @@ urlpatterns = [
         "group/<int:group_id>/detail/", GroupTemplateView.as_view(), name="group_detail"
     ),
     # User views
-    path("user/", UserListView.as_view(), name="user_list"),
     path(
         "user/me/<path:remaining_path>/",
         UserMeRedirect.as_view(),
