@@ -56,7 +56,7 @@ msgstr "nom"
 msgid "owner"
 msgstr "propriétaire"
 
-#: api/models.py core/models.py
+#: api/models.py core/models.py counter/models.py
 msgid "groups"
 msgstr "groupes"
 
@@ -2999,24 +2999,6 @@ msgstr ""
 "détails dessus, comme la date (en incluant l'année)."
 
 #: counter/forms.py
-#, python-format
-msgid ""
-"This product is a formula. Its price cannot be greater than the price of the "
-"products constituting it, which is %(price)s €"
-msgstr ""
-"Ce produit est une formule. Son prix ne peut pas être supérieur au prix des "
-"produits qui la constituent, soit %(price)s €."
-
-#: counter/forms.py
-#, python-format
-msgid ""
-"This product is a formula. Its special price cannot be greater than the "
-"price of the products constituting it, which is %(price)s €"
-msgstr ""
-"Ce produit est une formule. Son prix spécial ne peut pas être supérieur au "
-"prix des produits qui la constituent, soit %(price)s €."
-
-#: counter/forms.py
 msgid ""
 "The same product cannot be at the same time the result and a part of the "
 "formula."
@@ -3025,18 +3007,12 @@ msgstr ""
 "formule."
 
 #: counter/forms.py
-msgid ""
-"The result cannot be more expensive than the total of the other products."
-msgstr ""
-"Le résultat ne peut pas être plus cher que le total des autres produits."
-
-#: counter/forms.py
 msgid "Refound this account"
 msgstr "Rembourser ce compte"
 
 #: counter/forms.py
 msgid "The selected product isn't available for this user"
-msgstr "Le produit sélectionné n'est pas disponnible pour cet utilisateur"
+msgstr "Le produit sélectionné n'est pas disponible pour cet utilisateur"
 
 #: counter/forms.py
 msgid "Submitted basket is invalid"
@@ -3151,18 +3127,6 @@ msgid "Initial cost of purchasing the product"
 msgstr "Coût initial d'achat du produit"
 
 #: counter/models.py
-msgid "selling price"
-msgstr "prix de vente"
-
-#: counter/models.py
-msgid "special selling price"
-msgstr "prix de vente spécial"
-
-#: counter/models.py
-msgid "Price for barmen during their permanence"
-msgstr "Prix pour les barmen durant leur permanence"
-
-#: counter/models.py
 msgid "icon"
 msgstr "icône"
 
@@ -3173,6 +3137,10 @@ msgstr "âge limite"
 #: counter/models.py
 msgid "tray price"
 msgstr "prix plateau"
+
+#: counter/models.py
+msgid "Buy five, get the sixth free"
+msgstr "Pour cinq achetés, le sixième offert"
 
 #: counter/models.py
 msgid "buying groups"
@@ -3186,9 +3154,34 @@ msgstr "archivé"
 msgid "updated at"
 msgstr "mis à jour le"
 
-#: counter/models.py
+#: counter/models.py eboutic/models.py
 msgid "product"
 msgstr "produit"
+
+#: counter/models.py
+msgid "always show"
+msgstr "toujours montrer"
+
+#: counter/models.py
+msgid ""
+"If this option is enabled, people will see this price and be able to pay it, "
+"even if another cheaper price exists. Else it will visible only if it is the "
+"cheapest available price."
+msgstr ""
+"Si cette option est activée, les gens verront ce prix et pourront le payer, "
+"même si un autre moins cher existe. Dans le cas contraire, le prix sera "
+"visible uniquement s'il s'agit du prix disponible le plus faible."
+
+#: counter/models.py
+msgid ""
+"A short label for easier differentiation if a user can see multiple prices."
+msgstr ""
+"Un court libellé pour faciliter la différentiation si un utilisateur peut "
+"voir plusieurs prix."
+
+#: counter/models.py
+msgid "price"
+msgstr "prix"
 
 #: counter/models.py
 msgid "products"
@@ -3668,10 +3661,6 @@ msgstr ""
 msgid "New formula"
 msgstr "Nouvelle formule"
 
-#: counter/templates/counter/formula_list.jinja
-msgid "instead of"
-msgstr "au lieu de"
-
 #: counter/templates/counter/fragments/create_student_card.jinja
 msgid "No student card registered."
 msgstr "Aucune carte étudiante enregistrée."
@@ -3795,6 +3784,10 @@ msgstr ""
 "aucune conséquence autre que le retrait de l'argent de votre compte."
 
 #: counter/templates/counter/product_form.jinja
+msgid "Remove price"
+msgstr "Retirer le prix"
+
+#: counter/templates/counter/product_form.jinja
 msgid "Remove this action"
 msgstr "Retirer cette action"
 
@@ -3814,6 +3807,14 @@ msgstr "Dernière mise à jour"
 #: counter/templates/counter/product_form.jinja
 msgid "Product creation"
 msgstr "Création de produit"
+
+#: counter/templates/counter/product_form.jinja
+msgid "Prices"
+msgstr "Prix"
+
+#: counter/templates/counter/product_form.jinja
+msgid "Add a price"
+msgstr "Ajouter un prix"
 
 #: counter/templates/counter/product_form.jinja
 msgid "Automatic actions"
@@ -4067,16 +4068,8 @@ msgid "Invoice already validated"
 msgstr "Facture déjà validée"
 
 #: eboutic/models.py
-msgid "product id"
-msgstr "ID du produit"
-
-#: eboutic/models.py
 msgid "product name"
 msgstr "nom du produit"
-
-#: eboutic/models.py
-msgid "product type id"
-msgstr "id du type du produit"
 
 #: eboutic/models.py
 msgid "basket"

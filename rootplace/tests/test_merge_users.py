@@ -33,8 +33,6 @@ class TestMergeUser(TestCase):
         cls.club = baker.make(Club)
         cls.eboutic = Counter.objects.get(name="Eboutic")
         cls.barbar = Product.objects.get(code="BARB")
-        cls.barbar.selling_price = 2
-        cls.barbar.save()
         cls.root = User.objects.get(username="root")
         cls.to_keep = User.objects.create(
             username="to_keep", password="plop", email="u.1@utbm.fr"

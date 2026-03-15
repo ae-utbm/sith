@@ -49,13 +49,9 @@
             <strong class="card-title">{{ formula.result.name }}</strong>
             <p>
               {% for p in formula.products.all() %}
-                <i>{{ p.code }} ({{ p.selling_price }} €)</i>
+                <i>{{ p.name }} ({{ p.code }})</i>
                 {% if not loop.last %}+{% endif %}
               {% endfor %}
-            </p>
-            <p>
-              {{ formula.result.selling_price }} €
-              ({% trans %}instead of{% endtrans %} {{ formula.max_selling_price}} €)
             </p>
           </div>
           {% if user.has_perm("counter.delete_productformula") %}
