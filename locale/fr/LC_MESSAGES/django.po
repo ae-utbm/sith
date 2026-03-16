@@ -5838,3 +5838,39 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "Eurockéennes 2025 partnership"
+msgstr "Partenariat Eurockéennes 2025"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid ""
+"Our partner uses Weezevent to sell tickets. Weezevent may collect user info "
+"according to its own privacy policy. By clicking the accept button you "
+"consent to their terms of services."
+msgstr ""
+"Notre partenaire utilises Wezevent pour vendre ses billets. Weezevent peut "
+"collecter des informations utilisateur conformément à sa propre politique de "
+"confidentialité. En cliquant sur le bouton d'acceptation vous consentez à "
+"leurs termes de service."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "Privacy policy"
+msgstr "Politique de confidentialité"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid ""
+"You must be subscribed to benefit from the partnership with the Eurockéennes."
+msgstr ""
+"Vous devez être cotisant pour bénéficier du partenariat avec les "
+"Eurockéennes."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+#, python-format
+msgid ""
+"This partnership offers a discount of up to 33%% on tickets for Friday, "
+"Saturday and Sunday, as well as the 3-day package from Friday to Sunday."
+msgstr ""
+"Ce partenariat permet de profiter d'une réduction jusqu'à 33%% sur les "
+"billets du vendredi, du samedi et du dimanche, ainsi qu'au forfait 3 jours, "
+"du vendredi au dimanche."
