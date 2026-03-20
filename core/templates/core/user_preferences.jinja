@@ -6,6 +6,7 @@
 
 {%- block additional_css -%}
   <link rel="stylesheet" href="{{ static('user/user_preferences.scss') }}">
+  {# importing ajax-select-index is necessary for it to be applied after HTMX reload #}
   <link rel="stylesheet" href="{{ static("bundled/core/components/ajax-select-index.css") }}">
   <link rel="stylesheet" href="{{ static("core/components/ajax-select.scss") }}">
 {%- endblock -%}
