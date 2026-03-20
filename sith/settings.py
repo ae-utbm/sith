@@ -355,7 +355,6 @@ SITH_TWITTER = "@ae_utbm"
 # AE configuration
 SITH_MAIN_CLUB_ID = env.int("SITH_MAIN_CLUB_ID", default=1)
 SITH_PDF_CLUB_ID = env.int("SITH_PDF_CLUB_ID", default=2)
-SITH_LAUNDERETTE_CLUB_ID = env.int("SITH_LAUNDERETTE_CLUB_ID", default=84)
 
 # Main root for club pages
 SITH_CLUB_ROOT_PAGE = "clubs"
@@ -483,13 +482,6 @@ SITH_LOG_OPERATION_TYPE = [
 
 SITH_PEDAGOGY_UTBM_API = "https://extranet1.utbm.fr/gpedago/api/guide"
 
-SITH_ECOCUP_CONS = env.int("SITH_ECOCUP_CONS", default=1151)
-
-SITH_ECOCUP_DECO = env.int("SITH_ECOCUP_DECO", default=1152)
-
-# The limit is the maximum difference between cons and deco possible for a customer
-SITH_ECOCUP_LIMIT = 3
-
 # Defines pagination for cash summary
 SITH_COUNTER_CASH_SUMMARY_LENGTH = 50
 
@@ -512,7 +504,6 @@ SITH_PRODUCT_SUBSCRIPTION_ONE_SEMESTER = env.int(
 SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS = env.int(
     "SITH_PRODUCT_SUBSCRIPTION_TWO_SEMESTERS", default=2
 )
-SITH_PRODUCTTYPE_SUBSCRIPTION = env.int("SITH_PRODUCTTYPE_SUBSCRIPTION", default=2)
 
 # Number of weeks before the end of a subscription when the subscriber can resubscribe
 SITH_SUBSCRIPTION_END = 10
