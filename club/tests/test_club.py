@@ -1,12 +1,15 @@
 from datetime import timedelta
 
 import pytest
+from django.test import Client
+from django.urls import reverse
 from django.utils.timezone import localdate
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 
 from club.models import Club, Membership
 from core.baker_recipes import subscriber_user
+from core.models import User
 
 
 @pytest.mark.django_db
@@ -25,3 +28,10 @@ def test_club_queryset_having_board_member():
 
     club_ids = Club.objects.having_board_member(user).values_list("id", flat=True)
     assert set(club_ids) == {clubs[1].id, clubs[2].id}
+
+
+@pytest.mark.django_db
+def test_club_list(client: Client):
+    client.force_login(baker.make(User))
+    res = client.get(reverse("club:club_list"))
+    assert res.status_code == 200

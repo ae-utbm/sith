@@ -59,6 +59,14 @@ class TestClubSearch(TestCase):
         ids = {d["id"] for d in response.json()["results"]}
         assert ids == {c.id for c in [self.clubs[0], self.clubs[1], self.clubs[3]]}
 
+    def test_club_search_profile(self):
+        self.client.force_login(self.user)
+        url = reverse("api:search_club_profile")
+        response = self.client.get(url, {"search": "AE"})
+        assert response.status_code == 200
+        ids = {d["id"] for d in response.json()["results"]}
+        assert ids == {c.id for c in [self.clubs[0], self.clubs[1], self.clubs[3]]}
+
 
 @pytest.mark.django_db
 class TestFetchClub:
