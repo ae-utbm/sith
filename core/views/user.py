@@ -248,14 +248,15 @@ class UserTabsMixin(TabedViewMixin):
                     "name": _("Groups"),
                 }
             )
-        if (
+        can_view_account = (
             hasattr(user, "customer")
             and user.customer
             and (
                 user == self.request.user
                 or self.request.user.has_perm("counter.view_customer")
             )
-        ):
+        )
+        if can_view_account or user.preferences.show_my_stats:
             tab_list.append(
                 {
                     "url": reverse("core:user_stats", kwargs={"user_id": user.id}),
@@ -263,6 +264,7 @@ class UserTabsMixin(TabedViewMixin):
                     "name": _("Stats"),
                 }
             )
+        if can_view_account:
             tab_list.append(
                 {
                     "url": reverse("core:user_account", kwargs={"user_id": user.id}),
@@ -349,7 +351,7 @@ class UserGodfathersTreeView(UserTabsMixin, CanViewMixin, DetailView):
         return kwargs
 
 
-class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
+class UserStatsView(UserTabsMixin, UserPassesTestMixin, DetailView):
     """Display a user's stats."""
 
     model = User
@@ -357,15 +359,20 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_stats.jinja"
     current_tab = "stats"
-    queryset = User.objects.exclude(customer=None).select_related("customer")
+    queryset = User.objects.exclude(customer=None).select_related(
+        "customer", "_preferences"
+    )
 
-    def dispatch(self, request, *arg, **kwargs):
-        profile = self.get_object()
-        if not (
-            profile == request.user or request.user.has_perm("counter.view_customer")
-        ):
-            raise PermissionDenied
-        return super().dispatch(request, *arg, **kwargs)
+    def test_func(self):
+        profile: User = self.get_object()
+        return (
+            profile == self.request.user
+            or self.request.user.has_perm("counter.view_customer")
+            or (
+                self.request.user.can_view(profile)
+                and profile.preferences.show_my_stats
+            )
+        )
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
