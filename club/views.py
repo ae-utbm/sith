@@ -42,7 +42,7 @@ from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, ListView, View
+from django.views.generic import DetailView, TemplateView, View
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
@@ -180,15 +180,10 @@ class ClubTabsMixin(TabedViewMixin):
         return tab_list
 
 
-class ClubListView(ListView):
+class ClubListView(TemplateView):
     """List the Clubs."""
 
-    model = Club
     template_name = "club/club_list.jinja"
-    queryset = (
-        Club.objects.filter(parent=None).order_by("name").prefetch_related("children")
-    )
-    context_object_name = "club_list"
 
 
 class ClubView(ClubTabsMixin, DetailView):

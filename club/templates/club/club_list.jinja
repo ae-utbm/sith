@@ -1,4 +1,5 @@
 {% extends "core/base.jinja" %}
+{% from "core/macros.jinja" import paginate_alpine %}
 
 {% block title -%}
   {% trans %}Club list{% endtrans %}
@@ -8,45 +9,76 @@
   {% trans %}The list of all clubs existing at UTBM.{% endtrans %}
 {%- endblock %}
 
-{% macro display_club(club) -%}
+{% block additional_js %}
+  <script type="module" src="{{ static("bundled/club/club-list-index.ts") }}"></script>
+{% endblock %}
 
-  {% if club.is_active or user.is_root %}
-
-    <li><a href="{{ url('club:club_view', club_id=club.id) }}">{{ club.name }}</a>
-
-      {% if not club.is_active %}
-        ({% trans %}inactive{% endtrans %})
-      {% endif %}
-
-      {% if club.president %} - <a href="{{ url('core:user_profile', user_id=club.president.user.id) }}">{{ club.president.user }}</a>{% endif %}
-      {% if club.short_description %}<p>{{ club.short_description|markdown }}</p>{% endif %}
-
-  {% endif %}
-
-  {%- if club.children.all()|length != 0 %}
-    <ul>
-      {%- for c in club.children.order_by('name').prefetch_related("children") %}
-        {{ display_club(c) }}
-      {%- endfor %}
-    </ul>
-  {%- endif -%}
-  </li>
-{%- endmacro %}
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("club/list.scss") }}">
+{% endblock %}
 
 {% block content %}
-  {% if user.is_root %}
-    <p><a href="{{ url('club:club_new') }}">{% trans %}New club{% endtrans %}</a></p>
-  {% endif %}
-  {% if club_list %}
+  <main x-data="clubList">
+    <h3>{% trans %}Filters{% endtrans %}</h3>
+    <form id="club-list-filters">
+      <div class="row gap-4x">
+        <fieldset>
+          <label for="club-name-input">{% trans %}Name{% endtrans %}</label>
+          <input
+            id="club-name-input"
+            type="text"
+            name="club-name"
+            x-model.debounce.500ms="clubName"
+          />
+        </fieldset>
+        <fieldset class="grow">
+          <legend>{% trans %}Club state{% endtrans %}</legend>
+          <div class="row">
+            <input type="radio" id="filter-active-clubs" x-model="clubStatus" value="active">
+            <label for="filter-active-clubs">{% trans %}Active{% endtrans %}</label>
+          </div>
+          <div class="row">
+            <input type="radio" id="filter-inactive-clubs" x-model="clubStatus" value="inactive">
+            <label for="filter-inactive-clubs">{% trans %}Inactive{% endtrans %}</label>
+          </div>
+          <div class="row">
+            <input type="radio" id="filter-all-clubs" x-model="clubStatus" value="both">
+            <label for="filter-all-clubs">{% trans %}All clubs{% endtrans %}</label>
+          </div>
+        </fieldset>
+      </div>
+    </form>
     <h3>{% trans %}Club list{% endtrans %}</h3>
-    <ul>
-      {%- for club in club_list %}
-        {{ display_club(club) }}
-      {%- endfor %}
-    </ul>
-  {% else %}
-    {% trans %}There is no club in this website.{% endtrans %}
-  {% endif %}
+    {% if user.has_perm("club.add_club") %}
+      <br>
+      <a href="{{ url('club:club_new') }}" class="btn btn-blue">
+        <i class="fa fa-plus"></i> {% trans %}New club{% endtrans %}
+      </a>
+    {% endif %}
+    <section class="aria-busy-grow" :aria-busy="loading" id="club-list">
+      <template x-for="club of clubs" :key="club.id">
+        <div class="card">
+          <a :href="club.url">
+            <template x-if="club.logo">
+              <img class="club-image" :src="club.logo" :alt="`logo ${club.name}`">
+            </template>
+            <template x-if="!club.logo">
+              <i class="fa-regular fa-image fa-4x club-image"></i>
+            </template>
+          </a>
+          <div class="content">
+            <a :href="club.url">
+              <h4 x-text="`${club.name} ${club.is_active ? '' : '({% trans %}inactive{% endtrans %})'}`"></h4>
+            </a>
+            <template x-for="paragraph of getParagraphs(club.short_description)">
+              <p x-text="paragraph"></p>
+            </template>
+          </div>
+        </div>
+      </template>
+    </section>
+    {{ paginate_alpine("currentPage", "nbPages") }}
+  </main>
 {% endblock %}
 
 
