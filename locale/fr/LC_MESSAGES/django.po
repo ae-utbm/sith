@@ -217,14 +217,57 @@ msgstr "home"
 msgid "You can not make loops in clubs"
 msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 
+#: club/models.py com/models.py counter/models.py trombi/models.py
+msgid "club"
+msgstr "club"
+
+#: club/models.py
+msgid "The club with which this role is associated"
+msgstr "Le club auquel ce rôle est attaché."
+
+#: club/models.py core/models.py counter/models.py election/models.py
+#: forum/models.py
+msgid "description"
+msgstr "description"
+
+#: club/models.py
+msgid "Board role"
+msgstr "Rôle du bureau"
+
+#: club/models.py
+msgid "Presidency role"
+msgstr "Rôle de la présidence"
+
+#: club/models.py
+msgid ""
+"If the role is inactive, people joining the club won't be able to get it."
+msgstr ""
+"Si ce rôle est inactif, il ne pourra pas être attribué aux gens qui rejoignent le club."
+
+#: club/models.py
+msgid "club role"
+msgstr "rôle de club"
+
+#: club/models.py
+msgid "club roles"
+msgstr "rôles de club"
+
+#: club/models.py
+#, python-format
+msgid ""
+"Role %(name)s was declared as a presidency role without being a board role"
+msgstr ""
+"Le rôle %(name)s a été déclaré comme rôle de présidence sans être un rôle du bureau."
+
+#: club/models.py
+#, python-format
+msgid "Board role %(role)s cannot be placed below a member role"
+msgstr "Le rôle du bureau %(role)s ne peut pas être placé en-dessous d'un rôle de membre."
+
 #: club/models.py core/models.py counter/models.py eboutic/models.py
 #: election/models.py pedagogy/models.py sas/models.py trombi/models.py
 msgid "user"
 msgstr "utilisateur"
-
-#: club/models.py com/models.py counter/models.py trombi/models.py
-msgid "club"
-msgstr "club"
 
 #: club/models.py counter/models.py election/models.py
 msgid "start date"
@@ -237,11 +280,6 @@ msgstr "date de fin"
 #: club/models.py core/models.py election/models.py trombi/models.py
 msgid "role"
 msgstr "rôle"
-
-#: club/models.py core/models.py counter/models.py election/models.py
-#: forum/models.py
-msgid "description"
-msgstr "description"
 
 #: club/models.py
 msgid "past member"
@@ -5358,42 +5396,6 @@ msgstr "Cursus alternant (-20%)"
 #: sith/settings.py
 msgid "One year for free(CA offer)"
 msgstr "Une année offerte (Offre CA)"
-
-#: sith/settings.py
-msgid "President"
-msgstr "Président⸱e"
-
-#: sith/settings.py
-msgid "Vice-President"
-msgstr "Vice-Président⸱e"
-
-#: sith/settings.py
-msgid "Treasurer"
-msgstr "Trésorier⸱e"
-
-#: sith/settings.py
-msgid "Communication supervisor"
-msgstr "Responsable communication"
-
-#: sith/settings.py
-msgid "Secretary"
-msgstr "Secrétaire"
-
-#: sith/settings.py
-msgid "IT supervisor"
-msgstr "Responsable info"
-
-#: sith/settings.py
-msgid "Board member"
-msgstr "Membre du bureau"
-
-#: sith/settings.py
-msgid "Active member"
-msgstr "Membre actif⸱ve"
-
-#: sith/settings.py
-msgid "Curious"
-msgstr "Curieux⸱euse"
 
 #: sith/settings.py
 msgid "A new poster needs to be moderated"
