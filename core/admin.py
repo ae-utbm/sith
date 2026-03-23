@@ -63,6 +63,7 @@ class UserAdmin(admin.ModelAdmin):
         "scrub_pict",
         "user_permissions",
         "groups",
+        "whitelisted_users",
     )
     inlines = (UserBanInline,)
     search_fields = ["first_name", "last_name", "username"]
