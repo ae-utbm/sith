@@ -27,7 +27,10 @@ class Migration(migrations.Migration):
             name="show_my_stats",
             field=models.BooleanField(
                 default=False,
-                help_text="Allow subscribers to access your AE account stats.",
+                help_text=(
+                    "Allow subscribers (or whitelisted users "
+                    "if your profile is hidden) to access your AE account stats."
+                ),
                 verbose_name="show your stats to others",
             ),
         ),

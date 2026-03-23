@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-14 23:09+0100\n"
+"POT-Creation-Date: 2026-03-23 22:21+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1554,10 +1554,11 @@ msgstr "utilisateurs whitelistés"
 
 #: core/models.py
 msgid ""
-"Even if this profile is hidden, the users in this list will still be able to see "
-"it."
+"Even if this profile is hidden, the users in this list will still be able to "
+"see it."
 msgstr ""
-"Même si ce profil est caché, les utilisateurs sur cette liste pourront toujours le voir."
+"Même si ce profil est caché, les utilisateurs sur cette liste pourront "
+"toujours le voir."
 
 #: core/models.py
 msgid "A user with that username already exists"
@@ -1616,8 +1617,12 @@ msgid "show your stats to others"
 msgstr "montrez vos statistiques aux autres"
 
 #: core/models.py
-msgid "Allow subscribers to access your AE account stats."
-msgstr "Autoriser les cotisants à accéder aux statistiques de votre compte AE"
+msgid ""
+"Allow subscribers (or whitelisted users if your profile is hidden) to access "
+"your AE account stats."
+msgstr ""
+"Autorise les cotisants (ou les personnes whitelistées, si votre profil est "
+"caché) à accéder aux statistiques de votre compte AE"
 
 #: core/models.py
 msgid "get a notification for every click"

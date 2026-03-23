@@ -21,7 +21,7 @@
   <fieldset class="form-group" x-show="!isViewable">
     {{ form.whitelisted_users.as_field_group() }}
   </fieldset>
-  <fieldset class="form-group" x-show="isViewable">
+  <fieldset class="form-group">
     {{ form.show_my_stats }}
     {{ form.show_my_stats.label_tag() }}
     <span class="helptext">

@@ -781,7 +781,10 @@ class Preferences(models.Model):
     receive_weekmail = models.BooleanField(_("receive the Weekmail"), default=False)
     show_my_stats = models.BooleanField(
         _("show your stats to others"),
-        help_text=_("Allow subscribers to access your AE account stats."),
+        help_text=_(
+            "Allow subscribers (or whitelisted users "
+            "if your profile is hidden) to access your AE account stats."
+        ),
         default=False,
     )
     notify_on_click = models.BooleanField(
