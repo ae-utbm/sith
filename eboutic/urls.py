@@ -31,6 +31,7 @@ from eboutic.views import (
     EbouticMainView,
     EbouticPayWithSith,
     EtransactionAutoAnswer,
+    EurockPartnerFragment,
     payment_result,
 )
 
@@ -50,4 +51,5 @@ urlpatterns = [
         EtransactionAutoAnswer.as_view(),
         name="etransation_autoanswer",
     ),
+    path("eurock/", EurockPartnerFragment.as_view(), name="eurock"),
 ]
