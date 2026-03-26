@@ -36,6 +36,7 @@ export function registerComponent(name: string, options?: ElementDefinitionOptio
  **/
 export function inheritHtmlElement<K extends keyof HTMLElementTagNameMap>(tagName: K) {
   return class Inherited extends HTMLElement {
+    readonly inheritedTagName = tagName;
     protected node: HTMLElementTagNameMap[K];
 
     connectedCallback(autoAddNode?: boolean) {
