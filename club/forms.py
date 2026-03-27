@@ -315,3 +315,22 @@ class JoinClubForm(ClubMemberForm):
                 _("You are already a member of this club"), code="invalid"
             )
         return super().clean()
+
+
+class ClubSearchForm(forms.ModelForm):
+    class Meta:
+        model = Club
+        fields = ["name"]
+        widgets = {"name": forms.SearchInput(attrs={"autocomplete": "off"})}
+
+    club_status = forms.NullBooleanField(
+        label=_("Club status"),
+        widget=forms.RadioSelect(
+            choices=[(True, _("Active")), (False, _("Inactive")), ("", _("All clubs"))],
+        ),
+        initial=True,
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["name"].required = False

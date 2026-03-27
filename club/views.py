@@ -42,15 +42,21 @@ from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, TemplateView, View
+from django.views.generic import DetailView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic.edit import (
+    CreateView,
+    DeleteView,
+    FormMixin,
+    UpdateView,
+)
 
 from club.forms import (
     ClubAddMemberForm,
     ClubAdminEditForm,
     ClubEditForm,
     ClubOldMemberForm,
+    ClubSearchForm,
     JoinClubForm,
     MailingForm,
     SellingsForm,
@@ -66,7 +72,12 @@ from com.views import (
 from core.auth.mixins import CanEditMixin, PermissionOrClubBoardRequiredMixin
 from core.models import Page, PageRev
 from core.views import BasePageEditView, DetailFormView, UseFragmentsMixin
-from core.views.mixins import FragmentMixin, FragmentRenderer, TabedViewMixin
+from core.views.mixins import (
+    AllowFragment,
+    FragmentMixin,
+    FragmentRenderer,
+    TabedViewMixin,
+)
 from counter.models import Selling
 
 if TYPE_CHECKING:
@@ -180,10 +191,41 @@ class ClubTabsMixin(TabedViewMixin):
         return tab_list
 
 
-class ClubListView(TemplateView):
-    """List the Clubs."""
+class ClubListView(AllowFragment, FormMixin, ListView):
+    """List the clubs of the AE, with a form to perform basic search.
+
+    Notes:
+        This view is fully public, because we want to advertise as much as possible
+        the cultural life of the AE.
+        In accordance with that matter, searching and listing the clubs is done
+        entirely server-side (no AlpineJS involved) ;
+        this is done this way in order to be sure the page is the most accessible
+        and SEO-friendly possible, even if it makes the UX slightly less smooth.
+    """
 
     template_name = "club/club_list.jinja"
+    form_class = ClubSearchForm
+    queryset = Club.objects.order_by("name")
+    paginate_by = 1
+
+    def get_form_kwargs(self):
+        res = super().get_form_kwargs()
+        if self.request.GET:
+            res |= {"data": self.request.GET, "initial": self.request.GET}
+        return res
+
+    def get_queryset(self):
+        form: ClubSearchForm = self.get_form()
+        qs = self.queryset
+        if not form.is_bound:
+            return qs
+        if not form.is_valid():
+            return qs.none()
+        if name := form.cleaned_data.get("name"):
+            qs = qs.filter(name__icontains=name)
+        if (is_active := form.cleaned_data.get("club_status")) is not None:
+            qs = qs.filter(is_active=is_active)
+        return qs
 
 
 class ClubView(ClubTabsMixin, DetailView):
