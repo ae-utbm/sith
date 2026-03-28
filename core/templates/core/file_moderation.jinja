@@ -10,7 +10,7 @@
   {% extends "core/base.jinja" %}
 {% endif %}
 
-{% from "core/macros.jinja" import paginate_htmx with context %}
+{% from "core/macros.jinja" import paginate_htmx %}
 
 {% block title %}
   {% trans %}File moderation{% endtrans %}
@@ -48,6 +48,6 @@
           >{% trans %}Delete{% endtrans %}</button></p>
       </div>
     {% endfor %}
-    {{ paginate_htmx(page_obj, paginator) }}
+    {{ paginate_htmx(request, page_obj, paginator) }}
   </div>
 {% endblock %}

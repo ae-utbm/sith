@@ -1,5 +1,5 @@
 {% extends "core/base.jinja" %}
-{% from "core/macros.jinja" import paginate_jinja with context %}
+{% from "core/macros.jinja" import paginate_jinja %}
 
 {% block title %}
   {% trans %}Operation logs{% endtrans %}
@@ -29,6 +29,6 @@
 
   <br>
   {% if is_paginated %}
-    {{ paginate_jinja(page_obj, paginator) }}
+    {{ paginate_jinja(request, page_obj, paginator) }}
   {% endif %}
 {% endblock content %}
