@@ -10,7 +10,7 @@
   {% extends "core/base.jinja" %}
 {% endif %}
 
-{% from "core/macros.jinja" import paginate_htmx %}
+{% from "core/macros.jinja" import paginate_htmx with context %}
 
 {% block title %}
   {% trans %}File moderation{% endtrans %}

@@ -1,5 +1,6 @@
 {% extends "core/base.jinja" %}
-{% from 'core/macros.jinja' import user_profile_link, paginate_jinja %}
+{% from 'core/macros.jinja' import user_profile_link %}
+{% from 'core/macros.jinja' import paginate_jinja with context %}
 
 {% block title %}
   {% trans %}Cash register summary list{% endtrans %}

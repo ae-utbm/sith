@@ -124,6 +124,9 @@
     This must be coupled with a view that handles pagination
     with the Django Paginator object.
 
+    Warning:
+      You must include this macro `with context` as it uses the `querystring` macro
+
     Parameters:
         current_page (django.core.paginator.Page): the current page object
         paginator (django.core.paginator.Paginator): the paginator object
@@ -138,6 +141,9 @@
     with the Django Paginator object and supports fragments.
 
     The replaced fragment will be #content so make sure you are calling this macro inside your content block.
+
+    Warning:
+      You must include this macro `with context` as it uses the `querystring` macro
 
     Parameters:
         current_page (django.core.paginator.Page): the current page object
