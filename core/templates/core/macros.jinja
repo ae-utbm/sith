@@ -124,8 +124,11 @@
     This must be coupled with a view that handles pagination
     with the Django Paginator object.
 
-    Warning:
-      You must include this macro `with context` as it uses the `querystring` macro
+    Warnings:
+        This macro must be imported with context :
+        ```jinja
+        {% from "core/macros.jinja" import paginate_jinja with context %}
+        ```
 
     Parameters:
         current_page (django.core.paginator.Page): the current page object
@@ -142,8 +145,11 @@
 
     The replaced fragment will be #content so make sure you are calling this macro inside your content block.
 
-    Warning:
-      You must include this macro `with context` as it uses the `querystring` macro
+    Warnings:
+        This macro must be imported with context :
+        ```jinja
+        {% from "core/macros.jinja" import paginate_jinja with context %}
+        ```
 
     Parameters:
         current_page (django.core.paginator.Page): the current page object
@@ -254,14 +260,7 @@
 
 
 {% macro querystring() %}
-  {%- for key, values in request.GET.lists() -%}
-    {%- if key not in kwargs -%}
-      {%- for value in values -%}
-        {{ key }}={{ value }}&amp;
-      {%- endfor -%}
-    {%- endif -%}
-  {%- endfor -%}
-  {%- for key, value in kwargs.items() -%}
-    {{ key }}={{ value }}&amp;
-  {%- endfor -%}
+  {%- set qs = request.GET.copy() -%}
+  {%- do qs.update(kwargs) -%}
+  {{- qs | urlencode -}}
 {% endmacro %}
