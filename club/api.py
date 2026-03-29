@@ -9,7 +9,6 @@ from api.auth import ApiKeyAuth
 from api.permissions import CanView, HasPerm
 from club.models import Club, Membership
 from club.schemas import (
-    ClubProfileSchema,
     ClubSchema,
     ClubSearchFilterSchema,
     SimpleClubSchema,
@@ -28,16 +27,6 @@ class ClubController(ControllerBase):
     @paginate(PageNumberPaginationExtra, page_size=50)
     def search_club(self, filters: Query[ClubSearchFilterSchema]):
         return filters.filter(Club.objects.order_by("name")).values()
-
-    @route.get(
-        "/search-profile",
-        response=PaginatedResponseSchema[ClubProfileSchema],
-        url_name="search_club_profile",
-    )
-    @paginate(PageNumberPaginationExtra, page_size=50)
-    def search_club_profile(self, filters: Query[ClubSearchFilterSchema]):
-        """Same as /api/club/search, but with more returned data"""
-        return filters.filter(Club.objects.order_by("name"))
 
     @route.get(
         "/{int:club_id}",

@@ -218,7 +218,7 @@ class ClubListView(AllowFragment, FormMixin, ListView):
         form: ClubSearchForm = self.get_form()
         qs = self.queryset
         if not form.is_bound:
-            return qs
+            return qs.filter(is_active=True)
         if not form.is_valid():
             return qs.none()
         if name := form.cleaned_data.get("name"):

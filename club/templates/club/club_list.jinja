@@ -33,7 +33,9 @@
       <div class="row gap-4x">
         {{ form }}
       </div>
-      <input type="submit" class="btn btn-blue margin-bottom" value="{% trans %}Search{% endtrans %}">
+      <button type="submit" class="btn btn-blue margin-bottom">
+        <i class="fa fa-magnifying-glass"></i>{% trans %}Search{% endtrans %}
+      </button>
     </form>
     <h3>{% trans %}Club list{% endtrans %}</h3>
     {% if user.has_perm("club.add_club") %}

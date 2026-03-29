@@ -30,8 +30,12 @@ def test_club_queryset_having_board_member():
     assert set(club_ids) == {clubs[1].id, clubs[2].id}
 
 
+@pytest.mark.parametrize("nb_additional_clubs", [10, 30])
+@pytest.mark.parametrize("is_fragment", [True, False])
 @pytest.mark.django_db
-def test_club_list(client: Client):
+def test_club_list(client: Client, nb_additional_clubs: int, is_fragment):
     client.force_login(baker.make(User))
-    res = client.get(reverse("club:club_list"))
+    baker.make(Club, _quantity=nb_additional_clubs)
+    headers = {"HX-Request": True} if is_fragment else {}
+    res = client.get(reverse("club:club_list"), headers=headers)
     assert res.status_code == 200
