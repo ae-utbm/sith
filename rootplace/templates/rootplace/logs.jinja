@@ -28,5 +28,7 @@
   </table>
 
   <br>
-  {{ paginate_jinja(page_obj, paginator) }}
+  {% if is_paginated %}
+    {{ paginate_jinja(request, page_obj, paginator) }}
+  {% endif %}
 {% endblock content %}

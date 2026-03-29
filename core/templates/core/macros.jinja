@@ -118,20 +118,21 @@
   </nav>
 {% endmacro %}
 
-{% macro paginate_jinja(current_page, paginator) %}
+{% macro paginate_jinja(request, current_page, paginator) %}
     {# Add pagination buttons for pages without Alpine.
 
     This must be coupled with a view that handles pagination
     with the Django Paginator object.
 
     Parameters:
+        request (django.http.request.HttpRequest): the current django request
         current_page (django.core.paginator.Page): the current page object
         paginator (django.core.paginator.Paginator): the paginator object
     #}
-  {{ paginate_server_side(current_page, paginator, False) }}
+  {{ paginate_server_side(request, current_page, paginator, False) }}
 {% endmacro %}
 
-{% macro paginate_htmx(current_page, paginator) %}
+{% macro paginate_htmx(request, current_page, paginator) %}
     {# Add pagination buttons for pages without Alpine but supporting fragments.
 
     This must be coupled with a view that handles pagination
@@ -140,24 +141,25 @@
     The replaced fragment will be #content so make sure you are calling this macro inside your content block.
 
     Parameters:
+        request (django.http.request.HttpRequest): the current django request
         current_page (django.core.paginator.Page): the current page object
         paginator (django.core.paginator.Paginator): the paginator object
     #}
-  {{ paginate_server_side(current_page, paginator, True) }}
+  {{ paginate_server_side(request, current_page, paginator, True) }}
 {% endmacro %}
 
-{% macro paginate_server_side(current_page, paginator, use_htmx) %}
+{% macro paginate_server_side(request, current_page, paginator, use_htmx) %}
   <nav class="pagination">
     {% if current_page.has_previous() %}
       <a
         {% if use_htmx -%}
-          hx-get="?{{ querystring(page=current_page.previous_page_number()) }}"
+          hx-get="?{{ querystring(request, page=current_page.previous_page_number()) }}"
           hx-swap="innerHTML"
           hx-target="#content"
           hx-push-url="true"
           hx-trigger="click, keyup[key=='ArrowLeft'] from:body"
         {%- else -%}
-          href="?{{ querystring(page=current_page.previous_page_number()) }}"
+          href="?{{ querystring(request, page=current_page.previous_page_number()) }}"
         {%- endif -%}
       >
         <button>
@@ -175,12 +177,12 @@
       {% else %}
         <a
           {% if use_htmx -%}
-            hx-get="?{{ querystring(page=i) }}"
+            hx-get="?{{ querystring(request, page=i) }}"
             hx-swap="innerHTML"
             hx-target="#content"
             hx-push-url="true"
           {%- else -%}
-            href="?{{ querystring(page=i) }}"
+            href="?{{ querystring(request, page=i) }}"
           {%- endif -%}
         >
           <button>{{ i }}</button>
@@ -190,13 +192,13 @@
     {% if current_page.has_next() %}
       <a
         {% if use_htmx -%}
-          hx-get="?{{querystring(page=current_page.next_page_number())}}"
+          hx-get="?{{querystring(request, page=current_page.next_page_number())}}"
           hx-swap="innerHTML"
           hx-target="#content"
           hx-push-url="true"
           hx-trigger="click, keyup[key=='ArrowRight'] from:body"
         {%- else -%}
-          href="?{{querystring(page=current_page.next_page_number())}}"
+          href="?{{querystring(request, page=current_page.next_page_number())}}"
         {%- endif -%}
       ><button>
         <i class="fa fa-caret-right"></i>
@@ -247,15 +249,8 @@
 {% endmacro %}
 
 
-{% macro querystring() %}
-  {%- for key, values in request.GET.lists() -%}
-    {%- if key not in kwargs -%}
-      {%- for value in values -%}
-        {{ key }}={{ value }}&amp;
-      {%- endfor -%}
-    {%- endif -%}
-  {%- endfor -%}
-  {%- for key, value in kwargs.items() -%}
-    {{ key }}={{ value }}&amp;
-  {%- endfor -%}
+{% macro querystring(request) %}
+  {%- set qs = request.GET.copy() -%}
+  {%- do qs.update(kwargs) -%}
+  {{- qs | urlencode -}}
 {% endmacro %}
