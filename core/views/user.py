@@ -28,10 +28,12 @@ from datetime import timedelta
 from operator import itemgetter
 from smtplib import SMTPException
 
+from django.contrib import messages
 from django.contrib.auth import login, views
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import DateField, F, QuerySet, Sum
 from django.db.models.functions import Trunc
@@ -48,7 +50,6 @@ from django.views.generic import (
     CreateView,
     DeleteView,
     DetailView,
-    ListView,
     RedirectView,
     TemplateView,
 )
@@ -65,8 +66,9 @@ from core.views.forms import (
     UserGodfathersForm,
     UserGroupsForm,
     UserProfileForm,
+    UserVisibilityForm,
 )
-from core.views.mixins import TabedViewMixin, UseFragmentsMixin
+from core.views.mixins import FragmentMixin, TabedViewMixin, UseFragmentsMixin
 from counter.models import Refilling, Selling
 from eboutic.models import Invoice
 from trombi.views import UserTrombiForm
@@ -248,14 +250,15 @@ class UserTabsMixin(TabedViewMixin):
                     "name": _("Groups"),
                 }
             )
-        if (
+        can_view_account = (
             hasattr(user, "customer")
             and user.customer
             and (
                 user == self.request.user
                 or self.request.user.has_perm("counter.view_customer")
             )
-        ):
+        )
+        if can_view_account or user.preferences.show_my_stats:
             tab_list.append(
                 {
                     "url": reverse("core:user_stats", kwargs={"user_id": user.id}),
@@ -263,6 +266,7 @@ class UserTabsMixin(TabedViewMixin):
                     "name": _("Stats"),
                 }
             )
+        if can_view_account:
             tab_list.append(
                 {
                     "url": reverse("core:user_account", kwargs={"user_id": user.id}),
@@ -349,7 +353,7 @@ class UserGodfathersTreeView(UserTabsMixin, CanViewMixin, DetailView):
         return kwargs
 
 
-class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
+class UserStatsView(UserTabsMixin, UserPassesTestMixin, DetailView):
     """Display a user's stats."""
 
     model = User
@@ -357,15 +361,20 @@ class UserStatsView(UserTabsMixin, CanViewMixin, DetailView):
     context_object_name = "profile"
     template_name = "core/user_stats.jinja"
     current_tab = "stats"
-    queryset = User.objects.exclude(customer=None).select_related("customer")
+    queryset = User.objects.exclude(customer=None).select_related(
+        "customer", "_preferences"
+    )
 
-    def dispatch(self, request, *arg, **kwargs):
-        profile = self.get_object()
-        if not (
-            profile == request.user or request.user.has_perm("counter.view_customer")
-        ):
-            raise PermissionDenied
-        return super().dispatch(request, *arg, **kwargs)
+    def test_func(self):
+        profile: User = self.get_object()
+        return (
+            profile == self.request.user
+            or self.request.user.has_perm("counter.view_customer")
+            or (
+                self.request.user.can_view(profile)
+                and profile.preferences.show_my_stats
+            )
+        )
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
@@ -402,13 +411,6 @@ class UserMiniView(CanViewMixin, DetailView):
     pk_url_kwarg = "user_id"
     context_object_name = "profile"
     template_name = "core/user_mini.jinja"
-
-
-class UserListView(ListView, CanEditPropMixin):
-    """Displays the user list."""
-
-    model = User
-    template_name = "core/user_list.jinja"
 
 
 # FIXME: the edit_once fields aren't displayed to the user (as expected).
@@ -468,6 +470,30 @@ class UserClubView(UserTabsMixin, CanViewMixin, DetailView):
     current_tab = "clubs"
 
 
+class UserVisibilityFormFragment(FragmentMixin, SuccessMessageMixin, UpdateView):
+    model = User
+    form_class = UserVisibilityForm
+    template_name = "core/fragment/user_visibility.jinja"
+    pk_url_kwarg = "user_id"
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"label_suffix": ""}
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(
+            self.request, _("Visibility parameters updated."), extra_tags="visibility"
+        )
+        return response
+
+    def render_fragment(self, request, **kwargs) -> SafeString:
+        self.object = kwargs.get("user")
+        return super().render_fragment(request, **kwargs)
+
+    def get_success_url(self, **kwargs):
+        return self.request.path
+
+
 class UserPreferencesView(UserTabsMixin, UseFragmentsMixin, CanEditMixin, UpdateView):
     """Edit a user's preferences."""
 
@@ -481,7 +507,10 @@ class UserPreferencesView(UserTabsMixin, UseFragmentsMixin, CanEditMixin, Update
     current_tab = "prefs"
 
     def get_form_kwargs(self):
-        return super().get_form_kwargs() | {"instance": self.object.preferences}
+        return super().get_form_kwargs() | {
+            "instance": self.object.preferences,
+            "label_suffix": "",
+        }
 
     def get_success_url(self):
         return self.request.path
@@ -491,6 +520,9 @@ class UserPreferencesView(UserTabsMixin, UseFragmentsMixin, CanEditMixin, Update
         from counter.views.student_card import StudentCardFormFragment
 
         res = super().get_fragment_context_data()
+        res["user_visibility_fragment"] = UserVisibilityFormFragment.as_fragment()(
+            self.request, user=self.object
+        )
         if hasattr(self.object, "customer"):
             res["student_card_fragment"] = StudentCardFormFragment.as_fragment()(
                 self.request, customer=self.object.customer

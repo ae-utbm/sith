@@ -131,7 +131,7 @@ class UserQuerySet(models.QuerySet):
         if user.has_perm("core.view_hidden_user"):
             return self
         if user.has_perm("core.view_user"):
-            return self.filter(is_viewable=True)
+            return self.filter(Q(is_viewable=True) | Q(whitelisted_users=user))
         if user.is_anonymous:
             return self.none()
         return self.filter(id=user.id)
@@ -278,6 +278,16 @@ class User(AbstractUser):
             "will be able to see your profile."
         ),
         default=True,
+    )
+    whitelisted_users = models.ManyToManyField(
+        "User",
+        related_name="visible_by_whitelist",
+        verbose_name=_("whitelisted users"),
+        help_text=_(
+            "Even if this profile is hidden, "
+            "the users in this list will still be able to see it."
+        ),
+        blank=True,
     )
     godfathers = models.ManyToManyField("User", related_name="godchildren", blank=True)
 
@@ -518,7 +528,7 @@ class User(AbstractUser):
         self.username = user_name
         return user_name
 
-    def is_owner(self, obj):
+    def is_owner(self, obj: models.Model):
         """Determine if the object is owned by the user."""
         if hasattr(obj, "is_owned_by") and obj.is_owned_by(self):
             return True
@@ -526,7 +536,7 @@ class User(AbstractUser):
             return True
         return self.is_root
 
-    def can_edit(self, obj):
+    def can_edit(self, obj: models.Model):
         """Determine if the object can be edited by the user."""
         if hasattr(obj, "can_be_edited_by") and obj.can_be_edited_by(self):
             return True
@@ -540,11 +550,9 @@ class User(AbstractUser):
                 pks = list(obj.edit_groups.values_list("id", flat=True))
             if any(self.is_in_group(pk=pk) for pk in pks):
                 return True
-        if isinstance(obj, User) and obj == self:
-            return True
         return self.is_owner(obj)
 
-    def can_view(self, obj):
+    def can_view(self, obj: models.Model):
         """Determine if the object can be viewed by the user."""
         if hasattr(obj, "can_be_viewed_by") and obj.can_be_viewed_by(self):
             return True
@@ -563,14 +571,35 @@ class User(AbstractUser):
                 return True
         return self.can_edit(obj)
 
-    def can_be_edited_by(self, user):
-        return user.is_root or user.is_board_member
+    def can_be_edited_by(self, user: User):
+        return user == self or user.is_root or user.is_board_member
 
     def can_be_viewed_by(self, user: User) -> bool:
+        """Check if the given user can be viewed by this user.
+
+        Given users A and B. A can be viewed by B if :
+
+        - A and B are the same user
+        - or B has the permission to view hidden users
+        - or B can view users in general and A didn't hide its profile
+        - or B is in A's whitelist.
+        """
+
+        def is_in_whitelist(u: User):
+            if (
+                hasattr(self, "_prefetched_objects_cache")
+                and "whitelisted_users" in self._prefetched_objects_cache
+            ):
+                return u in self.whitelisted_users.all()
+            return self.whitelisted_users.contains(u)
+
         return (
             user.id == self.id
             or user.has_perm("core.view_hidden_user")
-            or (user.has_perm("core.view_user") and self.is_viewable)
+            or (
+                user.has_perm("core.view_user")
+                and (self.is_viewable or is_in_whitelist(user))
+            )
         )
 
     def get_mini_item(self):
@@ -750,7 +779,14 @@ class Preferences(models.Model):
         User, related_name="_preferences", on_delete=models.CASCADE
     )
     receive_weekmail = models.BooleanField(_("receive the Weekmail"), default=False)
-    show_my_stats = models.BooleanField(_("show your stats to others"), default=False)
+    show_my_stats = models.BooleanField(
+        _("show your stats to others"),
+        help_text=_(
+            "Allow subscribers (or whitelisted users "
+            "if your profile is hidden) to access your AE account stats."
+        ),
+        default=False,
+    )
     notify_on_click = models.BooleanField(
         _("get a notification for every click"), default=False
     )

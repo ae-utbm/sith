@@ -147,18 +147,7 @@
       {%- endfor -%}
     </div>
 
-    {# Checkboxes #}
-    <div class="profile-visible">
-      <div class="row">
-        {{ form.is_viewable }}
-        {{ form.is_viewable.label_tag() }}
-      </div>
-      <span class="helptext">
-        {{ form.is_viewable.help_text }}
-      </span>
-    </div>
     <div class="final-actions">
-
       {%- if form.instance == user -%}
         <p>
           <a href="{{ url('core:password_change') }}">{%- trans -%}Change my password{%- endtrans -%}</a>
@@ -170,7 +159,6 @@
           </a>
         </p>
       {%- endif -%}
-
       <p>
         <input type="submit" value="{%- trans -%}Update{%- endtrans -%}" />
       </p>

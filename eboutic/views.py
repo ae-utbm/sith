@@ -42,11 +42,11 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
-from django.views.generic import DetailView, FormView, UpdateView, View
+from django.views.generic import DetailView, FormView, TemplateView, UpdateView, View
 from django.views.generic.edit import SingleObjectMixin
 from django_countries.fields import Country
 
-from core.auth.mixins import CanViewMixin
+from core.auth.mixins import CanViewMixin, IsSubscriberMixin
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
 from counter.forms import BaseBasketForm, BasketProductForm, BillingInfoForm
 from counter.models import (
@@ -350,3 +350,7 @@ class EtransactionAutoAnswer(View):
             return HttpResponse(
                 "Payment failed with error: " + request.GET["Error"], status=202
             )
+
+
+class EurockPartnerFragment(IsSubscriberMixin, TemplateView):
+    template_name = "eboutic/eurock_fragment.jinja"

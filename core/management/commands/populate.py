@@ -116,7 +116,11 @@ class Command(BaseCommand):
         )
         main_club.board_group.permissions.add(
             *Permission.objects.filter(
-                codename__in=["view_subscription", "add_subscription"]
+                codename__in=[
+                    "view_subscription",
+                    "add_subscription",
+                    "view_hidden_user",
+                ]
             )
         )
         bar_club = Club.objects.create(

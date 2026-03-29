@@ -48,6 +48,6 @@
           >{% trans %}Delete{% endtrans %}</button></p>
       </div>
     {% endfor %}
-    {{ paginate_htmx(page_obj, paginator) }}
+    {{ paginate_htmx(request, page_obj, paginator) }}
   </div>
 {% endblock %}

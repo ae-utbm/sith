@@ -146,7 +146,7 @@
                           <label for="{{ input_id }}">
                         {%- endif %}
                         <figure>
-                          {%- if user.is_viewable %}
+                          {%- if user.can_view(candidature.user) %}
                             {% if candidature.user.profile_pict %}
                               <img class="candidate__picture" src="{{ candidature.user.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}">
                             {% else %}

@@ -46,7 +46,7 @@
     </section>
   {%- endfor %}
   {% if is_paginated %}
-    {{ paginate_jinja(page_obj, paginator) }}
+    {{ paginate_jinja(request, page_obj, paginator) }}
   {% endif %}
 {%- endblock %}
 
