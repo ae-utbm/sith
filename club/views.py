@@ -206,7 +206,7 @@ class ClubListView(AllowFragment, FormMixin, ListView):
     template_name = "club/club_list.jinja"
     form_class = ClubSearchForm
     queryset = Club.objects.order_by("name")
-    paginate_by = 1
+    paginate_by = 20
 
     def get_form_kwargs(self):
         res = super().get_form_kwargs()
