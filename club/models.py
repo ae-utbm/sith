@@ -278,6 +278,7 @@ class ClubRole(OrderedModel):
             )
         if (
             self.is_board
+            and self.order
             and self.club.roles.filter(is_board=False, order__lt=self.order).exists()
         ):
             errors.append(
@@ -289,6 +290,22 @@ class ClubRole(OrderedModel):
         if errors:
             raise ValidationError(errors)
         return super().clean()
+
+    def save(self, *args, **kwargs):
+        auto_order = self.order is None and self.is_board
+        if not auto_order:
+            super().save(*args, **kwargs)
+            return
+        # get the role that should be placed after the role we are dealing with.
+        # So, if this is role is presidency, get the first board role ;
+        # if it is a board role, get the first member role ;
+        # and if it is a member role, get nothing (OrderedModel.save will
+        # automatically put it in the last position anyway)
+        filters = {"is_board": self.is_presidency, "is_presidency": False}
+        next_role = self.club.roles.filter(**filters).order_by("order").first()
+        super().save(*args, **kwargs)
+        if next_role:
+            self.above(next_role)
 
 
 class MembershipQuerySet(models.QuerySet):
