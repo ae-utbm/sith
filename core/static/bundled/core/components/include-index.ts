@@ -61,7 +61,26 @@ const startObserver = (observer: MutationObserver) => {
   });
 };
 
-// Refresh *-once components when changes happens
+// Refresh all ElementOnce components on the document based on their tag name
+// They should all be be extended from the `elementOnce` factory
+const refreshElement = (componentName: string, tagName: string) => {
+  for (const element of document.getElementsByTagName(componentName)) {
+    const node = element as unknown as {
+      inheritedTagName: string;
+      refresh(): null;
+    };
+
+    // We can't guess if an element is compatible before we get one
+    // We exit the function completely if it's not compatible
+    if (node.inheritedTagName.toUpperCase() !== tagName.toUpperCase()) {
+      return;
+    }
+
+    node.refresh();
+  }
+};
+
+// Refresh ElementOnce components when changes happens
 const observer = new MutationObserver((mutations: MutationRecord[]) => {
   observer.disconnect();
   for (const mutation of mutations) {
@@ -69,19 +88,6 @@ const observer = new MutationObserver((mutations: MutationRecord[]) => {
       if (node.nodeType !== node.ELEMENT_NODE) {
         continue;
       }
-      const refreshElement = (componentName: string, tagName: string) => {
-        for (const element of document.getElementsByTagName(componentName)) {
-          // We can't guess if an element is compatible before we get one
-          // We exit the function completely if it's not compatible
-          if (
-            (element as any).inheritedTagName.toUpperCase() !== tagName.toUpperCase()
-          ) {
-            return;
-          }
-
-          (element as any).refresh();
-        }
-      };
       for (const registered of registeredComponents) {
         refreshElement(registered, (node as HTMLElement).tagName);
       }
