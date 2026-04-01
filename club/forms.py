@@ -331,6 +331,11 @@ class ClubSearchForm(forms.ModelForm):
         initial=True,
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, data: dict | None = None, **kwargs):
+        super().__init__(*args, data=data, **kwargs)
+        if data is not None and "club_status" not in data:
+            # if the key is missing, it is considered as None,
+            # even though we want the default True value to be applied in such a case
+            # so we enforce it.
+            self.fields["club_status"].value = True
         self.fields["name"].required = False

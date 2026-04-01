@@ -210,7 +210,7 @@ class ClubListView(AllowFragment, FormMixin, ListView):
 
     def get_form_kwargs(self):
         res = super().get_form_kwargs()
-        if self.request.GET:
+        if self.request.method == "GET":
             res |= {"data": self.request.GET, "initial": self.request.GET}
         return res
 
