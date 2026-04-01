@@ -129,10 +129,10 @@
         current_page (django.core.paginator.Page): the current page object
         paginator (django.core.paginator.Paginator): the paginator object
     #}
-  {{ paginate_server_side(request, current_page, paginator, False) }}
+  {{ paginate_server_side(request, current_page, paginator, "") }}
 {% endmacro %}
 
-{% macro paginate_htmx(request, current_page, paginator) %}
+{% macro paginate_htmx(request, current_page, paginator, htmx_target="#content") %}
     {# Add pagination buttons for pages without Alpine but supporting fragments.
 
     This must be coupled with a view that handles pagination
@@ -144,18 +144,19 @@
         request (django.http.request.HttpRequest): the current django request
         current_page (django.core.paginator.Page): the current page object
         paginator (django.core.paginator.Paginator): the paginator object
+        htmx_target (string): htmx target selector (default '#content')
     #}
-  {{ paginate_server_side(request, current_page, paginator, True) }}
+  {{ paginate_server_side(request, current_page, paginator, htmx_target) }}
 {% endmacro %}
 
-{% macro paginate_server_side(request, current_page, paginator, use_htmx) %}
+{% macro paginate_server_side(request, current_page, paginator, htmx_target) %}
   <nav class="pagination">
     {% if current_page.has_previous() %}
       <a
-        {% if use_htmx -%}
+        {% if htmx_target -%}
           hx-get="?{{ querystring(request, page=current_page.previous_page_number()) }}"
           hx-swap="innerHTML"
-          hx-target="#content"
+          hx-target="{{ htmx_target }}"
           hx-push-url="true"
           hx-trigger="click, keyup[key=='ArrowLeft'] from:body"
         {%- else -%}
@@ -176,10 +177,10 @@
         <strong>{{ paginator.ELLIPSIS }}</strong>
       {% else %}
         <a
-          {% if use_htmx -%}
+          {% if htmx_target -%}
             hx-get="?{{ querystring(request, page=i) }}"
             hx-swap="innerHTML"
-            hx-target="#content"
+            hx-target="{{ htmx_target }}"
             hx-push-url="true"
           {%- else -%}
             href="?{{ querystring(request, page=i) }}"
@@ -191,10 +192,10 @@
     {% endfor %}
     {% if current_page.has_next() %}
       <a
-        {% if use_htmx -%}
+        {% if htmx_target -%}
           hx-get="?{{querystring(request, page=current_page.next_page_number())}}"
           hx-swap="innerHTML"
-          hx-target="#content"
+          hx-target="{{ htmx_target }}"
           hx-push-url="true"
           hx-trigger="click, keyup[key=='ArrowRight'] from:body"
         {%- else -%}
