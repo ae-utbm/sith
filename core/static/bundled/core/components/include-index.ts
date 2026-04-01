@@ -1,17 +1,30 @@
-import { inheritHtmlElement, registerComponent } from "#core:utils/web-components.ts";
+import {
+  type InheritedHtmlElement,
+  inheritHtmlElement,
+  registerComponent,
+} from "#core:utils/web-components.ts";
+
+/**
+ * ElementOnce web components
+ *
+ * Those elements ensures that their content is always included only once on a document
+ * They are compatible with elements that are not managed with our Web Components
+ **/
+export interface ElementOnce<K extends keyof HTMLElementTagNameMap>
+  extends InheritedHtmlElement<K> {
+  getElementQuerySelector(): string;
+  refresh(): void;
+}
 
 /**
  * Create an abstract class for ElementOnce types Web Components
- *
- * Those class aren't really abstract because that would be complicated with the
- * multiple inheritance involved
- * Instead, we just raise an unimplemented error
  **/
-function elementOnce<K extends keyof HTMLElementTagNameMap>(tagName: K) {
-  return class ElementOnce extends inheritHtmlElement(tagName) {
-    getElementQuerySelector(): string {
-      throw new Error("Unimplemented");
-    }
+export function elementOnce<K extends keyof HTMLElementTagNameMap>(tagName: K) {
+  abstract class ElementOnceImpl
+    extends inheritHtmlElement(tagName)
+    implements ElementOnce<K>
+  {
+    abstract getElementQuerySelector(): string;
 
     clearNode() {
       while (this.firstChild) {
@@ -37,7 +50,8 @@ function elementOnce<K extends keyof HTMLElementTagNameMap>(tagName: K) {
       // We need to manually clear the containing node to trigger the observer
       this.clearNode();
     }
-  };
+  }
+  return ElementOnceImpl;
 }
 
 // Set of ElementOnce type components to refresh with the observer
@@ -47,12 +61,34 @@ const registeredComponents: Set<string> = new Set();
  * Helper to register ElementOnce types Web Components
  * It's a wrapper around registerComponent that registers that component on
  * a MutationObserver that activates a refresh on them when elements are removed
+ *
+ * You are not supposed to unregister an element
  **/
-function registerElementOnce(name: string, options?: ElementDefinitionOptions) {
+export function registerElementOnce(name: string, options?: ElementDefinitionOptions) {
   registeredComponents.add(name);
   return registerComponent(name, options);
 }
 
+// Refresh all ElementOnce components on the document based on the tag name of the removed element
+const refreshElement = <
+  T extends keyof HTMLElementTagNameMap,
+  K extends keyof HTMLElementTagNameMap,
+>(
+  components: HTMLCollectionOf<ElementOnce<T>>,
+  removedTagName: K,
+) => {
+  for (const element of components) {
+    // We can't guess if an element is compatible before we get one
+    // We exit the function completely if it's not compatible
+    if (element.inheritedTagName.toUpperCase() !== removedTagName.toUpperCase()) {
+      return;
+    }
+
+    element.refresh();
+  }
+};
+
+// Since we need to pause the observer, we make an helper to start it with consistent arguments
 const startObserver = (observer: MutationObserver) => {
   observer.observe(document, {
     // We want to also listen for elements contained in the header (eg: link)
@@ -61,27 +97,9 @@ const startObserver = (observer: MutationObserver) => {
   });
 };
 
-// Refresh all ElementOnce components on the document based on their tag name
-// They should all be be extended from the `elementOnce` factory
-const refreshElement = (componentName: string, tagName: string) => {
-  for (const element of document.getElementsByTagName(componentName)) {
-    const node = element as unknown as {
-      inheritedTagName: string;
-      refresh(): null;
-    };
-
-    // We can't guess if an element is compatible before we get one
-    // We exit the function completely if it's not compatible
-    if (node.inheritedTagName.toUpperCase() !== tagName.toUpperCase()) {
-      return;
-    }
-
-    node.refresh();
-  }
-};
-
 // Refresh ElementOnce components when changes happens
 const observer = new MutationObserver((mutations: MutationRecord[]) => {
+  // To avoid infinite recursion, we need to pause the observer while manipulation nodes
   observer.disconnect();
   for (const mutation of mutations) {
     for (const node of mutation.removedNodes) {
@@ -89,10 +107,16 @@ const observer = new MutationObserver((mutations: MutationRecord[]) => {
         continue;
       }
       for (const registered of registeredComponents) {
-        refreshElement(registered, (node as HTMLElement).tagName);
+        refreshElement(
+          document.getElementsByTagName(registered) as HTMLCollectionOf<
+            ElementOnce<"html"> // The specific tag doesn't really matter
+          >,
+          (node as HTMLElement).tagName as keyof HTMLElementTagNameMap,
+        );
       }
     }
   }
+  // We then resume the observer
   startObserver(observer);
 });
 
