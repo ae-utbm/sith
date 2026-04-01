@@ -23,10 +23,17 @@ export function registerComponent(name: string, options?: ElementDefinitionOptio
  * The technique is to:
  *  create a new web component
  *  create the desired type inside
- *  pass all attributes to the child component
+ *  move all attributes to the child component
  *  store is at as `node` inside the parent
- *
- * Since we can't use the generic type to instantiate the node, we create a generator function
+ **/
+export interface InheritedHtmlElement<K extends keyof HTMLElementTagNameMap>
+  extends HTMLElement {
+  readonly inheritedTagName: K;
+  node: HTMLElementTagNameMap[K];
+}
+
+/**
+ * Generator function that creates an InheritedHtmlElement compatible class
  *
  * ```js
  * class MyClass extends inheritHtmlElement("select") {
@@ -35,11 +42,15 @@ export function registerComponent(name: string, options?: ElementDefinitionOptio
  * ```
  **/
 export function inheritHtmlElement<K extends keyof HTMLElementTagNameMap>(tagName: K) {
-  return class Inherited extends HTMLElement {
-    protected node: HTMLElementTagNameMap[K];
+  return class InheritedHtmlElementImpl
+    extends HTMLElement
+    implements InheritedHtmlElement<K>
+  {
+    readonly inheritedTagName = tagName;
+    node: HTMLElementTagNameMap[K];
 
     connectedCallback(autoAddNode?: boolean) {
-      this.node = document.createElement(tagName);
+      this.node = document.createElement(this.inheritedTagName);
       const attributes: Attr[] = []; // We need to make a copy to delete while iterating
       for (const attr of this.attributes) {
         if (attr.name in this.node) {
@@ -47,6 +58,10 @@ export function inheritHtmlElement<K extends keyof HTMLElementTagNameMap>(tagNam
         }
       }
 
+      // We move compatible attributes to the child element
+      // This avoids weird inconsistencies between attributes
+      // when we manipulate the dom in the future
+      // This is especially important when using attribute based reactivity
       for (const attr of attributes) {
         this.removeAttributeNode(attr);
         this.node.setAttributeNode(attr);

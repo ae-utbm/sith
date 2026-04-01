@@ -1,11 +1,7 @@
 {% extends "core/base.jinja" %}
 {% from 'core/macros.jinja' import user_profile_link, select_all_checkbox %}
 
-{% block additional_js %}
-  <script type="module" src="{{ static("bundled/core/components/ajax-select-index.ts") }}"></script>
-{% endblock %}
 {% block additional_css %}
-  <link rel="stylesheet" href="{{ static("bundled/core/components/ajax-select-index.css") }}">
   <link rel="stylesheet" href="{{ static("club/members.scss") }}">
 {% endblock %}
 
