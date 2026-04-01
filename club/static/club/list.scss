@@ -1,0 +1,47 @@
+#club-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+  padding: 2em;
+
+  .card {
+    display: block;
+    background-color: unset;
+
+    .club-image {
+      float: left;
+      margin-right: 2rem;
+      margin-bottom: .5rem;
+      width: 150px;
+      height: 150px;
+      border-radius: 10%;
+      background-color: rgba(173, 173, 173, 0.2);
+
+      @media screen and (max-width: 500px) {
+        width: 100px;
+        height: 100px;
+      }
+    }
+
+    i.club-image {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: black;
+    }
+
+    .content {
+      display: block;
+      text-align: justify;
+
+      h4 {
+        margin-top: 0;
+        margin-right: .5rem;
+      }
+
+      p {
+        font-size: 100%;
+      }
+    }
+  }
+}

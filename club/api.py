@@ -6,7 +6,7 @@ from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
 from api.auth import ApiKeyAuth
-from api.permissions import CanAccessLookup, CanView, HasPerm
+from api.permissions import CanView, HasPerm
 from club.models import Club, Membership
 from club.schemas import (
     ClubSchema,
@@ -22,13 +22,11 @@ class ClubController(ControllerBase):
     @route.get(
         "/search",
         response=PaginatedResponseSchema[SimpleClubSchema],
-        auth=[ApiKeyAuth(), SessionAuth()],
-        permissions=[CanAccessLookup],
         url_name="search_club",
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
     def search_club(self, filters: Query[ClubSearchFilterSchema]):
-        return filters.filter(Club.objects.all())
+        return filters.filter(Club.objects.order_by("name")).values()
 
     @route.get(
         "/{int:club_id}",

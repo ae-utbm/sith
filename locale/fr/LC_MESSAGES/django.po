@@ -310,16 +310,36 @@ msgid "The list of all clubs existing at UTBM."
 msgstr "La liste de tous les clubs existants à l'UTBM"
 
 #: club/templates/club/club_list.jinja
-msgid "inactive"
-msgstr "inactif"
+msgid "Filters"
+msgstr "Filtres"
+
+#: club/templates/club/club_list.jinja
+msgid "Name"
+msgstr "Nom"
+
+#: club/templates/club/club_list.jinja
+msgid "Club state"
+msgstr "Etat du club"
+
+#: club/templates/club/club_list.jinja
+msgid "Active"
+msgstr "Actif"
+
+#: club/templates/club/club_list.jinja
+msgid "Inactive"
+msgstr "Inactif"
+
+#: club/templates/club/club_list.jinja
+msgid "All clubs"
+msgstr "Tous les clubs"
 
 #: club/templates/club/club_list.jinja core/templates/core/user_tools.jinja
 msgid "New club"
 msgstr "Nouveau club"
 
 #: club/templates/club/club_list.jinja
-msgid "There is no club in this website."
-msgstr "Il n'y a pas de club dans ce site web."
+msgid "inactive"
+msgstr "inactif"
 
 #: club/templates/club/club_members.jinja
 msgid "Club members"
@@ -1880,10 +1900,6 @@ msgstr "L'AE"
 #: core/templates/core/base/navbar.jinja
 msgid "AE's clubs"
 msgstr "Les clubs de L'AE"
-
-#: core/templates/core/base/navbar.jinja
-msgid "Others UTBM's Associations"
-msgstr "Les autres associations de l'UTBM"
 
 #: core/templates/core/base/navbar.jinja
 msgid "Big event"

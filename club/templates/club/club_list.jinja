@@ -1,52 +1,76 @@
-{% extends "core/base.jinja" %}
+{% if is_fragment %}
+  {% extends "core/base_fragment.jinja" %}
 
-{% block title -%}
-  {% trans %}Club list{% endtrans %}
-{%- endblock %}
+  {# Don't display tabs and errors #}
+  {% block tabs %}
+  {% endblock %}
+  {% block errors %}
+  {% endblock %}
+{% else %}
+  {% extends "core/base.jinja" %}
+  {% block additional_css %}
+    <link rel="stylesheet" href="{{ static("club/list.scss") }}">
+  {% endblock %}
+  {% block description -%}
+    {% trans %}The list of all clubs existing at UTBM.{% endtrans %}
+  {%- endblock %}
+  {% block title -%}
+    {% trans %}Club list{% endtrans %}
+  {%- endblock %}
+{% endif %}
 
-{% block description -%}
-  {% trans %}The list of all clubs existing at UTBM.{% endtrans %}
-{%- endblock %}
-
-{% macro display_club(club) -%}
-
-  {% if club.is_active or user.is_root %}
-
-    <li><a href="{{ url('club:club_view', club_id=club.id) }}">{{ club.name }}</a>
-
-      {% if not club.is_active %}
-        ({% trans %}inactive{% endtrans %})
-      {% endif %}
-
-      {% if club.president %} - <a href="{{ url('core:user_profile', user_id=club.president.user.id) }}">{{ club.president.user }}</a>{% endif %}
-      {% if club.short_description %}<p>{{ club.short_description|markdown }}</p>{% endif %}
-
-  {% endif %}
-
-  {%- if club.children.all()|length != 0 %}
-    <ul>
-      {%- for c in club.children.order_by('name').prefetch_related("children") %}
-        {{ display_club(c) }}
-      {%- endfor %}
-    </ul>
-  {%- endif -%}
-  </li>
-{%- endmacro %}
+{% from "core/macros.jinja" import paginate_htmx %}
 
 {% block content %}
-  {% if user.is_root %}
-    <p><a href="{{ url('club:club_new') }}">{% trans %}New club{% endtrans %}</a></p>
-  {% endif %}
-  {% if club_list %}
+  <main>
+    <h3>{% trans %}Filters{% endtrans %}</h3>
+    <form
+      id="club-list-filters"
+      hx-get="{{ url("club:club_list") }}"
+      hx-target="#content"
+      hx-swap="outerHtml"
+      hx-push-url="true"
+    >
+      <div class="row gap-4x">
+        {{ form }}
+      </div>
+      <button type="submit" class="btn btn-blue margin-bottom">
+        <i class="fa fa-magnifying-glass"></i>{% trans %}Search{% endtrans %}
+      </button>
+    </form>
     <h3>{% trans %}Club list{% endtrans %}</h3>
-    <ul>
-      {%- for club in club_list %}
-        {{ display_club(club) }}
-      {%- endfor %}
-    </ul>
-  {% else %}
-    {% trans %}There is no club in this website.{% endtrans %}
-  {% endif %}
+    {% if user.has_perm("club.add_club") %}
+      <br>
+      <a href="{{ url('club:club_new') }}" class="btn btn-blue">
+        <i class="fa fa-plus"></i> {% trans %}New club{% endtrans %}
+      </a>
+    {% endif %}
+    <section class="aria-busy-grow" id="club-list">
+      {% for club in object_list %}
+        <div class="card">
+          {% set club_url = club.get_absolute_url() %}
+          <a href="{{ club_url }}">
+            {% if club.logo %}
+              <img class="club-image" src="{{ club.logo.url }}" alt="logo {{ club.name }}">
+            {% else %}
+              <i class="fa-regular fa-image fa-4x club-image"></i>
+            {% endif %}
+          </a>
+          <div class="content">
+            <a href="{{ club_url }}">
+              <h4>
+                {{ club.name }} {% if not club.is_active %}({% trans %}inactive{% endtrans %}){% endif %}
+              </h4>
+            </a>
+            {{ club.short_description|markdown }}
+          </div>
+        </div>
+      {% endfor %}
+    </section>
+    {% if is_paginated %}
+      {{ paginate_htmx(request, page_obj, paginator) }}
+    {% endif %}
+  </main>
 {% endblock %}
 
 
