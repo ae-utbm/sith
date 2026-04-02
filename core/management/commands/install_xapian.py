@@ -39,12 +39,16 @@ class Command(BaseCommand):
             return None
         return xapian.version_string()
 
-    def _desired_version(self) -> str:
+    def _desired_version(self) -> tuple[str, str, str]:
         with open(
             Path(__file__).parent.parent.parent.parent / "pyproject.toml", "rb"
         ) as f:
             pyproject = tomli.load(f)
-            return pyproject["tool"]["xapian"]["version"]
+            return (
+                pyproject["tool"]["xapian"]["version"],
+                pyproject["tool"]["xapian"]["core-sha256"],
+                pyproject["tool"]["xapian"]["bindings-sha256"],
+            )
 
     def handle(self, *args, force: bool, **options):
         if not os.environ.get("VIRTUAL_ENV", None):
@@ -53,7 +57,7 @@ class Command(BaseCommand):
             )
             return
 
-        desired = self._desired_version()
+        desired, core_checksum, bindings_checksum = self._desired_version()
         if desired == self._current_version():
             if not force:
                 self.stdout.write(
@@ -65,7 +69,12 @@ class Command(BaseCommand):
             f"Installing xapian version {desired} at {os.environ['VIRTUAL_ENV']}"
         )
         subprocess.run(
-            [str(Path(__file__).parent / "install_xapian.sh"), desired],
+            [
+                str(Path(__file__).parent / "install_xapian.sh"),
+                desired,
+                core_checksum,
+                bindings_checksum,
+            ],
             env=dict(os.environ),
             check=True,
         )
