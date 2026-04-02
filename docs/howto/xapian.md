@@ -21,7 +21,7 @@ Pour installer xapian le plus simplement possible, on le compile depuis les
 sources via la commande `./manage.py install_xapian` comme indiqué dans la 
 documentation d'installation.
 
-La version de xapian est contrôllée par le `pyproject.toml` dans la section 
+La version de xapian est contrôlée par le `pyproject.toml` dans la section 
 `[tool.xapian]`.
 
 Cette section ressemble à ceci:
@@ -43,16 +43,16 @@ altérés entre la configuration du fichier et l'installation par l'utilisateur
 et/ou le déploiement.
 
 L'installation de xapian passe par deux fichiers, `xapian-core` et 
-`xapian-bindings` disponnibles sur [https://xapian.org/download](https://xapian.org/download).
+`xapian-bindings` disponibles sur [https://xapian.org/download](https://xapian.org/download).
 
 Lorsque le script d'installation télécharge les fichiers, il vérifie leur 
 signature sha256 contre celles contenues dans ces deux variables. Si la 
-signature n'es pas la même, une erreur est levée, protégant l'utilisateur 
+signature n'est pas la même, une erreur est levée, protégant l'utilisateur 
 d'une potentielle attaque.
 
 Pour mettre à jour, il faut donc changer la version ET modifier la signature !
 
-Pour récupérer ces signatures, il suffit de télécharger soi même les archives 
+Pour récupérer ces signatures, il suffit de télécharger soi-même les archives 
 du logiciel sur ce site, utiliser la commande `sha256sum` dessus et, enfin, 
 reporter la valeur sortie par cette commande.
 
