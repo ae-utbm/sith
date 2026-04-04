@@ -56,6 +56,12 @@ Commencez par installer les dépendances système :
         sudo pacman -S postgresql nginx
         ```
 
+    === "Fedora/RHEL/AlmaLinux/Rocky"
+
+        ```bash
+        sudo dnf install postgresql libpq-devel nginx
+        ```
+
 === "macOS"
 
     ```bash
@@ -100,9 +106,11 @@ PROCFILE_SERVICE=
     vous devez ouvrir une autre fenêtre de votre terminal
     et lancer la commande `npm run serve`
 
-## Configurer Redis en service externe
+## Configurer Redis/Valkey en service externe
 
-Redis est installé comme dépendance mais pas lancé par défaut.
+Redis est installé comme dépendance mais n'es pas lancé par défaut.
+
+Si vous avez installé Valkey parce que Redis n'es pas disponible, remplacez juste `redis` par `valkey`.
 
 En mode développement, le sith se charge de le démarrer mais
 pas en production !
