@@ -12,7 +12,7 @@ et d'un client d'API (celui auquel est liée votre
 Deux informations vous sont nécessaires, en plus de votre clef d'API :
 
 - l'id du client : vous pouvez l'obtenir soit en le demandant à l'équipe info,
-  soit en appelant la route `GET /client/me` avec votre clef d'API
+  soit en appelant la route `GET /api/client/me` avec votre clef d'API
   renseignée dans le header [X-APIKey](./connect.md#x-apikey)
 - la clef HMAC du client : vous devez la demander à l'équipe info.
 
@@ -91,16 +91,29 @@ et doit contenir les données décrites dans
 - `callback_url`(URL) : l'URL que le site AE appellera si l'authentification
   réussit
 - `signature`(string) : la signature des données de la requête.
+  Il s'agit d'une signature par clef HMAC dont le fonctionnement 
+  est détaillé plus bas.
 
 Ces données doivent être url-encodées et passées dans les paramètres GET.
 
-!!!tip "URL de retour"
+!!!warning "URL de retour"
 
-    Notre système n'impose aucune contrainte quant à la manière
-    de construire votre URL (hormis le fait que ce doit être une URL HTTPS valide),
-    mais il est tout de même conseillé d'utiliser l'identifiant de votre
-    utilisateur comme paramètre dans l'URL 
-    (par exemple `GET /callback/{int:user_id}/`).
+    Les URLs fournies doivent être des URLs HTTP valides.
+    En outre, elles doivent obligatoirement inclure la barre oblique finale.
+
+    === "URL correcte ✔️"
+
+        `https://exemple.ae.utbm.fr/foo/`
+
+    === "URL incorrecte ❌"
+
+        `https://exemple.ae.utbm.fr/foo`
+
+!!!tip
+
+    Inclure l'id de votre utilisateur dans l'URL de retour
+    peut être un bon moyen de l'identifier lors du callback.
+    Par exemple : `GET /callback/{int:user_id}/`.
 
 ???Example
 
@@ -186,6 +199,8 @@ et la signature de l'URL de retour doit être vérifiée.
 
 Dans le deux cas, la signature est le digest HMAC-SHA512
 des données url-encodées, en utilisant la clef HMAC du client d'API.
+L'ordre dans lequel ces données sont placées dans l'encodage URL
+doit être strictement le même que celui donné plus haut.
 
 ???Example "Signature de l'URL de connexion"
 
@@ -347,6 +362,10 @@ des données url-encodées, en utilisant la clef HMAC du client d'API.
 
     Vous devez impérativement vérifier la signature 
     des données de la requête de callback !
+
+    Ne pas vérifier la signature permet à n'importe quel acteur 
+    tierce malveillant de vous appeler sur votre callback. 
+    Ce serait une faille de sécurité majeure de votre côté.
 
     Si l'équipe informatique se rend compte que vous ne le faites pas,
     elle se réserve le droit de suspendre votre application,
