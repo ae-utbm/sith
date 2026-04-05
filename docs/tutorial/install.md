@@ -79,6 +79,29 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
         sudo pacman -S uv gcc git gettext pkgconf npm valkey
         ```
 
+    === "Fedora"
+        ```bash
+        sudo dnf update
+        sudo dnf install epel-release
+        sudo dnf install python-devel uv git gettext pkgconf npm redis @c-development @development-tools
+        ```
+
+    === "RHEL/AlmaLinux/Rocky"
+        ```bash
+        dnf update
+        dnf install epel-release
+        dnf install python-devel uv git gettext pkgconf npm valkey
+        dnf group install "Development Tools"
+        ```
+
+        La couche de compatibilitée valkey/redis est un package Fedora. 
+        Il est nécessaire de faire un alias nous même:
+
+        ```bash
+        ln -s /usr/bin/valkey-server /usr/bin/redis-server
+        ```
+
+
 === "macOS"
 
     Pour installer les dépendances, il est fortement recommandé d'installer le gestionnaire de paquets `homebrew <https://brew.sh/index_fr>`_.  
@@ -98,7 +121,7 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
 !!!note
 
     Python ne fait pas parti des dépendances puisqu'il est automatiquement
-    installé par uv.
+    installé par uv. Il est cependant parfois nécessaire d'installer les headers Python nécessaire à la compilation de certains paquets.
 
 ## Finaliser l'installation
 
