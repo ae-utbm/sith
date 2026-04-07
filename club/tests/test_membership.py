@@ -10,7 +10,7 @@ from django.db.models import Max
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.timezone import localdate, localtime, now
-from model_bakery import baker
+from model_bakery import baker, seq
 from pytest_django.asserts import assertRedirects
 
 from club.forms import ClubAddMemberForm, JoinClubForm
@@ -317,51 +317,6 @@ class TestMembership(TestClub):
         self.club.refresh_from_db()
         assert self.club.members.count() == nb_memberships
 
-    def test_president_add_members(self):
-        """Test that the president of the club can add members."""
-        president = self.club.members.get(role=self.president_role).user
-        nb_club_membership = self.club.members.count()
-        nb_subscriber_memberships = self.subscriber.memberships.count()
-        self.client.force_login(president)
-        response = self.client.post(
-            self.new_members_url,
-            {"user": self.subscriber.id, "role": self.president_role.id},
-        )
-        assert response.status_code == 200
-        assert response.headers.get("HX-Redirect", "") == reverse(
-            "club:club_members", kwargs={"club_id": self.club.id}
-        )
-        self.club.refresh_from_db()
-        self.subscriber.refresh_from_db()
-        assert self.club.members.count() == nb_club_membership + 1
-        assert self.subscriber.memberships.count() == nb_subscriber_memberships + 1
-        self.assert_membership_started_today(self.subscriber, role=self.president_role)
-
-    def test_add_member_greater_role(self):
-        """Test that a member of the club member cannot create
-        a membership with a greater role than its own.
-        """
-        user_role = self.simple_board_member.memberships.first().role
-        other_role = baker.make(ClubRole, club=user_role.club, is_board=True)
-        other_role.above(user_role)
-        form = ClubAddMemberForm(
-            data={"user": self.subscriber.id, "role": other_role.id},
-            request_user=self.simple_board_member,
-            club=self.club,
-        )
-        nb_memberships = self.club.members.count()
-
-        assert not form.is_valid()
-        assert form.errors == {
-            "role": [
-                "Sélectionnez un choix valide. "
-                "Ce choix ne fait pas partie de ceux disponibles."
-            ]
-        }
-        self.club.refresh_from_db()
-        assert nb_memberships == self.club.members.count()
-        assert not self.subscriber.memberships.filter(club=self.club).exists()
-
     def test_add_member_without_role(self):
         """Test that trying to add members without specifying their role fails."""
         form = ClubAddMemberForm(
@@ -578,6 +533,50 @@ def test_membership_delete(client: Client):
 
 
 @pytest.mark.django_db
+class TestAddMemberForm(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.club = baker.make(Club)
+        cls.roles = baker.make(
+            ClubRole,
+            club=cls.club,
+            is_board=iter([True, True, True, True, False, False]),
+            is_presidency=iter([True, True, False, False, False, False]),
+            order=seq(0),
+            _quantity=6,
+            _bulk_create=True,
+        )
+        cls.roles[-1].is_active = False
+        cls.roles[-1].save()
+
+    def test_admin(self):
+        """Test that admin users can give any active role."""
+        user = baker.make(
+            User, user_permissions=[Permission.objects.get(codename="add_membership")]
+        )
+        form = ClubAddMemberForm(request_user=user, club=self.club)
+        assert list(form.fields["role"].queryset) == self.roles[:-1]
+
+    def test_president(self):
+        """Test that someone with a presidency role can give any active role."""
+        user = baker.make(Membership, club=self.club, role=self.roles[0]).user
+        form = ClubAddMemberForm(request_user=user, club=self.club)
+        assert list(form.fields["role"].queryset) == self.roles[:-1]
+
+    def test_board_member(self):
+        """Test that someone with a board role can give lower active role."""
+        user = baker.make(Membership, club=self.club, role=self.roles[2]).user
+        form = ClubAddMemberForm(request_user=user, club=self.club)
+        assert list(form.fields["role"].queryset) == self.roles[3:-1]
+
+    def test_simple_member(self):
+        """Test that someone with a non-board role cannot give roles."""
+        user = baker.make(Membership, club=self.club, role=self.roles[4]).user
+        form = ClubAddMemberForm(request_user=user, club=self.club)
+        assert list(form.fields["role"].queryset) == []
+
+
+@pytest.mark.django_db
 class TestJoinClub:
     @pytest.fixture(autouse=True)
     def clear_cache(self):
@@ -638,6 +637,7 @@ class TestOldMembersView(TestCase):
             ClubRole,
             club=club,
             is_board=itertools.cycle([True, True, False]),
+            order=seq(0),
             _quantity=10,
             _bulk_create=True,
         )
@@ -665,3 +665,11 @@ class TestOldMembersView(TestCase):
         self.client.force_login(baker.make(User))
         res = self.client.get(self.url)
         assert res.status_code == 403
+
+    def test_context_data(self):
+        # mark a membership as not ended, to make sure it is excluded from the result
+        self.memberships[0].end_date = None
+        self.memberships[0].save()
+        self.client.force_login(subscriber_user.make())
+        res = self.client.get(self.url)
+        assert list(res.context_data.get("old_members")) == self.memberships[1:]
