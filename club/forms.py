@@ -237,7 +237,7 @@ class ClubMemberForm(forms.ModelForm):
 
     @property
     def available_roles(self) -> QuerySet[ClubRole]:
-        """The greatest role that will be obtainable with this form."""
+        """The roles that will be obtainable with this form."""
         # this is unreachable, because it will be overridden by subclasses
         return ClubRole.objects.none()  # pragma: no cover
 
@@ -251,20 +251,21 @@ class ClubAddMemberForm(ClubMemberForm):
 
     @cached_property
     def available_roles(self):
-        """The greatest role that will be obtainable with this form.
+        """The roles that will be obtainable with this form.
 
         Admins and the club president can attribute any role.
         Board members can attribute roles lower than their own.
         Other users cannot attribute roles with this form
         """
+        qs = self.club.roles.filter(is_active=True)
         if self.request_user.has_perm("club.add_membership"):
-            return self.club.roles.all()
+            return qs.all()
         membership = self.request_user_membership
         if membership is None or not membership.role.is_board:
             return ClubRole.objects.none()
         if membership.role.is_presidency:
-            return self.club.roles.all()
-        return self.club.roles.above_instance(membership.role)
+            return qs.all()
+        return qs.above_instance(membership.role)
 
     def clean_user(self):
         """Check that the user is not trying to add a user already in the club.
@@ -292,7 +293,7 @@ class JoinClubForm(ClubMemberForm):
 
     @cached_property
     def available_roles(self):
-        return self.club.roles.filter(is_board=False)
+        return self.club.roles.filter(is_board=False, is_active=True)
 
     def clean(self):
         """Check that the user is subscribed and isn't already in the club."""
