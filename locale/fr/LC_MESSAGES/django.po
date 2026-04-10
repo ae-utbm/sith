@@ -258,7 +258,8 @@ msgstr "Rôle de la présidence"
 msgid ""
 "If the role is inactive, people joining the club won't be able to get it."
 msgstr ""
-"Si ce rôle est inactif, il ne pourra pas être attribué aux gens qui rejoignent le club."
+"Si ce rôle est inactif, il ne pourra pas être attribué aux gens qui "
+"rejoignent le club."
 
 #: club/models.py
 msgid "club role"
@@ -273,12 +274,22 @@ msgstr "rôles de club"
 msgid ""
 "Role %(name)s was declared as a presidency role without being a board role"
 msgstr ""
-"Le rôle %(name)s a été déclaré comme rôle de présidence sans être un rôle du bureau."
+"Le rôle %(name)s a été déclaré comme rôle de présidence sans être un rôle du "
+"bureau."
 
 #: club/models.py
 #, python-format
-msgid "Board role %(role)s cannot be placed below a member role"
-msgstr "Le rôle du bureau %(role)s ne peut pas être placé en-dessous d'un rôle de membre."
+msgid "Role %(role)s cannot be placed below a member role"
+msgstr ""
+"Le rôle %(role)s ne peut pas être placé en-dessous d'un rôle de "
+"membre."
+
+#: club/models.py
+#, python-format
+msgid "Role %(role)s cannot be placed below a non-presidency role"
+msgstr ""
+"Le rôle %(role)s ne peut pas être placé en-dessous d'un rôle de "
+"membre."
 
 #: club/models.py core/models.py counter/models.py eboutic/models.py
 #: election/models.py pedagogy/models.py sas/models.py trombi/models.py
