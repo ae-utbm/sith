@@ -35,6 +35,7 @@ from club.views import (
     ClubPageEditView,
     ClubPageHistView,
     ClubRevView,
+    ClubRoleUpdateView,
     ClubSellingCSVView,
     ClubSellingView,
     ClubToolsView,
@@ -71,6 +72,7 @@ urlpatterns = [
         ClubOldMembersView.as_view(),
         name="club_old_members",
     ),
+    path("<int:club_id>/role/", ClubRoleUpdateView.as_view(), name="club_roles"),
     path("<int:club_id>/sellings/", ClubSellingView.as_view(), name="club_sellings"),
     path(
         "<int:club_id>/sellings/csv/", ClubSellingCSVView.as_view(), name="sellings_csv"

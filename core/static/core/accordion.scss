@@ -53,7 +53,7 @@ details.accordion>.accordion-content {
     opacity: 0;
 
     @supports (max-height: calc-size(max-content, size)) {
-      max-height: 0px;
+      max-height: 0;
     }
   }
 
@@ -71,11 +71,12 @@ details.accordion>.accordion-content {
   }
 }
 
-// ::details-content isn't available on firefox yet
+// ::details-content is available on firefox only since september 2025
+// (and wasn't available when this code was initially written)
 // we use .accordion-content as a workaround
 // But we need to use ::details-content for chrome because it's
 // not working correctly otherwise
-// it only happen in chrome, not safari or firefox
+// it only happens in chrome, not safari or firefox
 // Note: `selector` is not supported by scss so we comment it out to
 // avoid compiling it and sending it straight to the css
 // This is a trick that comes from here :

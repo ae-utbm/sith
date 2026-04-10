@@ -330,3 +330,42 @@ class ClubSearchForm(forms.ModelForm):
             # so we enforce it.
             self.fields["club_status"].value = True
         self.fields["name"].required = False
+
+
+class ClubRoleForm(forms.ModelForm):
+    error_css_class = "error"
+    required_css_class = "required"
+
+    class Meta:
+        model = ClubRole
+        fields = ["name", "description", "is_presidency", "is_board", "is_active"]
+        widgets = {
+            "is_presidency": forms.HiddenInput(),
+            "is_board": forms.HiddenInput(),
+            "is_active": forms.CheckboxInput(attrs={"class": "switch"}),
+        }
+
+    def __init__(self, *args, label_suffix="", **kwargs):
+        super().__init__(*args, label_suffix=label_suffix, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if "ORDER" in cleaned_data:
+            self.instance.order = cleaned_data["ORDER"]
+        return cleaned_data
+
+
+class ClubRoleBaseFormSet(forms.BaseInlineFormSet):
+    ordering_widget = forms.HiddenInput()
+
+
+ClubRoleFormSet = forms.inlineformset_factory(
+    Club,
+    ClubRole,
+    ClubRoleForm,
+    ClubRoleBaseFormSet,
+    can_delete=False,
+    can_order=True,
+    edit_only=True,
+    extra=0,
+)

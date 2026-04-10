@@ -28,7 +28,11 @@ import csv
 import itertools
 from typing import TYPE_CHECKING, Any
 
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    UserPassesTestMixin,
+)
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
@@ -55,6 +59,7 @@ from club.forms import (
     ClubAdminEditForm,
     ClubEditForm,
     ClubOldMemberForm,
+    ClubRoleFormSet,
     ClubSearchForm,
     JoinClubForm,
     MailingForm,
@@ -412,6 +417,28 @@ class ClubOldMembersView(ClubTabsMixin, PermissionRequiredMixin, DetailView):
                 .select_related("user", "role")
             )
         }
+
+
+class ClubRoleUpdateView(
+    ClubTabsMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView
+):
+    form_class = ClubRoleFormSet
+    model = Club
+    template_name = "club/club_roles.jinja"
+    pk_url_kwarg = "club_id"
+    current_tab = "members"
+    success_message = _("Club roles updated")
+
+    def test_func(self):
+        if self.request.user.has_perm("club.change_clubrole"):
+            return True
+        club: Club = self.get_object()
+        return club.members.filter(
+            user=self.request.user, role__is_presidency=True
+        ).exists()
+
+    def get_success_url(self):
+        return self.request.path
 
 
 class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
