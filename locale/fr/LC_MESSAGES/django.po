@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-23 22:21+0100\n"
+"POT-Creation-Date: 2026-04-16 19:05+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -242,7 +242,8 @@ msgstr "Rôle de la présidence"
 msgid ""
 "If the role is inactive, people joining the club won't be able to get it."
 msgstr ""
-"Si ce rôle est inactif, il ne pourra pas être attribué aux gens qui rejoignent le club."
+"Si ce rôle est inactif, il ne pourra pas être attribué aux gens qui "
+"rejoignent le club."
 
 #: club/models.py
 msgid "club role"
@@ -257,12 +258,22 @@ msgstr "rôles de club"
 msgid ""
 "Role %(name)s was declared as a presidency role without being a board role"
 msgstr ""
-"Le rôle %(name)s a été déclaré comme rôle de présidence sans être un rôle du bureau."
+"Le rôle %(name)s a été déclaré comme rôle de présidence sans être un rôle du "
+"bureau."
 
 #: club/models.py
 #, python-format
-msgid "Board role %(role)s cannot be placed below a member role"
-msgstr "Le rôle du bureau %(role)s ne peut pas être placé en-dessous d'un rôle de membre."
+msgid "Role %(role)s cannot be placed below a member role"
+msgstr ""
+"Le rôle %(role)s ne peut pas être placé en-dessous d'un rôle de "
+"membre."
+
+#: club/models.py
+#, python-format
+msgid "Role %(role)s cannot be placed below a non-presidency role"
+msgstr ""
+"Le rôle %(role)s ne peut pas être placé en-dessous d'un rôle de "
+"membre."
 
 #: club/models.py core/models.py counter/models.py eboutic/models.py
 #: election/models.py pedagogy/models.py sas/models.py trombi/models.py
@@ -4244,6 +4255,47 @@ msgid "this page"
 msgstr "cette page"
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "Eurockéennes 2025 partnership"
+msgstr "Partenariat Eurockéennes 2025"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid ""
+"Our partner uses Weezevent to sell tickets. Weezevent may collect user info "
+"according to its own privacy policy. By clicking the accept button you "
+"consent to their terms of services."
+msgstr ""
+"Notre partenaire utilises Wezevent pour vendre ses billets. Weezevent peut "
+"collecter des informations utilisateur conformément à sa propre politique de "
+"confidentialité. En cliquant sur le bouton d'acceptation vous consentez à "
+"leurs termes de service."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "Privacy policy"
+msgstr "Politique de confidentialité"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+#: trombi/templates/trombi/comment_moderation.jinja
+msgid "Accept"
+msgstr "Accepter"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid ""
+"You must be subscribed to benefit from the partnership with the Eurockéennes."
+msgstr ""
+"Vous devez être cotisant pour bénéficier du partenariat avec les "
+"Eurockéennes."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+#, python-format
+msgid ""
+"This partnership offers a discount of up to 33%% on tickets for Friday, "
+"Saturday and Sunday, as well as the 3-day package from Friday to Sunday."
+msgstr ""
+"Ce partenariat permet de profiter d'une réduction jusqu'à 33%% sur les "
+"billets du vendredi, du samedi et du dimanche, ainsi qu'au forfait 3 jours, "
+"du vendredi au dimanche."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "There are no items available for sale"
 msgstr "Aucun article n'est disponible à la vente"
 
@@ -5634,10 +5686,6 @@ msgid "Moderate Trombi comments"
 msgstr "Modérer les commentaires du Trombi"
 
 #: trombi/templates/trombi/comment_moderation.jinja
-msgid "Accept"
-msgstr "Accepter"
-
-#: trombi/templates/trombi/comment_moderation.jinja
 msgid "Reject"
 msgstr "Refuser"
 
@@ -5878,39 +5926,3 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid "Eurockéennes 2025 partnership"
-msgstr "Partenariat Eurockéennes 2025"
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid ""
-"Our partner uses Weezevent to sell tickets. Weezevent may collect user info "
-"according to its own privacy policy. By clicking the accept button you "
-"consent to their terms of services."
-msgstr ""
-"Notre partenaire utilises Wezevent pour vendre ses billets. Weezevent peut "
-"collecter des informations utilisateur conformément à sa propre politique de "
-"confidentialité. En cliquant sur le bouton d'acceptation vous consentez à "
-"leurs termes de service."
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid "Privacy policy"
-msgstr "Politique de confidentialité"
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid ""
-"You must be subscribed to benefit from the partnership with the Eurockéennes."
-msgstr ""
-"Vous devez être cotisant pour bénéficier du partenariat avec les "
-"Eurockéennes."
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-#, python-format
-msgid ""
-"This partnership offers a discount of up to 33%% on tickets for Friday, "
-"Saturday and Sunday, as well as the 3-day package from Friday to Sunday."
-msgstr ""
-"Ce partenariat permet de profiter d'une réduction jusqu'à 33%% sur les "
-"billets du vendredi, du samedi et du dimanche, ainsi qu'au forfait 3 jours, "
-"du vendredi au dimanche."
