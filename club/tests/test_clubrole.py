@@ -10,7 +10,7 @@ def test_order_auto():
     """Test that newly created roles are put in the right place."""
     club = baker.make(Club)
     recipe = Recipe(ClubRole, club=club, name=seq("role "))
-    # bulk create initial roles
+    # bulk create initial roles (1 presidency, 1 board, 1 member)
     roles = recipe.make(
         is_board=iter([True, True, False]),
         is_presidency=iter([True, False, False]),

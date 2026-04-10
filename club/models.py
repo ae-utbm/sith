@@ -245,7 +245,6 @@ class ClubRole(OrderedModel):
     class Meta(OrderedModel.Meta):
         verbose_name = _("club role")
         verbose_name_plural = _("club roles")
-        abstract = False
         constraints = [
             # presidency IMPLIES board <=> NOT presidency OR board
             # cf. MT1 :)
@@ -276,14 +275,26 @@ class ClubRole(OrderedModel):
                     % {"name": self.name}
                 )
             )
+        roles = list(self.club.roles.all())
         if (
             self.is_board
             and self.order
-            and self.club.roles.filter(is_board=False, order__lt=self.order).exists()
+            and any(r.order < self.order and not r.is_board for r in roles)
         ):
             errors.append(
                 ValidationError(
-                    _("Board role %(role)s cannot be placed below a member role")
+                    _("Role %(role)s cannot be placed below a member role")
+                    % {"role": self.name}
+                )
+            )
+        if (
+            self.is_presidency
+            and self.order
+            and any(r.order < self.order and not r.is_presidency for r in roles)
+        ):
+            errors.append(
+                ValidationError(
+                    _("Role %(role)s cannot be placed below a non-presidency role")
                     % {"role": self.name}
                 )
             )
