@@ -59,13 +59,14 @@ from club.forms import (
     ClubAdminEditForm,
     ClubEditForm,
     ClubOldMemberForm,
+    ClubRoleCreateForm,
     ClubRoleFormSet,
     ClubSearchForm,
     JoinClubForm,
     MailingForm,
     SellingsForm,
 )
-from club.models import Club, Mailing, MailingSubscription, Membership
+from club.models import Club, ClubRole, Mailing, MailingSubscription, Membership
 from com.models import Poster
 from com.views import (
     PosterCreateBaseView,
@@ -437,8 +438,89 @@ class ClubRoleUpdateView(
             user=self.request.user, role__is_presidency=True
         ).exists()
 
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"form_kwargs": {"label_suffix": ""}}
+
     def get_success_url(self):
         return self.request.path
+
+
+class ClubRoleBaseCreateView(UserPassesTestMixin, SuccessMessageMixin, CreateView):
+    """View to create a new Club Role, using [][club.forms.ClubRoleCreateForm].
+
+    This view isn't meant to be called directly, but rather subclassed for each
+    type of role that can exist :
+
+    - `[ClubRolePresidencyCreateView][club.views.ClubRolePresidencyCreateView]`
+      to create a presidency role
+    - `[ClubRoleBoardCreateView][club.views.ClubRoleBoardCreateView]`
+      to create a board role
+    - `[ClubRoleMemberCreateView][club.views.ClubRoleMemberCreateView]`
+      to create a member role
+
+    Each subclass have to override the following variables :
+
+    - `is_presidency` and `is_board`, indicating what type of role
+      the view creates.
+    - `role_description`, which is the title of the page, indication
+       the user what kind of role is being created.
+
+    This way, we are making sure the correct type of role will
+    be created, without bothering the user with the implementation details.
+    """
+
+    form_class = ClubRoleCreateForm
+    model = ClubRole
+    template_name = "core/create.jinja"
+    success_message = _("Role %(name)s created")
+    role_description = ""
+    is_presidency: bool
+    is_board: bool
+
+    @cached_property
+    def club(self):
+        return get_object_or_404(Club, id=self.kwargs["club_id"])
+
+    def test_func(self):
+        return self.request.user.is_authenticated and (
+            self.request.user.has_perm("club.add_clubrole")
+            or self.club.members.filter(
+                user=self.request.user, role__is_presidency=True
+            ).exists()
+        )
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {
+            "club": self.club,
+            "is_presidency": self.is_presidency,
+            "is_board": self.is_board,
+        }
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "object_name": self.role_description
+        }
+
+    def get_success_url(self):
+        return reverse("club:club_roles", kwargs={"club_id": self.club.id})
+
+
+class ClubRolePresidencyCreateView(ClubRoleBaseCreateView):
+    is_presidency = True
+    is_board = True
+    role_description = _("club role \u2013 presidency")
+
+
+class ClubRoleBoardCreateView(ClubRoleBaseCreateView):
+    is_presidency = False
+    is_board = True
+    role_description = _("club role \u2013 board")
+
+
+class ClubRoleMemberCreateView(ClubRoleBaseCreateView):
+    is_presidency = False
+    is_board = False
+    role_description = _("club role \u2013 member")
 
 
 class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
