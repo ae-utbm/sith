@@ -12,6 +12,15 @@
 
   <h2>{% trans %}Club members{% endtrans %}</h2>
 
+  {% if club.can_roles_be_edited_by(user) %}
+    <a
+      href="{{ url("club:club_roles", club_id=object.id) }}"
+      class="btn btn-blue margin-bottom"
+    >
+      {% trans %}Manage roles{% endtrans %}
+    </a>
+  {% endif %}
+
   {% if add_member_fragment %}
     <br />
     {{ add_member_fragment }}
