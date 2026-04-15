@@ -238,6 +238,13 @@ class Club(models.Model):
         """Method to see if that object can be edited by the given user."""
         return self.has_rights_in_club(user)
 
+    def can_roles_be_edited_by(self, user: User) -> bool:
+        """Return True if the given user can edit the roles of this club"""
+        return (
+            user.has_perm("club.change_clubrole")
+            or self.members.ongoing().filter(user=user, role__is_presidency=True).exists()
+        )
+
     @cached_property
     def current_members(self) -> list[Membership]:
         return list(
