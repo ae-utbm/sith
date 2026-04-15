@@ -40,8 +40,13 @@
           {{ subform.description.as_field_group() }}
         </div>
         <div class="form-group">
-          {{ subform.is_active }}
-          {{ subform.is_active.label_tag() }}
+          <div>
+            {{ subform.is_active }}
+            {{ subform.is_active.label_tag() }}
+          </div>
+          <span class="helptext">
+            {{ subform.is_active.help_text }}
+          </span>
         </div>
       </div>
     </details>
@@ -49,14 +54,42 @@
 {% endmacro %}
 
 {% block content %}
+  <p>
+    {% trans trimmed %}
+      Roles give rights on the club.
+      Higher roles grant more rights, and the members having them are displayed higher
+      in the club members list.
+    {% endtrans %}
+  </p>
+  <p>
+    {% trans trimmed %}
+      On this page, you can edit their name and description, as well as their order.
+      You can also drag roles from a category to another
+      (e.g. a board role can be made into a presidency role).
+    {% endtrans %}
+  </p>
   <form method="post" x-data="clubRoleList">
     {% csrf_token %}
     {{ form.management_form }}
     {{ form.non_form_errors() }}
     <h3>{% trans %}Presidency{% endtrans %}</h3>
-    <a class="btn btn-blue" href="{{ url("club:new_role_president", club_id=club.id) }}">
+    <a class="btn btn-blue margin-bottom" href="{{ url("club:new_role_president", club_id=club.id) }}">
       <i class="fa fa-plus"></i> {% trans %}add role{% endtrans %}
     </a>
+    <details class="clickable margin-bottom">
+      <summary>{% trans %}Help{% endtrans %}</summary>
+      {# The style we use for markdown rendering is quite nice for what we want to display,
+         so we are just gonna reuse it. #}
+      <div class="markdown">
+        <p>{% trans %}Users with a presidency role can :{% endtrans %}</p>
+        <ul>
+          <li>{% trans %}create new club roles and edit existing ones{% endtrans %}</li>
+          <li>{% trans %}manage the club counters{% endtrans %}</li>
+          <li>{% trans %}add new members with any active role and end any membership{% endtrans %}</li>
+        </ul>
+        <p>{% trans %}They also have all the rights of the club board.{% endtrans %}</p>
+      </div>
+    </details>
     <div
       x-sort="reorder($item, { isBoard: true, isPresidency: true })"
       x-sort:group="roles"
@@ -69,9 +102,30 @@
       {% endfor %}
     </div>
     <h3>{% trans %}Board{% endtrans %}</h3>
-    <a class="btn btn-blue" href="{{ url("club:new_role_board", club_id=club.id) }}">
+    <a class="btn btn-blue margin-bottom" href="{{ url("club:new_role_board", club_id=club.id) }}">
       <i class="fa fa-plus"></i> {% trans %}add role{% endtrans %}
     </a>
+    <details class="clickable margin-bottom">
+      <summary>{% trans %}Help{% endtrans %}</summary>
+      <div class="markdown">
+        <p>
+          {% trans trimmed %}
+            Board members can do most administrative actions in the club, including :
+          {% endtrans %}
+        </p>
+        <ul>
+          <li>{% trans %}manage the club posters{% endtrans %}</li>
+          <li>{% trans %}create news for the club{% endtrans %}</li>
+          <li>{% trans %}click users on the club's counters{% endtrans %}</li>
+          <li>
+            {% trans trimmed %}
+              add new members and end active memberships
+              for roles that are lower than their own.
+            {% endtrans %}
+          </li>
+        </ul>
+      </div>
+    </details>
     <div
       x-sort="reorder($item, { isBoard: true, isPresidency: false })"
       x-sort:group="roles"
@@ -84,9 +138,15 @@
       {% endfor %}
     </div>
     <h3>{% trans %}Members{% endtrans %}</h3>
-    <a class="btn btn-blue" href="{{ url("club:new_role_member", club_id=club.id) }}">
+    <a class="btn btn-blue margin-bottom" href="{{ url("club:new_role_member", club_id=club.id) }}">
       <i class="fa fa-plus"></i> {% trans %}add role{% endtrans %}
     </a>
+    <details class="clickable margin-bottom">
+      <summary>{% trans %}Help{% endtrans %}</summary>
+      <div class="markdown">
+        <p>{% trans %}Simple members cannot perform administrative actions.{% endtrans %}</p>
+      </div>
+    </details>
     <div
       x-sort="reorder($item, { isBoard: false, isPresidency: false })"
       x-sort:group="roles"
