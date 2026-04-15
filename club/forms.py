@@ -345,14 +345,36 @@ class ClubRoleForm(forms.ModelForm):
             "is_active": forms.CheckboxInput(attrs={"class": "switch"}),
         }
 
-    def __init__(self, *args, label_suffix="", **kwargs):
-        super().__init__(*args, label_suffix=label_suffix, **kwargs)
-
     def clean(self):
         cleaned_data = super().clean()
         if "ORDER" in cleaned_data:
             self.instance.order = cleaned_data["ORDER"]
         return cleaned_data
+
+
+class ClubRoleCreateForm(forms.ModelForm):
+    """Form to create a club role.
+
+    Notes:
+        For UX purposes, users are not meant to fill `is_presidency`
+        and `is_board`, so those values are required by the form constructor
+        in order to initialize the instance properly.
+    """
+
+    error_css_class = "error"
+    required_css_class = "required"
+
+    class Meta:
+        model = ClubRole
+        fields = ["name", "description"]
+
+    def __init__(
+        self, *args, club: Club, is_presidency: bool, is_board: bool, **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+        self.instance.club = club
+        self.instance.is_presidency = is_presidency
+        self.instance.is_board = is_board
 
 
 class ClubRoleBaseFormSet(forms.BaseInlineFormSet):
