@@ -54,7 +54,14 @@
     {{ form.management_form }}
     {{ form.non_form_errors() }}
     <h3>{% trans %}Presidency{% endtrans %}</h3>
-    <div x-sort="reorder($item, { isBoard: true, isPresidency: true })" x-sort:group="roles">
+    <a class="btn btn-blue" href="{{ url("club:new_role_president", club_id=club.id) }}">
+      <i class="fa fa-plus"></i> {% trans %}add role{% endtrans %}
+    </a>
+    <div
+      x-sort="reorder($item, { isBoard: true, isPresidency: true })"
+      x-sort:group="roles"
+      x-ref="presidencyFormSet"
+    >
       {% for subform in form %}
         {% if subform.is_presidency.value() %}
           {{ display_subform(subform) }}
@@ -62,7 +69,14 @@
       {% endfor %}
     </div>
     <h3>{% trans %}Board{% endtrans %}</h3>
-    <div x-sort="reorder($item, { isBoard: true, isPresidency: false })" x-sort:group="roles">
+    <a class="btn btn-blue" href="{{ url("club:new_role_board", club_id=club.id) }}">
+      <i class="fa fa-plus"></i> {% trans %}add role{% endtrans %}
+    </a>
+    <div
+      x-sort="reorder($item, { isBoard: true, isPresidency: false })"
+      x-sort:group="roles"
+      x-ref="boardFormSet"
+    >
       {% for subform in form %}
         {% if subform.is_board.value() and not subform.is_presidency.value() %}
           {{ display_subform(subform) }}
@@ -70,7 +84,14 @@
       {% endfor %}
     </div>
     <h3>{% trans %}Members{% endtrans %}</h3>
-    <div x-sort="reorder($item, { isBoard: false, isPresidency: false })" x-sort:group="roles">
+    <a class="btn btn-blue" href="{{ url("club:new_role_member", club_id=club.id) }}">
+      <i class="fa fa-plus"></i> {% trans %}add role{% endtrans %}
+    </a>
+    <div
+      x-sort="reorder($item, { isBoard: false, isPresidency: false })"
+      x-sort:group="roles"
+      x-ref="memberFormSet"
+    >
       {% for subform in form %}
         {% if not subform.is_board.value() %}
           {{ display_subform(subform) }}

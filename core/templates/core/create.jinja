@@ -1,11 +1,18 @@
 {% extends "core/base.jinja" %}
 
+{# if the template context has the `object_name` variable,
+   then this one will be used in the page title,
+   instead of the result of `str(object)` #}
+{% if not object_name %}
+  {% set object_name=form.instance.__class__._meta.verbose_name %}
+{% endif %}
+
 {% block title %}
-  {% trans name=form.instance.__class__._meta.verbose_name %}Create {{ name }}{% endtrans %}
+  {% trans name=object_name %}Create {{ name }}{% endtrans %}
 {% endblock %}
 
 {% block content %}
-  <h2>{% trans name=form.instance.__class__._meta.verbose_name %}Create {{ name }}{% endtrans %}</h2>
+  <h2>{% trans name=object_name %}Create {{ name }}{% endtrans %}</h2>
   <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p() }}
