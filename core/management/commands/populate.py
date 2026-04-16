@@ -16,7 +16,7 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
@@ -110,7 +110,7 @@ class Command(BaseCommand):
         p.save(force_lock=True)
 
         club_root = SithFile.objects.create(name="clubs", owner=root)
-        sas = SithFile.objects.create(name="SAS", owner=root)
+        sas = SithFile.objects.create(name="SAS", owner=root, is_in_sas=True)
         main_club = Club.objects.create(
             id=1, name="AE", address="6 Boulevard Anatole France, 90000 Belfort"
         )

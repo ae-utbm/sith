@@ -37,7 +37,7 @@ from sas.forms import (
     PictureModerationRequestForm,
     PictureUploadForm,
 )
-from sas.models import Album, PeoplePictureRelation, Picture
+from sas.models import Album, AlbumQuerySet, PeoplePictureRelation, Picture
 
 
 class AlbumCreateFragment(FragmentMixin, CreateView):
@@ -265,6 +265,9 @@ class AlbumEditView(CanEditMixin, UpdateView):
     form_class = AlbumEditForm
     template_name = "core/edit.jinja"
     pk_url_kwarg = "album_id"
+
+    def get_queryset(self) -> AlbumQuerySet:
+        return super().get_queryset().exclude(id=settings.SITH_SAS_ROOT_DIR_ID)
 
     def form_valid(self, form):
         ret = super().form_valid(form)
