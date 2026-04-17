@@ -1,6 +1,12 @@
+from collections.abc import Callable
+
 import pytest
+from django.contrib.auth.models import Permission
+from django.test import Client, TestCase
+from django.urls import reverse
 from model_bakery import baker, seq
 from model_bakery.recipe import Recipe
+from pytest_django.asserts import assertRedirects
 
 from club.forms import ClubRoleFormSet
 from club.models import Club, ClubRole, Membership
@@ -8,21 +14,35 @@ from core.baker_recipes import subscriber_user
 from core.models import AnonymousUser, User
 
 
-@pytest.mark.django_db
-def test_order_auto():
-    """Test that newly created roles are put in the right place."""
+def make_club():
+    # unittest-style tests cannot use fixture, so we create a function
+    # that will be callable either by a pytest fixture or inside
+    # a TestCase.setUpTestData method.
     club = baker.make(Club)
     recipe = Recipe(ClubRole, club=club, name=seq("role "))
-    # bulk create initial roles (1 presidency, 1 board, 1 member)
-    roles = recipe.make(
+    recipe.make(
         is_board=iter([True, True, False]),
         is_presidency=iter([True, False, False]),
         order=iter([1, 2, 3]),
         _quantity=3,
         _bulk_create=True,
     )
-    # then create the remaining roles one by one (like they will be in prod)
+    return club
+
+
+@pytest.fixture
+def club(db):
+    """A club with a presidency role, a board role and a member role"""
+    return make_club()
+
+
+@pytest.mark.django_db
+def test_order_auto(club):
+    """Test that newly created roles are put in the right place."""
+    roles = list(club.roles.all())
+    # create new roles one by one (like they will be in prod)
     # each new role should be placed at the end of its category
+    recipe = Recipe(ClubRole, club=club, name=seq("new role "))
     role_a = recipe.make(is_board=True, is_presidency=True, order=None)
     role_b = recipe.make(is_board=True, is_presidency=False, order=None)
     role_c = recipe.make(is_board=False, is_presidency=False, order=None)

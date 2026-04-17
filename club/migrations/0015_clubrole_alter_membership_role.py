@@ -148,6 +148,9 @@ class Migration(migrations.Migration):
                     ("is_presidency", False), ("is_board", True), _connector="OR"
                 ),
                 name="clubrole_presidency_implies_board",
+                violation_error_message=(
+                    "A role cannot be in the presidency while not being in the board"
+                ),
             ),
         ),
         migrations.RunPython(migrate_roles, migrations.RunPython.noop),
