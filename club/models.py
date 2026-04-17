@@ -242,7 +242,9 @@ class Club(models.Model):
         """Return True if the given user can edit the roles of this club"""
         return user.is_authenticated and (
             user.has_perm("club.change_clubrole")
-            or self.members.ongoing().filter(user=user, role__is_presidency=True).exists()
+            or self.members.ongoing()
+            .filter(user=user, role__is_presidency=True)
+            .exists()
         )
 
     @cached_property
@@ -292,6 +294,9 @@ class ClubRole(OrderedModel):
             models.CheckConstraint(
                 condition=Q(is_presidency=False) | Q(is_board=True),
                 name="clubrole_presidency_implies_board",
+                violation_error_message=_(
+                    "A role cannot be in the presidency while not being in the board"
+                ),
             )
         ]
 
@@ -301,21 +306,8 @@ class ClubRole(OrderedModel):
     def get_display_name(self):
         return f"{self.name} - {self.club.name}"
 
-    def get_absolute_url(self):
-        return reverse("club:club_roles", kwargs={"club_id": self.club_id})
-
     def clean(self):
         errors = []
-        if self.is_presidency and not self.is_board:
-            errors.append(
-                ValidationError(
-                    _(
-                        "Role %(name)s was declared as a presidency role "
-                        "without being a board role"
-                    )
-                    % {"name": self.name}
-                )
-            )
         roles = list(self.club.roles.all())
         if (
             self.is_board
