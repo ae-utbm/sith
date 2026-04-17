@@ -430,19 +430,34 @@ class ClubRoleUpdateView(
     current_tab = "members"
     success_message = _("Club roles updated")
 
+    @cached_property
+    def club(self) -> Club:
+        return self.get_object()
+
     def test_func(self):
-        if self.request.user.has_perm("club.change_clubrole"):
-            return True
-        club: Club = self.get_object()
-        return club.members.filter(
-            user=self.request.user, role__is_presidency=True
-        ).exists()
+        return self.club.can_roles_be_edited_by(self.request.user)
 
     def get_form_kwargs(self):
         return super().get_form_kwargs() | {"form_kwargs": {"label_suffix": ""}}
 
     def get_success_url(self):
-        return self.request.path
+        # if the user lost the right to view the role update page
+        # (because it moved its own role out of the presidency),
+        # redirect to the club member page, else stay on the same page.
+        if self.club.can_roles_be_edited_by(self.request.user):
+            return self.request.path
+        return reverse("club:club_members", kwargs={"club_id": self.club.id})
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "user_role": ClubRole.objects.filter(
+                club=self.object,
+                members__user=self.request.user,
+                members__end_date=None,
+            )
+            .values_list("id", flat=True)
+            .first()
+        }
 
 
 class ClubRoleBaseCreateView(UserPassesTestMixin, SuccessMessageMixin, CreateView):
