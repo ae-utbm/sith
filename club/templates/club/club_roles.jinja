@@ -14,6 +14,7 @@
     x-data="{
             isPresidency: {{ subform.is_presidency.value()|lower }},
             isBoard: {{ subform.is_board.value()|lower }},
+            roleId: {{ subform.id.value() }},
             }"
     x-sort:item="$data"
   >
@@ -68,7 +69,11 @@
       (e.g. a board role can be made into a presidency role).
     {% endtrans %}
   </p>
-  <form method="post" x-data="clubRoleList">
+  <form
+    method="post"
+    x-data="clubRoleList({ userRoleId: {{ user_role or "null" }} })"
+    @submit="confirmSubmission"
+  >
     {% csrf_token %}
     {{ form.management_form }}
     {{ form.non_form_errors() }}
@@ -93,7 +98,6 @@
     <div
       x-sort="reorder($item, { isBoard: true, isPresidency: true })"
       x-sort:group="roles"
-      x-ref="presidencyFormSet"
     >
       {% for subform in form %}
         {% if subform.is_presidency.value() %}
@@ -129,7 +133,6 @@
     <div
       x-sort="reorder($item, { isBoard: true, isPresidency: false })"
       x-sort:group="roles"
-      x-ref="boardFormSet"
     >
       {% for subform in form %}
         {% if subform.is_board.value() and not subform.is_presidency.value() %}
@@ -150,7 +153,6 @@
     <div
       x-sort="reorder($item, { isBoard: false, isPresidency: false })"
       x-sort:group="roles"
-      x-ref="memberFormSet"
     >
       {% for subform in form %}
         {% if not subform.is_board.value() %}

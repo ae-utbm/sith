@@ -240,7 +240,7 @@ class Club(models.Model):
 
     def can_roles_be_edited_by(self, user: User) -> bool:
         """Return True if the given user can edit the roles of this club"""
-        return (
+        return user.is_authenticated and (
             user.has_perm("club.change_clubrole")
             or self.members.ongoing().filter(user=user, role__is_presidency=True).exists()
         )

@@ -3,16 +3,22 @@ import type { AlpineComponent } from "alpinejs";
 interface RoleGroupData {
   isBoard: boolean;
   isPresidency: boolean;
+  roleId: number;
 }
 
 document.addEventListener("alpine:init", () => {
-  Alpine.data("clubRoleList", () => ({
+  Alpine.data("clubRoleList", (config: { userRoleId: number | null }) => ({
+    confirmOnSubmit: false,
+
     /**
      * Edit relevant item data after it has been moved by x-sort
      */
     reorder(item: AlpineComponent<RoleGroupData>, conf: RoleGroupData) {
       item.isBoard = conf.isBoard;
       item.isPresidency = conf.isPresidency;
+      // if the user has moved its own role outside the presidency,
+      // submitting the form will require a confirmation
+      this.confirmOnSubmit = config.userRoleId === item.roleId && !item.isPresidency;
       this.resetOrder();
     },
     /**
@@ -31,6 +37,24 @@ document.addEventListener("alpine:init", () => {
       );
       for (const [i, elem] of inputs.entries()) {
         elem.value = (i + 1).toString();
+      }
+    },
+
+    /**
+     * If the user moved its role out of the presidency, ask a confirmation
+     * before submitting the form
+     */
+    confirmSubmission(event: SubmitEvent) {
+      if (
+        this.confirmOnSubmit &&
+        !confirm(
+          gettext(
+            "You're going to remove your own role from the presidency. " +
+              "You may lock yourself out of this page. Do you want to continue ? ",
+          ),
+        )
+      ) {
+        event.preventDefault();
       }
     },
   }));
