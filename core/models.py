@@ -131,7 +131,9 @@ class UserQuerySet(models.QuerySet):
         if user.has_perm("core.view_hidden_user"):
             return self
         if user.has_perm("core.view_user"):
-            return self.filter(Q(is_viewable=True) | Q(whitelisted_users=user))
+            return self.filter(
+                Q(is_viewable=True) | Q(whitelisted_users=user) | Q(pk=user.pk)
+            )
         if user.is_anonymous:
             return self.none()
         return self.filter(id=user.id)

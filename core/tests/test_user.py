@@ -410,12 +410,20 @@ class TestUserQuerySetViewableBy:
         assert set(viewable) == set(users)
 
     @pytest.mark.parametrize(
-        "user_factory", [old_subscriber_user.make, subscriber_user.make]
+        "user_factory",
+        [
+            old_subscriber_user.make,
+            lambda: old_subscriber_user.make(is_viewable=False),
+            subscriber_user.make,
+            lambda: subscriber_user.make(is_viewable=False),
+        ],
     )
-    def test_subscriber(self, users: list[User], user_factory):
+    def test_can_search(self, users: list[User], user_factory):
         user = user_factory()
-        viewable = User.objects.filter(id__in=[u.id for u in users]).viewable_by(user)
-        assert set(viewable) == {users[0], users[1]}
+        viewable = User.objects.filter(
+            id__in=[u.id for u in [*users, user]]
+        ).viewable_by(user)
+        assert set(viewable) == {user, users[0], users[1]}
 
     def test_whitelist(self, users: list[User]):
         user = subscriber_user.make()
