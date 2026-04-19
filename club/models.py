@@ -28,7 +28,7 @@ from typing import Iterable, Self
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.validators import RegexValidator, validate_email
-from django.db import models, transaction
+from django.db import ProgrammingError, models, transaction
 from django.db.models import Exists, F, OuterRef, Q
 from django.urls import reverse
 from django.utils import timezone
@@ -92,10 +92,10 @@ class Club(models.Model):
         Page, related_name="club", blank=True, on_delete=models.PROTECT
     )
     members_group = models.OneToOneField(
-        Group, related_name="club", on_delete=models.PROTECT
+        Group, related_name="club", on_delete=models.PROTECT, editable=False
     )
     board_group = models.OneToOneField(
-        Group, related_name="club_board", on_delete=models.PROTECT
+        Group, related_name="club_board", on_delete=models.PROTECT, editable=False
     )
 
     objects = ClubQuerySet.as_manager()
@@ -182,6 +182,40 @@ class Club(models.Model):
         elif self.parent and self.parent.page and self.page.parent != self.parent.page:
             self.page.parent = self.parent.page
         self.page.save(force_lock=True)
+
+    def create_default_roles(self):
+        """Create some roles that should exist by default for this club.
+
+        The created roles are : president, treasurer, active member and curious.
+
+        Warnings:
+            When calling this method, no club must exist yet for this club.
+        """
+        if self.roles.exists():
+            raise ProgrammingError(
+                "Default roles can be created only for clubs "
+                "that don't have associated roles yet"
+            )
+        # The names are written in French, because there is no gettext involved
+        # for strings stored in database, and the majority of users are french.
+        roles = [
+            ClubRole(name="Président⸱e", is_board=True, is_presidency=True),
+            ClubRole(name="Trésorier⸱e", is_board=True, is_presidency=False),
+            ClubRole(name="Membre actif⸱ve", is_board=False, is_presidency=False),
+            ClubRole(
+                name="Curieux⸱euse",
+                description=(
+                    "Les gens qui suivent l'activité "
+                    "du club sans forcément y participer"
+                ),
+                is_board=False,
+                is_presidency=False,
+            ),
+        ]
+        for i, role in enumerate(roles):
+            role.club = self
+            role.order = i
+        ClubRole.objects.bulk_create(roles)
 
     def delete(self, *args, **kwargs) -> tuple[int, dict[str, int]]:
         self.board_group.delete()

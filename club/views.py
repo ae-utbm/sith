@@ -580,6 +580,11 @@ class ClubCreateView(PermissionRequiredMixin, CreateView):
     template_name = "core/create.jinja"
     permission_required = "club.add_club"
 
+    def form_valid(self, form):
+        res = super().form_valid(form)
+        self.object.create_default_roles()
+        return res
+
 
 class MembershipSetOldView(CanEditMixin, SingleObjectMixin, View):
     """Set a membership as being old."""
