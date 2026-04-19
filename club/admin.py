@@ -13,6 +13,8 @@
 #
 #
 from django.contrib import admin
+from django.forms.models import ModelForm
+from django.http import HttpRequest
 
 from club.models import Club, ClubRole, Membership
 
@@ -28,6 +30,17 @@ class ClubAdmin(admin.ModelAdmin):
         "home",
         "page",
     )
+
+    def save_model(
+        self,
+        request: HttpRequest,
+        obj: Club,
+        form: ModelForm,
+        change: bool,  # noqa: FBT001
+    ):
+        super().save_model(request, obj, form, change)
+        if not change:
+            obj.create_default_roles()
 
 
 @admin.register(ClubRole)

@@ -121,6 +121,26 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "club roles",
             },
         ),
+        migrations.AlterField(
+            model_name="club",
+            name="board_group",
+            field=models.OneToOneField(
+                editable=False,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="club_board",
+                to="core.group",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="club",
+            name="members_group",
+            field=models.OneToOneField(
+                editable=False,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="club",
+                to="core.group",
+            ),
+        ),
         migrations.AddConstraint(
             model_name="clubrole",
             constraint=models.CheckConstraint(
