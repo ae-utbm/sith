@@ -20,7 +20,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls import reverse
-from django.utils import timezone
+from django.utils.timezone import localdate
 from model_bakery import baker
 from pytest_django.asserts import assertHTMLEqual, assertInHTML, assertRedirects
 
@@ -64,6 +64,24 @@ def test_main_page_no_form_for_regular_users(client: Client):
     soup = BeautifulSoup(res.text, "lxml")
     forms = soup.find("main").find_all("form")
     assert len(forms) == 0
+
+
+@pytest.mark.django_db
+def test_main_page_displayed_albums(client: Client):
+    """Test that the right data is displayed on the SAS main page"""
+    sas = Album.objects.get(id=settings.SITH_SAS_ROOT_DIR_ID)
+    Album.objects.exclude(id=sas.id).delete()
+    album_a = baker.make(Album, parent=sas, is_moderated=True)
+    album_b = baker.make(Album, parent=album_a, is_moderated=True)
+    album_c = baker.make(Album, parent=sas, is_moderated=True)
+    baker.make(Album, parent=sas, is_moderated=False)
+    client.force_login(subscriber_user.make())
+    res = client.get(reverse("sas:main"))
+    # album_b is not a direct child of the SAS, so it shouldn't be displayed
+    # in the categories, but it should appear in the latest albums.
+    # album_d isn't moderated, so it shouldn't appear at all for a simple user.
+    assert res.context_data["latest"] == [album_c, album_b, album_a]
+    assert res.context_data["categories"] == [album_a, album_c]
 
 
 @pytest.mark.django_db
@@ -149,11 +167,7 @@ class TestAlbumEdit:
 
     @pytest.mark.parametrize(
         "user",
-        [
-            None,
-            lambda: baker.make(User),
-            subscriber_user.make,
-        ],
+        [None, lambda: baker.make(User), subscriber_user.make],
     )
     def test_permission_denied(
         self,
@@ -164,9 +178,10 @@ class TestAlbumEdit:
         if user:
             client.force_login(user())
 
-        response = client.get(reverse("sas:album_edit", kwargs={"album_id": album.pk}))
+        url = reverse("sas:album_edit", kwargs={"album_id": album.pk})
+        response = client.get(url)
         assert response.status_code == 403
-        response = client.post(reverse("sas:album_edit", kwargs={"album_id": album.pk}))
+        response = client.post(url)
         assert response.status_code == 403
 
     def test_sas_root_read_only(self, client: Client, sas_root: Album):
@@ -174,13 +189,10 @@ class TestAlbumEdit:
             User, groups=[Group.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
         )
         client.force_login(moderator)
-        response = client.get(
-            reverse("sas:album_edit", kwargs={"album_id": sas_root.pk})
-        )
+        url = reverse("sas:album_edit", kwargs={"album_id": sas_root.pk})
+        response = client.get(url)
         assert response.status_code == 404
-        response = client.post(
-            reverse("sas:album_edit", kwargs={"album_id": sas_root.pk})
-        )
+        response = client.post(url)
         assert response.status_code == 404
 
     @pytest.mark.parametrize(
@@ -198,7 +210,7 @@ class TestAlbumEdit:
         data = {
             "name": album.name[: Album.NAME_MAX_LENGTH],
             "parent": baker.make(Album, parent=album.parent, is_moderated=True).pk,
-            "date": timezone.now().strftime("%Y-%m-%d"),
+            "date": localdate().strftime("%Y-%m-%d"),
             "file": "/random/path",
             "edit_groups": [settings.SITH_GROUP_SAS_ADMIN_ID],
             "recursive": False,
@@ -210,7 +222,7 @@ class TestAlbumEdit:
         data = {
             "name": album.name[: Album.NAME_MAX_LENGTH],
             "parent": album.pk,
-            "date": timezone.now().strftime("%Y-%m-%d"),
+            "date": localdate().strftime("%Y-%m-%d"),
         }
         assert AlbumEditForm(data=data).is_valid()
 
@@ -223,19 +235,12 @@ class TestAlbumEdit:
         payload = {
             "name": album.name[: Album.NAME_MAX_LENGTH],
             "parent": album.pk,
-            "date": timezone.now().strftime("%Y-%m-%d"),
+            "date": localdate().strftime("%Y-%m-%d"),
         }
         response = client.post(
-            reverse(
-                "sas:album_edit",
-                kwargs={"album_id": album.pk},
-            ),
-            payload,
+            reverse("sas:album_edit", kwargs={"album_id": album.pk}), payload
         )
-        assertInHTML(
-            "<li>Boucle dans l'arborescence des dossiers</li>",
-            response.text,
-        )
+        assertInHTML("<li>Boucle dans l'arborescence des dossiers</li>", response.text)
         assert response.status_code == 200
 
     @pytest.mark.parametrize(
@@ -247,57 +252,39 @@ class TestAlbumEdit:
             ),
         ],
     )
+    @pytest.mark.parametrize(
+        "parent",
+        [
+            lambda: baker.make(
+                Album, parent_id=settings.SITH_SAS_ROOT_DIR_ID, is_moderated=True
+            ),
+            lambda: Album.objects.get(id=settings.SITH_SAS_ROOT_DIR_ID),
+        ],
+    )
     def test_update(
         self,
         client: Client,
         album: Album,
         sas_root: Album,
         user: Callable[[], User],
+        parent: Callable[[], Album],
     ):
         client.force_login(user())
-
-        # Prepare a good payload
         expected_redirect = reverse("sas:album", kwargs={"album_id": album.pk})
-        expected_date = timezone.now()
         payload = {
             "name": album.name[: Album.NAME_MAX_LENGTH],
-            "parent": baker.make(Album, parent=sas_root, is_moderated=True).pk,
-            "date": expected_date.strftime("%Y-%m-%d"),
+            "parent": parent().id,
+            "date": localdate().strftime("%Y-%m-%d"),
             "recursive": False,
         }
-
-        # Test successful update
         response = client.post(
-            reverse(
-                "sas:album_edit",
-                kwargs={"album_id": album.pk},
-            ),
-            payload,
+            reverse("sas:album_edit", kwargs={"album_id": album.pk}), payload
         )
         assertRedirects(response, expected_redirect)
-        updated_album = Album.objects.get(id=album.pk)
-        assert updated_album.name == payload["name"]
-        assert updated_album.parent.id == payload["parent"]
-        assert timezone.localdate(updated_album.date) == timezone.localdate(
-            expected_date
-        )
-
-        # Test root album can be used as parent
-        payload["parent"] = sas_root.pk
-        response = client.post(
-            reverse(
-                "sas:album_edit",
-                kwargs={"album_id": album.pk},
-            ),
-            payload,
-        )
-        assertRedirects(response, expected_redirect)
-        updated_album = Album.objects.get(id=album.pk)
-        assert updated_album.name == payload["name"]
-        assert updated_album.parent.id == payload["parent"]
-        assert timezone.localdate(updated_album.date) == timezone.localdate(
-            expected_date
-        )
+        album.refresh_from_db()
+        assert album.name == payload["name"]
+        assert album.parent.id == payload["parent"]
+        assert localdate(album.date) == localdate()
 
 
 class TestSasModeration(TestCase):

@@ -205,13 +205,7 @@ class AlbumQuerySet(models.QuerySet):
 
 class SASAlbumManager(models.Manager):
     def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .filter(
-                Q(id=settings.SITH_SAS_ROOT_DIR_ID) | Q(is_in_sas=True, is_folder=True)
-            )
-        )
+        return super().get_queryset().filter(Q(is_in_sas=True, is_folder=True))
 
 
 class Album(SasFile):

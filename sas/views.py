@@ -37,7 +37,7 @@ from sas.forms import (
     PictureModerationRequestForm,
     PictureUploadForm,
 )
-from sas.models import Album, AlbumQuerySet, PeoplePictureRelation, Picture
+from sas.models import Album, PeoplePictureRelation, Picture
 
 
 class AlbumCreateFragment(FragmentMixin, CreateView):
@@ -85,7 +85,9 @@ class SASMainView(UseFragmentsMixin, TemplateView):
         kwargs["categories"] = list(
             albums_qs.filter(parent_id=settings.SITH_SAS_ROOT_DIR_ID).order_by("id")
         )
-        kwargs["latest"] = list(albums_qs.order_by("-id")[:5])
+        kwargs["latest"] = list(
+            albums_qs.exclude(id=settings.SITH_SAS_ROOT_DIR_ID).order_by("-id")[:5]
+        )
         return kwargs
 
 
@@ -126,6 +128,9 @@ def send_thumb(request, picture_id):
 
 class AlbumView(CanViewMixin, UseFragmentsMixin, DetailView):
     model = Album
+    # exclude the SAS from the album accessible with this view
+    # the SAS can be viewed only with SASMainView
+    queryset = Album.objects.exclude(id=settings.SITH_SAS_ROOT_DIR_ID)
     pk_url_kwarg = "album_id"
     template_name = "sas/album.jinja"
 
@@ -262,12 +267,10 @@ class PictureAskRemovalView(CanViewMixin, DetailView, FormView):
 
 class AlbumEditView(CanEditMixin, UpdateView):
     model = Album
+    queryset = Album.objects.exclude(id=settings.SITH_SAS_ROOT_DIR_ID)
     form_class = AlbumEditForm
     template_name = "core/edit.jinja"
     pk_url_kwarg = "album_id"
-
-    def get_queryset(self) -> AlbumQuerySet:
-        return super().get_queryset().exclude(id=settings.SITH_SAS_ROOT_DIR_ID)
 
     def form_valid(self, form):
         ret = super().form_valid(form)

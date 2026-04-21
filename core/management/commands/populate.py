@@ -110,7 +110,9 @@ class Command(BaseCommand):
         p.save(force_lock=True)
 
         club_root = SithFile.objects.create(name="clubs", owner=root)
-        sas = SithFile.objects.create(name="SAS", owner=root, is_in_sas=True)
+        sas = SithFile.objects.create(
+            name="SAS", owner=root, id=settings.SITH_SAS_ROOT_DIR_ID
+        )
         main_club = Club.objects.create(
             id=1, name="AE", address="6 Boulevard Anatole France, 90000 Belfort"
         )
