@@ -348,7 +348,7 @@ class ClubRoleForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         if "ORDER" in cleaned_data:
-            self.instance.order = cleaned_data["ORDER"]
+            self.instance.order = cleaned_data["ORDER"] - 1
         return cleaned_data
 
 
