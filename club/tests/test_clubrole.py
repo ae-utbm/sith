@@ -23,7 +23,7 @@ def make_club():
     recipe.make(
         is_board=iter([True, True, False]),
         is_presidency=iter([True, False, False]),
-        order=iter([1, 2, 3]),
+        order=iter([0, 1, 2]),
         _quantity=3,
         _bulk_create=True,
     )
@@ -143,6 +143,7 @@ class TestClubRoleUpdate(TestCase):
             Membership, club=cls.club, role=cls.roles[0], user=cls.user, end_date=None
         )
         cls.url = reverse("club:club_roles", kwargs={"club_id": cls.club.id})
+        cls.redirect_url = reverse("club:club_members", kwargs={"club_id": cls.club.id})
 
     def setUp(self):
         self.payload = {
@@ -150,7 +151,7 @@ class TestClubRoleUpdate(TestCase):
             "roles-INITIAL_FORMS": 3,
             "roles-MIN_NUM_FORMS": 0,
             "roles-MAX_NUM_FORMS": 1000,
-            "roles-0-ORDER": self.roles[0].order,
+            "roles-0-ORDER": 1,
             "roles-0-id": self.roles[0].id,
             "roles-0-club": self.club.id,
             "roles-0-is_presidency": True,
@@ -158,7 +159,7 @@ class TestClubRoleUpdate(TestCase):
             "roles-0-name": self.roles[0].name,
             "roles-0-description": self.roles[0].description,
             "roles-0-is_active": True,
-            "roles-1-ORDER": self.roles[1].order,
+            "roles-1-ORDER": 2,
             "roles-1-id": self.roles[1].id,
             "roles-1-club": self.club.id,
             "roles-1-is_presidency": False,
@@ -166,7 +167,7 @@ class TestClubRoleUpdate(TestCase):
             "roles-1-name": self.roles[1].name,
             "roles-1-description": self.roles[1].description,
             "roles-1-is_active": True,
-            "roles-2-ORDER": self.roles[2].order,
+            "roles-2-ORDER": 3,
             "roles-2-id": self.roles[2].id,
             "roles-2-club": self.club.id,
             "roles-2-is_presidency": False,
@@ -183,7 +184,7 @@ class TestClubRoleUpdate(TestCase):
         assert res.status_code == 200
         self.payload["roles-2-name"] = "foo"
         res = self.client.post(self.url, data=self.payload)
-        assertRedirects(res, self.url)
+        assertRedirects(res, self.redirect_url)
         self.roles[2].refresh_from_db()
         assert self.roles[2].name == "foo"
 
@@ -242,9 +243,7 @@ class TestClubRoleUpdate(TestCase):
         self.payload["roles-0-is_presidency"] = False
         self.client.force_login(self.user)
         res = self.client.post(self.url, data=self.payload)
-        assertRedirects(
-            res, reverse("club:club_members", kwargs={"club_id": self.club.id})
-        )
+        assertRedirects(res, self.redirect_url)
         # When the user clicked that button, it still had the right to update roles,
         # so the modification should be applied
         self.roles[0].refresh_from_db()

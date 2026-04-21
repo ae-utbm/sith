@@ -441,17 +441,12 @@ class ClubRoleUpdateView(
         return super().get_form_kwargs() | {"form_kwargs": {"label_suffix": ""}}
 
     def get_success_url(self):
-        # if the user lost the right to view the role update page
-        # (because it moved its own role out of the presidency),
-        # redirect to the club member page, else stay on the same page.
-        if self.club.can_roles_be_edited_by(self.request.user):
-            return self.request.path
         return reverse("club:club_members", kwargs={"club_id": self.club.id})
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "user_role": ClubRole.objects.filter(
-                club=self.object,
+                club=self.club,
                 members__user=self.request.user,
                 members__end_date=None,
             )
