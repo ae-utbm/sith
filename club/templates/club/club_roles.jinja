@@ -1,7 +1,7 @@
 {% extends "core/base.jinja" %}
 
 {% block additional_js %}
-  <script type="module" src="{{ static("bundled/club/role-list-index.ts") }}"></script>
+  <script type="module" src="{{ static("bundled/club/role-list-index.ts") }}" xmlns="http://www.w3.org/1999/html"></script>
 {% endblock %}
 
 {% block additional_css %}
@@ -78,7 +78,7 @@
     {{ form.management_form }}
     {{ form.non_form_errors() }}
     <h3>{% trans %}Presidency{% endtrans %}</h3>
-    <a class="btn btn-blue margin-bottom" href="{{ url("club:new_role_president", club_id=club.id) }}">
+    <a class="btn btn-grey margin-bottom" href="{{ url("club:new_role_president", club_id=club.id) }}">
       <i class="fa fa-plus"></i> {% trans %}add role{% endtrans %}
     </a>
     <details class="clickable margin-bottom">
@@ -105,8 +105,9 @@
         {% endif %}
       {% endfor %}
     </div>
+    <br>
     <h3>{% trans %}Board{% endtrans %}</h3>
-    <a class="btn btn-blue margin-bottom" href="{{ url("club:new_role_board", club_id=club.id) }}">
+    <a class="btn btn-grey margin-bottom" href="{{ url("club:new_role_board", club_id=club.id) }}">
       <i class="fa fa-plus"></i> {% trans %}add role{% endtrans %}
     </a>
     <details class="clickable margin-bottom">
@@ -140,8 +141,9 @@
         {% endif %}
       {% endfor %}
     </div>
+    <br>
     <h3>{% trans %}Members{% endtrans %}</h3>
-    <a class="btn btn-blue margin-bottom" href="{{ url("club:new_role_member", club_id=club.id) }}">
+    <a class="btn btn-grey margin-bottom" href="{{ url("club:new_role_member", club_id=club.id) }}">
       <i class="fa fa-plus"></i> {% trans %}add role{% endtrans %}
     </a>
     <details class="clickable margin-bottom">
@@ -160,6 +162,11 @@
         {% endif %}
       {% endfor %}
     </div>
-    <p><input type="submit" value="{% trans %}Save{% endtrans %}" /></p>
+    <br>
+    <p>
+      <button type="submit" class="btn btn-blue">
+        <i class="fa fa-check"></i>{% trans %}Save{% endtrans %}
+      </button>
+    </p>
   </form>
 {% endblock content %}
