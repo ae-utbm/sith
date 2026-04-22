@@ -80,6 +80,7 @@ def test_main_page_displayed_albums(client: Client):
     # album_b is not a direct child of the SAS, so it shouldn't be displayed
     # in the categories, but it should appear in the latest albums.
     # album_d isn't moderated, so it shouldn't appear at all for a simple user.
+    # Also, the SAS itself shouldn't be listed in the albums.
     assert res.context_data["latest"] == [album_c, album_b, album_a]
     assert res.context_data["categories"] == [album_a, album_c]
 
@@ -107,6 +108,15 @@ def test_album_access_non_subscriber(client: Client):
     cache.clear()
     res = client.get(reverse("sas:album", kwargs={"album_id": album.id}))
     assert res.status_code == 200
+
+
+@pytest.mark.django_db
+def test_accessing_sas_from_album_view_is_404(client: Client):
+    """Test that trying to see the SAS with a regular album view isn't allowed."""
+    res = client.get(
+        reverse("sas:album", kwargs={"album_id": settings.SITH_SAS_ROOT_DIR_ID})
+    )
+    assert res.status_code == 404
 
 
 @pytest.mark.django_db
