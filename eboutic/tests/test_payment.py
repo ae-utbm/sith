@@ -16,7 +16,7 @@ from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
-from counter.baker_recipes import product_recipe
+from counter.baker_recipes import price_recipe, product_recipe
 from counter.models import Product, ProductType, Selling
 from counter.tests.test_counter import force_refill_user
 from eboutic.models import Basket, BasketItem
@@ -32,23 +32,22 @@ class TestPaymentBase(TestCase):
         cls.basket = baker.make(Basket, user=cls.customer)
         cls.refilling = product_recipe.make(
             product_type_id=settings.SITH_COUNTER_PRODUCTTYPE_REFILLING,
-            selling_price=15,
+            prices=[price_recipe.make(amount=15)],
         )
 
         product_type = baker.make(ProductType)
 
         cls.snack = product_recipe.make(
-            selling_price=1.5, special_selling_price=1, product_type=product_type
+            product_type=product_type, prices=[price_recipe.make(amount=1.5)]
         )
         cls.beer = product_recipe.make(
             limit_age=18,
-            selling_price=2.5,
-            special_selling_price=1,
             product_type=product_type,
+            prices=[price_recipe.make(amount=2.5)],
         )
 
-        BasketItem.from_product(cls.snack, 1, cls.basket).save()
-        BasketItem.from_product(cls.beer, 2, cls.basket).save()
+        BasketItem.from_price(cls.snack.prices.first(), 1, cls.basket).save()
+        BasketItem.from_price(cls.beer.prices.first(), 2, cls.basket).save()
 
 
 class TestPaymentSith(TestPaymentBase):
@@ -116,13 +115,13 @@ class TestPaymentSith(TestPaymentBase):
         assert len(sellings) == 2
         assert sellings[0].payment_method == Selling.PaymentMethod.SITH_ACCOUNT
         assert sellings[0].quantity == 1
-        assert sellings[0].unit_price == self.snack.selling_price
+        assert sellings[0].unit_price == self.snack.prices.first().amount
         assert sellings[0].counter.type == "EBOUTIC"
         assert sellings[0].product == self.snack
 
         assert sellings[1].payment_method == Selling.PaymentMethod.SITH_ACCOUNT
         assert sellings[1].quantity == 2
-        assert sellings[1].unit_price == self.beer.selling_price
+        assert sellings[1].unit_price == self.beer.prices.first().amount
         assert sellings[1].counter.type == "EBOUTIC"
         assert sellings[1].product == self.beer
 
@@ -146,7 +145,7 @@ class TestPaymentSith(TestPaymentBase):
         )
 
     def test_refilling_in_basket(self):
-        BasketItem.from_product(self.refilling, 1, self.basket).save()
+        BasketItem.from_price(self.refilling.prices.first(), 1, self.basket).save()
         self.client.force_login(self.customer)
         force_refill_user(self.customer, self.basket.total + 1)
         self.customer.customer.refresh_from_db()
@@ -191,8 +190,8 @@ class TestPaymentCard(TestPaymentBase):
     def test_buy_success(self):
         response = self.client.get(self.generate_bank_valid_answer(self.basket))
         assert response.status_code == 200
-        assert response.content.decode("utf-8") == "Payment successful"
-        assert Basket.objects.filter(id=self.basket.id).first() is None
+        assert response.content.decode() == "Payment successful"
+        assert not Basket.objects.filter(id=self.basket.id).exists()
 
         sellings = Selling.objects.filter(customer=self.customer.customer).order_by(
             "quantity"
@@ -200,13 +199,13 @@ class TestPaymentCard(TestPaymentBase):
         assert len(sellings) == 2
         assert sellings[0].payment_method == Selling.PaymentMethod.CARD
         assert sellings[0].quantity == 1
-        assert sellings[0].unit_price == self.snack.selling_price
+        assert sellings[0].unit_price == self.snack.prices.first().amount
         assert sellings[0].counter.type == "EBOUTIC"
         assert sellings[0].product == self.snack
 
         assert sellings[1].payment_method == Selling.PaymentMethod.CARD
         assert sellings[1].quantity == 2
-        assert sellings[1].unit_price == self.beer.selling_price
+        assert sellings[1].unit_price == self.beer.prices.first().amount
         assert sellings[1].counter.type == "EBOUTIC"
         assert sellings[1].product == self.beer
 
@@ -216,7 +215,9 @@ class TestPaymentCard(TestPaymentBase):
         assert not customer.subscriptions.first().is_valid_now()
 
         basket = baker.make(Basket, user=customer)
-        BasketItem.from_product(Product.objects.get(code="2SCOTIZ"), 1, basket).save()
+        BasketItem.from_price(
+            Product.objects.get(code="2SCOTIZ").prices.first(), 1, basket
+        ).save()
         response = self.client.get(self.generate_bank_valid_answer(basket))
         assert response.status_code == 200
 
@@ -228,12 +229,13 @@ class TestPaymentCard(TestPaymentBase):
         assert subscription.location == "EBOUTIC"
 
     def test_buy_refilling(self):
-        BasketItem.from_product(self.refilling, 2, self.basket).save()
+        price = self.refilling.prices.first()
+        BasketItem.from_price(price, 2, self.basket).save()
         response = self.client.get(self.generate_bank_valid_answer(self.basket))
         assert response.status_code == 200
 
         self.customer.customer.refresh_from_db()
-        assert self.customer.customer.amount == self.refilling.selling_price * 2
+        assert self.customer.customer.amount == price.amount * 2
 
     def test_multiple_responses(self):
         bank_response = self.generate_bank_valid_answer(self.basket)
@@ -253,17 +255,17 @@ class TestPaymentCard(TestPaymentBase):
         self.basket.delete()
         response = self.client.get(bank_response)
         assert response.status_code == 500
-        assert (
-            response.text
-            == "Basket processing failed with error: SuspiciousOperation('Basket does not exists')"
+        assert response.text == (
+            "Basket processing failed with error: "
+            "SuspiciousOperation('Basket does not exists')"
         )
 
     def test_altered_basket(self):
         bank_response = self.generate_bank_valid_answer(self.basket)
-        BasketItem.from_product(self.snack, 1, self.basket).save()
+        BasketItem.from_price(self.snack.prices.first(), 1, self.basket).save()
         response = self.client.get(bank_response)
         assert response.status_code == 500
-        assert (
-            response.text == "Basket processing failed with error: "
+        assert response.text == (
+            "Basket processing failed with error: "
             "SuspiciousOperation('Basket total and amount do not match')"
         )

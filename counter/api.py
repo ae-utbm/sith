@@ -101,13 +101,9 @@ class ProductController(ControllerBase):
         """Get the detailed information about the products."""
         return filters.filter(
             Product.objects.select_related("club")
-            .prefetch_related("buying_groups")
+            .prefetch_related("prices", "prices__groups")
             .select_related("product_type")
-            .order_by(
-                F("product_type__order").asc(nulls_last=True),
-                "product_type",
-                "name",
-            )
+            .order_by(F("product_type__order").asc(nulls_last=True), "name")
         )
 
 

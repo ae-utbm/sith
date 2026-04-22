@@ -20,7 +20,6 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import Permission, make_password
-from django.core.cache import cache
 from django.http import HttpResponse
 from django.shortcuts import resolve_url
 from django.test import Client, TestCase
@@ -34,13 +33,13 @@ from pytest_django.asserts import assertRedirects
 
 from club.models import Membership
 from core.baker_recipes import board_user, subscriber_user, very_old_subscriber_user
-from core.models import BanGroup, User
-from counter.baker_recipes import product_recipe, sale_recipe
+from core.models import BanGroup, Group, User
+from counter.baker_recipes import price_recipe, product_recipe, sale_recipe
 from counter.models import (
     Counter,
     Customer,
     Permanency,
-    Product,
+    ProductType,
     Refilling,
     ReturnableProduct,
     Selling,
@@ -204,7 +203,7 @@ class TestRefilling(TestFullClickBase):
 
 @dataclass
 class BasketItem:
-    id: int | None = None
+    price_id: int | None = None
     quantity: int | None = None
 
     def to_form(self, index: int) -> dict[str, str]:
@@ -236,38 +235,59 @@ class TestCounterClick(TestFullClickBase):
         cls.banned_counter_customer.ban_groups.add(
             BanGroup.objects.get(pk=settings.SITH_GROUP_BANNED_COUNTER_ID)
         )
+        subscriber_group = Group.objects.get(id=settings.SITH_GROUP_SUBSCRIBERS_ID)
+        old_subscriber_group = Group.objects.get(
+            id=settings.SITH_GROUP_OLD_SUBSCRIBERS_ID
+        )
+        _product_recipe = product_recipe.extend(product_type=baker.make(ProductType))
 
-        cls.gift = product_recipe.make(
-            selling_price="-1.5",
-            special_selling_price="-1.5",
+        cls.gift = price_recipe.make(
+            amount=-1.5, groups=[subscriber_group], product=_product_recipe.make()
         )
-        cls.beer = product_recipe.make(
-            limit_age=18, selling_price=1.5, special_selling_price=1
+        cls.beer = price_recipe.make(
+            groups=[subscriber_group],
+            amount=1.5,
+            product=_product_recipe.make(limit_age=18),
         )
-        cls.beer_tap = product_recipe.make(
-            limit_age=18, tray=True, selling_price=1.5, special_selling_price=1
+        cls.beer_tap = price_recipe.make(
+            groups=[subscriber_group],
+            amount=1.5,
+            product=_product_recipe.make(limit_age=18, tray=True),
         )
-        cls.snack = product_recipe.make(
-            limit_age=0, selling_price=1.5, special_selling_price=1
+        cls.snack = price_recipe.make(
+            groups=[subscriber_group, old_subscriber_group],
+            amount=1.5,
+            product=_product_recipe.make(limit_age=0),
         )
-        cls.stamps = product_recipe.make(
-            limit_age=0, selling_price=1.5, special_selling_price=1
+        cls.stamps = price_recipe.make(
+            groups=[subscriber_group],
+            amount=1.5,
+            product=_product_recipe.make(limit_age=0),
         )
         ReturnableProduct.objects.all().delete()
-        cls.cons = baker.make(Product, selling_price=1)
-        cls.dcons = baker.make(Product, selling_price=-1)
+        cls.cons = price_recipe.make(
+            amount=1, groups=[subscriber_group], product=_product_recipe.make()
+        )
+        cls.dcons = price_recipe.make(
+            amount=-1, groups=[subscriber_group], product=_product_recipe.make()
+        )
         baker.make(
             ReturnableProduct,
-            product=cls.cons,
-            returned_product=cls.dcons,
+            product=cls.cons.product,
+            returned_product=cls.dcons.product,
             max_return=3,
         )
 
         cls.counter.products.add(
-            cls.gift, cls.beer, cls.beer_tap, cls.snack, cls.cons, cls.dcons
+            cls.gift.product,
+            cls.beer.product,
+            cls.beer_tap.product,
+            cls.snack.product,
+            cls.cons.product,
+            cls.dcons.product,
         )
-        cls.other_counter.products.add(cls.snack)
-        cls.club_counter.products.add(cls.stamps)
+        cls.other_counter.products.add(cls.snack.product)
+        cls.club_counter.products.add(cls.stamps.product)
 
     def login_in_bar(self, barmen: User | None = None):
         used_barman = barmen if barmen is not None else self.barmen
@@ -285,10 +305,7 @@ class TestCounterClick(TestFullClickBase):
     ) -> HttpResponse:
         used_counter = counter if counter is not None else self.counter
         used_client = client if client is not None else self.client
-        data = {
-            "form-TOTAL_FORMS": str(len(basket)),
-            "form-INITIAL_FORMS": "0",
-        }
+        data = {"form-TOTAL_FORMS": str(len(basket)), "form-INITIAL_FORMS": "0"}
         for index, item in enumerate(basket):
             data.update(item.to_form(index))
         return used_client.post(
@@ -331,19 +348,9 @@ class TestCounterClick(TestFullClickBase):
         res = self.submit_basket(
             self.customer, [BasketItem(self.beer.id, 2), BasketItem(self.snack.id, 1)]
         )
-        assert res.status_code == 302
+        self.assertRedirects(res, self.counter.get_absolute_url())
 
         assert self.updated_amount(self.customer) == Decimal("5.5")
-
-        # Test barmen special price
-
-        force_refill_user(self.barmen, 10)
-
-        assert (
-            self.submit_basket(self.barmen, [BasketItem(self.beer.id, 1)])
-        ).status_code == 302
-
-        assert self.updated_amount(self.barmen) == Decimal(9)
 
     def test_click_tray_price(self):
         force_refill_user(self.customer, 20)
@@ -351,12 +358,12 @@ class TestCounterClick(TestFullClickBase):
 
         # Not applying tray price
         res = self.submit_basket(self.customer, [BasketItem(self.beer_tap.id, 2)])
-        assert res.status_code == 302
+        self.assertRedirects(res, self.counter.get_absolute_url())
         assert self.updated_amount(self.customer) == Decimal(17)
 
         # Applying tray price
         res = self.submit_basket(self.customer, [BasketItem(self.beer_tap.id, 7)])
-        assert res.status_code == 302
+        self.assertRedirects(res, self.counter.get_absolute_url())
         assert self.updated_amount(self.customer) == Decimal(8)
 
     def test_click_alcool_unauthorized(self):
@@ -477,7 +484,8 @@ class TestCounterClick(TestFullClickBase):
             BasketItem(None, 1),
             BasketItem(self.beer.id, None),
         ]:
-            assert self.submit_basket(self.customer, [item]).status_code == 200
+            res = self.submit_basket(self.customer, [item])
+            assert res.status_code == 200
             assert self.updated_amount(self.customer) == Decimal(10)
 
     def test_click_not_enough_money(self):
@@ -506,29 +514,30 @@ class TestCounterClick(TestFullClickBase):
         res = self.submit_basket(
             self.customer, [BasketItem(self.beer.id, 1), BasketItem(self.gift.id, 1)]
         )
-        assert res.status_code == 302
+        self.assertRedirects(res, self.counter.get_absolute_url())
 
         assert self.updated_amount(self.customer) == 0
 
     def test_recordings(self):
-        force_refill_user(self.customer, self.cons.selling_price * 3)
+        force_refill_user(self.customer, self.cons.amount * 3)
         self.login_in_bar(self.barmen)
         res = self.submit_basket(self.customer, [BasketItem(self.cons.id, 3)])
         assert res.status_code == 302
         assert self.updated_amount(self.customer) == 0
         assert list(
             self.customer.customer.return_balances.values("returnable", "balance")
-        ) == [{"returnable": self.cons.cons.id, "balance": 3}]
+        ) == [{"returnable": self.cons.product.cons.id, "balance": 3}]
 
         res = self.submit_basket(self.customer, [BasketItem(self.dcons.id, 3)])
         assert res.status_code == 302
-        assert self.updated_amount(self.customer) == self.dcons.selling_price * -3
+        assert self.updated_amount(self.customer) == self.dcons.amount * -3
 
         res = self.submit_basket(
-            self.customer, [BasketItem(self.dcons.id, self.dcons.dcons.max_return)]
+            self.customer,
+            [BasketItem(self.dcons.id, self.dcons.product.dcons.max_return)],
         )
         # from now on, the user amount should not change
-        expected_amount = self.dcons.selling_price * (-3 - self.dcons.dcons.max_return)
+        expected_amount = self.dcons.amount * (-3 - self.dcons.product.dcons.max_return)
         assert res.status_code == 302
         assert self.updated_amount(self.customer) == expected_amount
 
@@ -545,48 +554,57 @@ class TestCounterClick(TestFullClickBase):
     def test_recordings_when_negative(self):
         sale_recipe.make(
             customer=self.customer.customer,
-            product=self.dcons,
-            unit_price=self.dcons.selling_price,
+            product=self.dcons.product,
+            unit_price=self.dcons.amount,
             quantity=10,
         )
         self.customer.customer.update_returnable_balance()
         self.login_in_bar(self.barmen)
         res = self.submit_basket(self.customer, [BasketItem(self.dcons.id, 1)])
         assert res.status_code == 200
-        assert self.updated_amount(self.customer) == self.dcons.selling_price * -10
+        assert self.updated_amount(self.customer) == self.dcons.amount * -10
 
         res = self.submit_basket(self.customer, [BasketItem(self.cons.id, 3)])
         assert res.status_code == 302
         assert (
             self.updated_amount(self.customer)
-            == self.dcons.selling_price * -10 - self.cons.selling_price * 3
+            == self.dcons.amount * -10 - self.cons.amount * 3
         )
 
         res = self.submit_basket(self.customer, [BasketItem(self.beer.id, 1)])
         assert res.status_code == 302
         assert (
             self.updated_amount(self.customer)
-            == self.dcons.selling_price * -10
-            - self.cons.selling_price * 3
-            - self.beer.selling_price
+            == self.dcons.amount * -10 - self.cons.amount * 3 - self.beer.amount
         )
 
     def test_no_fetch_archived_product(self):
         counter = baker.make(Counter)
+        group = baker.make(Group)
         customer = baker.make(Customer)
-        product_recipe.make(archived=True, counters=[counter])
-        unarchived_products = product_recipe.make(
-            archived=False, counters=[counter], _quantity=3
+        group.users.add(customer.user)
+        _product_recipe = product_recipe.extend(
+            counters=[counter], product_type=baker.make(ProductType)
         )
-        customer_products = counter.get_products_for(customer)
-        assert unarchived_products == customer_products
+        price_recipe.make(
+            _quantity=2,
+            product=iter(_product_recipe.make(archived=True, _quantity=2)),
+            groups=[group],
+        )
+        unarchived_prices = price_recipe.make(
+            _quantity=2,
+            product=iter(_product_recipe.make(archived=False, _quantity=2)),
+            groups=[group],
+        )
+        customer_prices = counter.get_prices_for(customer)
+        assert unarchived_prices == customer_prices
 
 
 class TestCounterStats(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.users = subscriber_user.make(_quantity=4)
-        product = product_recipe.make(selling_price=1)
+        product = price_recipe.make(amount=1).product
         cls.counter = baker.make(
             Counter, type=["BAR"], sellers=cls.users[:4], products=[product]
         )
@@ -784,9 +802,6 @@ class TestClubCounterClickAccess(TestCase):
         )
 
         cls.user = subscriber_user.make()
-
-    def setUp(self):
-        cache.clear()
 
     def test_anonymous(self):
         res = self.client.get(self.click_url)

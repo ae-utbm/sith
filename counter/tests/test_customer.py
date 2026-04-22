@@ -341,7 +341,7 @@ def test_update_balance():
 def test_update_returnable_balance():
     ReturnableProduct.objects.all().delete()
     customer = baker.make(Customer)
-    products = product_recipe.make(selling_price=0, _quantity=4, _bulk_create=True)
+    products = product_recipe.make(_quantity=4, _bulk_create=True)
     returnables = [
         baker.make(
             ReturnableProduct, product=products[0], returned_product=products[1]

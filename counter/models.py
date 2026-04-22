@@ -22,7 +22,7 @@ import string
 from datetime import date, datetime, timedelta
 from datetime import timezone as tz
 from decimal import Decimal
-from typing import Literal, Self
+from typing import TYPE_CHECKING, Literal, Self
 
 from dict2xml import dict2xml
 from django.conf import settings
@@ -46,6 +46,9 @@ from core.models import Group, Notification, User
 from core.utils import get_start_of_semester
 from counter.fields import CurrencyField
 from subscription.models import Subscription
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 def get_eboutic() -> Counter:
@@ -157,14 +160,7 @@ class Customer(models.Model):
 
     @property
     def can_buy(self) -> bool:
-        """Check if whether this customer has the right to purchase any item.
-
-        This must be not confused with the Product.can_be_sold_to(user)
-        method as the present method returns an information
-        about a customer whereas the other tells something
-        about the relation between a User (not a Customer,
-        don't mix them) and a Product.
-        """
+        """Check if whether this customer has the right to purchase any item."""
         subscription = self.user.subscriptions.order_by("subscription_end").last()
         if subscription is None:
             return False
@@ -363,24 +359,19 @@ class Product(models.Model):
     QUANTITY_FOR_TRAY_PRICE = 6
 
     name = models.CharField(_("name"), max_length=64)
-    description = models.TextField(_("description"), default="")
+    description = models.TextField(_("description"), blank=True, default="")
     product_type = models.ForeignKey(
         ProductType,
         related_name="products",
         verbose_name=_("product type"),
         null=True,
-        blank=True,
+        blank=False,
         on_delete=models.SET_NULL,
     )
     code = models.CharField(_("code"), max_length=16, blank=True)
     purchase_price = CurrencyField(
         _("purchase price"),
         help_text=_("Initial cost of purchasing the product"),
-    )
-    selling_price = CurrencyField(_("selling price"))
-    special_selling_price = CurrencyField(
-        _("special selling price"),
-        help_text=_("Price for barmen during their permanence"),
     )
     icon = ResizedImageField(
         height=70,
@@ -394,7 +385,9 @@ class Product(models.Model):
         Club, related_name="products", verbose_name=_("club"), on_delete=models.CASCADE
     )
     limit_age = models.IntegerField(_("limit age"), default=0)
-    tray = models.BooleanField(_("tray price"), default=False)
+    tray = models.BooleanField(
+        _("tray price"), help_text=_("Buy five, get the sixth free"), default=False
+    )
     buying_groups = models.ManyToManyField(
         Group, related_name="products", verbose_name=_("buying groups"), blank=True
     )
@@ -419,41 +412,77 @@ class Product(models.Model):
             pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID
         ) or user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID)
 
-    def can_be_sold_to(self, user: User) -> bool:
-        """Check if whether the user given in parameter has the right to buy
-        this product or not.
 
-        This must be not confused with the Customer.can_buy()
-        method as the present method returns an information
-        about the relation between a User and a Product,
-        whereas the other tells something about a Customer
-        (and not a user, they are not the same model).
+class PriceQuerySet(models.QuerySet):
+    def for_user(self, user: User) -> Self:
+        age = user.age
+        if user.is_banned_alcohol:
+            age = min(age, 17)
+        return self.filter(
+            Q(is_always_shown=True, groups__in=user.all_groups)
+            | Q(
+                id=Subquery(
+                    Price.objects.filter(
+                        product_id=OuterRef("product_id"), groups__in=user.all_groups
+                    )
+                    .order_by("amount")
+                    .values("id")[:1]
+                )
+            ),
+            product__archived=False,
+            product__limit_age__lte=age,
+        )
 
-        Returns:
-            True if the user can buy this product else False
 
-        Warning:
-            This performs a db query, thus you can quickly have
-            a N+1 queries problem if you call it in a loop.
-            Hopefully, you can avoid that if you prefetch the buying_groups :
+class Price(models.Model):
+    amount = CurrencyField(_("amount"))
+    product = models.ForeignKey(
+        Product,
+        verbose_name=_("product"),
+        related_name="prices",
+        on_delete=models.CASCADE,
+    )
+    groups = models.ManyToManyField(
+        Group, verbose_name=_("groups"), related_name="prices"
+    )
+    is_always_shown = models.BooleanField(
+        _("always show"),
+        help_text=_(
+            "If this option is enabled, "
+            "people will see this price and be able to pay it, "
+            "even if another cheaper price exists. "
+            "Else it will visible only if it is the cheapest available price."
+        ),
+        default=False,
+    )
+    label = models.CharField(
+        _("label"),
+        help_text=_(
+            "A short label for easier differentiation "
+            "if a user can see multiple prices."
+        ),
+        max_length=32,
+        default="",
+        blank=True,
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("updated at"), auto_now=True)
 
-            ```python
-            user = User.objects.get(username="foobar")
-            products = [
-                p
-                for p in Product.objects.prefetch_related("buying_groups")
-                if p.can_be_sold_to(user)
-            ]
-            ```
-        """
-        buying_groups = list(self.buying_groups.all())
-        if not buying_groups:
-            return True
-        return any(user.is_in_group(pk=group.id) for group in buying_groups)
+    objects = PriceQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("price")
+
+    def __str__(self):
+        if not self.label:
+            return f"{self.product.name} ({self.amount}€)"
+        return f"{self.product.name} {self.label} ({self.amount}€)"
 
     @property
-    def profit(self):
-        return self.selling_price - self.purchase_price
+    def full_label(self):
+        if not self.label:
+            return self.product.name
+        return f"{self.product.name} \u2013 {self.label}"
 
 
 class ProductFormula(models.Model):
@@ -473,18 +502,6 @@ class ProductFormula(models.Model):
 
     def __str__(self):
         return self.result.name
-
-    @cached_property
-    def max_selling_price(self) -> float:
-        # iterating over all products is less efficient than doing
-        # a simple aggregation, but this method is likely to be used in
-        # coordination with `max_special_selling_price`,
-        # and Django caches the result of the `all` queryset.
-        return sum(p.selling_price for p in self.products.all())
-
-    @cached_property
-    def max_special_selling_price(self) -> float:
-        return sum(p.special_selling_price for p in self.products.all())
 
 
 class CounterQuerySet(models.QuerySet):
@@ -716,35 +733,20 @@ class Counter(models.Model):
         # but they share the same primary key
         return self.type == "BAR" and any(b.pk == customer.pk for b in self.barmen_list)
 
-    def get_products_for(self, customer: Customer) -> list[Product]:
-        """
-        Get all allowed products for the provided customer on this counter
-        Prices will be annotated
-        """
-
-        products = (
-            self.products.filter(archived=False)
-            .select_related("product_type")
-            .prefetch_related("buying_groups")
+    def get_prices_for(
+        self, customer: Customer, *, order_by: Sequence[str] | None = None
+    ) -> list[Price]:
+        qs = (
+            Price.objects.filter(
+                product__counters=self, product__product_type__isnull=False
+            )
+            .for_user(customer.user)
+            .select_related("product", "product__product_type")
+            .prefetch_related("groups")
         )
-
-        # Only include age appropriate products
-        age = customer.user.age
-        if customer.user.is_banned_alcohol:
-            age = min(age, 17)
-        products = products.filter(limit_age__lte=age)
-
-        # Compute special price for customer if he is a barmen on that bar
-        if self.customer_is_barman(customer):
-            products = products.annotate(price=F("special_selling_price"))
-        else:
-            products = products.annotate(price=F("selling_price"))
-
-        return [
-            product
-            for product in products.all()
-            if product.can_be_sold_to(customer.user)
-        ]
+        if order_by:
+            qs = qs.order_by(*order_by)
+        return list(qs)
 
 
 class CounterSellers(models.Model):
@@ -1025,7 +1027,9 @@ class Selling(models.Model):
         event = self.product.eticket.event_title or _("Unknown event")
         subject = _("Eticket bought for the event %(event)s") % {"event": event}
         message_html = _(
-            "You bought an eticket for the event %(event)s.\nYou can download it directly from this link %(eticket)s.\nYou can also retrieve all your e-tickets on your account page %(url)s."
+            "You bought an eticket for the event %(event)s.\n"
+            "You can download it directly from this link %(eticket)s.\n"
+            "You can also retrieve all your e-tickets on your account page %(url)s."
         ) % {
             "event": event,
             "url": (
