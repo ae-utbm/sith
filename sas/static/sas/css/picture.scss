@@ -134,7 +134,7 @@
           --loading-size: 20px
         }
 
-        @media (max-width: 1000px) {
+        @media (min-width: 700px) and (max-width: 1000px) {
           max-width: calc(50% - 5px);
         }
 
@@ -201,75 +201,70 @@
   }
 }
 
-.general {
+#pict .general {
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  gap: 3em;
+  justify-content: space-evenly;
 
   @media (max-width: 1000px) {
+    gap: 1em;
     flex-direction: column;
   }
 
-  >.infos {
+  .infos, .tools {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    width: 50%;
-
-    >div>div {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-
-      >*:first-child {
-        min-width: 150px;
-
-        @media (max-width: 1000px) {
-          min-width: auto;
-        }
-      }
+    gap: .5em;
+    @media (min-width: 700px) {
+      max-width: 350px;
     }
+  }
+  .infos > div, .tools > div > div {
+    display: flex;
+    flex-direction: column;
+    gap: .35em;
+  }
+
+  .tools > div, >.infos >div>div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
   }
 
   >.tools {
-    display: flex;
-    flex-direction: column;
-    width: 50%;
+    flex: 1;
 
-    >div {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
+    >div>div {
+      >a.btn {
+        background-color: $primary-neutral-light-color;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0;
+        color: black;
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
 
-      >div {
-        >a.button {
-          box-sizing: border-box;
-          background-color: $primary-neutral-light-color;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 10px;
-          color: black;
-          border-radius: 5px;
-          width: 40px;
-          height: 40px;
-
-          &:hover {
-            background-color: #aaa;
-          }
+        &:hover {
+          background-color: #aaa;
         }
+      }
 
-        >a.text.danger {
-          color: red;
+      >a.text.danger {
+        color: red;
 
-          &:hover {
-            color: darkred;
-          }
+        &:hover {
+          color: darkred;
         }
+      }
 
-        &.buttons {
-          display: flex;
-          gap: 5px;
-        }
+      &.buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
       }
     }
   }

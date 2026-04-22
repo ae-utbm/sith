@@ -118,15 +118,20 @@
                 <a class="text" :href="currentPicture.full_size_url">
                   {% trans %}HD version{% endtrans %}
                 </a>
-                <br>
-                <a class="text danger" :href="currentPicture.report_url">
+                <a class="text danger " :href="currentPicture.report_url">
                   {% trans %}Ask for removal{% endtrans %}
                 </a>
               </div>
               <div class="buttons">
-                <a class="button" :href="currentPicture.edit_url"><i class="fa-regular fa-pen-to-square edit-action"></i></a>
-                <a class="button" href="?rotate_left"><i class="fa-solid fa-rotate-left"></i></a>
-                <a class="button" href="?rotate_right"><i class="fa-solid fa-rotate-right"></i></a>
+                <a
+                  class="btn btn-no-text"
+                  :href="currentPicture.edit_url"
+                  x-show="{{ user.has_perm("sas.change_sasfile")|tojson }} || currentPicture.owner.id === {{ user.id }}"
+                >
+                  <i class="fa-regular fa-pen-to-square edit-action"></i>
+                </a>
+                <a class="btn btn-no-text" href="?rotate_left"><i class="fa-solid fa-rotate-left"></i></a>
+                <a class="btn btn-no-text" href="?rotate_right"><i class="fa-solid fa-rotate-right"></i></a>
               </div>
             </div>
           </div>
