@@ -12,6 +12,17 @@
   {% trans %}See all the photos taken during events organised by the AE.{% endtrans %}
 {%- endblock %}
 
+{% block metatags %}
+  <meta property="og:url" content="{{ request.build_absolute_uri() }}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Stock à souvenirs" />
+  <meta
+    property="og:description"
+    content="Retrouvez toutes les photos prises durant les événements organisés par l'AE."
+  />
+  <meta property="og:image" content="{{ request.build_absolute_uri(static("core/img/logo_no_text.png")) }}" />
+{% endblock %}
+
 {% set is_sas_admin = user.is_root or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
 
 {% from "sas/macros.jinja" import display_album %}
