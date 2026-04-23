@@ -3,7 +3,7 @@ from typing import Annotated
 from django.db.models import Q
 from ninja import FilterLookup, FilterSchema, ModelSchema
 
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 from core.schemas import NonEmptyStr, SimpleUserSchema
 
 
@@ -39,14 +39,21 @@ class ClubProfileSchema(ModelSchema):
         return obj.get_absolute_url()
 
 
+class ClubRoleSchema(ModelSchema):
+    class Meta:
+        model = ClubRole
+        fields = ["id", "name", "is_presidency", "is_board"]
+
+
 class ClubMemberSchema(ModelSchema):
     """A schema to represent all memberships in a club."""
 
     class Meta:
         model = Membership
-        fields = ["start_date", "end_date", "role", "description"]
+        fields = ["start_date", "end_date", "description"]
 
     user: SimpleUserSchema
+    role: ClubRoleSchema
 
 
 class ClubSchema(ModelSchema):
@@ -62,6 +69,7 @@ class UserMembershipSchema(ModelSchema):
 
     class Meta:
         model = Membership
-        fields = ["id", "start_date", "role", "description"]
+        fields = ["id", "start_date", "description"]
 
     club: SimpleClubSchema
+    role: ClubRoleSchema

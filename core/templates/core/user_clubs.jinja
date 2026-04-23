@@ -23,10 +23,10 @@
       </tr>
     </thead>
     <tbody>
-      {% for m in profile.memberships.filter(end_date=None).all() %}
+      {% for m in profile.memberships.ongoing().select_related("role") %}
         <tr>
           <td><a href="{{ url('club:club_members', club_id=m.club.id) }}">{{ m.club }}</a></td>
-          <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
+          <td>{{ m.role.name }}</td>
           <td>{{ m.description }}</td>
           <td>{{ m.start_date }}</td>
           {% if m.can_be_edited_by(user) %}
@@ -65,10 +65,10 @@
       </tr>
     </thead>
     <tbody>
-      {% for m in profile.memberships.exclude(end_date=None).all() %}
+      {% for m in profile.memberships.exclude(end_date=None).select_related("role") %}
         <tr>
           <td><a href="{{ url('club:club_members', club_id=m.club.id) }}">{{ m.club }}</a></td>
-          <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
+          <td>{{ m.role.name }}</td>
           <td>{{ m.description }}</td>
           <td>{{ m.start_date }}</td>
           <td>{{ m.end_date }}</td>

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-23 22:21+0100\n"
+"POT-Creation-Date: 2026-04-18 11:38+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -181,6 +181,22 @@ msgstr "Vous devez être cotisant pour faire partie d'un club"
 msgid "You are already a member of this club"
 msgstr "Vous êtes déjà membre de ce club."
 
+#: club/forms.py
+msgid "Club status"
+msgstr "État du club"
+
+#: club/forms.py
+msgid "Active"
+msgstr "Actif"
+
+#: club/forms.py
+msgid "Inactive"
+msgstr "Inactif"
+
+#: club/forms.py
+msgid "All clubs"
+msgstr "Tous les clubs"
+
 #: club/models.py
 msgid "slug name"
 msgstr "nom slug"
@@ -217,14 +233,64 @@ msgstr "home"
 msgid "You can not make loops in clubs"
 msgstr "Vous ne pouvez pas faire de boucles dans les clubs"
 
+#: club/models.py com/models.py counter/models.py trombi/models.py
+msgid "club"
+msgstr "club"
+
+#: club/models.py
+msgid "The club with which this role is associated"
+msgstr "Le club auquel ce rôle est attaché."
+
+#: club/models.py core/models.py counter/models.py election/models.py
+#: forum/models.py
+msgid "description"
+msgstr "description"
+
+#: club/models.py
+msgid "Board role"
+msgstr "Rôle du bureau"
+
+#: club/models.py
+msgid "Presidency role"
+msgstr "Rôle de la présidence"
+
+#: club/models.py
+msgid ""
+"If the role is inactive, people joining the club won't be able to get it."
+msgstr ""
+"Si ce rôle est inactif, il ne pourra pas être attribué aux gens qui "
+"rejoignent le club."
+
+#: club/models.py
+msgid "club role"
+msgstr "rôle de club"
+
+#: club/models.py
+msgid "club roles"
+msgstr "rôles de club"
+
+#: club/models.py
+msgid "A role cannot be in the presidency while not being in the board"
+msgstr ""
+"Un rôle ne peut pas appartenir à la présidence sans être dans le bureau"
+
+#: club/models.py
+#, python-format
+msgid "Role %(role)s cannot be placed below a member role"
+msgstr ""
+"Le rôle %(role)s ne peut pas être placé en-dessous d'un rôle de membre."
+
+#: club/models.py
+#, python-format
+msgid "Role %(role)s cannot be placed below a non-presidency role"
+msgstr ""
+"Le rôle %(role)s ne peut pas être placé en-dessous d'un rôle qui n'est pas "
+"de la présidence."
+
 #: club/models.py core/models.py counter/models.py eboutic/models.py
 #: election/models.py pedagogy/models.py sas/models.py trombi/models.py
 msgid "user"
 msgstr "utilisateur"
-
-#: club/models.py com/models.py counter/models.py trombi/models.py
-msgid "club"
-msgstr "club"
 
 #: club/models.py counter/models.py election/models.py
 msgid "start date"
@@ -237,11 +303,6 @@ msgstr "date de fin"
 #: club/models.py core/models.py election/models.py trombi/models.py
 msgid "role"
 msgstr "rôle"
-
-#: club/models.py core/models.py counter/models.py election/models.py
-#: forum/models.py
-msgid "description"
-msgstr "description"
 
 #: club/models.py
 msgid "past member"
@@ -302,48 +363,37 @@ msgid "Unregistered user"
 msgstr "Utilisateur non enregistré"
 
 #: club/templates/club/club_list.jinja
-msgid "Club list"
-msgstr "Liste des clubs"
-
-#: club/templates/club/club_list.jinja
 msgid "The list of all clubs existing at UTBM."
 msgstr "La liste de tous les clubs existants à l'UTBM"
+
+#: club/templates/club/club_list.jinja
+msgid "Club list"
+msgstr "Liste des clubs"
 
 #: club/templates/club/club_list.jinja
 msgid "Filters"
 msgstr "Filtres"
 
-#: club/templates/club/club_list.jinja
-msgid "Name"
-msgstr "Nom"
-
-#: club/templates/club/club_list.jinja
-msgid "Club state"
-msgstr "Etat du club"
-
-#: club/templates/club/club_list.jinja
-msgid "Active"
-msgstr "Actif"
-
-#: club/templates/club/club_list.jinja
-msgid "Inactive"
-msgstr "Inactif"
-
-#: club/templates/club/club_list.jinja
-msgid "All clubs"
-msgstr "Tous les clubs"
+#: club/templates/club/club_list.jinja core/templates/core/base/header.jinja
+#: forum/templates/forum/macros.jinja matmat/templates/matmat/search_form.jinja
+msgid "Search"
+msgstr "Recherche"
 
 #: club/templates/club/club_list.jinja core/templates/core/user_tools.jinja
 msgid "New club"
 msgstr "Nouveau club"
 
-#: club/templates/club/club_list.jinja
+#: club/templates/club/club_list.jinja club/templates/club/club_roles.jinja
 msgid "inactive"
 msgstr "inactif"
 
 #: club/templates/club/club_members.jinja
 msgid "Club members"
 msgstr "Membres du club"
+
+#: club/templates/club/club_members.jinja
+msgid "Manage roles"
+msgstr "Gérer les rôles"
 
 #: club/templates/club/club_members.jinja
 #: club/templates/club/club_old_members.jinja
@@ -382,6 +432,120 @@ msgstr "Du"
 #: core/templates/core/user_clubs.jinja
 msgid "To"
 msgstr "Au"
+
+#: club/templates/club/club_roles.jinja
+msgid ""
+"Roles give rights on the club. Higher roles grant more rights, and the "
+"members having them are displayed higher in the club members list."
+msgstr ""
+"Les rôles donnent des droits sur le club. Les rôles plus élevés donnent plus "
+"de droit, et les membres qui les possèdent sont affichés plus haut dans la "
+"liste des membres."
+
+#: club/templates/club/club_roles.jinja
+msgid ""
+"On this page, you can edit their name and description, as well as their "
+"order. You can also drag roles from a category to another (e.g. a board role "
+"can be made into a presidency role)."
+msgstr ""
+"Sur cette page, vous pouvez éditer leur nom et leur description, ainsi que "
+"leur ordre. Vous pouvez également déplacer des rôles d'une catégorie à "
+"l'autre (par exemple, un rôle du bureau peut devenir un rôle de présidence)."
+
+#: club/templates/club/club_roles.jinja
+msgid "Presidency"
+msgstr "Présidence"
+
+#: club/templates/club/club_roles.jinja
+msgid "add role"
+msgstr "ajouter un rôle"
+
+#: club/templates/club/club_roles.jinja core/templates/core/base/navbar.jinja
+msgid "Help"
+msgstr "Aide"
+
+#: club/templates/club/club_roles.jinja
+msgid "Users with a presidency role can :"
+msgstr "Les utilisateurs avec un rôle de présidence peuvent :"
+
+#: club/templates/club/club_roles.jinja
+msgid "create new club roles and edit existing ones"
+msgstr "créer de nouveaux rôles et modifier ceux qui existent"
+
+#: club/templates/club/club_roles.jinja
+msgid "manage the club counters"
+msgstr "gérer les comptoirs du club"
+
+#: club/templates/club/club_roles.jinja
+msgid "add new members with any active role and end any membership"
+msgstr ""
+"ajouter de nouveaux membres avec n'importe quel rôle et mettre fin à "
+"n'importe quelle adhésion au club."
+
+#: club/templates/club/club_roles.jinja
+msgid "They also have all the rights of the club board."
+msgstr "Ils possèdent également tous les droits du bureau."
+
+#: club/templates/club/club_roles.jinja
+msgid "Board"
+msgstr "Bureau"
+
+#: club/templates/club/club_roles.jinja
+msgid ""
+"Board members can do most administrative actions in the club, including :"
+msgstr ""
+"Les membres du bureau peuvent effectuer la plupart des actions "
+"administratives dans le club, incluant :"
+
+#: club/templates/club/club_roles.jinja
+msgid "manage the club posters"
+msgstr "gérer les affiches du club"
+
+#: club/templates/club/club_roles.jinja
+msgid "create news for the club"
+msgstr "créer des nouvelles pour le club"
+
+#: club/templates/club/club_roles.jinja
+msgid "click users on the club's counters"
+msgstr "cliquer des utilisateurs sur les comptoirs du club"
+
+#: club/templates/club/club_roles.jinja
+msgid ""
+"add new members and end active memberships for roles that are lower than "
+"their own."
+msgstr ""
+"ajouter de nouveaux membres et mettre fin à des adhésions en cours, pour des "
+"rôles plus bas que le leur."
+
+#: club/templates/club/club_roles.jinja club/views.py
+msgid "Members"
+msgstr "Membres"
+
+#: club/templates/club/club_roles.jinja
+msgid "Simple members cannot perform administrative actions."
+msgstr ""
+"Les simples membres ne peuvent pas effectuer d'actions administratives."
+
+#: club/templates/club/club_roles.jinja club/templates/club/edit_club.jinja
+#: club/templates/club/pagerev_edit.jinja com/templates/com/news_edit.jinja
+#: com/templates/com/poster_edit.jinja com/templates/com/screen_edit.jinja
+#: com/templates/com/weekmail.jinja core/templates/core/create.jinja
+#: core/templates/core/edit.jinja core/templates/core/file_edit.jinja
+#: core/templates/core/fragment/user_visibility.jinja
+#: core/templates/core/page/edit.jinja core/templates/core/page/prop.jinja
+#: core/templates/core/user_godfathers.jinja
+#: core/templates/core/user_godfathers_tree.jinja
+#: core/templates/core/user_preferences.jinja
+#: counter/templates/counter/cash_register_summary.jinja
+#: counter/templates/counter/invoices_call.jinja
+#: counter/templates/counter/product_form.jinja
+#: forum/templates/forum/reply.jinja
+#: subscription/templates/subscription/fragments/creation_form.jinja
+#: trombi/templates/trombi/comment.jinja
+#: trombi/templates/trombi/edit_profile.jinja
+#: trombi/templates/trombi/user_tools.jinja
+msgid "Save"
+msgstr "Sauver"
 
 #: club/templates/club/club_sellings.jinja
 msgid "Previous"
@@ -567,27 +731,6 @@ msgstr ""
 "Les champs de formulaire suivants sont liées à la description basique d'un "
 "club. Tous les membres du bureau du club peuvent voir et modifier ceux-ci."
 
-#: club/templates/club/edit_club.jinja club/templates/club/pagerev_edit.jinja
-#: com/templates/com/news_edit.jinja com/templates/com/poster_edit.jinja
-#: com/templates/com/screen_edit.jinja com/templates/com/weekmail.jinja
-#: core/templates/core/create.jinja core/templates/core/edit.jinja
-#: core/templates/core/file_edit.jinja
-#: core/templates/core/fragment/user_visibility.jinja
-#: core/templates/core/page/edit.jinja core/templates/core/page/prop.jinja
-#: core/templates/core/user_godfathers.jinja
-#: core/templates/core/user_godfathers_tree.jinja
-#: core/templates/core/user_preferences.jinja
-#: counter/templates/counter/cash_register_summary.jinja
-#: counter/templates/counter/invoices_call.jinja
-#: counter/templates/counter/product_form.jinja
-#: forum/templates/forum/reply.jinja
-#: subscription/templates/subscription/fragments/creation_form.jinja
-#: trombi/templates/trombi/comment.jinja
-#: trombi/templates/trombi/edit_profile.jinja
-#: trombi/templates/trombi/user_tools.jinja
-msgid "Save"
-msgstr "Sauver"
-
 #: club/templates/club/fragments/add_member.jinja
 msgid "Add a new member"
 msgstr "Ajouter un nouveau membre"
@@ -669,10 +812,6 @@ msgid "Infos"
 msgstr "Infos"
 
 #: club/views.py
-msgid "Members"
-msgstr "Membres"
-
-#: club/views.py
 msgid "Old members"
 msgstr "Anciens membres"
 
@@ -720,6 +859,27 @@ msgstr "Vous êtes maintenant membre de ce club."
 #, python-format
 msgid "%(user)s has been added to club."
 msgstr "%(user)s a été ajouté au club."
+
+#: club/views.py
+msgid "Club roles updated"
+msgstr "Rôles de club mis à jour"
+
+#: club/views.py
+#, python-format
+msgid "Role %(name)s created"
+msgstr "Rôle %(name)s créé"
+
+#: club/views.py
+msgid "club role – presidency"
+msgstr "rôle de club – présidence"
+
+#: club/views.py
+msgid "club role – board"
+msgstr "rôle de club – bureau"
+
+#: club/views.py
+msgid "club role – member"
+msgstr "rôle de club – membre"
 
 #: club/views.py
 msgid "Benefit"
@@ -1863,11 +2023,6 @@ msgstr "Connexion"
 msgid "Register"
 msgstr "Inscription"
 
-#: core/templates/core/base/header.jinja forum/templates/forum/macros.jinja
-#: matmat/templates/matmat/search_form.jinja
-msgid "Search"
-msgstr "Recherche"
-
 #: core/templates/core/base/header.jinja
 msgid "Logout"
 msgstr "Déconnexion"
@@ -1948,10 +2103,6 @@ msgstr "Partenaires"
 #: core/templates/core/base/navbar.jinja
 msgid "Subscriber benefits"
 msgstr "Les avantages cotisants"
-
-#: core/templates/core/base/navbar.jinja
-msgid "Help"
-msgstr "Aide"
 
 #: core/templates/core/base/navbar.jinja
 msgid "FAQ"
@@ -4213,6 +4364,47 @@ msgid "this page"
 msgstr "cette page"
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "Eurockéennes 2025 partnership"
+msgstr "Partenariat Eurockéennes 2025"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid ""
+"Our partner uses Weezevent to sell tickets. Weezevent may collect user info "
+"according to its own privacy policy. By clicking the accept button you "
+"consent to their terms of services."
+msgstr ""
+"Notre partenaire utilises Wezevent pour vendre ses billets. Weezevent peut "
+"collecter des informations utilisateur conformément à sa propre politique de "
+"confidentialité. En cliquant sur le bouton d'acceptation vous consentez à "
+"leurs termes de service."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "Privacy policy"
+msgstr "Politique de confidentialité"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+#: trombi/templates/trombi/comment_moderation.jinja
+msgid "Accept"
+msgstr "Accepter"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid ""
+"You must be subscribed to benefit from the partnership with the Eurockéennes."
+msgstr ""
+"Vous devez être cotisant pour bénéficier du partenariat avec les "
+"Eurockéennes."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+#, python-format
+msgid ""
+"This partnership offers a discount of up to 33%% on tickets for Friday, "
+"Saturday and Sunday, as well as the 3-day package from Friday to Sunday."
+msgstr ""
+"Ce partenariat permet de profiter d'une réduction jusqu'à 33%% sur les "
+"billets du vendredi, du samedi et du dimanche, ainsi qu'au forfait 3 jours, "
+"du vendredi au dimanche."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "There are no items available for sale"
 msgstr "Aucun article n'est disponible à la vente"
 
@@ -5367,42 +5559,6 @@ msgid "One year for free(CA offer)"
 msgstr "Une année offerte (Offre CA)"
 
 #: sith/settings.py
-msgid "President"
-msgstr "Président⸱e"
-
-#: sith/settings.py
-msgid "Vice-President"
-msgstr "Vice-Président⸱e"
-
-#: sith/settings.py
-msgid "Treasurer"
-msgstr "Trésorier⸱e"
-
-#: sith/settings.py
-msgid "Communication supervisor"
-msgstr "Responsable communication"
-
-#: sith/settings.py
-msgid "Secretary"
-msgstr "Secrétaire"
-
-#: sith/settings.py
-msgid "IT supervisor"
-msgstr "Responsable info"
-
-#: sith/settings.py
-msgid "Board member"
-msgstr "Membre du bureau"
-
-#: sith/settings.py
-msgid "Active member"
-msgstr "Membre actif⸱ve"
-
-#: sith/settings.py
-msgid "Curious"
-msgstr "Curieux⸱euse"
-
-#: sith/settings.py
 msgid "A new poster needs to be moderated"
 msgstr "Une nouvelle affiche a besoin d'être modérée"
 
@@ -5637,10 +5793,6 @@ msgstr "fin"
 #: trombi/templates/trombi/comment_moderation.jinja
 msgid "Moderate Trombi comments"
 msgstr "Modérer les commentaires du Trombi"
-
-#: trombi/templates/trombi/comment_moderation.jinja
-msgid "Accept"
-msgstr "Accepter"
 
 #: trombi/templates/trombi/comment_moderation.jinja
 msgid "Reject"
@@ -5883,39 +6035,3 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid "Eurockéennes 2025 partnership"
-msgstr "Partenariat Eurockéennes 2025"
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid ""
-"Our partner uses Weezevent to sell tickets. Weezevent may collect user info "
-"according to its own privacy policy. By clicking the accept button you "
-"consent to their terms of services."
-msgstr ""
-"Notre partenaire utilises Wezevent pour vendre ses billets. Weezevent peut "
-"collecter des informations utilisateur conformément à sa propre politique de "
-"confidentialité. En cliquant sur le bouton d'acceptation vous consentez à "
-"leurs termes de service."
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid "Privacy policy"
-msgstr "Politique de confidentialité"
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid ""
-"You must be subscribed to benefit from the partnership with the Eurockéennes."
-msgstr ""
-"Vous devez être cotisant pour bénéficier du partenariat avec les "
-"Eurockéennes."
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-#, python-format
-msgid ""
-"This partnership offers a discount of up to 33%% on tickets for Friday, "
-"Saturday and Sunday, as well as the 3-day package from Friday to Sunday."
-msgstr ""
-"Ce partenariat permet de profiter d'une réduction jusqu'à 33%% sur les "
-"billets du vendredi, du samedi et du dimanche, ainsi qu'au forfait 3 jours, "
-"du vendredi au dimanche."
