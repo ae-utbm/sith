@@ -13,8 +13,10 @@
 #
 #
 from django.contrib import admin
+from django.forms.models import ModelForm
+from django.http import HttpRequest
 
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 
 
 @admin.register(Club)
@@ -28,6 +30,31 @@ class ClubAdmin(admin.ModelAdmin):
         "home",
         "page",
     )
+
+    def save_model(
+        self,
+        request: HttpRequest,
+        obj: Club,
+        form: ModelForm,
+        change: bool,  # noqa: FBT001
+    ):
+        super().save_model(request, obj, form, change)
+        if not change:
+            obj.create_default_roles()
+
+
+@admin.register(ClubRole)
+class ClubRoleAdmin(admin.ModelAdmin):
+    list_display = ("name", "club", "is_board", "is_presidency")
+    search_fields = ("name",)
+    autocomplete_fields = ("club",)
+    list_select_related = ("club",)
+    list_filter = (
+        "is_board",
+        "is_presidency",
+        ("club", admin.RelatedOnlyFieldListFilter),
+    )
+    show_facets = admin.ModelAdmin.show_facets.ALWAYS
 
 
 @admin.register(Membership)

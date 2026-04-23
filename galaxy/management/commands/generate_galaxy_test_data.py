@@ -29,8 +29,9 @@ from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from model_bakery import baker
 
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 from core.models import Group, Page, SithFile, User
 from core.utils import RED_PIXEL_PNG
 from sas.models import Album, PeoplePictureRelation, Picture
@@ -217,11 +218,19 @@ class Command(BaseCommand):
                 "The `make_clubs()` method must be called before `make_club_memberships()`"
             )
         memberships = []
+        roles = {
+            r.club_id: r.id
+            for r in baker.make(
+                ClubRole,
+                club=iter(self.clubs),
+                _quantity=len(self.clubs),
+                _bulk_create=True,
+            )
+        }
         for i in range(1, 11):  # users can be in up to 20 clubs
             self.logger.info(f"Club membership, pass {i}")
-            for uid in range(
-                i, self.NB_USERS, i
-            ):  # Pass #1 will make sure every user is at least in one club
+            for uid in range(i, self.NB_USERS, i):
+                # Pass #1 will make sure every user is at least in one club
                 user = self.users[uid]
                 club = self.clubs[(uid + i**2) % self.NB_CLUBS]
 
@@ -236,7 +245,7 @@ class Command(BaseCommand):
                     Membership(
                         user=user,
                         club=club,
-                        role=(uid + i) % 10 + 1,  # spread the different roles
+                        role_id=roles[club.id],
                         start_date=start,
                         end_date=end,
                     )
@@ -259,7 +268,7 @@ class Command(BaseCommand):
                     Membership(
                         user=user,
                         club=club,
-                        role=((uid // 10) + i) % 10 + 1,  # spread the different roles
+                        role_id=roles[club.id],
                         start_date=start,
                         end_date=end,
                     )

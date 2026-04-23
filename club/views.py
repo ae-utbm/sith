@@ -28,7 +28,6 @@ import csv
 import itertools
 from typing import TYPE_CHECKING, Any
 
-from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
@@ -355,7 +354,7 @@ class ClubMembersView(
         membership = self.object.get_membership_for(self.request.user)
         if (
             membership
-            and membership.role <= settings.SITH_MAXIMUM_FREE_ROLE
+            and not membership.role.is_board
             and not self.request.user.has_perm("club.add_membership")
         ):
             # Simple club members won't see the form anymore.
@@ -380,8 +379,8 @@ class ClubMembersView(
         kwargs["members"] = list(
             self.object.members.ongoing()
             .annotate(is_editable=Q(id__in=editable))
-            .order_by("-role")
-            .select_related("user")
+            .order_by("role__order")
+            .select_related("user", "role")
         )
         kwargs["can_end_membership"] = len(editable) > 0
         return kwargs
@@ -409,8 +408,8 @@ class ClubOldMembersView(ClubTabsMixin, PermissionRequiredMixin, DetailView):
         return super().get_context_data(**kwargs) | {
             "old_members": (
                 self.object.members.exclude(end_date=None)
-                .order_by("-role", "description", "-end_date")
-                .select_related("user")
+                .order_by("role__order", "description", "-end_date")
+                .select_related("user", "role")
             )
         }
 
@@ -580,6 +579,11 @@ class ClubCreateView(PermissionRequiredMixin, CreateView):
     fields = ["name", "parent"]
     template_name = "core/create.jinja"
     permission_required = "club.add_club"
+
+    def form_valid(self, form):
+        res = super().form_valid(form)
+        self.object.create_default_roles()
+        return res
 
 
 class MembershipSetOldView(CanEditMixin, SingleObjectMixin, View):
@@ -761,9 +765,7 @@ class MailingAutoGenerationView(View):
     def get(self, request, *args, **kwargs):
         club = self.mailing.club
         self.mailing.subscriptions.all().delete()
-        members = club.members.filter(
-            role__gte=settings.SITH_CLUB_ROLES_ID["Board member"]
-        ).exclude(end_date__lte=timezone.now())
+        members = club.members.ongoing().filter(role__is_board=True)
         for member in members.all():
             MailingSubscription(user=member.user, mailing=self.mailing).save()
         return redirect("club:mailing", club_id=club.id)

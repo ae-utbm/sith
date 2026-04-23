@@ -4,7 +4,7 @@ from django.urls import reverse
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 from core.baker_recipes import subscriber_user
 
 
@@ -12,7 +12,12 @@ from core.baker_recipes import subscriber_user
 def test_club_board_member_cannot_edit_club_properties(client: Client):
     user = subscriber_user.make()
     club = baker.make(Club, name="old name", is_active=True, address="old address")
-    baker.make(Membership, club=club, user=user, role=7)
+    baker.make(
+        Membership,
+        club=club,
+        user=user,
+        role=baker.make(ClubRole, club=club, is_board=True),
+    )
     client.force_login(user)
     res = client.post(
         reverse("club:club_edit", kwargs={"club_id": club.id}),
@@ -32,7 +37,12 @@ def test_edit_club_page_doesnt_crash(client: Client):
     """crash test for club:club_edit"""
     club = baker.make(Club)
     user = subscriber_user.make()
-    baker.make(Membership, club=club, user=user, role=3)
+    baker.make(
+        Membership,
+        club=club,
+        user=user,
+        role=baker.make(ClubRole, club=club, is_board=True),
+    )
     client.force_login(user)
     res = client.get(reverse("club:club_edit", kwargs={"club_id": club.id}))
     assert res.status_code == 200

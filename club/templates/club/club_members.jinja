@@ -41,7 +41,7 @@
           {% for m in members %}
             <tr>
               <td>{{ user_profile_link(m.user) }}</td>
-              <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
+              <td>{{ m.role.name }}</td>
               <td>{{ m.description }}</td>
               <td>{{ m.start_date }}</td>
               {%- if can_end_membership -%}

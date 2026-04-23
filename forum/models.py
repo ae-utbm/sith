@@ -183,7 +183,7 @@ class Forum(models.Model):
                 Forum._club_memberships[self.id] = {}
                 Forum._club_memberships[self.id][user.id] = m
         if m:
-            return m.role > settings.SITH_MAXIMUM_FREE_ROLE
+            return m.role.is_board
         return False
 
     def check_loop(self):

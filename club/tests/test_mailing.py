@@ -3,9 +3,10 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from model_bakery import baker
 
 from club.forms import MailingForm
-from club.models import Club, Mailing, Membership
+from club.models import Club, ClubRole, Mailing, Membership
 from core.models import User
 
 
@@ -25,7 +26,7 @@ class TestMailingForm(TestCase):
             user=cls.rbatsbak,
             club=cls.club,
             start_date=timezone.now(),
-            role=settings.SITH_CLUB_ROLES_ID["Board member"],
+            role=baker.make(ClubRole, club=cls.club, is_board=True),
         ).save()
 
     def test_mailing_list_add_no_moderation(self):
