@@ -16,6 +16,7 @@ from typing import Any
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count, OuterRef, Subquery
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
@@ -152,10 +153,9 @@ class AlbumView(CanViewMixin, UseFragmentsMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if not self.object.file:
-            self.object.generate_thumbnail()
-        if request.user.can_edit(self.object):  # Handle the copy-paste functions
-            FileView.handle_clipboard(request, self.object)
+        if not request.user.can_edit(self.object):
+            raise PermissionDenied
+        FileView.handle_clipboard(request, self.object)
         return HttpResponseRedirect(self.request.path)
 
     def get_fragment_data(self) -> dict[str, dict[str, Any]]:
