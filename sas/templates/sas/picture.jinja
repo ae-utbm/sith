@@ -122,7 +122,8 @@
                   {% trans %}Ask for removal{% endtrans %}
                 </a>
               </div>
-              <div class="buttons">
+              <div class="buttons"
+              >
                 <a
                   class="btn btn-no-text"
                   :href="currentPicture.edit_url"
@@ -130,8 +131,22 @@
                 >
                   <i class="fa-regular fa-pen-to-square edit-action"></i>
                 </a>
-                <a class="btn btn-no-text" href="?rotate_left"><i class="fa-solid fa-rotate-left"></i></a>
-                <a class="btn btn-no-text" href="?rotate_right"><i class="fa-solid fa-rotate-right"></i></a>
+                <form method="post" action="{{ url("sas:picture_rotate") }}"
+                      x-show="{{ user.has_perm("sas.change_sasfile")|tojson}}"
+                >
+                  {% csrf_token %}
+                  <input type="hidden" name="picture" :value="currentPicture.id">
+                  <input type="hidden" name="direction" value="LEFT">
+                  <button><i class="fa-solid fa-rotate-left"></i></button>
+                </form>
+                <form method="post" action="{{ url("sas:picture_rotate") }}"
+                      x-show="{{ user.has_perm("sas.change_sasfile")|tojson}}"
+                >
+                  {% csrf_token %}
+                  <input type="hidden" name="picture" :value="currentPicture.id">
+                  <input type="hidden" name="direction" value="RIGHT">
+                  <button><i class="fa-solid fa-rotate-right"></i></button>
+                </form>
               </div>
             </div>
           </div>

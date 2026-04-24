@@ -22,6 +22,7 @@ from sas.views import (
     ModerationView,
     PictureAskRemovalView,
     PictureEditView,
+    PictureRotateView,
     PictureView,
     SASMainView,
     UserPicturesView,
@@ -52,6 +53,7 @@ urlpatterns = [
         send_compressed,
         name="download_compressed",
     ),
+    path("picture/rotate", PictureRotateView.as_view(), name="picture_rotate"),
     path("picture/<int:picture_id>/download/thumb/", send_thumb, name="download_thumb"),
     path(
         "user/<int:user_id>/pictures/", UserPicturesView.as_view(), name="user_pictures"

@@ -1,13 +1,13 @@
 <div id="quick-notifications"
-     x-data="{
+     x-data='{
              messages: [
              {%- for message in messages -%}
                {%- if not message.extra_tags -%}
-                 { tag: '{{ message.tags }}', text: '{{ message }}' },
+                 { tag: {{ message.tags|string|tojson }}, text: {{ message|string|tojson }} },
                {%- endif -%}
              {%- endfor -%}
              ]
-             }"
+             }'
      @quick-notification-add="(e) => messages.push(e?.detail)"
      @quick-notification-delete="messages = []">
   <template x-for="(message, index) in messages">
