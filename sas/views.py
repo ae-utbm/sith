@@ -15,12 +15,14 @@
 from typing import Any
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Count, OuterRef, Subquery
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.safestring import SafeString
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DetailView, TemplateView
 from django.views.generic.edit import FormView, UpdateView
 
@@ -35,6 +37,7 @@ from sas.forms import (
     AlbumEditForm,
     PictureEditForm,
     PictureModerationRequestForm,
+    PictureRotationForm,
     PictureUploadForm,
 )
 from sas.models import Album, PeoplePictureRelation, Picture
@@ -96,18 +99,37 @@ class PictureView(CanViewMixin, DetailView):
     pk_url_kwarg = "picture_id"
     template_name = "sas/picture.jinja"
 
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if "rotate_right" in request.GET:
-            self.object.rotate(270)
-        if "rotate_left" in request.GET:
-            self.object.rotate(90)
-        return super().get(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "album": Album.objects.get(children=self.object)
         }
+
+
+class PictureRotateView(PermissionRequiredMixin, FormView):
+    form_class = PictureRotationForm
+    template_name = "core/edit.jinja"
+    permission_required = "sas.moderate_sasfile"
+
+    def form_valid(self, form: PictureRotationForm):
+        angles = {"RIGHT": 270, "LEFT": 90}
+        cleaned = form.clean()
+        cleaned["picture"].rotate(angles[cleaned["direction"]])
+        self._success_url = reverse(
+            "sas:picture",
+            kwargs={
+                "picture_id": cleaned["picture"].pk,
+            },
+        )
+        messages.warning(
+            self.request,
+            _(
+                "Newly rotated image might not be immediately displayed due to your web browser's cache"
+            ),
+        )
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self._success_url
 
 
 def send_album(request, album_id):

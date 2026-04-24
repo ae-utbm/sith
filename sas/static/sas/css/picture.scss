@@ -191,7 +191,9 @@
     }
 
     >form {
-      input, .ts-wrapper {
+
+      input,
+      .ts-wrapper {
         min-width: 100%;
         max-width: 100%;
         margin: 5px;
@@ -212,22 +214,27 @@
     flex-direction: column;
   }
 
-  .infos, .tools {
+  .infos,
+  .tools {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: .5em;
+
     @media (min-width: 700px) {
       max-width: 350px;
     }
   }
-  .infos > div, .tools > div > div {
+
+  .infos>div,
+  .tools>div>div {
     display: flex;
     flex-direction: column;
     gap: .35em;
   }
 
-  .tools > div, >.infos >div>div {
+  .tools>div,
+  >.infos>div>div {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -237,7 +244,15 @@
     flex: 1;
 
     >div>div {
-      >a.btn {
+
+      >form {
+        margin: 0;
+        padding: 0;
+        display: flex;
+      }
+
+      >a.btn,
+      >form>button {
         background-color: $primary-neutral-light-color;
         display: flex;
         justify-content: center;

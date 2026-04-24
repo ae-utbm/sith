@@ -139,20 +139,20 @@ class Picture(SasFile):
         self.compressed.name = new_extension_name
 
     def rotate(self, degree):
-        for attr in ["file", "compressed", "thumbnail"]:
-            name = self.__getattribute__(attr).name
-            with open(settings.MEDIA_ROOT / name, "r+b") as file:
-                if file:
-                    im = Image.open(BytesIO(file.read()))
-                    file.seek(0)
-                    im = im.rotate(degree, expand=True)
-                    im.save(
-                        fp=file,
-                        format=self.mime_type.split("/")[-1].upper(),
-                        quality=90,
-                        optimize=True,
-                        progressive=True,
-                    )
+        im = Image.open(BytesIO(self.file.read()))
+        self.file.seek(0)
+        with open(self.file.path, "r+b") as f:
+            im = im.rotate(degree, expand=True)
+            im.save(
+                fp=f,
+                format=self.mime_type.split("/")[-1].upper(),
+                quality=90,
+                optimize=True,
+                progressive=True,
+            )
+        self.file.seek(0)
+        self.generate_thumbnails(overwrite=True)
+        self.save()
 
     def get_next(self):
         if self.is_moderated:

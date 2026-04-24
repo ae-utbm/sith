@@ -12,16 +12,19 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from io import BytesIO
 from typing import Callable
 
 import pytest
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.cache import cache
+from django.core.files.base import ContentFile
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.timezone import localdate
 from model_bakery import baker
+from PIL import Image
 from pytest_django.asserts import assertHTMLEqual, assertInHTML, assertRedirects
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
@@ -295,6 +298,93 @@ class TestAlbumEdit:
         assert album.name == payload["name"]
         assert album.parent.id == payload["parent"]
         assert localdate(album.date) == localdate()
+
+
+@pytest.mark.django_db
+class TestPictureRotation:
+    @pytest.fixture
+    def picture(self) -> Picture:
+        # Creating a fake image from scratch is painful
+        # One of the base image in the test set is good enough
+        return Picture.objects.get(name="sli.jpg")
+
+    def load_image(self, file: ContentFile) -> Image.Image:
+        file.seek(0)
+        im = Image.open(BytesIO(file.read()))
+        file.seek(0)
+        return im
+
+    @pytest.mark.parametrize(
+        "user",
+        [
+            None,
+            lambda: baker.make(User),
+            subscriber_user.make,
+            old_subscriber_user.make,
+        ],
+    )
+    def test_permission_denied(
+        self,
+        client: Client,
+        picture: Picture,
+        user: Callable[[], User] | None,
+    ):
+        if user:
+            client.force_login(user())
+
+        payload = {
+            "picture": picture.pk,
+            "direction": "LEFT",
+        }
+        url = reverse("sas:picture_rotate")
+        response = client.post(url, payload)
+        if user:
+            assert response.status_code == 403
+        else:
+            assertRedirects(
+                response,
+                reverse(
+                    "core:login",
+                    query={
+                        "next": url,
+                    },
+                ),
+            )
+
+    @pytest.mark.parametrize(
+        "user",
+        [
+            lambda: baker.make(User, is_superuser=True),
+            lambda: baker.make(
+                User, groups=[Group.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
+            ),
+        ],
+    )
+    def test_rotation(
+        self,
+        client: Client,
+        picture: Picture,
+        user: Callable[[], User],
+    ):
+        client.force_login(user())
+
+        payload = {
+            "picture": picture.pk,
+            "direction": "LEFT",
+        }
+        response = client.post(reverse("sas:picture_rotate"), payload)
+        assertRedirects(
+            response, reverse("sas:picture", kwargs={"picture_id": picture.pk})
+        )
+
+        payload = {
+            "picture": picture.pk,
+            "direction": "RIGHT",
+        }
+        response = client.post(reverse("sas:picture_rotate"), payload)
+        assertRedirects(
+            response, reverse("sas:picture", kwargs={"picture_id": picture.pk})
+        )
 
 
 class TestSasModeration(TestCase):

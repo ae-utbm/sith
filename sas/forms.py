@@ -90,3 +90,10 @@ class PictureModerationRequestForm(forms.ModelForm):
         self.instance.author = self.user
         self.instance.picture = self.picture
         return super().save(commit)
+
+
+class PictureRotationForm(forms.Form):
+    picture = forms.ModelChoiceField(Picture.objects.all(), required=True)
+    direction = forms.ChoiceField(
+        choices=[("LEFT", _("Left")), ("RIGHT", _("Right"))], required=True
+    )
