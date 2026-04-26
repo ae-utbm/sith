@@ -3,10 +3,11 @@ from urllib.parse import unquote
 
 import pydantic
 import requests
+import sentry_sdk
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.mixins import AccessMixin, LoginRequiredMixin
+from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.generic import FormView, TemplateView
@@ -20,16 +21,19 @@ from core.schemas import UserProfileSchema
 from core.utils import hmac_hexdigest
 
 
-class ThirdPartyAuthView(LoginRequiredMixin, FormView):
+class ThirdPartyAuthView(AccessMixin, FormView):
     form_class = ThirdPartyAuthForm
     template_name = "api/third_party/auth.jinja"
     success_url = reverse_lazy("core:index")
 
-    def parse_params(self) -> ThirdPartyAuthParamsSchema:
+    def parse_params(self) -> ThirdPartyAuthParamsSchema | None:
         """Parse and check the authentication parameters.
 
-        Raises:
-            PermissionDenied: if the verification failed.
+        If parsing fails, messages will be created using the django message
+        infrastructure.
+
+        Returns:
+            The parses parameters, or None if the parsing failed.
         """
         # This is here rather than in ThirdPartyAuthForm because
         # the given parameters and their signature are checked during both
@@ -39,20 +43,39 @@ class ThirdPartyAuthView(LoginRequiredMixin, FormView):
         params = {key: unquote(val) for key, val in params.items()}
         try:
             params = ThirdPartyAuthParamsSchema(**params)
-        except pydantic.ValidationError as e:
-            raise PermissionDenied("Wrong data format") from e
+        except pydantic.ValidationError:
+            messages.error(
+                self.request, _("The data provided for authentication is incorrect")
+            )
+            return None
         client: ApiClient = get_object_or_none(ApiClient, id=params.client_id)
         if not client:
-            raise PermissionDenied
+            messages.error(
+                self.request, _("The data provided for authentication is incorrect")
+            )
+            return None
         if not hmac.compare_digest(
             hmac_hexdigest(client.hmac_key, params.model_dump(exclude={"signature"})),
             params.signature,
         ):
-            raise PermissionDenied("Bad signature")
+            messages.error(
+                self.request,
+                _(
+                    "The signature is incorrect. "
+                    "We cannot ensure the provenance of the request."
+                ),
+            )
+            return None
         return params
 
     def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
         self.params = self.parse_params()
+        if not self.params:
+            # if parameters parsing failed, shortcut the operation and display
+            # an empty page with just the error messages.
+            return render(request, "core/base.jinja")
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, *args, **kwargs):
@@ -73,10 +96,14 @@ class ThirdPartyAuthView(LoginRequiredMixin, FormView):
         client = ApiClient.objects.get(id=form.cleaned_data["client_id"])
         user = UserProfileSchema.from_orm(self.request.user).model_dump()
         data = {"user": user, "signature": hmac_hexdigest(client.hmac_key, user)}
-        response = requests.post(form.cleaned_data["callback_url"], json=data)
+        try:
+            ok = requests.post(form.cleaned_data["callback_url"], json=data).ok
+        except requests.RequestException as e:
+            sentry_sdk.capture_exception(e)
+            ok = False
         self.success_url = reverse(
             "api-link:third-party-auth-result",
-            kwargs={"result": "success" if response.ok else "failure"},
+            kwargs={"result": "success" if ok else "failure"},
         )
         return super().form_valid(form)
 
