@@ -148,13 +148,23 @@ msgid ""
 "href=\"%(sith_cgu_link)s\">the Students' Association</a> applies as soon as "
 "the form is submitted."
 msgstr ""
-"Les politiques de confidentialité de <a href=\"%(privacy_link)s\">%(app)s</a> et de <a "
-"href=\"%(sith_cgu_link)s\">l'Association des Etudiants</a> s'appliquent dès la soumission "
-"du formulaire."
+"Les politiques de confidentialité de <a href=\"%(privacy_link)s\">%(app)s</"
+"a> et de <a href=\"%(sith_cgu_link)s\">l'Association des Etudiants</a> "
+"s'appliquent dès la soumission du formulaire."
 
 #: api/templates/api/third_party/auth.jinja
 msgid "Confirmation of identity"
 msgstr "Confirmation d'identité"
+
+#: api/views.py
+msgid "The data provided for authentication is incorrect"
+msgstr "Les données fournies pour l'authentification sont incorrectes."
+
+#: api/views.py
+msgid ""
+"The signature is incorrect. We cannot ensure the provenance of the request."
+msgstr ""
+"La signature est incorrecte. Nous ne pouvons pas garantir l'authenticité de la requête."
 
 #: api/views.py
 #, python-format
@@ -167,7 +177,9 @@ msgstr ""
 
 #: api/views.py
 msgid "You have been successfully authenticated. You can now close this page."
-msgstr "Vous avez été authentifié avec succès. Vous pouvez maintenant fermer cette page."
+msgstr ""
+"Vous avez été authentifié avec succès. Vous pouvez maintenant fermer cette "
+"page."
 
 #: api/views.py
 msgid ""
@@ -175,9 +187,9 @@ msgid ""
 "during the interaction with the third-party application. Please contact the "
 "managers of the latter."
 msgstr ""
-"Votre authentification sur le site AE a fonctionné, mais une erreur est arrivée "
-"durant l'interaction avec l'application tierce. Veuillez contacter les responsables "
-"de cette dernière."
+"Votre authentification sur le site AE a fonctionné, mais une erreur est "
+"arrivée durant l'interaction avec l'application tierce. Veuillez contacter "
+"les responsables de cette dernière."
 
 #: club/forms.py
 msgid "Users to add"
@@ -262,6 +274,24 @@ msgstr "Vous devez être cotisant pour faire partie d'un club"
 #: club/forms.py
 msgid "You are already a member of this club"
 msgstr "Vous êtes déjà membre de ce club."
+
+#: club/forms.py
+#, fuzzy
+#| msgid "Club state"
+msgid "Club status"
+msgstr "Etat du club"
+
+#: club/forms.py
+msgid "Active"
+msgstr "Actif"
+
+#: club/forms.py
+msgid "Inactive"
+msgstr "Inactif"
+
+#: club/forms.py
+msgid "All clubs"
+msgstr "Tous les clubs"
 
 #: club/models.py
 msgid "slug name"
@@ -384,36 +414,21 @@ msgid "Unregistered user"
 msgstr "Utilisateur non enregistré"
 
 #: club/templates/club/club_list.jinja
-msgid "Club list"
-msgstr "Liste des clubs"
-
-#: club/templates/club/club_list.jinja
 msgid "The list of all clubs existing at UTBM."
 msgstr "La liste de tous les clubs existants à l'UTBM"
+
+#: club/templates/club/club_list.jinja
+msgid "Club list"
+msgstr "Liste des clubs"
 
 #: club/templates/club/club_list.jinja
 msgid "Filters"
 msgstr "Filtres"
 
-#: club/templates/club/club_list.jinja
-msgid "Name"
-msgstr "Nom"
-
-#: club/templates/club/club_list.jinja
-msgid "Club state"
-msgstr "Etat du club"
-
-#: club/templates/club/club_list.jinja
-msgid "Active"
-msgstr "Actif"
-
-#: club/templates/club/club_list.jinja
-msgid "Inactive"
-msgstr "Inactif"
-
-#: club/templates/club/club_list.jinja
-msgid "All clubs"
-msgstr "Tous les clubs"
+#: club/templates/club/club_list.jinja core/templates/core/base/header.jinja
+#: forum/templates/forum/macros.jinja matmat/templates/matmat/search_form.jinja
+msgid "Search"
+msgstr "Recherche"
 
 #: club/templates/club/club_list.jinja core/templates/core/user_tools.jinja
 msgid "New club"
@@ -1944,11 +1959,6 @@ msgstr "Connexion"
 #: core/templates/core/base/header.jinja core/templates/core/register.jinja
 msgid "Register"
 msgstr "Inscription"
-
-#: core/templates/core/base/header.jinja forum/templates/forum/macros.jinja
-#: matmat/templates/matmat/search_form.jinja
-msgid "Search"
-msgstr "Recherche"
 
 #: core/templates/core/base/header.jinja
 msgid "Logout"
@@ -4295,6 +4305,47 @@ msgid "this page"
 msgstr "cette page"
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "Eurockéennes 2025 partnership"
+msgstr "Partenariat Eurockéennes 2025"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid ""
+"Our partner uses Weezevent to sell tickets. Weezevent may collect user info "
+"according to its own privacy policy. By clicking the accept button you "
+"consent to their terms of services."
+msgstr ""
+"Notre partenaire utilises Wezevent pour vendre ses billets. Weezevent peut "
+"collecter des informations utilisateur conformément à sa propre politique de "
+"confidentialité. En cliquant sur le bouton d'acceptation vous consentez à "
+"leurs termes de service."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "Privacy policy"
+msgstr "Politique de confidentialité"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+#: trombi/templates/trombi/comment_moderation.jinja
+msgid "Accept"
+msgstr "Accepter"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid ""
+"You must be subscribed to benefit from the partnership with the Eurockéennes."
+msgstr ""
+"Vous devez être cotisant pour bénéficier du partenariat avec les "
+"Eurockéennes."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+#, python-format
+msgid ""
+"This partnership offers a discount of up to 33%% on tickets for Friday, "
+"Saturday and Sunday, as well as the 3-day package from Friday to Sunday."
+msgstr ""
+"Ce partenariat permet de profiter d'une réduction jusqu'à 33%% sur les "
+"billets du vendredi, du samedi et du dimanche, ainsi qu'au forfait 3 jours, "
+"du vendredi au dimanche."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "There are no items available for sale"
 msgstr "Aucun article n'est disponible à la vente"
 
@@ -5721,10 +5772,6 @@ msgid "Moderate Trombi comments"
 msgstr "Modérer les commentaires du Trombi"
 
 #: trombi/templates/trombi/comment_moderation.jinja
-msgid "Accept"
-msgstr "Accepter"
-
-#: trombi/templates/trombi/comment_moderation.jinja
 msgid "Reject"
 msgstr "Refuser"
 
@@ -5965,39 +6012,3 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid "Eurockéennes 2025 partnership"
-msgstr "Partenariat Eurockéennes 2025"
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid ""
-"Our partner uses Weezevent to sell tickets. Weezevent may collect user info "
-"according to its own privacy policy. By clicking the accept button you "
-"consent to their terms of services."
-msgstr ""
-"Notre partenaire utilises Wezevent pour vendre ses billets. Weezevent peut "
-"collecter des informations utilisateur conformément à sa propre politique de "
-"confidentialité. En cliquant sur le bouton d'acceptation vous consentez à "
-"leurs termes de service."
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid "Privacy policy"
-msgstr "Politique de confidentialité"
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid ""
-"You must be subscribed to benefit from the partnership with the Eurockéennes."
-msgstr ""
-"Vous devez être cotisant pour bénéficier du partenariat avec les "
-"Eurockéennes."
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-#, python-format
-msgid ""
-"This partnership offers a discount of up to 33%% on tickets for Friday, "
-"Saturday and Sunday, as well as the 3-day package from Friday to Sunday."
-msgstr ""
-"Ce partenariat permet de profiter d'une réduction jusqu'à 33%% sur les "
-"billets du vendredi, du samedi et du dimanche, ainsi qu'au forfait 3 jours, "
-"du vendredi au dimanche."
