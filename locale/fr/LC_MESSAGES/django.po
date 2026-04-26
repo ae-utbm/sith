@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-12 11:12+0200\n"
+"POT-Creation-Date: 2026-05-23 15:09+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -148,13 +148,24 @@ msgid ""
 "href=\"%(sith_cgu_link)s\">the Students' Association</a> applies as soon as "
 "the form is submitted."
 msgstr ""
-"Les politiques de confidentialité de <a href=\"%(privacy_link)s\">%(app)s</a> et de <a "
-"href=\"%(sith_cgu_link)s\">l'Association des Etudiants</a> s'appliquent dès la soumission "
-"du formulaire."
+"Les politiques de confidentialité de <a href=\"%(privacy_link)s\">%(app)s</"
+"a> et de <a href=\"%(sith_cgu_link)s\">l'Association des Etudiants</a> "
+"s'appliquent dès la soumission du formulaire."
 
 #: api/templates/api/third_party/auth.jinja
 msgid "Confirmation of identity"
 msgstr "Confirmation d'identité"
+
+#: api/views.py
+msgid "The data provided for authentication is incorrect"
+msgstr "Les données fournies pour l'authentification sont incorrectes."
+
+#: api/views.py
+msgid ""
+"The signature is incorrect. We cannot ensure the provenance of the request."
+msgstr ""
+"La signature est incorrecte. Nous ne pouvons pas garantir l'authenticité de "
+"la requête."
 
 #: api/views.py
 #, python-format
@@ -167,7 +178,9 @@ msgstr ""
 
 #: api/views.py
 msgid "You have been successfully authenticated. You can now close this page."
-msgstr "Vous avez été authentifié avec succès. Vous pouvez maintenant fermer cette page."
+msgstr ""
+"Vous avez été authentifié avec succès. Vous pouvez maintenant fermer cette "
+"page."
 
 #: api/views.py
 msgid ""
@@ -175,9 +188,9 @@ msgid ""
 "during the interaction with the third-party application. Please contact the "
 "managers of the latter."
 msgstr ""
-"Votre authentification sur le site AE a fonctionné, mais une erreur est arrivée "
-"durant l'interaction avec l'application tierce. Veuillez contacter les responsables "
-"de cette dernière."
+"Votre authentification sur le site AE a fonctionné, mais une erreur est "
+"arrivée durant l'interaction avec l'application tierce. Veuillez contacter "
+"les responsables de cette dernière."
 
 #: club/forms.py
 msgid "Users to add"

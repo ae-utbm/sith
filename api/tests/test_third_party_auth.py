@@ -1,6 +1,7 @@
 from unittest import mock
 from unittest.mock import Mock
 
+from django.contrib.messages import Message, get_messages
 from django.db.models import Max
 from django.test import TestCase
 from django.urls import reverse
@@ -87,7 +88,15 @@ class TestThirdPartyAuth(TestCase):
         del self.query["signature"]
         self.query["signature"] = hmac_hexdigest(new_key, self.query)
         res = self.client.get(reverse("api-link:third-party-auth", query=self.query))
-        assert res.status_code == 403
+        assert list(get_messages(res.wsgi_request)) == [
+            Message(
+                level=40,
+                message=(
+                    "La signature est incorrecte. "
+                    "Nous ne pouvons pas garantir l'authenticité de la requête."
+                ),
+            )
+        ]
 
     def test_cgu_not_accepted(self):
         self.client.force_login(self.user)
@@ -102,13 +111,24 @@ class TestThirdPartyAuth(TestCase):
         assert res.status_code == 200
 
     def test_invalid_client(self):
+        self.client.force_login(self.user)
         self.query["client_id"] = ApiClient.objects.aggregate(res=Max("id"))["res"] + 1
         res = self.client.get(reverse("api-link:third-party-auth", query=self.query))
-        assert res.status_code == 403
+        assert list(get_messages(res.wsgi_request)) == [
+            Message(
+                level=40,
+                message="Les données fournies pour l'authentification sont incorrectes.",
+            )
+        ]
 
     def test_missing_parameter(self):
-        """Test that a 403 is raised if there is a missing parameter."""
+        self.client.force_login(self.user)
         del self.query["username"]
         self.query["signature"] = hmac_hexdigest(self.api_client.hmac_key, self.query)
         res = self.client.get(reverse("api-link:third-party-auth", query=self.query))
-        assert res.status_code == 403
+        assert list(get_messages(res.wsgi_request)) == [
+            Message(
+                level=40,
+                message="Les données fournies pour l'authentification sont incorrectes.",
+            )
+        ]
