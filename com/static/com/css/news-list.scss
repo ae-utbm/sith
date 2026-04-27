@@ -16,9 +16,13 @@
   #right_column {
     flex: 20%;
     margin: 3.2px;
-
     display: inline-block;
     vertical-align: top;
+
+    @media screen and (min-width: 800px) {
+      max-width: 20%;
+      min-width: 200px;
+    }
   }
 
   #left_column {
@@ -46,7 +50,7 @@
     }
   }
 
-  @media screen and (max-width: $small-devices) {
+  @media screen and (max-width: 800px) {
     #left_column,
     #right_column {
       flex: 100%;
@@ -76,10 +80,10 @@
     display: block;
     width: 100%;
     background: white;
-    font-size: 70%;
     margin-bottom: 1em;
 
     #links_content {
+      font-size: 85%;
       overflow: auto;
       box-shadow: $shadow-color 1px 1px 1px;
       min-height: 20em;
@@ -95,24 +99,10 @@
 
         li {
           margin: 10px;
-
-          .fa-facebook {
-            color: $faceblue;
-          }
-
-          .fa-discord {
-            color: $discordblurple;
-          }
-
-          .fa-square-instagram::before {
-            background: $instagradient;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-          }
-
           i {
             width: 25px;
             text-align: center;
+            margin-right: .5rem;
           }
         }
       }
