@@ -18,7 +18,7 @@
     <span class="helptext">{{ form.is_viewable.help_text }}</span>
     {{ form.is_viewable.errors }}
   </fieldset>
-  <fieldset class="form-group" x-show="!isViewable">
+  <fieldset class="form-group" x-show="!isViewable" x-transition x-cloak>
     {{ form.whitelisted_users.as_field_group() }}
   </fieldset>
   <fieldset class="form-group">
