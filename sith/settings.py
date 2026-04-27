@@ -88,6 +88,11 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 
 ALLOWED_HOSTS = ["*"]
 
+# RemovedInDjango60Warning: It's a transitional setting helpful in early
+# adoption of "https" as the new default value of forms.URLField.assume_scheme.
+# Remove this after upgrading to Django 6.x
+FORMS_URLFIELD_ASSUME_HTTPS = True
+
 # Application definition
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
