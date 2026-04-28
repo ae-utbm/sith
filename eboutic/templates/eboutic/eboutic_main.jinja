@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block additional_css %}
-  <link rel="stylesheet" href="{{ static("eboutic/css/eboutic.css") }}">
+  <link rel="stylesheet" href="{{ static("eboutic/css/eboutic.scss") }}">
   <link rel="stylesheet" href="{{ static("core/components/card.scss") }}">
 {% endblock %}
 
@@ -168,9 +168,9 @@
       </section>
       {% for prices in categories %}
         {% set category = prices[0].product.product_type %}
-        <section>
-          <div class="category-header">
-            <h3>{{ category.name }}</h3>
+            <section>
+              <div class="category-header">
+                <h3>{{ category.name }}</h3>
             {% if category.comment %}
               <p><i>{{ category.comment }}</i></p>
             {% endif %}
