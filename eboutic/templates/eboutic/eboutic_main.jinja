@@ -8,6 +8,14 @@
   {% trans %}The online shop of the association.{% endtrans %}
 {%- endblock %}
 
+{% block metatags %}
+  <meta property="og:url" content="{{ request.build_absolute_uri() }}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Eboutic" />
+  <meta property="og:description" content="La boutique en ligne de l'AE" />
+  <meta property="og:image" content="{{ request.build_absolute_uri(static("core/img/logo_no_text.png")) }}" />
+{% endblock %}
+
 {% block additional_js %}
     {# This script contains the code to perform requests to manipulate the
     user basket without having to reload the page #}
@@ -168,9 +176,9 @@
       </section>
       {% for prices in categories %}
         {% set category = prices[0].product.product_type %}
-            <section>
-              <div class="category-header">
-                <h3>{{ category.name }}</h3>
+        <section>
+          <div class="category-header">
+            <h3>{{ category.name }}</h3>
             {% if category.comment %}
               <p><i>{{ category.comment }}</i></p>
             {% endif %}
