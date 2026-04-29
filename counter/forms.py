@@ -447,6 +447,27 @@ class ProductForm(forms.ModelForm):
             self.fields[key].widget.attrs["max"] = price
             self.fields[key].validators.append(MaxValueValidator(price))
 
+    def clean(self):
+        cleaned_data = super().clean()
+        # The "special price" is the discounted price for AE members; it
+        # should never be higher than the regular `selling_price`. The
+        # form previously accepted that combination silently (issue #1361).
+        selling_price = cleaned_data.get("selling_price")
+        special_selling_price = cleaned_data.get("special_selling_price")
+        if (
+            selling_price is not None
+            and special_selling_price is not None
+            and special_selling_price > selling_price
+        ):
+            self.add_error(
+                "special_selling_price",
+                _(
+                    "The special price must not be higher than "
+                    "the regular selling price."
+                ),
+            )
+        return cleaned_data
+
     def is_valid(self):
         return super().is_valid() and self.action_formset.is_valid()
 

@@ -120,6 +120,21 @@ class TestCreateProduct(TestCase):
         assert instance.name == "foo"
         assert instance.selling_price == 1.0
 
+    def test_special_price_cannot_exceed_normal_price(self):
+        # Regression for #1361: the form silently accepted a
+        # special_selling_price higher than the regular selling_price,
+        # which is nonsense for the AE-member discount it represents.
+        data = self.data | {"selling_price": 1.0, "special_selling_price": 2.0}
+        form = ProductForm(data=data)
+        assert not form.is_valid()
+        assert "special_selling_price" in form.errors
+
+    def test_special_price_equal_to_normal_price_is_allowed(self):
+        # Equality is fine — a product that simply has no member discount.
+        data = self.data | {"selling_price": 1.5, "special_selling_price": 1.5}
+        form = ProductForm(data=data)
+        assert form.is_valid()
+
     def test_form_with_product_from_formula(self):
         """Test when the edited product is a result of a formula."""
         self.client.force_login(self.counter_admin)
