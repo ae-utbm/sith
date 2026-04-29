@@ -6,10 +6,10 @@
 {% endblock %}
 
 {% block additional_css %}
-  <link rel="stylesheet" type="text/css" href="{{ static('counter/css/counter-click.scss') }}" defer></link>
-  <link rel="stylesheet" type="text/css" href="{{ static('bundled/core/components/ajax-select-index.css') }}" defer></link>
-  <link rel="stylesheet" type="text/css" href="{{ static('core/components/ajax-select.scss') }}" defer></link>
-  <link rel="stylesheet" type="text/css" href="{{ static('core/components/tabs.scss') }}" defer></link>
+  <link rel="stylesheet" href="{{ static('counter/css/counter-click.scss') }}">
+  <link rel="stylesheet" href="{{ static('bundled/core/components/ajax-select-index.css') }}">
+  <link rel="stylesheet" href="{{ static('core/components/ajax-select.scss') }}">
+  <link rel="stylesheet" href="{{ static('core/components/tabs.scss') }}">
   <link rel="stylesheet" href="{{ static("core/components/card.scss") }}">
 {% endblock %}
 
@@ -65,10 +65,10 @@
                 <option value="FIN">{% trans %}Confirm (FIN){% endtrans %}</option>
                 <option value="ANN">{% trans %}Cancel (ANN){% endtrans %}</option>
               </optgroup>
-              {%- for category in categories.keys() -%}
+              {%- for category, prices in categories.items() -%}
                 <optgroup label="{{ category }}">
-                  {%- for product in categories[category] -%}
-                    <option value="{{ product.id }}">{{ product }}</option>
+                  {%- for price in prices -%}
+                    <option value="{{ price.id }}">{{ price.full_label }}</option>
                   {%- endfor -%}
                 </optgroup>
               {%- endfor -%}
@@ -103,24 +103,25 @@
             </div>
             <ul>
               <li x-show="getBasketSize() === 0">{% trans %}This basket is empty{% endtrans %}</li>
-              <template x-for="(item, index) in Object.values(basket)" :key="item.product.id">
+              <template x-for="(item, index) in Object.values(basket)" :key="item.product.price.id">
                 <li>
                   <template x-for="error in item.errors">
                     <div class="alert alert-red" x-text="error">
                     </div>
                   </template>
 
-                  <button @click.prevent="addToBasket(item.product.id, -1)">-</button>
+                  <button @click.prevent="addToBasket(item.product.price.id, -1)">-</button>
                   <span class="quantity" x-text="item.quantity"></span>
-                  <button @click.prevent="addToBasket(item.product.id, 1)">+</button>
+                  <button @click.prevent="addToBasket(item.product.price.id, 1)">+</button>
 
                   <span x-text="item.product.name"></span> :
                   <span x-text="item.sum().toLocaleString(undefined, { minimumFractionDigits: 2 })">€</span>
-                  <span x-show="item.getBonusQuantity() > 0" x-text="`${item.getBonusQuantity()} x P`"></span>
+                  <span x-show="item.getBonusQuantity() > 0"
+                        x-text="`${item.getBonusQuantity()} x P`"></span>
 
                   <button
                     class="remove-item"
-                    @click.prevent="removeFromBasket(item.product.id)"
+                    @click.prevent="removeFromBasket(item.product.price.id)"
                   ><i class="fa fa-trash-can delete-action"></i></button>
 
                   <input
@@ -133,9 +134,9 @@
                   >
                   <input
                     type="hidden"
-                    :value="item.product.id"
-                    :id="`id_form-${index}-id`"
-                    :name="`form-${index}-id`"
+                    :value="item.product.price.id"
+                    :id="`id_form-${index}-price_id`"
+                    :name="`form-${index}-price_id`"
                     required
                     readonly
                   >
@@ -201,30 +202,30 @@
       </div>
 
       <div id="products">
-        {% if not products %}
+        {% if not prices %}
           <div class="alert alert-red">
             {% trans %}No products available on this counter for this user{% endtrans %}
           </div>
         {% else %}
           <ui-tab-group>
-            {% for category in categories.keys() -%}
+            {% for category, prices in categories.items() -%}
               <ui-tab title="{{ category }}" {% if loop.index == 1 -%}active{%- endif -%}>
                 <h5 class="margin-bottom">{{ category }}</h5>
                 <div class="row gap-2x">
-                  {% for product in categories[category] -%}
-                    <button class="card shadow" @click="addToBasket('{{ product.id }}', 1)">
+                  {% for price in prices -%}
+                    <button class="card shadow" @click="addToBasket('{{ price.id }}', 1)">
                       <img
                         class="card-image"
-                        alt="image de {{ product.name }}"
-                        {% if product.icon %}
-                          src="{{ product.icon.url }}"
+                        alt="image de {{ price.full_label }}"
+                        {% if price.product.icon %}
+                          src="{{ price.product.icon.url }}"
                         {% else %}
                           src="{{ static('core/img/na.gif') }}"
                         {% endif %}
                       />
                       <span class="card-content">
-                        <strong class="card-title">{{ product.name }}</strong>
-                        <p>{{ product.price }} €<br>{{ product.code }}</p>
+                        <strong class="card-title">{{ price.full_label }}</strong>
+                        <p>{{ price.amount }} €<br>{{ price.product.code }}</p>
                       </span>
                     </button>
                   {%- endfor %}
@@ -241,13 +242,14 @@
   {{ super() }}
   <script>
     const products = {
-      {%- for product in products -%}
-        {{ product.id }}: {
-          id: "{{ product.id }}",
-          name: "{{ product.name }}",
-          price: {{ product.price }},
-          hasTrayPrice: {{ product.tray | tojson }},
-          quantityForTrayPrice: {{ product.QUANTITY_FOR_TRAY_PRICE }},
+      {%- for price in prices -%}
+        {{ price.id }}: {
+          productId: {{ price.product_id }},
+          price: { id: "{{ price.id }}", amount: {{ price.amount }} },
+          code: "{{ price.product.code }}",
+          name: "{{ price.full_label }}",
+          hasTrayPrice: {{ price.product.tray | tojson }},
+          quantityForTrayPrice: {{ price.product.QUANTITY_FOR_TRAY_PRICE }},
         },
       {%- endfor -%}
     };

@@ -73,7 +73,7 @@ class CounterClick(
         kwargs["form_kwargs"] = {
             "customer": self.customer,
             "counter": self.object,
-            "allowed_products": {product.id: product for product in self.products},
+            "allowed_prices": {price.id: price for price in self.prices},
         }
         return kwargs
 
@@ -103,7 +103,7 @@ class CounterClick(
         ):
             return redirect(obj)  # Redirect to counter
 
-        self.products = obj.get_products_for(self.customer)
+        self.prices = obj.get_prices_for(self.customer)
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -121,32 +121,31 @@ class CounterClick(
             # This is important because some items have a negative price
             # Negative priced items gives money to the customer and should
             # be processed first so that we don't throw a not enough money error
-            for form in sorted(formset, key=lambda form: form.product.price):
+            for form in sorted(formset, key=lambda form: form.price.amount):
                 self.request.session["last_basket"].append(
-                    f"{form.cleaned_data['quantity']} x {form.product.name}"
+                    f"{form.cleaned_data['quantity']} x {form.price.full_label}"
                 )
 
+                common_kwargs = {
+                    "product": form.price.product,
+                    "club_id": form.price.product.club_id,
+                    "counter": self.object,
+                    "seller": operator,
+                    "customer": self.customer,
+                }
                 Selling(
-                    label=form.product.name,
-                    product=form.product,
-                    club=form.product.club,
-                    counter=self.object,
-                    unit_price=form.product.price,
+                    **common_kwargs,
+                    label=form.price.full_label,
+                    unit_price=form.price.amount,
                     quantity=form.cleaned_data["quantity"]
                     - form.cleaned_data["bonus_quantity"],
-                    seller=operator,
-                    customer=self.customer,
                 ).save()
                 if form.cleaned_data["bonus_quantity"] > 0:
                     Selling(
-                        label=f"{form.product.name} (Plateau)",
-                        product=form.product,
-                        club=form.product.club,
-                        counter=self.object,
+                        **common_kwargs,
+                        label=f"{form.price.full_label} (Plateau)",
                         unit_price=0,
                         quantity=form.cleaned_data["bonus_quantity"],
-                        seller=operator,
-                        customer=self.customer,
                     ).save()
 
             self.customer.update_returnable_balance()
@@ -207,14 +206,13 @@ class CounterClick(
     def get_context_data(self, **kwargs):
         """Add customer to the context."""
         kwargs = super().get_context_data(**kwargs)
-        kwargs["products"] = self.products
+        kwargs["prices"] = self.prices
         kwargs["formulas"] = ProductFormula.objects.filter(
-            result__in=self.products
+            result__in=[p.product_id for p in self.prices]
         ).prefetch_related("products")
         kwargs["categories"] = defaultdict(list)
-        for product in kwargs["products"]:
-            if product.product_type:
-                kwargs["categories"][product.product_type].append(product)
+        for price in self.prices:
+            kwargs["categories"][price.product.product_type].append(price)
         kwargs["customer"] = self.customer
         kwargs["cancel_url"] = self.get_success_url()
 

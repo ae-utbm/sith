@@ -17,6 +17,7 @@ from counter.models import (
     Counter,
     Customer,
     Permanency,
+    Price,
     Product,
     ProductType,
     Refilling,
@@ -278,6 +279,7 @@ class Command(BaseCommand):
         # 2/3 of the products are owned by AE
         clubs = [ae, ae, ae, ae, ae, ae, *other_clubs]
         products = []
+        prices = []
         buying_groups = []
         selling_places = []
         for _ in range(200):
@@ -288,25 +290,28 @@ class Command(BaseCommand):
                 product_type=random.choice(categories),
                 code="".join(self.faker.random_letters(length=random.randint(4, 8))),
                 purchase_price=price,
-                selling_price=price,
-                special_selling_price=price - min(0.5, price),
                 club=random.choice(clubs),
                 limit_age=0 if random.random() > 0.2 else 18,
-                archived=bool(random.random() > 0.7),
+                archived=self.faker.boolean(60),
             )
             products.append(product)
-            # there will be products without buying groups
-            # but there are also such products in the real database
-            buying_groups.extend(
-                Product.buying_groups.through(product=product, group=group)
-                for group in random.sample(groups, k=random.randint(0, 3))
-            )
+            for i in range(random.randint(0, 3)):
+                product_price = Price(
+                    amount=price, product=product, is_always_shown=self.faker.boolean()
+                )
+                # prices for non-subscribers will be higher than for subscribers
+                price *= 1.2
+                prices.append(product_price)
+                buying_groups.append(
+                    Price.groups.through(price=product_price, group=groups[i])
+                )
             selling_places.extend(
                 Counter.products.through(counter=counter, product=product)
                 for counter in random.sample(counters, random.randint(0, 4))
             )
         Product.objects.bulk_create(products)
-        Product.buying_groups.through.objects.bulk_create(buying_groups)
+        Price.objects.bulk_create(prices)
+        Price.groups.through.objects.bulk_create(buying_groups)
         Counter.products.through.objects.bulk_create(selling_places)
 
     def create_sales(self, sellers: list[User]):
@@ -320,7 +325,7 @@ class Command(BaseCommand):
                 )
             )
         )
-        products = list(Product.objects.all())
+        prices = list(Price.objects.select_related("product").all())
         counters = list(
             Counter.objects.filter(name__in=["Foyer", "MDE", "La Gommette"])
         )
@@ -330,14 +335,14 @@ class Command(BaseCommand):
             # the longer the customer has existed, the higher the mean of nb_products
             mu = 5 + (now().year - customer.since.year) * 2
             nb_sales = max(0, int(random.normalvariate(mu=mu, sigma=mu * 5)))
-            favoured_products = random.sample(products, k=(random.randint(1, 5)))
+            favoured_prices = random.sample(prices, k=(random.randint(1, 5)))
             favoured_counter = random.choice(counters)
             this_customer_sales = []
             for _ in range(nb_sales):
-                product = (
-                    random.choice(favoured_products)
+                price = (
+                    random.choice(favoured_prices)
                     if random.random() > 0.7
-                    else random.choice(products)
+                    else random.choice(prices)
                 )
                 counter = (
                     favoured_counter
@@ -346,11 +351,11 @@ class Command(BaseCommand):
                 )
                 this_customer_sales.append(
                     Selling(
-                        product=product,
+                        product=price.product,
                         counter=counter,
-                        club_id=product.club_id,
+                        club_id=price.product.club_id,
                         quantity=random.randint(1, 5),
-                        unit_price=product.selling_price,
+                        unit_price=price.amount,
                         seller=random.choice(sellers),
                         customer=customer,
                         date=make_aware(

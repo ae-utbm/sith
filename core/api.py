@@ -123,7 +123,7 @@ class GroupController(ControllerBase):
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
     def search_group(self, search: Annotated[str, MinLen(1)]):
-        return Group.objects.filter(name__icontains=search).values()
+        return Group.objects.filter(name__icontains=search).order_by("name").values()
 
 
 DepthValue = Annotated[int, Ge(0), Le(10)]

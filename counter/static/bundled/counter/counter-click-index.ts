@@ -1,11 +1,12 @@
-import { AlertMessage } from "#core:utils/alert-message.ts";
-import { BasketItem } from "#counter:counter/basket.ts";
+import { AlertMessage } from "#core:utils/alert-message";
+import { BasketItem } from "#counter:counter/basket";
 import type {
   CounterConfig,
+  CounterItem,
   ErrorMessage,
   ProductFormula,
-} from "#counter:counter/types.ts";
-import type { CounterProductSelect } from "./components/counter-product-select-index.ts";
+} from "#counter:counter/types";
+import type { CounterProductSelect } from "./components/counter-product-select-index";
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("counter", (config: CounterConfig) => ({
@@ -63,8 +64,10 @@ document.addEventListener("alpine:init", () => {
     },
 
     checkFormulas() {
+      // Try to find a formula.
+      // A formula is found if all its elements are already in the basket
       const products = new Set(
-        Object.keys(this.basket).map((i: string) => Number.parseInt(i, 10)),
+        Object.values(this.basket).map((item: BasketItem) => item.product.productId),
       );
       const formula: ProductFormula = config.formulas.find((f: ProductFormula) => {
         return f.products.every((p: number) => products.has(p));
@@ -72,22 +75,29 @@ document.addEventListener("alpine:init", () => {
       if (formula === undefined) {
         return;
       }
+      // Now that the formula is found, remove the items composing it from the basket
       for (const product of formula.products) {
-        const key = product.toString();
+        const key = Object.entries(this.basket).find(
+          ([_, i]: [string, BasketItem]) => i.product.productId === product,
+        )[0];
         this.basket[key].quantity -= 1;
         if (this.basket[key].quantity <= 0) {
           this.removeFromBasket(key);
         }
       }
+      // Then add the result product of the formula to the basket
+      const result = Object.values(config.products)
+        .filter((item: CounterItem) => item.productId === formula.result)
+        .reduce((acc, curr) => (acc.price.amount < curr.price.amount ? acc : curr));
+      this.addToBasket(result.price.id, 1);
       this.alertMessage.display(
         interpolate(
           gettext("Formula %(formula)s applied"),
-          { formula: config.products[formula.result.toString()].name },
+          { formula: result.name },
           true,
         ),
         { success: true },
       );
-      this.addToBasket(formula.result.toString(), 1);
     },
 
     getBasketSize() {

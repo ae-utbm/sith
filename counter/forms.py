@@ -1,12 +1,12 @@
 import json
 import math
 import uuid
+from collections import defaultdict
 from datetime import date, datetime, timezone
 
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.exceptions import ValidationError
-from django.core.validators import MaxValueValidator
 from django.db.models import Exists, OuterRef, Q
 from django.forms import BaseModelFormSet
 from django.utils.timezone import now
@@ -37,6 +37,7 @@ from counter.models import (
     Customer,
     Eticket,
     InvoiceCall,
+    Price,
     Product,
     ProductFormula,
     Refilling,
@@ -374,7 +375,21 @@ ScheduledProductActionFormSet = forms.modelformset_factory(
     can_delete=True,
     can_delete_extra=False,
     extra=0,
+)
+
+
+ProductPriceFormSet = forms.inlineformset_factory(
+    parent_model=Product,
+    model=Price,
+    fields=["amount", "label", "groups", "is_always_shown"],
+    widgets={
+        "groups": AutoCompleteSelectMultipleGroup,
+        "is_always_shown": forms.CheckboxInput(attrs={"class": "switch"}),
+    },
+    absolute_max=None,
+    can_delete_extra=False,
     min_num=1,
+    extra=0,
 )
 
 
@@ -389,10 +404,7 @@ class ProductForm(forms.ModelForm):
             "description",
             "product_type",
             "code",
-            "buying_groups",
             "purchase_price",
-            "selling_price",
-            "special_selling_price",
             "icon",
             "club",
             "limit_age",
@@ -407,8 +419,8 @@ class ProductForm(forms.ModelForm):
         }
         widgets = {
             "product_type": AutoCompleteSelect,
-            "buying_groups": AutoCompleteSelectMultipleGroup,
             "club": AutoCompleteSelectClub,
+            "tray": forms.CheckboxInput(attrs={"class": "switch"}),
         }
 
     counters = forms.ModelMultipleChoiceField(
@@ -418,50 +430,40 @@ class ProductForm(forms.ModelForm):
         queryset=Counter.objects.all(),
     )
 
-    def __init__(self, *args, instance=None, **kwargs):
-        super().__init__(*args, instance=instance, **kwargs)
+    def __init__(self, *args, prefix: str | None = None, instance=None, **kwargs):
+        super().__init__(*args, prefix=prefix, instance=instance, **kwargs)
+        self.fields["name"].widget.attrs["autofocus"] = "autofocus"
         if self.instance.id:
             self.fields["counters"].initial = self.instance.counters.all()
             if hasattr(self.instance, "formula"):
                 self.formula_init(self.instance.formula)
+        self.price_formset = ProductPriceFormSet(
+            *args, instance=self.instance, prefix="price", **kwargs
+        )
         self.action_formset = ScheduledProductActionFormSet(
-            *args, product=self.instance, **kwargs
+            *args, product=self.instance, prefix="action", **kwargs
         )
 
-    def formula_init(self, formula: ProductFormula):
-        """Part of the form initialisation specific to formula products."""
-        self.fields["selling_price"].help_text = _(
-            "This product is a formula. "
-            "Its price cannot be greater than the price "
-            "of the products constituting it, which is %(price)s €"
-        ) % {"price": formula.max_selling_price}
-        self.fields["special_selling_price"].help_text = _(
-            "This product is a formula. "
-            "Its special price cannot be greater than the price "
-            "of the products constituting it, which is %(price)s €"
-        ) % {"price": formula.max_special_selling_price}
-        for key, price in (
-            ("selling_price", formula.max_selling_price),
-            ("special_selling_price", formula.max_special_selling_price),
-        ):
-            self.fields[key].widget.attrs["max"] = price
-            self.fields[key].validators.append(MaxValueValidator(price))
-
     def is_valid(self):
-        return super().is_valid() and self.action_formset.is_valid()
+        return (
+            super().is_valid()
+            and self.price_formset.is_valid()
+            and self.action_formset.is_valid()
+        )
 
     def save(self, *args, **kwargs) -> Product:
         product = super().save(*args, **kwargs)
         product.counters.set(self.cleaned_data["counters"])
+        # if it's a creation, the product given in the formset
+        # wasn't a persisted instance.
+        # So if we tried to persist the related objects in the current state,
+        # they would be linked to no product, thus be completely useless
+        # To make it work, we have to replace
+        # the initial product with a persisted one
         for form in self.action_formset:
-            # if it's a creation, the product given in the formset
-            # wasn't a persisted instance.
-            # So if we tried to persist the scheduled actions in the current state,
-            # they would be linked to no product, thus be completely useless
-            # To make it work, we have to replace
-            # the initial product with a persisted one
             form.set_product(product)
         self.action_formset.save()
+        self.price_formset.save()
         return product
 
 
@@ -482,18 +484,6 @@ class ProductFormulaForm(forms.ModelForm):
                 _(
                     "The same product cannot be at the same time "
                     "the result and a part of the formula."
-                ),
-            )
-        prices = [p.selling_price for p in cleaned_data["products"]]
-        special_prices = [p.special_selling_price for p in cleaned_data["products"]]
-        selling_price = cleaned_data["result"].selling_price
-        special_selling_price = cleaned_data["result"].special_selling_price
-        if selling_price > sum(prices) or special_selling_price > sum(special_prices):
-            self.add_error(
-                "result",
-                _(
-                    "The result cannot be more expensive "
-                    "than the total of the other products."
                 ),
             )
         return cleaned_data
@@ -546,48 +536,47 @@ class CloseCustomerAccountForm(forms.Form):
     )
 
 
-class BasketProductForm(forms.Form):
+class BasketItemForm(forms.Form):
     quantity = forms.IntegerField(min_value=1, required=True)
-    id = forms.IntegerField(min_value=0, required=True)
+    price_id = forms.IntegerField(min_value=0, required=True)
 
     def __init__(
         self,
         customer: Customer,
         counter: Counter,
-        allowed_products: dict[int, Product],
+        allowed_prices: dict[int, Price],
         *args,
         **kwargs,
     ):
         self.customer = customer  # Used by formset
         self.counter = counter  # Used by formset
-        self.allowed_products = allowed_products
+        self.allowed_prices = allowed_prices
         super().__init__(*args, **kwargs)
 
-    def clean_id(self):
-        data = self.cleaned_data["id"]
+    def clean_price_id(self):
+        data = self.cleaned_data["price_id"]
 
-        # We store self.product so we can use it later on the formset validation
+        # We store self.price so we can use it later on the formset validation
         # And also in the global clean
-        self.product = self.allowed_products.get(data, None)
-        if self.product is None:
+        self.price = self.allowed_prices.get(data, None)
+        if self.price is None:
             raise forms.ValidationError(
                 _("The selected product isn't available for this user")
             )
-
         return data
 
     def clean(self):
         cleaned_data = super().clean()
         if len(self.errors) > 0:
-            return
+            return cleaned_data
 
         # Compute prices
         cleaned_data["bonus_quantity"] = 0
-        if self.product.tray:
+        if self.price.product.tray:
             cleaned_data["bonus_quantity"] = math.floor(
                 cleaned_data["quantity"] / Product.QUANTITY_FOR_TRAY_PRICE
             )
-        cleaned_data["total_price"] = self.product.price * (
+        cleaned_data["total_price"] = self.price.amount * (
             cleaned_data["quantity"] - cleaned_data["bonus_quantity"]
         )
 
@@ -611,8 +600,8 @@ class BaseBasketForm(forms.BaseFormSet):
             raise forms.ValidationError(_("Submitted basket is invalid"))
 
     def _check_product_are_unique(self):
-        product_ids = {form.cleaned_data["id"] for form in self.forms}
-        if len(product_ids) != len(self.forms):
+        price_ids = {form.cleaned_data["price_id"] for form in self.forms}
+        if len(price_ids) != len(self.forms):
             raise forms.ValidationError(_("Duplicated product entries."))
 
     def _check_enough_money(self, counter: Counter, customer: Customer):
@@ -622,10 +611,9 @@ class BaseBasketForm(forms.BaseFormSet):
 
     def _check_recorded_products(self, customer: Customer):
         """Check for, among other things, ecocups and pitchers"""
-        items = {
-            form.cleaned_data["id"]: form.cleaned_data["quantity"]
-            for form in self.forms
-        }
+        items = defaultdict(int)
+        for form in self.forms:
+            items[form.price.product_id] += form.cleaned_data["quantity"]
         ids = list(items.keys())
         returnables = list(
             ReturnableProduct.objects.filter(
@@ -651,7 +639,7 @@ class BaseBasketForm(forms.BaseFormSet):
 
 
 BasketForm = forms.formset_factory(
-    BasketProductForm, formset=BaseBasketForm, absolute_max=None, min_num=1
+    BasketItemForm, formset=BaseBasketForm, absolute_max=None, min_num=1
 )
 
 

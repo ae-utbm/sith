@@ -108,7 +108,7 @@
                 </template>
                 <span class="card-content">
                   <strong class="card-title" x-text="`${p.name} (${p.code})`"></strong>
-                  <p x-text="`${p.selling_price} €`"></p>
+                  <p x-text="`${p.prices.map((p) => p.amount).join(' – ')} €`"></p>
                 </span>
               </a>
             </template>
