@@ -1,7 +1,9 @@
+import datetime
 from typing import Any
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils.timezone import get_current_timezone
 from django.utils.translation import gettext_lazy as _
 
 from core.models import User
@@ -59,6 +61,15 @@ class AlbumEditForm(forms.ModelForm):
     parent = forms.ModelChoiceField(
         Album.objects.all(), required=True, widget=AutoCompleteSelectAlbum
     )
+
+    def clean_date(self):
+        album_date: datetime.date = self.cleaned_data["date"]
+        return datetime.datetime(
+            year=album_date.year,
+            month=album_date.month,
+            day=album_date.day,
+            tzinfo=get_current_timezone(),
+        )
 
 
 class PictureModerationRequestForm(forms.ModelForm):
