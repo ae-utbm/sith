@@ -220,7 +220,7 @@ class TestAlbumEdit:
         data = {
             "name": album.name[: Album.NAME_MAX_LENGTH],
             "parent": baker.make(Album, parent=album.parent, is_moderated=True).pk,
-            "date": localdate().strftime("%Y-%m-%d"),
+            "date": localdate(),
             "file": "/random/path",
             "edit_groups": [settings.SITH_GROUP_SAS_ADMIN_ID],
             "recursive": False,
@@ -232,7 +232,7 @@ class TestAlbumEdit:
         data = {
             "name": album.name[: Album.NAME_MAX_LENGTH],
             "parent": album.pk,
-            "date": localdate().strftime("%Y-%m-%d"),
+            "date": localdate(),
         }
         assert AlbumEditForm(data=data).is_valid()
 
@@ -245,7 +245,7 @@ class TestAlbumEdit:
         payload = {
             "name": album.name[: Album.NAME_MAX_LENGTH],
             "parent": album.pk,
-            "date": localdate().strftime("%Y-%m-%d"),
+            "date": localdate(),
         }
         response = client.post(
             reverse("sas:album_edit", kwargs={"album_id": album.pk}), payload
@@ -284,7 +284,7 @@ class TestAlbumEdit:
         payload = {
             "name": album.name[: Album.NAME_MAX_LENGTH],
             "parent": parent().id,
-            "date": localdate().strftime("%Y-%m-%d"),
+            "date": localdate(),
             "recursive": False,
         }
         response = client.post(
