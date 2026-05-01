@@ -14,7 +14,7 @@ jobs:
   
     steps:
     - name: SSH Remote Commands
-      uses: appleboy/ssh-action@v1.1.0
+      uses: appleboy/ssh-action@v1.2.5
       with:
         # Proxy
         proxy_host : ${{secrets.PROXY_HOST}}
@@ -28,8 +28,6 @@ jobs:
         port : ${{secrets.PORT}}
         username : ${{secrets.USER}}
         key: ${{secrets.KEY}}
-
-        script_stop: true
 
         # See https://github.com/ae-utbm/sith/wiki/GitHub-Actions#deployment-action
         script: |
