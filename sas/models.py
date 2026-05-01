@@ -100,13 +100,25 @@ class Picture(SasFile):
             return (w / h) < 1
 
     def get_download_url(self):
-        return reverse("sas:download", kwargs={"picture_id": self.id})
+        return reverse(
+            "sas:download",
+            kwargs={"picture_id": self.id},
+            query={"date": int(self.updated_at.timestamp())},
+        )
 
     def get_download_compressed_url(self):
-        return reverse("sas:download_compressed", kwargs={"picture_id": self.id})
+        return reverse(
+            "sas:download_compressed",
+            kwargs={"picture_id": self.id},
+            query={"date": int(self.updated_at.timestamp())},
+        )
 
     def get_download_thumb_url(self):
-        return reverse("sas:download_thumb", kwargs={"picture_id": self.id})
+        return reverse(
+            "sas:download_thumb",
+            kwargs={"picture_id": self.id},
+            query={"date": int(self.updated_at.timestamp())},
+        )
 
     def get_absolute_url(self):
         return reverse("sas:picture", kwargs={"picture_id": self.id})
@@ -239,7 +251,11 @@ class Album(SasFile):
         return reverse("sas:album", kwargs={"album_id": self.id})
 
     def get_download_url(self):
-        return reverse("sas:album_preview", kwargs={"album_id": self.id})
+        return reverse(
+            "sas:album_preview",
+            kwargs={"album_id": self.id},
+            query={"date": int(self.updated_at.timestamp())},
+        )
 
     def generate_thumbnail(self):
         p = self.children_pictures.order_by("?").first()

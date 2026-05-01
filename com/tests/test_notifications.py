@@ -7,7 +7,7 @@ from model_bakery import baker
 
 from com.models import News, NewsDate
 from core.baker_recipes import subscriber_user
-from core.models import Group, Notification, User
+from core.models import Group, Notification, SithFile, User
 
 
 @pytest.mark.django_db
@@ -18,6 +18,7 @@ def test_notification_created():
     past_news = baker.make(News, is_published=False)
     baker.make(NewsDate, news=past_news, start_date=now() - timedelta(days=1))
     com_admin_group = Group.objects.get(pk=settings.SITH_GROUP_COM_ADMIN_ID)
+    SithFile.objects.filter(owner__in=com_admin_group.users.all()).delete()
     com_admin_group.users.all().delete()
     Notification.objects.all().delete()
     com_admin = baker.make(User, groups=[com_admin_group])
