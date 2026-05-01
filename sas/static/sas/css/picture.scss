@@ -235,37 +235,34 @@
 
   >.tools {
     flex: 1;
+    .btn {
+      background-color: $primary-neutral-light-color;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      color: black;
+      width: 40px;
+      height: 40px;
+      font-size: 20px;
 
-    >div>div {
-      >a.btn {
-        background-color: $primary-neutral-light-color;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 0;
-        color: black;
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-
-        &:hover {
-          background-color: #aaa;
-        }
+      &:hover {
+        background-color: #aaa;
       }
+    }
 
-      >a.text.danger {
-        color: red;
+    a.text.danger {
+      color: red;
 
-        &:hover {
-          color: darkred;
-        }
+      &:hover {
+        color: darkred;
       }
+    }
 
-      &.buttons {
-        display: flex;
-        flex-direction: row;
-        gap: 5px;
-      }
+    .buttons {
+      display: flex;
+      flex-direction: row;
+      gap: 5px;
     }
   }
 }
