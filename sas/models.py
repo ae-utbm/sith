@@ -22,6 +22,7 @@ from typing import ClassVar, Self
 
 from django.conf import settings
 from django.core.cache import cache
+from django.core.files.base import ContentFile
 from django.db import models
 from django.db.models import Exists, OuterRef, Q
 from django.urls import reverse
@@ -110,7 +111,7 @@ class Picture(SasFile):
     def get_absolute_url(self):
         return reverse("sas:picture", kwargs={"picture_id": self.id})
 
-    def generate_thumbnails(self, *, overwrite=False):
+    def generate_thumbnails(self):
         im = Image.open(BytesIO(self.file.read()))
         with contextlib.suppress(Exception):
             im = exif_auto_rotate(im)
@@ -126,10 +127,6 @@ class Picture(SasFile):
         file = resize_image(im, max(im.size), extension, optimize=False)
         thumb = resize_image(im, 200, "webp")
         compressed = resize_image(im, 1200, "webp")
-        if overwrite:
-            self.file.delete()
-            self.thumbnail.delete()
-            self.compressed.delete()
         new_extension_name = str(Path(self.name).with_suffix(".webp"))
         self.file = file
         self.file.name = self.name
@@ -245,17 +242,12 @@ class Album(SasFile):
         return reverse("sas:album_preview", kwargs={"album_id": self.id})
 
     def generate_thumbnail(self):
-        p = (
-            self.children_pictures.order_by("?").first()
-            or self.children_albums.exclude(file=None)
-            .exclude(file="")
-            .order_by("?")
-            .first()
-        )
-        if p and p.file:
-            image = resize_image(Image.open(BytesIO(p.file.read())), 200, "webp")
+        p = self.children_pictures.order_by("?").first()
+        if p and p.thumbnail:
+            image = ContentFile(
+                name=str(Path(self.name) / "thumb.webp"), content=p.thumbnail.read()
+            )
             self.file = image
-            self.file.name = f"{self.name}/thumb.webp"
             self.save()
 
 

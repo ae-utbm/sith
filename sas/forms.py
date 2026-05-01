@@ -1,17 +1,24 @@
+import copy
 import datetime
-from typing import Any
+from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.timezone import get_current_timezone
 from django.utils.translation import gettext_lazy as _
+from PIL import Image
 
 from core.models import User
+from core.utils import resize_image
 from core.views import MultipleImageField
 from core.views.forms import SelectDate
 from core.views.widgets.ajax_select import AutoCompleteSelectMultipleGroup
 from sas.models import Album, Picture, PictureModerationRequest
 from sas.widgets.ajax_select import AutoCompleteSelectAlbum
+
+if TYPE_CHECKING:
+    from django.db.models.fields.files import FieldFile
 
 
 class AlbumCreateForm(forms.ModelForm):
@@ -51,12 +58,9 @@ class AlbumEditForm(forms.ModelForm):
     class Meta:
         model = Album
         fields = ["name", "date", "file", "parent", "edit_groups"]
-        widgets = {
-            "edit_groups": AutoCompleteSelectMultipleGroup,
-        }
+        widgets = {"edit_groups": AutoCompleteSelectMultipleGroup, "date": SelectDate}
 
     name = forms.CharField(max_length=Album.NAME_MAX_LENGTH, label=_("file name"))
-    date = forms.DateField(label=_("Date"), widget=SelectDate, required=True)
     recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
     parent = forms.ModelChoiceField(
         Album.objects.all(), required=True, widget=AutoCompleteSelectAlbum
@@ -70,6 +74,36 @@ class AlbumEditForm(forms.ModelForm):
             day=album_date.day,
             tzinfo=get_current_timezone(),
         )
+
+    def clean_file(self):
+        # if a file was given in the form, resize it
+        f: FieldFile = self.cleaned_data["file"]
+        if self.errors or not f or "file" not in self.changed_data:
+            return f
+        f.file = resize_image(Image.open(f.file), 200, "WEBP")
+        return f
+
+    def save(self, commit=True):  # noqa: FBT002
+        initial_file = copy.copy(self.initial["file"])
+        if not self.cleaned_data["file"]:
+            # if no file is in the form, it can mean either :
+            # - there was a file initially, but the deletion box was checked
+            # - there was no file initially, and there still isn't
+            # in both cases, we procedurally generate the thumbnail
+            self.instance.generate_thumbnail()
+        elif "file" in self.changed_data:
+            # the file was either added or modified
+            self.instance.file.name = str(Path(self.instance.name) / "thumb.webp")
+        res = super().save(commit=commit)
+        if initial_file and (
+            not self.instance.file or initial_file.path != self.instance.file.path
+        ):
+            # The initial file must be removed from storage
+            # AFTER the new one has been dealt with,
+            # in order to be sure that django will generate a different filename.
+            # Otherwise, the client cache wouldn't be properly busted.
+            initial_file.delete(save=False)
+        return res
 
 
 class PictureModerationRequestForm(forms.ModelForm):
