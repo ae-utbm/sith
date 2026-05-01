@@ -91,13 +91,6 @@ class Picture(SasFile):
 
     objects = SASPictureManager.from_queryset(PictureQuerySet)()
 
-    @property
-    def is_vertical(self):
-        with open(settings.MEDIA_ROOT / self.file.name, "rb") as f:
-            im = Image.open(BytesIO(f.read()))
-            (w, h) = im.size
-            return (w / h) < 1
-
     def get_download_url(self):
         return reverse(
             "sas:download",
@@ -167,30 +160,6 @@ class Picture(SasFile):
         """
         img = Image.open(self.file).rotate(degree)
         self.generate_thumbnails(img=img, save=True)
-
-    def get_next(self):
-        if self.is_moderated:
-            pictures_qs = self.parent.children.filter(
-                is_moderated=True,
-                asked_for_removal=False,
-                is_folder=False,
-                id__gt=self.id,
-            )
-        else:
-            pictures_qs = Picture.objects.filter(id__gt=self.id, is_moderated=False)
-        return pictures_qs.order_by("id").first()
-
-    def get_previous(self):
-        if self.is_moderated:
-            pictures_qs = self.parent.children.filter(
-                is_moderated=True,
-                asked_for_removal=False,
-                is_folder=False,
-                id__lt=self.id,
-            )
-        else:
-            pictures_qs = Picture.objects.filter(id__lt=self.id, is_moderated=False)
-        return pictures_qs.order_by("-id").first()
 
 
 class AlbumQuerySet(models.QuerySet):
