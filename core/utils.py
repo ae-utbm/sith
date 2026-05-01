@@ -25,7 +25,6 @@ from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpRequest
 from django.utils.timezone import localdate
-from PIL import ExifTags
 from PIL.Image import Image, Resampling
 
 RED_PIXEL_PNG: Final[bytes] = (
@@ -176,22 +175,6 @@ def resize_image_explicit(
         PIL.ImageFile.MAXBLOCK = im.size[0] * im.size[1]
         im.save(fp=content, format=img_format, optimize=optimize)
     return ContentFile(content.getvalue())
-
-
-def exif_auto_rotate(image):
-    for orientation in ExifTags.TAGS:
-        if ExifTags.TAGS[orientation] == "Orientation":
-            break
-    exif = dict(image._getexif().items())
-
-    if exif[orientation] == 3:
-        image = image.rotate(180, expand=True)
-    elif exif[orientation] == 6:
-        image = image.rotate(270, expand=True)
-    elif exif[orientation] == 8:
-        image = image.rotate(90, expand=True)
-
-    return image
 
 
 def get_client_ip(request: HttpRequest) -> str | None:

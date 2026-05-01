@@ -15,7 +15,6 @@
 
 from __future__ import annotations
 
-import contextlib
 from io import BytesIO
 from pathlib import Path
 from typing import ClassVar, Self
@@ -30,7 +29,7 @@ from django.utils.translation import gettext_lazy as _
 from PIL import Image
 
 from core.models import Notification, SithFile, User
-from core.utils import exif_auto_rotate, resize_image
+from core.utils import resize_image
 
 
 class SasFile(SithFile):
@@ -123,45 +122,51 @@ class Picture(SasFile):
     def get_absolute_url(self):
         return reverse("sas:picture", kwargs={"picture_id": self.id})
 
-    def generate_thumbnails(self):
-        im = Image.open(BytesIO(self.file.read()))
-        with contextlib.suppress(Exception):
-            im = exif_auto_rotate(im)
+    def generate_thumbnails(
+        self, *, img: Image.Image | None = None, save: bool = False
+    ):
+        """Generate the thumbnail and the compressed version of this picture.
+
+        Args:
+            img: if given, this will be used to generate
+            all three images (file, compressed, thumbnail).
+            Else, `self.file` will be used
+            save: if True, save the instance in database.
+        """
+        img = img or Image.open(self.file)
+        extension = self.mime_type.split("/")[-1]
+        previous_files = [
+            f.name for f in (self.file, self.thumbnail, self.compressed) if f
+        ]
         # convert the compressed image and the thumbnail into webp
         # The original image keeps its original type, because it's not
         # meant to be shown on the website, but rather to keep the real image
-        # for less frequent cases (like downloading the pictures of an user)
-        extension = self.mime_type.split("/")[-1]
+        # for less frequent cases (like downloading the pictures of a user)
         # the HD version of the image doesn't need to be optimized, because :
         # - it isn't frequently queried
-        # - optimizing large images takes a lot time, which greatly hinders the UX
+        # - optimizing large images takes a lot of time, which greatly hinders the UX
         # - photographers usually already optimize their images
-        file = resize_image(im, max(im.size), extension, optimize=False)
-        thumb = resize_image(im, 200, "webp")
-        compressed = resize_image(im, 1200, "webp")
         new_extension_name = str(Path(self.name).with_suffix(".webp"))
-        self.file = file
-        self.file.name = self.name
-        self.thumbnail = thumb
-        self.thumbnail.name = new_extension_name
-        self.compressed = compressed
-        self.compressed.name = new_extension_name
+        file = resize_image(img, max(img.size), extension, optimize=False)
+        self.file.save(self.name, file, save=False)
+        thumbnail = resize_image(img, 200, "webp")
+        self.thumbnail.save(new_extension_name, thumbnail, save=False)
+        compressed = resize_image(img, 1200, "webp")
+        self.compressed.save(new_extension_name, compressed, save=save)
+        # once the new images have been saved, delete the previous ones.
+        # The deletion of old files is done after, so that if anything goes
+        # during the whole process, no data will be lost.
+        for filename in previous_files:
+            self.file.storage.delete(filename)
 
-    def rotate(self, degree):
-        for attr in ["file", "compressed", "thumbnail"]:
-            name = self.__getattribute__(attr).name
-            with open(settings.MEDIA_ROOT / name, "r+b") as file:
-                if file:
-                    im = Image.open(BytesIO(file.read()))
-                    file.seek(0)
-                    im = im.rotate(degree, expand=True)
-                    im.save(
-                        fp=file,
-                        format=self.mime_type.split("/")[-1].upper(),
-                        quality=90,
-                        optimize=True,
-                        progressive=True,
-                    )
+    def rotate(self, degree: int | float):
+        """Rotate this picture and update its thumbnails accordingly.
+
+        Args:
+            degree: the rotation angle, in degree, counter-clockwise
+        """
+        img = Image.open(self.file).rotate(degree)
+        self.generate_thumbnails(img=img, save=True)
 
     def get_next(self):
         if self.is_moderated:

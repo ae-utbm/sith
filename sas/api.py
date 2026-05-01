@@ -126,9 +126,8 @@ class PicturesController(ControllerBase):
         if self_moderate:
             new.moderator = user
         try:
-            new.generate_thumbnails()
             new.full_clean()
-            new.save()
+            new.generate_thumbnails(save=True)
         except ValidationError as e:
             return self.create_response({"detail": dict(e)}, status_code=409)
 
