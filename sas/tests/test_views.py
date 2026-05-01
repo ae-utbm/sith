@@ -65,6 +65,25 @@ def test_main_page_no_form_for_regular_users(client: Client):
 
 
 @pytest.mark.django_db
+def test_main_page_displayed_albums(client: Client):
+    """Test that the right data is displayed on the SAS main page"""
+    sas = Album.objects.get(id=settings.SITH_SAS_ROOT_DIR_ID)
+    Album.objects.exclude(id=sas.id).delete()
+    album_a = baker.make(Album, parent=sas, is_moderated=True)
+    album_b = baker.make(Album, parent=album_a, is_moderated=True)
+    album_c = baker.make(Album, parent=sas, is_moderated=True)
+    baker.make(Album, parent=sas, is_moderated=False)
+    client.force_login(subscriber_user.make())
+    res = client.get(reverse("sas:main"))
+    # album_b is not a direct child of the SAS, so it shouldn't be displayed
+    # in the categories, but it should appear in the latest albums.
+    # album_d isn't moderated, so it shouldn't appear at all for a simple user.
+    # Also, the SAS itself shouldn't be listed in the albums.
+    assert res.context_data["latest"] == [album_c, album_b, album_a]
+    assert res.context_data["categories"] == [album_a, album_c]
+
+
+@pytest.mark.django_db
 def test_main_page_content_anonymous(client: Client):
     """Test that public users see only an incentive to login"""
     res = client.get(reverse("sas:main"))
@@ -76,6 +95,7 @@ def test_main_page_content_anonymous(client: Client):
 @pytest.mark.django_db
 def test_album_access_non_subscriber(client: Client):
     """Test that non-subscribers can only access albums where they are identified."""
+    cache.clear()
     album = baker.make(Album, parent_id=settings.SITH_SAS_ROOT_DIR_ID)
     user = baker.make(User)
     client.force_login(user)
@@ -87,6 +107,15 @@ def test_album_access_non_subscriber(client: Client):
     cache.clear()
     res = client.get(reverse("sas:album", kwargs={"album_id": album.id}))
     assert res.status_code == 200
+
+
+@pytest.mark.django_db
+def test_accessing_sas_from_album_view_is_404(client: Client):
+    """Test that trying to see the SAS with a regular album view isn't allowed."""
+    res = client.get(
+        reverse("sas:album", kwargs={"album_id": settings.SITH_SAS_ROOT_DIR_ID})
+    )
+    assert res.status_code == 404
 
 
 @pytest.mark.django_db

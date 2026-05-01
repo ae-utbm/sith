@@ -80,6 +80,7 @@ nav:
     - Ajouter un logo de promo: howto/logo.md
     - Ajouter une cotisation: howto/subscriptions.md
     - Modifier le weekmail: howto/weekmail.md
+    - Mettre à jour xapian: howto/xapian.md
     - Terminal: howto/terminal.md
     - Direnv: howto/direnv.md
   - Reference:

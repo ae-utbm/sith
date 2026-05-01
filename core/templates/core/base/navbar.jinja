@@ -5,9 +5,8 @@
     <details name="navbar" class="menu">
       <summary class="head">{% trans %}Associations & Clubs{% endtrans %}</summary>
       <ul class="content">
-        <li><a href="{{ url('core:page', page_name='ae') }}">{% trans %}AE{% endtrans %}</a></li>
-        <li><a href="{{ url('core:page', page_name='clubs') }}">{% trans %}AE's clubs{% endtrans %}</a></li>
-        <li><a href="{{ url('core:page', page_name='utbm-associations') }}">{% trans %}Others UTBM's Associations{% endtrans %}</a></li>
+        <li><a href="{{ url("core:page", page_name="ae") }}">{% trans %}AE{% endtrans %}</a></li>
+        <li><a href="{{ url("club:club_list") }}">{% trans %}AE's clubs{% endtrans %}</a></li>
       </ul>
     </details>
     <details name="navbar" class="menu">

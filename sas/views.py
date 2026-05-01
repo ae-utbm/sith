@@ -16,6 +16,7 @@ from typing import Any
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count, OuterRef, Subquery
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
@@ -85,7 +86,9 @@ class SASMainView(UseFragmentsMixin, TemplateView):
         kwargs["categories"] = list(
             albums_qs.filter(parent_id=settings.SITH_SAS_ROOT_DIR_ID).order_by("id")
         )
-        kwargs["latest"] = list(albums_qs.order_by("-id")[:5])
+        kwargs["latest"] = list(
+            albums_qs.exclude(id=settings.SITH_SAS_ROOT_DIR_ID).order_by("-id")[:5]
+        )
         return kwargs
 
 
@@ -126,6 +129,9 @@ def send_thumb(request, picture_id):
 
 class AlbumView(CanViewMixin, UseFragmentsMixin, DetailView):
     model = Album
+    # exclude the SAS from the album accessible with this view
+    # the SAS can be viewed only with SASMainView
+    queryset = Album.objects.exclude(id=settings.SITH_SAS_ROOT_DIR_ID)
     pk_url_kwarg = "album_id"
     template_name = "sas/album.jinja"
 
@@ -147,10 +153,9 @@ class AlbumView(CanViewMixin, UseFragmentsMixin, DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if not self.object.file:
-            self.object.generate_thumbnail()
-        if request.user.can_edit(self.object):  # Handle the copy-paste functions
-            FileView.handle_clipboard(request, self.object)
+        if not request.user.can_edit(self.object):
+            raise PermissionDenied
+        FileView.handle_clipboard(request, self.object)
         return HttpResponseRedirect(self.request.path)
 
     def get_fragment_data(self) -> dict[str, dict[str, Any]]:
@@ -262,6 +267,7 @@ class PictureAskRemovalView(CanViewMixin, DetailView, FormView):
 
 class AlbumEditView(CanEditMixin, UpdateView):
     model = Album
+    queryset = Album.objects.exclude(id=settings.SITH_SAS_ROOT_DIR_ID)
     form_class = AlbumEditForm
     template_name = "core/edit.jinja"
     pk_url_kwarg = "album_id"

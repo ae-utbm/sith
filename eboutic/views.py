@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import base64
 import contextlib
+import itertools
 import json
 from typing import TYPE_CHECKING
 
@@ -28,9 +29,7 @@ from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import (
-    LoginRequiredMixin,
-)
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.db import DatabaseError, transaction
@@ -48,23 +47,16 @@ from django_countries.fields import Country
 
 from core.auth.mixins import CanViewMixin, IsSubscriberMixin
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
-from counter.forms import BaseBasketForm, BasketProductForm, BillingInfoForm
+from counter.forms import BaseBasketForm, BasketItemForm, BillingInfoForm
 from counter.models import (
     BillingInfo,
     Customer,
-    Product,
+    Price,
     Refilling,
     Selling,
     get_eboutic,
 )
-from eboutic.models import (
-    Basket,
-    BasketItem,
-    BillingInfoState,
-    Invoice,
-    InvoiceItem,
-    get_eboutic_products,
-)
+from eboutic.models import Basket, BasketItem, BillingInfoState, Invoice, InvoiceItem
 
 if TYPE_CHECKING:
     from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
@@ -78,7 +70,7 @@ class BaseEbouticBasketForm(BaseBasketForm):
 
 
 EbouticBasketForm = forms.formset_factory(
-    BasketProductForm, formset=BaseEbouticBasketForm, absolute_max=None, min_num=1
+    BasketItemForm, formset=BaseEbouticBasketForm, absolute_max=None, min_num=1
 )
 
 
@@ -88,7 +80,6 @@ class EbouticMainView(LoginRequiredMixin, FormView):
     The purchasable products are those of the eboutic which
     belong to a category of products of a product category
     (orphan products are inaccessible).
-
     """
 
     template_name = "eboutic/eboutic_main.jinja"
@@ -99,7 +90,7 @@ class EbouticMainView(LoginRequiredMixin, FormView):
         kwargs["form_kwargs"] = {
             "customer": self.customer,
             "counter": get_eboutic(),
-            "allowed_products": {product.id: product for product in self.products},
+            "allowed_prices": {price.id: price for price in self.prices},
         }
         return kwargs
 
@@ -110,19 +101,25 @@ class EbouticMainView(LoginRequiredMixin, FormView):
 
         with transaction.atomic():
             self.basket = Basket.objects.create(user=self.request.user)
-            for form in formset:
-                BasketItem.from_product(
-                    form.product, form.cleaned_data["quantity"], self.basket
-                ).save()
-            self.basket.save()
+            BasketItem.objects.bulk_create(
+                [
+                    BasketItem.from_price(
+                        form.price, form.cleaned_data["quantity"], self.basket
+                    )
+                    for form in formset
+                ]
+            )
         return super().form_valid(formset)
 
     def get_success_url(self):
         return reverse("eboutic:checkout", kwargs={"basket_id": self.basket.id})
 
     @cached_property
-    def products(self) -> list[Product]:
-        return get_eboutic_products(self.request.user)
+    def prices(self) -> list[Price]:
+        return get_eboutic().get_prices_for(
+            self.customer,
+            order_by=["product__product_type__order", "product_id", "amount"],
+        )
 
     @cached_property
     def customer(self) -> Customer:
@@ -130,7 +127,12 @@ class EbouticMainView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["products"] = self.products
+        context["categories"] = [
+            list(i[1])
+            for i in itertools.groupby(
+                self.prices, key=lambda p: p.product.product_type_id
+            )
+        ]
         context["customer_amount"] = self.request.user.account_balance
 
         purchases = (
@@ -267,11 +269,8 @@ class EbouticPayWithSith(CanViewMixin, SingleObjectMixin, View):
     def post(self, request, *args, **kwargs):
         basket = self.get_object()
         refilling = settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
-        if basket.items.filter(type_id=refilling).exists():
-            messages.error(
-                self.request,
-                _("You can't buy a refilling with sith money"),
-            )
+        if basket.items.filter(product__product_type_id=refilling).exists():
+            messages.error(self.request, _("You can't buy a refilling with sith money"))
             return redirect("eboutic:payment_result", "failure")
 
         eboutic = get_eboutic()
@@ -326,22 +325,23 @@ class EtransactionAutoAnswer(View):
                         raise SuspiciousOperation(
                             "Basket total and amount do not match"
                         )
-                    i = Invoice()
-                    i.user = b.user
-                    i.payment_method = "CARD"
-                    i.save()
-                    for it in b.items.all():
-                        InvoiceItem(
-                            invoice=i,
-                            product_id=it.product_id,
-                            product_name=it.product_name,
-                            type_id=it.type_id,
-                            product_unit_price=it.product_unit_price,
-                            quantity=it.quantity,
-                        ).save()
+                    i = Invoice.objects.create(user=b.user)
+                    InvoiceItem.objects.bulk_create(
+                        [
+                            InvoiceItem(
+                                invoice=i,
+                                product_id=item.product_id,
+                                label=item.label,
+                                unit_price=item.unit_price,
+                                quantity=item.quantity,
+                            )
+                            for item in b.items.all()
+                        ]
+                    )
                     i.validate()
                     b.delete()
             except Exception as e:
+                sentry_sdk.capture_exception(e)
                 return HttpResponse(
                     "Basket processing failed with error: " + repr(e), status=500
                 )

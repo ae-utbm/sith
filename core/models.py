@@ -131,7 +131,9 @@ class UserQuerySet(models.QuerySet):
         if user.has_perm("core.view_hidden_user"):
             return self
         if user.has_perm("core.view_user"):
-            return self.filter(Q(is_viewable=True) | Q(whitelisted_users=user))
+            return self.filter(
+                Q(is_viewable=True) | Q(whitelisted_users=user) | Q(pk=user.pk)
+            )
         if user.is_anonymous:
             return self.none()
         return self.filter(id=user.id)
@@ -884,8 +886,10 @@ class SithFile(models.Model):
         return self.get_parent_path() + "/" + self.name
 
     def save(self, *args, **kwargs):
-        sas = SithFile.objects.filter(id=settings.SITH_SAS_ROOT_DIR_ID).first()
-        self.is_in_sas = sas in self.get_parent_list() or self == sas
+        sas_id = settings.SITH_SAS_ROOT_DIR_ID
+        self.is_in_sas = self.id == sas_id or any(
+            p.id == sas_id for p in self.get_parent_list()
+        )
         adding = self._state.adding
         super().save(*args, **kwargs)
         if adding:

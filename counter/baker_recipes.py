@@ -2,10 +2,11 @@ from model_bakery.recipe import Recipe, foreign_key
 
 from club.models import Club
 from core.models import User
-from counter.models import Counter, Product, Refilling, Selling
+from counter.models import Counter, Price, Product, Refilling, Selling
 
 counter_recipe = Recipe(Counter)
 product_recipe = Recipe(Product, club=foreign_key(Recipe(Club)))
+price_recipe = Recipe(Price, product=foreign_key(product_recipe))
 sale_recipe = Recipe(
     Selling,
     product=foreign_key(product_recipe),

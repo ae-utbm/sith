@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 # Originates from https://gist.github.com/jorgecarleitao/ab6246c86c936b9c55fd
 # first argument of the script is Xapian version (e.g. 1.2.19)
+# second argument of the script is core sha256
+# second argument of the script is binding sha256
 VERSION="$1"
+CORE_SHA256="$2"
+BINDINGS_SHA256="$3"
 
 # Cleanup env vars for auto discovery mechanism
 unset CPATH
@@ -21,8 +25,14 @@ BINDINGS=xapian-bindings-$VERSION
 
 # download
 echo "Downloading source..."
-curl -O "https://oligarchy.co.uk/xapian/$VERSION/${CORE}.tar.xz"
+curl -O "https://oligarchy.co.uk/xapian/$VERSION/${CORE}.tar.xz" || exit 1
+
+echo "${CORE_SHA256}  ${CORE}.tar.xz" | sha256sum -c - || exit 1
+
 curl -O "https://oligarchy.co.uk/xapian/$VERSION/${BINDINGS}.tar.xz"
+
+echo "${BINDINGS_SHA256}  ${BINDINGS}.tar.xz" | sha256sum -c - || exit 1
+
 
 # extract
 echo "Extracting source..."

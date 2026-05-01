@@ -30,7 +30,7 @@ class ClubProfileSchema(ModelSchema):
 
     class Meta:
         model = Club
-        fields = ["id", "name", "logo"]
+        fields = ["id", "name", "logo", "is_active", "short_description"]
 
     url: str
 

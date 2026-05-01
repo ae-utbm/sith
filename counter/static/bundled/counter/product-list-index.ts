@@ -1,13 +1,9 @@
 import { showSaveFilePicker } from "native-file-system-adapter";
 import type TomSelect from "tom-select";
-import { paginated } from "#core:utils/api.ts";
-import { csv } from "#core:utils/csv.ts";
-import {
-  getCurrentUrlParams,
-  History,
-  updateQueryString,
-} from "#core:utils/history.ts";
-import type { NestedKeyOf } from "#core:utils/types.ts";
+import { paginated } from "#core:utils/api";
+import { csv } from "#core:utils/csv";
+import { getCurrentUrlParams, History, updateQueryString } from "#core:utils/history";
+import type { NestedKeyOf } from "#core:utils/types";
 import {
   type ProductSchema,
   type ProductSearchProductsDetailedData,
@@ -19,6 +15,9 @@ type GroupedProducts = Record<ProductType, ProductSchema[]>;
 
 const defaultPageSize = 100;
 const defaultPage = 1;
+
+// biome-ignore lint/style/useNamingConvention: api is snake case
+type ProductWithPriceSchema = ProductSchema & { selling_price: string };
 
 /**
  * Keys of the properties to include in the CSV.
@@ -34,7 +33,7 @@ const csvColumns = [
   "purchase_price",
   "selling_price",
   "archived",
-] as NestedKeyOf<ProductSchema>[];
+] as NestedKeyOf<ProductWithPriceSchema>[];
 
 /**
  * Title of the csv columns.
@@ -175,7 +174,16 @@ document.addEventListener("alpine:init", () => {
         this.nbPages > 1
           ? await paginated(productSearchProductsDetailed, this.getQueryParams())
           : Object.values<ProductSchema[]>(this.products).flat();
-      const content = csv.stringify(products, {
+      // CSV cannot represent nested data
+      // so we create a row for each price of each product.
+      const productsWithPrice: ProductWithPriceSchema[] = products.flatMap(
+        (product: ProductSchema) =>
+          product.prices.map((price) =>
+            // biome-ignore lint/style/useNamingConvention: API is snake_case
+            Object.assign(product, { selling_price: price.amount }),
+          ),
+      );
+      const content = csv.stringify(productsWithPrice, {
         columns: csvColumns,
         titleRow: csvColumnTitles,
       });

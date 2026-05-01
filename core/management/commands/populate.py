@@ -16,7 +16,7 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
@@ -41,7 +41,14 @@ from com.ics_calendar import IcsCalendar
 from com.models import News, NewsDate, Sith, Weekmail
 from core.models import BanGroup, Group, Page, PageRev, SithFile, User
 from core.utils import resize_image
-from counter.models import Counter, Product, ProductType, ReturnableProduct, StudentCard
+from counter.models import (
+    Counter,
+    Price,
+    Product,
+    ProductType,
+    ReturnableProduct,
+    StudentCard,
+)
 from election.models import Candidature, Election, ElectionList, Role
 from forum.models import Forum
 from pedagogy.models import UE
@@ -110,7 +117,9 @@ class Command(BaseCommand):
         p.save(force_lock=True)
 
         club_root = SithFile.objects.create(name="clubs", owner=root)
-        sas = SithFile.objects.create(name="SAS", owner=root)
+        sas = SithFile.objects.create(
+            name="SAS", owner=root, id=settings.SITH_SAS_ROOT_DIR_ID
+        )
         main_club = Club.objects.create(
             id=1, name="AE", address="6 Boulevard Anatole France, 90000 Belfort"
         )
@@ -372,125 +381,15 @@ class Command(BaseCommand):
             end_date=localdate() - timedelta(days=100),
         )
 
-        p = ProductType.objects.create(name="Bières bouteilles")
-        c = ProductType.objects.create(name="Cotisations")
-        r = ProductType.objects.create(name="Rechargements")
-        verre = ProductType.objects.create(name="Verre")
-        cotis = Product.objects.create(
-            name="Cotis 1 semestre",
-            code="1SCOTIZ",
-            product_type=c,
-            purchase_price="15",
-            selling_price="15",
-            special_selling_price="15",
-            club=main_club,
-        )
-        cotis2 = Product.objects.create(
-            name="Cotis 2 semestres",
-            code="2SCOTIZ",
-            product_type=c,
-            purchase_price="28",
-            selling_price="28",
-            special_selling_price="28",
-            club=main_club,
-        )
-        refill = Product.objects.create(
-            name="Rechargement 15 €",
-            code="15REFILL",
-            product_type=r,
-            purchase_price="15",
-            selling_price="15",
-            special_selling_price="15",
-            club=main_club,
-        )
-        barb = Product.objects.create(
-            name="Barbar",
-            code="BARB",
-            product_type=p,
-            purchase_price="1.50",
-            selling_price="1.7",
-            special_selling_price="1.6",
-            club=main_club,
-            limit_age=18,
-        )
-        cble = Product.objects.create(
-            name="Chimay Bleue",
-            code="CBLE",
-            product_type=p,
-            purchase_price="1.50",
-            selling_price="1.7",
-            special_selling_price="1.6",
-            club=main_club,
-            limit_age=18,
-        )
-        cons = Product.objects.create(
-            name="Consigne Eco-cup",
-            code="CONS",
-            product_type=verre,
-            purchase_price="1",
-            selling_price="1",
-            special_selling_price="1",
-            club=main_club,
-        )
-        dcons = Product.objects.create(
-            name="Déconsigne Eco-cup",
-            code="DECO",
-            product_type=verre,
-            purchase_price="-1",
-            selling_price="-1",
-            special_selling_price="-1",
-            club=main_club,
-        )
-        cors = Product.objects.create(
-            name="Corsendonk",
-            code="CORS",
-            product_type=p,
-            purchase_price="1.50",
-            selling_price="1.7",
-            special_selling_price="1.6",
-            club=main_club,
-            limit_age=18,
-        )
-        carolus = Product.objects.create(
-            name="Carolus",
-            code="CARO",
-            product_type=p,
-            purchase_price="1.50",
-            selling_price="1.7",
-            special_selling_price="1.6",
-            club=main_club,
-            limit_age=18,
-        )
-        Product.objects.create(
-            name="remboursement",
-            code="REMBOURS",
-            purchase_price="0",
-            selling_price="0",
-            special_selling_price="0",
-            club=refound,
-        )
-        groups.subscribers.products.add(
-            cotis, cotis2, refill, barb, cble, cors, carolus
-        )
-        groups.old_subscribers.products.add(cotis, cotis2)
-
-        mde = Counter.objects.get(name="MDE")
-        mde.products.add(barb, cble, cons, dcons)
-
-        eboutic = Counter.objects.get(name="Eboutic")
-        eboutic.products.add(barb, cotis, cotis2, refill)
+        self._create_products(groups, main_club, refound)
 
         Counter.objects.create(name="Carte AE", club=refound, type="OFFICE")
-
-        ReturnableProduct.objects.create(
-            product=cons, returned_product=dcons, max_return=3
-        )
 
         # Add barman to counter
         Counter.sellers.through.objects.bulk_create(
             [
-                Counter.sellers.through(counter_id=2, user=krophil),
-                Counter.sellers.through(counter=mde, user=skia),
+                Counter.sellers.through(counter_id=1, user=skia),  # MDE
+                Counter.sellers.through(counter_id=2, user=krophil),  # Foyer
             ]
         )
 
@@ -743,6 +642,131 @@ class Command(BaseCommand):
                 PeoplePictureRelation(user=sli, picture=img_skia_sli_krophil),
                 PeoplePictureRelation(user=krophil, picture=img_skia_sli_krophil),
                 PeoplePictureRelation(user=richard, picture=img_richard),
+            ]
+        )
+
+    def _create_products(
+        self, groups: PopulatedGroups, main_club: Club, refound_club: Club
+    ):
+        beers_type, cotis_type, refill_type, verre_type = (
+            ProductType.objects.bulk_create(
+                [
+                    ProductType(name="Bières bouteilles"),
+                    ProductType(name="Cotisations"),
+                    ProductType(name="Rechargements"),
+                    ProductType(name="Verre"),
+                ]
+            )
+        )
+        cotis = Product.objects.create(
+            name="Cotis 1 semestre",
+            code="1SCOTIZ",
+            product_type=cotis_type,
+            purchase_price=15,
+            club=main_club,
+        )
+        cotis2 = Product.objects.create(
+            name="Cotis 2 semestres",
+            code="2SCOTIZ",
+            product_type=cotis_type,
+            purchase_price="28",
+            club=main_club,
+        )
+        refill = Product.objects.create(
+            name="Rechargement 15 €",
+            code="15REFILL",
+            product_type=refill_type,
+            purchase_price=15,
+            club=main_club,
+        )
+        barb = Product.objects.create(
+            name="Barbar",
+            code="BARB",
+            product_type=beers_type,
+            purchase_price="1.50",
+            club=main_club,
+            limit_age=18,
+        )
+        cble = Product.objects.create(
+            name="Chimay Bleue",
+            code="CBLE",
+            product_type=beers_type,
+            purchase_price="1.50",
+            club=main_club,
+            limit_age=18,
+        )
+        cons = Product.objects.create(
+            name="Consigne Eco-cup",
+            code="CONS",
+            product_type=verre_type,
+            purchase_price="1",
+            club=main_club,
+        )
+        dcons = Product.objects.create(
+            name="Déconsigne Eco-cup",
+            code="DECO",
+            product_type=verre_type,
+            purchase_price="-1",
+            club=main_club,
+        )
+        cors = Product.objects.create(
+            name="Corsendonk",
+            code="CORS",
+            product_type=beers_type,
+            purchase_price="1.50",
+            club=main_club,
+            limit_age=18,
+        )
+        carolus = Product.objects.create(
+            name="Carolus",
+            code="CARO",
+            product_type=beers_type,
+            purchase_price="1.50",
+            club=main_club,
+            limit_age=18,
+        )
+        Product.objects.create(
+            name="remboursement",
+            code="REMBOURS",
+            purchase_price=0,
+            club=refound_club,
+        )
+        ReturnableProduct.objects.create(
+            product=cons, returned_product=dcons, max_return=3
+        )
+        mde = Counter.objects.get(name="MDE")
+        mde.products.add(barb, cble, cons, dcons)
+        eboutic = Counter.objects.get(name="Eboutic")
+        eboutic.products.add(barb, cotis, cotis2, refill)
+
+        cotis, cotis2, refill, barb, cble, cors, carolus, cons, dcons = (
+            Price.objects.bulk_create(
+                [
+                    Price(product=cotis, amount=15),
+                    Price(product=cotis2, amount=28),
+                    Price(product=refill, amount=15),
+                    Price(product=barb, amount=1.7),
+                    Price(product=cble, amount=1.7),
+                    Price(product=cors, amount=1.7),
+                    Price(product=carolus, amount=1.7),
+                    Price(product=cons, amount=1),
+                    Price(product=dcons, amount=-1),
+                ]
+            )
+        )
+        Price.groups.through.objects.bulk_create(
+            [
+                Price.groups.through(price=cotis, group=groups.subscribers),
+                Price.groups.through(price=cotis2, group=groups.subscribers),
+                Price.groups.through(price=refill, group=groups.subscribers),
+                Price.groups.through(price=barb, group=groups.subscribers),
+                Price.groups.through(price=cble, group=groups.subscribers),
+                Price.groups.through(price=cors, group=groups.subscribers),
+                Price.groups.through(price=carolus, group=groups.subscribers),
+                Price.groups.through(price=cotis, group=groups.old_subscribers),
+                Price.groups.through(price=cotis2, group=groups.old_subscribers),
+                Price.groups.through(price=cons, group=groups.old_subscribers),
+                Price.groups.through(price=dcons, group=groups.old_subscribers),
             ]
         )
 

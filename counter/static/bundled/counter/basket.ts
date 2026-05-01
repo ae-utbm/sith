@@ -1,12 +1,11 @@
-import type { Product } from "#counter:counter/types.ts";
+import type { CounterItem } from "#counter:counter/types";
 
 export class BasketItem {
   quantity: number;
-  product: Product;
-  quantityForTrayPrice: number;
+  product: CounterItem;
   errors: string[];
 
-  constructor(product: Product, quantity: number) {
+  constructor(product: CounterItem, quantity: number) {
     this.quantity = quantity;
     this.product = product;
     this.errors = [];
@@ -20,6 +19,6 @@ export class BasketItem {
   }
 
   sum(): number {
-    return (this.quantity - this.getBonusQuantity()) * this.product.price;
+    return (this.quantity - this.getBonusQuantity()) * this.product.price.amount;
   }
 }

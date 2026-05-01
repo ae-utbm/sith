@@ -1,12 +1,14 @@
 export {};
 
 interface BasketItem {
-  id: number;
+  priceId: number;
   name: string;
   quantity: number;
-  // biome-ignore lint/style/useNamingConvention: the python code is snake_case
-  unit_price: number;
+  unitPrice: number;
 }
+
+// increment the key number if the data schema of the cached basket changes
+const BASKET_CACHE_KEY = "basket1";
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("basket", (lastPurchaseTime?: number) => ({
@@ -30,24 +32,24 @@ document.addEventListener("alpine:init", () => {
       // It's quite tricky to manually apply attributes to the management part
       // of a formset so we dynamically apply it here
       this.$refs.basketManagementForm
-        .querySelector("#id_form-TOTAL_FORMS")
+        .getElementById("#id_form-TOTAL_FORMS")
         .setAttribute(":value", "basket.length");
     },
 
     loadBasket(): BasketItem[] {
-      if (localStorage.basket === undefined) {
+      if (localStorage.getItem(BASKET_CACHE_KEY) === null) {
         return [];
       }
       try {
-        return JSON.parse(localStorage.basket);
+        return JSON.parse(localStorage.getItem(BASKET_CACHE_KEY));
       } catch (_err) {
         return [];
       }
     },
 
     saveBasket() {
-      localStorage.basket = JSON.stringify(this.basket);
-      localStorage.basketTimestamp = Date.now();
+      localStorage.setItem(BASKET_CACHE_KEY, JSON.stringify(this.basket));
+      localStorage.setItem("basketTimestamp", Date.now().toString());
     },
 
     /**
@@ -56,7 +58,7 @@ document.addEventListener("alpine:init", () => {
      */
     getTotal() {
       return this.basket.reduce(
-        (acc: number, item: BasketItem) => acc + item.quantity * item.unit_price,
+        (acc: number, item: BasketItem) => acc + item.quantity * item.unitPrice,
         0,
       );
     },
@@ -74,7 +76,7 @@ document.addEventListener("alpine:init", () => {
      * @param itemId the id of the item to remove
      */
     remove(itemId: number) {
-      const index = this.basket.findIndex((e: BasketItem) => e.id === itemId);
+      const index = this.basket.findIndex((e: BasketItem) => e.priceId === itemId);
 
       if (index < 0) {
         return;
@@ -83,7 +85,7 @@ document.addEventListener("alpine:init", () => {
 
       if (this.basket[index].quantity === 0) {
         this.basket = this.basket.filter(
-          (e: BasketItem) => e.id !== this.basket[index].id,
+          (e: BasketItem) => e.priceId !== this.basket[index].id,
         );
       }
     },
@@ -104,11 +106,10 @@ document.addEventListener("alpine:init", () => {
      */
     createItem(id: number, name: string, price: number): BasketItem {
       const newItem = {
-        id,
+        priceId: id,
         name,
         quantity: 0,
-        // biome-ignore lint/style/useNamingConvention: the python code is snake_case
-        unit_price: price,
+        unitPrice: price,
       } as BasketItem;
 
       this.basket.push(newItem);
@@ -125,7 +126,7 @@ document.addEventListener("alpine:init", () => {
      * @param price The unit price of the product
      */
     addFromCatalog(id: number, name: string, price: number) {
-      let item = this.basket.find((e: BasketItem) => e.id === id);
+      let item = this.basket.find((e: BasketItem) => e.priceId === id);
 
       // if the item is not in the basket, we create it
       // else we add + 1 to it

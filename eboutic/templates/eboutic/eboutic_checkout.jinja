@@ -32,9 +32,9 @@
       <tbody>
         {% for item in basket.items.all() %}
           <tr>
-            <td>{{ item.product_name }}</td>
+            <td>{{ item.label }}</td>
             <td>{{ item.quantity }}</td>
-            <td>{{ item.product_unit_price }} €</td>
+            <td>{{ item.unit_price }} €</td>
           </tr>
         {% endfor %}
       </tbody>
