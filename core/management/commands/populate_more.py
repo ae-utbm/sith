@@ -11,7 +11,7 @@ from django.db.models import Count, Exists, Min, OuterRef, Subquery
 from django.utils.timezone import localdate, make_aware, now
 from faker import Faker
 
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 from core.models import Group, User, UserBan
 from counter.models import (
     Counter,
@@ -173,20 +173,25 @@ class Command(BaseCommand):
         Customer.objects.bulk_create(customers, ignore_conflicts=True)
 
     def make_club(self, club: Club, members: list[User], old_members: list[User]):
-        def zip_roles(users: list[User]) -> Iterator[tuple[User, int]]:
-            roles = iter(sorted(settings.SITH_CLUB_ROLES.keys(), reverse=True))
+        roles: list[ClubRole] = list(club.roles.all())
+
+        def zip_roles(users: list[User]) -> Iterator[tuple[User, ClubRole]]:
+            important_roles = [r for r in roles if r.is_board]
+            important_roles.sort(key=lambda r: r.order)
+            simple_board_role = important_roles.pop()
+            member_roles = [r for r in roles if not r.is_board]
             user_idx = 0
-            while (role := next(roles)) > 2:
+            for _role in important_roles:
                 # one member for each major role
-                yield users[user_idx], role
+                yield users[user_idx], _role
                 user_idx += 1
             for _ in range(int(0.3 * (len(users) - user_idx))):
                 # 30% of the remaining in the board
-                yield users[user_idx], 2
+                yield users[user_idx], simple_board_role
                 user_idx += 1
             for remaining in users[user_idx + 1 :]:
                 # everything else is a simple member
-                yield remaining, 1
+                yield remaining, random.choices(member_roles, weights=(0.8, 0.2))[0]
 
         memberships = []
         old_members = old_members.copy()
@@ -198,19 +203,14 @@ class Command(BaseCommand):
                     start_date=start,
                     end_date=self.faker.past_date(start),
                     user=old,
-                    role=random.choice(list(settings.SITH_CLUB_ROLES.keys())),
+                    role=random.choice(roles),
                     club=club,
                 )
             )
         for member, role in zip_roles(members):
             start = self.faker.past_date("-1y")
             memberships.append(
-                Membership(
-                    start_date=start,
-                    user=member,
-                    role=role,
-                    club=club,
-                )
+                Membership(start_date=start, user=member, role=role, club=club)
             )
         memberships = Membership.objects.bulk_create(memberships)
         Membership._add_club_groups(memberships)
