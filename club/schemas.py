@@ -2,6 +2,7 @@ from typing import Annotated
 
 from django.db.models import Q
 from ninja import FilterLookup, FilterSchema, ModelSchema
+from pydantic import HttpUrl
 
 from club.models import Club, ClubRole, Membership
 from core.schemas import NonEmptyStr, SimpleUserSchema
@@ -62,6 +63,11 @@ class ClubSchema(ModelSchema):
         fields = ["id", "name", "logo", "is_active", "short_description", "address"]
 
     members: list[ClubMemberSchema]
+    links: list[HttpUrl]
+
+    @staticmethod
+    def resolve_links(obj: Club):
+        return [link.url for link in obj.links.all()]
 
 
 class UserMembershipSchema(ModelSchema):

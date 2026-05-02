@@ -41,7 +41,7 @@ class ClubController(ControllerBase):
             queryset=Membership.objects.ongoing().select_related("user", "role"),
         )
         return self.get_object_or_exception(
-            Club.objects.prefetch_related(prefetch), id=club_id
+            Club.objects.prefetch_related(prefetch, "links"), id=club_id
         )
 
 
