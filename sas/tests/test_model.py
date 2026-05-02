@@ -1,6 +1,11 @@
+from io import BytesIO
+from pathlib import Path
+
 import pytest
+from django.core.files.base import ContentFile
 from django.test import TestCase
 from model_bakery import baker
+from PIL import Image
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import User
@@ -67,3 +72,36 @@ def test_identifications_viewable_by_user():
     assert list(picture.people.viewable_by(identifications[1].user)) == [
         identifications[1]
     ]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("save", [True, False])
+@pytest.mark.parametrize("initially_saved", [True, False])
+@pytest.mark.parametrize("pass_img_kwarg", [True, False])
+def test_generate_thumbnail(save, initially_saved, pass_img_kwarg):
+    """Test that Picture.generate_thumbnails works properly"""
+    image = Image.new("RGB", (2, 1))
+    image.putdata([(255, 0, 0), (0, 255, 0)])
+    buffer = BytesIO()
+    image.save(buffer, format="PNG")
+    file = ContentFile(buffer.getvalue(), "img.png")
+    picture: Picture = picture_recipe.prepare(
+        file=file,
+        name=file.name,
+        mime_type="image/png",
+        _save_related=True,
+    )
+    if initially_saved:
+        picture.save()
+    picture.generate_thumbnails(img=image if pass_img_kwarg else None, save=save)
+    storage = picture.file.storage
+    for f in picture.file, picture.compressed, picture.thumbnail:
+        # the tested picture is alone in its album,
+        # so there should be a single file in each folder
+        assert storage.exists(f.name)
+        _dirs, files = storage.listdir(str(Path(f.path).parent))
+        assert files == [Path(f.name).name]
+    new_img = Image.open(picture.file)
+    assert new_img.get_flattened_data() == image.get_flattened_data()
+    assert Image.open(picture.thumbnail).size == (200, 100)
+    assert Image.open(picture.compressed).size == (1200, 600)
