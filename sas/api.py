@@ -126,9 +126,8 @@ class PicturesController(ControllerBase):
         if self_moderate:
             new.moderator = user
         try:
-            new.generate_thumbnails()
             new.full_clean()
-            new.save()
+            new.generate_thumbnails(save=True)
         except ValidationError as e:
             return self.create_response({"detail": dict(e)}, status_code=409)
 
@@ -176,6 +175,19 @@ class PicturesController(ControllerBase):
     @route.delete("/{picture_id}", permissions=[IsSasAdmin])
     def delete_picture(self, picture_id: int):
         self.get_object_or_exception(Picture, pk=picture_id).delete()
+
+    @route.post(
+        "/{picture_id}/rotate/{direction}",
+        permissions=[IsSasAdmin],
+        response=PictureSchema,
+        url_name="rotate_picture",
+    )
+    def rotate_picture(self, picture_id: int, direction: Literal["left", "right"]):
+        """Rotate the given picture and returns its edited data."""
+        angle = 90 if direction == "left" else 270
+        picture = self.get_object_or_exception(Picture, pk=picture_id)
+        picture.rotate(angle)
+        return picture
 
     @route.patch(
         "/{picture_id}/moderation",

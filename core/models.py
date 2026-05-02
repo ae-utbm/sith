@@ -853,7 +853,7 @@ class SithFile(models.Model):
         User,
         related_name="owned_files",
         verbose_name=_("owner"),
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
     )
     edit_groups = models.ManyToManyField(
         Group, related_name="editable_files", verbose_name=_("edit group"), blank=True
@@ -865,6 +865,7 @@ class SithFile(models.Model):
     mime_type = models.CharField(_("mime type"), max_length=30)
     size = models.IntegerField(_("size"), default=0)
     date = models.DateTimeField(_("date"), default=timezone.now)
+    updated_at = models.DateTimeField(_("updated at"), auto_now=True)
     is_moderated = models.BooleanField(_("is moderated"), default=False)
     moderator = models.ForeignKey(
         User,
@@ -872,7 +873,7 @@ class SithFile(models.Model):
         verbose_name=_("owner"),
         null=True,
         blank=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
     )
     asked_for_removal = models.BooleanField(_("asked for removal"), default=False)
     is_in_sas = models.BooleanField(

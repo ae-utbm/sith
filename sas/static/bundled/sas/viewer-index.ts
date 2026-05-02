@@ -1,7 +1,7 @@
 import type TomSelect from "tom-select";
-import type { UserAjaxSelect } from "#core:core/components/ajax-select-index.ts";
-import { paginated } from "#core:utils/api.ts";
-import { History } from "#core:utils/history.ts";
+import type { UserAjaxSelect } from "#core:core/components/ajax-select-index";
+import { paginated } from "#core:utils/api";
+import { History } from "#core:utils/history";
 import {
   type IdentifiedUserSchema,
   type ModerationRequestSchema,
@@ -14,6 +14,7 @@ import {
   picturesFetchPictures,
   picturesIdentifyUsers,
   picturesModeratePicture,
+  picturesRotatePicture,
   type UserProfileSchema,
   usersidentifiedDeleteRelation,
 } from "#openapi";
@@ -28,16 +29,30 @@ class PictureWithIdentifications {
   identificationsLoading = false;
   moderationLoading = false;
   id: number;
-  // biome-ignore lint/style/useNamingConvention: api is in snake_case
-  compressed_url: string;
+  compressedUrl: string = "";
+  thumbUrl: string = "";
+  fullSizeUrl: string = "";
   moderationRequests: ModerationRequestSchema[] = null;
 
   constructor(picture: PictureSchema) {
     Object.assign(this, picture);
+    this.compressedUrl = picture.compressed_url;
+    this.thumbUrl = picture.thumb_url;
+    this.fullSizeUrl = picture.full_size_url;
   }
 
   static fromPicture(picture: PictureSchema): PictureWithIdentifications {
     return new PictureWithIdentifications(picture);
+  }
+
+  rebuildUrls(date: Date) {
+    const buildUrl = (url: string) => {
+      const base = url.split("?", 1)[0];
+      return `${base}?date=${date.getTime().toString()}`;
+    };
+    this.compressedUrl = buildUrl(this.compressedUrl);
+    this.thumbUrl = buildUrl(this.thumbUrl);
+    this.fullSizeUrl = buildUrl(this.fullSizeUrl);
   }
 
   /**
@@ -82,12 +97,25 @@ class PictureWithIdentifications {
     this.moderationLoading = false;
   }
 
+  async rotate(direction: "left" | "right") {
+    this.imageLoading = true;
+    const res = await picturesRotatePicture({
+      // biome-ignore lint/style/useNamingConvention: api is snake case
+      path: { picture_id: this.id, direction: direction },
+    });
+    // urls returned by the api include a timestamp for cache busting
+    this.fullSizeUrl = res.data.full_size_url;
+    this.compressedUrl = res.data.compressed_url;
+    this.thumbUrl = res.data.thumb_url;
+    this.imageLoading = false;
+  }
+
   /**
    * Preload the photo and the identifications
    */
   async preload(): Promise<void> {
     const img = new Image();
-    img.src = this.compressed_url;
+    img.src = this.compressedUrl;
     if (!img.complete) {
       this.imageLoading = true;
       img.addEventListener("load", () => {
@@ -140,7 +168,8 @@ document.addEventListener("alpine:init", () => {
       // biome-ignore lint/style/useNamingConvention: api is in snake_case
       full_size_url: "",
       owner: "",
-      date: new Date(),
+      // biome-ignore lint/style/useNamingConvention: api is in snake_case
+      created_at: new Date(),
       identifications: [] as IdentifiedUserSchema[],
     },
     /**
@@ -291,10 +320,8 @@ document.addEventListener("alpine:init", () => {
     async submitIdentification(): Promise<void> {
       const widget: TomSelect = this.selector.widget;
       await picturesIdentifyUsers({
-        path: {
-          // biome-ignore lint/style/useNamingConvention: api is in snake_case
-          picture_id: this.currentPicture.id,
-        },
+        // biome-ignore lint/style/useNamingConvention: api is in snake_case
+        path: { picture_id: this.currentPicture.id },
         body: widget.items.map((i: string) => Number.parseInt(i, 10)),
       });
       // refresh the identified users list
