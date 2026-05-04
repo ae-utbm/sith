@@ -60,7 +60,7 @@ documentation = "https://sith-ae.readthedocs.io/"
 
 [dependency-groups]
 prod = [
-    "psycopg[c]>=3.3.3,<4.0.0",
+    "psycopg[c]>=3.3.4,<4.0.0",
 ]
 dev = [
     "django-debug-toolbar>=6.3.0,<7",
