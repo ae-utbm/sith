@@ -68,6 +68,12 @@
         <template x-for="[key, value] in Object.entries(data)" :key="key">
           <input type="hidden" :name="key" :value="value">
         </template>
+        <input type="checkbox" value="cgv" required>
+        <label>
+          {% trans  trimmed %}I have read and accept {% endtrans %}
+          <a href="">{% trans %}the general terms and conditions{% endtrans%}</a> 
+          {%trans%}of the student assosiation of UTBM{% endtrans %}</label>
+        <br>
         <input
           x-cloak
           type="submit"
@@ -93,6 +99,12 @@
     {% else %}
       <form method="post" action="{{ url('eboutic:pay_with_sith', basket_id=basket.id) }}" name="sith-pay-form">
         {% csrf_token %}
+        <input type="checkbox" value="cgv" required>
+        <label>
+          {% trans  trimmed %}I have read and accept {% endtrans %}
+          <a href="">{% trans %}the general terms and conditions{% endtrans%}</a> 
+          {%trans%}of the student assosiation of UTBM{% endtrans %}</label>
+        <br>
         <input class="btn btn-blue" type="submit" value="{% trans %}Pay with Sith account{% endtrans %}"/>
       </form>
     {% endif %}
