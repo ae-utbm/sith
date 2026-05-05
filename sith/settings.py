@@ -523,22 +523,14 @@ SITH_SUBSCRIPTIONS = {
     "membre-honoraire": {"name": _("Honorary member"), "price": 0, "duration": 666},
     "assidu": {"name": _("Assidu member"), "price": 0, "duration": 2},
     "amicale/doceo": {"name": _("Amicale/DOCEO member"), "price": 0, "duration": 2},
-    "reseau-ut": {"name": _("UT network member"), "price": 0, "duration": 1},
-    "crous": {"name": _("CROUS member"), "price": 0, "duration": 2},
-    "sbarro/esta": {"name": _("Sbarro/ESTA member"), "price": 15, "duration": 2},
-    "un-semestre-welcome": {
-        "name": _("One semester Welcome Week"),
+    "reseau-ut (hors UTC)": {
+        "name": _("UT network member (excluding UTC)"),
         "price": 0,
         "duration": 1,
     },
-    "benevoles-euroks": {"name": _("Eurok's volunteer"), "price": 5, "duration": 0.1},
-    "six-semaines-essai": {
-        "name": _("Six weeks for free"),
-        "price": 0,
-        "duration": 0.23,
-    },
+    "crous": {"name": _("CROUS member"), "price": 0, "duration": 2},
+    "sbarro/esta": {"name": _("Sbarro/ESTA member"), "price": 15, "duration": 2},
     "un-jour": {"name": _("One day"), "price": 0, "duration": 0.00555333},
-    "membre-staff-ga": {"name": _("GA staff member"), "price": 1, "duration": 0.076},
     # Discount subscriptions
     "un-semestre-reduction": {
         "name": _("One semester (-20%)"),
@@ -564,12 +556,6 @@ SITH_SUBSCRIPTIONS = {
         "name": _("Alternating cursus (-20%)"),
         "price": 28,
         "duration": 6,
-    },
-    # CA special offer
-    "un-an-offert-CA": {
-        "name": _("One year for free(CA offer)"),
-        "price": 0,
-        "duration": 2,
     },
     # To be completed....
 }
