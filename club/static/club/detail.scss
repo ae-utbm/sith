@@ -1,0 +1,66 @@
+#club-detail {
+  img.club-logo {
+    display: block;
+    max-height: 200px;
+    max-width: 200px;
+  }
+  #club-attributes {
+    ul {
+      list-style: none;
+      margin-left: 0;
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+
+      li i {
+        margin-right: .5rem;
+      }
+    }
+  }
+
+  &:not(.has-links) {
+    #club-attributes {
+      float: right;
+      margin: 1em 0 1em 2em;
+
+      @media screen and (max-width: 650px) {
+        margin-left: 1em;
+      }
+      @media screen and (max-width: 400px) {
+        float: unset;
+        img.club-logo {
+          margin: auto;
+        }
+      }
+    }
+  }
+
+  &.has-links {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 2em;
+
+    @media screen and (max-width: 650px) {
+      flex-direction: column;
+      gap: 1em;
+    }
+
+    #club-attributes {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      min-width: 200px;
+      @media screen and (max-width: 650px) {
+        margin-top: 1em;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        h4 {
+          margin: 0;
+        }
+        img.club-logo {
+          margin-left: auto;
+        }
+      }
+    }
+  }
+}

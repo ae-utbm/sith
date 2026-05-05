@@ -21,15 +21,43 @@
   {% endif %}
 {% endblock %}
 
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("club/detail.scss") }}">
+{% endblock %}
+
 {% block content %}
-  <div id="club_detail">
-    {% if club.logo %}
-      <div class="club_logo"><img src="{{ club.logo.url }}" alt="{{ club.name }}"></div>
-    {% endif %}
-    <h3>{{ club.name }}</h3>
-    {% if page_revision %}
-      {{ page_revision|markdown }}
-    {% endif %}
+  <h3>{{ club.name }}</h3>
+  <div id="club-detail" {% if links %}class="has-links"{% endif %}>
+    <div id="club-attributes">
+      {% if club.logo %}
+        <img
+          class="club-logo"
+          src="{{ club.logo.url }}"
+          alt="{{ club.name }}"
+          width="{{ club.logo.width }}"
+          height="{{ club.logo.height }}"
+        >
+      {% endif %}
+      {% if links %}
+        <div id="club-links">
+          <h4>{% trans %}Links{% endtrans %}</h4>
+          <ul>
+            {% for link in links %}
+              <li>
+                <a href="{{ link.url }}" rel="noopener" target="_blank">
+                  <i class="{{ link.link_type.icon }} fa-xl"></i>{{ link.name }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+    <div id="club-page">
+      {% if page_revision %}
+        {{ page_revision|markdown }}
+      {% endif %}
+    </div>
   </div>
 {% endblock %}
 

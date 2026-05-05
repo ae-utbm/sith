@@ -257,6 +257,7 @@ class ClubView(ClubTabsMixin, DetailView):
             .values_list("content", flat=True)
             .first()
         )
+        kwargs["links"] = list(self.object.links.select_related("link_type").all())
         return kwargs
 
 
