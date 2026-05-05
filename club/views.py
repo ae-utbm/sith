@@ -37,6 +37,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
 from django.db.models import F, Q, Sum
+from django.db.models.functions import Length
 from django.http import Http404, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -66,7 +67,14 @@ from club.forms import (
     MailingForm,
     SellingsForm,
 )
-from club.models import Club, ClubRole, Mailing, MailingSubscription, Membership
+from club.models import (
+    Club,
+    ClubRole,
+    LinkType,
+    Mailing,
+    MailingSubscription,
+    Membership,
+)
 from com.models import Poster
 from com.views import (
     PosterCreateBaseView,
@@ -688,6 +696,11 @@ class ClubEditView(ClubTabsMixin, CanEditMixin, UpdateView):
         if self.object.is_owned_by(self.request.user):
             return ClubAdminEditForm
         return ClubEditForm
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "link_types": list(LinkType.objects.order_by(Length("url_base").desc()))
+        }
 
 
 class ClubCreateView(PermissionRequiredMixin, CreateView):

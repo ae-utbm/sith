@@ -103,7 +103,7 @@ def add_attr(field: BoundField, attr: str):
         if "=" not in d:
             attrs["class"] = d
         else:
-            key, val = d.split("=")
+            key, val = d.split("=", maxsplit=1)
             attrs[key] = val
 
     return field.as_widget(attrs=attrs)
