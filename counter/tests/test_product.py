@@ -219,6 +219,6 @@ def test_price_for_user():
         recipe.make(amount=1, groups=[groups[1]], is_always_shown=False),
     ]
     qs = Price.objects.order_by("-amount")
-    assert set(qs.for_user(users[0])) == {prices[0], prices[1], prices[4]}
-    assert set(qs.for_user(users[1])) == {prices[0], prices[4]}
-    assert set(qs.for_user(users[2])) == {prices[0], prices[3]}
+    assert list(qs.for_user(users[0])) == [prices[0], prices[1], prices[4]]
+    assert list(qs.for_user(users[1])) == [prices[0], prices[4]]
+    assert list(qs.for_user(users[2])) == [prices[0], prices[3]]

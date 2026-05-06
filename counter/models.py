@@ -431,7 +431,7 @@ class PriceQuerySet(models.QuerySet):
             ),
             product__archived=False,
             product__limit_age__lte=age,
-        )
+        ).distinct()
 
 
 class Price(models.Model):
