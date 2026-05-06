@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-12 09:52+0200\n"
+"POT-Creation-Date: 2026-05-12 11:12+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -362,6 +362,62 @@ msgstr "Cet email est déjà abonné à cette mailing"
 msgid "Unregistered user"
 msgstr "Utilisateur non enregistré"
 
+#: club/models.py
+#, python-format
+msgid "The base url that links with this type must respect (e.g. `%(url)s`)"
+msgstr ""
+"L'url de base que tous les liens de ce type doivent respecter (par exemple "
+"`%(url)s`)"
+
+#: club/models.py counter/models.py
+msgid "icon"
+msgstr "icône"
+
+#: club/models.py
+msgid "The fontawesome class to use (e.g. `fa-brands fa-instagram`)"
+msgstr ""
+"La classe fontawesome à utiliser (par exemple `fa-brands fa-instagram`)"
+
+#: club/models.py
+msgid "link type"
+msgstr "type de lien"
+
+#: club/models.py
+msgid "link types"
+msgstr "types de lien"
+
+#: club/models.py
+msgid "link url"
+msgstr "url du lien"
+
+#: club/models.py core/models.py counter/models.py
+msgid "created at"
+msgstr "créé le"
+
+#: club/models.py core/models.py counter/models.py
+msgid "updated at"
+msgstr "mis à jour le"
+
+#: club/models.py
+msgid "club link"
+msgstr "lien de club"
+
+#: club/models.py
+msgid "club links"
+msgstr "liens de club"
+
+#: club/models.py
+msgid "Duplicated url"
+msgstr "Url dupliquée"
+
+#: club/models.py
+msgid "This link doesn't match with the url base of its type."
+msgstr "Ce lien ne correspond pas à l'url de base de son type."
+
+#: club/templates/club/club_detail.jinja com/templates/com/news_list.jinja
+msgid "Links"
+msgstr "Liens"
+
 #: club/templates/club/club_list.jinja
 msgid "The list of all clubs existing at UTBM."
 msgstr "La liste de tous les clubs existants à l'UTBM"
@@ -709,6 +765,10 @@ msgid "Edit %(name)s"
 msgstr "Éditer %(name)s"
 
 #: club/templates/club/edit_club.jinja
+msgid "Remove link"
+msgstr "Retirer le lien"
+
+#: club/templates/club/edit_club.jinja
 msgid "Club properties"
 msgstr "Propriétés du club"
 
@@ -731,6 +791,22 @@ msgid ""
 msgstr ""
 "Les champs de formulaire suivants sont liées à la description basique d'un "
 "club. Tous les membres du bureau du club peuvent voir et modifier ceux-ci."
+
+#: club/templates/club/edit_club.jinja
+msgid "Club links"
+msgstr "Liens du club"
+
+#: club/templates/club/edit_club.jinja
+msgid ""
+"Note: if the icon of one of your links doesn't exist yet, you can ask the "
+"info team to add it."
+msgstr ""
+"Note : si l'icône d'un de vos liens n'existe pas encore, vous pouvez demander "
+"au pôle info de l'ajouter."
+
+#: club/templates/club/edit_club.jinja
+msgid "Add link"
+msgstr "Ajouter un lien"
 
 #: club/templates/club/fragments/add_member.jinja
 msgid "Add a new member"
@@ -1252,10 +1328,6 @@ msgid "All coming events"
 msgstr "Tous les événements à venir"
 
 #: com/templates/com/news_list.jinja
-msgid "Links"
-msgstr "Liens"
-
-#: com/templates/com/news_list.jinja
 msgid "Our services"
 msgstr "Nos services"
 
@@ -1760,10 +1832,6 @@ msgstr "Visiteur"
 msgid "ban type"
 msgstr "type de ban"
 
-#: core/models.py counter/models.py
-msgid "created at"
-msgstr "créé le"
-
 #: core/models.py
 msgid "expires at"
 msgstr "expire le"
@@ -1852,10 +1920,6 @@ msgstr "taille"
 #: core/models.py counter/models.py eboutic/models.py forum/models.py
 msgid "date"
 msgstr "date"
-
-#: core/models.py counter/models.py
-msgid "updated at"
-msgstr "mis à jour le"
 
 #: core/models.py
 msgid "asked for removal"
@@ -3326,10 +3390,6 @@ msgstr "prix d'achat"
 #: counter/models.py
 msgid "Initial cost of purchasing the product"
 msgstr "Coût initial d'achat du produit"
-
-#: counter/models.py
-msgid "icon"
-msgstr "icône"
 
 #: counter/models.py
 msgid "limit age"
