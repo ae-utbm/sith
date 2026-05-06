@@ -3,7 +3,7 @@
     <script-once type="module" src="{{ js }}"></script-once>
   {% endfor %}
   {% for css in statics.css %}
-    <link-once rel="stylesheet" type="text/css" href="{{ css }}" defer></link-once>
+    <link-once rel="stylesheet" type="text/css" href="{{ css }}"></link-once>
   {% endfor %}
 
   <{{ component }} name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %}>
