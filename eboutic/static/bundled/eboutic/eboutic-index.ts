@@ -28,11 +28,8 @@ document.addEventListener("alpine:init", () => {
           this.basket = [];
         }
       }
-
-      // It's quite tricky to manually apply attributes to the management part
-      // of a formset so we dynamically apply it here
-      this.$refs.basketManagementForm
-        .getElementById("#id_form-TOTAL_FORMS")
+      document
+        .getElementById("id_form-TOTAL_FORMS")
         .setAttribute(":value", "basket.length");
     },
 
