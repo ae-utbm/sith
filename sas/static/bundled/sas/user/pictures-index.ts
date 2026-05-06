@@ -1,4 +1,4 @@
-import { paginated } from "#core:utils/api.ts";
+import { paginated } from "#core:utils/api";
 import {
   type PictureSchema,
   type PicturesFetchPicturesData,

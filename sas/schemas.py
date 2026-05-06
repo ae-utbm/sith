@@ -70,7 +70,15 @@ class PictureFilterSchema(FilterSchema):
 class PictureSchema(ModelSchema):
     class Meta:
         model = Picture
-        fields = ["id", "name", "date", "size", "is_moderated", "asked_for_removal"]
+        fields = [
+            "id",
+            "name",
+            "date",
+            "updated_at",
+            "size",
+            "is_moderated",
+            "asked_for_removal",
+        ]
 
     owner: UserProfileSchema
     sas_url: str

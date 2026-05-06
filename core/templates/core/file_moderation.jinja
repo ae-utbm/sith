@@ -33,7 +33,8 @@
           <a href="{{ url("core:file_detail", file_id=f.id) }}">{{ f.name }}</a><br/>
           {% trans %}Full name: {% endtrans %}{{ f.get_parent_path()+'/'+f.name }}<br/>
           {% trans %}Owner: {% endtrans %}{{ f.owner.get_display_name() }}<br/>
-          {% trans %}Date: {% endtrans %}{{ f.date|date(DATE_FORMAT) }} {{ f.date|time(TIME_FORMAT) }}<br/>
+          {% trans %}Date: {% endtrans %}
+          {{ f.date|date(DATE_FORMAT) }} {{ f.date|time(TIME_FORMAT) }}<br/>
         </p>
         <p><button
           hx-get="{{ url('core:file_moderate', file_id=f.id) }}"

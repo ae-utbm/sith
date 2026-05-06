@@ -97,14 +97,6 @@ class PictureView(CanViewMixin, DetailView):
     pk_url_kwarg = "picture_id"
     template_name = "sas/picture.jinja"
 
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if "rotate_right" in request.GET:
-            self.object.rotate(270)
-        if "rotate_left" in request.GET:
-            self.object.rotate(90)
-        return super().get(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "album": Album.objects.get(children=self.object)

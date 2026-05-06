@@ -1,9 +1,9 @@
 {% extends "core/base.jinja" %}
 
 {%- block additional_css -%}
-  <link defer rel="stylesheet" href="{{ static('bundled/core/components/ajax-select-index.css') }}">
-  <link defer rel="stylesheet" href="{{ static('core/components/ajax-select.scss') }}">
-  <link defer rel="stylesheet" href="{{ static('sas/css/picture.scss') }}">
+  <link rel="stylesheet" href="{{ static('bundled/core/components/ajax-select-index.css') }}">
+  <link rel="stylesheet" href="{{ static('core/components/ajax-select.scss') }}">
+  <link rel="stylesheet" href="{{ static('sas/css/picture.scss') }}">
 {%- endblock -%}
 
 {%- block additional_js -%}
@@ -84,7 +84,7 @@
       <div class="main">
         <div class="photo" :aria-busy="currentPicture.imageLoading">
           <img
-            :src="currentPicture.compressed_url"
+            :src="currentPicture.compressedUrl"
             :alt="currentPicture.name"
             id="main-picture"
             x-ref="mainPicture"
@@ -100,7 +100,7 @@
                 <span
                   x-text="Intl.DateTimeFormat(
                           '{{ LANGUAGE_CODE }}', {dateStyle: 'long'}
-                          ).format(new Date(currentPicture.date))"
+                          ).format(Date.parse(currentPicture.date))"
                 >
                 </span>
               </div>
@@ -115,23 +115,38 @@
             <h5>{% trans %}Tools{% endtrans %}</h5>
             <div>
               <div>
-                <a class="text" :href="currentPicture.full_size_url">
+                <a class="text" :href="currentPicture.fullSizeUrl">
                   {% trans %}HD version{% endtrans %}
                 </a>
                 <a class="text danger " :href="currentPicture.report_url">
                   {% trans %}Ask for removal{% endtrans %}
                 </a>
               </div>
-              <div class="buttons">
+              <div
+                class="buttons"
+                x-show="{{ user.has_perm("sas.change_sasfile")|tojson }} || currentPicture.owner.id === {{ user.id }}"
+              >
                 <a
                   class="btn btn-no-text"
                   :href="currentPicture.edit_url"
-                  x-show="{{ user.has_perm("sas.change_sasfile")|tojson }} || currentPicture.owner.id === {{ user.id }}"
+                  :disabled="currentPicture.imageLoading"
                 >
                   <i class="fa-regular fa-pen-to-square edit-action"></i>
                 </a>
-                <a class="btn btn-no-text" href="?rotate_left"><i class="fa-solid fa-rotate-left"></i></a>
-                <a class="btn btn-no-text" href="?rotate_right"><i class="fa-solid fa-rotate-right"></i></a>
+                <button
+                  class="btn btn-no-text"
+                  @click="currentPicture.rotate('left')"
+                  :disabled="currentPicture.imageLoading"
+                >
+                  <i class="fa-solid fa-rotate-left"></i>
+                </button>
+                <button
+                  class="btn btn-no-text"
+                  @click="currentPicture.rotate('right')"
+                  :disabled="currentPicture.imageLoading"
+                >
+                  <i class="fa-solid fa-rotate-right"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -146,7 +161,7 @@
                 @keyup.left.window="currentPicture = previousPicture"
                 @click="currentPicture = previousPicture"
               >
-                <img :src="previousPicture.thumb_url" alt="{% trans %}Previous picture{% endtrans %}"/>
+                <img :src="previousPicture.thumbUrl" alt="{% trans %}Previous picture{% endtrans %}"/>
                 <div class="overlay">←</div>
               </div>
             </template>
@@ -157,7 +172,7 @@
                 @keyup.right.window="currentPicture = nextPicture"
                 @click="currentPicture = nextPicture"
               >
-                <img :src="nextPicture.thumb_url" alt="{% trans %}Previous picture{% endtrans %}"/>
+                <img :src="nextPicture.thumbUrl" alt="{% trans %}Previous picture{% endtrans %}"/>
                 <div class="overlay">→</div>
               </div>
             </template>

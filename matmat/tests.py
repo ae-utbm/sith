@@ -7,13 +7,14 @@ from model_bakery import baker
 
 from com.models import News
 from core.baker_recipes import subscriber_user
-from core.models import User
+from core.models import SithFile, User
 
 
 class TestMatmatronch(TestCase):
     @classmethod
     def setUpTestData(cls):
         News.objects.all().delete()
+        SithFile.objects.all().delete()
         User.objects.all().delete()
         users = [
             baker.prepare(User, promo=17),
