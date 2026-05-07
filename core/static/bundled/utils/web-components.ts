@@ -47,9 +47,18 @@ export function inheritHtmlElement<K extends keyof HTMLElementTagNameMap>(tagNam
     implements InheritedHtmlElement<K>
   {
     readonly inheritedTagName = tagName;
+    private readonly initializedAttribute = "component-initialized";
     node: HTMLElementTagNameMap[K];
 
     connectedCallback(autoAddNode?: boolean) {
+      // When nesting inherited elements, we might trigger the wrapping twice
+      // To avoid this, we tag a created element as initialized
+      // We then skip the initialization step and grab the inner content as the node
+      if (this.hasAttribute(this.initializedAttribute)) {
+        this.node = this.firstChild as HTMLElementTagNameMap[K];
+        return;
+      }
+
       this.node = document.createElement(this.inheritedTagName);
       const attributes: Attr[] = []; // We need to make a copy to delete while iterating
       for (const attr of this.attributes) {
@@ -57,6 +66,8 @@ export function inheritHtmlElement<K extends keyof HTMLElementTagNameMap>(tagNam
           attributes.push(attr);
         }
       }
+
+      this.setAttribute(this.initializedAttribute, "");
 
       // We move compatible attributes to the child element
       // This avoids weird inconsistencies between attributes

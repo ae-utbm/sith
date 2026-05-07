@@ -84,11 +84,7 @@ const refreshElement = <
       return;
     }
 
-    // This might be called at some bad timing
-    // This prevents crashes of the observer
-    if (element.refresh) {
-      element.refresh();
-    }
+    element.refresh();
   }
 };
 
@@ -134,7 +130,7 @@ startObserver(observer);
 export class LinkOnce extends elementOnce("link") {
   getElementQuerySelector(): string {
     // We get href from node.attributes instead of node.href to avoid getting the domain part
-    return `link[href='${this.node.attributes.getNamedItem("href")?.nodeValue}']`;
+    return `link[href='${this.node.attributes.getNamedItem("href").nodeValue}']`;
   }
 }
 
@@ -146,6 +142,6 @@ export class LinkOnce extends elementOnce("link") {
 export class ScriptOnce extends inheritHtmlElement("script") {
   getElementQuerySelector(): string {
     // We get href from node.attributes instead of node.src to avoid getting the domain part
-    return `script[src='${this.node.attributes.getNamedItem("src")?.nodeValue}']`;
+    return `script[src='${this.node.attributes.getNamedItem("src").nodeValue}']`;
   }
 }
