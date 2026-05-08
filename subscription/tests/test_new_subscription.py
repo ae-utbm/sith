@@ -12,7 +12,6 @@ from django.urls import reverse
 from django.utils.timezone import localdate
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
-from pytest_django.fixtures import SettingsWrapper
 
 from core.baker_recipes import board_user, old_subscriber_user, subscriber_user
 from core.models import Group, User
@@ -26,9 +25,7 @@ from subscription.models import Subscription
     "user_factory",
     [old_subscriber_user.make, lambda: baker.make(User)],
 )
-def test_form_existing_user_valid(
-    user_factory: Callable[[], User], settings: SettingsWrapper
-):
+def test_form_existing_user_valid(user_factory: Callable[[], User]):
     """Test `SubscriptionExistingUserForm`"""
     user = user_factory()
     user.date_of_birth = date(year=1967, month=3, day=14)
@@ -48,7 +45,7 @@ def test_form_existing_user_valid(
 
 
 @pytest.mark.django_db
-def test_form_existing_user_with_birthdate(settings: SettingsWrapper):
+def test_form_existing_user_with_birthdate():
     """Test `SubscriptionExistingUserForm`"""
     user = baker.make(User, date_of_birth=None)
     data = {
@@ -70,7 +67,7 @@ def test_form_existing_user_with_birthdate(settings: SettingsWrapper):
 
 
 @pytest.mark.django_db
-def test_form_existing_user_invalid(settings: SettingsWrapper):
+def test_form_existing_user_invalid():
     """Test `SubscriptionExistingUserForm`, with users that shouldn't subscribe."""
     user = subscriber_user.make()
     # make sure the current subscription will end in a long time
@@ -91,7 +88,7 @@ def test_form_existing_user_invalid(settings: SettingsWrapper):
 
 
 @pytest.mark.django_db
-def test_form_new_user(settings: SettingsWrapper):
+def test_form_new_user():
     data = {
         "first_name": "John",
         "last_name": "Doe",
@@ -121,7 +118,7 @@ def test_form_new_user(settings: SettingsWrapper):
     "subscription_type",
     ["un-semestre", "deux-semestres", "cursus-tronc-commun", "cursus-branche"],
 )
-def test_form_set_new_user_as_student(settings: SettingsWrapper, subscription_type):
+def test_form_set_new_user_as_student(subscription_type):
     """Test that new users have the student role by default."""
     data = {
         "first_name": "John",
@@ -165,7 +162,7 @@ def test_page_access_with_get_data(client: Client):
 
 
 @pytest.mark.django_db
-def test_submit_form_existing_user(client: Client, settings: SettingsWrapper):
+def test_submit_form_existing_user(client: Client):
     client.force_login(
         baker.make(
             User,
@@ -196,7 +193,7 @@ def test_submit_form_existing_user(client: Client, settings: SettingsWrapper):
 
 
 @pytest.mark.django_db
-def test_submit_form_new_user(client: Client, settings: SettingsWrapper):
+def test_submit_form_new_user(client: Client):
     client.force_login(
         baker.make(
             User,

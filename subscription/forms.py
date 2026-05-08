@@ -120,6 +120,12 @@ class SubscriptionNewUserForm(SubscriptionForm):
             email=self.cleaned_data.get("email"),
             date_of_birth=self.cleaned_data.get("date_of_birth"),
         )
+        if self.errors:
+            # don't bother generating username, password and other data.
+            # The form validation failed anyway, so using a dummy User
+            # (just for Subscription.clean not to crash) is enough
+            self.instance.member = member
+            return super().clean()
         if self.cleaned_data.get("subscription_type") in [
             "un-semestre",
             "deux-semestres",
