@@ -23,7 +23,7 @@
         <a target="#" href="{{ url("com:news_feed") }}"><i class="fa fa-rss feed"></i></a>
       </h3>
       {% if user.is_authenticated and (user.is_com_admin or user.memberships.board().ongoing().exists()) %}
-        <a class="btn btn-blue margin-bottom" href="{{ url("com:news_new") }}">
+        <a class="btn btn-blue" href="{{ url("com:news_new") }}">
           <i class="fa fa-plus"></i>
           {% trans %}Create news{% endtrans %}
         </a>

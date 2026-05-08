@@ -1,0 +1,162 @@
+#eboutic-title {
+  margin-left: 20px;
+}
+
+#eboutic {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  column-gap: 20px;
+  margin: 0 20px 20px;
+
+  h3 {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  #basket {
+    --box-shadow:
+    rgb(60 64 67 / 30%) 0 1px 3px 0,
+    rgb(60 64 67 / 15%) 0 4px 8px 3px;
+    min-width: 300px;
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
+    padding: 10px;
+    h3 {
+      margin-top: 0;
+    }
+  }
+
+  @media screen and (max-width: 765px) {
+    flex-direction: column-reverse;
+    align-items: center;
+    margin: 10px;
+    row-gap: 20px;
+
+    #eboutic-title {
+      margin-bottom: 20px;
+      margin-top: 4px;
+    }
+    #basket {
+      width: -webkit-fill-available;
+    }
+  }
+
+  .item-list {
+    margin-left: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+  }
+
+  .item-row {
+    gap: 10px;
+  }
+
+  .item-name {
+    word-break: break-word;
+    width: 100%;
+    line-height: 100%;
+    white-space: normal;
+  }
+
+  .fa-plus,
+  .fa-minus {
+    cursor: pointer;
+    background-color: #354a5f;
+    color: white;
+    border-radius: 50%;
+    padding: 5px;
+    font-size: 10px;
+    line-height: 10px;
+    width: 10px;
+    text-align: center;
+  }
+
+  .item-quantity {
+    min-width: 65px;
+    justify-content: space-between;
+    align-items: center;
+    display: flex;
+    gap: 5px;
+  }
+
+  .item-price {
+    min-width: 65px;
+    text-align: right;
+  }
+
+/*  CSS du catalogue  */
+
+  #catalog {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    row-gap: 30px;
+  }
+
+  .category-header {
+    margin-bottom: 15px;
+  }
+
+  .product-group {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 15px;
+    row-gap: 15px;
+  }
+
+  .card.selected::after {
+    --box-shadow: 0 0 12px 2px rgb(0 0 0 / 14%);
+    content: "🛒";
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 5px;
+    border-radius: 50%;
+    box-shadow: var(--box-shadow);
+    background-color: white;
+    width: 20px;
+    height: 20px;
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  input {
+    all: unset;
+  }
+  .catalog-buttons {
+    display: flex;
+    justify-content: center;
+    column-gap: 30px;
+    margin: 30px 0 0;
+
+    button {
+      min-width: 60px;
+    }
+    form {
+      margin: 0;
+    }
+  }
+
+
+  @media screen and (max-width: 765px) {
+    #catalog {
+      row-gap: 15px;
+      width: 100%;
+    }
+
+    section {
+      text-align: center;
+    }
+
+    .product-group {
+      justify-content: space-around;
+      flex-direction: column;
+    }
+  }
+}
