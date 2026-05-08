@@ -1,0 +1,38 @@
+<form
+  hx-post="{{ url("subscription:fragment-existing-user") }}"
+  hx-target="this"
+  hx-disabled-elt="find input[type='submit']"
+  hx-swap="outerHTML"
+>
+  {% csrf_token %}
+
+  <div x-data="existing_user_subscription_form" class="form-content existing-user">
+    <fieldset>
+      {{ form.errors }}
+      {% for field in form %}
+        <div class="form-group">
+          {{ field.label_tag() }}
+          {{ field }}
+          {% if field.help_text %}
+            <span class="helptext">{{ field.help_text }}</span>
+          {% endif %}
+          {% if field.name == "payment_method" %}
+            <i>
+              {% trans trimmed %}
+                If the subscription is done using the AE account,
+                you must also click it on the AE counter.
+              {% endtrans %}
+            </i>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </fieldset>
+    <div
+      id="subscription-form-user-mini-profile"
+      x-html="profileFragment"
+      :aria-busy="loading"
+    ></div>
+  </div>
+
+  <input type="submit" value="{% trans %}Save{% endtrans %}">
+</form>

@@ -23,6 +23,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DetailView, TemplateView
 from django.views.generic.edit import FormView
 
+from core.views import FragmentMixin, UseFragmentsMixin
 from core.views.group import PermissionGroupsUpdateView
 from subscription.forms import (
     SelectionDateForm,
@@ -32,24 +33,9 @@ from subscription.forms import (
 from subscription.models import Subscription
 
 
-class NewSubscription(PermissionRequiredMixin, TemplateView):
-    template_name = "subscription/subscription.jinja"
+class CreateSubscriptionFragment(PermissionRequiredMixin, FragmentMixin, CreateView):
     permission_required = "subscription.add_subscription"
-
-    def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
-            "existing_user_form": SubscriptionExistingUserForm(
-                initial={"member": self.request.GET.get("member")}
-            ),
-            "new_user_form": SubscriptionNewUserForm(),
-            "existing_user_post_url": reverse("subscription:fragment-existing-user"),
-            "new_user_post_url": reverse("subscription:fragment-new-user"),
-        }
-
-
-class CreateSubscriptionFragment(PermissionRequiredMixin, CreateView):
-    template_name = "subscription/fragments/creation_form.jinja"
-    permission_required = "subscription.add_subscription"
+    object = None
 
     def get_success_url(self):
         return reverse(
@@ -61,14 +47,14 @@ class CreateSubscriptionExistingUserFragment(CreateSubscriptionFragment):
     """Create a subscription for a user who already exists."""
 
     form_class = SubscriptionExistingUserForm
-    extra_context = {"post_url": reverse_lazy("subscription:fragment-existing-user")}
+    template_name = "subscription/fragments/creation_form_existing_user.jinja"
 
 
 class CreateSubscriptionNewUserFragment(CreateSubscriptionFragment):
     """Create a subscription for a user who doesn't exist yet."""
 
     form_class = SubscriptionNewUserForm
-    extra_context = {"post_url": reverse_lazy("subscription:fragment-new-user")}
+    template_name = "subscription/fragments/creation_form_new_user.jinja"
 
     def form_valid(self, form):
         res = super().form_valid(form)
@@ -81,6 +67,15 @@ class CreateSubscriptionNewUserFragment(CreateSubscriptionFragment):
                 from_email="ae@utbm.fr",
             )
         return res
+
+
+class NewSubscription(PermissionRequiredMixin, UseFragmentsMixin, TemplateView):
+    template_name = "subscription/subscription.jinja"
+    permission_required = "subscription.add_subscription"
+    fragments = {
+        "new_user_fragment": CreateSubscriptionNewUserFragment,
+        "existing_user_fragment": CreateSubscriptionExistingUserFragment,
+    }
 
 
 class SubscriptionCreatedFragment(PermissionRequiredMixin, DetailView):

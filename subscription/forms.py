@@ -79,7 +79,6 @@ class SubscriptionNewUserForm(SubscriptionForm):
     """
 
     allowed_payment_methods = ["CARD", "CASH"]
-    template_name = "subscription/forms/create_new_user.jinja"
 
     __user_fields = forms.fields_for_model(
         User,
@@ -153,7 +152,6 @@ class SubscriptionNewUserForm(SubscriptionForm):
 class SubscriptionExistingUserForm(SubscriptionForm):
     """Form to add a subscription to an existing user."""
 
-    template_name = "subscription/forms/create_existing_user.jinja"
     required_css_class = "required"
 
     birthdate = forms.fields_for_model(
