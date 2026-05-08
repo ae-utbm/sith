@@ -6,13 +6,28 @@
 >
   {% csrf_token %}
 
-  <div x-data="existing_user_subscription_form" class="form-content existing-user">
+  {% set alpine_input_attrs = {
+  'id_member': 'x-ref=userSelect,x-model=selectedUser',
+  'id_birthdate': ':value=dateOfBirth,:hidden=dateOfBirthHidden',
+  } %}
+
+  {% set alpine_field_attrs = {
+  'id_birthdate': (':hidden=dateOfBirthHidden', 'x-cloack')
+  } %}
+
+  <div x-data="existing_user_subscription_form()" class="form-content existing-user">
     <fieldset>
-      {{ form.errors }}
+      {% if form.errors %}
+        {{ form.errors.__all__ }}
+      {% endif %}
       {% for field in form %}
-        <div class="form-group">
+        <div
+          class="form-group"
+          {% for attr in alpine_field_attrs.get(field.auto_id, []) %}
+            {{ attr }}
+          {% endfor %}>
           {{ field.label_tag() }}
-          {{ field }}
+          {{ field|add_attr(alpine_input_attrs.get(field.auto_id, "")) }}
           {% if field.help_text %}
             <span class="helptext">{{ field.help_text }}</span>
           {% endif %}
