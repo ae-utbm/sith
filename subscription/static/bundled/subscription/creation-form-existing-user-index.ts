@@ -7,16 +7,15 @@ Alpine.data("existing_user_subscription_form", () => ({
   dateOfBirth: "",
   dateOfBirthHidden: true,
 
-  async init() {
+  init() {
     this.$watch("selectedUser", async () => {
       await this.loadProfile(Number.parseInt(this.selectedUser, 10));
     });
 
-    // Wait for web components to load
-    await this.$nextTick();
-
-    // Force to detect the initial value
-    this.selectedUser = this.$refs.userSelect.widget.getValue();
+    this.$nextTick(() => {
+      // Force to detect the initial value
+      this.selectedUser = this.$refs.userSelect.widget.getValue();
+    });
   },
 
   async loadProfile(userId: number) {
