@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-02 17:57+0200\n"
+"POT-Creation-Date: 2026-05-10 20:27+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -258,10 +258,6 @@ msgstr "rôle"
 #: forum/models.py
 msgid "description"
 msgstr "description"
-
-#: club/models.py
-msgid "past member"
-msgstr "ancien membre"
 
 #: club/models.py com/templates/com/mailing_admin.jinja
 #: com/templates/com/news_admin_list.jinja com/templates/com/weekmail.jinja
@@ -582,7 +578,8 @@ msgstr ""
 #: counter/templates/counter/invoices_call.jinja
 #: counter/templates/counter/product_form.jinja
 #: forum/templates/forum/reply.jinja
-#: subscription/templates/subscription/fragments/creation_form.jinja
+#: subscription/templates/subscription/fragments/creation_form_existing_user.jinja
+#: subscription/templates/subscription/fragments/creation_form_new_user.jinja
 #: trombi/templates/trombi/comment.jinja
 #: trombi/templates/trombi/edit_profile.jinja
 #: trombi/templates/trombi/user_tools.jinja
@@ -2892,8 +2889,8 @@ msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
 #: core/views/forms.py
 msgid ""
-"Profile: you need to be visible on the picture, in order to be recognized "
-"(e.g. by the barmen)"
+"Profile: you need to be visible on the picture, in order to be recognized (e."
+"g. by the barmen)"
 msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
@@ -3693,10 +3690,10 @@ msgid ""
 "orders a sandwich and a soft drink, the formula will be applied and the "
 "basket will then contain a sandwich formula instead."
 msgstr ""
-"Par exemple s'il existe une formule associant un produit « Formule "
-"sandwich » aux produits « Sandwich » et « Soft », alors, si une personne "
-"commande un sandwich et un soft, la formule sera appliquée et le panier "
-"contiendra alors une formule sandwich à la place."
+"Par exemple s'il existe une formule associant un produit « Formule sandwich "
+"» aux produits « Sandwich » et « Soft », alors, si une personne commande un "
+"sandwich et un soft, la formule sera appliquée et le panier contiendra alors "
+"une formule sandwich à la place."
 
 #: counter/templates/counter/formula_list.jinja
 msgid "New formula"
@@ -3758,8 +3755,8 @@ msgstr ""
 #: counter/templates/counter/mails/account_dump.jinja
 msgid "If you think this was a mistake, please mail us at ae@utbm.fr."
 msgstr ""
-"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à "
-"ae@utbm.fr."
+"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à ae@utbm."
+"fr."
 
 #: counter/templates/counter/mails/account_dump.jinja
 msgid ""
@@ -5341,7 +5338,9 @@ msgid "Amicale/DOCEO member"
 msgstr "Membre de l'Amicale/DOCEO"
 
 #: sith/settings.py
-msgid "UT network member"
+#, fuzzy
+#| msgid "UT network member"
+msgid "UT network member (excluding UTC)"
 msgstr "Cotisant du réseau UT"
 
 #: sith/settings.py
@@ -5353,24 +5352,8 @@ msgid "Sbarro/ESTA member"
 msgstr "Membre de Sbarro ou de l'ESTA"
 
 #: sith/settings.py
-msgid "One semester Welcome Week"
-msgstr "Un semestre Welcome Week"
-
-#: sith/settings.py
-msgid "Eurok's volunteer"
-msgstr "Bénévole Eurockéennes"
-
-#: sith/settings.py
-msgid "Six weeks for free"
-msgstr "6 semaines gratuites"
-
-#: sith/settings.py
 msgid "One day"
 msgstr "Un jour"
-
-#: sith/settings.py
-msgid "GA staff member"
-msgstr "Membre staff GA"
 
 #: sith/settings.py
 msgid "One semester (-20%)"
@@ -5391,10 +5374,6 @@ msgstr "Cursus branche (-20%)"
 #: sith/settings.py
 msgid "Alternating cursus (-20%)"
 msgstr "Cursus alternant (-20%)"
-
-#: sith/settings.py
-msgid "One year for free(CA offer)"
-msgstr "Une année offerte (Offre CA)"
 
 #: sith/settings.py
 msgid "President"
@@ -5518,7 +5497,7 @@ msgstr "lieu"
 msgid "You can not subscribe many time for the same period"
 msgstr "Vous ne pouvez pas cotiser plusieurs fois pour la même période"
 
-#: subscription/templates/subscription/forms/create_existing_user.jinja
+#: subscription/templates/subscription/fragments/creation_form_existing_user.jinja
 msgid ""
 "If the subscription is done using the AE account, you must also click it on "
 "the AE counter."
@@ -5909,3 +5888,21 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 #, python-format
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
+
+#~ msgid "past member"
+#~ msgstr "ancien membre"
+
+#~ msgid "One semester Welcome Week"
+#~ msgstr "Un semestre Welcome Week"
+
+#~ msgid "Eurok's volunteer"
+#~ msgstr "Bénévole Eurockéennes"
+
+#~ msgid "Six weeks for free"
+#~ msgstr "6 semaines gratuites"
+
+#~ msgid "GA staff member"
+#~ msgstr "Membre staff GA"
+
+#~ msgid "One year for free(CA offer)"
+#~ msgstr "Une année offerte (Offre CA)"
