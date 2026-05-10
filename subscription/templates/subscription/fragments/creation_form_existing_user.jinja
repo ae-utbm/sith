@@ -8,24 +8,27 @@
 
   <div x-data="existing_user_subscription_form" class="form-content existing-user">
     <fieldset>
-      {{ form.errors }}
-      {% for field in form %}
-        <div class="form-group">
-          {{ field.label_tag() }}
-          {{ field }}
-          {% if field.help_text %}
-            <span class="helptext">{{ field.help_text }}</span>
-          {% endif %}
-          {% if field.name == "payment_method" %}
-            <i>
-              {% trans trimmed %}
-                If the subscription is done using the AE account,
-                you must also click it on the AE counter.
-              {% endtrans %}
-            </i>
-          {% endif %}
-        </div>
-      {% endfor %}
+      {{ form.non_field_errors() }}
+      <div class="form-group">
+        {{ form.member.label_tag() }}
+        {{ form.member|add_attr("x-ref=userSelect,x-model=selectedUser") }}
+      </div>
+      <div class="form-group">
+        {{ form.birthdate.label_tag() }}
+        {{ form.birthdate|add_attr(":value=dateOfBirth,:hidden=dateOfBirthHidden,:type=dateOfBirthHidden ? 'hidden' : 'date'") }}
+        <span class="helptext">{{ form.birthdate.help_text }}</span>
+      </div>
+      <div class="form-group">{{ form.subscription_type.as_field_group() }}</div>
+      <div class="form-group">
+        {{ form.payment_method.as_field_group() }}
+        <i>
+          {% trans trimmed %}
+            If the subscription is done using the AE account,
+            you must also click it on the AE counter.
+          {% endtrans %}
+        </i>
+      </div>
+      <div class="form-group">{{ form.location.as_field_group() }}</div>
     </fieldset>
     <div
       id="subscription-form-user-mini-profile"
