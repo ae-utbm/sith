@@ -1,9 +1,9 @@
 import { showSaveFilePicker } from "native-file-system-adapter";
 import type TomSelect from "tom-select";
+import type { NestedKeyOf } from "#core:types/nested-key";
 import { paginated } from "#core:utils/api";
 import { csv } from "#core:utils/csv";
 import { getCurrentUrlParams, History, updateQueryString } from "#core:utils/history";
-import type { NestedKeyOf } from "#core:utils/types";
 import {
   type ProductSchema,
   type ProductSearchProductsDetailedData,
