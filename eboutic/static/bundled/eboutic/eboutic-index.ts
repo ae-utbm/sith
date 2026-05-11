@@ -7,8 +7,7 @@ interface BasketItem {
   unitPrice: number;
 }
 
-// increment the key number if the data schema of the cached basket changes
-const BASKET_CACHE_KEY = "basket1";
+const BASKET_CACHE_KEY = "basket";
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("basket", (lastPurchaseTime?: number) => ({
