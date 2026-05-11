@@ -12,19 +12,23 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from typing import Callable
+from typing import Callable, Literal
+from unittest.mock import patch
 
 import pytest
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.cache import cache
+from django.core.files.base import ContentFile
 from django.test import Client, TestCase
 from django.urls import reverse
 from model_bakery import baker
+from PIL import Image
 from pytest_django.asserts import assertHTMLEqual, assertInHTML, assertRedirects
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import Group, User
+from core.utils import RED_PIXEL_PNG
 from sas.baker_recipes import picture_recipe
 from sas.models import Album, Picture
 
@@ -160,6 +164,71 @@ class TestAlbumUpload:
         assert len(errors) == 1
         assert errors[0].text == "Vous n'avez pas la permission de faire cela"
         assert not album.children.exists()
+
+
+@pytest.mark.django_db
+class TestPictureRotation:
+    @pytest.fixture
+    def picture(self) -> Picture:
+        return picture_recipe.make(
+            parent_id=settings.SITH_SAS_ROOT_DIR_ID,
+            file=ContentFile(name="foo.png", content=RED_PIXEL_PNG),
+            compressed=ContentFile(name="foo.png", content=RED_PIXEL_PNG),
+            thumbnail=ContentFile(name="foo.png", content=RED_PIXEL_PNG),
+        )
+
+    @pytest.mark.parametrize(
+        "user",
+        [
+            None,
+            lambda: baker.make(User),
+            subscriber_user.make,
+            old_subscriber_user.make,
+        ],
+    )
+    def test_permission_denied(
+        self, client: Client, picture: Picture, user: Callable[[], User] | None
+    ):
+        if user:
+            client.force_login(user())
+
+        url = reverse(
+            "api:rotate_picture", kwargs={"picture_id": picture.id, "direction": "left"}
+        )
+        response = client.post(url)
+        assert response.status_code == 403 if user else 401
+
+    @pytest.mark.parametrize(
+        "user",
+        [
+            lambda: baker.make(User, is_superuser=True),
+            lambda: baker.make(
+                User, groups=[Group.objects.get(pk=settings.SITH_GROUP_SAS_ADMIN_ID)]
+            ),
+        ],
+    )
+    @pytest.mark.parametrize(("direction", "angle"), [("left", 90), ("right", 270)])
+    def test_rotation(
+        self,
+        client: Client,
+        picture: Picture,
+        user: Callable[[], User],
+        direction: Literal["left", "right"],
+        angle: Literal[90, 270],
+    ):
+        client.force_login(user())
+        url = reverse(
+            "api:rotate_picture",
+            kwargs={"picture_id": picture.id, "direction": direction},
+        )
+        with (
+            patch.object(Image.Image, "rotate") as mocked_rotate,
+            patch.object(Picture, "generate_thumbnails") as mocked_thumb,
+        ):
+            response = client.post(url)
+            assert response.status_code == 200
+            mocked_rotate.assert_called_once_with(angle)
+            mocked_thumb.assert_called_once()
 
 
 class TestSasModeration(TestCase):

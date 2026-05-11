@@ -5,7 +5,8 @@
     margin-top: 0;
   }
 
-  fieldset p:first-of-type, & > p:first-of-type {
+  fieldset p:first-of-type,
+  &>p:first-of-type {
     margin-top: 0;
   }
 
@@ -24,7 +25,7 @@
     fieldset {
       flex: 0 1 auto;
 
-      p:has(input[hidden]) {
+      .form-group:has(input[hidden]) {
         // when the input is hidden, hide the whole label+input+help text group
         display: none;
       }

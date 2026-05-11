@@ -28,7 +28,7 @@ export class Tab extends HTMLElement {
     return html`
     	<button
 	    	role="tab"
-	    	?aria-selected=${this.active}
+	    	?aria-selected="${this.active}"
     		class="tab-header clickable ${this.active ? "active" : ""}"
     		@click="${() => this.setActive(true)}"
     	>
@@ -40,7 +40,7 @@ export class Tab extends HTMLElement {
     return html`
     	<section
     		class="tab-section"
-    		?hidden=${!this.active}
+    		?hidden="${!this.active}"
     	>
 	    	${unsafeHTML(this.getContentHtml())}
 	    </section>

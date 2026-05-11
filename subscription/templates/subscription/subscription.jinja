@@ -18,22 +18,14 @@
   <link rel="stylesheet" href="{{ static("subscription/css/subscription.scss") }}">
 {% endblock %}
 
-{% macro form_fragment(form_object, post_url) %}
-  {# Include the form fragment inside a with block,
-  in order to inject the right form in the right place #}
-  {% with form=form_object, post_url=post_url %}
-    {% include "subscription/fragments/creation_form.jinja" %}
-  {% endwith %}
-{% endmacro %}
-
 {% block content %}
   <h3>{% trans %}New subscription{% endtrans %}</h3>
   <ui-tab-group id="subscription-form">
     <ui-tab title="{% trans %}Existing member{% endtrans %}" active>
-      {{ form_fragment(existing_user_form, existing_user_post_url) }}
+      {{ existing_user_fragment }}
     </ui-tab>
     <ui-tab title="{% trans %}New member{% endtrans %}">
-      {{ form_fragment(new_user_form, new_user_post_url) }}
+      {{ new_user_fragment }}
     </ui-tab>
   </ui-tab-group>
 {% endblock %}

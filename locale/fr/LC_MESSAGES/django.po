@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-23 22:21+0100\n"
+"POT-Creation-Date: 2026-05-10 20:27+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -181,6 +181,22 @@ msgstr "Vous devez être cotisant pour faire partie d'un club"
 msgid "You are already a member of this club"
 msgstr "Vous êtes déjà membre de ce club."
 
+#: club/forms.py
+msgid "Club status"
+msgstr "État du club"
+
+#: club/forms.py
+msgid "Active"
+msgstr "Actif"
+
+#: club/forms.py
+msgid "Inactive"
+msgstr "Inactif"
+
+#: club/forms.py
+msgid "All clubs"
+msgstr "Tous les clubs"
+
 #: club/models.py
 msgid "slug name"
 msgstr "nom slug"
@@ -243,10 +259,6 @@ msgstr "rôle"
 msgid "description"
 msgstr "description"
 
-#: club/models.py
-msgid "past member"
-msgstr "ancien membre"
-
 #: club/models.py com/templates/com/mailing_admin.jinja
 #: com/templates/com/news_admin_list.jinja com/templates/com/weekmail.jinja
 #: core/templates/core/user_clubs.jinja
@@ -302,36 +314,21 @@ msgid "Unregistered user"
 msgstr "Utilisateur non enregistré"
 
 #: club/templates/club/club_list.jinja
-msgid "Club list"
-msgstr "Liste des clubs"
-
-#: club/templates/club/club_list.jinja
 msgid "The list of all clubs existing at UTBM."
 msgstr "La liste de tous les clubs existants à l'UTBM"
+
+#: club/templates/club/club_list.jinja
+msgid "Club list"
+msgstr "Liste des clubs"
 
 #: club/templates/club/club_list.jinja
 msgid "Filters"
 msgstr "Filtres"
 
-#: club/templates/club/club_list.jinja
-msgid "Name"
-msgstr "Nom"
-
-#: club/templates/club/club_list.jinja
-msgid "Club state"
-msgstr "Etat du club"
-
-#: club/templates/club/club_list.jinja
-msgid "Active"
-msgstr "Actif"
-
-#: club/templates/club/club_list.jinja
-msgid "Inactive"
-msgstr "Inactif"
-
-#: club/templates/club/club_list.jinja
-msgid "All clubs"
-msgstr "Tous les clubs"
+#: club/templates/club/club_list.jinja core/templates/core/base/header.jinja
+#: forum/templates/forum/macros.jinja matmat/templates/matmat/search_form.jinja
+msgid "Search"
+msgstr "Recherche"
 
 #: club/templates/club/club_list.jinja core/templates/core/user_tools.jinja
 msgid "New club"
@@ -433,7 +430,7 @@ msgstr "Bénéfice : "
 #: counter/templates/counter/cash_summary_list.jinja
 #: counter/templates/counter/last_ops.jinja
 #: counter/templates/counter/refilling_list.jinja
-#: rootplace/templates/rootplace/logs.jinja sas/forms.py
+#: rootplace/templates/rootplace/logs.jinja
 #: trombi/templates/trombi/user_profile.jinja
 msgid "Date"
 msgstr "Date"
@@ -581,7 +578,8 @@ msgstr ""
 #: counter/templates/counter/invoices_call.jinja
 #: counter/templates/counter/product_form.jinja
 #: forum/templates/forum/reply.jinja
-#: subscription/templates/subscription/fragments/creation_form.jinja
+#: subscription/templates/subscription/fragments/creation_form_existing_user.jinja
+#: subscription/templates/subscription/fragments/creation_form_new_user.jinja
 #: trombi/templates/trombi/comment.jinja
 #: trombi/templates/trombi/edit_profile.jinja
 #: trombi/templates/trombi/user_tools.jinja
@@ -1692,6 +1690,10 @@ msgstr "taille"
 msgid "date"
 msgstr "date"
 
+#: core/models.py counter/models.py
+msgid "updated at"
+msgstr "mis à jour le"
+
 #: core/models.py
 msgid "asked for removal"
 msgstr "retrait demandé"
@@ -1862,11 +1864,6 @@ msgstr "Connexion"
 #: core/templates/core/base/header.jinja core/templates/core/register.jinja
 msgid "Register"
 msgstr "Inscription"
-
-#: core/templates/core/base/header.jinja forum/templates/forum/macros.jinja
-#: matmat/templates/matmat/search_form.jinja
-msgid "Search"
-msgstr "Recherche"
 
 #: core/templates/core/base/header.jinja
 msgid "Logout"
@@ -2892,8 +2889,8 @@ msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
 #: core/views/forms.py
 msgid ""
-"Profile: you need to be visible on the picture, in order to be recognized "
-"(e.g. by the barmen)"
+"Profile: you need to be visible on the picture, in order to be recognized (e."
+"g. by the barmen)"
 msgstr ""
 "Photo de profil: vous devez être visible sur la photo afin d'être reconnu "
 "(par exemple par les barmen)"
@@ -3194,10 +3191,6 @@ msgstr "groupe d'achat"
 #: counter/models.py election/models.py
 msgid "archived"
 msgstr "archivé"
-
-#: counter/models.py
-msgid "updated at"
-msgstr "mis à jour le"
 
 #: counter/models.py eboutic/models.py
 msgid "product"
@@ -3697,10 +3690,10 @@ msgid ""
 "orders a sandwich and a soft drink, the formula will be applied and the "
 "basket will then contain a sandwich formula instead."
 msgstr ""
-"Par exemple s'il existe une formule associant un produit « Formule "
-"sandwich » aux produits « Sandwich » et « Soft », alors, si une personne "
-"commande un sandwich et un soft, la formule sera appliquée et le panier "
-"contiendra alors une formule sandwich à la place."
+"Par exemple s'il existe une formule associant un produit « Formule sandwich "
+"» aux produits « Sandwich » et « Soft », alors, si une personne commande un "
+"sandwich et un soft, la formule sera appliquée et le panier contiendra alors "
+"une formule sandwich à la place."
 
 #: counter/templates/counter/formula_list.jinja
 msgid "New formula"
@@ -3762,8 +3755,8 @@ msgstr ""
 #: counter/templates/counter/mails/account_dump.jinja
 msgid "If you think this was a mistake, please mail us at ae@utbm.fr."
 msgstr ""
-"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à "
-"ae@utbm.fr."
+"Si vous pensez qu'il s'agit d'une erreur, veuillez envoyer un mail à ae@utbm."
+"fr."
 
 #: counter/templates/counter/mails/account_dump.jinja
 msgid ""
@@ -3829,12 +3822,12 @@ msgstr ""
 "aucune conséquence autre que le retrait de l'argent de votre compte."
 
 #: counter/templates/counter/product_form.jinja
-msgid "Remove price"
-msgstr "Retirer le prix"
-
-#: counter/templates/counter/product_form.jinja
 msgid "Remove this action"
 msgstr "Retirer cette action"
+
+#: counter/templates/counter/product_form.jinja
+msgid "Remove price"
+msgstr "Retirer le prix"
 
 #: counter/templates/counter/product_form.jinja
 #, python-format
@@ -4204,6 +4197,47 @@ msgstr ""
 #: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "this page"
 msgstr "cette page"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "Eurockéennes 2025 partnership"
+msgstr "Partenariat Eurockéennes 2025"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid ""
+"Our partner uses Weezevent to sell tickets. Weezevent may collect user info "
+"according to its own privacy policy. By clicking the accept button you "
+"consent to their terms of services."
+msgstr ""
+"Notre partenaire utilises Wezevent pour vendre ses billets. Weezevent peut "
+"collecter des informations utilisateur conformément à sa propre politique de "
+"confidentialité. En cliquant sur le bouton d'acceptation vous consentez à "
+"leurs termes de service."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid "Privacy policy"
+msgstr "Politique de confidentialité"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+#: trombi/templates/trombi/comment_moderation.jinja
+msgid "Accept"
+msgstr "Accepter"
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+msgid ""
+"You must be subscribed to benefit from the partnership with the Eurockéennes."
+msgstr ""
+"Vous devez être cotisant pour bénéficier du partenariat avec les "
+"Eurockéennes."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+#, python-format
+msgid ""
+"This partnership offers a discount of up to 33%% on tickets for Friday, "
+"Saturday and Sunday, as well as the 3-day package from Friday to Sunday."
+msgstr ""
+"Ce partenariat permet de profiter d'une réduction jusqu'à 33%% sur les "
+"billets du vendredi, du samedi et du dimanche, ainsi qu'au forfait 3 jours, "
+"du vendredi au dimanche."
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "There are no items available for sale"
@@ -5304,7 +5338,9 @@ msgid "Amicale/DOCEO member"
 msgstr "Membre de l'Amicale/DOCEO"
 
 #: sith/settings.py
-msgid "UT network member"
+#, fuzzy
+#| msgid "UT network member"
+msgid "UT network member (excluding UTC)"
 msgstr "Cotisant du réseau UT"
 
 #: sith/settings.py
@@ -5316,24 +5352,8 @@ msgid "Sbarro/ESTA member"
 msgstr "Membre de Sbarro ou de l'ESTA"
 
 #: sith/settings.py
-msgid "One semester Welcome Week"
-msgstr "Un semestre Welcome Week"
-
-#: sith/settings.py
-msgid "Eurok's volunteer"
-msgstr "Bénévole Eurockéennes"
-
-#: sith/settings.py
-msgid "Six weeks for free"
-msgstr "6 semaines gratuites"
-
-#: sith/settings.py
 msgid "One day"
 msgstr "Un jour"
-
-#: sith/settings.py
-msgid "GA staff member"
-msgstr "Membre staff GA"
 
 #: sith/settings.py
 msgid "One semester (-20%)"
@@ -5354,10 +5374,6 @@ msgstr "Cursus branche (-20%)"
 #: sith/settings.py
 msgid "Alternating cursus (-20%)"
 msgstr "Cursus alternant (-20%)"
-
-#: sith/settings.py
-msgid "One year for free(CA offer)"
-msgstr "Une année offerte (Offre CA)"
 
 #: sith/settings.py
 msgid "President"
@@ -5481,7 +5497,7 @@ msgstr "lieu"
 msgid "You can not subscribe many time for the same period"
 msgstr "Vous ne pouvez pas cotiser plusieurs fois pour la même période"
 
-#: subscription/templates/subscription/forms/create_existing_user.jinja
+#: subscription/templates/subscription/fragments/creation_form_existing_user.jinja
 msgid ""
 "If the subscription is done using the AE account, you must also click it on "
 "the AE counter."
@@ -5630,10 +5646,6 @@ msgstr "fin"
 #: trombi/templates/trombi/comment_moderation.jinja
 msgid "Moderate Trombi comments"
 msgstr "Modérer les commentaires du Trombi"
-
-#: trombi/templates/trombi/comment_moderation.jinja
-msgid "Accept"
-msgstr "Accepter"
 
 #: trombi/templates/trombi/comment_moderation.jinja
 msgid "Reject"
@@ -5877,38 +5889,20 @@ msgstr "Vous ne pouvez plus écrire de commentaires, la date est passée."
 msgid "Maximum characters: %(max_length)s"
 msgstr "Nombre de caractères max: %(max_length)s"
 
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid "Eurockéennes 2025 partnership"
-msgstr "Partenariat Eurockéennes 2025"
+#~ msgid "past member"
+#~ msgstr "ancien membre"
 
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid ""
-"Our partner uses Weezevent to sell tickets. Weezevent may collect user info "
-"according to its own privacy policy. By clicking the accept button you "
-"consent to their terms of services."
-msgstr ""
-"Notre partenaire utilises Wezevent pour vendre ses billets. Weezevent peut "
-"collecter des informations utilisateur conformément à sa propre politique de "
-"confidentialité. En cliquant sur le bouton d'acceptation vous consentez à "
-"leurs termes de service."
+#~ msgid "One semester Welcome Week"
+#~ msgstr "Un semestre Welcome Week"
 
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid "Privacy policy"
-msgstr "Politique de confidentialité"
+#~ msgid "Eurok's volunteer"
+#~ msgstr "Bénévole Eurockéennes"
 
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid ""
-"You must be subscribed to benefit from the partnership with the Eurockéennes."
-msgstr ""
-"Vous devez être cotisant pour bénéficier du partenariat avec les "
-"Eurockéennes."
+#~ msgid "Six weeks for free"
+#~ msgstr "6 semaines gratuites"
 
-#: eboutic/templates/eboutic/eboutic_main.jinja
-#, python-format
-msgid ""
-"This partnership offers a discount of up to 33%% on tickets for Friday, "
-"Saturday and Sunday, as well as the 3-day package from Friday to Sunday."
-msgstr ""
-"Ce partenariat permet de profiter d'une réduction jusqu'à 33%% sur les "
-"billets du vendredi, du samedi et du dimanche, ainsi qu'au forfait 3 jours, "
-"du vendredi au dimanche."
+#~ msgid "GA staff member"
+#~ msgstr "Membre staff GA"
+
+#~ msgid "One year for free(CA offer)"
+#~ msgstr "Une année offerte (Offre CA)"

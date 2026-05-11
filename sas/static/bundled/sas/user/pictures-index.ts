@@ -1,4 +1,4 @@
-import { paginated } from "#core:utils/api.ts";
+import { paginated } from "#core:utils/api";
 import {
   type PictureSchema,
   type PicturesFetchPicturesData,
@@ -35,8 +35,23 @@ document.addEventListener("alpine:init", () => {
         // biome-ignore lint/style/useNamingConvention: from python api
         query: { users_identified: [config.userId] },
       } as PicturesFetchPicturesData);
-      localStorage.setItem(localStorageInvalidationKey, config.nbPictures.toString());
-      localStorage.setItem(localStorageKey, JSON.stringify(pictures));
+      try {
+        localStorage.setItem(localStorageInvalidationKey, config.nbPictures.toString());
+        localStorage.setItem(localStorageKey, JSON.stringify(pictures));
+      } catch {
+        // an exception is raised if the localstorage is entirely filled
+        // so just delete all cached user pictures.
+        // A cache hit is not worth the page breaking.
+        Object.keys(localStorage)
+          .filter(
+            (key) =>
+              key.startsWith("user") &&
+              (key.endsWith("Pictures") || key.endsWith("PicturesNumber")),
+          )
+          .forEach((key) => {
+            localStorage.removeItem(key);
+          });
+      }
       return pictures;
     },
 

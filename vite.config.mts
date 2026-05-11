@@ -1,5 +1,4 @@
 import { parse, resolve } from "node:path";
-import inject from "@rollup/plugin-inject";
 import { glob } from "glob";
 import { visualizer } from "rollup-plugin-visualizer";
 import {
@@ -81,14 +80,8 @@ export default defineConfig((config: UserConfig) => {
     resolve: {
       alias: getAliases(),
     },
-
-    plugins: [
-      inject({
-        // biome-ignore lint/style/useNamingConvention: that's how it's called
-        Alpine: "alpinejs",
-        htmx: "htmx.org",
-      }),
-      visualizer({ filename: ".bundle-size-report.html" }) as PluginOption,
-    ],
+    // biome-ignore lint/style/useNamingConvention: that's how it's called
+    inject: { Alpine: "alpinejs", htmx: "htmx.org" },
+    plugins: [visualizer({ filename: ".bundle-size-report.html" }) as PluginOption],
   } satisfies UserConfig;
 });

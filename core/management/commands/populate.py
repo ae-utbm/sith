@@ -622,8 +622,7 @@ class Command(BaseCommand):
                     )
                     pict.file.name = p.name
                     pict.full_clean()
-                    pict.generate_thumbnails()
-                    pict.save()
+                    pict.generate_thumbnails(save=True)
 
         img_skia = Picture.objects.get(name="skia.jpg")
         img_sli = Picture.objects.get(name="sli.jpg")

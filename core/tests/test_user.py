@@ -21,7 +21,7 @@ from core.baker_recipes import (
     subscriber_user,
     very_old_subscriber_user,
 )
-from core.models import AnonymousUser, Group, User
+from core.models import AnonymousUser, Group, SithFile, User
 from core.views import UserTabsMixin
 from counter.baker_recipes import sale_recipe
 from counter.models import Counter, Customer, Permanency, Refilling, Selling
@@ -34,6 +34,7 @@ class TestSearchUsers(TestCase):
     def setUpTestData(cls):
         # News.author has on_delete=PROTECT, so news must be deleted beforehand
         News.objects.all().delete()
+        SithFile.objects.all().delete()
         User.objects.all().delete()
         user_recipe = Recipe(
             User,

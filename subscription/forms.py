@@ -79,7 +79,6 @@ class SubscriptionNewUserForm(SubscriptionForm):
     """
 
     allowed_payment_methods = ["CARD", "CASH"]
-    template_name = "subscription/forms/create_new_user.jinja"
 
     __user_fields = forms.fields_for_model(
         User,
@@ -121,6 +120,12 @@ class SubscriptionNewUserForm(SubscriptionForm):
             email=self.cleaned_data.get("email"),
             date_of_birth=self.cleaned_data.get("date_of_birth"),
         )
+        if self.errors:
+            # don't bother generating username, password and other data.
+            # The form validation failed anyway, so using a dummy User
+            # (just for Subscription.clean not to crash) is enough
+            self.instance.member = member
+            return super().clean()
         if self.cleaned_data.get("subscription_type") in [
             "un-semestre",
             "deux-semestres",
@@ -153,7 +158,6 @@ class SubscriptionNewUserForm(SubscriptionForm):
 class SubscriptionExistingUserForm(SubscriptionForm):
     """Form to add a subscription to an existing user."""
 
-    template_name = "subscription/forms/create_existing_user.jinja"
     required_css_class = "required"
 
     birthdate = forms.fields_for_model(
