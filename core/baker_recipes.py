@@ -4,9 +4,9 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.utils.timezone import localdate, now
 from model_bakery import seq
-from model_bakery.recipe import Recipe, related
+from model_bakery.recipe import Recipe, foreign_key, related
 
-from club.models import Membership
+from club.models import ClubRole, Membership
 from core.models import Group, User
 from subscription.models import Subscription
 
@@ -52,7 +52,9 @@ ae_board_membership = Recipe(
     Membership,
     start_date=now() - timedelta(days=30),
     club_id=settings.SITH_MAIN_CLUB_ID,
-    role=settings.SITH_CLUB_ROLES_ID["Board member"],
+    role=foreign_key(
+        Recipe(ClubRole, club_id=settings.SITH_MAIN_CLUB_ID, is_board=True)
+    ),
 )
 
 board_user = Recipe(

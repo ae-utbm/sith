@@ -23,13 +23,12 @@
 #
 
 from django import forms
-from django.conf import settings
-from django.db.models import Exists, OuterRef, Q
+from django.db.models import Exists, OuterRef, Q, QuerySet
 from django.db.models.functions import Lower
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from club.models import Club, Mailing, MailingSubscription, Membership
+from club.models import Club, ClubRole, Mailing, MailingSubscription, Membership
 from core.models import User
 from core.views.forms import SelectDateTime
 from core.views.widgets.ajax_select import (
@@ -215,9 +214,7 @@ class ClubOldMemberForm(forms.Form):
 
     def __init__(self, *args, user: User, club: Club, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["members_old"].queryset = (
-            Membership.objects.ongoing().filter(club=club).editable_by(user)
-        )
+        self.fields["members_old"].queryset = club.members.ongoing().editable_by(user)
 
 
 class ClubMemberForm(forms.ModelForm):
@@ -235,19 +232,14 @@ class ClubMemberForm(forms.ModelForm):
         self.request_user = request_user
         self.request_user_membership = self.club.get_membership_for(self.request_user)
         super().__init__(*args, **kwargs)
-        self.fields["role"].required = True
-        self.fields["role"].choices = [
-            (value, name)
-            for value, name in settings.SITH_CLUB_ROLES.items()
-            if value <= self.max_available_role
-        ]
+        self.fields["role"].queryset = self.available_roles
         self.instance.club = club
 
     @property
-    def max_available_role(self):
-        """The greatest role that will be obtainable with this form."""
+    def available_roles(self) -> QuerySet[ClubRole]:
+        """The roles that will be obtainable with this form."""
         # this is unreachable, because it will be overridden by subclasses
-        return -1  # pragma: no cover
+        return ClubRole.objects.none()  # pragma: no cover
 
 
 class ClubAddMemberForm(ClubMemberForm):
@@ -258,21 +250,22 @@ class ClubAddMemberForm(ClubMemberForm):
         widgets = {"user": AutoCompleteSelectUser}
 
     @cached_property
-    def max_available_role(self):
-        """The greatest role that will be obtainable with this form.
+    def available_roles(self):
+        """The roles that will be obtainable with this form.
 
         Admins and the club president can attribute any role.
         Board members can attribute roles lower than their own.
         Other users cannot attribute roles with this form
         """
+        qs = self.club.roles.filter(is_active=True)
         if self.request_user.has_perm("club.add_membership"):
-            return settings.SITH_CLUB_ROLES_ID["President"]
+            return qs.all()
         membership = self.request_user_membership
-        if membership is None or membership.role <= settings.SITH_MAXIMUM_FREE_ROLE:
-            return -1
-        if membership.role == settings.SITH_CLUB_ROLES_ID["President"]:
-            return membership.role
-        return membership.role - 1
+        if membership is None or not membership.role.is_board:
+            return ClubRole.objects.none()
+        if membership.role.is_presidency:
+            return qs.all()
+        return qs.above_instance(membership.role)
 
     def clean_user(self):
         """Check that the user is not trying to add a user already in the club.
@@ -296,13 +289,11 @@ class JoinClubForm(ClubMemberForm):
 
     def __init__(self, *args, club: Club, request_user: User, **kwargs):
         super().__init__(*args, club=club, request_user=request_user, **kwargs)
-        # this form doesn't manage the user who will join the club,
-        # so we must set this here to avoid errors
         self.instance.user = self.request_user
 
     @cached_property
-    def max_available_role(self):
-        return settings.SITH_MAXIMUM_FREE_ROLE
+    def available_roles(self):
+        return self.club.roles.filter(is_board=False, is_active=True)
 
     def clean(self):
         """Check that the user is subscribed and isn't already in the club."""

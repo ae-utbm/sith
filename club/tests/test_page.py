@@ -5,7 +5,7 @@ from django.urls import reverse
 from model_bakery import baker
 from pytest_django.asserts import assertHTMLEqual, assertRedirects
 
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 from core.baker_recipes import subscriber_user
 from core.markdown import markdown
 from core.models import PageRev, User
@@ -59,7 +59,12 @@ def test_page_revision(client: Client):
 def test_edit_page(client: Client):
     club = baker.make(Club)
     user = subscriber_user.make()
-    baker.make(Membership, user=user, club=club, role=3)
+    baker.make(
+        Membership,
+        user=user,
+        club=club,
+        role=baker.make(ClubRole, club=club, is_board=True),
+    )
     client.force_login(user)
     url = reverse("club:club_edit_page", kwargs={"club_id": club.id})
     content = "# foo\nLorem ipsum dolor sit amet"

@@ -17,7 +17,7 @@
       {% for member in old_members %}
         <tr>
           <td>{{ user_profile_link(member.user) }}</td>
-          <td>{{ settings.SITH_CLUB_ROLES[member.role] }}</td>
+          <td>{{ member.role.name }}</td>
           <td>{{ member.description }}</td>
           <td>{{ member.start_date }}</td>
           <td>{{ member.end_date }}</td>
