@@ -388,9 +388,6 @@ class Product(models.Model):
     tray = models.BooleanField(
         _("tray price"), help_text=_("Buy five, get the sixth free"), default=False
     )
-    buying_groups = models.ManyToManyField(
-        Group, related_name="products", verbose_name=_("buying groups"), blank=True
-    )
     archived = models.BooleanField(_("archived"), default=False)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
