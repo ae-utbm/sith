@@ -1,6 +1,13 @@
 {% if is_fragment %}
   {% extends "core/base_fragment.jinja" %}
 
+  {% block metatags %}
+    <meta property="og:url" content="{{ request.build_absolute_uri() }}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Liste des clubs et assos" />
+    <meta property="og:image" content="{{ request.build_absolute_uri(static("core/img/logo_no_text.png")) }}" />
+  {% endblock %}
+
   {# Don't display tabs and errors #}
   {% block tabs %}
   {% endblock %}
