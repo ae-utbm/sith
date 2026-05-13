@@ -1,3 +1,5 @@
+import itertools
+from datetime import timedelta
 from io import BytesIO
 from typing import Callable
 from uuid import uuid4
@@ -8,6 +10,7 @@ from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils.timezone import now
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from PIL import Image
@@ -16,9 +19,10 @@ from pytest_django.asserts import assertNumQueries, assertRedirects
 from club.models import Club
 from core.baker_recipes import board_user, subscriber_user
 from core.models import Group, User
-from counter.baker_recipes import product_recipe
+from counter.baker_recipes import product_recipe, sale_recipe
 from counter.forms import ProductForm, ProductPriceFormSet
-from counter.models import Price, Product, ProductType
+from counter.models import Price, Product, ProductType, Selling
+from eboutic.models import Basket, BasketItem
 
 
 @pytest.mark.django_db
@@ -222,3 +226,57 @@ def test_price_for_user():
     assert list(qs.for_user(users[0])) == [prices[0], prices[1], prices[4]]
     assert list(qs.for_user(users[1])) == [prices[0], prices[4]]
     assert list(qs.for_user(users[2])) == [prices[0], prices[3]]
+
+
+class TestProductClicLimit(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.products = product_recipe.make(
+            clic_limit=itertools.chain([5, 10, 15], itertools.repeat(None)),
+            _quantity=6,
+            _bulk_create=True,
+        )
+        cls.qs = Product.objects.filter(id__in=[p.id for p in cls.products])
+
+    def test_no_sales_or_basket(self):
+        """Test that it works if no sales has been made yet"""
+        assert list(self.qs.under_clic_limit()) == self.products
+
+    def test_with_sales(self):
+        """Test that it works when there are existing sales"""
+        sales = sale_recipe.make(
+            product=itertools.cycle(self.products),
+            _quantity=len(self.products) * 5,
+            _bulk_create=True,
+        )
+        Selling.objects.filter(id__in=[s.id for s in sales]).update(quantity=2)
+        assert list(self.qs.under_clic_limit()) == self.products[2:]
+
+    def test_with_sales_and_basket(self):
+        """Test that it works when there are existing sales and basket items."""
+        sales = sale_recipe.make(
+            product=itertools.cycle(self.products),
+            _quantity=len(self.products) * 5,
+            _bulk_create=True,
+        )
+        Selling.objects.filter(id__in=[s.id for s in sales]).update(quantity=1)
+        basket = baker.make(
+            Basket, date=now() - settings.SITH_EBOUTIC_BASKET_TIMEOUT / 2
+        )
+        items = baker.make(
+            BasketItem,
+            product=itertools.cycle(self.products),
+            basket=basket,
+            _quantity=len(self.products) * 5,
+        )
+        BasketItem.objects.filter(id__in=[i.id for i in items]).update(quantity=1)
+        assert list(self.qs.under_clic_limit()) == self.products[2:]
+
+        # expired basket items shouldn't be accounted when computing clic limit
+        item = BasketItem.objects.filter(product=self.products[1])[0]
+        item.basket = baker.make(
+            Basket,
+            date=now() - settings.SITH_EBOUTIC_BASKET_TIMEOUT - timedelta(minutes=1),
+        )
+        item.save()
+        assert list(self.qs.under_clic_limit()) == self.products[1:]

@@ -34,6 +34,7 @@ from django.forms import ValidationError
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import PeriodicTask
 from django_countries.fields import CountryField
@@ -353,6 +354,38 @@ class ProductType(OrderedModel):
         return user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID)
 
 
+class ProductQuerySet(models.QuerySet):
+    def under_clic_limit(self) -> Self:
+        """Filter product which clic limit isn't reached yet.
+
+        The clic limit is reached when the amount of sales
+        and of items in a basket for less than 15 minutes
+        is greater or equal than `Product.clic_limit`.
+        """
+        # import here to avoid circular import
+        from eboutic.models import BasketItem
+
+        nb_click_subquery = Subquery(
+            Selling.objects.filter(product_id=OuterRef("id"))
+            .values("product_id")
+            .annotate(res=Sum("quantity", default=0))
+            .values("res")[:1]
+        )
+        nb_basket_items_subquery = Subquery(
+            BasketItem.objects.filter(
+                product_id=OuterRef("id"),
+                basket__date__gt=now() - settings.SITH_EBOUTIC_BASKET_TIMEOUT,
+            )
+            .values("product_id")
+            .annotate(res=Sum("quantity"))
+            .values("res")[:1]
+        )
+        return self.annotate(
+            clicked=Coalesce(nb_click_subquery, 0),
+            reserved=Coalesce(nb_basket_items_subquery, 0),
+        ).filter(Q(clic_limit=None) | Q(clic_limit__gt=(F("clicked") + F("reserved"))))
+
+
 class Product(models.Model):
     """A product, with all its related information."""
 
@@ -370,8 +403,7 @@ class Product(models.Model):
     )
     code = models.CharField(_("code"), max_length=16, blank=True)
     purchase_price = CurrencyField(
-        _("purchase price"),
-        help_text=_("Initial cost of purchasing the product"),
+        _("purchase price"), help_text=_("Initial cost of purchasing the product")
     )
     icon = ResizedImageField(
         height=70,
@@ -388,9 +420,20 @@ class Product(models.Model):
     tray = models.BooleanField(
         _("tray price"), help_text=_("Buy five, get the sixth free"), default=False
     )
+    clic_limit = models.PositiveSmallIntegerField(
+        _("clic limit"),
+        help_text=_(
+            "If a limit is set, the product won't be purchasable "
+            "anymore on the eboutic once the latter is reached."
+        ),
+        null=True,
+        blank=True,
+    )
     archived = models.BooleanField(_("archived"), default=False)
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
+
+    objects = ProductQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("product")
