@@ -69,6 +69,18 @@
                 {{ club.name }} {% if not club.is_active %}({% trans %}inactive{% endtrans %}){% endif %}
               </h4>
             </a>
+            {% set links = club.links.all() %}
+            {% if links %}
+              <br>
+              <div class="row gap-2x">
+                {% for link in club.links.all() %}
+                  <a href="{{ link.url }}">
+                    <i class="{{ link.link_type.icon }} fa-xl"></i>
+                    <strong>{{ link.name }}</strong>
+                  </a>
+                {% endfor %}
+              </div>
+            {% endif %}
             {{ club.short_description|markdown }}
           </div>
         </div>

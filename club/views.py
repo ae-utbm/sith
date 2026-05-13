@@ -36,7 +36,7 @@ from django.contrib.auth.mixins import (
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
-from django.db.models import F, Q, Sum
+from django.db.models import F, Prefetch, Q, Sum
 from django.db.models.functions import Length
 from django.http import Http404, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -48,12 +48,7 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import (
-    CreateView,
-    DeleteView,
-    FormMixin,
-    UpdateView,
-)
+from django.views.generic.edit import CreateView, DeleteView, FormMixin, UpdateView
 
 from club.forms import (
     ClubAddMemberForm,
@@ -69,6 +64,7 @@ from club.forms import (
 )
 from club.models import (
     Club,
+    ClubLink,
     ClubRole,
     LinkType,
     Mailing,
@@ -218,7 +214,9 @@ class ClubListView(AllowFragment, FormMixin, ListView):
 
     template_name = "club/club_list.jinja"
     form_class = ClubSearchForm
-    queryset = Club.objects.order_by("name")
+    queryset = Club.objects.prefetch_related(
+        Prefetch("links", queryset=ClubLink.objects.select_related("link_type"))
+    ).order_by("name")
     paginate_by = 20
 
     def get_form_kwargs(self):
