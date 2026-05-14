@@ -409,6 +409,7 @@ class ProductForm(forms.ModelForm):
             "club",
             "limit_age",
             "tray",
+            "clic_limit",
             "archived",
         ]
         help_texts = {
