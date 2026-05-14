@@ -103,7 +103,7 @@ class CounterClick(
         ):
             return redirect(obj)  # Redirect to counter
 
-        self.prices = obj.get_prices_for(self.customer)
+        self.prices = list(obj.get_prices_for(self.customer))
 
         return super().dispatch(request, *args, **kwargs)
 

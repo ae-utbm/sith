@@ -33,7 +33,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.db import DatabaseError, transaction
-from django.db.models import Subquery
+from django.db.models import Exists, OuterRef, Subquery
 from django.db.models.fields import forms
 from django.db.utils import cached_property
 from django.http import HttpResponse
@@ -92,7 +92,9 @@ class EbouticMainView(LoginRequiredMixin, FormView):
         kwargs["form_kwargs"] = {
             "customer": self.customer,
             "counter": get_eboutic(),
-            "allowed_prices": {price.id: price for price in self.prices},
+            "allowed_prices": {
+                price.id: price for price in self.prices if not price.sold_out
+            },
         }
         return kwargs
 
@@ -118,9 +120,14 @@ class EbouticMainView(LoginRequiredMixin, FormView):
 
     @cached_property
     def prices(self) -> list[Price]:
-        return get_eboutic().get_prices_for(
-            self.customer,
-            order_by=["product__product_type__order", "product_id", "amount"],
+        eboutic = get_eboutic()
+        sold_out_subquery = ~Exists(
+            eboutic.products.under_clic_limit().filter(id=OuterRef("product_id"))
+        )
+        return list(
+            eboutic.get_prices_for(self.customer)
+            .annotate(sold_out=sold_out_subquery)
+            .order_by("product__product_type__order", "product_id", "amount")
         )
 
     @cached_property

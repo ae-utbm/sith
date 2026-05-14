@@ -596,7 +596,7 @@ class TestCounterClick(TestFullClickBase):
             product=iter(_product_recipe.make(archived=False, _quantity=2)),
             groups=[group],
         )
-        customer_prices = counter.get_prices_for(customer)
+        customer_prices = list(counter.get_prices_for(customer))
         assert unarchived_prices == customer_prices
 
 

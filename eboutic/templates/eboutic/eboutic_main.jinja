@@ -187,9 +187,10 @@
             {% for price in prices %}
               <button
                 id="{{ price.id }}"
-                class="card product-button clickable shadow"
+                class="card clickable shadow"
                 :class="{selected: basket.some((i) => i.priceId === {{ price.id }})}"
                 @click='addFromCatalog({{ price.id }}, {{ price.full_label|tojson }}, {{ price.amount }})'
+                {% if price.sold_out %}disabled{% endif %}
               >
                 {% if price.product.icon %}
                   <img
@@ -202,6 +203,9 @@
                 {% endif %}
                 <div class="card-content">
                   <h4 class="card-title">{{ price.full_label }}</h4>
+                  {% if price.sold_out -%}
+                    <p><em>{% trans %}Product sold out{% endtrans %}</em></p>
+                  {%- endif %}
                   <p>{{ price.amount }} €</p>
                 </div>
               </button>
