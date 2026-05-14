@@ -209,15 +209,15 @@ class ClubListView(AllowFragment, FormMixin, ListView):
 
     def get_form_kwargs(self):
         res = super().get_form_kwargs()
-        if self.request.method == "GET":
-            res |= {"data": self.request.GET, "initial": self.request.GET}
+        # if request.GET is empty, the form will interpret club_status as None,
+        # even though we want it to be initially True,
+        # so we force a defaut True value.
+        res["data"] = {"club_status": True} | self.request.GET.dict()
         return res
 
     def get_queryset(self):
         form: ClubSearchForm = self.get_form()
         qs = self.queryset
-        if not form.is_bound:
-            return qs.filter(is_active=True)
         if not form.is_valid():
             return qs.none()
         if name := form.cleaned_data.get("name"):
