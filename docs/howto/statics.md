@@ -35,8 +35,8 @@ les fichiers sont à mettre dans un dossier `static/bundled` de l'application à
 Pour accéder au fichier, il faut utiliser `static` comme pour le reste mais en ajouter `bundled/` comme prefix.
 
 ```jinja
-	{# Example pour ajouter sith/core/bundled/alpine-index.js #}
-	<script type="module" src="{{ static('bundled/alpine-index.js') }}"></script>
+	{# Example pour ajouter sith/core/bundled/alpine-index.ts #}
+	<script type="module" src="{{ static('bundled/alpine-index.ts') }}"></script>
 	<script type="module" src="{{ static('bundled/other-index.ts') }}"></script>
 ```
 
