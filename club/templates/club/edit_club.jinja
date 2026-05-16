@@ -27,7 +27,10 @@
           {# we change the icon when the user change it and leave the input,
              or when it is pasted from the clipboard #}
           {{ form.url|add_attr("x-model.change=url,@paste.prevent=url = $event.clipboardData.getData('text')") }}
-          <i :class="linkType.icon || 'fa fa-link'"></i>
+          <i
+            :class="linkType.icon || 'fa fa-link'"
+            tooltip="{% trans %}This icon will change according to the given url.{% endtrans %}"
+          ></i>
         </span>
       </div>
       <div>{{ form.name.as_field_group() }}</div>

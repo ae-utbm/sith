@@ -74,7 +74,7 @@
               <br>
               <div class="row gap-2x">
                 {% for link in club.links.all() %}
-                  <a href="{{ link.url }}">
+                  <a href="{{ link.url }}" rel="noopener external" target="_blank">
                     <i class="{{ link.link_type.icon }} fa-xl"></i>
                     <strong>{{ link.name }}</strong>
                   </a>

@@ -765,6 +765,10 @@ msgid "Edit %(name)s"
 msgstr "Éditer %(name)s"
 
 #: club/templates/club/edit_club.jinja
+msgid "This icon will change according to the given url."
+msgstr "Cette icône changera en fonction de l'url fournie"
+
+#: club/templates/club/edit_club.jinja
 msgid "Remove link"
 msgstr "Retirer le lien"
 
@@ -801,8 +805,8 @@ msgid ""
 "Note: if the icon of one of your links doesn't exist yet, you can ask the "
 "info team to add it."
 msgstr ""
-"Note : si l'icône d'un de vos liens n'existe pas encore, vous pouvez demander "
-"au pôle info de l'ajouter."
+"Note : si l'icône d'un de vos liens n'existe pas encore, vous pouvez "
+"demander au pôle info de l'ajouter."
 
 #: club/templates/club/edit_club.jinja
 msgid "Add link"
