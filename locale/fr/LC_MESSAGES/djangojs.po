@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-17 22:42+0200\n"
+"POT-Creation-Date: 2026-05-17 10:03+0200\n"
 "PO-Revision-Date: 2024-09-17 11:54+0200\n"
 "Last-Translator: Sli <antoine@bartuccio.fr>\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -262,6 +262,10 @@ msgstr "Types de produits réordonnés !"
 #, javascript-format
 msgid "Product type reorganisation failed with status code : %d"
 msgstr "La réorganisation des types de produit a échoué avec le code : %d"
+
+#: eboutic/static/bundled/eboutic/checkout-index.ts
+msgid "Basket expired"
+msgstr "Panier expiré"
 
 #: sas/static/bundled/sas/pictures-download-index.ts
 msgid "pictures.%(extension)s"

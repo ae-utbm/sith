@@ -39,6 +39,8 @@ from django.db.utils import cached_property
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils.formats import localize
+from django.utils.timezone import localtime
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 from django.views.generic import DetailView, FormView, TemplateView, UpdateView, View
@@ -187,9 +189,7 @@ class BillingInfoFormFragment(
 
     def get_initial(self):
         if self.object is None:
-            return {
-                "country": Country(code="FR"),
-            }
+            return {"country": Country(code="FR")}
         return {}
 
     def render_fragment(self, request, **kwargs) -> SafeString:
@@ -255,10 +255,19 @@ class EbouticCheckout(CanViewMixin, UseFragmentsMixin, DetailView):
             kwargs["customer_amount"] = None
         kwargs["billing_infos"] = {}
 
-        with contextlib.suppress(BillingInfo.DoesNotExist):
-            kwargs["billing_infos"] = json.dumps(
-                dict(self.object.get_e_transaction_data())
+        if self.object.is_expired:
+            messages.error(self.request, _("Basket expired"))
+        else:
+            timeout = self.object.date + settings.SITH_EBOUTIC_BASKET_TIMEOUT
+            messages.warning(
+                self.request,
+                _("Basket available until %(until)s")
+                % {"until": localize(localtime(timeout).time())},
             )
+            with contextlib.suppress(BillingInfo.DoesNotExist):
+                kwargs["billing_infos"] = json.dumps(
+                    dict(self.object.get_e_transaction_data())
+                )
         return kwargs
 
 
@@ -268,9 +277,14 @@ class EbouticPayWithSith(CanViewMixin, SingleObjectMixin, View):
 
     def post(self, request, *args, **kwargs):
         basket = self.get_object()
+        if basket.is_expired:
+            messages.error(self.request, _("Basket expired"))
+            basket.delete()
+            return redirect("eboutic:payment_result", "failure")
         refilling = settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
         if basket.items.filter(product__product_type_id=refilling).exists():
             messages.error(self.request, _("You can't buy a refilling with sith money"))
+            basket.delete()
             return redirect("eboutic:payment_result", "failure")
 
         eboutic = get_eboutic()
@@ -288,6 +302,7 @@ class EbouticPayWithSith(CanViewMixin, SingleObjectMixin, View):
         except DatabaseError as e:
             sentry_sdk.capture_exception(e)
         except ValidationError as e:
+            basket.delete()
             messages.error(self.request, e.message)
         return redirect("eboutic:payment_result", "failure")
 

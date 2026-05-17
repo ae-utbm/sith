@@ -15,11 +15,10 @@
 {% block content %}
   <h3>{% trans %}Eboutic{% endtrans %}</h3>
 
-  <script type="text/javascript">
-    let billingInfos = {{ billing_infos|safe }};
-  </script>
-
-  <div x-data="etransaction(billingInfos, {{ basket.id }})">
+  <div x-data='etransaction(
+               {{ billing_infos|tojson }},
+               { id: {{ basket.id }}, timeout: new Date('{{ basket.date + settings.SITH_EBOUTIC_BASKET_TIMEOUT }}') }
+                                                                                                                         )'>
     <p>{% trans %}Basket: {% endtrans %}</p>
     <table>
       <thead>
@@ -72,7 +71,11 @@
           x-cloak
           type="submit"
           id="bank-submit-button"
-          :disabled="!isCbAvailable"
+          {% if basket.is_expired %}
+            disabled="disabled"
+          {% else %}
+            :disabled="!isCbAvailable"
+          {% endif %}
           class="btn btn-blue"
           value="{% trans %}Pay with credit card{% endtrans %}"
         />
@@ -93,7 +96,16 @@
     {% else %}
       <form method="post" action="{{ url('eboutic:pay_with_sith', basket_id=basket.id) }}" name="sith-pay-form">
         {% csrf_token %}
-        <input class="btn btn-blue" type="submit" value="{% trans %}Pay with Sith account{% endtrans %}"/>
+        <input
+          {% if basket.is_expired %}
+            disabled="disabled"
+          {% else %}
+            :disabled="!isSithAvailable"
+          {% endif %}
+          class="btn btn-blue"
+          type="submit"
+          value="{% trans %}Pay with Sith account{% endtrans %}"
+        />
       </form>
     {% endif %}
   </div>
