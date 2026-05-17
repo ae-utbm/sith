@@ -17,8 +17,8 @@
 
   <div x-data='etransaction(
                {{ billing_infos|tojson }},
-               { id: {{ basket.id }}, timeout: new Date('{{ basket.date + settings.SITH_EBOUTIC_BASKET_TIMEOUT }}') }
-                                                                                                                         )'>
+               { id: {{ basket.id }}, timeout: new Date("{{ basket.date + settings.SITH_EBOUTIC_BASKET_TIMEOUT }}") }
+               )'>
     <p>{% trans %}Basket: {% endtrans %}</p>
     <table>
       <thead>
