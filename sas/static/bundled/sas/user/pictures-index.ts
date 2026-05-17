@@ -23,9 +23,9 @@ document.addEventListener("alpine:init", () => {
 
     async fetchPictures(): Promise<PictureSchema[]> {
       // Check the cache before hitting the API.
-      const localStorageKey = "userPictures";
+      const storageKey = "userPictures";
       const cacheContent: { userId: number; pictures: PictureSchema[] }[] = JSON.parse(
-        localStorage.getItem(localStorageKey) || "[]",
+        sessionStorage.getItem(storageKey) || "[]",
       );
       const userPictures = cacheContent.find((obj) => obj.userId === config.userId);
       if (
@@ -45,12 +45,12 @@ document.addEventListener("alpine:init", () => {
       cacheContent.push({ userId: config.userId, pictures: pictures });
       try {
         // cache only the pictures of the last 4 visited profiles
-        localStorage.setItem(localStorageKey, JSON.stringify(cacheContent.slice(-4)));
+        sessionStorage.setItem(storageKey, JSON.stringify(cacheContent.slice(-4)));
       } catch {
         // an exception is raised if the localstorage is entirely filled.
         // To be as safe as possible, delete the cached pictures.
         // A cache hit is not worth the page breaking.
-        localStorage.removeItem(localStorageKey);
+        sessionStorage.removeItem(storageKey);
       }
       return pictures;
     },
