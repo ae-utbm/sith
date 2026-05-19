@@ -47,7 +47,7 @@ document.addEventListener("alpine:init", () => {
         // cache only the pictures of the last 4 visited profiles
         sessionStorage.setItem(storageKey, JSON.stringify(cacheContent.slice(-4)));
       } catch {
-        // an exception is raised if the localstorage is entirely filled.
+        // an exception is raised if the storage is entirely filled.
         // To be as safe as possible, delete the cached pictures.
         // A cache hit is not worth the page breaking.
         sessionStorage.removeItem(storageKey);

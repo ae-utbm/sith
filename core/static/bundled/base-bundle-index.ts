@@ -3,7 +3,7 @@ import Alpine from "alpinejs";
 import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
 import htmx from "htmx.org";
 import { limitedChoices } from "#core:alpine/limited-choices";
-import { cacheBuster } from "#core:core/localstorage";
+import { expireOldStorage } from "#core:core/localstorage";
 import { default as navbar } from "#core:core/navbar";
 import {
   type NotificationPlugin,
@@ -53,4 +53,4 @@ navbar();
 /**
  * Script that clears the cache when the cache version changes
  */
-cacheBuster();
+expireOldStorage();

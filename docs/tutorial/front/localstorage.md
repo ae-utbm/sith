@@ -22,19 +22,9 @@ Pour résoudre le premier de ces deux problèmes, il y a un script permettant
 d'annuler une partie du cache.
 Ce dernier se trouve dans le fichier `core/static/bundled/core/cache.ts`.
 
-Vous devrez modifier ce cache chaque fois que vous effectuerez
-un changement de schéma, c'est-à-dire dans un des cas suivants :
-
-- une des clefs du cache n'est plus utilisée
-- la clef n'a pas changé, mais la manière dont les données attachées à cette clef
-  sont formées a été modifiée.
-
-!!!Note
-
-    Si vous ne faites qu'ajouter des données, sans modifier ni supprimer
-    celles qui sont là, vous n'avez pas besoin d'invalider le cache.
-
-Vous devez effectuer deux modifications dans ce fichier :
+Vous devrez modifier ce fichier chaque fois qu'un élément du localStorage
+cessera d'être utilisé.
+Les modifications à apporter sont les suivantes :
 
 - incrémenter la version du cache
 - ajouter une ligne permettant de retirer votre clef du cache
@@ -54,3 +44,32 @@ export function cacheBuster() {
   localStorage.setItem("version", CURRENT_CACHE_VERSION.toString());
 }
 ```
+
+## Versionnage d'une clef
+
+Dans le cas où une paire clef-valeur du localStorage subit un changement
+dans son schéma de données, utilisez `versionedLocalStorage` :
+
+```typescript
+import { versionedLocalStorage } from "#core:core/cache";
+
+const foo = () => {
+  let obj = versionedLocalStorage.getItem("<key>", { version: 1 });
+  if (obj === null) {
+    obj = fetchMyObject();
+    versionedLocalStorage.setItem("<key>", obj, { version: 1 })
+  }
+  // Do something with obj...
+}
+```
+
+!!!Warning
+
+    Il existe une différence d'usage entre `localStorage` et `versionedLocalStorage` :
+    les valeurs données à `localStorage` doivent être des strings (généralement
+    obtenus avec `JSON.stringify`), tandis que `versionedLocalStorage` utilise
+    directement des objets JS.
+
+    Cette différence résulte du fait que `versionedLocalStorage` doit légèrement
+    modifier les données pour y inclure la version, et gérer en interne
+    la conversion en JSON.
