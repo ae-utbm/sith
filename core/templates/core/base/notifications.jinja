@@ -1,5 +1,4 @@
 <div id="quick-notifications"
-     x-data='{ messages: $notifications.getAll() }'
      x-init='$notifications.addMany([
              {%- for message in messages -%}
                {%- if not message.extra_tags -%}
@@ -8,7 +7,7 @@
              {%- endfor -%}
              ])'
 >
-  <template x-for="(message, index) in messages">
+  <template x-for="(message, index) in $notifications.getAll()">
     <div class="alert" :class="`alert-${message.tag}`" x-transition>
       <span class="alert-main" x-text="message.text"></span>
       <span class="clickable" @click="messages = messages.filter((item, i) => i !== index)">

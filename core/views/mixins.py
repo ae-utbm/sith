@@ -54,7 +54,7 @@ class FragmentRenderer(Protocol):
     ) -> SafeString: ...
 
 
-class FragmentMixin(TemplateResponseMixin, ContextMixin):
+class FragmentMixin(TemplateResponseMixin, AllowFragment, ContextMixin):
     """Make a view buildable as a fragment that can be embedded in a template.
 
     Most fragments are used in two different ways :
