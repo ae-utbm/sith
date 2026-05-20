@@ -5497,10 +5497,8 @@ msgid "Amicale/DOCEO member"
 msgstr "Membre de l'Amicale/DOCEO"
 
 #: sith/settings.py
-#, fuzzy
-#| msgid "UT network member"
 msgid "UT network member (excluding UTC)"
-msgstr "Cotisant du réseau UT"
+msgstr "Cotisant du réseau UT (hors UTC)"
 
 #: sith/settings.py
 msgid "CROUS member"
