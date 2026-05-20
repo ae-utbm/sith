@@ -7,11 +7,30 @@ export enum NotificationLevel {
 }
 
 export interface NotificationPlugin {
+  /**
+   * Add an error message to the notifications.
+   */
   error: (message: string) => void;
+  /**
+   * Add a warning message to the notifications
+   */
   warning: (message: string) => void;
+  /**
+   * Add a success message to the notifications
+   */
   success: (message: string) => void;
+  /**
+   * Remove all notifications displayed on the page.
+   */
   clear: () => void;
+  /**
+   * Add multiple notifications at once.
+   * The added notifications can have different notification levels.
+   */
   addMany: (notifs: Notification[]) => void;
+  /**
+   * Return all notifications displayed on the page.
+   */
   getAll: () => Notification[];
 }
 
