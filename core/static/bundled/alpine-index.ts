@@ -3,7 +3,7 @@ import { Alpine } from "alpinejs";
 import { limitedChoices } from "#core:alpine/limited-choices";
 import {
   type NotificationPlugin,
-  alpinePlugin as notificationPlugin,
+  notificationsPlugin as notifications,
 } from "#core:utils/notifications";
 
 declare module "alpinejs" {
@@ -11,8 +11,8 @@ declare module "alpinejs" {
     $notifications: NotificationPlugin;
   }
 }
-Alpine.plugin([sort, limitedChoices]);
-Alpine.magic("notifications", notificationPlugin);
+
+Alpine.plugin([sort, limitedChoices, notifications]);
 // biome-ignore lint/style/useNamingConvention: it's how it's named
 Object.assign(window, { Alpine });
 

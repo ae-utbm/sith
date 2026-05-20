@@ -2,7 +2,7 @@
      x-init='$notifications.addMany([
              {%- for message in messages -%}
                {%- if not message.extra_tags -%}
-                 { tag: {{ message.tags|string|tojson }}, text: {{ message|string|tojson }} },
+                 { tag: "{{ message.tags }}", text: {{ message|string|tojson }} },
                {%- endif -%}
              {%- endfor -%}
              ])'

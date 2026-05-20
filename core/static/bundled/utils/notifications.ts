@@ -44,27 +44,21 @@ Alpine.store("notifications", [] as Notification[]);
 function createNotification(message: string, level: NotificationLevel) {
   (Alpine.store("notifications") as Notification[]).push({ text: message, tag: level });
 }
-
-function deleteNotifications() {
-  Alpine.store("notifications", []);
+function createManyNotifications(notifs: Notification[]) {
+  for (const notif of notifs) {
+    createNotification(notif.text, notif.tag);
+  }
 }
 
-function getNotifications() {
-  return Alpine.store("notifications") as Notification[];
-}
+export const notifications: NotificationPlugin = {
+  error: (message: string) => createNotification(message, NotificationLevel.Error),
+  warning: (message: string) => createNotification(message, NotificationLevel.Warning),
+  success: (message: string) => createNotification(message, NotificationLevel.Success),
+  clear: () => Alpine.store("notifications", []),
+  addMany: (notifs: Notification[]) => createManyNotifications(notifs),
+  getAll: () => Alpine.store("notifications") as Notification[],
+};
 
-export function alpinePlugin(): NotificationPlugin {
-  return {
-    error: (message: string) => createNotification(message, NotificationLevel.Error),
-    warning: (message: string) =>
-      createNotification(message, NotificationLevel.Warning),
-    success: (message: string) =>
-      createNotification(message, NotificationLevel.Success),
-    clear: () => deleteNotifications(),
-    addMany: (notifs: Notification[]) =>
-      notifs.forEach((n) => {
-        createNotification(n.text, n.tag);
-      }),
-    getAll: () => getNotifications(),
-  };
+export function notificationsPlugin(GlobalAlpine: Alpine) {
+  GlobalAlpine.magic("notifications", () => ({ ...notifications }));
 }

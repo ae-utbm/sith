@@ -237,14 +237,18 @@
       clear   : optional boolean that controls if notifications should be cleared first. True is the default
   #}
   {% if messages %}
-    <div x-init="() => {
+    <div x-init='() => {
                  {%- if clear -%}
                    $notifications.clear();
                  {%- endif -%}
+                 $notifications.addMany([
                  {%- for message in messages -%}
-                   $notifications.{{ message.tags }}('{{ message }}');
+                   {%- if not message.extra_tags -%}
+                     { tag: "{{ message.tags }}", text: {{ message|string|tojson }} },
+                   {%- endif -%}
                  {%- endfor -%}
-                 }"></div>
+                 ])
+                 }'></div>
   {% endif %}
 {% endmacro %}
 
