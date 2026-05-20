@@ -38,6 +38,6 @@
     }
   },
   "javascript": {
-    "globals": ["Alpine", "$", "jQuery", "gettext", "interpolate"]
+    "globals": ["Alpine", "gettext", "interpolate"]
   }
 }
