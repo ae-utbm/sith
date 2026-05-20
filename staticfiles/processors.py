@@ -32,7 +32,7 @@ class JsBundlerManifestEntry:
         # because that's what the user types when importing statics and that's what django gives us
         # This is really similar to what we are doing in the bundler, it uses a similar algorithm
         # Example:
-        # core/static/bundled/alpine-index.js -> bundled/alpine-index.js
+        # core/static/bundled/alpine-index.ts -> bundled/alpine-index.ts
         # core/static/bundled/components/include-index.ts -> core/static/bundled/components/include-index.ts
         def get_relative_src_name(name: str) -> str:
             original_path = Path(name)
