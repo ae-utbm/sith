@@ -398,6 +398,28 @@ body {
     }
   }
 
+  /* Fontawesome icons */
+  .fa-brands, .fa-link {
+    color: black;
+  }
+
+  .fa-facebook {
+    color: $faceblue;
+  }
+
+  .fa-discord {
+    color: $discordblurple;
+  }
+
+  .fa-square-instagram::before, .fa-instagram::before {
+    background: $instagradient;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .fa-bluesky, .fa-square-bluesky {
+    color: #0f73ff;
+  }
 }
 
 @media screen and (max-width: $small-devices) {
@@ -747,18 +769,5 @@ textarea {
 
   button {
     vertical-align: middle;
-  }
-}
-
-/*--------------------------------JQuery-------------------------------*/
-#club_detail {
-  .club_logo {
-    float: right;
-
-    img {
-      display: block;
-      max-height: 10em;
-      max-width: 10em;
-    }
   }
 }

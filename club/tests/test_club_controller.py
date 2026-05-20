@@ -88,8 +88,8 @@ class TestFetchClub:
     def test_fetch_club_nb_queries(self, client: Client, club: Club):
         user = subscriber_user.make()
         client.force_login(user)
-        with assertNumQueries(6):
+        with assertNumQueries(7):
             # - 4 queries for authentication
-            # - 2 queries for the actual data
+            # - 3 queries for the actual data
             res = client.get(reverse("api:fetch_club", kwargs={"club_id": club.id}))
             assert res.status_code == 200

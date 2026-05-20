@@ -36,7 +36,7 @@ from django.utils import timezone
 from django.utils.timezone import localdate
 from PIL import Image
 
-from club.models import Club, ClubRole, Membership
+from club.models import Club, ClubLink, ClubRole, LinkType, Membership
 from com.ics_calendar import IcsCalendar
 from com.models import News, NewsDate, Sith, Weekmail
 from core.models import BanGroup, Group, Page, PageRev, SithFile, User
@@ -830,6 +830,54 @@ class Command(BaseCommand):
             ):
                 roles.append(ClubRole(club=club, order=i, name=role))
         ClubRole.objects.bulk_create(roles)
+        insta, fb, discord, _ = LinkType.objects.bulk_create(
+            [
+                LinkType(
+                    name="instagram",
+                    icon="fa-brands fa-square-instagram",
+                    url_base="https://www.instagram.com",
+                ),
+                LinkType(
+                    name="facebook",
+                    icon="fa-brands fa-facebook",
+                    url_base="https://www.facebook.com",
+                ),
+                LinkType(
+                    name="discord",
+                    icon="fa-brands fa-discord",
+                    url_base="https://discord.gg",
+                ),
+                LinkType(name="generic", icon="fa fa-link", url_base=""),
+            ]
+        )
+        ClubLink.objects.bulk_create(
+            [
+                ClubLink(
+                    name="insta AE",
+                    url="https://www.instagram.com/ae_utbm/",
+                    club=ae,
+                    link_type=insta,
+                ),
+                ClubLink(
+                    name="insta activités AE",
+                    url="https://www.instagram.com/activites_ae/",
+                    club=ae,
+                    link_type=insta,
+                ),
+                ClubLink(
+                    name="facebook AE",
+                    url="https://www.facebook.com/ae_utbm",
+                    club=ae,
+                    link_type=fb,
+                ),
+                ClubLink(
+                    name="Discord",
+                    url="https://discord.gg/QvTm3XJrHR",
+                    club=ae,
+                    link_type=discord,
+                ),
+            ]
+        )
         return PopulatedClubs(ae=ae, troll=troll, pdf=pdf, refound=refound)
 
     def _create_groups(self) -> PopulatedGroups:

@@ -21,7 +21,13 @@ def test_club_board_member_cannot_edit_club_properties(client: Client):
     client.force_login(user)
     res = client.post(
         reverse("club:club_edit", kwargs={"club_id": club.id}),
-        {"name": "new name", "is_active": False, "address": "new address"},
+        {
+            "name": "new name",
+            "is_active": False,
+            "address": "new address",
+            "link-TOTAL_FORMS": 0,
+            "link-INITIAL_FORMS": 0,
+        },
     )
     # The request should success,
     # but admin-only fields shouldn't be taken into account

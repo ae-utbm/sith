@@ -773,3 +773,81 @@ class MailingSubscription(models.Model):
 
     def fetch_format(self):
         return self.get_email + " "
+
+
+class LinkType(models.Model):
+    """A link type, in order to group links and give them icons.
+
+    Notes:
+        Among all club links, there is a special one, with an empty base url
+        and a default link icon.
+        It is use as a fallback item when no actual link type can be found.
+
+    Danger:
+        LinkType.icon is content that will be raw-rendered in the template.
+        It is NOT safe to allow users to give it.
+        The edition of this field must be reserved to trusted admins.
+    """
+
+    name = models.CharField(_("name"), max_length=40)
+    url_base = models.URLField(
+        "url base",
+        unique=True,
+        help_text=_(
+            "The base url that links with this type must respect (e.g. `%(url)s`)"
+        )
+        % {"url": "https://www.instagram.com"},
+    )
+    icon = models.CharField(
+        _("icon"),
+        max_length=40,
+        help_text=_("The fontawesome class to use (e.g. `fa-brands fa-instagram`)"),
+    )
+
+    class Meta:
+        verbose_name = _("link type")
+        verbose_name_plural = _("link types")
+
+    def __str__(self):
+        return self.name
+
+
+class ClubLink(models.Model):
+    link_type = models.ForeignKey(
+        LinkType,
+        verbose_name=_("link type"),
+        on_delete=models.CASCADE,
+        related_name="links",
+    )
+    name = models.CharField(_("name"), max_length=40, blank=True)
+    url = models.URLField(_("link url"))
+    club = models.ForeignKey(
+        Club, verbose_name=_("club"), on_delete=models.CASCADE, related_name="links"
+    )
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    updated_at = models.DateTimeField(_("updated at"), auto_now=True)
+
+    class Meta:
+        verbose_name = _("club link")
+        verbose_name_plural = _("club links")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["club", "url"],
+                name="club_clublink_unique_club_url",
+                violation_error_message=_("Duplicated url"),
+            )
+        ]
+
+    def __str__(self):
+        return self.url
+
+    def save(self, **kwargs):
+        if not self.name:
+            self.name = self.link_type.name
+        return super().save(**kwargs)
+
+    def clean(self):
+        if not self.url.startswith(self.link_type.url_base):
+            raise ValidationError(
+                _("This link doesn't match with the url base of its type.")
+            )

@@ -28,7 +28,14 @@ from django.db.models.functions import Lower
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from club.models import Club, ClubRole, Mailing, MailingSubscription, Membership
+from club.models import (
+    Club,
+    ClubLink,
+    ClubRole,
+    Mailing,
+    MailingSubscription,
+    Membership,
+)
 from core.models import User
 from core.views.forms import SelectDateTime
 from core.views.widgets.ajax_select import (
@@ -39,6 +46,26 @@ from counter.models import Counter, Selling
 from counter.schemas import SaleFilterSchema
 
 
+class ClubLinkForm(forms.ModelForm):
+    error_css_class = "error"
+    required_css_class = "required"
+
+    class Meta:
+        model = ClubLink
+        fields = ["url", "name", "link_type"]
+        widgets = {
+            "url": forms.URLInput(
+                {"pattern": "https://.*", "placeholder": "https://monlien.com"}
+            ),
+            "link_type": forms.HiddenInput(),
+        }
+
+
+ClubLinkFormSet = forms.inlineformset_factory(
+    Club, ClubLink, ClubLinkForm, extra=0, can_delete_extra=False
+)
+
+
 class ClubEditForm(forms.ModelForm):
     error_css_class = "error"
     required_css_class = "required"
@@ -47,6 +74,20 @@ class ClubEditForm(forms.ModelForm):
         model = Club
         fields = ["address", "logo", "short_description"]
         widgets = {"short_description": forms.Textarea()}
+
+    def __init__(self, *args, prefix: str | None = None, instance=None, **kwargs):
+        super().__init__(*args, prefix=prefix, instance=instance, **kwargs)
+        self.link_formset = ClubLinkFormSet(
+            *args, instance=self.instance, prefix="link", **kwargs
+        )
+
+    def is_valid(self):
+        return super().is_valid() and self.link_formset.is_valid()
+
+    def save(self, commit=True):  # noqa: FBT002
+        res = super().save(commit=commit)
+        self.link_formset.save(commit=commit)
+        return res
 
 
 class ClubAdminEditForm(ClubEditForm):

@@ -16,7 +16,7 @@ from django.contrib import admin
 from django.forms.models import ModelForm
 from django.http import HttpRequest
 
-from club.models import Club, ClubRole, Membership
+from club.models import Club, ClubLink, ClubRole, LinkType, Membership
 
 
 @admin.register(Club)
@@ -67,3 +67,18 @@ class MembershipAdmin(admin.ModelAdmin):
         "club__name",
     )
     autocomplete_fields = ("user",)
+
+
+@admin.register(LinkType)
+class LinkTypeAdmin(admin.ModelAdmin):
+    list_display = ("name", "url_base", "icon")
+    search_fields = ("name",)
+
+
+@admin.register(ClubLink)
+class ClubLinkAdmin(admin.ModelAdmin):
+    list_display = ("link_type", "club", "url")
+    list_select_related = ("link_type", "club")
+    autocomplete_fields = ("link_type", "club")
+    search_fields = ("link_type__name", "url")
+    list_filter = ("link_type", ("club", admin.RelatedOnlyFieldListFilter))
