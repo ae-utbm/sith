@@ -1,3 +1,11 @@
+/**
+ * File containing main functions and library re-exports
+ * that should be accessible throughout the whole website.
+ *
+ * The idea is to group all that shared code into a single bundle,
+ * for more efficient tree-shaking and gzip compression.
+ */
+
 import sort from "@alpinejs/sort";
 import Alpine from "alpinejs";
 import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
