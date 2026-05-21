@@ -33,7 +33,7 @@ def migrate_roles(apps: StateApps, schema_editor):
             club_id=club_id,
             order=max(SITH_CLUB_ROLES) - role,
         )
-        updates.append(When(role=role, then=new_role.id))
+        updates.append(When(club_id=club_id, role=role, then=new_role.id))
     # all updates must happen at the same time
     # otherwise, the 10 first created ClubRole would be
     # re-modified after their initial creation, and it would
