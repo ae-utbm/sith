@@ -1,4 +1,4 @@
-import { versionedLocalStorage } from "#core:core/cache";
+import { versionedLocalStorage } from "#core:core/localstorage";
 
 interface BasketItem {
   priceId: number;

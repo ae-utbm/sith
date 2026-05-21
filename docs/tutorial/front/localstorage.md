@@ -51,7 +51,7 @@ Dans le cas où une paire clef-valeur du localStorage subit un changement
 dans son schéma de données, utilisez `versionedLocalStorage` :
 
 ```typescript
-import { versionedLocalStorage } from "#core:core/cache";
+import { versionedLocalStorage } from "#core:core/localstorage";
 
 const foo = () => {
   let obj = versionedLocalStorage.getItem("<key>", { version: 1 });
