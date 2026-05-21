@@ -81,9 +81,9 @@
     width: 100%;
     background: white;
     margin-bottom: 1em;
+    font-size: 85%;
 
     #links_content {
-      font-size: 85%;
       overflow: auto;
       box-shadow: $shadow-color 1px 1px 1px;
       min-height: 20em;
@@ -99,6 +99,7 @@
 
         li {
           margin: 10px;
+
           i {
             width: 25px;
             text-align: center;
@@ -112,12 +113,13 @@
     #birthdays_content {
       box-shadow: $shadow-color 1px 1px 1px;
       padding: 1em;
+
       ul.birthdays_year {
         margin: 0;
         list-style-type: none;
         font-weight: bold;
 
-        >li {
+        > li {
           padding: 0.5em;
 
           &:nth-child(even) {
