@@ -5,7 +5,7 @@ from django.urls import reverse
 from model_bakery import baker
 from pytest_django.asserts import assertHTMLEqual, assertRedirects
 
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 from core.baker_recipes import subscriber_user
 from core.markdown import markdown
 from core.models import PageRev, User
@@ -21,7 +21,7 @@ def test_page_display_on_club_main_page(client: Client):
 
     assert res.status_code == 200
     soup = BeautifulSoup(res.text, "lxml")
-    detail_html = soup.find(id="club_detail").find(class_="markdown")
+    detail_html = soup.find(id="club-page").find(class_="markdown")
     assertHTMLEqual(detail_html.decode_contents(), markdown(content))
 
 
@@ -34,7 +34,7 @@ def test_club_main_page_without_content(client: Client):
 
     assert res.status_code == 200
     soup = BeautifulSoup(res.text, "lxml")
-    detail_html = soup.find(id="club_detail")
+    detail_html = soup.find(id="club-page")
     assert detail_html.find_all("markdown") == []
 
 
@@ -59,7 +59,12 @@ def test_page_revision(client: Client):
 def test_edit_page(client: Client):
     club = baker.make(Club)
     user = subscriber_user.make()
-    baker.make(Membership, user=user, club=club, role=3)
+    baker.make(
+        Membership,
+        user=user,
+        club=club,
+        role=baker.make(ClubRole, club=club, is_board=True),
+    )
     client.force_login(user)
     url = reverse("club:club_edit_page", kwargs={"club_id": club.id})
     content = "# foo\nLorem ipsum dolor sit amet"

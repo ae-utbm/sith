@@ -88,6 +88,11 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 
 ALLOWED_HOSTS = ["*"]
 
+# RemovedInDjango60Warning: It's a transitional setting helpful in early
+# adoption of "https" as the new default value of forms.URLField.assume_scheme.
+# Remove this after upgrading to Django 6.x
+FORMS_URLFIELD_ASSUME_HTTPS = True
+
 # Application definition
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
@@ -560,35 +565,6 @@ SITH_SUBSCRIPTIONS = {
     # To be completed....
 }
 
-SITH_CLUB_ROLES_ID = {
-    "President": 10,
-    "Vice-President": 9,
-    "Treasurer": 7,
-    "Communication supervisor": 5,
-    "Secretary": 4,
-    "IT supervisor": 3,
-    "Board member": 2,
-    "Active member": 1,
-    "Curious": 0,
-}
-
-SITH_CLUB_ROLES = {
-    10: _("President"),
-    9: _("Vice-President"),
-    7: _("Treasurer"),
-    5: _("Communication supervisor"),
-    4: _("Secretary"),
-    3: _("IT supervisor"),
-    2: _("Board member"),
-    1: _("Active member"),
-    0: _("Curious"),
-}
-
-# This corresponds to the maximum role a user can freely subscribe to
-# In this case, SITH_MAXIMUM_FREE_ROLE=1 means that a user can
-# set himself as "Membre actif" or "Curieux", but not higher
-SITH_MAXIMUM_FREE_ROLE = 1
-
 # Minutes to timeout the logged barmen
 SITH_BARMAN_TIMEOUT = 30
 
@@ -665,16 +641,17 @@ if DEBUG:
     INSTALLED_APPS += ("debug_toolbar",)
     MIDDLEWARE = ("debug_toolbar.middleware.DebugToolbarMiddleware", *MIDDLEWARE)
     DEBUG_TOOLBAR_PANELS = [
-        "debug_toolbar.panels.versions.VersionsPanel",
+        "debug_toolbar.panels.history.HistoryPanel",
         "debug_toolbar.panels.timer.TimerPanel",
         "debug_toolbar.panels.settings.SettingsPanel",
         "debug_toolbar.panels.headers.HeadersPanel",
         "debug_toolbar.panels.request.RequestPanel",
         "debug_toolbar.panels.sql.SQLPanel",
-        "sith.toolbar_debug.TemplatesPanel",
+        "debug_toolbar.panels.templates.TemplatesPanel",
         "debug_toolbar.panels.cache.CachePanel",
         "debug_toolbar.panels.signals.SignalsPanel",
-        "debug_toolbar.panels.redirects.RedirectsPanel",
+        "debug_toolbar.panels.community.CommunityPanel",
+        "debug_toolbar.panels.profiling.ProfilingPanel",
     ]
     if not TESTING:
         SENTRY_ENV = "development"  # We can't test if it gets overridden in settings

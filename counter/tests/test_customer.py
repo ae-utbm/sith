@@ -3,14 +3,13 @@ import string
 from datetime import timedelta
 
 import pytest
-from django.conf import settings
 from django.contrib.auth.base_user import make_password
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.timezone import now
 from model_bakery import baker
 
-from club.models import Membership
+from club.models import ClubRole, Membership
 from core.baker_recipes import board_user, subscriber_user
 from core.models import User
 from counter.baker_recipes import product_recipe, refill_recipe, sale_recipe
@@ -42,11 +41,12 @@ class TestStudentCard(TestCase):
         cls.counter.sellers.add(cls.barmen)
 
         cls.club_counter = baker.make(Counter)
+        role = baker.make(ClubRole, club=cls.club_counter.club, is_board=True)
         baker.make(
             Membership,
             start_date=now() - timedelta(days=30),
             club=cls.club_counter.club,
-            role=settings.SITH_CLUB_ROLES_ID["Board member"],
+            role=role,
             user=cls.club_admin,
         )
 

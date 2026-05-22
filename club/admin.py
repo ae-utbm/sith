@@ -13,8 +13,10 @@
 #
 #
 from django.contrib import admin
+from django.forms.models import ModelForm
+from django.http import HttpRequest
 
-from club.models import Club, Membership
+from club.models import Club, ClubLink, ClubRole, LinkType, Membership
 
 
 @admin.register(Club)
@@ -29,6 +31,31 @@ class ClubAdmin(admin.ModelAdmin):
         "page",
     )
 
+    def save_model(
+        self,
+        request: HttpRequest,
+        obj: Club,
+        form: ModelForm,
+        change: bool,  # noqa: FBT001
+    ):
+        super().save_model(request, obj, form, change)
+        if not change:
+            obj.create_default_roles()
+
+
+@admin.register(ClubRole)
+class ClubRoleAdmin(admin.ModelAdmin):
+    list_display = ("name", "club", "is_board", "is_presidency")
+    search_fields = ("name",)
+    autocomplete_fields = ("club",)
+    list_select_related = ("club",)
+    list_filter = (
+        "is_board",
+        "is_presidency",
+        ("club", admin.RelatedOnlyFieldListFilter),
+    )
+    show_facets = admin.ModelAdmin.show_facets.ALWAYS
+
 
 @admin.register(Membership)
 class MembershipAdmin(admin.ModelAdmin):
@@ -40,3 +67,18 @@ class MembershipAdmin(admin.ModelAdmin):
         "club__name",
     )
     autocomplete_fields = ("user",)
+
+
+@admin.register(LinkType)
+class LinkTypeAdmin(admin.ModelAdmin):
+    list_display = ("name", "url_base", "icon")
+    search_fields = ("name",)
+
+
+@admin.register(ClubLink)
+class ClubLinkAdmin(admin.ModelAdmin):
+    list_display = ("link_type", "club", "url")
+    list_select_related = ("link_type", "club")
+    autocomplete_fields = ("link_type", "club")
+    search_fields = ("link_type__name", "url")
+    list_filter = ("link_type", ("club", admin.RelatedOnlyFieldListFilter))

@@ -28,12 +28,16 @@ import csv
 import itertools
 from typing import TYPE_CHECKING, Any
 
-from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import (
+    LoginRequiredMixin,
+    PermissionRequiredMixin,
+    UserPassesTestMixin,
+)
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
-from django.db.models import F, Q, Sum
+from django.db.models import F, Prefetch, Q, Sum
+from django.db.models.functions import Length
 from django.http import Http404, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
@@ -44,24 +48,29 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, View
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import (
-    CreateView,
-    DeleteView,
-    FormMixin,
-    UpdateView,
-)
+from django.views.generic.edit import CreateView, DeleteView, FormMixin, UpdateView
 
 from club.forms import (
     ClubAddMemberForm,
     ClubAdminEditForm,
     ClubEditForm,
     ClubOldMemberForm,
+    ClubRoleCreateForm,
+    ClubRoleFormSet,
     ClubSearchForm,
     JoinClubForm,
     MailingForm,
     SellingsForm,
 )
-from club.models import Club, Mailing, MailingSubscription, Membership
+from club.models import (
+    Club,
+    ClubLink,
+    ClubRole,
+    LinkType,
+    Mailing,
+    MailingSubscription,
+    Membership,
+)
 from com.models import Poster
 from com.views import (
     PosterCreateBaseView,
@@ -205,20 +214,22 @@ class ClubListView(AllowFragment, FormMixin, ListView):
 
     template_name = "club/club_list.jinja"
     form_class = ClubSearchForm
-    queryset = Club.objects.order_by("name")
+    queryset = Club.objects.prefetch_related(
+        Prefetch("links", queryset=ClubLink.objects.select_related("link_type"))
+    ).order_by("name")
     paginate_by = 20
 
     def get_form_kwargs(self):
         res = super().get_form_kwargs()
-        if self.request.method == "GET":
-            res |= {"data": self.request.GET, "initial": self.request.GET}
+        # if request.GET is empty, the form will interpret club_status as None,
+        # even though we want it to be initially True,
+        # so we force a defaut True value.
+        res["data"] = {"club_status": True} | self.request.GET.dict()
         return res
 
     def get_queryset(self):
         form: ClubSearchForm = self.get_form()
         qs = self.queryset
-        if not form.is_bound:
-            return qs.filter(is_active=True)
         if not form.is_valid():
             return qs.none()
         if name := form.cleaned_data.get("name"):
@@ -244,6 +255,7 @@ class ClubView(ClubTabsMixin, DetailView):
             .values_list("content", flat=True)
             .first()
         )
+        kwargs["links"] = list(self.object.links.select_related("link_type").all())
         return kwargs
 
 
@@ -355,7 +367,7 @@ class ClubMembersView(
         membership = self.object.get_membership_for(self.request.user)
         if (
             membership
-            and membership.role <= settings.SITH_MAXIMUM_FREE_ROLE
+            and not membership.role.is_board
             and not self.request.user.has_perm("club.add_membership")
         ):
             # Simple club members won't see the form anymore.
@@ -380,8 +392,8 @@ class ClubMembersView(
         kwargs["members"] = list(
             self.object.members.ongoing()
             .annotate(is_editable=Q(id__in=editable))
-            .order_by("-role")
-            .select_related("user")
+            .order_by("role__order")
+            .select_related("user", "role")
         )
         kwargs["can_end_membership"] = len(editable) > 0
         return kwargs
@@ -409,10 +421,123 @@ class ClubOldMembersView(ClubTabsMixin, PermissionRequiredMixin, DetailView):
         return super().get_context_data(**kwargs) | {
             "old_members": (
                 self.object.members.exclude(end_date=None)
-                .order_by("-role", "description", "-end_date")
-                .select_related("user")
+                .order_by("role__order", "description", "-end_date")
+                .select_related("user", "role")
             )
         }
+
+
+class ClubRoleUpdateView(
+    ClubTabsMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView
+):
+    form_class = ClubRoleFormSet
+    model = Club
+    template_name = "club/club_roles.jinja"
+    pk_url_kwarg = "club_id"
+    current_tab = "members"
+    success_message = _("Club roles updated")
+
+    @cached_property
+    def club(self) -> Club:
+        return self.get_object()
+
+    def test_func(self):
+        return self.club.can_roles_be_edited_by(self.request.user)
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"form_kwargs": {"label_suffix": ""}}
+
+    def get_success_url(self):
+        return reverse("club:club_members", kwargs={"club_id": self.club.id})
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "user_role": ClubRole.objects.filter(
+                club=self.club,
+                members__user=self.request.user,
+                members__end_date=None,
+            )
+            .values_list("id", flat=True)
+            .first()
+        }
+
+
+class ClubRoleBaseCreateView(UserPassesTestMixin, SuccessMessageMixin, CreateView):
+    """View to create a new Club Role, using [][club.forms.ClubRoleCreateForm].
+
+    This view isn't meant to be called directly, but rather subclassed for each
+    type of role that can exist :
+
+    - `[ClubRolePresidencyCreateView][club.views.ClubRolePresidencyCreateView]`
+      to create a presidency role
+    - `[ClubRoleBoardCreateView][club.views.ClubRoleBoardCreateView]`
+      to create a board role
+    - `[ClubRoleMemberCreateView][club.views.ClubRoleMemberCreateView]`
+      to create a member role
+
+    Each subclass have to override the following variables :
+
+    - `is_presidency` and `is_board`, indicating what type of role
+      the view creates.
+    - `role_description`, which is the title of the page, indication
+       the user what kind of role is being created.
+
+    This way, we are making sure the correct type of role will
+    be created, without bothering the user with the implementation details.
+    """
+
+    form_class = ClubRoleCreateForm
+    model = ClubRole
+    template_name = "core/create.jinja"
+    success_message = _("Role %(name)s created")
+    role_description = ""
+    is_presidency: bool
+    is_board: bool
+
+    @cached_property
+    def club(self):
+        return get_object_or_404(Club, id=self.kwargs["club_id"])
+
+    def test_func(self):
+        return self.request.user.is_authenticated and (
+            self.request.user.has_perm("club.add_clubrole")
+            or self.club.members.filter(
+                user=self.request.user, role__is_presidency=True
+            ).exists()
+        )
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {
+            "club": self.club,
+            "is_presidency": self.is_presidency,
+            "is_board": self.is_board,
+        }
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "object_name": self.role_description
+        }
+
+    def get_success_url(self):
+        return reverse("club:club_roles", kwargs={"club_id": self.club.id})
+
+
+class ClubRolePresidencyCreateView(ClubRoleBaseCreateView):
+    is_presidency = True
+    is_board = True
+    role_description = _("club role \u2013 presidency")
+
+
+class ClubRoleBoardCreateView(ClubRoleBaseCreateView):
+    is_presidency = False
+    is_board = True
+    role_description = _("club role \u2013 board")
+
+
+class ClubRoleMemberCreateView(ClubRoleBaseCreateView):
+    is_presidency = False
+    is_board = False
+    role_description = _("club role \u2013 member")
 
 
 class ClubSellingView(ClubTabsMixin, CanEditMixin, DetailFormView):
@@ -571,6 +696,11 @@ class ClubEditView(ClubTabsMixin, CanEditMixin, UpdateView):
             return ClubAdminEditForm
         return ClubEditForm
 
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "link_types": list(LinkType.objects.order_by(Length("url_base").desc()))
+        }
+
 
 class ClubCreateView(PermissionRequiredMixin, CreateView):
     """Create a club (for the Sith admin)."""
@@ -580,6 +710,11 @@ class ClubCreateView(PermissionRequiredMixin, CreateView):
     fields = ["name", "parent"]
     template_name = "core/create.jinja"
     permission_required = "club.add_club"
+
+    def form_valid(self, form):
+        res = super().form_valid(form)
+        self.object.create_default_roles()
+        return res
 
 
 class MembershipSetOldView(CanEditMixin, SingleObjectMixin, View):
@@ -761,9 +896,7 @@ class MailingAutoGenerationView(View):
     def get(self, request, *args, **kwargs):
         club = self.mailing.club
         self.mailing.subscriptions.all().delete()
-        members = club.members.filter(
-            role__gte=settings.SITH_CLUB_ROLES_ID["Board member"]
-        ).exclude(end_date__lte=timezone.now())
+        members = club.members.ongoing().filter(role__is_board=True)
         for member in members.all():
             MailingSubscription(user=member.user, mailing=self.mailing).save()
         return redirect("club:mailing", club_id=club.id)

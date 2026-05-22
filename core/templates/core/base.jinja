@@ -35,12 +35,9 @@
       <noscript><link rel="stylesheet" href="{{ static('bundled/fontawesome-index.css') }}"></noscript>
 
       <script src="{{ url('javascript-catalog') }}"></script>
-      <script type="module" src="{{ static("bundled/core/navbar-index.ts") }}"></script>
+      <script type="module" src="{{ static("bundled/base-bundle-index.ts") }}"></script>
       <script type="module" src="{{ static("bundled/core/components/include-index.ts") }}"></script>
-      <script type="module" src="{{ static('bundled/alpine-index.js') }}"></script>
-      <script type="module" src="{{ static('bundled/htmx-index.js') }}"></script>
-      <script type="module" src="{{ static('bundled/country-flags-index.ts') }}"></script>
-      <script type="module" src="{{ static('bundled/core/tooltips-index.ts') }}"></script>
+      <script type="module" src="{{ static("bundled/core/tooltips-index.ts") }}"></script>
 
       {% block additional_css %}{% endblock %}
       {% block additional_js %}{% endblock %}

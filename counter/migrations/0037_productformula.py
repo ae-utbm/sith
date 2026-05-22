@@ -32,8 +32,9 @@ class Migration(migrations.Migration):
                 (
                     "result",
                     models.OneToOneField(
-                        help_text="The formula product.",
+                        help_text="The product got with the formula.",
                         on_delete=django.db.models.deletion.CASCADE,
+                        related_name="formula",
                         to="counter.product",
                         verbose_name="result product",
                     ),

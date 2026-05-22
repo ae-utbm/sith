@@ -4,7 +4,7 @@ from django.urls import reverse
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 from core.baker_recipes import subscriber_user
 from core.models import User
 
@@ -15,7 +15,8 @@ class TestSubscriptionPermission(TestCase):
         cls.user: User = subscriber_user.make()
         cls.admin = baker.make(User, is_superuser=True)
         cls.club = baker.make(Club)
-        baker.make(Membership, user=cls.user, club=cls.club, role=7)
+        role = baker.make(ClubRole, club=cls.club, is_board=True)
+        baker.make(Membership, user=cls.user, club=cls.club, role=role)
 
     def test_give_permission(self):
         self.client.force_login(self.admin)

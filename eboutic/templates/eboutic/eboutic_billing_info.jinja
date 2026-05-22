@@ -32,5 +32,7 @@
     </form>
   </div>
   <br>
-  {{ update_notifications(messages) }}
+  {% if is_fragment %}
+    {{ update_notifications(messages) }}
+  {% endif %}
 </div>

@@ -1,4 +1,4 @@
-import type { NestedKeyOf } from "#core:utils/types.ts";
+import type { NestedKeyOf } from "#core:types/nested-key";
 
 interface StringifyOptions<T extends object> {
   /** The columns to include in the resulting CSV. */

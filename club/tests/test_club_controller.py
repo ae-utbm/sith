@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 import pytest
+from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -8,7 +9,7 @@ from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertNumQueries
 
-from club.models import Club, Membership
+from club.models import Club, ClubRole, Membership
 from core.baker_recipes import subscriber_user
 from core.models import Group, Page, User
 
@@ -26,8 +27,10 @@ class TestClubSearch(TestCase):
                 "id", flat=True
             )
         )
-        Page.objects.exclude(club=None).delete()
+        Membership.objects.all().delete()
+        ClubRole.objects.all().delete()
         Club.objects.all().delete()
+        Page.objects.exclude(name=settings.SITH_CLUB_ROOT_PAGE).delete()
         Group.objects.filter(id__in=groups).delete()
 
         cls.clubs = baker.make(
@@ -85,8 +88,8 @@ class TestFetchClub:
     def test_fetch_club_nb_queries(self, client: Client, club: Club):
         user = subscriber_user.make()
         client.force_login(user)
-        with assertNumQueries(6):
+        with assertNumQueries(7):
             # - 4 queries for authentication
-            # - 2 queries for the actual data
+            # - 3 queries for the actual data
             res = client.get(reverse("api:fetch_club", kwargs={"club_id": club.id}))
             assert res.status_code == 200

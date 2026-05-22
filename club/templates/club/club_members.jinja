@@ -12,6 +12,15 @@
 
   <h2>{% trans %}Club members{% endtrans %}</h2>
 
+  {% if club.can_roles_be_edited_by(user) %}
+    <a
+      href="{{ url("club:club_roles", club_id=object.id) }}"
+      class="btn btn-blue margin-bottom"
+    >
+      <i class="fa fa-users-gear"></i> {% trans %}Manage roles{% endtrans %}
+    </a>
+  {% endif %}
+
   {% if add_member_fragment %}
     <br />
     {{ add_member_fragment }}
@@ -41,7 +50,7 @@
           {% for m in members %}
             <tr>
               <td>{{ user_profile_link(m.user) }}</td>
-              <td>{{ settings.SITH_CLUB_ROLES[m.role] }}</td>
+              <td>{{ m.role.name }}</td>
               <td>{{ m.description }}</td>
               <td>{{ m.start_date }}</td>
               {%- if can_end_membership -%}

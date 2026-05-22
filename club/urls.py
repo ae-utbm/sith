@@ -35,6 +35,10 @@ from club.views import (
     ClubPageEditView,
     ClubPageHistView,
     ClubRevView,
+    ClubRoleBoardCreateView,
+    ClubRoleMemberCreateView,
+    ClubRolePresidencyCreateView,
+    ClubRoleUpdateView,
     ClubSellingCSVView,
     ClubSellingView,
     ClubToolsView,
@@ -70,6 +74,22 @@ urlpatterns = [
         "<int:club_id>/elderlies/",
         ClubOldMembersView.as_view(),
         name="club_old_members",
+    ),
+    path("<int:club_id>/role/", ClubRoleUpdateView.as_view(), name="club_roles"),
+    path(
+        "<int:club_id>/role/new/president/",
+        ClubRolePresidencyCreateView.as_view(),
+        name="new_role_president",
+    ),
+    path(
+        "<int:club_id>/role/new/board/",
+        ClubRoleBoardCreateView.as_view(),
+        name="new_role_board",
+    ),
+    path(
+        "<int:club_id>/role/new/member/",
+        ClubRoleMemberCreateView.as_view(),
+        name="new_role_member",
     ),
     path("<int:club_id>/sellings/", ClubSellingView.as_view(), name="club_sellings"),
     path(
