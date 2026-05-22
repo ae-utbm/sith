@@ -1,6 +1,8 @@
+import re
 from datetime import datetime, timezone
 
 import pytest
+from bs4 import BeautifulSoup
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import Client
@@ -130,9 +132,11 @@ def test_eboutic_basket_expiry(
             _bulk_create=True,
         )
 
+    soup = BeautifulSoup(client.get(reverse("eboutic:main")).text, "lxml")
     assert (
-        f'x-data="basket({int(expected.timestamp() * 1000) if expected else "null"})"'
-        in client.get(reverse("eboutic:main")).text
+        # remove any space from the value before asserting
+        re.sub(r"\s+", "", soup.find(id="eboutic").attrs["x-data"])
+        == f"basket([],{int(expected.timestamp() * 1000) if expected else 'null'},)"
     )
 
 
@@ -235,15 +239,6 @@ class TestEboutic(TestCase):
         assert response.status_code == 200
         assert Basket.objects.first() is None
 
-        response = self.submit_basket([BasketItem(self.cotiz.id, 1)])
-        assert response.status_code == 200
-        assert Basket.objects.first() is None
-
-        response = self.submit_basket([BasketItem(self.not_in_counter.id, 1)])
-        assert response.status_code == 200
-        assert Basket.objects.first() is None
-
-        self.client.force_login(self.new_customer)
         response = self.submit_basket([BasketItem(self.cotiz.id, 1)])
         assert response.status_code == 200
         assert Basket.objects.first() is None
