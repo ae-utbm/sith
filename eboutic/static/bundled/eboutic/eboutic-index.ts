@@ -1,4 +1,4 @@
-export {};
+import { versionedLocalStorage } from "#core:core/localstorage";
 
 interface BasketItem {
   priceId: number;
@@ -7,8 +7,8 @@ interface BasketItem {
   unitPrice: number;
 }
 
-// increment the key number if the data schema of the cached basket changes
-const BASKET_CACHE_KEY = "basket1";
+const BASKET_CACHE_KEY = "basket";
+const BASKET_CACHE_VERSION = 1;
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("basket", (lastPurchaseTime?: number) => ({
@@ -34,18 +34,16 @@ document.addEventListener("alpine:init", () => {
     },
 
     loadBasket(): BasketItem[] {
-      if (localStorage.getItem(BASKET_CACHE_KEY) === null) {
-        return [];
-      }
-      try {
-        return JSON.parse(localStorage.getItem(BASKET_CACHE_KEY));
-      } catch (_err) {
-        return [];
-      }
+      const cached = versionedLocalStorage.getItem<BasketItem[]>(BASKET_CACHE_KEY, {
+        version: BASKET_CACHE_VERSION,
+      });
+      return cached ?? [];
     },
 
     saveBasket() {
-      localStorage.setItem(BASKET_CACHE_KEY, JSON.stringify(this.basket));
+      versionedLocalStorage.setItem(BASKET_CACHE_KEY, this.basket, {
+        version: BASKET_CACHE_VERSION,
+      });
       localStorage.setItem("basketTimestamp", Date.now().toString());
     },
 

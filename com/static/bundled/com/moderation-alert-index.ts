@@ -1,4 +1,3 @@
-import { exportToHtml } from "#core:utils/globals.ts";
 import { newsDeleteNews, newsFetchNewsDates, newsPublishNews } from "#openapi";
 
 // This will be used in jinja templates,
@@ -13,7 +12,8 @@ const AlertState = {
   // biome-ignore lint/style/useNamingConvention: this feels more like an enum
   DISPLAYED: 4, // When published at page generation
 };
-exportToHtml("AlertState", AlertState);
+// biome-ignore lint/style/useNamingConvention: it's an enum, PascalCase is better
+Object.assign(window, { AlertState });
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("moderationAlert", (newsId: number) => ({

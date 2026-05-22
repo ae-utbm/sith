@@ -66,6 +66,8 @@ nav:
     - Gestion des permissions: tutorial/perms.md
     - Gestion des groupes: tutorial/groups.md
     - Les fragments: tutorial/fragments.md
+    - Frontend:
+      - localStorage: tutorial/front/localstorage.md
     - API:
       - Développement: tutorial/api/dev.md
       - Connexion à l'API: tutorial/api/connect.md

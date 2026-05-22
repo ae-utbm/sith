@@ -1,12 +1,10 @@
-import { exportToHtml } from "#core:utils/globals.ts";
-
-exportToHtml("showMenu", () => {
+function showMenu() {
   const navbar = document.getElementById("navbar-content");
   const current = navbar.getAttribute("mobile-display");
   navbar.setAttribute("mobile-display", current === "hidden" ? "revealed" : "hidden");
-});
+}
 
-document.addEventListener("alpine:init", () => {
+function navbarInit() {
   const menuItems = document.querySelectorAll(".navbar details[name='navbar'].menu");
   const isDesktop = () => {
     return window.innerWidth >= 500;
@@ -33,4 +31,9 @@ document.addEventListener("alpine:init", () => {
       }
     });
   }
-});
+}
+
+export default () => {
+  Object.assign(document, { showMenu });
+  document.addEventListener("alpine:init", navbarInit);
+};

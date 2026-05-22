@@ -22,35 +22,35 @@ document.addEventListener("alpine:init", () => {
     albums: [] as Album[],
 
     async fetchPictures(): Promise<PictureSchema[]> {
-      const localStorageKey = `user${config.userId}Pictures`;
-      const localStorageInvalidationKey = `user${config.userId}PicturesNumber`;
-      const lastCachedNumber = localStorage.getItem(localStorageInvalidationKey);
+      // Check the cache before hitting the API.
+      const storageKey = "userPictures";
+      const cacheContent: { userId: number; pictures: PictureSchema[] }[] = JSON.parse(
+        sessionStorage.getItem(storageKey) || "[]",
+      );
+      const userPictures = cacheContent.find((obj) => obj.userId === config.userId);
       if (
-        lastCachedNumber !== null &&
-        Number.parseInt(lastCachedNumber, 10) === config.nbPictures
+        userPictures !== undefined &&
+        userPictures.pictures.length === config.nbPictures
       ) {
-        return JSON.parse(localStorage.getItem(localStorageKey));
+        // The cached value is considered valid
+        // if it contains the right amount of pictures.
+        // This amount is known because it is given in the template.
+        return userPictures.pictures;
       }
       const pictures = await paginated(picturesFetchPictures, {
         // biome-ignore lint/style/useNamingConvention: from python api
         query: { users_identified: [config.userId] },
       } as PicturesFetchPicturesData);
+
+      cacheContent.push({ userId: config.userId, pictures: pictures });
       try {
-        localStorage.setItem(localStorageInvalidationKey, config.nbPictures.toString());
-        localStorage.setItem(localStorageKey, JSON.stringify(pictures));
+        // cache only the pictures of the last 4 visited profiles
+        sessionStorage.setItem(storageKey, JSON.stringify(cacheContent.slice(-4)));
       } catch {
-        // an exception is raised if the localstorage is entirely filled
-        // so just delete all cached user pictures.
+        // an exception is raised if the storage is entirely filled.
+        // To be as safe as possible, delete the cached pictures.
         // A cache hit is not worth the page breaking.
-        Object.keys(localStorage)
-          .filter(
-            (key) =>
-              key.startsWith("user") &&
-              (key.endsWith("Pictures") || key.endsWith("PicturesNumber")),
-          )
-          .forEach((key) => {
-            localStorage.removeItem(key);
-          });
+        sessionStorage.removeItem(storageKey);
       }
       return pictures;
     },
