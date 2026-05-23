@@ -1,16 +1,19 @@
 import re
 from datetime import datetime, timezone
 
+import freezegun
 import pytest
 from bs4 import BeautifulSoup
+from django.conf import settings
 from django.http import HttpResponse
 from django.test import TestCase
 from django.test.client import Client
 from django.urls import reverse
-from django.utils.timezone import localdate
+from django.utils.timezone import localdate, now
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
+import eboutic.models
 from core.baker_recipes import subscriber_user
 from core.models import Group, User
 from counter.baker_recipes import (
@@ -235,17 +238,45 @@ class TestEboutic(TestCase):
 
     def test_add_forbidden_product(self):
         self.client.force_login(self.new_customer)
-        response = self.submit_basket([BasketItem(self.beer.id, 1)])
-        assert response.status_code == 200
-        assert Basket.objects.first() is None
+        for product in self.beer, self.cotiz, self.not_in_counter:
+            response = self.submit_basket([BasketItem(product.id, 1)])
+            assert response.status_code == 200
+            assert not Basket.objects.exists()
 
-        response = self.submit_basket([BasketItem(self.cotiz.id, 1)])
+    def test_sold_out_product(self):
+        sold_out = product_recipe.make(
+            clic_limit=3, counters=[self.eboutic], product_type=baker.make(ProductType)
+        )
+        price = price_recipe.make(product=sold_out, groups=[self.group_cotiz], amount=0)
+        sale_recipe.make(
+            product=sold_out,
+            customer=self.subscriber.customer,
+            unit_price=0,
+            quantity=1,
+        )
+        baker.make(
+            eboutic.models.BasketItem,
+            basket=baker.make(Basket),
+            product=sold_out,
+            quantity=2,
+        )
+        self.client.force_login(self.subscriber)
+        response = self.submit_basket([BasketItem(price.id, 1)])
         assert response.status_code == 200
-        assert Basket.objects.first() is None
-
-        response = self.submit_basket([BasketItem(self.not_in_counter.id, 1)])
-        assert response.status_code == 200
-        assert Basket.objects.first() is None
+        assert Basket.objects.count() == 1
+        with freezegun.freeze_time(
+            now()
+            + settings.SITH_EBOUTIC_BASKET_TIMEOUT
+            + settings.SITH_EBOUTIC_ETRANSACTION_TIMEOUT
+        ):
+            # after a while, unpaid basket items should expire and make the
+            # product available again.
+            response = self.submit_basket([BasketItem(price.id, 1)])
+        assertRedirects(
+            response,
+            reverse("eboutic:checkout", kwargs={"basket_id": Basket.objects.last().id}),
+        )
+        assert Basket.objects.count() == 2
 
     def test_create_basket(self):
         self.client.force_login(self.new_customer)

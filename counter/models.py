@@ -371,7 +371,9 @@ class ProductQuerySet(models.QuerySet):
         nb_basket_items_subquery = Subquery(
             BasketItem.objects.filter(
                 product_id=OuterRef("id"),
-                basket__date__gt=now() - settings.SITH_EBOUTIC_BASKET_TIMEOUT,
+                basket__date__gt=now()
+                - settings.SITH_EBOUTIC_BASKET_TIMEOUT
+                - settings.SITH_EBOUTIC_ETRANSACTION_TIMEOUT,
             )
             .values("product_id")
             .annotate(res=Sum("quantity"))

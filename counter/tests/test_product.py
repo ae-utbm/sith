@@ -1,5 +1,4 @@
 import itertools
-from datetime import timedelta
 from io import BytesIO
 from typing import Callable
 from uuid import uuid4
@@ -276,7 +275,9 @@ class TestProductClicLimit(TestCase):
         item = BasketItem.objects.filter(product=self.products[1])[0]
         item.basket = baker.make(
             Basket,
-            date=now() - settings.SITH_EBOUTIC_BASKET_TIMEOUT - timedelta(minutes=1),
+            date=now()
+            - settings.SITH_EBOUTIC_BASKET_TIMEOUT
+            - settings.SITH_EBOUTIC_ETRANSACTION_TIMEOUT,
         )
         item.save()
         assert list(self.qs.under_clic_limit()) == self.products[1:]
