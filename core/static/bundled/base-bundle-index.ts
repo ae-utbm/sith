@@ -6,10 +6,12 @@
  * for more efficient tree-shaking and gzip compression.
  */
 
+import { morph } from "@alpinejs/morph";
 import sort from "@alpinejs/sort";
 import Alpine from "alpinejs";
 import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
 import htmx from "htmx.org";
+import "htmx-ext-alpine-morph";
 import { limitedChoices } from "#core:alpine/limited-choices";
 import { expireOldStorage } from "#core:core/localstorage";
 import { default as navbar } from "#core:core/navbar";
@@ -27,7 +29,7 @@ declare module "alpinejs" {
   }
 }
 
-Alpine.plugin([sort, limitedChoices, notifications]);
+Alpine.plugin([sort, limitedChoices, morph, notifications]);
 // biome-ignore lint/style/useNamingConvention: it's how it's named
 Object.assign(window, { Alpine });
 
