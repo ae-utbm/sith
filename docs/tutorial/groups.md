@@ -263,3 +263,35 @@ avec un unique champ permettant de sélectionner des groupes.
 Par défaut, seuls les utilisateurs avec la permission
 `auth.change_permission` auront accès à ce formulaire
 (donc, normalement, uniquement les utilisateurs Root).
+
+```mermaid
+sequenceDiagram
+    participant A as Utilisateur
+    participant B as ReverseProxy
+    participant C as MarkdownImage
+    participant D as Model
+
+    A->>B: GET /page/foo
+    B->>C: GET /page/foo
+    C-->>B: La page, avec les urls
+    B-->>A: La page, avec les urls
+    alt image publique 
+        A->>B: GET markdown/public/2025/img.webp
+        B-->>A: img.webp
+    end
+    alt image privée 
+        A->>B: GET markdown_image/{id}
+        B->>C: GET markdown_image/{id}
+        C->>D: user.can_view(image)
+        alt l'utilisateur a le droit de voir l'image
+            D-->>C: True
+            C-->>B: 200 (avec le X-Accel-Redirect)
+            B-->>A: img.webp
+        end
+        alt l'utilisateur n'a pas le droit de l'image
+            D-->>C: False
+            C-->>B: 403
+            B-->>A: 403
+        end
+    end
+```
