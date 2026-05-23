@@ -17,6 +17,15 @@ class ApiClientAdmin(admin.ModelAdmin):
         "owner__nick_name",
     )
     autocomplete_fields = ("owner", "groups", "client_permissions")
+    readonly_fields = ("hmac_key",)
+    actions = ("reset_hmac_key",)
+
+    @admin.action(permissions=["change"], description=_("Reset HMAC key"))
+    def reset_hmac_key(self, _request: HttpRequest, queryset: QuerySet[ApiClient]):
+        objs = list(queryset)
+        for obj in objs:
+            obj.reset_hmac(commit=False)
+        ApiClient.objects.bulk_update(objs, fields=["hmac_key"])
 
 
 @admin.register(ApiKey)

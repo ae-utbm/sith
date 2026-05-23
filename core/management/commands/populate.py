@@ -28,6 +28,7 @@ from typing import ClassVar, NamedTuple
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
+from django.core.files.base import ContentFile
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connection
@@ -118,15 +119,21 @@ class Command(BaseCommand):
         )
         self.profiles_root = SithFile.objects.create(name="profiles", owner=root)
         home_root = SithFile.objects.create(name="users", owner=root)
-
-        # Page needed for club creation
-        p = Page(name=settings.SITH_CLUB_ROOT_PAGE)
-        p.save(force_lock=True)
-
         club_root = SithFile.objects.create(name="clubs", owner=root)
         sas = SithFile.objects.create(
             name="SAS", owner=root, id=settings.SITH_SAS_ROOT_DIR_ID
         )
+        SithFile.objects.create(
+            name="CGU",
+            is_folder=False,
+            file=ContentFile(
+                content="Conditions générales d'utilisation", name="cgu.txt"
+            ),
+            owner=root,
+        )
+        # Page needed for club creation
+        p = Page(name=settings.SITH_CLUB_ROOT_PAGE)
+        p.save(force_lock=True)
         clubs = self._create_clubs()
 
         self.reset_index("club")
