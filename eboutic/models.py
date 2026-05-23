@@ -98,6 +98,15 @@ class Basket(models.Model):
 
     @property
     def is_expired(self) -> bool:
+        """Return True if this basket is expired.
+
+        An expired basket can no longer be used tp pay with sith account
+        or to start an etransaction.
+
+        Warnings:
+            Users have an additional time if they pay with an etransaction,
+            so an expired basket may be purchased after its expiration in that case.
+        """
         return (self.date + settings.SITH_EBOUTIC_BASKET_TIMEOUT) <= now()
 
     def generate_sales(
