@@ -17,7 +17,7 @@ from pytest_django.asserts import assertRedirects
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from counter.baker_recipes import price_recipe, product_recipe
-from counter.models import Product, ProductType, Selling
+from counter.models import Product, ProductType, Refilling, Selling
 from counter.tests.test_counter import force_refill_user
 from eboutic.models import Basket, BasketItem
 
@@ -236,6 +236,10 @@ class TestPaymentCard(TestPaymentBase):
 
         self.customer.customer.refresh_from_db()
         assert self.customer.customer.amount == price.amount * 2
+        refill = self.customer.customer.refillings.last()
+        assert refill is not None
+        assert refill.amount == price.amount * 2
+        assert refill.payment_method == Refilling.PaymentMethod.CARD
 
     def test_multiple_responses(self):
         bank_response = self.generate_bank_valid_answer(self.basket)
