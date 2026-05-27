@@ -56,10 +56,15 @@
         <div class="accordion-content">
           {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user_id) %}
 
-          <form method="post" action=""
-                class="code_form" @submit.prevent="handleCode">
+          <form method="post" action="" class="code_form" @submit.prevent="handleCode">
 
-            <counter-product-select name="code" x-ref="codeField" autofocus required placeholder="{% trans %}Select a product...{% endtrans %}">
+            <counter-product-select
+              name="code"
+              x-ref="codeField"
+              autofocus
+              required
+              placeholder="{% trans %}Select a product...{% endtrans %}"
+            >
               <option value=""></option>
               <optgroup label="{% trans %}Operations{% endtrans %}">
                 <option value="FIN">{% trans %}Confirm (FIN){% endtrans %}</option>
@@ -73,8 +78,6 @@
                 </optgroup>
               {%- endfor -%}
             </counter-product-select>
-
-            <input type="submit" value="{% trans %}Go{% endtrans %}"/>
           </form>
 
           {% for error in form.non_form_errors() %}
