@@ -42,7 +42,28 @@
   min-width: 350px;
 
   ul {
-    list-style-type: none;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    margin-left: 0;
+
+    .basket-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .product-name {
+        flex: 1 2 0;
+        min-width: 0;
+        text-wrap: wrap;
+      }
+    }
+  }
+
+  form {
+    margin-top: .5rem;
+    margin-bottom: .5rem;
   }
 }
 

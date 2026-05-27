@@ -46,6 +46,10 @@ details.accordion>.accordion-content {
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
   overflow: hidden;
+
+  @media screen and (max-width: 600px) {
+    padding: .75em 1.5em;
+  }
 }
 
 @mixin animation($selector) {
