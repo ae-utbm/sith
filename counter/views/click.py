@@ -14,6 +14,7 @@
 #
 from collections import defaultdict
 
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import Q
@@ -21,6 +22,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, resolve_url
 from django.urls import reverse
 from django.utils.safestring import SafeString
+from django.utils.translation import gettext as _
 from django.views.generic import FormView
 from django.views.generic.detail import SingleObjectMixin
 from ninja.main import HttpRequest
@@ -29,13 +31,7 @@ from core.auth.mixins import CanViewMixin
 from core.models import User
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
 from counter.forms import BasketForm, RefillForm
-from counter.models import (
-    Counter,
-    Customer,
-    ProductFormula,
-    ReturnableProduct,
-    Selling,
-)
+from counter.models import Counter, Customer, ProductFormula, ReturnableProduct, Selling
 from counter.utils import is_logged_in_counter
 from counter.views.mixins import CounterTabsMixin
 from counter.views.student_card import StudentCardFormFragment
@@ -97,10 +93,9 @@ class CounterClick(
             raise PermissionDenied
 
         if obj.type == "BAR" and (
-            not obj.is_open
-            or "counter_token" not in request.session
-            or request.session["counter_token"] != obj.token
+            not obj.is_open or request.session.get("counter_token", "") != obj.token
         ):
+            messages.error(request, _("You cannot click users on this counter"))
             return redirect(obj)  # Redirect to counter
 
         self.prices = list(obj.get_prices_for(self.customer))

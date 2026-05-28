@@ -17,6 +17,7 @@ from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from club.models import Club
 from club.widgets.ajax_select import AutoCompleteSelectClub
 from core.models import User, UserQuerySet
+from core.views import LoginForm
 from core.views.forms import (
     FutureDateTimeField,
     NFCTextInput,
@@ -91,29 +92,17 @@ class StudentCardForm(forms.ModelForm):
 
 
 class GetUserForm(forms.Form):
-    """The Form class aims at providing a valid user_id field in its cleaned data, in order to pass it to some view,
-    reverse function, or any other use.
-
-    The Form implements a nice JS widget allowing the user to type a customer account id, or search the database with
-    some nickname, first name, or last name (TODO)
-    """
+    """Find a user to show its click page."""
 
     code = forms.CharField(
         label="Code",
         max_length=StudentCard.UID_SIZE,
         required=False,
-        widget=NFCTextInput,
+        widget=NFCTextInput(attrs={"autofocus": True}),
     )
     id = forms.CharField(
-        label=_("Select user"),
-        help_text=None,
-        widget=AutoCompleteSelectUser,
-        required=False,
+        label=_("Select user"), widget=AutoCompleteSelectUser, required=False
     )
-
-    def as_p(self):
-        self.fields["code"].widget.attrs["autofocus"] = True
-        return super().as_p()
 
     def clean(self):
         cleaned_data = super().clean()
@@ -136,9 +125,27 @@ class GetUserForm(forms.Form):
 
         if customer is None or not customer.can_buy:
             raise forms.ValidationError(_("User not found"))
-        cleaned_data["user_id"] = customer.user.id
+        cleaned_data["user_id"] = customer.user_id
         cleaned_data["user"] = customer.user
         return cleaned_data
+
+
+class CounterLoginForm(LoginForm):
+    def __init__(self, *args, counter: Counter, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.counter = counter
+
+    def confirm_login_allowed(self, user: User):
+        super().confirm_login_allowed(user)
+        if not self.counter.sellers.contains(user):
+            raise ValidationError(
+                message=_("You are not a barman of this counter."), code="not_barman"
+            )
+        if user in self.counter.barmen_list:
+            raise ValidationError(
+                message=_("You are already logged in this counter."),
+                code="not_logged_in",
+            )
 
 
 class RefillForm(forms.ModelForm):

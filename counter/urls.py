@@ -41,7 +41,6 @@ from counter.views.admin import (
     ReturnableProductUpdateView,
     SellingDeleteView,
 )
-from counter.views.auth import counter_login, counter_logout
 from counter.views.cash import (
     CashSummaryEditView,
     CashSummaryListView,
@@ -57,7 +56,9 @@ from counter.views.eticket import (
 from counter.views.home import (
     CounterActivityView,
     CounterLastOperationsView,
+    CounterLoginFragment,
     CounterMain,
+    counter_logout,
 )
 from counter.views.invoice import InvoiceCallView
 from counter.views.student_card import StudentCardDeleteView, StudentCardFormFragment
@@ -82,7 +83,7 @@ urlpatterns = [
     ),
     path("<int:counter_id>/activity/", CounterActivityView.as_view(), name="activity"),
     path("<int:counter_id>/stats/", CounterStatView.as_view(), name="stats"),
-    path("<int:counter_id>/login/", counter_login, name="login"),
+    path("<int:counter_id>/login/", CounterLoginFragment.as_view(), name="login"),
     path("<int:counter_id>/logout/", counter_logout, name="logout"),
     path("eticket/<int:selling_id>/pdf/", EticketPDFView.as_view(), name="eticket_pdf"),
     path(

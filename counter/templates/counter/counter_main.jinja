@@ -32,12 +32,11 @@
       </ul>
       <p><strong>{% trans %}Total: {% endtrans %}{{ last_total }} €</strong></p>
     {% endif %}
-    {% if barmen %}
+    {% if can_click %}
       <p>{% trans %}Enter client code:{% endtrans %}</p>
-      <form method="post" action="">
+      <form method="post" action="" id="select-user-form">
         {% csrf_token %}
-        <input type="hidden" name="counter_token" value="{{ counter.token }}" />
-        {{ form.as_p() }}
+        {{ form }}
         <p><input type="submit" value="{% trans %}validate{% endtrans %}" /></p>
       </form>
     {% else %}
@@ -45,17 +44,11 @@
     {% endif %}
   </div>
   {% if counter.type == 'BAR' %}
-    <div>
-      <h3>{% trans %}Barman: {% endtrans %}</h3>
-      {% for b in barmen %}
-        <p>{{ barman_logout_link(b) }}</p>
-      {% endfor %}
-      <form method="post" action="{{ url('counter:login', counter_id=counter.id) }}">
-        {% csrf_token %}
-        {{ login_form.as_p() }}
-        <p><input type="submit" value="{% trans %}login{% endtrans %}" /></p>
-      </form>
-    </div>
+    <h3>{% trans %}Barman: {% endtrans %}</h3>
+    {% for b in barmen %}
+      <p>{{ barman_logout_link(b) }}</p>
+    {% endfor %}
+    {{ login_fragment }}
   {% endif %}
 {% endblock %}
 
@@ -63,10 +56,10 @@
   {{ super() }}
   <script type="text/javascript">
     window.addEventListener("DOMContentLoaded", () => {
-      // The login form annoyingly takes priority over the code form 
-      // This is due to the loading time of the web component
-      // We can't rely on DOMContentLoaded to know if the component is there so we
-      // periodically run a script until the field is there
+      {# The login form annoyingly takes priority over the code form
+         This is due to the loading time of the web component
+         We can't rely on DOMContentLoaded to know if the component is there so we
+         periodically run a script until the field is there #}
       const autofocus = () => {
         const field = document.querySelector("input[id='id_code']");
         if (field === null){

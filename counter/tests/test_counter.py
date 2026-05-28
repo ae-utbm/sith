@@ -17,6 +17,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 import pytest
+from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import Permission, make_password
@@ -718,51 +719,46 @@ class TestCounterStats(TestCase):
 class TestBarmanConnection(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.krophil = User.objects.get(username="krophil")
-        cls.skia = User.objects.get(username="skia")
-        cls.skia.customer.account = 800
-        cls.krophil.customer.save()
-        cls.skia.customer.save()
-
-        cls.counter = Counter.objects.get(id=2)
+        cls.barman = subscriber_user.make()
+        cls.barman.set_password("plop")
+        cls.barman.save()
+        cls.counter = baker.make(Counter, type="BAR", sellers=[cls.barman])
+        cls.login_url = reverse("counter:login", kwargs={"counter_id": cls.counter.id})
+        cls.detail_url = reverse(
+            "counter:details", kwargs={"counter_id": cls.counter.id}
+        )
 
     def test_barman_granted(self):
-        self.client.post(
-            reverse("counter:login", args=[self.counter.id]),
-            {"username": "krophil", "password": "plop"},
+        response = self.client.post(
+            self.login_url, {"username": self.barman.username, "password": "plop"}
         )
-        response = self.client.get(reverse("counter:details", args=[self.counter.id]))
-
-        assert "<p>Entrez un code client : </p>" in str(response.content)
-
-    def test_counters_list_barmen(self):
-        self.client.post(
-            reverse("counter:login", args=[self.counter.id]),
-            {"username": "krophil", "password": "plop"},
+        assert response.status_code == 200
+        assert response.headers["HX-Redirect"] == self.detail_url
+        last_perm = Permanency.objects.last()
+        assert last_perm.counter == self.counter
+        assert last_perm.user == self.barman
+        assert last_perm.end is None
+        response = self.client.get(
+            self.detail_url, {"username": self.barman.username, "password": "plop"}
         )
-        response = self.client.get(reverse("counter:activity", args=[self.counter.id]))
-
-        assert '<li><a href="/user/10/">Kro Phil&#39;</a></li>' in str(response.content)
+        assert response.context_data.get("barmen") == [self.barman]
+        soup = BeautifulSoup(response.text, "lxml")
+        assert soup.find("form", id="select-user-form") is not None
 
     def test_barman_denied(self):
-        self.client.post(
-            reverse("counter:login", args=[self.counter.id]),
-            {"username": "skia", "password": "plop"},
+        not_barman = subscriber_user.make()
+        not_barman.set_password("plop")
+        not_barman.save()
+        response = self.client.post(
+            self.login_url, {"username": not_barman.username, "password": "plop"}
         )
-        response_get = self.client.get(
-            reverse("counter:details", args=[self.counter.id])
-        )
+        assert "HX-Redirect" not in response.headers
+        assert not Permanency.objects.filter(user=not_barman).exists()
 
-        assert "<p>Merci de vous identifier</p>" in str(response_get.content)
-
-    def test_counters_list_no_barmen(self):
-        self.client.post(
-            reverse("counter:login", args=[self.counter.id]),
-            {"username": "krophil", "password": "plop"},
-        )
-        response = self.client.get(reverse("counter:activity", args=[self.counter.id]))
-
-        assert '<li><a href="/user/1/">S&#39; Kia</a></li>' not in str(response.content)
+        response = self.client.get(self.detail_url)
+        assert response.context_data.get("barmen") == []
+        soup = BeautifulSoup(response.text, "lxml")
+        assert soup.find("form", id="select-user-form") is None
 
 
 @pytest.mark.django_db
