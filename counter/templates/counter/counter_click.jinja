@@ -73,7 +73,7 @@
               {%- for category, prices in categories.items() -%}
                 <optgroup label="{{ category }}">
                   {%- for price in prices -%}
-                    <option value="{{ price.id }}">{{ price.full_label }}</option>
+                    <option value="{{ price.id }}">{{ price.full_label }} ({{ price.product.code }})</option>
                   {%- endfor -%}
                 </optgroup>
               {%- endfor -%}
