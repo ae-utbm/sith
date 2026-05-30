@@ -793,10 +793,7 @@ class LinkType(models.Model):
     url_base = models.URLField(
         "url base",
         unique=True,
-        help_text=_(
-            "The base url that links with this type must respect (e.g. `%(url)s`)"
-        )
-        % {"url": "https://www.instagram.com"},
+        help_text=_("The base url that links with this type must respect"),
     )
     icon = models.CharField(
         _("icon"),
