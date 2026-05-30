@@ -219,16 +219,14 @@ class Invoice(models.Model):
         if self.validated:
             raise DataError(_("Invoice already validated"))
         customer, _created = Customer.get_or_create(user=self.user)
-        kwargs = {
-            "counter": get_eboutic(),
-            "customer": customer,
-            "date": self.date,
-            "payment_method": Selling.PaymentMethod.CARD,
-        }
+        kwargs = {"counter": get_eboutic(), "customer": customer, "date": self.date}
         for i in self.items.select_related("product"):
             if i.product.product_type_id == settings.SITH_COUNTER_PRODUCTTYPE_REFILLING:
                 Refilling.objects.create(
-                    **kwargs, operator=self.user, amount=i.unit_price * i.quantity
+                    **kwargs,
+                    operator=self.user,
+                    amount=i.unit_price * i.quantity,
+                    payment_method=Refilling.PaymentMethod.CARD,
                 )
             else:
                 Selling.objects.create(
@@ -239,6 +237,7 @@ class Invoice(models.Model):
                     seller=self.user,
                     unit_price=i.unit_price,
                     quantity=i.quantity,
+                    payment_method=Selling.PaymentMethod.CARD,
                 )
         self.validated = True
         self.save()
