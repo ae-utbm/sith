@@ -12,6 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+import random
 from collections import defaultdict
 
 from django.contrib import messages
@@ -42,7 +43,7 @@ def get_operator(request: HttpRequest, counter: Counter, customer: Customer) -> 
         return request.user
     if counter.customer_is_barman(customer):
         return customer.user
-    return counter.get_random_barman()
+    return random.choice(list(request.barmen))
 
 
 class CounterClick(
@@ -74,7 +75,7 @@ class CounterClick(
         return kwargs
 
     def dispatch(self, request, *args, **kwargs):
-        self.customer = get_object_or_404(Customer, user__id=self.kwargs["user_id"])
+        self.customer = get_object_or_404(Customer, user_id=self.kwargs["user_id"])
         obj: Counter = self.get_object()
 
         if not self.customer.can_buy or self.customer.user.is_banned_counter:
@@ -92,8 +93,8 @@ class CounterClick(
             # or a seller of this counter.
             raise PermissionDenied
 
-        if obj.type == "BAR" and (
-            not obj.is_open or request.session.get("counter_token", "") != obj.token
+        if obj.type == "BAR" and not (
+            request.barmen and request.barmen.issubset(set(obj.barmen_list))
         ):
             messages.error(request, _("You cannot click users on this counter"))
             return redirect(obj)  # Redirect to counter
@@ -194,7 +195,7 @@ class CounterClick(
             )
         if self.object.can_refill():
             res["refilling_fragment"] = RefillingCreateView.as_fragment()(
-                self.request, customer=self.customer
+                self.request, customer=self.customer, counter=self.object
             )
         return res
 
@@ -232,11 +233,13 @@ class RefillingCreateView(FragmentMixin, FormView):
         if not is_logged_in_counter(request):
             raise PermissionDenied
 
-        self.counter: Counter = get_object_or_404(
-            Counter, token=request.session["counter_token"]
-        )
+        self.counter: Counter = get_object_or_404(Counter, id=self.kwargs["counter_id"])
 
-        if not self.counter.can_refill():
+        if not (
+            request.barmen
+            and request.barmen.issubset(self.counter.barmen_list)
+            and self.counter.can_refill()
+        ):
             raise PermissionDenied
 
         self.operator = get_operator(request, self.counter, self.customer)
@@ -245,6 +248,7 @@ class RefillingCreateView(FragmentMixin, FormView):
 
     def render_fragment(self, request, **kwargs) -> SafeString:
         self.customer = kwargs.pop("customer")
+        self.counter = kwargs.pop("counter")
         return super().render_fragment(request, **kwargs)
 
     def form_valid(self, form):
@@ -259,7 +263,8 @@ class RefillingCreateView(FragmentMixin, FormView):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         kwargs["action"] = reverse(
-            "counter:refilling_create", kwargs={"customer_id": self.customer.pk}
+            "counter:refilling_create",
+            kwargs={"customer_id": self.customer.pk, "counter_id": self.counter.pk},
         )
         return kwargs
 

@@ -15,12 +15,12 @@
 from datetime import timedelta
 
 from django.conf import settings
+from django.db.models import F
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import SafeString
-from django.utils.timezone import now
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 from django.views.generic.detail import SingleObjectMixin
@@ -49,10 +49,9 @@ class CounterLoginFragment(FragmentMixin, SingleObjectMixin, FormView):
         return super().get_form_kwargs() | {"counter": self.object}
 
     def form_valid(self, form: CounterLoginForm):
-        self.object.permanencies.create(user=form.get_user(), start=timezone.now())
-        if not self.object.barmen_list:
-            self.object.gen_token()
-        self.request.session["counter_token"] = self.object.token
+        user = form.get_user()
+        self.object.permanencies.create(user=user, start=timezone.now())
+        self.request.barmen.add(user)
         self.success_url = reverse(
             "counter:details", kwargs={"counter_id": self.object.id}
         )
@@ -92,8 +91,8 @@ class CounterMain(
     def dispatch(self, request, *args, **kwargs):
         self.object: Counter = self.get_object()
         if self.object.type != "BAR" and self.request.method.upper() == "POST":
-            # barmen have to log in (thus do a POST request)
-            # only if it is a bar.
+            # barmen have to log in (thus do a POST request) only if it is a bar,
+            # so a POST on a non-bar counter makes no sense
             return self.http_method_not_allowed(request, *args, **kwargs)
         if self.object.type == "BAR":
             self.object.update_activity()
@@ -115,7 +114,8 @@ class CounterMain(
         kwargs["can_click"] = (
             self.object.type == "BAR"
             and self.object.is_open
-            and self.request.session.get("counter_token", "") == self.object.token
+            and self.request.barmen
+            and self.request.barmen.issubset(set(self.object.barmen_list))
         ) or (
             self.object.type == "OFFICE"
             and (

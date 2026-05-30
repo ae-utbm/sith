@@ -67,7 +67,7 @@ urlpatterns = [
     path("<int:counter_id>/", CounterMain.as_view(), name="details"),
     path("<int:counter_id>/click/<int:user_id>/", CounterClick.as_view(), name="click"),
     path(
-        "refill/<int:customer_id>/",
+        "<int:counter_id>/refill/<int:customer_id>/",
         RefillingCreateView.as_view(),
         name="refilling_create",
     ),
