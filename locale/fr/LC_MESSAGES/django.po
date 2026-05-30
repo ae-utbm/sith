@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-12 11:12+0200\n"
+"POT-Creation-Date: 2026-05-15 11:46+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4504,6 +4504,15 @@ msgstr ""
 "fournir pour effectuer un paiement par carte bancaire. De ce fait, si vous "
 "souhaitez payer par carte, vous devez rajouter un numéro de téléphone aux "
 "données que vous aviez déjà fourni."
+
+#: eboutic/views.py
+msgid "Basket expired"
+msgstr "Panier expiré"
+
+#: eboutic/views.py
+#, python-format
+msgid "Basket available until %(until)s"
+msgstr "Panier disponible jusqu'à %(until)s"
 
 #: eboutic/views.py
 msgid "You can't buy a refilling with sith money"

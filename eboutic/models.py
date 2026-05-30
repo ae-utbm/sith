@@ -24,6 +24,7 @@ from django.conf import settings
 from django.db import DataError, models
 from django.db.models import F, OuterRef, Subquery, Sum
 from django.utils.functional import cached_property
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 from core.models import User
@@ -95,6 +96,10 @@ class Basket(models.Model):
             ]
         )
 
+    @property
+    def is_expired(self) -> bool:
+        return (self.date + settings.SITH_EBOUTIC_BASKET_TIMEOUT) <= now()
+
     def generate_sales(
         self, counter, seller: User, payment_method: Selling.PaymentMethod
     ):
@@ -133,9 +138,20 @@ class Basket(models.Model):
         ]
 
     def get_e_transaction_data(self) -> list[tuple[str, str]]:
+        """Get data for etransaction payment.
+
+        Raises:
+            Customer.DoesNotExist: if the user linked to this basket
+                has no customer account
+            BillingInfo.DoesNotExist: if the user linked to this basket has no
+                billing infos, or incorrect billing infos.
+            ValueError: if this is called on a basket which payment delay is expired.
+        """
         user = self.user
         if not hasattr(user, "customer"):
             raise Customer.DoesNotExist
+        if self.is_expired:
+            raise ValueError("This method cannot be called on an expired basket.")
         customer = user.customer
         if (
             not hasattr(user.customer, "billing_infos")
@@ -155,6 +171,10 @@ class Basket(models.Model):
             ("PBX_IDENTIFIANT", settings.SITH_EBOUTIC_PBX_IDENTIFIANT),
             ("PBX_TOTAL", str(int(self.total * 100))),
             ("PBX_DEVISE", "978"),  # This is Euro
+            (
+                "PBX_DISPLAY",
+                str(int(settings.SITH_EBOUTIC_ETRANSACTION_TIMEOUT.total_seconds())),
+            ),
             ("PBX_CMD", str(self.id)),
             ("PBX_PORTEUR", user.email),
             ("PBX_RETOUR", "Amount:M;BasketID:R;Auto:A;Error:E;Sig:K"),

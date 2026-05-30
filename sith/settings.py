@@ -571,6 +571,11 @@ SITH_BARMAN_TIMEOUT = 30
 # Minutes to delete the last operations
 SITH_LAST_OPERATIONS_LIMIT = 10
 
+# time before a basket is considered expired
+SITH_EBOUTIC_BASKET_TIMEOUT = timedelta(minutes=10)
+# time that a user can spend on the CB payment page before it to timeout
+SITH_EBOUTIC_ETRANSACTION_TIMEOUT = timedelta(minutes=10)
+
 # ET variables
 SITH_EBOUTIC_CB_ENABLED = env.bool("SITH_EBOUTIC_CB_ENABLED", default=True)
 SITH_EBOUTIC_ET_URL = env.str(
