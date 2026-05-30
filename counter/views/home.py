@@ -46,9 +46,12 @@ class CounterLoginFragment(FragmentMixin, SingleObjectMixin, FormView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
-        return super().get_form_kwargs() | {"counter": self.object}
+        return super().get_form_kwargs() | {
+            "request": self.request,
+            "counter": self.object,
+        }
 
-    def form_valid(self, form: CounterLoginForm):
+    def form_valid(self, form: GetUserForm):
         user = form.get_user()
         self.object.permanencies.create(user=user, start=timezone.now())
         self.request.barmen.add(user)
@@ -82,7 +85,7 @@ class CounterMain(
     """The public (barman) view."""
 
     model = Counter
-    queryset = Counter.objects.annotate_is_open().exclude(type="EBOUTIC")
+    queryset = Counter.objects.exclude(type="EBOUTIC")
     template_name = "counter/counter_main.jinja"
     pk_url_kwarg = "counter_id"
     form_class = GetUserForm
@@ -111,9 +114,11 @@ class CounterMain(
         kwargs = super().get_context_data(**kwargs)
         if self.object.type == "BAR":
             kwargs["barmen"] = self.object.barmen_list
+            kwargs["barmen_here"] = list(
+                self.request.barmen.intersection(self.object.barmen_list)
+            )
         kwargs["can_click"] = (
             self.object.type == "BAR"
-            and self.object.is_open
             and self.request.barmen
             and self.request.barmen.issubset(set(self.object.barmen_list))
         ) or (
@@ -132,7 +137,7 @@ class CounterMain(
             )
         return kwargs
 
-    def form_valid(self, form: CounterLoginForm):
+    def form_valid(self, form: GetUserForm):
         """We handle here the redirection, passing the user id of the asked customer."""
         self.success_url = reverse(
             "counter:click",

@@ -9,6 +9,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Q
 from django.forms import BaseModelFormSet
+from django.http import HttpRequest
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import ClockedSchedule
@@ -131,9 +132,18 @@ class GetUserForm(forms.Form):
 
 
 class CounterLoginForm(LoginForm):
-    def __init__(self, *args, counter: Counter, **kwargs):
+    """LoginForm to log a barman in a counter.
+
+    To be able to log in a counter, a user must :
+
+    - be part of the sellers of the given counter
+    - not being already logged in any counter
+    """
+
+    def __init__(self, *args, request: HttpRequest, counter: Counter, **kwargs):
         super().__init__(*args, **kwargs)
         self.counter = counter
+        self.request = request
 
     def confirm_login_allowed(self, user: User):
         super().confirm_login_allowed(user)
@@ -141,11 +151,13 @@ class CounterLoginForm(LoginForm):
             raise ValidationError(
                 message=_("You are not a barman of this counter."), code="not_barman"
             )
-        if user in self.counter.barmen_list:
-            raise ValidationError(
-                message=_("You are already logged in this counter."),
-                code="not_logged_in",
+        if user in self.request.barmen:
+            message = (
+                _("You are already logged in this counter.")
+                if user in self.counter.barmen_list
+                else _("You are already logged in another counter.")
             )
+            raise ValidationError(message=message, code="already_logged_in")
 
 
 class RefillForm(forms.ModelForm):

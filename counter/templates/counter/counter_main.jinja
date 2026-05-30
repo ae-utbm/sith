@@ -44,10 +44,35 @@
     {% endif %}
   </div>
   {% if counter.type == 'BAR' %}
-    <h3>{% trans %}Barman: {% endtrans %}</h3>
-    {% for b in barmen %}
-      <p>{{ barman_logout_link(b) }}</p>
-    {% endfor %}
+    <h3>{% trans %}Barmen:{% endtrans %}</h3>
+
+    {% if barmen_here %}
+      <div class="row gap-2x">
+        <div>
+          <h4>{% trans %}On this device{% endtrans %}</h4>
+          {% for b in barmen_here %}
+            <p>{{ barman_logout_link(b) }}</p>
+          {% endfor %}
+        </div>
+        <div>
+          <h4>{% trans %}Elsewhere{% endtrans %}</h4>
+          {% if barmen_here|length == barmen|length %}
+            {# all logged barmen are logged in this session #}
+            <p><em>{% trans %}No barman logged elsewhere{% endtrans %}</em></p>
+          {% else %}
+            {% for b in barmen %}
+              {%- if b not in barmen_here -%}
+                <p>{{ barman_logout_link(b) }}</p>
+              {%- endif -%}
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    {% else %}
+      {% for b in barmen %}
+        <p>{{ barman_logout_link(b) }}</p>
+      {% endfor %}
+    {% endif %}
     {{ login_fragment }}
   {% endif %}
 {% endblock %}
