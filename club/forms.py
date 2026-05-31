@@ -392,6 +392,30 @@ class ClubRoleForm(forms.ModelForm):
             self.instance.order = cleaned_data["ORDER"] - 1
         return cleaned_data
 
+    def save(self, commit=True):  # noqa: FBT002
+        instance: ClubRole = super().save(commit=commit)
+        if commit and "is_board" in self.changed_data:
+            # if the role was moved from board to simple member,
+            # remove all users with that role from the club board group.
+            # If the role became a board role, add users with
+            # that role to the club board group.
+            group_id = instance.club.board_group_id
+            if self.cleaned_data["is_board"]:
+                User.groups.through.objects.bulk_create(
+                    [
+                        User.groups.through(user_id=u, group_id=group_id)
+                        for u in Membership.objects.ongoing()
+                        .filter(role=instance)
+                        .values_list("user_id", flat=True)
+                    ],
+                    ignore_conflicts=True,
+                )
+            else:
+                User.groups.through.objects.filter(
+                    user__memberships__role=instance, group_id=group_id
+                ).delete()
+        return instance
+
 
 class ClubRoleCreateForm(forms.ModelForm):
     """Form to create a club role.
