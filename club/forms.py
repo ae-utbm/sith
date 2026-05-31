@@ -21,10 +21,13 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import itertools
+from operator import attrgetter
 
 from django import forms
 from django.db.models import Exists, OuterRef, Q, QuerySet
 from django.db.models.functions import Lower
+from django.forms.models import ModelChoiceField, ModelChoiceIterator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -44,6 +47,37 @@ from core.views.widgets.ajax_select import (
 )
 from counter.models import Counter, Selling
 from counter.schemas import SaleFilterSchema
+
+
+class ClubRoleChoiceIterator(ModelChoiceIterator):
+    """Custom `ModelChoiceIterator` for `ClubRoleChoiceField`"""
+
+    def __iter__(self):
+        if self.field.empty_label is not None:
+            yield "", self.field.empty_label
+        queryset = self.queryset.select_related("club").order_by("club", "order")
+        groups = [
+            (club, [self.choice(role) for role in roles])
+            for club, roles in itertools.groupby(queryset, key=attrgetter("club"))
+        ]
+        if len(groups) == 1:
+            # there is only one club involved, no need to have optgroups
+            yield from groups[0][1]
+        else:
+            # there are multiple clubs, optgroups are necessary to differentiate
+            # roles having the same name
+            yield from groups
+
+
+class ClubRoleChoiceField(ModelChoiceField):
+    """Custom `ModelChoiceField` for `[ClubRole][club.models.ClubRole]`.
+
+    If only one club is involved, behave like the base `ModelChoiceField`.
+    If dealing with the roles of multiple clubs, group the roles
+    into a different `optgroup` for each club.
+    """
+
+    iterator = ClubRoleChoiceIterator
 
 
 class ClubLinkForm(forms.ModelForm):
