@@ -25,6 +25,9 @@ document.addEventListener("alpine:init", () => {
       }
 
       this.codeField = this.$refs.codeField;
+      this.codeField.widget.hook("after", "onOptionSelect", () => {
+        this.handleCode();
+      });
       this.codeField.widget.focus();
 
       // It's quite tricky to manually apply attributes to the management part
@@ -154,6 +157,7 @@ document.addEventListener("alpine:init", () => {
         this.addToBasket(code, quantity);
       }
       this.codeField.widget.clear();
+      this.codeField.widget.setTextboxValue("");
       this.codeField.widget.focus();
     },
   }));

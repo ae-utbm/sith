@@ -1,6 +1,6 @@
-import type { RecursivePartial, TomSettings } from "tom-select/dist/types/types";
-import { AutoCompleteSelectBase } from "#core:core/components/ajax-select-base.ts";
-import { registerComponent } from "#core:utils/web-components.ts";
+import type { RecursivePartial, TomSettings } from "tom-select/src/types";
+import { AutoCompleteSelectBase } from "#core:core/components/ajax-select-base";
+import { registerComponent } from "#core:utils/web-components";
 
 const productParsingRegex = /^(\d+x)?(.*)/i;
 const codeParsingRegex = / \((\w+)\)$/;
@@ -63,13 +63,6 @@ export class CounterProductSelect extends AutoCompleteSelectBase {
         );
       },
     );
-
-    this.widget.hook("after", "onOptionSelect", () => {
-      /* Focus the next element if it's an input */
-      if (this.nextElementSibling.nodeName === "INPUT") {
-        (this.nextElementSibling as HTMLInputElement).focus();
-      }
-    });
   }
   protected tomSelectSettings(): RecursivePartial<TomSettings> {
     /* We disable the dropdown on focus because we're going to always autofocus the widget */
@@ -80,9 +73,7 @@ export class CounterProductSelect extends AutoCompleteSelectBase {
       // We need to manually set weights or it results on an inconsistent
       // behavior between production and development environment
       searchField: [
-        // @ts-expect-error documentation says it's fine, specified type is wrong
         { field: "code", weight: 2 },
-        // @ts-expect-error documentation says it's fine, specified type is wrong
         { field: "text", weight: 0.5 },
       ],
     };
