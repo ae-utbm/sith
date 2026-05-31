@@ -1,6 +1,9 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
+from club.forms import ClubRoleChoiceField
+from club.models import ClubRole
+from club.widgets.ajax_select import AutoCompleteSelectMultipleClub
 from core.models import User
 from core.views.forms import SelectDateTime
 from core.views.widgets.ajax_select import (
@@ -79,18 +82,20 @@ class VoteForm(forms.Form):
 class RoleForm(forms.ModelForm):
     """Form for creating a role."""
 
+    required_css_class = "required"
+    error_css_class = "error"
+
     class Meta:
         model = Role
-        fields = ["title", "election", "description", "max_choice"]
-        widgets = {"election": AutoCompleteSelect}
+        fields = ["club_role", "title", "description", "max_choice"]
+        field_classes = {"club_role": ClubRoleChoiceField}
 
-    def __init__(self, *args, **kwargs):
-        election_id = kwargs.pop("election_id", None)
+    def __init__(self, *args, election: Election, **kwargs):
         super().__init__(*args, **kwargs)
-        if election_id:
-            self.fields["election"].queryset = Election.objects.filter(
-                id=election_id
-            ).all()
+        self.instance.election = election
+        self.fields["club_role"].queryset = ClubRole.objects.filter(
+            is_board=True, club__in=election.clubs.all()
+        )
 
     def clean(self):
         cleaned_data = super().clean()
@@ -108,21 +113,21 @@ class ElectionListForm(forms.ModelForm):
         fields = ("title", "election")
         widgets = {"election": AutoCompleteSelect}
 
-    def __init__(self, *args, **kwargs):
-        election_id = kwargs.pop("election_id", None)
+    def __init__(self, *args, election: Election, **kwargs):
         super().__init__(*args, **kwargs)
-        if election_id:
-            self.fields["election"].queryset = Election.objects.filter(
-                id=election_id
-            ).all()
+        self.instance.election = election
 
 
 class ElectionForm(forms.ModelForm):
+    required_css_class = "required"
+    error_css_class = "error"
+
     class Meta:
         model = Election
         fields = [
             "title",
             "description",
+            "clubs",
             "archived",
             "start_candidature",
             "end_candidature",
@@ -134,21 +139,13 @@ class ElectionForm(forms.ModelForm):
             "candidature_groups",
         ]
         widgets = {
+            "clubs": AutoCompleteSelectMultipleClub,
             "edit_groups": AutoCompleteSelectMultipleGroup,
             "view_groups": AutoCompleteSelectMultipleGroup,
             "vote_groups": AutoCompleteSelectMultipleGroup,
             "candidature_groups": AutoCompleteSelectMultipleGroup,
+            "start_date": SelectDateTime,
+            "end_date": SelectDateTime,
+            "start_candidature": SelectDateTime,
+            "end_candidature": SelectDateTime,
         }
-
-    start_date = forms.DateTimeField(
-        label=_("Start date"), widget=SelectDateTime, required=True
-    )
-    end_date = forms.DateTimeField(
-        label=_("End date"), widget=SelectDateTime, required=True
-    )
-    start_candidature = forms.DateTimeField(
-        label=_("Start candidature"), widget=SelectDateTime, required=True
-    )
-    end_candidature = forms.DateTimeField(
-        label=_("End candidature"), widget=SelectDateTime, required=True
-    )
