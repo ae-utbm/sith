@@ -19,6 +19,7 @@ from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateVi
 from core.auth.mixins import CanEditMixin, CanViewMixin
 from election.forms import (
     CandidateForm,
+    ElectionCreateForm,
     ElectionForm,
     ElectionListForm,
     RoleForm,
@@ -208,7 +209,7 @@ class CandidatureCreateView(LoginRequiredMixin, CreateView):
 
 class ElectionCreateView(PermissionRequiredMixin, CreateView):
     model = Election
-    form_class = ElectionForm
+    form_class = ElectionCreateForm
     template_name = "core/create.jinja"
     permission_required = "election.add_election"
 

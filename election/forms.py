@@ -1,4 +1,8 @@
+from datetime import timedelta
+
 from django import forms
+from django.conf import settings
+from django.utils.timezone import localtime
 from django.utils.translation import gettext_lazy as _
 
 from club.forms import ClubRoleChoiceField
@@ -149,3 +153,30 @@ class ElectionForm(forms.ModelForm):
             "start_candidature": SelectDateTime,
             "end_candidature": SelectDateTime,
         }
+
+
+class ElectionCreateForm(ElectionForm):
+    """ElectionForm, but specifically for creation."""
+
+    def __init__(self, *args, initial: dict | None = None, **kwargs):
+        # propose sound default timestamps :
+        # start of candidatures at tomorrow 00h01, start of votes a week later.
+        start = localtime().replace(hour=0, minute=1, second=0) + timedelta(days=1)
+        default_initial = {
+            "start_candidature": start,
+            "end_candidature": start + timedelta(days=7, minutes=-2),  # 23h59
+            "start_date": start + timedelta(days=7),  # 00h01
+            "end_date": start + timedelta(days=14, minutes=-2),  # 23h59
+            "view_groups": [settings.SITH_GROUP_PUBLIC_ID],
+            "vote_groups": [settings.SITH_GROUP_SUBSCRIBERS_ID],
+            "candidature_groups": [settings.SITH_GROUP_SUBSCRIBERS_ID],
+        }
+        if initial:
+            default_initial.update(initial)
+        super().__init__(*args, initial=default_initial, **kwargs)
+
+    def save(self, commit=True):  # noqa: FBT002
+        instance = super().save(commit=commit)
+        if commit:
+            ElectionList.objects.create(title="Candidat⸱e libre", election=instance)
+        return instance
