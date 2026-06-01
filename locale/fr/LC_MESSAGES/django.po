@@ -141,8 +141,7 @@ msgstr "vous devez spécifier au moins un utilisateur ou une adresse email"
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/forms.py com/forms.py counter/forms.py election/forms.py
-#: subscription/forms.py
+#: club/forms.py com/forms.py counter/forms.py subscription/forms.py
 msgid "End date"
 msgstr "Date de fin"
 
@@ -261,7 +260,7 @@ msgstr ""
 "Si ce rôle est inactif, il ne pourra pas être attribué aux gens qui "
 "rejoignent le club."
 
-#: club/models.py
+#: club/models.py election/models.py
 msgid "club role"
 msgstr "rôle de club"
 
@@ -592,6 +591,7 @@ msgstr ""
 #: counter/templates/counter/cash_register_summary.jinja
 #: counter/templates/counter/invoices_call.jinja
 #: counter/templates/counter/product_form.jinja
+#: election/templates/election/role_form.jinja
 #: forum/templates/forum/reply.jinja
 #: subscription/templates/subscription/fragments/creation_form_existing_user.jinja
 #: subscription/templates/subscription/fragments/creation_form_new_user.jinja
@@ -975,7 +975,7 @@ msgstr "Prix d'achat"
 msgid "Format: 16:9 | Resolution: 1920x1080"
 msgstr "Format : 16:9 | Résolution : 1920x1080"
 
-#: com/forms.py election/forms.py subscription/forms.py
+#: com/forms.py subscription/forms.py
 msgid "Start date"
 msgstr "Date de début"
 
@@ -3780,15 +3780,6 @@ msgid "Cancel (ANN)"
 msgstr "Annuler (ANN)"
 
 #: counter/templates/counter/counter_click.jinja
-#: counter/templates/counter/fragments/create_refill.jinja
-#: counter/templates/counter/fragments/create_student_card.jinja
-#: counter/templates/counter/invoices_call.jinja
-#: sas/templates/sas/picture.jinja
-#: subscription/templates/subscription/stats.jinja
-msgid "Go"
-msgstr "Valider"
-
-#: counter/templates/counter/counter_click.jinja
 #: eboutic/templates/eboutic/eboutic_checkout.jinja
 msgid "Basket: "
 msgstr "Panier : "
@@ -3943,6 +3934,14 @@ msgstr ""
 #: counter/templates/counter/formula_list.jinja
 msgid "New formula"
 msgstr "Nouvelle formule"
+
+#: counter/templates/counter/fragments/create_refill.jinja
+#: counter/templates/counter/fragments/create_student_card.jinja
+#: counter/templates/counter/invoices_call.jinja
+#: sas/templates/sas/picture.jinja
+#: subscription/templates/subscription/stats.jinja
+msgid "Go"
+msgstr "Valider"
 
 #: counter/templates/counter/fragments/create_student_card.jinja
 msgid "No student card registered."
@@ -4540,13 +4539,13 @@ msgstr "Vote blanc"
 msgid "This role already exists for this election"
 msgstr "Ce rôle existe déjà pour cette élection"
 
-#: election/forms.py
-msgid "Start candidature"
-msgstr "Début des candidatures"
+#: election/models.py
+msgid "clubs"
+msgstr "clubs"
 
-#: election/forms.py
-msgid "End candidature"
-msgstr "Fin des candidatures"
+#: election/models.py
+msgid "The club(s) this election is held for."
+msgstr "Le(s) club(s) pour lequel cette élection est tenue."
 
 #: election/models.py
 msgid "start candidature"
@@ -4583,6 +4582,14 @@ msgstr "élection"
 #: election/models.py
 msgid "max choice"
 msgstr "nombre de choix maxi"
+
+#: election/models.py
+msgid ""
+"A club role. Filling this will allow automatic completion of title and "
+"description, and automatic assignation after the elections."
+msgstr ""
+"Un rôle de club. Remplir ce champ permet l'autocomplétion du titre et de la "
+"description, et l'attribution automatique des rôles après les élections."
 
 #: election/models.py
 msgid "election list"
@@ -4671,6 +4678,10 @@ msgid "Current elections"
 msgstr "Élections actuelles"
 
 #: election/templates/election/election_list.jinja
+msgid "New election"
+msgstr "Nouvelle élection"
+
+#: election/templates/election/election_list.jinja
 msgid "Applications open from"
 msgstr "Candidatures ouvertes à partir du"
 
@@ -4681,6 +4692,24 @@ msgstr "au"
 #: election/templates/election/election_list.jinja
 msgid "Polls open from"
 msgstr "Votes ouverts du"
+
+#: election/templates/election/role_form.jinja
+msgid "Election role"
+msgstr "Rôle d'élection"
+
+#: election/templates/election/role_form.jinja
+#, python-format
+msgid "Create role for election \"%(election)s\""
+msgstr "Création d'un rôle pour l'élection « %(election)s »"
+
+#: election/templates/election/role_form.jinja
+#, python-format
+msgid "Edit role for election \"%(election)s\""
+msgstr "Modification d'un rôle pour l'élection « %(election)s »"
+
+#: election/templates/election/role_form.jinja
+msgid "autofill form"
+msgstr "compléter le formulaire"
 
 #: election/views.py
 msgid "Form is invalid"
