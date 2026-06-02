@@ -15,6 +15,7 @@
 from datetime import timedelta
 
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.db.models import F
 from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
@@ -43,6 +44,10 @@ class CounterLoginFragment(FragmentMixin, SingleObjectMixin, FormView):
 
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
+        if self.object.type != "BAR":
+            # barmen have to log in only if it is a bar,
+            # so calling this view on a non-bar counter makes no sense
+            raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
@@ -51,7 +56,7 @@ class CounterLoginFragment(FragmentMixin, SingleObjectMixin, FormView):
             "counter": self.object,
         }
 
-    def form_valid(self, form: GetUserForm):
+    def form_valid(self, form: CounterLoginForm):
         user = form.get_user()
         self.object.permanencies.create(user=user, start=timezone.now())
         self.request.barmen.add(user)
@@ -93,10 +98,6 @@ class CounterMain(
 
     def dispatch(self, request, *args, **kwargs):
         self.object: Counter = self.get_object()
-        if self.object.type != "BAR" and self.request.method.upper() == "POST":
-            # barmen have to log in (thus do a POST request) only if it is a bar,
-            # so a POST on a non-bar counter makes no sense
-            return self.http_method_not_allowed(request, *args, **kwargs)
         if self.object.type == "BAR":
             self.object.update_activity()
         return super().dispatch(request, *args, **kwargs)

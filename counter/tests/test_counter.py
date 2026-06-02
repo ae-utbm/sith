@@ -768,21 +768,62 @@ class TestBarmanConnection(TestCase):
         soup = BeautifulSoup(response.text, "lxml")
         assert soup.find("form", id="select-user-form") is not None
 
-    def test_barman_denied(self):
-        not_barman = subscriber_user.make()
-        not_barman.set_password("plop")
-        not_barman.save()
+    def assert_counter_login_fails(self, user: User):
+        initial_perms = set(self.counter.permanencies.filter(user=user, end=None))
         response = self.client.post(
-            self.login_url, {"username": not_barman.username, "password": "plop"}
+            self.login_url, {"username": user.username, "password": "plop"}
         )
         assert "HX-Redirect" not in response.headers
-        assert not Permanency.objects.filter(user=not_barman).exists()
-        assert self.barman not in response.wsgi_request.barmen
+        assert (
+            set(self.counter.permanencies.filter(user=user, end=None)) == initial_perms
+        )
+        if initial_perms:
+            # the user was already logged in, and we already tested
+            # that it didn't re-login, so we can skip the next assertions.
+            return
+
+        self.counter.refresh_from_db()
+        assert response.wsgi_request.barmen.isdisjoint(set(self.counter.barmen_list))
 
         response = self.client.get(self.detail_url)
         assert response.context_data.get("barmen") == []
         soup = BeautifulSoup(response.text, "lxml")
         assert soup.find("form", id="select-user-form") is None
+
+    def test_barman_not_seller(self):
+        """Test when the barman is not a seller of the counter"""
+        not_barman = subscriber_user.make()
+        not_barman.set_password("plop")
+        not_barman.save()
+        self.assert_counter_login_fails(not_barman)
+
+    def test_barman_already_logged(self):
+        """Test when the barman is already logged in the current counter."""
+        self.client.post(
+            self.login_url, {"username": self.barman.username, "password": "plop"}
+        )
+        self.assert_counter_login_fails(self.barman)
+
+    def test_barman_already_logged_elsewhere(self):
+        """Test when the barman is already logged in another counter."""
+        other_counter = baker.make(Counter, type="BAR")
+        CounterSellers.objects.create(counter=other_counter, user=self.barman)
+        self.client.post(
+            reverse("counter:login", kwargs={"counter_id": other_counter.id}),
+            {"username": self.barman.username, "password": "plop"},
+        )
+        self.assert_counter_login_fails(self.barman)
+
+    def test_login_on_non_bar_counter(self):
+        counter = baker.make(Counter, type="OFFICE")
+        CounterSellers.objects.create(counter=counter, user=self.barman)
+        url = reverse("counter:login", kwargs={"counter_id": counter.id})
+        response = self.client.get(url)
+        assert response.status_code == 403
+        response = self.client.post(
+            url, {"username": self.barman.username, "password": "plop"}
+        )
+        assert response.status_code == 403
 
 
 @pytest.mark.django_db
