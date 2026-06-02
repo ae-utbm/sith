@@ -228,15 +228,8 @@ class BillingInfo(models.Model):
     address_2 = models.CharField(_("Address 2"), max_length=50, blank=True, null=True)
     zip_code = models.CharField(_("Zip code"), max_length=16)  # code postal
     city = models.CharField(_("City"), max_length=50)
-    country = CountryField(blank_label=_("Country"))
-
-    # This table was created during the A22 semester.
-    # However, later on, CA asked for the phone number to be added to the billing info.
-    # As the table was already created, this new field had to be nullable,
-    # even tough it is required by the bank and shouldn't be null.
-    # If one day there is no null phone number remaining,
-    # please make the field non-nullable.
-    phone_number = PhoneNumberField(_("Phone number"), null=True, blank=False)
+    country = CountryField(_("Country"))
+    phone_number = PhoneNumberField(_("Phone number"))
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

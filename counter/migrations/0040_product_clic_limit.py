@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 help_text=(
                     "If a limit is set, the product won't be purchasable "
-                    "anymore once the latter is reached."
+                    "anymore on the eboutic once the latter is reached."
                 ),
                 null=True,
                 verbose_name="clic limit",

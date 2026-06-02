@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import hmac
 from datetime import datetime
-from enum import Enum
 from typing import Self
 
 from dict2xml import dict2xml
@@ -38,30 +37,6 @@ from counter.models import (
     Selling,
     get_eboutic,
 )
-
-
-class BillingInfoState(Enum):
-    VALID = 1
-    EMPTY = 2
-    MISSING_PHONE_NUMBER = 3
-
-    @classmethod
-    def from_model(cls, info: BillingInfo | None) -> BillingInfoState:
-        if info is None:
-            return cls.EMPTY
-        for attr in [
-            "first_name",
-            "last_name",
-            "address_1",
-            "zip_code",
-            "city",
-            "country",
-        ]:
-            if getattr(info, attr) == "":
-                return cls.EMPTY
-        if info.phone_number is None:
-            return cls.MISSING_PHONE_NUMBER
-        return cls.VALID
 
 
 class Basket(models.Model):
@@ -162,11 +137,7 @@ class Basket(models.Model):
         if self.is_expired:
             raise ValueError("This method cannot be called on an expired basket.")
         customer = user.customer
-        if (
-            not hasattr(user.customer, "billing_infos")
-            or BillingInfoState.from_model(user.customer.billing_infos)
-            != BillingInfoState.VALID
-        ):
+        if not hasattr(user.customer, "billing_infos"):
             raise BillingInfo.DoesNotExist
         cart = {
             "shoppingcart": {"total": {"totalQuantity": min(self.items.count(), 99)}}
