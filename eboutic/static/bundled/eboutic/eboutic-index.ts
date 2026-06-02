@@ -11,7 +11,7 @@ const BASKET_CACHE_KEY = "basket";
 const BASKET_CACHE_VERSION = 1;
 
 document.addEventListener("alpine:init", () => {
-  Alpine.data("basket", (lastPurchaseTime?: number) => ({
+  Alpine.data("basket", (validPrices: number[], lastPurchaseTime?: number) => ({
     basket: [] as BasketItem[],
 
     init() {
@@ -19,15 +19,6 @@ document.addEventListener("alpine:init", () => {
       this.$watch("basket", () => {
         this.saveBasket();
       });
-      // Invalidate basket if a purchase was made
-      if (lastPurchaseTime !== null && localStorage.basketTimestamp !== undefined) {
-        if (
-          new Date(lastPurchaseTime) >=
-          new Date(Number.parseInt(localStorage.basketTimestamp, 10))
-        ) {
-          this.basket = [];
-        }
-      }
       document
         .getElementById("id_form-TOTAL_FORMS")
         .setAttribute(":value", "basket.length");
@@ -37,7 +28,22 @@ document.addEventListener("alpine:init", () => {
       const cached = versionedLocalStorage.getItem<BasketItem[]>(BASKET_CACHE_KEY, {
         version: BASKET_CACHE_VERSION,
       });
-      return cached ?? [];
+      if (!cached) {
+        return [];
+      }
+      if (
+        lastPurchaseTime !== null &&
+        localStorage.basketTimestamp !== undefined &&
+        new Date(lastPurchaseTime) >=
+          new Date(Number.parseInt(localStorage.basketTimestamp, 10))
+      ) {
+        // Invalidate basket if a purchase was made
+        return [];
+      }
+      // The basket is cached and not expired, so return it,
+      // but without items that are invalid
+      // (e.g. because the product is archived, or sold out)
+      return cached.filter((item) => validPrices.includes(item.priceId));
     },
 
     saveBasket() {

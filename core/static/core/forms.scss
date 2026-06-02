@@ -23,7 +23,7 @@
     border-radius: 5px;
     color: black;
 
-    &:hover {
+    &:not(.link-like):not(:disabled):hover {
       background: hsl(0, 0%, 83%);
     }
   }

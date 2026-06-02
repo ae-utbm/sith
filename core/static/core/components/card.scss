@@ -29,7 +29,12 @@
   align-items: center;
   gap: 20px;
 
-  &.clickable:hover {
+  &:disabled {
+    background-color: darken($primary-neutral-light-color, 5%);
+    opacity: 65%;
+  }
+
+  &.clickable:not(:disabled):hover {
     background-color: darken($primary-neutral-light-color, 5%);
   }
 
