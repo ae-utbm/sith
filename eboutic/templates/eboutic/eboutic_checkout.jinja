@@ -15,8 +15,12 @@
 {% block content %}
   <h3>{% trans %}Eboutic{% endtrans %}</h3>
 
+  <script type="text/javascript">
+    const billingInfos = {{ billing_infos|safe }};
+  </script>
+
   <div x-data='etransaction(
-               {{ billing_infos|tojson }},
+               billingInfos,
                { id: {{ basket.id }}, timeout: new Date("{{ basket.date + settings.SITH_EBOUTIC_BASKET_TIMEOUT }}") }
                )'>
     <p>{% trans %}Basket: {% endtrans %}</p>
