@@ -115,6 +115,7 @@ INSTALLED_APPS = (
     "django_jinja",
     "ninja_extra",
     "haystack",
+    "django_countries",
     "django_celery_results",
     "django_celery_beat",
     "captcha",
@@ -294,7 +295,11 @@ USE_TZ = True
 
 LOCALE_PATHS = [BASE_DIR / "locale"]
 
+# for PhoneNumberField
 PHONENUMBER_DEFAULT_REGION = "FR"
+# for CountryField
+COUNTRIES_FIRST = ["FR", "CH", "DE"]
+COUNTRIES_FIRST_BREAK = "───────────"
 
 # Medias
 MEDIA_URL = "/data/"
