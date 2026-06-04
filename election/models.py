@@ -5,7 +5,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 
-from club.models import Club, ClubRole
+from club.models import Club, ClubRole, Membership
 from core.models import Group, User
 
 
@@ -101,6 +101,15 @@ class Election(models.Model):
             results[role.title] = role.results(total_vote)
         return results
 
+    @cached_property
+    def results_applied(self) -> bool:
+        """Returns True if one or more roles of this election have been applied."""
+        return Membership.objects.filter(
+            role__election_roles__election=self,
+            end_date=None,
+            start_date__gte=self.end_date,
+        ).exists()
+
 
 class Role(OrderedModel):
     """This class allows to create a new role available for a candidature."""
@@ -129,6 +138,16 @@ class Role(OrderedModel):
     )
 
     order_with_respect_to = "election"
+
+    class Meta(OrderedModel.Meta):
+        constraints = [
+            models.UniqueConstraint(
+                fields=["title", "election"],
+                name="title_election_unique_constraint",
+                violation_error_message=_("This role already exists for this election"),
+                violation_error_code="invalid",
+            )
+        ]
 
     def __str__(self):
         return f"{self.title} - {self.election.title}"

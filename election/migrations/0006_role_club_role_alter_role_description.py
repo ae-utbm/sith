@@ -50,4 +50,13 @@ class Migration(migrations.Migration):
                 default=1, verbose_name="max choice"
             ),
         ),
+        migrations.AddConstraint(
+            model_name="role",
+            constraint=models.UniqueConstraint(
+                fields=("title", "election"),
+                name="title_election_unique_constraint",
+                violation_error_code="invalid",
+                violation_error_message="This role already exists for this election",
+            ),
+        ),
     ]

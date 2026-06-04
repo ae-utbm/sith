@@ -7,7 +7,7 @@
         was linked to a club role.
       {% endtrans %}
     </p>
-  {% elif already_applied %}
+  {% elif form.election.results_applied %}
     <em>
       {%- trans trimmed -%}
         The results of this election have been applied

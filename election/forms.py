@@ -106,15 +106,6 @@ class RoleForm(forms.ModelForm):
             is_board=True, club__in=election.clubs.all()
         )
 
-    def clean(self):
-        cleaned_data = super().clean()
-        title = cleaned_data.get("title")
-        election = cleaned_data.get("election")
-        if Role.objects.filter(title=title, election=election).exists():
-            raise forms.ValidationError(
-                _("This role already exists for this election"), code="invalid"
-            )
-
 
 class ElectionListForm(forms.ModelForm):
     class Meta:
