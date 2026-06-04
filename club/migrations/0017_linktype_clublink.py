@@ -25,8 +25,7 @@ class Migration(migrations.Migration):
                     "url_base",
                     models.URLField(
                         help_text=(
-                            "The base url that links with this type "
-                            "must respect (e.g. `https://www.instagram.com`)"
+                            "The base url that links with this type must respect"
                         ),
                         unique=True,
                         verbose_name="url base",

@@ -43,6 +43,7 @@ from core.models import BanGroup, Group, Page, PageRev, SithFile, User
 from core.utils import resize_image
 from counter.models import (
     Counter,
+    CounterSellers,
     Price,
     Product,
     ProductType,
@@ -364,10 +365,10 @@ class Command(BaseCommand):
         Counter.objects.create(name="Carte AE", club=clubs.refound, type="OFFICE")
 
         # Add barman to counter
-        Counter.sellers.through.objects.bulk_create(
+        CounterSellers.objects.bulk_create(
             [
-                Counter.sellers.through(counter_id=1, user=skia),  # MDE
-                Counter.sellers.through(counter_id=2, user=krophil),  # Foyer
+                CounterSellers(counter_id=1, user=skia, is_regular=True),  # MDE
+                CounterSellers(counter_id=2, user=krophil, is_regular=True),  # Foyer
             ]
         )
 

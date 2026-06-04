@@ -46,7 +46,7 @@ from django.http import HttpRequest
 from ninja_extra import ControllerBase
 from ninja_extra.permissions import BasePermission
 
-from counter.models import Counter
+from counter.utils import is_logged_in_counter
 
 
 class IsInGroup(BasePermission):
@@ -186,12 +186,7 @@ class IsLoggedInCounter(BasePermission):
     """Check that a user is logged in a counter."""
 
     def has_permission(self, request: HttpRequest, controller: ControllerBase) -> bool:
-        if "/counter/" not in request.META.get("HTTP_REFERER", ""):
-            return False
-        token = request.session.get("counter_token")
-        if not token:
-            return False
-        return Counter.objects.filter(token=token).exists()
+        return is_logged_in_counter(request)
 
 
 CanAccessLookup = IsLoggedInCounter | HasPerm("core.access_lookup")

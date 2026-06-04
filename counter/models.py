@@ -619,7 +619,6 @@ class Counter(models.Model):
     view_groups = models.ManyToManyField(
         Group, related_name="viewable_counters", blank=True
     )
-    token = models.CharField(_("token"), max_length=30, null=True, blank=True)
 
     objects = CounterQuerySet.as_manager()
 

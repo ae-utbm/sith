@@ -21,4 +21,5 @@ class Migration(migrations.Migration):
                 verbose_name="clic limit",
             ),
         ),
+        migrations.RemoveField(model_name="counter", name="token"),
     ]

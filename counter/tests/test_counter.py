@@ -17,9 +17,11 @@ from datetime import timedelta
 from decimal import Decimal
 
 import pytest
+from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import Permission, make_password
+from django.contrib.messages import DEFAULT_LEVELS, get_messages
 from django.http import HttpResponse
 from django.shortcuts import resolve_url
 from django.test import Client, TestCase
@@ -37,6 +39,7 @@ from core.models import BanGroup, Group, User
 from counter.baker_recipes import price_recipe, product_recipe, sale_recipe
 from counter.models import (
     Counter,
+    CounterSellers,
     Customer,
     Permanency,
     ProductType,
@@ -66,10 +69,14 @@ class TestFullClickBase(TestCase):
         cls.subscriber = subscriber_user.make()
 
         cls.counter = baker.make(Counter, type="BAR")
-        cls.counter.sellers.add(cls.barmen, cls.board_admin)
-
         cls.other_counter = baker.make(Counter, type="BAR")
-        cls.other_counter.sellers.add(cls.barmen)
+        CounterSellers.objects.bulk_create(
+            [
+                CounterSellers(counter=cls.counter, user=cls.barmen),
+                CounterSellers(counter=cls.counter, user=cls.board_admin),
+                CounterSellers(counter=cls.other_counter, user=cls.barmen),
+            ]
+        )
 
         cls.yet_another_counter = baker.make(Counter, type="BAR")
 
@@ -114,7 +121,10 @@ class TestRefilling(TestFullClickBase):
     ) -> HttpResponse:
         used_client = client if client is not None else self.client
         return used_client.post(
-            reverse("counter:refilling_create", kwargs={"customer_id": user.pk}),
+            reverse(
+                "counter:refilling_create",
+                kwargs={"customer_id": user.pk, "counter_id": self.counter.pk},
+            ),
             {"amount": str(amount), "payment_method": Refilling.PaymentMethod.CASH},
             HTTP_REFERER=reverse(
                 "counter:click", kwargs={"counter_id": counter.id, "user_id": user.pk}
@@ -138,7 +148,10 @@ class TestRefilling(TestFullClickBase):
             return self.client.post(
                 reverse(
                     "counter:refilling_create",
-                    kwargs={"customer_id": self.customer.pk},
+                    kwargs={
+                        "customer_id": self.customer.pk,
+                        "counter_id": self.counter.pk,
+                    },
                 ),
                 {"amount": "10", "payment_method": "CASH"},
             )
@@ -442,9 +455,19 @@ class TestCounterClick(TestFullClickBase):
 
     def test_click_not_connected(self):
         force_refill_user(self.customer, 10)
+
+        # trying to click on a bar without being logged should result
+        # in a redirect to the counter page with an error message
         res = self.submit_basket(self.customer, [BasketItem(self.snack.id, 2)])
         assertRedirects(res, self.counter.get_absolute_url())
+        messages = list(get_messages(res.wsgi_request))
+        assert len(messages) == 1
+        assert messages[0].level == DEFAULT_LEVELS["ERROR"]
+        assert (
+            messages[0].message == "Vous ne pouvez pas cliquer des gens sur ce comptoir"
+        )
 
+        # trying to click on an office counter without permission should 403
         res = self.submit_basket(
             self.customer, [BasketItem(self.snack.id, 2)], counter=self.club_counter
         )
@@ -718,59 +741,97 @@ class TestCounterStats(TestCase):
 class TestBarmanConnection(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.krophil = User.objects.get(username="krophil")
-        cls.skia = User.objects.get(username="skia")
-        cls.skia.customer.account = 800
-        cls.krophil.customer.save()
-        cls.skia.customer.save()
-
-        cls.counter = Counter.objects.get(id=2)
+        cls.barman = subscriber_user.make()
+        cls.barman.set_password("plop")
+        cls.barman.save()
+        cls.counter = baker.make(Counter, type="BAR", sellers=[cls.barman])
+        cls.login_url = reverse("counter:login", kwargs={"counter_id": cls.counter.id})
+        cls.detail_url = reverse(
+            "counter:details", kwargs={"counter_id": cls.counter.id}
+        )
 
     def test_barman_granted(self):
+        response = self.client.post(
+            self.login_url, {"username": self.barman.username, "password": "plop"}
+        )
+        assert response.status_code == 200
+        assert response.headers["HX-Redirect"] == self.detail_url
+        last_perm = Permanency.objects.last()
+        assert last_perm.counter == self.counter
+        assert last_perm.user == self.barman
+        assert last_perm.end is None
+        assert self.barman in response.wsgi_request.barmen
+        response = self.client.get(
+            self.detail_url, {"username": self.barman.username, "password": "plop"}
+        )
+        assert response.context_data.get("barmen") == [self.barman]
+        soup = BeautifulSoup(response.text, "lxml")
+        assert soup.find("form", id="select-user-form") is not None
+
+    def assert_counter_login_fails(self, user: User):
+        initial_perms = set(self.counter.permanencies.filter(user=user, end=None))
+        response = self.client.post(
+            self.login_url, {"username": user.username, "password": "plop"}
+        )
+        assert "HX-Redirect" not in response.headers
+        assert (
+            set(self.counter.permanencies.filter(user=user, end=None)) == initial_perms
+        )
+        if initial_perms:
+            # the user was already logged in, and we already tested
+            # that it didn't re-login, so we can skip the next assertions.
+            return
+
+        self.counter.refresh_from_db()
+        assert response.wsgi_request.barmen.isdisjoint(set(self.counter.barmen_list))
+
+        response = self.client.get(self.detail_url)
+        assert response.context_data.get("barmen") == []
+        soup = BeautifulSoup(response.text, "lxml")
+        assert soup.find("form", id="select-user-form") is None
+
+    def test_barman_not_seller(self):
+        """Test when the barman is not a seller of the counter"""
+        not_barman = subscriber_user.make()
+        not_barman.set_password("plop")
+        not_barman.save()
+        self.assert_counter_login_fails(not_barman)
+
+    def test_barman_already_logged(self):
+        """Test when the barman is already logged in the current counter."""
         self.client.post(
-            reverse("counter:login", args=[self.counter.id]),
-            {"username": "krophil", "password": "plop"},
+            self.login_url, {"username": self.barman.username, "password": "plop"}
         )
-        response = self.client.get(reverse("counter:details", args=[self.counter.id]))
+        self.assert_counter_login_fails(self.barman)
 
-        assert "<p>Entrez un code client : </p>" in str(response.content)
-
-    def test_counters_list_barmen(self):
+    def test_barman_already_logged_elsewhere(self):
+        """Test when the barman is already logged in another counter."""
+        other_counter = baker.make(Counter, type="BAR")
+        CounterSellers.objects.create(counter=other_counter, user=self.barman)
         self.client.post(
-            reverse("counter:login", args=[self.counter.id]),
-            {"username": "krophil", "password": "plop"},
+            reverse("counter:login", kwargs={"counter_id": other_counter.id}),
+            {"username": self.barman.username, "password": "plop"},
         )
-        response = self.client.get(reverse("counter:activity", args=[self.counter.id]))
+        self.assert_counter_login_fails(self.barman)
 
-        assert '<li><a href="/user/10/">Kro Phil&#39;</a></li>' in str(response.content)
-
-    def test_barman_denied(self):
-        self.client.post(
-            reverse("counter:login", args=[self.counter.id]),
-            {"username": "skia", "password": "plop"},
+    def test_login_on_non_bar_counter(self):
+        counter = baker.make(Counter, type="OFFICE")
+        CounterSellers.objects.create(counter=counter, user=self.barman)
+        url = reverse("counter:login", kwargs={"counter_id": counter.id})
+        response = self.client.get(url)
+        assert response.status_code == 403
+        response = self.client.post(
+            url, {"username": self.barman.username, "password": "plop"}
         )
-        response_get = self.client.get(
-            reverse("counter:details", args=[self.counter.id])
-        )
-
-        assert "<p>Merci de vous identifier</p>" in str(response_get.content)
-
-    def test_counters_list_no_barmen(self):
-        self.client.post(
-            reverse("counter:login", args=[self.counter.id]),
-            {"username": "krophil", "password": "plop"},
-        )
-        response = self.client.get(reverse("counter:activity", args=[self.counter.id]))
-
-        assert '<li><a href="/user/1/">S&#39; Kia</a></li>' not in str(response.content)
+        assert response.status_code == 403
 
 
 @pytest.mark.django_db
-def test_barman_timeout():
+def test_barman_timeout(client: Client):
     """Test that barmen timeout is well managed."""
     bar = baker.make(Counter, type="BAR")
     user = baker.make(User)
-    bar.sellers.add(user)
+    CounterSellers.objects.create(counter=bar, user=user)
     baker.make(Permanency, counter=bar, user=user, start=now())
 
     qs = Counter.objects.annotate_is_open().filter(pk=bar.pk)
@@ -786,6 +847,8 @@ def test_barman_timeout():
         bar = qs[0]
         assert not bar.is_open
         assert bar.barmen_list == []
+    res = client.get("")
+    assert res.wsgi_request.barmen == set()
 
 
 class TestClubCounterClickAccess(TestCase):
@@ -835,14 +898,14 @@ class TestClubCounterClickAccess(TestCase):
 
     def test_barman(self):
         """Sellers should be able to click on office counters"""
-        self.counter.sellers.add(self.user)
+        CounterSellers.objects.create(counter=self.counter, user=self.user)
         self.client.force_login(self.user)
         res = self.client.get(self.click_url)
         assert res.status_code == 200
 
     def test_both_barman_and_board_member(self):
         """If the user is barman and board member, he should be authorized as well."""
-        self.counter.sellers.add(self.user)
+        CounterSellers.objects.create(counter=self.counter, user=self.user)
         baker.make(
             Membership, club=self.counter.club, user=self.user, role=self.board_role
         )
@@ -866,16 +929,17 @@ class TestCounterLogout:
                 reverse("counter:logout", kwargs={"counter_id": permanence.counter_id}),
                 data={"user_id": permanence.user_id},
             )
-            assertRedirects(
-                res,
-                reverse(
-                    "counter:details", kwargs={"counter_id": permanence.counter_id}
-                ),
-            )
-            permanence.refresh_from_db()
-            assert permanence.end == now()
+        assertRedirects(
+            res,
+            reverse("counter:details", kwargs={"counter_id": permanence.counter_id}),
+        )
+        permanence.refresh_from_db()
+        assert permanence.end == permanence.activity
+        assert permanence.user not in res.wsgi_request.barmen
 
     def test_logout_doesnt_change_old_permanences(self, client: Client):
+        # regression test for #1141
+        # https://github.com/ae-utbm/sith/pull/1141
         perm_counter = baker.make(Counter, type="BAR")
         permanence = baker.make(
             Permanency,
@@ -896,6 +960,6 @@ class TestCounterLogout:
                 data={"user_id": permanence.user_id},
             )
             permanence.refresh_from_db()
-            assert permanence.end == now()
+            assert permanence.end == permanence.activity
             old_permanence.refresh_from_db()
             assert old_permanence.end == old_end

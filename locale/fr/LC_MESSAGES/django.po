@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-23 12:15+0200\n"
+"POT-Creation-Date: 2026-06-02 10:53+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -363,11 +363,8 @@ msgid "Unregistered user"
 msgstr "Utilisateur non enregistré"
 
 #: club/models.py
-#, python-format
-msgid "The base url that links with this type must respect (e.g. `%(url)s`)"
-msgstr ""
-"L'url de base que tous les liens de ce type doivent respecter (par exemple "
-"`%(url)s`)"
+msgid "The base url that links with this type must respect"
+msgstr "L'url de base que tous les liens de ce type doivent respecter"
 
 #: club/models.py counter/models.py
 msgid "icon"
@@ -2203,6 +2200,7 @@ msgstr "Êtes-vous sûr de vouloir supprimer \"%(name)s\" ?"
 #: core/templates/core/delete_confirm.jinja
 #: core/templates/core/file_delete_confirm.jinja
 #: counter/templates/counter/fragments/delete_student_card.jinja
+#: counter/templates/counter/fragments/login.jinja
 msgid "Confirm"
 msgstr "Confirmation"
 
@@ -3207,6 +3205,18 @@ msgid "User not found"
 msgstr "Utilisateur non trouvé"
 
 #: counter/forms.py
+msgid "You are not a barman of this counter."
+msgstr "Vous n'êtes pas barman sur ce comptoir."
+
+#: counter/forms.py
+msgid "You are already logged in this counter."
+msgstr "Vous êtes déjà connecté à ce comptoir."
+
+#: counter/forms.py
+msgid "You are already logged in another counter."
+msgstr "Vous êtes déjà connecté à un autre comptoir."
+
+#: counter/forms.py
 msgid "Regular barmen"
 msgstr "Barmen réguliers"
 
@@ -3483,10 +3493,6 @@ msgstr "Bureau"
 #: counter/models.py
 msgid "sellers"
 msgstr "vendeurs"
-
-#: counter/models.py
-msgid "token"
-msgstr "jeton"
 
 #: counter/models.py
 msgid "regular barman"
@@ -3812,7 +3818,7 @@ msgstr ""
 
 #: counter/templates/counter/counter_click.jinja
 msgid "No products available on this counter for this user"
-msgstr "Pas de produits disponnibles dans ce comptoir pour cet utilisateur"
+msgstr "Pas de produits disponibles dans ce comptoir pour cet utilisateur"
 
 #: counter/templates/counter/counter_list.jinja
 msgid "Counter admin list"
@@ -3873,12 +3879,20 @@ msgid "Please, login"
 msgstr "Merci de vous identifier"
 
 #: counter/templates/counter/counter_main.jinja
-msgid "Barman: "
-msgstr "Barman : "
+msgid "Barmen:"
+msgstr "Barmen :"
 
 #: counter/templates/counter/counter_main.jinja
-msgid "login"
-msgstr "login"
+msgid "On this device"
+msgstr "Sur cet appareil"
+
+#: counter/templates/counter/counter_main.jinja
+msgid "Elsewhere"
+msgstr "Ailleurs"
+
+#: counter/templates/counter/counter_main.jinja
+msgid "No barman logged elsewhere"
+msgstr "Pas de barman connecté ailleurs"
 
 #: counter/templates/counter/eticket_list.jinja
 msgid "Eticket list"
@@ -4283,21 +4297,13 @@ msgstr "Montant du chèque"
 msgid "Check quantity"
 msgstr "Nombre de chèque"
 
+#: counter/views/click.py
+msgid "You cannot click users on this counter"
+msgstr "Vous ne pouvez pas cliquer des gens sur ce comptoir"
+
 #: counter/views/eticket.py
 msgid "people(s)"
 msgstr "personne(s)"
-
-#: counter/views/home.py
-msgid "Bad credentials"
-msgstr "Mauvais identifiants"
-
-#: counter/views/home.py
-msgid "User is not barman"
-msgstr "L'utilisateur n'est pas barman."
-
-#: counter/views/home.py
-msgid "Bad location, someone is already logged in somewhere else"
-msgstr "Mauvais comptoir, quelqu'un est déjà connecté ailleurs"
 
 #: counter/views/invoice.py
 msgid "Invoice calls status has been updated."

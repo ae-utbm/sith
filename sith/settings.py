@@ -34,6 +34,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
 import binascii
+import contextlib
 import os
 import sys
 from datetime import timedelta
@@ -41,6 +42,7 @@ from pathlib import Path
 
 import sentry_sdk
 from dateutil.relativedelta import relativedelta
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.translation import gettext_lazy as _
 from environs import Env
 from sentry_sdk.integrations.django import DjangoIntegration
@@ -91,7 +93,8 @@ ALLOWED_HOSTS = ["*"]
 # RemovedInDjango60Warning: It's a transitional setting helpful in early
 # adoption of "https" as the new default value of forms.URLField.assume_scheme.
 # Remove this after upgrading to Django 6.x
-FORMS_URLFIELD_ASSUME_HTTPS = True
+with contextlib.suppress(RemovedInDjango60Warning):
+    FORMS_URLFIELD_ASSUME_HTTPS = True
 
 # Application definition
 
@@ -138,13 +141,13 @@ MIDDLEWARE = (
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "core.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    "core.middleware.AuthenticationMiddleware",
     "core.middleware.SignalRequestMiddleware",
+    "counter.middleware.BarmenMiddleware",
 )
 
 ROOT_URLCONF = "sith.urls"
