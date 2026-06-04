@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-02 10:53+0200\n"
+"POT-Creation-Date: 2026-06-04 17:30+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4627,14 +4627,22 @@ msgid "Polls will open "
 msgstr "Les votes ouvriront "
 
 #: election/templates/election/election_detail.jinja
+msgid " at"
+msgstr " à"
+
+#: election/templates/election/election_detail.jinja
+msgid "and will close "
+msgstr "et fermeront"
+
+#: election/templates/election/election_detail.jinja
 #: election/templates/election/election_list.jinja
 #: forum/templates/forum/macros.jinja
 msgid " at "
 msgstr " à "
 
 #: election/templates/election/election_detail.jinja
-msgid "and will close "
-msgstr "et fermeront"
+msgid "Apply election result"
+msgstr "Appliquer les résultats de l'élection"
 
 #: election/templates/election/election_detail.jinja
 msgid "You already have submitted your vote."
@@ -4692,6 +4700,41 @@ msgstr "au"
 #: election/templates/election/election_list.jinja
 msgid "Polls open from"
 msgstr "Votes ouverts du"
+
+#: election/templates/election/fragments/apply_result.jinja
+msgid "No result to apply"
+msgstr "Pas de résultats à appliquer"
+
+#: election/templates/election/fragments/apply_result.jinja
+msgid "This may be because no role of this election was linked to a club role."
+msgstr ""
+"Ceci s'explique peut-être parce qu'aucun poste de cette élection n'était lié "
+"à un rôle de club."
+
+#: election/templates/election/fragments/apply_result.jinja
+msgid "The results of this election have been applied"
+msgstr "Les résultats de cette élection ont été appliqués"
+
+#: election/templates/election/fragments/apply_result.jinja
+#, python-format
+msgid "%(club)s members"
+msgstr "Membres %(club)s"
+
+#: election/templates/election/fragments/apply_result.jinja
+msgid "Warning"
+msgstr "Attention"
+
+#: election/templates/election/fragments/apply_result.jinja
+msgid ""
+"Only election roles linked to a club role will be automatically applied."
+msgstr ""
+"Seuls les postes de cette élection qui sont liés à un rôle de club seront "
+"automatiquement appliqués."
+
+#: election/templates/election/fragments/apply_result.jinja
+msgid "Don't forget to manually apply the eventual remaining roles afterward."
+msgstr ""
+"N'oubliez pas après d'attribuer manuellement les éventuels postes restants."
 
 #: election/templates/election/role_form.jinja
 msgid "Election role"
