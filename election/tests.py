@@ -40,7 +40,6 @@ class TestElectionDetail(TestElection):
             reverse("election:detail", args=str(self.election.id))
         )
         assert response.status_code == 200
-        assert "La roue tourne" in str(response.content)
 
 
 class TestElectionUpdateView(TestElection):

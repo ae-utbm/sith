@@ -16,8 +16,11 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
+from club.models import Membership
 from core.auth.mixins import CanEditMixin, CanViewMixin
+from core.views import FragmentMixin
 from election.forms import (
+    ApplyElectionResultForm,
     CandidateForm,
     ElectionCreateForm,
     ElectionForm,
@@ -405,3 +408,45 @@ class ElectionListDeleteView(CanEditMixin, DeleteView):
 
     def get_success_url(self, **kwargs):
         return reverse("election:detail", kwargs={"election_id": self.election.id})
+
+
+class ApplyResultFragment(
+    LoginRequiredMixin, UserPassesTestMixin, FragmentMixin, FormView
+):
+    template_name = "election/fragments/apply_result.jinja"
+    form_class = ApplyElectionResultForm
+
+    @cached_property
+    def election(self):
+        return get_object_or_404(Election, pk=self.kwargs["election_id"])
+
+    def test_func(self):
+        if not self.election.is_vote_finished:
+            return False
+        if self.request.user.has_perm("club.add_membership"):
+            return True
+        return self.election.edit_groups.filter(
+            id__in=self.request.user.all_groups
+        ).exists()
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"election": self.election}
+
+    def form_valid(self, form: ApplyElectionResultForm):
+        form.save()
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "already_applied": Membership.objects.filter(
+                role__election_roles__election=self.election,
+                end_date=None,
+                start_date__gte=self.election.end_date,
+            ).exists(),
+            "clubs": self.election.clubs.all(),
+        }
+
+    def get_success_url(self, **kwargs):
+        return reverse(
+            "election:apply_result", kwargs={"election_id": self.election.id}
+        )

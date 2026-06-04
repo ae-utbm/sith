@@ -1,12 +1,17 @@
 from datetime import timedelta
+from itertools import groupby, islice
+from operator import attrgetter
 
 from django import forms
 from django.conf import settings
-from django.utils.timezone import localtime
+from django.db import transaction
+from django.db.models import Count
+from django.forms.models import ModelChoiceIterator, ModelChoiceIteratorValue
+from django.utils.timezone import localdate, localtime
 from django.utils.translation import gettext_lazy as _
 
 from club.forms import ClubRoleChoiceField
-from club.models import ClubRole
+from club.models import ClubRole, Membership
 from club.widgets.ajax_select import AutoCompleteSelectMultipleClub
 from core.models import User
 from core.views.forms import SelectDateTime
@@ -180,3 +185,83 @@ class ElectionCreateForm(ElectionForm):
         if commit:
             ElectionList.objects.create(title="Candidat⸱e libre", election=instance)
         return instance
+
+
+class ElectionWinnerChoiceIterator(ModelChoiceIterator):
+    """Iterate over the candidates that gathered enough votes"""
+
+    def __iter__(self):
+        # for each role, yield only the N first candidates,
+        # where N is the election role max_choice
+        qs = (
+            self.queryset.annotate(nb_votes=Count("votes"))
+            .order_by("role__order", "-nb_votes")
+            .select_related("role", "user", "role__club_role", "role__club_role__club")
+        )
+        yield from (
+            (
+                f"{role.title} \u2013 {role.club_role.club.name}",
+                [self.choice(cand) for cand in islice(candidates, role.max_choice)],
+            )
+            for role, candidates in groupby(qs, key=attrgetter("role"))
+        )
+
+    def choice(self, obj: Candidature):
+        return (
+            ModelChoiceIteratorValue(self.field.prepare_value(obj), obj),
+            obj.user.get_full_name(),
+        )
+
+
+class ElectionWinnerChoiceField(forms.ModelMultipleChoiceField):
+    """Custom `ModelChoiceField` for `[ClubRole][club.models.ClubRole]`.
+
+    If only one club is involved, behave like the base `ModelChoiceField`.
+    If dealing with the roles of multiple clubs, group the roles
+    into a different `optgroup` for each club.
+    """
+
+    iterator = ElectionWinnerChoiceIterator
+    widget = forms.CheckboxSelectMultiple
+
+
+class ApplyElectionResultForm(forms.Form):
+    """Form to select winners of an election, and automatically apply the results."""
+
+    candidates = ElectionWinnerChoiceField(Candidature.objects.none())
+
+    def __init__(self, *args, election: Election, **kwargs):
+        self.election = election
+        super().__init__(*args, **kwargs)
+        qs = Candidature.objects.filter(
+            role__election=election, role__club_role__isnull=False
+        )
+        # pass all candidates to the ModelChoiceField ;
+        # its inner choice iterator will take care of filtering only the winners.
+        self.fields["candidates"].queryset = qs
+        # By default, mark every candidate as selected.
+        # Election results are usually completely validated during the AG,
+        # so it makes more sense UX-wise to eventually unselect a candidate
+        # than to select everyone.
+        self.fields["candidates"].initial = qs.values_list("id", flat=True)
+
+    def save(self):
+        if self.errors:
+            return
+        candidates: list[Candidature] = list(self.cleaned_data["candidates"])
+        with transaction.atomic():
+            Membership.objects.filter(
+                role__in=[c.role.club_role for c in candidates],
+                end_date=None,
+                start_date__lt=self.election.end_date,
+            ).update(end_date=localdate())
+            memberships = [
+                Membership(
+                    user_id=c.user_id,
+                    club_id=c.role.club_role.club_id,
+                    role=c.role.club_role,
+                )
+                for c in candidates
+            ]
+            Membership.objects.bulk_create(memberships)
+            Membership._add_club_groups(memberships)

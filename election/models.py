@@ -135,9 +135,9 @@ class Role(OrderedModel):
 
     def results(self, total_vote: int) -> dict[str, dict[str, int | float]]:
         if total_vote == 0:
-            candidates = self.candidatures.values_list("user__username")
+            candidates = self.candidatures.values_list("user__username", flat=True)
             return {
-                key: {"vote": 0, "percent": 0} for key in ["blank_votes", *candidates]
+                key: {"vote": 0, "percent": 0} for key in ["blank vote", *candidates]
             }
         total_vote *= self.max_choice
         results = {"total vote": total_vote}

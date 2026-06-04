@@ -1,6 +1,7 @@
 from django.urls import path
 
 from election.views import (
+    ApplyResultFragment,
     CandidatureCreateView,
     CandidatureDeleteView,
     CandidatureUpdateView,
@@ -56,4 +57,9 @@ urlpatterns = [
     ),
     path("<int:election_id>/vote/", VoteFormView.as_view(), name="vote"),
     path("<int:election_id>/detail/", ElectionDetailView.as_view(), name="detail"),
+    path(
+        "fragment/<int:election_id>/apply/",
+        ApplyResultFragment.as_view(),
+        name="apply_result",
+    ),
 ]
