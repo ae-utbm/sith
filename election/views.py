@@ -18,7 +18,9 @@ from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateVi
 
 from core.auth.mixins import CanEditMixin, CanViewMixin
 from election.forms import (
+    ApplyElectionResultForm,
     CandidateForm,
+    ElectionCreateForm,
     ElectionForm,
     ElectionListForm,
     RoleForm,
@@ -208,7 +210,7 @@ class CandidatureCreateView(LoginRequiredMixin, CreateView):
 
 class ElectionCreateView(PermissionRequiredMixin, CreateView):
     model = Election
-    form_class = ElectionForm
+    form_class = ElectionCreateForm
     template_name = "core/create.jinja"
     permission_required = "election.add_election"
 
@@ -219,7 +221,7 @@ class ElectionCreateView(PermissionRequiredMixin, CreateView):
 class RoleCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Role
     form_class = RoleForm
-    template_name = "core/create.jinja"
+    template_name = "election/role_form.jinja"
 
     @cached_property
     def election(self):
@@ -228,22 +230,17 @@ class RoleCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     def test_func(self):
         if not self.election.is_vote_editable:
             return False
-        if self.request.user.has_perm("election.add_role"):
-            return True
-        return self.election.edit_groups.filter(
-            id__in=self.request.user.all_groups
-        ).exists()
-
-    def get_initial(self):
-        return {"election": self.election}
+        user = self.request.user
+        return user.has_perm("election.add_role") or user.can_edit(self.election)
 
     def get_form_kwargs(self):
-        return super().get_form_kwargs() | {"election_id": self.election.id}
+        return super().get_form_kwargs() | {"election": self.election}
 
     def get_success_url(self, **kwargs):
-        return reverse(
-            "election:detail", kwargs={"election_id": self.object.election_id}
-        )
+        return reverse("election:detail", kwargs={"election_id": self.election.id})
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"election": self.election}
 
 
 class ElectionListCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
@@ -267,16 +264,11 @@ class ElectionListCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView
         )
         return not groups.isdisjoint(self.request.user.all_groups.keys())
 
-    def get_initial(self):
-        return {"election": self.election}
-
     def get_form_kwargs(self):
-        return super().get_form_kwargs() | {"election_id": self.election.id}
+        return super().get_form_kwargs() | {"election": self.election}
 
     def get_success_url(self, **kwargs):
-        return reverse(
-            "election:detail", kwargs={"election_id": self.object.election_id}
-        )
+        return reverse("election:detail", kwargs={"election_id": self.election.id})
 
 
 # Update view
@@ -287,18 +279,6 @@ class ElectionUpdateView(CanEditMixin, UpdateView):
     form_class = ElectionForm
     template_name = "core/edit.jinja"
     pk_url_kwarg = "election_id"
-
-    def get_initial(self):
-        return {
-            "start_date": self.object.start_date.strftime("%Y-%m-%d %H:%M:%S"),
-            "end_date": self.object.end_date.strftime("%Y-%m-%d %H:%M:%S"),
-            "start_candidature": self.object.start_candidature.strftime(
-                "%Y-%m-%d %H:%M:%S"
-            ),
-            "end_candidature": self.object.end_candidature.strftime(
-                "%Y-%m-%d %H:%M:%S"
-            ),
-        }
 
     def get_success_url(self, **kwargs):
         return reverse_lazy("election:detail", kwargs={"election_id": self.object.id})
@@ -324,48 +304,30 @@ class CandidatureUpdateView(LoginRequiredMixin, CanEditMixin, UpdateView):
         )
 
 
-class RoleUpdateView(CanEditMixin, UpdateView):
+class RoleUpdateView(UserPassesTestMixin, UpdateView):
     model = Role
     form_class = RoleForm
-    template_name = "core/edit.jinja"
+    template_name = "election/role_form.jinja"
     pk_url_kwarg = "role_id"
 
-    def dispatch(self, request, *arg, **kwargs):
-        self.object = self.get_object()
-        if not self.object.election.is_vote_editable:
-            raise PermissionDenied
-        return super().dispatch(request, *arg, **kwargs)
+    @cached_property
+    def election(self):
+        return self.get_object().election
 
-    def remove_fields(self):
-        self.form.fields.pop("election", None)
+    def test_func(self):
+        if not self.election.is_vote_editable:
+            return False
+        user = self.request.user
+        return user.has_perm("election.change_role") or user.can_edit(self.election)
 
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.form = self.get_form()
-        self.remove_fields()
-        return self.render_to_response(self.get_context_data(form=self.form))
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.form = self.get_form()
-        self.remove_fields()
-        if (
-            request.user.is_authenticated
-            and request.user.can_edit(self.object)
-            and self.form.is_valid()
-        ):
-            return super().form_valid(self.form)
-        return self.form_invalid(self.form)
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"election": self.election}
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["election_id"] = self.object.election.id
-        return kwargs
+        return super().get_form_kwargs() | {"election": self.election}
 
     def get_success_url(self, **kwargs):
-        return reverse_lazy(
-            "election:detail", kwargs={"election_id": self.object.election.id}
-        )
+        return reverse("election:detail", kwargs={"election_id": self.election.id})
 
 
 # Delete Views
@@ -425,3 +387,41 @@ class ElectionListDeleteView(CanEditMixin, DeleteView):
 
     def get_success_url(self, **kwargs):
         return reverse("election:detail", kwargs={"election_id": self.election.id})
+
+
+class ApplyResultFragment(LoginRequiredMixin, UserPassesTestMixin, FormView):
+    template_name = "election/fragments/apply_result.jinja"
+    form_class = ApplyElectionResultForm
+
+    @cached_property
+    def election(self):
+        return get_object_or_404(Election, pk=self.kwargs["election_id"])
+
+    def test_func(self):
+        if not self.election.is_vote_finished:
+            return False
+        if self.request.user.has_perm("club.add_membership"):
+            return True
+        return self.election.edit_groups.filter(
+            id__in=self.request.user.all_groups
+        ).exists()
+
+    def post(self, request, *args, **kwargs):
+        if self.election.results_applied:
+            raise PermissionDenied
+        return super().post(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"election": self.election}
+
+    def form_valid(self, form: ApplyElectionResultForm):
+        form.save()
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"clubs": self.election.clubs.all()}
+
+    def get_success_url(self, **kwargs):
+        return reverse(
+            "election:apply_result", kwargs={"election_id": self.election.id}
+        )

@@ -29,13 +29,25 @@
         {% trans %}Polls closed {% endtrans %}
       {%- else %}
         {% trans %}Polls will open {% endtrans %}
-        <time datetime="{{ election.start_date }}">{{ election.start_date|localtime|date(DATETIME_FORMAT)}}</time>
-        {% trans %} at {% endtrans %}<time>{{ election.start_date|localtime|time(DATETIME_FORMAT)}}</time>
+        <time datetime="{{ election.start_date }}">{{ election.start_date|localtime|date(DATETIME_FORMAT) }}</time>
+        {% trans %}at{% endtrans %}
+        <time>{{ election.start_date|localtime|time(DATETIME_FORMAT) }}</time>
         {% trans %}and will close {% endtrans %}
       {%- endif %}
-      <time datetime="{{ election.end_date }}">{{ election.end_date|localtime|date(DATETIME_FORMAT)}}</time>
-      {% trans %} at {% endtrans %}<time>{{ election.end_date|localtime|time(DATETIME_FORMAT)}}</time>
+      <time datetime="{{ election.end_date }}">{{ election.end_date|localtime|date(DATETIME_FORMAT) }}</time>
+      {% trans %}at{% endtrans %}
+      <time>{{ election.end_date|localtime|time(DATETIME_FORMAT) }}</time>
     </p>
+    {%- if election.is_vote_finished and user.can_edit(election) %}
+      <details class="accordion" name="apply-result">
+        <summary>{% trans %}Apply election result{% endtrans %}</summary>
+        <div
+          class="accordion-content aria-busy-grow"
+          hx-get="{{ url("election:apply_result", election_id=election.id) }}"
+          hx-trigger="toggle from:closest details once"
+        ></div>
+      </details>
+    {% endif %}
     {%- if user_has_voted %}
       <p class="election__elector-infos">
         {%- if election.is_vote_active %}
@@ -47,17 +59,27 @@
     {%- endif %}
   </section>
   <section class="election_vote">
-    <form action="{{ url('election:vote', election.id) }}" method="post" class="election__vote-form" name="vote-form" id="vote-form">
+    <form
+      action="{{ url('election:vote', election.id) }}"
+      method="post"
+      class="election__vote-form"
+      name="vote-form"
+      id="vote-form"
+    >
       {% csrf_token %}
       <table class="election_table">
         <thead class="lists">
           <tr>
-            <th class="column" style="width: {{ 100 / (election_lists|length + 1) }}%">{% trans %}Blank vote{% endtrans %}</th>
+            <th class="column" style="width: {{ 100 / (election_lists|length + 1) }}%">
+              {% trans %}Blank vote{% endtrans %}
+            </th>
             {%- for election_list in election_lists %}
               <th class="column" style="width: {{ 100 / (election_lists|length + 1) }}%">
                 <span>{{ election_list.title }}</span>
                 {% if user.can_edit(election_list) and election.is_vote_editable -%}
-                  <a href="{{ url('election:delete_list', list_id=election_list.id) }}"><i class="fa-regular fa-trash-can delete-action"></i></a>
+                  <a href="{{ url('election:delete_list', list_id=election_list.id) }}">
+                    <i class="fa-regular fa-trash-can delete-action"></i>
+                  </a>
                 {% endif %}
               </th>
             {%- endfor %}
@@ -103,22 +125,45 @@
                       <button disabled><i class="fa fa-arrow-down"></i></button>
                       <button disabled><i class="fa fa-caret-down"></i></button>
                     {%- else -%}
-                      <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=bottom');"><i class="fa fa-arrow-down"></i></button>
-                      <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=down');"><i class="fa fa-caret-down"></i></button>
+                      <button
+                        type="button"
+                        onclick="window.location.replace('?role={{ role.id }}&action=bottom');"
+                      >
+                        <i class="fa fa-arrow-down"></i>
+                      </button>
+                      <button
+                        type="button"
+                        onclick="window.location.replace('?role={{ role.id }}&action=down');"
+                      >
+                        <i class="fa fa-caret-down"></i>
+                      </button>
                     {%- endif -%}
                     {%- if loop.first -%}
                       <button disabled><i class="fa fa-caret-up"></i></button>
                       <button disabled><i class="fa fa-arrow-up"></i></button>
                     {%- else -%}
-                      <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=up');"><i class="fa fa-caret-up"></i></button>
-                      <button type="button" onclick="window.location.replace('?role={{ role.id }}&action=top');"><i class="fa fa-arrow-up"></i></button>
+                      <button
+                        type="button"
+                        onclick="window.location.replace('?role={{ role.id }}&action=up');"
+                      >
+                        <i
+                          class="fa fa-caret-up"></i>
+                      </button>
+                      <button
+                        type="button"
+                        onclick="window.location.replace('?role={{ role.id }}&action=top');"
+                      ><i class="fa fa-arrow-up"></i>
+                      </button>
                     {%- endif -%}
                   </div>
                 {%- endif -%}
               </td>
             </tr>
             <tr class="role_candidates">
-              <td class="list_per_role" style="width: 100%; max-width: {{ 100 / (election_lists|length + 1) }}%">
+              <td
+                class="list_per_role"
+                style="width: 100%; max-width: {{ 100 / (election_lists|length + 1) }}%"
+              >
                 {%- if role.max_choice == 1 and show_vote_buttons %}
                   <div class="radio-btn">
                     {% set input_id = "blank_vote_" + role.id|string %}
@@ -131,26 +176,46 @@
                 {%- if election.is_vote_finished %}
                   {%- set results = election_results[role.title]['blank vote'] %}
                   <div class="election__results">
-                    <strong>{{ results.vote }} {% trans %}votes{% endtrans %} ({{ "%.2f" % results.percent }} %)</strong>
+                    <strong>
+                      {{ results.vote }} {% trans %}votes{% endtrans %} ({{ "%.2f" % results.percent }} %)
+                    </strong>
                   </div>
                 {%- endif %}
               </td>
               {%- for election_list in election_lists %}
-                <td class="list_per_role" style="width: 100%; max-width: {{ 100 / (election_lists|length + 1) }}%">
+                <td
+                  class="list_per_role"
+                  style="width: 100%; max-width: {{ 100 / (election_lists|length + 1) }}%"
+                >
                   <ul class="candidates">
                     {%- for candidature in election_list.candidatures.select_related("user", "user__profile_pict").filter(role=role) %}
                       <li class="candidate">
                         {%- if show_vote_buttons %}
                           {% set input_id = "candidature_" + candidature.id|string %}
-                          <input id="{{ input_id }}" type="{{ 'checkbox' if role.max_choice > 1 else 'radio' }}" {{ 'checked' if candidature.id|string in role_data else '' }} {{ 'disabled' if user_has_voted else '' }} name="{{ role.title }}" value="{{ candidature.id }}">
+                          <input
+                            id="{{ input_id }}"
+                            type="{{ 'checkbox' if role.max_choice > 1 else 'radio' }}"
+                            {% if candidature.id|string in role_data %}checked{% endif %}
+                            {% if user_has_voted %}disabled{% endif %}
+                            name="{{ role.title }}"
+                            value="{{ candidature.id }}"
+                          >
                           <label for="{{ input_id }}">
                         {%- endif %}
                         <figure>
                           {%- if user.can_view(candidature.user) %}
                             {% if candidature.user.profile_pict %}
-                              <img class="candidate__picture" src="{{ candidature.user.profile_pict.get_download_url() }}" alt="{% trans %}Profile{% endtrans %}">
+                              <img
+                                class="candidate__picture"
+                                src="{{ candidature.user.profile_pict.get_download_url() }}"
+                                alt="{% trans %}Profile{% endtrans %}"
+                              >
                             {% else %}
-                              <img class="candidate__picture" src="{{ static('core/img/unknown.jpg') }}" alt="{% trans %}Profile{% endtrans %}">
+                              <img
+                                class="candidate__picture"
+                                src="{{ static('core/img/unknown.jpg') }}"
+                                alt="{% trans %}Profile{% endtrans %}"
+                              >
                             {% endif %}
                           {%- endif %}
                           <figcaption class="candidate__details">
@@ -164,8 +229,12 @@
                           {%- if user.can_edit(candidature) -%}
                             {%- if election.is_vote_editable -%}
                               <div class="edit_btns">
-                                <a href="{{url('election:update_candidate', candidature_id=candidature.id)}}"><i class="fa-regular fa-pen-to-square edit-action"></i>️</a>
-                                <a href="{{url('election:delete_candidate', candidature_id=candidature.id)}}"><i class="fa-regular fa-trash-can delete-action"></i></a>
+                                <a href="{{ url('election:update_candidate', candidature_id=candidature.id) }}">
+                                  <i class="fa-regular fa-pen-to-square edit-action"></i>
+                                </a>
+                                <a href="{{ url('election:delete_candidate', candidature_id=candidature.id) }}">
+                                  <i class="fa-regular fa-trash-can delete-action"></i>
+                                </a>
                               </div>
                             {%- endif -%}
                           {%- endif -%}
