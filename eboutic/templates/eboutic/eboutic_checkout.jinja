@@ -72,8 +72,18 @@
          we have a third dummy form, containing only the cgv button,
          which validation is triggered when one of the two other forms is submitted.
          If the validation of this form fails, the submit event will be cancelled. #}
-        <div class="form-group margin-bottom">
-          <input type="checkbox" id="cgv-checkbox" name="cgv" required>
+        <div class="form-group">
+          <input
+            type="checkbox"
+            id="cgv-checkbox"
+            name="cgv"
+            required
+            {% if basket.is_expired %}
+              disabled="disabled"
+            {% else %}
+              :disabled="!isCbAvailable && !isSithAvailable"
+            {% endif %}
+          >
           <label for="cgv-checkbox">
             {% trans  trimmed %}I have read and I accept{% endtrans %}
             <a href="{{ url('core:page', 'cgv') }}">{% trans %}the general terms and conditions{% endtrans%}</a>
