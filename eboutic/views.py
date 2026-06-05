@@ -58,7 +58,7 @@ from counter.models import (
     Selling,
     get_eboutic,
 )
-from eboutic.models import Basket, BasketItem, BillingInfoState, Invoice, InvoiceItem
+from eboutic.models import Basket, BasketItem, Invoice, InvoiceItem
 
 if TYPE_CHECKING:
     from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
@@ -187,7 +187,7 @@ def payment_result(request, result: str) -> HttpResponse:
 class BillingInfoFormFragment(
     LoginRequiredMixin, FragmentMixin, SuccessMessageMixin, UpdateView
 ):
-    """Update billing info"""
+    """Update or create billing info"""
 
     model = BillingInfo
     form_class = BillingInfoForm
@@ -218,26 +218,15 @@ class BillingInfoFormFragment(
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["billing_infos_state"] = BillingInfoState.from_model(self.object)
         kwargs["action"] = reverse("eboutic:billing_infos")
-        match BillingInfoState.from_model(self.object):
-            case BillingInfoState.EMPTY:
-                messages.warning(
-                    self.request,
-                    _(
-                        "You must fill your billing infos if you want to pay with your credit card"
-                    ),
-                )
-            case BillingInfoState.MISSING_PHONE_NUMBER:
-                messages.warning(
-                    self.request,
-                    _(
-                        "The Crédit Agricole changed its policy related to the billing "
-                        + "information that must be provided in order to pay with a credit card. "
-                        + "If you want to pay with your credit card, you must add a phone number "
-                        + "to the data you already provided.",
-                    ),
-                )
+        if not self.object:
+            messages.warning(
+                self.request,
+                _(
+                    "You must fill your billing infos "
+                    "if you want to pay with your credit card"
+                ),
+            )
         return kwargs
 
     def get_success_url(self, **kwargs):

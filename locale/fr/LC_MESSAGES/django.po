@@ -4512,18 +4512,6 @@ msgstr ""
 "par carte bancaire"
 
 #: eboutic/views.py
-msgid ""
-"The Crédit Agricole changed its policy related to the billing information "
-"that must be provided in order to pay with a credit card. If you want to pay "
-"with your credit card, you must add a phone number to the data you already "
-"provided."
-msgstr ""
-"Le Crédit Agricole a changé  sa politique relative aux informations à "
-"fournir pour effectuer un paiement par carte bancaire. De ce fait, si vous "
-"souhaitez payer par carte, vous devez rajouter un numéro de téléphone aux "
-"données que vous aviez déjà fourni."
-
-#: eboutic/views.py
 msgid "Basket expired"
 msgstr "Panier expiré"
 
