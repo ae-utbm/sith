@@ -28,8 +28,8 @@
       <thead>
         <tr>
           <td>Article</td>
-          <td>Quantity</td>
-          <td>Unit price</td>
+          <td>{% trans %}Quantity{% endtrans %}</td>
+          <td>{% trans %}Unit price{% endtrans %}</td>
         </tr>
       </thead>
       <tbody>
@@ -63,10 +63,41 @@
       <div @htmx:after-request="fill">
         {{ billing_infos_form }}
       </div>
-      {% include "core/base/notifications.jinja" %}
+    {% endif %}
+    {% include "core/base/notifications.jinja" %}
+    {% if settings.SITH_EBOUTIC_CB_ENABLED or (basket.total <= user.account_balance and not basket.contains_refilling_item) %}
+      {# don't display the cgv form if no payment mean is available #}
+      <form id="cgv-form" x-ref="cgvForm">
+      {# In order to have one CGV button for both payment means,
+         we have a third dummy form, containing only the cgv button,
+         which validation is triggered when one of the two other forms is submitted.
+         If the validation of this form fails, the submit event will be cancelled. #}
+        <div class="form-group">
+          <input
+            type="checkbox"
+            id="cgv-checkbox"
+            name="cgv"
+            required
+            {% if basket.is_expired %}
+              disabled="disabled"
+            {% else %}
+              :disabled="!isCbAvailable && !isSithAvailable"
+            {% endif %}
+          >
+          <label for="cgv-checkbox">
+            {% trans  trimmed %}I have read and I accept{% endtrans %}
+            <a href="{{ url('core:page', 'cgv') }}">{% trans %}the general terms and conditions{% endtrans%}</a>
+            {%trans%}of the student association of the UTBM{% endtrans %}
+          </label>
+        </div>
+      </form>
+    {% endif %}
+    {% if settings.SITH_EBOUTIC_CB_ENABLED %}
       <form
         method="post"
+        id="bank-payment-form"
         action="{{ settings.SITH_EBOUTIC_ET_URL }}"
+        @submit="if (!$refs.cgvForm.reportValidity()) $event.preventDefault()"
       >
         <template x-for="[key, value] in Object.entries(data)" :key="key">
           <input type="hidden" :name="key" :value="value">
@@ -98,7 +129,12 @@
     {% elif basket.total > user.account_balance %}
       <p>{% trans %}AE account payment disabled because you do not have enough money remaining.{% endtrans %}</p>
     {% else %}
-      <form method="post" action="{{ url('eboutic:pay_with_sith', basket_id=basket.id) }}" name="sith-pay-form">
+      <form
+        method="post"
+        action="{{ url('eboutic:pay_with_sith', basket_id=basket.id) }}"
+        id="sith-payment-form"
+        @submit="if (!$refs.cgvForm.reportValidity()) $event.preventDefault()"
+      >
         {% csrf_token %}
         <input
           {% if basket.is_expired %}

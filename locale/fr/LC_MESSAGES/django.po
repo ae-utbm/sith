@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-04 17:30+0200\n"
+"POT-Creation-Date: 2026-06-05 13:39+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -680,6 +680,7 @@ msgstr "Étiquette"
 #: core/templates/core/user_account_detail.jinja
 #: core/templates/core/user_stats.jinja
 #: counter/templates/counter/last_ops.jinja
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
 msgid "Quantity"
 msgstr "Quantité"
 
@@ -963,7 +964,7 @@ msgstr "rôle de club – membre"
 msgid "Benefit"
 msgstr "Bénéfice"
 
-#: club/views.py
+#: club/views.py eboutic/templates/eboutic/eboutic_checkout.jinja
 msgid "Unit price"
 msgstr "Prix unitaire"
 
@@ -4381,6 +4382,18 @@ msgid "Remaining account amount: "
 msgstr "Solde restant : "
 
 #: eboutic/templates/eboutic/eboutic_checkout.jinja
+msgid "I have read and I accept"
+msgstr "J'ai lu et j'accepte"
+
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
+msgid "the general terms and conditions"
+msgstr "les conditions générales de vente"
+
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
+msgid "of the student association of the UTBM"
+msgstr "de l'Association des étudiants de l'UTBM"
+
+#: eboutic/templates/eboutic/eboutic_checkout.jinja
 msgid "Pay with credit card"
 msgstr "Payer avec une carte bancaire"
 
@@ -4535,10 +4548,6 @@ msgstr "Utilisateur se présentant"
 msgid "Blank vote"
 msgstr "Vote blanc"
 
-#: election/forms.py
-msgid "This role already exists for this election"
-msgstr "Ce rôle existe déjà pour cette élection"
-
 #: election/models.py
 msgid "clubs"
 msgstr "clubs"
@@ -4592,6 +4601,10 @@ msgstr ""
 "description, et l'attribution automatique des rôles après les élections."
 
 #: election/models.py
+msgid "This role already exists for this election"
+msgstr "Ce rôle existe déjà pour cette élection"
+
+#: election/models.py
 msgid "election list"
 msgstr "liste électorale"
 
@@ -4627,18 +4640,12 @@ msgid "Polls will open "
 msgstr "Les votes ouvriront "
 
 #: election/templates/election/election_detail.jinja
-msgid " at"
-msgstr " à"
+msgid "at"
+msgstr "à"
 
 #: election/templates/election/election_detail.jinja
 msgid "and will close "
 msgstr "et fermeront"
-
-#: election/templates/election/election_detail.jinja
-#: election/templates/election/election_list.jinja
-#: forum/templates/forum/macros.jinja
-msgid " at "
-msgstr " à "
 
 #: election/templates/election/election_detail.jinja
 msgid "Apply election result"
@@ -4692,6 +4699,11 @@ msgstr "Nouvelle élection"
 #: election/templates/election/election_list.jinja
 msgid "Applications open from"
 msgstr "Candidatures ouvertes à partir du"
+
+#: election/templates/election/election_list.jinja
+#: forum/templates/forum/macros.jinja
+msgid " at "
+msgstr " à "
 
 #: election/templates/election/election_list.jinja
 msgid "to"
