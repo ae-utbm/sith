@@ -4,6 +4,7 @@ import pytest
 from django.contrib.auth.models import Permission
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils.timezone import now
 from model_bakery import baker, seq
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertRedirects
@@ -239,7 +240,7 @@ class TestClubRoleUpdate(TestCase):
 
     def test_president_moves_itself_out_of_the_presidency(self):
         """Test that if the user moves its own role out of the presidency,
-        then it's redirected to another page and loses access to the update page."""
+        then it loses access to the update page."""
         self.payload["roles-0-is_presidency"] = False
         self.client.force_login(self.user)
         res = self.client.post(self.url, data=self.payload)
@@ -251,3 +252,29 @@ class TestClubRoleUpdate(TestCase):
 
         res = self.client.get(self.url)
         assert res.status_code == 403
+
+    def test_role_stops_being_board(self):
+        """Test that if a role stops being a board role,
+        its users lose the club board group."""
+        self.payload["roles-0-is_board"] = False
+        self.payload["roles-0-is_presidency"] = False
+        self.payload["roles-1-is_board"] = False
+        formset = ClubRoleFormSet(data=self.payload, instance=self.club)
+        assert formset.is_valid()
+        formset.save()
+        assert not self.user.groups.contains(self.club.board_group)
+
+    def test_role_becomes_board(self):
+        """Test that if a role becomes a board role,
+        its active users get the club board group"""
+        members = [
+            baker.make(Membership, club=self.club, role=self.roles[0], end_date=None),
+            baker.make(Membership, club=self.club, role=self.roles[0], end_date=now()),
+        ]
+        self.payload["roles-2-is_board"] = True
+        formset = ClubRoleFormSet(data=self.payload, instance=self.club)
+        assert formset.is_valid()
+        formset.save()
+        # the second membership is finished, so its user shouldn't get the role
+        assert members[0].user.groups.contains(self.club.board_group)
+        assert not members[1].user.groups.contains(self.club.board_group)

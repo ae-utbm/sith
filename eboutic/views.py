@@ -33,12 +33,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import SuspiciousOperation, ValidationError
 from django.db import DatabaseError, transaction
-from django.db.models import Subquery
+from django.db.models import Exists, OuterRef, Subquery
 from django.db.models.fields import forms
 from django.db.utils import cached_property
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils.formats import localize
+from django.utils.timezone import localtime
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 from django.views.generic import DetailView, FormView, TemplateView, UpdateView, View
@@ -56,7 +58,7 @@ from counter.models import (
     Selling,
     get_eboutic,
 )
-from eboutic.models import Basket, BasketItem, BillingInfoState, Invoice, InvoiceItem
+from eboutic.models import Basket, BasketItem, Invoice, InvoiceItem
 
 if TYPE_CHECKING:
     from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
@@ -90,7 +92,9 @@ class EbouticMainView(LoginRequiredMixin, FormView):
         kwargs["form_kwargs"] = {
             "customer": self.customer,
             "counter": get_eboutic(),
-            "allowed_prices": {price.id: price for price in self.prices},
+            "allowed_prices": {
+                price.id: price for price in self.prices if not price.sold_out
+            },
         }
         return kwargs
 
@@ -116,9 +120,14 @@ class EbouticMainView(LoginRequiredMixin, FormView):
 
     @cached_property
     def prices(self) -> list[Price]:
-        return get_eboutic().get_prices_for(
-            self.customer,
-            order_by=["product__product_type__order", "product_id", "amount"],
+        eboutic = get_eboutic()
+        sold_out_subquery = ~Exists(
+            eboutic.products.under_clic_limit().filter(id=OuterRef("product_id"))
+        )
+        return list(
+            eboutic.get_prices_for(self.customer)
+            .annotate(sold_out=sold_out_subquery)
+            .order_by("product__product_type__order", "product_id", "amount")
         )
 
     @cached_property
@@ -178,7 +187,7 @@ def payment_result(request, result: str) -> HttpResponse:
 class BillingInfoFormFragment(
     LoginRequiredMixin, FragmentMixin, SuccessMessageMixin, UpdateView
 ):
-    """Update billing info"""
+    """Update or create billing info"""
 
     model = BillingInfo
     form_class = BillingInfoForm
@@ -187,9 +196,7 @@ class BillingInfoFormFragment(
 
     def get_initial(self):
         if self.object is None:
-            return {
-                "country": Country(code="FR"),
-            }
+            return {"country": Country(code="FR")}
         return {}
 
     def render_fragment(self, request, **kwargs) -> SafeString:
@@ -211,26 +218,15 @@ class BillingInfoFormFragment(
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["billing_infos_state"] = BillingInfoState.from_model(self.object)
         kwargs["action"] = reverse("eboutic:billing_infos")
-        match BillingInfoState.from_model(self.object):
-            case BillingInfoState.EMPTY:
-                messages.warning(
-                    self.request,
-                    _(
-                        "You must fill your billing infos if you want to pay with your credit card"
-                    ),
-                )
-            case BillingInfoState.MISSING_PHONE_NUMBER:
-                messages.warning(
-                    self.request,
-                    _(
-                        "The Crédit Agricole changed its policy related to the billing "
-                        + "information that must be provided in order to pay with a credit card. "
-                        + "If you want to pay with your credit card, you must add a phone number "
-                        + "to the data you already provided.",
-                    ),
-                )
+        if not self.object:
+            messages.warning(
+                self.request,
+                _(
+                    "You must fill your billing infos "
+                    "if you want to pay with your credit card"
+                ),
+            )
         return kwargs
 
     def get_success_url(self, **kwargs):
@@ -255,10 +251,19 @@ class EbouticCheckout(CanViewMixin, UseFragmentsMixin, DetailView):
             kwargs["customer_amount"] = None
         kwargs["billing_infos"] = {}
 
-        with contextlib.suppress(BillingInfo.DoesNotExist):
-            kwargs["billing_infos"] = json.dumps(
-                dict(self.object.get_e_transaction_data())
+        if self.object.is_expired:
+            messages.error(self.request, _("Basket expired"))
+        else:
+            timeout = self.object.date + settings.SITH_EBOUTIC_BASKET_TIMEOUT
+            messages.warning(
+                self.request,
+                _("Basket available until %(until)s")
+                % {"until": localize(localtime(timeout).time())},
             )
+            with contextlib.suppress(BillingInfo.DoesNotExist):
+                kwargs["billing_infos"] = json.dumps(
+                    dict(self.object.get_e_transaction_data())
+                )
         return kwargs
 
 
@@ -268,9 +273,14 @@ class EbouticPayWithSith(CanViewMixin, SingleObjectMixin, View):
 
     def post(self, request, *args, **kwargs):
         basket = self.get_object()
+        if basket.is_expired:
+            messages.error(self.request, _("Basket expired"))
+            basket.delete()
+            return redirect("eboutic:payment_result", "failure")
         refilling = settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
         if basket.items.filter(product__product_type_id=refilling).exists():
             messages.error(self.request, _("You can't buy a refilling with sith money"))
+            basket.delete()
             return redirect("eboutic:payment_result", "failure")
 
         eboutic = get_eboutic()
@@ -288,6 +298,7 @@ class EbouticPayWithSith(CanViewMixin, SingleObjectMixin, View):
         except DatabaseError as e:
             sentry_sdk.capture_exception(e)
         except ValidationError as e:
+            basket.delete()
             messages.error(self.request, e.message)
         return redirect("eboutic:payment_result", "failure")
 

@@ -3,6 +3,7 @@ import urllib
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
+import freezegun
 from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
 from cryptography.hazmat.primitives.hashes import SHA1
@@ -17,7 +18,7 @@ from pytest_django.asserts import assertRedirects
 
 from core.baker_recipes import old_subscriber_user, subscriber_user
 from counter.baker_recipes import price_recipe, product_recipe
-from counter.models import Product, ProductType, Selling
+from counter.models import Product, ProductType, Refilling, Selling
 from counter.tests.test_counter import force_refill_user
 from eboutic.models import Basket, BasketItem
 
@@ -105,7 +106,7 @@ class TestPaymentSith(TestPaymentBase):
             ),
             reverse("eboutic:payment_result", kwargs={"result": "success"}),
         )
-        assert Basket.objects.filter(id=self.basket.id).first() is None
+        assert not Basket.objects.filter(id=self.basket.id).exists()
         self.customer.customer.refresh_from_db()
         assert self.customer.customer.amount == Decimal(1)
 
@@ -139,10 +140,7 @@ class TestPaymentSith(TestPaymentBase):
         assert len(messages) == 1
         assert messages[0].level == DEFAULT_LEVELS["ERROR"]
         assert messages[0].message == "Solde insuffisant"
-
-        assert Basket.objects.contains(self.basket), (
-            "After an unsuccessful request, the basket should be kept"
-        )
+        assert not Basket.objects.filter(id=self.basket.id).exists()
 
     def test_refilling_in_basket(self):
         BasketItem.from_price(self.refilling.prices.first(), 1, self.basket).save()
@@ -157,13 +155,31 @@ class TestPaymentSith(TestPaymentBase):
             response,
             reverse("eboutic:payment_result", kwargs={"result": "failure"}),
         )
-        assert Basket.objects.filter(id=self.basket.id).first() is not None
+        assert not Basket.objects.filter(id=self.basket.id).exists()
         messages = list(get_messages(response.wsgi_request))
         assert messages[0].level == DEFAULT_LEVELS["ERROR"]
         assert (
             messages[0].message
             == "Vous ne pouvez pas acheter un rechargement avec de l'argent du sith"
         )
+        self.customer.customer.refresh_from_db()
+        assert self.customer.customer.amount == initial_account_balance
+
+    def test_basket_expired(self):
+        self.client.force_login(self.customer)
+        initial_account_balance = self.customer.customer.amount
+        with freezegun.freeze_time(settings.SITH_EBOUTIC_BASKET_TIMEOUT):
+            response = self.client.post(
+                reverse("eboutic:pay_with_sith", kwargs={"basket_id": self.basket.id})
+            )
+        assertRedirects(
+            response,
+            reverse("eboutic:payment_result", kwargs={"result": "failure"}),
+        )
+        messages = list(get_messages(response.wsgi_request))
+        assert messages[0].level == DEFAULT_LEVELS["ERROR"]
+        assert messages[0].message == "Panier expiré"
+        assert not Basket.objects.filter(id=self.basket.id).exists()
         self.customer.customer.refresh_from_db()
         assert self.customer.customer.amount == initial_account_balance
 
@@ -236,6 +252,10 @@ class TestPaymentCard(TestPaymentBase):
 
         self.customer.customer.refresh_from_db()
         assert self.customer.customer.amount == price.amount * 2
+        refill = self.customer.customer.refillings.last()
+        assert refill is not None
+        assert refill.amount == price.amount * 2
+        assert refill.payment_method == Refilling.PaymentMethod.CARD
 
     def test_multiple_responses(self):
         bank_response = self.generate_bank_valid_answer(self.basket)

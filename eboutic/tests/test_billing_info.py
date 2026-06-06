@@ -37,12 +37,9 @@ class TestBillingInfo:
 
     def test_edit_infos(self, client: Client, payload: dict[str, str]):
         user = subscriber_user.make()
-        baker.make(BillingInfo, customer=user.customer)
+        baker.make(BillingInfo, customer=user.customer, phone_number="06 01 02 03 04")
         client.force_login(user)
-        response = client.post(
-            reverse("eboutic:billing_infos"),
-            payload,
-        )
+        response = client.post(reverse("eboutic:billing_infos"), payload)
         user.refresh_from_db()
         infos = BillingInfo.objects.get(customer__user=user)
         assert response.status_code == 302

@@ -20,41 +20,34 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import random
 
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
 from core.middleware import get_signal_request
 from core.models import OperationLog
-from counter.models import Counter, Refilling, Selling
+from counter.models import Refilling, Selling
 
 
-def write_log(instance, operation_type):
+def write_log(instance: Selling | Refilling, operation_type):
     def get_user():
         request = get_signal_request()
 
         if not request:
             return None
 
-        # Get a random barmen if deletion is from a counter
-        session = getattr(request, "session", {})
-        session_token = session.get("counter_token", None)
-        if session_token:
-            counter = Counter.objects.filter(token=session_token).first()
-            if counter and len(counter.barmen_list) > 0:
-                return counter.get_random_barman()
+        if request.barmen:
+            return random.choice(list(request.barmen))
 
         # Get the current logged user if not from a counter
-        if request.user and not request.user.is_anonymous:
+        if request.user.is_authenticated:
             return request.user
 
-        # Return None by default
         return None
 
     OperationLog(
-        label=str(instance),
-        operator=get_user(),
-        operation_type=operation_type,
+        label=str(instance), operator=get_user(), operation_type=operation_type
     ).save()
 
 

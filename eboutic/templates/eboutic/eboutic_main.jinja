@@ -30,7 +30,17 @@
 {% block content %}
   <h1 id="eboutic-title">{% trans %}Eboutic{% endtrans %}</h1>
 
-  <div id="eboutic" x-data="basket({{ last_purchase_time }})">
+  <div
+    id="eboutic"
+    x-data="basket(
+            [{%- for prices in categories -%}
+              {%- for p in prices -%}
+                {% if not p.sold_out %}{{ p.id }},{% endif %}
+              {%- endfor -%}
+            {%- endfor -%}],
+            {{ last_purchase_time }},
+            )"
+  >
     <div id="basket">
       <h3>Panier</h3>
       <form method="post" action="">
@@ -187,9 +197,10 @@
             {% for price in prices %}
               <button
                 id="{{ price.id }}"
-                class="card product-button clickable shadow"
+                class="card clickable shadow"
                 :class="{selected: basket.some((i) => i.priceId === {{ price.id }})}"
                 @click='addFromCatalog({{ price.id }}, {{ price.full_label|tojson }}, {{ price.amount }})'
+                {% if price.sold_out %}disabled{% endif %}
               >
                 {% if price.product.icon %}
                   <img
@@ -202,6 +213,9 @@
                 {% endif %}
                 <div class="card-content">
                   <h4 class="card-title">{{ price.full_label }}</h4>
+                  {% if price.sold_out -%}
+                    <p><em>{% trans %}Product sold out{% endtrans %}</em></p>
+                  {%- endif %}
                   <p>{{ price.amount }} €</p>
                 </div>
               </button>

@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import hmac
 from datetime import datetime
-from enum import Enum
 from typing import Self
 
 from dict2xml import dict2xml
@@ -24,6 +23,7 @@ from django.conf import settings
 from django.db import DataError, models
 from django.db.models import F, OuterRef, Subquery, Sum
 from django.utils.functional import cached_property
+from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 from core.models import User
@@ -37,30 +37,6 @@ from counter.models import (
     Selling,
     get_eboutic,
 )
-
-
-class BillingInfoState(Enum):
-    VALID = 1
-    EMPTY = 2
-    MISSING_PHONE_NUMBER = 3
-
-    @classmethod
-    def from_model(cls, info: BillingInfo | None) -> BillingInfoState:
-        if info is None:
-            return cls.EMPTY
-        for attr in [
-            "first_name",
-            "last_name",
-            "address_1",
-            "zip_code",
-            "city",
-            "country",
-        ]:
-            if getattr(info, attr) == "":
-                return cls.EMPTY
-        if info.phone_number is None:
-            return cls.MISSING_PHONE_NUMBER
-        return cls.VALID
 
 
 class Basket(models.Model):
@@ -94,6 +70,19 @@ class Basket(models.Model):
                 "total"
             ]
         )
+
+    @property
+    def is_expired(self) -> bool:
+        """Return True if this basket is expired.
+
+        An expired basket can no longer be used tp pay with sith account
+        or to start an etransaction.
+
+        Warnings:
+            Users have an additional time if they pay with an etransaction,
+            so an expired basket may be purchased after its expiration in that case.
+        """
+        return (self.date + settings.SITH_EBOUTIC_BASKET_TIMEOUT) <= now()
 
     def generate_sales(
         self, counter, seller: User, payment_method: Selling.PaymentMethod
@@ -133,15 +122,22 @@ class Basket(models.Model):
         ]
 
     def get_e_transaction_data(self) -> list[tuple[str, str]]:
+        """Get data for etransaction payment.
+
+        Raises:
+            Customer.DoesNotExist: if the user linked to this basket
+                has no customer account
+            BillingInfo.DoesNotExist: if the user linked to this basket has no
+                billing infos, or incorrect billing infos.
+            ValueError: if this is called on a basket which payment delay is expired.
+        """
         user = self.user
         if not hasattr(user, "customer"):
             raise Customer.DoesNotExist
+        if self.is_expired:
+            raise ValueError("This method cannot be called on an expired basket.")
         customer = user.customer
-        if (
-            not hasattr(user.customer, "billing_infos")
-            or BillingInfoState.from_model(user.customer.billing_infos)
-            != BillingInfoState.VALID
-        ):
+        if not hasattr(user.customer, "billing_infos"):
             raise BillingInfo.DoesNotExist
         cart = {
             "shoppingcart": {"total": {"totalQuantity": min(self.items.count(), 99)}}
@@ -155,6 +151,10 @@ class Basket(models.Model):
             ("PBX_IDENTIFIANT", settings.SITH_EBOUTIC_PBX_IDENTIFIANT),
             ("PBX_TOTAL", str(int(self.total * 100))),
             ("PBX_DEVISE", "978"),  # This is Euro
+            (
+                "PBX_DISPLAY",
+                str(int(settings.SITH_EBOUTIC_ETRANSACTION_TIMEOUT.total_seconds())),
+            ),
             ("PBX_CMD", str(self.id)),
             ("PBX_PORTEUR", user.email),
             ("PBX_RETOUR", "Amount:M;BasketID:R;Auto:A;Error:E;Sig:K"),
@@ -219,16 +219,14 @@ class Invoice(models.Model):
         if self.validated:
             raise DataError(_("Invoice already validated"))
         customer, _created = Customer.get_or_create(user=self.user)
-        kwargs = {
-            "counter": get_eboutic(),
-            "customer": customer,
-            "date": self.date,
-            "payment_method": Selling.PaymentMethod.CARD,
-        }
+        kwargs = {"counter": get_eboutic(), "customer": customer, "date": self.date}
         for i in self.items.select_related("product"):
             if i.product.product_type_id == settings.SITH_COUNTER_PRODUCTTYPE_REFILLING:
                 Refilling.objects.create(
-                    **kwargs, operator=self.user, amount=i.unit_price * i.quantity
+                    **kwargs,
+                    operator=self.user,
+                    amount=i.unit_price * i.quantity,
+                    payment_method=Refilling.PaymentMethod.CARD,
                 )
             else:
                 Selling.objects.create(
@@ -239,6 +237,7 @@ class Invoice(models.Model):
                     seller=self.user,
                     unit_price=i.unit_price,
                     quantity=i.quantity,
+                    payment_method=Selling.PaymentMethod.CARD,
                 )
         self.validated = True
         self.save()

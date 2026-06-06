@@ -5,6 +5,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 
+from club.models import Club, ClubRole, Membership
 from core.models import Group, User
 
 
@@ -13,6 +14,12 @@ class Election(models.Model):
 
     title = models.CharField(_("title"), max_length=255)
     description = models.TextField(_("description"), null=True, blank=True)
+    clubs = models.ManyToManyField(
+        Club,
+        related_name="elections",
+        verbose_name=_("clubs"),
+        help_text=_("The club(s) this election is held for."),
+    )
     start_candidature = models.DateTimeField(_("start candidature"), blank=False)
     end_candidature = models.DateTimeField(_("end candidature"), blank=False)
     start_date = models.DateTimeField(_("start date"), blank=False)
@@ -94,9 +101,18 @@ class Election(models.Model):
             results[role.title] = role.results(total_vote)
         return results
 
+    @cached_property
+    def results_applied(self) -> bool:
+        """Returns True if one or more roles of this election have been applied."""
+        return Membership.objects.filter(
+            role__election_roles__election=self,
+            end_date=None,
+            start_date__gte=self.end_date,
+        ).exists()
+
 
 class Role(OrderedModel):
-    """This class allows to create a new role avaliable for a candidature."""
+    """This class allows to create a new role available for a candidature."""
 
     election = models.ForeignKey(
         Election,
@@ -105,17 +121,42 @@ class Role(OrderedModel):
         on_delete=models.CASCADE,
     )
     title = models.CharField(_("title"), max_length=255)
-    description = models.TextField(_("description"), null=True, blank=True)
-    max_choice = models.IntegerField(_("max choice"), default=1)
+    description = models.TextField(_("description"), default="", blank=True)
+    max_choice = models.PositiveSmallIntegerField(_("max choice"), default=1)
+    club_role = models.ForeignKey(
+        ClubRole,
+        related_name="election_roles",
+        verbose_name=_("club role"),
+        help_text=_(
+            "A club role. Filling this will allow automatic "
+            "completion of title and description, "
+            "and automatic assignation after the elections."
+        ),
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+
+    order_with_respect_to = "election"
+
+    class Meta(OrderedModel.Meta):
+        constraints = [
+            models.UniqueConstraint(
+                fields=["title", "election"],
+                name="title_election_unique_constraint",
+                violation_error_message=_("This role already exists for this election"),
+                violation_error_code="invalid",
+            )
+        ]
 
     def __str__(self):
         return f"{self.title} - {self.election.title}"
 
     def results(self, total_vote: int) -> dict[str, dict[str, int | float]]:
         if total_vote == 0:
-            candidates = self.candidatures.values_list("user__username")
+            candidates = self.candidatures.values_list("user__username", flat=True)
             return {
-                key: {"vote": 0, "percent": 0} for key in ["blank_votes", *candidates]
+                key: {"vote": 0, "percent": 0} for key in ["blank vote", *candidates]
             }
         total_vote *= self.max_choice
         results = {"total vote": total_vote}

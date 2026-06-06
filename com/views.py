@@ -170,7 +170,7 @@ class NewsUpdateView(PermissionOrAuthorRequiredMixin, UpdateView):
     form_class = NewsForm
     template_name = "com/news_edit.jinja"
     pk_url_kwarg = "news_id"
-    permission_required = "com.edit_news"
+    permission_required = "com.change_news"
 
     def form_valid(self, form):
         response = super().form_valid(form)  # Does the saving part

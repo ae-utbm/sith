@@ -1,0 +1,51 @@
+<div id="apply-election-result-fragment">
+  {% if not form.candidates.field.choices %}
+    <em>{% trans %}No result to apply{% endtrans %}</em>
+    <p>
+      {% trans trimmed %}
+        This may be because no role of this election
+        was linked to a club role.
+      {% endtrans %}
+    </p>
+  {% elif form.election.results_applied %}
+    <em>
+      {%- trans trimmed -%}
+        The results of this election have been applied
+      {%- endtrans -%}
+    </em>
+    <p>
+      {% for club in clubs %}
+        <a href="{{ url("club:club_members", club_id=club.id) }}" class="btn btn-blue">
+          <i class="fa fa-arrow-up-right-from-square"></i>
+          {% trans club=club.name %}{{ club }} members{% endtrans %}
+        </a>
+      {% endfor %}
+    </p>
+  {% else %}
+    <div class="alert alert-yellow">
+      <div class="alert-main">
+        <strong class="alert-title">{% trans %}Warning{% endtrans %}</strong>
+        <p>
+          {%- trans trimmed -%}
+            Only election roles linked to a club role will be automatically applied.
+          {%- endtrans -%}
+        </p>
+        <p>
+          {%- trans trimmed -%}
+            Don't forget to manually apply the eventual remaining roles afterward.
+          {%- endtrans -%}
+        </p>
+      </div>
+    </div>
+    <form
+      hx-post="{{ url("election:apply_result", election_id=form.election.id) }}"
+      hx-swap="outerHTML"
+      hx-target="#apply-election-result-fragment"
+      hx-disabled-elt="find input[type='submit']"
+    >
+      {% csrf_token %}
+      {{ form }}
+      <input type="submit" class="btn btn-blue">
+    </form>
+  {% endif %}
+</div>

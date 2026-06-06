@@ -21,10 +21,13 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import itertools
+from operator import attrgetter
 
 from django import forms
 from django.db.models import Exists, OuterRef, Q, QuerySet
 from django.db.models.functions import Lower
+from django.forms.models import ModelChoiceField, ModelChoiceIterator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -44,6 +47,37 @@ from core.views.widgets.ajax_select import (
 )
 from counter.models import Counter, Selling
 from counter.schemas import SaleFilterSchema
+
+
+class ClubRoleChoiceIterator(ModelChoiceIterator):
+    """Custom `ModelChoiceIterator` for `ClubRoleChoiceField`"""
+
+    def __iter__(self):
+        if self.field.empty_label is not None:
+            yield "", self.field.empty_label
+        queryset = self.queryset.select_related("club").order_by("club", "order")
+        groups = [
+            (club, [self.choice(role) for role in roles])
+            for club, roles in itertools.groupby(queryset, key=attrgetter("club"))
+        ]
+        if len(groups) == 1:
+            # there is only one club involved, no need to have optgroups
+            yield from groups[0][1]
+        else:
+            # there are multiple clubs, optgroups are necessary to differentiate
+            # roles having the same name
+            yield from groups
+
+
+class ClubRoleChoiceField(ModelChoiceField):
+    """Custom `ModelChoiceField` for `[ClubRole][club.models.ClubRole]`.
+
+    If only one club is involved, behave like the base `ModelChoiceField`.
+    If dealing with the roles of multiple clubs, group the roles
+    into a different `optgroup` for each club.
+    """
+
+    iterator = ClubRoleChoiceIterator
 
 
 class ClubLinkForm(forms.ModelForm):
@@ -391,6 +425,30 @@ class ClubRoleForm(forms.ModelForm):
         if "ORDER" in cleaned_data:
             self.instance.order = cleaned_data["ORDER"] - 1
         return cleaned_data
+
+    def save(self, commit=True):  # noqa: FBT002
+        instance: ClubRole = super().save(commit=commit)
+        if commit and "is_board" in self.changed_data:
+            # if the role was moved from board to simple member,
+            # remove all users with that role from the club board group.
+            # If the role became a board role, add users with
+            # that role to the club board group.
+            group_id = instance.club.board_group_id
+            if self.cleaned_data["is_board"]:
+                User.groups.through.objects.bulk_create(
+                    [
+                        User.groups.through(user_id=u, group_id=group_id)
+                        for u in Membership.objects.ongoing()
+                        .filter(role=instance)
+                        .values_list("user_id", flat=True)
+                    ],
+                    ignore_conflicts=True,
+                )
+            else:
+                User.groups.through.objects.filter(
+                    user__memberships__role=instance, group_id=group_id
+                ).delete()
+        return instance
 
 
 class ClubRoleCreateForm(forms.ModelForm):

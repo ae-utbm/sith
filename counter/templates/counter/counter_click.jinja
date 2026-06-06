@@ -56,10 +56,15 @@
         <div class="accordion-content">
           {% set counter_click_url = url('counter:click', counter_id=counter.id, user_id=customer.user_id) %}
 
-          <form method="post" action=""
-                class="code_form" @submit.prevent="handleCode">
+          <form method="post" action="" @submit.prevent="handleCode">
 
-            <counter-product-select name="code" x-ref="codeField" autofocus required placeholder="{% trans %}Select a product...{% endtrans %}">
+            <counter-product-select
+              name="code"
+              x-ref="codeField"
+              autofocus
+              required
+              placeholder="{% trans %}Select a product...{% endtrans %}"
+            >
               <option value=""></option>
               <optgroup label="{% trans %}Operations{% endtrans %}">
                 <option value="FIN">{% trans %}Confirm (FIN){% endtrans %}</option>
@@ -68,13 +73,11 @@
               {%- for category, prices in categories.items() -%}
                 <optgroup label="{{ category }}">
                   {%- for price in prices -%}
-                    <option value="{{ price.id }}">{{ price.full_label }}</option>
+                    <option value="{{ price.id }}">{{ price.full_label }} ({{ price.product.code }})</option>
                   {%- endfor -%}
                 </optgroup>
               {%- endfor -%}
             </counter-product-select>
-
-            <input type="submit" value="{% trans %}Go{% endtrans %}"/>
           </form>
 
           {% for error in form.non_form_errors() %}
@@ -102,7 +105,9 @@
               {{ form.management_form }}
             </div>
             <ul>
-              <li x-show="getBasketSize() === 0">{% trans %}This basket is empty{% endtrans %}</li>
+              <li x-show="getBasketSize() === 0">
+                <em>{% trans %}This basket is empty{% endtrans %}</em>
+              </li>
               <template x-for="(item, index) in Object.values(basket)" :key="item.product.price.id">
                 <li>
                   <template x-for="error in item.errors">
@@ -110,19 +115,23 @@
                     </div>
                   </template>
 
-                  <button @click.prevent="addToBasket(item.product.price.id, -1)">-</button>
-                  <span class="quantity" x-text="item.quantity"></span>
-                  <button @click.prevent="addToBasket(item.product.price.id, 1)">+</button>
+                  <div class="basket-row">
+                    <div>
+                      <button @click.prevent="addToBasket(item.product.price.id, -1)">-</button>
+                      <span class="quantity" x-text="item.quantity"></span>
+                      <button @click.prevent="addToBasket(item.product.price.id, 1)">+</button>
+                    </div>
 
-                  <span x-text="item.product.name"></span> :
-                  <span x-text="item.sum().toLocaleString(undefined, { minimumFractionDigits: 2 })">€</span>
-                  <span x-show="item.getBonusQuantity() > 0"
-                        x-text="`${item.getBonusQuantity()} x P`"></span>
+                    <span class="product-name" x-text="item.product.name"></span>
+                    <span x-text="`${item.sum().toLocaleString(undefined, { minimumFractionDigits: 2 })} €`"></span>
+                    <span x-show="item.getBonusQuantity() > 0"
+                          x-text="`${item.getBonusQuantity()} x P`"></span>
 
-                  <button
-                    class="remove-item"
-                    @click.prevent="removeFromBasket(item.product.price.id)"
-                  ><i class="fa fa-trash-can delete-action"></i></button>
+                    <button
+                      class="remove-item"
+                      @click.prevent="removeFromBasket(item.product.price.id)"
+                    ><i class="fa fa-trash-can delete-action"></i></button>
+                  </div>
 
                   <input
                     type="hidden"

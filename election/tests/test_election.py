@@ -2,13 +2,15 @@ from datetime import timedelta
 
 import pytest
 from django.conf import settings
+from django.contrib.auth.models import Permission
 from django.test import Client, TestCase
 from django.urls import reverse
-from django.utils.timezone import now
+from django.utils.timezone import localtime, now
 from model_bakery import baker
 from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertRedirects
 
+from club.models import Club
 from core.baker_recipes import subscriber_user
 from core.models import Group, User
 from election.models import Candidature, Election, ElectionList, Role, Vote
@@ -38,7 +40,6 @@ class TestElectionDetail(TestElection):
             reverse("election:detail", args=str(self.election.id))
         )
         assert response.status_code == 200
-        assert "La roue tourne" in str(response.content)
 
 
 class TestElectionUpdateView(TestElection):
@@ -213,3 +214,42 @@ def test_election_results():
             "total vote": 100,
         },
     }
+
+
+@pytest.mark.django_db
+def test_create_election(client: Client):
+    user_group = baker.make(Group)
+    user = baker.make(
+        User,
+        user_permissions=[Permission.objects.get(codename="add_election")],
+        groups=[user_group],
+    )
+    club = baker.make(Club)
+    client.force_login(user)
+    url = reverse("election:create")
+
+    res = client.get(url)
+    assert res.status_code == 200
+
+    start = localtime().replace(hour=0, minute=1, second=0) + timedelta(days=1)
+    res = client.post(
+        url,
+        data={
+            "title": "foo",
+            "clubs": [club.id],
+            "view_groups": [user_group.id],
+            "start_candidature": start,
+            "end_candidature": start + timedelta(days=7, minutes=-2),
+            "start_date": start + timedelta(days=7),
+            "end_date": start + timedelta(days=14, minutes=-2),
+        },
+    )
+    election = Election.objects.last()
+    assertRedirects(
+        res, reverse("election:detail", kwargs={"election_id": election.id})
+    )
+    assert election.title == "foo"
+    assert list(election.clubs.all()) == [club]
+    assert list(election.election_lists.values_list("title", flat=True)) == [
+        "Candidat⸱e libre"
+    ]

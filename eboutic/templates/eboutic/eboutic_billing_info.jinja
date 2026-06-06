@@ -21,9 +21,10 @@
       hx-swap="outerHTML"
       hx-target="#billing-infos-fragment"
       x-show="collapsed"
+      x-cloak
     >
       {% csrf_token %}
-      {{ form.as_p() }}
+      {{ form }}
       <br>
       <input
         type="submit" class="btn btn-blue clickable"

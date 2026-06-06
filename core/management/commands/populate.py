@@ -20,7 +20,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from io import StringIO
 from pathlib import Path
 from typing import ClassVar, NamedTuple
@@ -33,7 +33,8 @@ from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db.models import Q
 from django.utils import timezone
-from django.utils.timezone import localdate
+from django.utils.lorem_ipsum import paragraphs
+from django.utils.timezone import localdate, now
 from PIL import Image
 
 from club.models import Club, ClubLink, ClubRole, LinkType, Membership
@@ -43,13 +44,14 @@ from core.models import BanGroup, Group, Page, PageRev, SithFile, User
 from core.utils import resize_image
 from counter.models import (
     Counter,
+    CounterSellers,
     Price,
     Product,
     ProductType,
     ReturnableProduct,
     StudentCard,
 )
-from election.models import Candidature, Election, ElectionList, Role
+from election.models import Candidature, Election, ElectionList, Role, Vote
 from forum.models import Forum
 from pedagogy.models import UE
 from sas.models import Album, PeoplePictureRelation, Picture
@@ -364,62 +366,15 @@ class Command(BaseCommand):
         Counter.objects.create(name="Carte AE", club=clubs.refound, type="OFFICE")
 
         # Add barman to counter
-        Counter.sellers.through.objects.bulk_create(
+        CounterSellers.objects.bulk_create(
             [
-                Counter.sellers.through(counter_id=1, user=skia),  # MDE
-                Counter.sellers.through(counter_id=2, user=krophil),  # Foyer
+                CounterSellers(counter_id=1, user=skia, is_regular=True),  # MDE
+                CounterSellers(counter_id=2, user=krophil, is_regular=True),  # Foyer
             ]
         )
 
         # Create an election
-        el = Election.objects.create(
-            title="Élection 2017",
-            description="La roue tourne",
-            start_candidature="1942-06-12 10:28:45+01",
-            end_candidature="2042-06-12 10:28:45+01",
-            start_date="1942-06-12 10:28:45+01",
-            end_date="7942-06-12 10:28:45+01",
-        )
-        el.view_groups.add(groups.public)
-        el.edit_groups.add(clubs.ae.board_group)
-        el.candidature_groups.add(groups.subscribers)
-        el.vote_groups.add(groups.subscribers)
-        liste = ElectionList.objects.create(title="Candidature Libre", election=el)
-        listeT = ElectionList.objects.create(title="Troll", election=el)
-        pres = Role.objects.create(
-            election=el, title="Président AE", description="Roi de l'AE"
-        )
-        resp = Role.objects.create(
-            election=el, title="Co Respo Info", max_choice=2, description="Ghetto++"
-        )
-        Candidature.objects.bulk_create(
-            [
-                Candidature(
-                    role=resp,
-                    user=skia,
-                    election_list=liste,
-                    program="Refesons le site AE",
-                ),
-                Candidature(
-                    role=resp,
-                    user=sli,
-                    election_list=liste,
-                    program="Vasy je deviens mon propre adjoint",
-                ),
-                Candidature(
-                    role=resp,
-                    user=krophil,
-                    election_list=listeT,
-                    program="Le Pôle Troll !",
-                ),
-                Candidature(
-                    role=pres,
-                    user=sli,
-                    election_list=listeT,
-                    program="En fait j'aime pas l'info, je voulais faire GMC",
-                ),
-            ]
-        )
+        self._create_elections(groups, clubs, skia, sli, krophil)
 
         # Forum
         room = Forum.objects.create(
@@ -1010,3 +965,132 @@ class Command(BaseCommand):
         BanGroup.objects.create(name="Banned from buying alcohol", description="")
         BanGroup.objects.create(name="Banned from counters", description="")
         BanGroup.objects.create(name="Banned to subscribe", description="")
+
+    def _create_elections(
+        self,
+        groups: PopulatedGroups,
+        clubs: PopulatedClubs,
+        skia: User,
+        sli: User,
+        krophil: User,
+    ):
+        """Populate elections.
+
+        4 elections are created :
+
+        - one that has not started yet,
+        - one on the candidature period
+        - one on the vote period
+        - one that is finished
+
+        All elections have two lists, are linked to the AE and Troll clubs,
+        and have one role for each board role of thos two clubs, plus
+        an additional role linked to no club roles.
+
+        The ongoing vote and finished elections have candidates.
+
+        The finished election has 10 voters.
+        """
+
+        def election_factory(title: str, start_candidature: datetime):
+            return Election(
+                title=title,
+                description="",
+                start_candidature=start_candidature,
+                end_candidature=start_candidature + timedelta(days=7),
+                start_date=start_candidature + timedelta(days=7),
+                end_date=start_candidature + timedelta(days=14),
+            )
+
+        # create the elections
+        elections = Election.objects.bulk_create(
+            [
+                election_factory("Election terminée", now() - timedelta(days=14)),
+                election_factory("Votes en cours", now() - timedelta(days=7)),
+                election_factory("Candidatures en cours", now()),
+                election_factory("Election à venir", now() + timedelta(days=7)),
+            ]
+        )
+        finished, ongoing_vote, _ongoing_candidature, _not_started = elections
+
+        # set the groups (all elections have the same groups)
+        groups.public.viewable_elections.set(elections)
+        clubs.ae.board_group.editable_elections.set(elections)
+        groups.subscribers.candidate_elections.set(elections)
+        groups.subscribers.votable_elections.set(elections)
+
+        # link elections to clubs (AE and Troll for all elections)
+        Election.clubs.through.objects.bulk_create(
+            [
+                *[Election.clubs.through(club=clubs.ae, election=e) for e in elections],
+                *[
+                    Election.clubs.through(club=clubs.troll, election=e)
+                    for e in elections
+                ],
+            ]
+        )
+
+        # Create lists (all elections have two lists)
+        ElectionList.objects.bulk_create(
+            [
+                *[ElectionList(title="Candidat libre", election=e) for e in elections],
+                *[ElectionList(title="Troll", election=e) for e in elections],
+            ]
+        )
+
+        # Create roles.
+        # Elections have a role for each board club role of AE and Troll,
+        # +an additional role linked to no club role
+        club_roles = list(
+            ClubRole.objects.filter(club__in=[clubs.ae, clubs.troll], is_board=True)
+            .select_related("club")
+            .order_by("club_id", "order")
+        )
+        Role.objects.bulk_create(
+            [
+                *[
+                    Role(election=e, title=f"{r.name} {r.club.name}", club_role=r)
+                    for r in club_roles
+                    for e in elections
+                ],
+                *[Role(election=e, title="Rôle libre") for e in elections],
+            ]
+        )
+
+        # create candidatures for ongoing_vote and finished elections
+        candidatures = []
+        lipsum = "\n\n".join(paragraphs(2))
+        for election in ongoing_vote, finished:
+            lists = list(election.election_lists.order_by("id"))
+            roles = list(election.roles.order_by("order")[:3])
+            candidatures.extend(
+                [
+                    Candidature(
+                        role=roles[0], user=skia, election_list=lists[0], program=lipsum
+                    ),
+                    Candidature(
+                        role=roles[1], user=sli, election_list=lists[0], program=lipsum
+                    ),
+                    Candidature(
+                        role=roles[2], user=krophil, election_list=lists[1], program=""
+                    ),
+                    Candidature(
+                        role=roles[2], user=sli, election_list=lists[0], program=lipsum
+                    ),
+                ]
+            )
+        candidatures = Candidature.objects.bulk_create(candidatures)
+
+        skia, sli_vp, krophil, sli_treso = candidatures[4:]  # candidates of finished
+        votes = Vote.objects.bulk_create(
+            [
+                *[Vote(role=skia.role) for _ in range(6)],
+                *[Vote(role=sli_vp.role) for _ in range(8)],
+                *[Vote(role=krophil.role) for _ in range(9)],
+            ]
+        )
+        skia.votes.set(votes[:6])
+        sli_vp.votes.set(votes[6:14])
+        krophil.votes.set(votes[14:20])
+        sli_treso.votes.set(votes[20:23])
+        finished.voters.set(list(User.objects.all()[:10]))
