@@ -24,7 +24,7 @@ from django.shortcuts import get_object_or_404, redirect, resolve_url
 from django.urls import reverse
 from django.utils.safestring import SafeString
 from django.utils.translation import gettext as _
-from django.views.generic import FormView
+from django.views.generic import CreateView, FormView
 from django.views.generic.detail import SingleObjectMixin
 from ninja.main import HttpRequest
 
@@ -32,7 +32,14 @@ from core.auth.mixins import CanViewMixin
 from core.models import User
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
 from counter.forms import BasketForm, RefillForm
-from counter.models import Counter, Customer, ProductFormula, ReturnableProduct, Selling
+from counter.models import (
+    Counter,
+    Customer,
+    ProductFormula,
+    Refilling,
+    ReturnableProduct,
+    Selling,
+)
 from counter.utils import is_logged_in_counter
 from counter.views.mixins import CounterTabsMixin
 from counter.views.student_card import StudentCardFormFragment
@@ -219,9 +226,10 @@ class CounterClick(
         return kwargs
 
 
-class RefillingCreateView(FragmentMixin, FormView):
+class RefillingCreateView(FragmentMixin, CreateView):
     """This is a fragment only view which integrates with counter_click.jinja"""
 
+    model = Refilling
     form_class = RefillForm
     template_name = "counter/fragments/create_refill.jinja"
 
@@ -242,23 +250,20 @@ class RefillingCreateView(FragmentMixin, FormView):
         ):
             raise PermissionDenied
 
-        self.operator = get_operator(request, self.counter, self.customer)
-
         return super().dispatch(request, *args, **kwargs)
 
     def render_fragment(self, request, **kwargs) -> SafeString:
         self.customer = kwargs.pop("customer")
         self.counter = kwargs.pop("counter")
+        self.object = None
         return super().render_fragment(request, **kwargs)
 
-    def form_valid(self, form):
-        res = super().form_valid(form)
-        form.clean()
-        form.instance.counter = self.counter
-        form.instance.operator = self.operator
-        form.instance.customer = self.customer
-        form.instance.save()
-        return res
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {
+            "counter": self.counter,
+            "operator": get_operator(self.request, self.counter, self.customer),
+            "customer": self.customer,
+        }
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)

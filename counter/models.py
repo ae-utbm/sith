@@ -881,6 +881,14 @@ class Refilling(models.Model):
             return False
         return user.is_owner(self.counter) and self.payment_method != "CARD"
 
+    def clean(self):
+        super().clean()
+        if self.amount + self.customer.amount > settings.SITH_ACCOUNT_MAX_MONEY:
+            raise ValidationError(
+                _("There cannot be more than %(money)d€ on an AE account")
+                % {"money": settings.SITH_ACCOUNT_MAX_MONEY}
+            )
+
     def delete(self, *args, **kwargs):
         self.customer.amount -= self.amount
         self.customer.save()

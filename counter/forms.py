@@ -6,6 +6,7 @@ from datetime import date, datetime, timezone
 
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Q
 from django.forms import BaseModelFormSet
@@ -168,18 +169,19 @@ class RefillForm(forms.ModelForm):
 
     error_css_class = "error"
     required_css_class = "required"
-    amount = forms.FloatField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "focus"})
-    )
 
     class Meta:
         model = Refilling
         fields = ["amount", "payment_method"]
         widgets = {"payment_method": forms.RadioSelect}
 
-    def __init__(self, *args, **kwargs):
+    def __init__(
+        self, *args, counter: Counter, operator: User, customer: Customer, **kwargs
+    ):
         super().__init__(*args, **kwargs)
-
+        max_value = settings.SITH_ACCOUNT_MAX_MONEY - customer.amount
+        # server-side max_value validation is done by Refilling.clean
+        self.fields["amount"].widget.attrs["max"] = max_value
         self.fields["payment_method"].choices = (
             method
             for method in self.fields["payment_method"].choices
@@ -187,6 +189,9 @@ class RefillForm(forms.ModelForm):
         )
         if self.fields["payment_method"].initial not in self.allowed_refilling_methods:
             self.fields["payment_method"].initial = self.allowed_refilling_methods[0]
+        self.instance.counter = counter
+        self.instance.operator = operator
+        self.instance.customer = customer
 
 
 class CounterEditForm(forms.ModelForm):
