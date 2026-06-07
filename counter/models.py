@@ -28,7 +28,7 @@ from dict2xml import dict2xml
 from django.conf import settings
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.db.models import Exists, F, OuterRef, Q, QuerySet, Subquery, Sum, Value
+from django.db.models import Exists, F, Max, OuterRef, Q, QuerySet, Subquery, Sum, Value
 from django.db.models.functions import Coalesce, Concat, Length
 from django.forms import ValidationError
 from django.urls import reverse
@@ -99,7 +99,9 @@ class Customer(models.Model):
 
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     account_id = models.CharField(_("account id"), max_length=10, unique=True)
-    amount = CurrencyField(_("amount"), default=0)
+    amount = CurrencyField(
+        _("amount"), max_value=settings.SITH_ACCOUNT_MAX_MONEY, default=0
+    )
 
     objects = CustomerQuerySet.as_manager()
 
@@ -156,13 +158,15 @@ class Customer(models.Model):
             unique_fields=["customer", "returnable"],
         )
 
-    @property
+    @cached_property
     def can_buy(self) -> bool:
         """Check if whether this customer has the right to purchase any item."""
-        subscription = self.user.subscriptions.order_by("subscription_end").last()
-        if subscription is None:
+        subscription_end = self.user.subscriptions.aggregate(
+            res=Max("subscription_end")
+        ).get("res")
+        if subscription_end is None:
             return False
-        return (date.today() - subscription.subscription_end) < timedelta(days=90)
+        return (date.today() - subscription_end) < timedelta(days=90)
 
     @classmethod
     def get_or_create(cls, user: User) -> tuple[Customer, bool]:
@@ -823,7 +827,7 @@ class Refilling(models.Model):
     counter = models.ForeignKey(
         Counter, related_name="refillings", blank=False, on_delete=models.CASCADE
     )
-    amount = CurrencyField(_("amount"))
+    amount = CurrencyField(_("amount"), min_value=0.01)
     operator = models.ForeignKey(
         User,
         related_name="refillings_as_operator",
