@@ -1,8 +1,7 @@
 from typing import TYPE_CHECKING, Callable
 
-from django.db.models import Exists, OuterRef
 from django.http import HttpRequest, HttpResponse
-from django.utils.functional import SimpleLazyObject, empty
+from django.utils.functional import SimpleLazyObject
 
 from core.models import User
 from counter.models import Permanency
@@ -11,20 +10,31 @@ if TYPE_CHECKING:
     from django.contrib.sessions.backends.base import SessionBase
 
 
-SESSION_BARMEN_KEY = "barmen_ids"
+SESSION_PERMANENCES_KEY = "permanence_ids"
 
 
 def get_cached_barmen(request: HttpRequest) -> set[User]:
     if not hasattr(request, "_cached_barmen"):
         session: SessionBase = request.session
-        barmen_ids = session.get(SESSION_BARMEN_KEY, [])
-        if barmen_ids:
-            request._cached_barmen = set(
-                User.objects.filter(
-                    Exists(Permanency.objects.filter(user=OuterRef("pk"), end=None)),
-                    id__in=barmen_ids,
-                )
+
+        if session_ids := session.get(SESSION_PERMANENCES_KEY, None):
+            # Get ongoing permanences which id is in session.
+            # Note : we store permanence ids rather than user id to be sure
+            # not to wrongfully mark someone as logged here,
+            # even if it logged out then logged in elsewhere.
+            permanences = (
+                Permanency.objects.filter(end=None, id__in=session_ids)
+                .order_by("id")
+                .select_related("user")
             )
+
+            # if the list of permanences occurring on this device has changed
+            # since the last page load, change the ids stored in session
+            real_ids = [p.id for p in permanences]
+            if real_ids != session_ids:
+                session[SESSION_PERMANENCES_KEY] = real_ids
+
+            request._cached_barmen = {p.user for p in permanences}
         else:
             request._cached_barmen = set()
 
@@ -53,12 +63,4 @@ class BarmenMiddleware:
     def __call__(self, request: HttpRequest):
         request.barmen = SimpleLazyObject(lambda: get_cached_barmen(request))
 
-        response = self.get_response(request)
-
-        if request.barmen._wrapped is not empty and {
-            b.id for b in request.barmen
-        } != set(request.session.get(SESSION_BARMEN_KEY, [])):
-            # update the session data only if `session.barmen`
-            # has been accessed and modified.
-            request.session[SESSION_BARMEN_KEY] = [b.id for b in request.barmen]
-        return response
+        return self.get_response(request)

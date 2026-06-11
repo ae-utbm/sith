@@ -3218,6 +3218,10 @@ msgid "You are already logged in another counter."
 msgstr "Vous êtes déjà connecté à un autre comptoir."
 
 #: counter/forms.py
+msgid "You are already logged on another device"
+msgstr "Vous êtes déjà connecté sur un autre appareil"
+
+#: counter/forms.py
 msgid "Regular barmen"
 msgstr "Barmen réguliers"
 
