@@ -32,7 +32,8 @@ class CurrencyField(models.DecimalField):
             res.append(MinValueValidator(self.min_value))
         return [*super().validators, *res]
 
-    def check(self, **kwargs):
+    def check(self, **kwargs):  # pragma: no cover
+        # this is executed during runserver, but won't run in prod
         errors = super().check(**kwargs)
         for name, val in ("min_value", self.min_value), ("max_value", self.max_value):
             if not val:

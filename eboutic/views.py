@@ -70,6 +70,26 @@ class BaseEbouticBasketForm(BaseBasketForm):
         # Disable money check
         ...
 
+    def _check_refills(self):
+        """Check that this basket won't put customer balance above the limit."""
+        refill_type_id = settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
+        total_refill = sum(
+            f.price.amount * f.cleaned_data["quantity"]
+            for f in self.forms
+            if f.price.product.product_type_id == refill_type_id
+        )
+        total_other = sum(
+            f.price.amount * f.cleaned_data["quantity"]
+            for f in self.forms
+            if f.price.product.product_type_id != refill_type_id
+        )
+        limit = settings.SITH_ACCOUNT_MAX_MONEY
+        if (total_refill - total_other + self.customer.amount) > limit:
+            raise ValidationError(
+                _("There cannot be more than %(money)d€ on an AE account")
+                % {"money": limit}
+            )
+
 
 EbouticBasketForm = forms.formset_factory(
     BasketItemForm, formset=BaseEbouticBasketForm, absolute_max=None, min_num=1
@@ -88,15 +108,15 @@ class EbouticMainView(LoginRequiredMixin, FormView):
     form_class = EbouticBasketForm
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["form_kwargs"] = {
+        return super().get_form_kwargs() | {
             "customer": self.customer,
             "counter": get_eboutic(),
-            "allowed_prices": {
-                price.id: price for price in self.prices if not price.sold_out
+            "form_kwargs": {
+                "allowed_prices": {
+                    price.id: price for price in self.prices if not price.sold_out
+                }
             },
         }
-        return kwargs
 
     def form_valid(self, formset):
         if len(formset) == 0:

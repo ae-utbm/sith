@@ -73,13 +73,13 @@ class CounterClick(
     current_tab = "counter"
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["form_kwargs"] = {
+        return super().get_form_kwargs() | {
             "customer": self.customer,
             "counter": self.object,
-            "allowed_prices": {price.id: price for price in self.prices},
+            "form_kwargs": {
+                "allowed_prices": {price.id: price for price in self.prices}
+            },
         }
-        return kwargs
 
     def dispatch(self, request, *args, **kwargs):
         self.customer = get_object_or_404(Customer, user_id=self.kwargs["user_id"])

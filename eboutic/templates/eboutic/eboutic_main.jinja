@@ -58,6 +58,17 @@
             </div>
           </div>
         {% endif %}
+        <template x-if="(getTotalRefill() + {{ customer_amount }}) > {{ settings.SITH_ACCOUNT_MAX_MONEY }}">
+          <div class="alert alert-red">
+            <div class="alert-main">
+              {% trans trimmed limit=settings.SITH_ACCOUNT_MAX_MONEY %}
+                You cannot purchase the current basket,
+                because it would put your AE account balance
+                above the {{ limit }}€ limit
+              {% endtrans %}
+            </div>
+          </div>
+        </template>
         <ul class="item-list">
           {# Starting money #}
           <li>
@@ -109,9 +120,12 @@
             <i class="fa fa-trash"></i>
             {% trans %}Clear{% endtrans %}
           </button>
-          <button class="btn btn-blue">
+          <button
+            class="btn btn-blue"
+            :disabled="(getTotalRefill() + {{ customer_amount }}) > {{ settings.SITH_ACCOUNT_MAX_MONEY }}"
+          >
             <i class="fa fa-check"></i>
-            <input type="submit" value="{% trans %}Validate{% endtrans %}"/>
+            {% trans %}Validate{% endtrans %}
           </button>
         </div>
       </form>
@@ -199,7 +213,12 @@
                 id="{{ price.id }}"
                 class="card clickable shadow"
                 :class="{selected: basket.some((i) => i.priceId === {{ price.id }})}"
-                @click='addFromCatalog({{ price.id }}, {{ price.full_label|tojson }}, {{ price.amount }})'
+                @click='addFromCatalog(
+                        {{ price.id }},
+                        {{ price.full_label|tojson }},
+                        {{ price.amount }},
+                        {{ (price.product.product_type_id == settings.SITH_COUNTER_PRODUCTTYPE_REFILLING)|lower }}
+                        )'
                 {% if price.sold_out %}disabled{% endif %}
               >
                 {% if price.product.icon %}

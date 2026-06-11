@@ -827,7 +827,7 @@ class Refilling(models.Model):
     counter = models.ForeignKey(
         Counter, related_name="refillings", blank=False, on_delete=models.CASCADE
     )
-    amount = CurrencyField(_("amount"), min_value=0.01)
+    amount: CurrencyField = CurrencyField(_("amount"), min_value=0.01)
     operator = models.ForeignKey(
         User,
         related_name="refillings_as_operator",
@@ -883,7 +883,7 @@ class Refilling(models.Model):
 
     def clean(self):
         super().clean()
-        if self.amount + self.customer.amount > settings.SITH_ACCOUNT_MAX_MONEY:
+        if (self.amount + self.customer.amount) > settings.SITH_ACCOUNT_MAX_MONEY:
             raise ValidationError(
                 _("There cannot be more than %(money)d€ on an AE account")
                 % {"money": settings.SITH_ACCOUNT_MAX_MONEY}

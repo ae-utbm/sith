@@ -565,16 +565,7 @@ class BasketItemForm(forms.Form):
     quantity = forms.IntegerField(min_value=1, required=True)
     price_id = forms.IntegerField(min_value=0, required=True)
 
-    def __init__(
-        self,
-        customer: Customer,
-        counter: Counter,
-        allowed_prices: dict[int, Price],
-        *args,
-        **kwargs,
-    ):
-        self.customer = customer  # Used by formset
-        self.counter = counter  # Used by formset
+    def __init__(self, allowed_prices: dict[int, Price], *args, **kwargs):
         self.allowed_prices = allowed_prices
         super().__init__(*args, **kwargs)
 
@@ -609,6 +600,11 @@ class BasketItemForm(forms.Form):
 
 
 class BaseBasketForm(forms.BaseFormSet):
+    def __init__(self, *args, customer: Customer, counter: Counter, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.customer = customer
+        self.counter = counter
+
     def clean(self):
         self.forms = [form for form in self.forms if form.cleaned_data != {}]
 
@@ -617,8 +613,9 @@ class BaseBasketForm(forms.BaseFormSet):
 
         self._check_forms_have_errors()
         self._check_product_are_unique()
-        self._check_recorded_products(self[0].customer)
-        self._check_enough_money(self[0].counter, self[0].customer)
+        self._check_recorded_products()
+        self._check_enough_money()
+        self._check_refills()
 
     def _check_forms_have_errors(self):
         if any(len(form.errors) > 0 for form in self):
@@ -629,12 +626,12 @@ class BaseBasketForm(forms.BaseFormSet):
         if len(price_ids) != len(self.forms):
             raise forms.ValidationError(_("Duplicated product entries."))
 
-    def _check_enough_money(self, counter: Counter, customer: Customer):
+    def _check_enough_money(self):
         self.total_price = sum([data["total_price"] for data in self.cleaned_data])
-        if self.total_price > customer.amount:
+        if self.total_price > self.customer.amount:
             raise forms.ValidationError(_("Not enough money"))
 
-    def _check_recorded_products(self, customer: Customer):
+    def _check_recorded_products(self):
         """Check for, among other things, ecocups and pitchers"""
         items = defaultdict(int)
         for form in self.forms:
@@ -643,7 +640,7 @@ class BaseBasketForm(forms.BaseFormSet):
         returnables = list(
             ReturnableProduct.objects.filter(
                 Q(product_id__in=ids) | Q(returned_product_id__in=ids)
-            ).annotate_balance_for(customer)
+            ).annotate_balance_for(self.customer)
         )
         limit_reached = []
         for returnable in returnables:
@@ -660,6 +657,13 @@ class BaseBasketForm(forms.BaseFormSet):
                     "for the following products : %s"
                 )
                 % ", ".join([str(p) for p in limit_reached])
+            )
+
+    def _check_refills(self):
+        refill_type_id = settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
+        if any(f.price.product.product_type_id == refill_type_id for f in self.forms):
+            raise ValidationError(
+                _("Refill bonds cannot be purchased outside of the eboutic")
             )
 
 
