@@ -535,6 +535,19 @@ class TestCounterClick(TestFullClickBase):
 
         assert self.updated_amount(self.customer) == Decimal(10)
 
+    def test_unrecord_above_limit_fails(self):
+        """Test that it's forbidden to give back a recorded product
+        if it puts the account balance above the limit.
+        """
+        self.login_in_bar()
+        limit = settings.SITH_ACCOUNT_MAX_MONEY
+        # put the account balance just at the limit
+        baker.make(Refilling, customer=self.customer.customer, amount=limit)
+        response = self.submit_basket(self.customer, [BasketItem(self.dcons.id, 1)])
+        assert response.status_code == 200  # no redirect = failure
+        self.customer.customer.refresh_from_db()
+        assert self.updated_amount(self.customer) == limit
+
     def test_annotate_has_barman_queryset(self):
         """Test if the custom queryset method `annotate_has_barman` works as intended."""
         counters = Counter.objects.annotate_has_barman(self.barmen)

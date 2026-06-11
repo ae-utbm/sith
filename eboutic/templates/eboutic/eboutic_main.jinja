@@ -58,7 +58,7 @@
             </div>
           </div>
         {% endif %}
-        <template x-if="(getTotalRefill() + {{ customer_amount }}) > {{ settings.SITH_ACCOUNT_MAX_MONEY }}">
+        <template x-if="(getTotalAdded() + {{ customer_amount }}) > {{ settings.SITH_ACCOUNT_MAX_MONEY }}">
           <div class="alert alert-red">
             <div class="alert-main">
               {% trans trimmed limit=settings.SITH_ACCOUNT_MAX_MONEY %}
@@ -122,7 +122,7 @@
           </button>
           <button
             class="btn btn-blue"
-            :disabled="(getTotalRefill() + {{ customer_amount }}) > {{ settings.SITH_ACCOUNT_MAX_MONEY }}"
+            :disabled="(getTotalAdded() + {{ customer_amount }}) > {{ settings.SITH_ACCOUNT_MAX_MONEY }}"
           >
             <i class="fa fa-check"></i>
             {% trans %}Validate{% endtrans %}

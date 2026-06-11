@@ -65,11 +65,15 @@ document.addEventListener("alpine:init", () => {
       );
     },
 
-    getTotalRefill() {
+    /**
+     * Get the total of money that would be added to the AE account on basket purchase.
+     */
+    getTotalAdded() {
       return this.basket
-        .filter((item) => item.isRefill)
+        .filter((item) => item.isRefill || item.unitPrice < 0)
         .reduce(
-          (acc: number, item: BasketItem) => acc + item.quantity * item.unitPrice,
+          (acc: number, item: BasketItem) =>
+            acc + Math.abs(item.quantity * item.unitPrice),
           0,
         );
     },

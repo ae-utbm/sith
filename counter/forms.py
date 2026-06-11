@@ -3,6 +3,7 @@ import math
 import uuid
 from collections import defaultdict
 from datetime import date, datetime, timezone
+from typing import ClassVar
 
 from dateutil.relativedelta import relativedelta
 from django import forms
@@ -11,6 +12,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Q
 from django.forms import BaseModelFormSet
 from django.http import HttpRequest
+from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import ClockedSchedule
@@ -600,6 +602,10 @@ class BasketItemForm(forms.Form):
 
 
 class BaseBasketForm(forms.BaseFormSet):
+    # Minimum amount of money there must be on the account after the transaction
+    # If None, the min balance check is skipped
+    min_result_balance: ClassVar[int | None] = 0
+
     def __init__(self, *args, customer: Customer, counter: Counter, **kwargs):
         super().__init__(*args, **kwargs)
         self.customer = customer
@@ -614,8 +620,7 @@ class BaseBasketForm(forms.BaseFormSet):
         self._check_forms_have_errors()
         self._check_product_are_unique()
         self._check_recorded_products()
-        self._check_enough_money()
-        self._check_refills()
+        self._check_account_balance()
 
     def _check_forms_have_errors(self):
         if any(len(form.errors) > 0 for form in self):
@@ -626,10 +631,33 @@ class BaseBasketForm(forms.BaseFormSet):
         if len(price_ids) != len(self.forms):
             raise forms.ValidationError(_("Duplicated product entries."))
 
-    def _check_enough_money(self):
-        self.total_price = sum([data["total_price"] for data in self.cleaned_data])
-        if self.total_price > self.customer.amount:
+    @cached_property
+    def total_price(self):
+        refill = settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
+        total_other = sum(
+            form.cleaned_data["total_price"]
+            for form in self.forms
+            if form.price.product.product_type_id != refill
+        )
+        total_refill = sum(
+            form.cleaned_data["total_price"]
+            for form in self.forms
+            if form.price.product.product_type_id == refill
+        )
+        return total_other - total_refill
+
+    def _check_account_balance(self):
+        result_balance = self.customer.amount - self.total_price
+        if (
+            self.min_result_balance is not None
+            and self.min_result_balance > result_balance
+        ):
             raise forms.ValidationError(_("Not enough money"))
+        if result_balance > settings.SITH_ACCOUNT_MAX_MONEY:
+            raise ValidationError(
+                _("There cannot be more than %(money)d€ on an AE account")
+                % {"money": settings.SITH_ACCOUNT_MAX_MONEY}
+            )
 
     def _check_recorded_products(self):
         """Check for, among other things, ecocups and pitchers"""
@@ -657,13 +685,6 @@ class BaseBasketForm(forms.BaseFormSet):
                     "for the following products : %s"
                 )
                 % ", ".join([str(p) for p in limit_reached])
-            )
-
-    def _check_refills(self):
-        refill_type_id = settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
-        if any(f.price.product.product_type_id == refill_type_id for f in self.forms):
-            raise ValidationError(
-                _("Refill bonds cannot be purchased outside of the eboutic")
             )
 
 

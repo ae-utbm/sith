@@ -3306,6 +3306,11 @@ msgstr "Saisie de produit dupliquée"
 msgid "Not enough money"
 msgstr "Solde insuffisant"
 
+#: counter/forms.py counter/models.py
+#, python-format
+msgid "There cannot be more than %(money)d€ on an AE account"
+msgstr "Il ne peut pas y avoir plus de %(money)d€ sur un compte AE"
+
 #: counter/forms.py
 #, python-format
 msgid ""
@@ -3313,11 +3318,6 @@ msgid ""
 msgstr ""
 "Cet utilisateur a atteint sa limite de déconsigne pour les produits "
 "suivants : %s"
-
-#: counter/forms.py
-msgid "Refill bonds cannot be purchased outside of the eboutic"
-msgstr ""
-"Les bons de rechargement ne peuvent pas être achetés en dehors de l'eboutic"
 
 #: counter/management/commands/dump_accounts.py
 msgid "Your AE account has been emptied"
@@ -3523,11 +3523,6 @@ msgstr "méthode de paiement"
 #: counter/models.py
 msgid "refilling"
 msgstr "rechargement"
-
-#: counter/models.py eboutic/views.py
-#, python-format
-msgid "There cannot be more than %(money)d€ on an AE account"
-msgstr "Il ne peut pas y avoir plus de %(money)d€ sur un compte AE"
 
 #: counter/models.py
 msgid "Sith account"

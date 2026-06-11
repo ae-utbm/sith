@@ -99,7 +99,7 @@ class Customer(models.Model):
 
     user = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     account_id = models.CharField(_("account id"), max_length=10, unique=True)
-    amount = CurrencyField(
+    amount: CurrencyField = CurrencyField(
         _("amount"), max_value=settings.SITH_ACCOUNT_MAX_MONEY, default=0
     )
 
