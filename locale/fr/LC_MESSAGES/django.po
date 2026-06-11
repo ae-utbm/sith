@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-05 13:39+0200\n"
+"POT-Creation-Date: 2026-06-10 20:18+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3314,6 +3314,11 @@ msgstr ""
 "Cet utilisateur a atteint sa limite de déconsigne pour les produits "
 "suivants : %s"
 
+#: counter/forms.py
+msgid "Refill bonds cannot be purchased outside of the eboutic"
+msgstr ""
+"Les bons de rechargement ne peuvent pas être achetés en dehors de l'eboutic"
+
 #: counter/management/commands/dump_accounts.py
 msgid "Your AE account has been emptied"
 msgstr "Votre compte AE a été vidé"
@@ -3518,6 +3523,11 @@ msgstr "méthode de paiement"
 #: counter/models.py
 msgid "refilling"
 msgstr "rechargement"
+
+#: counter/models.py eboutic/views.py
+#, python-format
+msgid "There cannot be more than %(money)d€ on an AE account"
+msgstr "Il ne peut pas y avoir plus de %(money)d€ sur un compte AE"
 
 #: counter/models.py
 msgid "Sith account"
@@ -4427,6 +4437,15 @@ msgstr "Payer avec un compte AE"
 #: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "The online shop of the association."
 msgstr "La boutique en ligne de l'association."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+#, python-format
+msgid ""
+"You cannot purchase the current basket, because it would put your AE account "
+"balance above the %(limit)s€ limit"
+msgstr ""
+"Vous ne pouvez pas finaliser le panier actuel, parce que le solde de votre "
+"compte AE passerait au-dessus de la limite de %(limit)s€."
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "Clear"
