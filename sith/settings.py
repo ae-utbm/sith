@@ -503,6 +503,12 @@ SITH_ACCOUNT_INACTIVITY_DELTA = relativedelta(years=2)
 SITH_ACCOUNT_DUMP_DELTA = timedelta(days=30)
 """timedelta between the warning mail and the actual account dump"""
 
+SITH_ACCOUNT_MAX_MONEY = 250  # €
+"""Maximum amount of money a sith account can hold.
+
+This amount is defined by the AE's Terms and Conditions of Sale.
+"""
+
 # Defines which product type is the refilling type,
 # and thus increases the account amount
 SITH_COUNTER_PRODUCTTYPE_REFILLING = env.int(

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-05 13:39+0200\n"
+"POT-Creation-Date: 2026-06-10 20:18+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3306,6 +3306,11 @@ msgstr "Saisie de produit dupliquée"
 msgid "Not enough money"
 msgstr "Solde insuffisant"
 
+#: counter/forms.py counter/models.py
+#, python-format
+msgid "There cannot be more than %(money)d€ on an AE account"
+msgstr "Il ne peut pas y avoir plus de %(money)d€ sur un compte AE"
+
 #: counter/forms.py
 #, python-format
 msgid ""
@@ -4427,6 +4432,15 @@ msgstr "Payer avec un compte AE"
 #: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "The online shop of the association."
 msgstr "La boutique en ligne de l'association."
+
+#: eboutic/templates/eboutic/eboutic_main.jinja
+#, python-format
+msgid ""
+"You cannot purchase the current basket, because it would put your AE account "
+"balance above the %(limit)s€ limit"
+msgstr ""
+"Vous ne pouvez pas finaliser le panier actuel, parce que le solde de votre "
+"compte AE passerait au-dessus de la limite de %(limit)s€."
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "Clear"

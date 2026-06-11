@@ -3,13 +3,16 @@ import math
 import uuid
 from collections import defaultdict
 from datetime import date, datetime, timezone
+from typing import ClassVar
 
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Q
 from django.forms import BaseModelFormSet
 from django.http import HttpRequest
+from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from django_celery_beat.models import ClockedSchedule
@@ -168,18 +171,19 @@ class RefillForm(forms.ModelForm):
 
     error_css_class = "error"
     required_css_class = "required"
-    amount = forms.FloatField(
-        min_value=0, widget=forms.NumberInput(attrs={"class": "focus"})
-    )
 
     class Meta:
         model = Refilling
         fields = ["amount", "payment_method"]
         widgets = {"payment_method": forms.RadioSelect}
 
-    def __init__(self, *args, **kwargs):
+    def __init__(
+        self, *args, counter: Counter, operator: User, customer: Customer, **kwargs
+    ):
         super().__init__(*args, **kwargs)
-
+        max_value = settings.SITH_ACCOUNT_MAX_MONEY - customer.amount
+        # server-side max_value validation is done by Refilling.clean
+        self.fields["amount"].widget.attrs["max"] = max_value
         self.fields["payment_method"].choices = (
             method
             for method in self.fields["payment_method"].choices
@@ -187,6 +191,9 @@ class RefillForm(forms.ModelForm):
         )
         if self.fields["payment_method"].initial not in self.allowed_refilling_methods:
             self.fields["payment_method"].initial = self.allowed_refilling_methods[0]
+        self.instance.counter = counter
+        self.instance.operator = operator
+        self.instance.customer = customer
 
 
 class CounterEditForm(forms.ModelForm):
@@ -560,16 +567,7 @@ class BasketItemForm(forms.Form):
     quantity = forms.IntegerField(min_value=1, required=True)
     price_id = forms.IntegerField(min_value=0, required=True)
 
-    def __init__(
-        self,
-        customer: Customer,
-        counter: Counter,
-        allowed_prices: dict[int, Price],
-        *args,
-        **kwargs,
-    ):
-        self.customer = customer  # Used by formset
-        self.counter = counter  # Used by formset
+    def __init__(self, allowed_prices: dict[int, Price], *args, **kwargs):
         self.allowed_prices = allowed_prices
         super().__init__(*args, **kwargs)
 
@@ -604,6 +602,15 @@ class BasketItemForm(forms.Form):
 
 
 class BaseBasketForm(forms.BaseFormSet):
+    # Minimum amount of money there must be on the account after the transaction
+    # If None, the min balance check is skipped
+    min_result_balance: ClassVar[int | None] = 0
+
+    def __init__(self, *args, customer: Customer, counter: Counter, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.customer = customer
+        self.counter = counter
+
     def clean(self):
         self.forms = [form for form in self.forms if form.cleaned_data != {}]
 
@@ -612,8 +619,8 @@ class BaseBasketForm(forms.BaseFormSet):
 
         self._check_forms_have_errors()
         self._check_product_are_unique()
-        self._check_recorded_products(self[0].customer)
-        self._check_enough_money(self[0].counter, self[0].customer)
+        self._check_recorded_products()
+        self._check_account_balance()
 
     def _check_forms_have_errors(self):
         if any(len(form.errors) > 0 for form in self):
@@ -624,12 +631,35 @@ class BaseBasketForm(forms.BaseFormSet):
         if len(price_ids) != len(self.forms):
             raise forms.ValidationError(_("Duplicated product entries."))
 
-    def _check_enough_money(self, counter: Counter, customer: Customer):
-        self.total_price = sum([data["total_price"] for data in self.cleaned_data])
-        if self.total_price > customer.amount:
-            raise forms.ValidationError(_("Not enough money"))
+    @cached_property
+    def total_price(self):
+        refill = settings.SITH_COUNTER_PRODUCTTYPE_REFILLING
+        total_other = sum(
+            form.cleaned_data["total_price"]
+            for form in self.forms
+            if form.price.product.product_type_id != refill
+        )
+        total_refill = sum(
+            form.cleaned_data["total_price"]
+            for form in self.forms
+            if form.price.product.product_type_id == refill
+        )
+        return total_other - total_refill
 
-    def _check_recorded_products(self, customer: Customer):
+    def _check_account_balance(self):
+        result_balance = self.customer.amount - self.total_price
+        if (
+            self.min_result_balance is not None
+            and self.min_result_balance > result_balance
+        ):
+            raise forms.ValidationError(_("Not enough money"))
+        if result_balance > settings.SITH_ACCOUNT_MAX_MONEY:
+            raise ValidationError(
+                _("There cannot be more than %(money)d€ on an AE account")
+                % {"money": settings.SITH_ACCOUNT_MAX_MONEY}
+            )
+
+    def _check_recorded_products(self):
         """Check for, among other things, ecocups and pitchers"""
         items = defaultdict(int)
         for form in self.forms:
@@ -638,7 +668,7 @@ class BaseBasketForm(forms.BaseFormSet):
         returnables = list(
             ReturnableProduct.objects.filter(
                 Q(product_id__in=ids) | Q(returned_product_id__in=ids)
-            ).annotate_balance_for(customer)
+            ).annotate_balance_for(self.customer)
         )
         limit_reached = []
         for returnable in returnables:
