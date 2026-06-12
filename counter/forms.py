@@ -39,6 +39,7 @@ from counter.models import (
     Customer,
     Eticket,
     InvoiceCall,
+    Permanency,
     Price,
     Product,
     ProductFormula,
@@ -151,12 +152,13 @@ class CounterLoginForm(LoginForm):
             raise ValidationError(
                 message=_("You are not a barman of this counter."), code="not_barman"
             )
-        if user in self.request.barmen:
-            message = (
-                _("You are already logged in this counter.")
-                if user in self.counter.barmen_list
-                else _("You are already logged in another counter.")
-            )
+        if Permanency.objects.filter(end=None, user=user).exists():
+            if user in self.request.barmen:
+                message = _("You are already logged in this counter.")
+            elif user in self.counter.barmen_list:
+                message = _("You are already logged in another counter.")
+            else:
+                message = _("You are already logged on another device")
             raise ValidationError(message=message, code="already_logged_in")
 
 

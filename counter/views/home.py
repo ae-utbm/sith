@@ -30,6 +30,7 @@ from django.views.generic.edit import FormView
 from core.auth.mixins import CanViewMixin
 from core.views import FragmentMixin, UseFragmentsMixin
 from counter.forms import CounterLoginForm, GetUserForm
+from counter.middleware import SESSION_PERMANENCES_KEY
 from counter.models import Counter, Permanency
 from counter.utils import is_logged_in_counter
 from counter.views.mixins import CounterTabsMixin
@@ -58,8 +59,8 @@ class CounterLoginFragment(FragmentMixin, SingleObjectMixin, FormView):
 
     def form_valid(self, form: CounterLoginForm):
         user = form.get_user()
-        self.object.permanencies.create(user=user, start=timezone.now())
-        self.request.barmen.add(user)
+        perm = self.object.permanencies.create(user=user, start=timezone.now())
+        self.request.session.setdefault(SESSION_PERMANENCES_KEY, []).append(perm.id)
         self.success_url = reverse(
             "counter:details", kwargs={"counter_id": self.object.id}
         )

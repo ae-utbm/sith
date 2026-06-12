@@ -1105,7 +1105,7 @@ class Permanency(models.Model):
         on_delete=models.CASCADE,
     )
     start = models.DateTimeField(_("start date"))
-    end = models.DateTimeField(_("end date"), null=True, db_index=True)
+    end = models.DateTimeField(_("end date"), null=True, blank=True, db_index=True)
     activity = models.DateTimeField(_("last activity date"), auto_now=True)
 
     class Meta:
