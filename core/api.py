@@ -2,7 +2,8 @@ from typing import Annotated, Any, Literal
 
 from annotated_types import Ge, Le, MinLen
 from django.conf import settings
-from django.db.models import F
+from django.db.models import F, Q
+from ninja import Schema
 from django.http import HttpResponse
 from ninja import File, Query
 from ninja.security import SessionAuth
@@ -29,6 +30,7 @@ from core.schemas import (
 )
 from core.templatetags.renderer import markdown
 from counter.utils import is_logged_in_counter
+from counter.models import Customer
 
 
 @api_controller("/markdown")
@@ -166,3 +168,27 @@ class FamilyController(ControllerBase):
                 ]
             ),
         }
+
+
+class LoginSchema(Schema):
+    identifier: str
+    password: str
+
+
+@api_controller("/auth")
+class AuthController(ControllerBase):
+    @route.post("/login", auth=None)
+    def login(self, body: LoginSchema):
+        """Authenticate a user by username, email or AE account id.
+
+        Returns the user's id on success, 401 on failure.
+        """
+        ident = body.identifier.strip()
+        user = User.objects.filter(Q(username=ident) | Q(email=ident)).first()
+        if user is None:
+            cust = Customer.objects.select_related("user").filter(account_id=ident).first()
+            if cust:
+                user = cust.user
+        if user is None or not user.check_password(body.password):
+            return HttpResponse(status=401)
+        return {"id": user.id}
