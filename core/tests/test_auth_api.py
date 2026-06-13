@@ -7,6 +7,7 @@ from django.urls import reverse
 from model_bakery import baker
 
 from core.models import User
+from core.schemas import UserSchema
 from counter.models import Customer
 
 
@@ -16,6 +17,7 @@ def post_login(client: Client, identifier: str, password: str):
         data=json.dumps({"identifier": identifier, "password": password}),
         content_type="application/json",
     )
+
 
 @pytest.fixture()
 def user(db) -> User:
@@ -35,7 +37,7 @@ def test_api_login_success(client: Client, user: User, identifier_getter):
     response = post_login(client, identifier_getter(user), "plop")
 
     assert response.status_code == 200
-    assert response.json() == {"id": user.id}
+    assert response.json() == UserSchema.model_validate(user).model_dump(mode="json")
     assert int(client.session["_auth_user_id"]) == user.id
 
 
