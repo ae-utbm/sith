@@ -2,10 +2,10 @@ from typing import Annotated, Any, Literal
 
 from annotated_types import Ge, Le, MinLen
 from django.conf import settings
-from django.db.models import F, Q
-from ninja import Schema
+from django.contrib.auth import login
+from django.db.models import F
 from django.http import HttpResponse
-from ninja import File, Query
+from ninja import File, Query, Status
 from ninja.security import SessionAuth
 from ninja_extra import ControllerBase, api_controller, paginate, route
 from ninja_extra.exceptions import PermissionDenied
@@ -19,6 +19,7 @@ from core.models import Group, QuickUploadImage, SithFile, User
 from core.schemas import (
     FamilyGodfatherSchema,
     GroupSchema,
+    LoginSchema,
     MarkdownSchema,
     SithFileSchema,
     UploadedFileSchema,
@@ -29,8 +30,8 @@ from core.schemas import (
     UserSchema,
 )
 from core.templatetags.renderer import markdown
+from core.views.forms import LoginForm
 from counter.utils import is_logged_in_counter
-from counter.models import Customer
 
 
 @api_controller("/markdown")
@@ -170,25 +171,28 @@ class FamilyController(ControllerBase):
         }
 
 
-class LoginSchema(Schema):
-    identifier: str
-    password: str
-
-
 @api_controller("/auth")
 class AuthController(ControllerBase):
-    @route.post("/login", auth=None)
+    @route.post(
+        "/login",
+        auth=None,
+        response={200: dict[Literal["id"], int], 401: dict[str, list[str]]},
+    )
     def login(self, body: LoginSchema):
         """Authenticate a user by username, email or AE account id.
 
         Returns the user's id on success, 401 on failure.
         """
-        ident = body.identifier.strip()
-        user = User.objects.filter(Q(username=ident) | Q(email=ident)).first()
-        if user is None:
-            cust = Customer.objects.select_related("user").filter(account_id=ident).first()
-            if cust:
-                user = cust.user
-        if user is None or not user.check_password(body.password):
-            return HttpResponse(status=401)
+        if self.context.request.user.is_authenticated:
+            raise PermissionDenied
+
+        login_form = LoginForm(
+            self.context.request,
+            data={"username": body.identifier, "password": body.password},
+        )
+        if not login_form.is_valid():
+            return Status(401, login_form.errors)
+
+        user = login_form.get_user()
+        login(self.context.request, user)
         return {"id": user.id}
