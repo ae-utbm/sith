@@ -176,7 +176,7 @@ class AuthController(ControllerBase):
     @route.post(
         "/login",
         auth=None,
-        response={200: dict[Literal["id"], int], 401: dict[str, list[str]]},
+        response={200: UserSchema, 401: dict[str, list[str]]},
     )
     def login(self, body: LoginSchema):
         """Authenticate a user by username, email or AE account id.
@@ -195,4 +195,4 @@ class AuthController(ControllerBase):
 
         user = login_form.get_user()
         login(self.context.request, user)
-        return {"id": user.id}
+        return user
