@@ -1,5 +1,3 @@
-import json
-
 import pytest
 from django.contrib.auth.hashers import make_password
 from django.test import Client
@@ -14,7 +12,8 @@ from counter.models import Customer
 def post_login(client: Client, identifier: str, password: str):
     return client.post(
         reverse("api:login"),
-        data={"identifier": identifier, "password": password}
+        data={"identifier": identifier, "password": password},
+        content_type="application/json",
     )
 
 
