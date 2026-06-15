@@ -786,10 +786,10 @@ class TestBarmanConnection(TestCase):
         assert last_perm.counter == self.counter
         assert last_perm.user == self.barman
         assert last_perm.end is None
-        assert self.barman in response.wsgi_request.barmen
         response = self.client.get(
             self.detail_url, {"username": self.barman.username, "password": "plop"}
         )
+        assert self.barman in response.wsgi_request.barmen
         assert response.context_data.get("barmen") == [self.barman]
         soup = BeautifulSoup(response.text, "lxml")
         assert soup.find("form", id="select-user-form") is not None
@@ -829,6 +829,41 @@ class TestBarmanConnection(TestCase):
             self.login_url, {"username": self.barman.username, "password": "plop"}
         )
         self.assert_counter_login_fails(self.barman)
+
+    def test_barman_already_logged_in_another_device(self):
+        """Test when the barman is already logged in the current counter on another device."""
+        other_client = Client()
+        other_client.post(
+            self.login_url, {"username": self.barman.username, "password": "plop"}
+        )
+        self.assert_counter_login_fails(self.barman)
+
+    def test_barman_login_elsewhere(self):
+        """Test when the barman log himself out then log in on another device."""
+        self.client.post(
+            self.login_url, {"username": self.barman.username, "password": "plop"}
+        )
+        other_client = Client()
+        other_client.post(
+            reverse("counter:logout", kwargs={"counter_id": self.counter.id}),
+            data={"user_id": self.barman.id},
+        )
+        response = other_client.post(
+            self.login_url, {"username": self.barman.username, "password": "plop"}
+        )
+        assert response.status_code == 200
+        assert response.headers["HX-Redirect"] == self.detail_url
+        # the barmen should now be logged in `other_client`...
+        response = other_client.get(
+            self.detail_url, {"username": self.barman.username, "password": "plop"}
+        )
+        assert self.barman in response.wsgi_request.barmen
+
+        # ... but not in `self.client`
+        response = self.client.get(
+            self.detail_url, {"username": self.barman.username, "password": "plop"}
+        )
+        assert self.barman not in response.wsgi_request.barmen
 
     def test_barman_already_logged_elsewhere(self):
         """Test when the barman is already logged in another counter."""
