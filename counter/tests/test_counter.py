@@ -144,6 +144,8 @@ class TestRefilling(TestFullClickBase):
         assert self.updated_amount(self.customer) == 0
 
     def test_refilling_no_refer_fail(self):
+        """Check that the refill fails is the HTTP_REFERER header is missing"""
+
         def refill():
             return self.client.post(
                 reverse(
@@ -157,13 +159,13 @@ class TestRefilling(TestFullClickBase):
             )
 
         self.client.force_login(self.club_admin)
-        assert refill()
+        assert refill().status_code == 403
 
         self.client.force_login(self.root)
-        assert refill()
+        assert refill().status_code == 403
 
         self.client.force_login(self.subscriber)
-        assert refill()
+        assert refill().status_code == 403
 
         assert self.updated_amount(self.customer) == 0
 
@@ -198,6 +200,17 @@ class TestRefilling(TestFullClickBase):
             ).status_code
             == 404
         )
+
+    def test_refilling_above_limit_fails(self):
+        """Test that it's forbidden to refill a customer above the limit."""
+        self.login_in_bar()
+        limit = settings.SITH_ACCOUNT_MAX_MONEY
+        # create a refilling to check that current balance is taken into account
+        baker.make(Refilling, customer=self.customer.customer, amount=limit // 2)
+        response = self.refill_user(self.customer, self.counter, (limit // 2) + 1)
+        assert response.status_code == 200  # no redirect = failure
+        self.customer.customer.refresh_from_db()
+        assert self.updated_amount(self.customer) == limit // 2
 
     def test_refilling_counter_success(self):
         self.login_in_bar()
@@ -521,6 +534,19 @@ class TestCounterClick(TestFullClickBase):
         assert res.status_code == 200
 
         assert self.updated_amount(self.customer) == Decimal(10)
+
+    def test_unrecord_above_limit_fails(self):
+        """Test that it's forbidden to give back a recorded product
+        if it puts the account balance above the limit.
+        """
+        self.login_in_bar()
+        limit = settings.SITH_ACCOUNT_MAX_MONEY
+        # put the account balance just at the limit
+        baker.make(Refilling, customer=self.customer.customer, amount=limit)
+        response = self.submit_basket(self.customer, [BasketItem(self.dcons.id, 1)])
+        assert response.status_code == 200  # no redirect = failure
+        self.customer.customer.refresh_from_db()
+        assert self.updated_amount(self.customer) == limit
 
     def test_annotate_has_barman_queryset(self):
         """Test if the custom queryset method `annotate_has_barman` works as intended."""

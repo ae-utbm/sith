@@ -66,9 +66,7 @@ if TYPE_CHECKING:
 
 
 class BaseEbouticBasketForm(BaseBasketForm):
-    def _check_enough_money(self, *args, **kwargs):
-        # Disable money check
-        ...
+    min_result_balance = None  # user can pay by card, so no minimum enforced
 
 
 EbouticBasketForm = forms.formset_factory(
@@ -88,15 +86,15 @@ class EbouticMainView(LoginRequiredMixin, FormView):
     form_class = EbouticBasketForm
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["form_kwargs"] = {
+        return super().get_form_kwargs() | {
             "customer": self.customer,
             "counter": get_eboutic(),
-            "allowed_prices": {
-                price.id: price for price in self.prices if not price.sold_out
+            "form_kwargs": {
+                "allowed_prices": {
+                    price.id: price for price in self.prices if not price.sold_out
+                }
             },
         }
-        return kwargs
 
     def form_valid(self, formset):
         if len(formset) == 0:

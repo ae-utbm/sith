@@ -200,7 +200,11 @@ class TestFilterInactive(TestCase):
         ]
         sale_recipe.make(customer=cls.users[3].customer, date=time_active)
         baker.make(
-            Refilling, customer=cls.users[4].customer, date=time_active, counter=counter
+            Refilling,
+            customer=cls.users[4].customer,
+            date=time_active,
+            counter=counter,
+            amount=1,
         )
         sale_recipe.make(customer=cls.users[5].customer, date=time_inactive)
 
@@ -455,7 +459,9 @@ def test_user_preferences(client: Client):
 @pytest.mark.django_db
 def test_user_stats(client: Client):
     user = subscriber_user.make()
-    baker.make(Refilling, customer=user.customer, amount=99999)
+    baker.make(
+        Refilling, customer=user.customer, amount=settings.SITH_ACCOUNT_MAX_MONEY
+    )
     bars = [b[0] for b in settings.SITH_COUNTER_BARS]
     baker.make(
         Permanency,

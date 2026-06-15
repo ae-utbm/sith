@@ -3,7 +3,6 @@ import { BasketItem } from "#counter:counter/basket";
 import type {
   CounterConfig,
   CounterItem,
-  ErrorMessage,
   ProductFormula,
 } from "#counter:counter/types";
 import type { CounterProductSelect } from "./components/counter-product-select-index";
@@ -24,7 +23,7 @@ document.addEventListener("alpine:init", () => {
         }
       }
 
-      this.codeField = this.$refs.codeField;
+      this.codeField = this.$refs.codeField as CounterProductSelect;
       this.codeField.widget.hook("after", "onOptionSelect", () => {
         this.handleCode();
       });
@@ -34,14 +33,14 @@ document.addEventListener("alpine:init", () => {
       // of a formset so we dynamically apply it here
       this.$refs.basketManagementForm
         .querySelector("#id_form-TOTAL_FORMS")
-        .setAttribute(":value", "getBasketSize()");
+        ?.setAttribute(":value", "getBasketSize()");
     },
 
     removeFromBasket(id: string) {
       delete this.basket[id];
     },
 
-    addToBasket(id: string, quantity: number): ErrorMessage {
+    addToBasket(id: string, quantity: number) {
       const item: BasketItem =
         this.basket[id] || new BasketItem(config.products[id], 0);
 
@@ -50,7 +49,7 @@ document.addEventListener("alpine:init", () => {
 
       if (item.quantity <= 0) {
         delete this.basket[id];
-        return "";
+        return;
       }
 
       this.basket[id] = item;
@@ -72,7 +71,7 @@ document.addEventListener("alpine:init", () => {
       const products = new Set(
         Object.values(this.basket).map((item: BasketItem) => item.product.productId),
       );
-      const formula: ProductFormula = config.formulas.find((f: ProductFormula) => {
+      const formula = config.formulas.find((f: ProductFormula) => {
         return f.products.every((p: number) => products.has(p));
       });
       if (formula === undefined) {
@@ -80,9 +79,13 @@ document.addEventListener("alpine:init", () => {
       }
       // Now that the formula is found, remove the items composing it from the basket
       for (const product of formula.products) {
-        const key = Object.entries(this.basket).find(
+        const item = Object.entries(this.basket).find(
           ([_, i]: [string, BasketItem]) => i.product.productId === product,
-        )[0];
+        );
+        if (item === undefined) {
+          continue;
+        }
+        const key = item[0];
         this.basket[key].quantity -= 1;
         if (this.basket[key].quantity <= 0) {
           this.removeFromBasket(key);
@@ -92,7 +95,7 @@ document.addEventListener("alpine:init", () => {
       const result = Object.values(config.products)
         .filter((item: CounterItem) => item.productId === formula.result)
         .reduce((acc, curr) => (acc.price.amount < curr.price.amount ? acc : curr));
-      this.addToBasket(result.price.id, 1);
+      this.addToBasket(result.price.id.toString(), 1);
       this.alertMessage.display(
         interpolate(
           gettext("Formula %(formula)s applied"),
@@ -119,14 +122,18 @@ document.addEventListener("alpine:init", () => {
     },
 
     onRefillingSuccess(event: CustomEvent) {
-      if (event.type !== "htmx:after-request" || event.detail.failed) {
+      if (
+        event.type !== "htmx:after-swap" ||
+        event.detail.failed ||
+        event.detail.elt.querySelector(".errorlist")
+      ) {
         return;
       }
       this.customerBalance += Number.parseFloat(
         (event.detail.target.querySelector("#id_amount") as HTMLInputElement).value,
       );
-      document.getElementById("selling-accordion").setAttribute("open", "");
-      this.codeField.widget.focus();
+      document.getElementById("selling-accordion")?.setAttribute("open", "");
+      this.codeField?.widget.focus();
     },
 
     finish() {
@@ -136,7 +143,7 @@ document.addEventListener("alpine:init", () => {
         });
         return;
       }
-      this.$refs.basketForm.submit();
+      (this.$refs.basketForm as HTMLFormElement).submit();
     },
 
     cancel() {
@@ -144,6 +151,8 @@ document.addEventListener("alpine:init", () => {
     },
 
     handleCode() {
+      if (!this.codeField) throw Error("Unexpected null codeField.");
+
       const [quantity, code] = this.codeField.getSelectedProduct() as [number, string];
 
       if (this.codeField.getOperationCodes().includes(code.toUpperCase())) {

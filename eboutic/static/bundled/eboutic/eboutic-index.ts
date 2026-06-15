@@ -5,10 +5,11 @@ interface BasketItem {
   name: string;
   quantity: number;
   unitPrice: number;
+  isRefill: boolean;
 }
 
 const BASKET_CACHE_KEY = "basket";
-const BASKET_CACHE_VERSION = 1;
+const BASKET_CACHE_VERSION = 2;
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("basket", (validPrices: number[], lastPurchaseTime?: number) => ({
@@ -21,7 +22,7 @@ document.addEventListener("alpine:init", () => {
       });
       document
         .getElementById("id_form-TOTAL_FORMS")
-        .setAttribute(":value", "basket.length");
+        ?.setAttribute(":value", "basket.length");
     },
 
     loadBasket(): BasketItem[] {
@@ -32,8 +33,8 @@ document.addEventListener("alpine:init", () => {
         return [];
       }
       if (
-        lastPurchaseTime !== null &&
-        localStorage.basketTimestamp !== undefined &&
+        lastPurchaseTime &&
+        localStorage.basketTimestamp &&
         new Date(lastPurchaseTime) >=
           new Date(Number.parseInt(localStorage.basketTimestamp, 10))
       ) {
@@ -65,6 +66,19 @@ document.addEventListener("alpine:init", () => {
     },
 
     /**
+     * Get the total of money that would be added to the AE account on basket purchase.
+     */
+    getTotalAdded() {
+      return this.basket
+        .filter((item) => item.isRefill || item.unitPrice < 0)
+        .reduce(
+          (acc: number, item: BasketItem) =>
+            acc + Math.abs(item.quantity * item.unitPrice),
+          0,
+        );
+    },
+
+    /**
      * Add 1 to the quantity of an item in the basket
      * @param {BasketItem} item
      */
@@ -86,7 +100,7 @@ document.addEventListener("alpine:init", () => {
 
       if (this.basket[index].quantity === 0) {
         this.basket = this.basket.filter(
-          (e: BasketItem) => e.priceId !== this.basket[index].id,
+          (e: BasketItem) => e.priceId !== this.basket[index].priceId,
         );
       }
     },
@@ -103,14 +117,16 @@ document.addEventListener("alpine:init", () => {
      * @param id The id of the product to add
      * @param name The name of the product
      * @param price The unit price of the product
+     * @param isRefill true if the product is a refill bond
      * @returns The created item
      */
-    createItem(id: number, name: string, price: number): BasketItem {
+    createItem(id: number, name: string, price: number, isRefill: boolean): BasketItem {
       const newItem = {
         priceId: id,
         name,
         quantity: 0,
         unitPrice: price,
+        isRefill,
       } as BasketItem;
 
       this.basket.push(newItem);
@@ -125,16 +141,17 @@ document.addEventListener("alpine:init", () => {
      * @param id The id of the product to add
      * @param name The name of the product
      * @param price The unit price of the product
+     * @param isRefill true if the product is a refill bond
      */
-    addFromCatalog(id: number, name: string, price: number) {
-      let item = this.basket.find((e: BasketItem) => e.priceId === id);
+    addFromCatalog(id: number, name: string, price: number, isRefill: boolean) {
+      const item = this.basket.find((e: BasketItem) => e.priceId === id);
 
       // if the item is not in the basket, we create it
       // else we add + 1 to it
       if (item) {
         this.add(item);
       } else {
-        item = this.createItem(id, name, price);
+        this.createItem(id, name, price, isRefill);
       }
     },
   }));
