@@ -181,7 +181,7 @@ class AuthController(ControllerBase):
     def login(self, body: LoginSchema):
         """Authenticate a user by username, email or AE account id.
 
-        Returns the user's id on success, 401 on failure.
+        Returns the user's data on success, 401 on failure.
         """
         if self.context.request.user.is_authenticated:
             raise PermissionDenied
