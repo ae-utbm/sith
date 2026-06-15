@@ -14,8 +14,7 @@ from counter.models import Customer
 def post_login(client: Client, identifier: str, password: str):
     return client.post(
         reverse("api:login"),
-        data=json.dumps({"identifier": identifier, "password": password}),
-        content_type="application/json",
+        data={"identifier": identifier, "password": password}
     )
 
 
