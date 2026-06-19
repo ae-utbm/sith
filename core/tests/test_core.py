@@ -18,6 +18,7 @@ from smtplib import SMTPException
 
 import freezegun
 import pytest
+from aemark import markdown
 from bs4 import BeautifulSoup
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Permission
@@ -34,7 +35,6 @@ from pytest_django.asserts import assertInHTML, assertRedirects
 from antispam.models import ToxicDomain
 from club.models import Club
 from core.baker_recipes import subscriber_user
-from core.markdown import markdown
 from core.models import AnonymousUser, Group, Page, User, validate_promo
 from core.utils import get_last_promo, get_semester_code, get_start_of_semester
 from core.views import AllowFragment
@@ -200,31 +200,28 @@ class TestUserLogin:
     [
         (
             "[nom du lien](page://nomDeLaPage)",
-            '<a href="/page/nomDeLaPage/">nom du lien</a>',
+            '<a href="/page/nomDeLaPage">nom du lien</a>',
         ),
         ("__texte__", "<u>texte</u>"),
         ("~~***__texte__***~~", "<del><em><strong><u>texte</u></strong></em></del>"),
         (
             '![tst_alt](/img.png?50% "tst_title")',
-            '<img src="/img.png" alt="tst_alt" title="tst_title" style="width:50%;" />',
+            '<img src="/img.png" style="width:50%" alt="tst_alt" title="tst_title" />',
         ),
-        (
-            "[texte](page://tst-page)",
-            '<a href="/page/tst-page/">texte</a>',
-        ),
+        ("[texte](page://tst-page)", '<a href="/page/tst-page">texte</a>'),
         (
             "![](/img.png?50x450)",
-            '<img src="/img.png" alt="" style="width:50px;height:450px;" />',
+            '<img src="/img.png" style="width:50px;height:450px" alt="" />',
         ),
         ("![](/img.png)", '<img src="/img.png" alt="" />'),
         (
             "![](/img.png?50%x120%)",
-            '<img src="/img.png" alt="" style="width:50%;height:120%;" />',
+            '<img src="/img.png" style="width:50%;height:120%" alt="" />',
         ),
-        ("![](/img.png?50px)", '<img src="/img.png" alt="" style="width:50px;" />'),
+        ("![](/img.png?50px)", '<img src="/img.png" style="width:50px" alt="" />'),
         (
             "![](/img.png?50pxx120%)",
-            '<img src="/img.png" alt="" style="width:50px;height:120%;" />',
+            '<img src="/img.png" style="width:50px;height:120%" alt="" />',
         ),
         # when the image dimension has a wrong format, don't touch the url
         ("![](/img.png?50pxxxxxxxx)", '<img src="/img.png?50pxxxxxxxx" alt="" />'),
@@ -350,7 +347,7 @@ http://git.an
             <p><a href="http://git.an">http://git.an</a></p>
             <h1>Swag</h1>
             <p>&lt;guy&gt;Bibou&lt;/guy&gt;</p>
-            <p>&lt;script&gt;alert('Guy');&lt;/script&gt;</p>
+            &lt;script&gt;alert('Guy');&lt;/script&gt;
             """
         assertInHTML(expected, response.text)
 

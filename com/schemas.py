@@ -1,13 +1,13 @@
 from datetime import datetime
 from typing import Annotated
 
+from aemark import markdown
 from ninja import FilterLookup, FilterSchema, ModelSchema
 from ninja_extra import service_resolver
 from ninja_extra.context import RouteContext
 
 from club.schemas import ClubProfileSchema
 from com.models import News, NewsDate
-from core.markdown import markdown
 
 
 class NewsDateFilterSchema(FilterSchema):
