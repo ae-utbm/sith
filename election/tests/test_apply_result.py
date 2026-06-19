@@ -13,6 +13,7 @@ from pytest_django.asserts import assertRedirects
 from club.models import Club, ClubRole, Membership
 from core.baker_recipes import subscriber_user
 from core.models import Group, User
+from election.forms import ApplyElectionResultForm
 from election.models import Candidature, Election, ElectionList, Role, Vote
 
 
@@ -154,6 +155,19 @@ class TestApplyResult(TestCase):
         assert "Les résultats de cette élection ont été appliqués" in response.text
         response = self.client.post(self.url, data={"candidates": ids})
         assert response.status_code == 403
+
+    def test_membership_description(self):
+        """Test that if club role name and election role name are different,
+        then the election role name is used as membership description.
+        """
+        form = ApplyElectionResultForm(
+            election=self.election, data={"candidates": [self.candidatures[0].id]}
+        )
+        assert form.is_valid()
+        memberships = form.save()
+        assert len(memberships) == 1
+        assert memberships[0].role == self.club_roles[0]
+        assert memberships[0].description == "election role 1"
 
     def test_no_result_to_apply(self):
         self.election.roles.update(club_role=None)
