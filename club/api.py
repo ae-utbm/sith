@@ -11,6 +11,7 @@ from club.models import Club, Membership
 from club.schemas import (
     ClubSchema,
     ClubSearchFilterSchema,
+    MembershipFilterSchema,
     SimpleClubSchema,
     UserMembershipSchema,
 )
@@ -62,3 +63,54 @@ class UserClubController(ControllerBase):
             .filter(user=user)
             .select_related("club", "user", "role")
         )
+
+
+@api_controller("/club_members/{since_date}")
+class ClubMembersController(ControllerBase):
+    @route.get(
+        "/new",
+        response=list[UserMembershipSchema],
+        auth=[ApiKeyAuth(), SessionAuth()],
+        permissions=[HasPerm("club.view_club")],
+        url_name="get_new_club_members_since_date",
+    )
+    def fetch_new_club_members(self, filters: Query[MembershipFilterSchema]):
+        """give all the members of a club that have joined since a given date"""
+        memberships = Membership.objects.ongoing().filter(
+            start_date__gte=filters.since_date, end_date__isnull=True
+        )
+        club_ids = memberships.values_list("club_id")
+        clubs = Club.objects.filter(id__in=club_ids)
+        return [
+            {
+                "club": club,
+                "user": membership.user,
+                "role": membership.role,
+                "joined_at": membership.start_date,
+            }
+            for club in clubs
+            for membership in memberships.filter(club=club)
+        ]
+
+    @route.get(
+        "/former",
+        response=list[UserMembershipSchema],
+        auth=[ApiKeyAuth(), SessionAuth()],
+        permissions=[HasPerm("club.view_club")],
+        url_name="get_former_club_members_since_date",
+    )
+    def fetch_former_club_members(self, filters: Query[MembershipFilterSchema]):
+        """give all the former members of a club that have left since a given date"""
+        memberships = Membership.objects.filter(end_date__gte=filters.since_date)
+        club_ids = memberships.values_list("club_id")
+        clubs = Club.objects.filter(id__in=club_ids)
+        return [
+            {
+                "club": club,
+                "user": membership.user,
+                "role": membership.role,
+                "left_at": membership.end_date,
+            }
+            for club in clubs
+            for membership in memberships.filter(club=club)
+        ]

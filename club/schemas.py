@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 
 from django.db.models import Q
@@ -79,3 +80,8 @@ class UserMembershipSchema(ModelSchema):
 
     club: SimpleClubSchema
     role: ClubRoleSchema
+    user: SimpleUserSchema
+
+
+class MembershipFilterSchema(FilterSchema):
+    since_date: Annotated[datetime, FilterLookup("date__lte")] = None
