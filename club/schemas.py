@@ -84,4 +84,5 @@ class UserMembershipSchema(ModelSchema):
 
 
 class MembershipFilterSchema(FilterSchema):
-    since_date: Annotated[datetime, FilterLookup("date__lte")] = None
+    since_date: Annotated[datetime, FilterLookup("date__lte")]
+    clubs_id: set[int] | None = None
