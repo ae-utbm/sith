@@ -65,7 +65,7 @@ class UserClubController(ControllerBase):
         )
 
 
-@api_controller("/clubs/{club_id}/members/{since_date}")
+@api_controller("/clubs/members/")
 class ClubMembershipController(ControllerBase):
     @route.get(
         "/new",
@@ -94,6 +94,7 @@ class ClubMembershipController(ControllerBase):
     def fetch_former_club_members(self, filters: Query[MembershipFilterSchema]):
         """give all the former members of all clubs that have left since a given date"""
         memberships = Membership.objects.filter(
+            start_date__lt=filters.since_date,
             end_date__gte=filters.since_date,
         )
         if filters.clubs_id is None:

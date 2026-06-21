@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from typing import Annotated
 
 from django.db.models import Q
@@ -84,5 +84,5 @@ class UserMembershipSchema(ModelSchema):
 
 
 class MembershipFilterSchema(FilterSchema):
-    since_date: Annotated[datetime, FilterLookup("date__lte")]
+    since_date: Annotated[date, FilterLookup("date__lte")]
     clubs_id: set[int] | None = None
