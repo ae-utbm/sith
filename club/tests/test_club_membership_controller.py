@@ -96,14 +96,17 @@ class TestMembershipAPI(TestCase):
 
 
 class TestNewMembershipAPI(TestMembershipAPI):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.url = reverse("api:get_new_clubs_members_since_date")
+
     def test_new_membership_one_club(self):
-        assert self.user.has_perm("club.view_club")
         self.client.force_login(self.user)
         since_date = localdate() - timedelta(weeks=1)
         arg = {"since_date": since_date, "clubs_id": self.clubs[0].id}
-        url = reverse("api:get_new_clubs_members_since_date")
-        with self.assertNumQueries(8):
-            response = self.client.get(url, arg)
+        with self.assertNumQueries(6):
+            response = self.client.get(self.url, query_params=arg)
         assert response.status_code == 200
         data = response.json()
 
@@ -112,16 +115,14 @@ class TestNewMembershipAPI(TestMembershipAPI):
         assert membership_ids == expected_ids
 
     def test_new_membership_multiple_club(self):
-        assert self.user.has_perm("club.view_club")
         self.client.force_login(self.user)
         since_date = localdate() - timedelta(weeks=1)
         arg = {
             "since_date": since_date,
             "clubs_id": [self.clubs[0].id, self.clubs[1].id],
         }
-        url = reverse("api:get_new_clubs_members_since_date")
-        with self.assertNumQueries(11):
-            response = self.client.get(url, arg)
+        with self.assertNumQueries(7):
+            response = self.client.get(self.url, query_params=arg)
         assert response.status_code == 200
         data = response.json()
 
@@ -130,13 +131,11 @@ class TestNewMembershipAPI(TestMembershipAPI):
         assert membership_ids == expected_ids
 
     def test_new_membership_all_clubs(self):
-        assert self.user.has_perm("club.view_club")
         self.client.force_login(self.user)
         since_date = localdate() - timedelta(weeks=1)
         arg = {"since_date": since_date}
-        url = reverse("api:get_new_clubs_members_since_date")
-        with self.assertNumQueries(14):
-            response = self.client.get(url, arg)
+        with self.assertNumQueries(8):
+            response = self.client.get(self.url, query_params=arg)
         assert response.status_code == 200
         data = response.json()
 
@@ -150,14 +149,17 @@ class TestNewMembershipAPI(TestMembershipAPI):
 
 
 class TestFormerMembershipAPI(TestMembershipAPI):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.url = reverse("api:get_former_clubs_members_since_date")
+
     def test_former_membership_one_club(self):
-        assert self.user.has_perm("club.view_club")
         self.client.force_login(self.user)
         since_date = localdate() - timedelta(weeks=1)
         arg = {"since_date": since_date, "clubs_id": self.clubs[1].id}
-        url = reverse("api:get_former_clubs_members_since_date")
-        with self.assertNumQueries(8):
-            response = self.client.get(url, arg)
+        with self.assertNumQueries(6):
+            response = self.client.get(self.url, query_params=arg)
 
         assert response.status_code == 200
         data = response.json()
@@ -167,16 +169,14 @@ class TestFormerMembershipAPI(TestMembershipAPI):
         assert membership_ids == expected_ids
 
     def test_new_membership_multiple_club(self):
-        assert self.user.has_perm("club.view_club")
         self.client.force_login(self.user)
         since_date = localdate() - timedelta(weeks=1)
         arg = {
             "since_date": since_date,
             "clubs_id": [self.clubs[1].id, self.clubs[0].id],
         }
-        url = reverse("api:get_former_clubs_members_since_date")
-        with self.assertNumQueries(11):
-            response = self.client.get(url, arg)
+        with self.assertNumQueries(7):
+            response = self.client.get(self.url, query_params=arg)
         assert response.status_code == 200
         data = response.json()
 
@@ -185,13 +185,11 @@ class TestFormerMembershipAPI(TestMembershipAPI):
         assert membership_ids == expected_ids
 
     def test_new_membership_all_clubs(self):
-        assert self.user.has_perm("club.view_club")
         self.client.force_login(self.user)
         since_date = localdate() - timedelta(weeks=1)
         arg = {"since_date": since_date}
-        url = reverse("api:get_former_clubs_members_since_date")
-        with self.assertNumQueries(14):
-            response = self.client.get(url, arg)
+        with self.assertNumQueries(8):
+            response = self.client.get(self.url, query_params=arg)
         assert response.status_code == 200
         data = response.json()
 

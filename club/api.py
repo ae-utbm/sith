@@ -76,8 +76,10 @@ class ClubMembershipController(ControllerBase):
     )
     def fetch_new_club_members(self, filters: Query[MembershipFilterSchema]):
         """give all the members of all clubs that have joined since a given date"""
-        memberships = Membership.objects.ongoing().filter(
-            start_date__gte=filters.since_date, end_date__isnull=True
+        memberships = (
+            Membership.objects.ongoing()
+            .filter(start_date__gte=filters.since_date, end_date__isnull=True)
+            .select_related("user", "role")
         )
         if filters.clubs_id:
             memberships = memberships.filter(club_id__in=filters.clubs_id)
@@ -96,7 +98,7 @@ class ClubMembershipController(ControllerBase):
         memberships = Membership.objects.filter(
             start_date__lt=filters.since_date,
             end_date__gte=filters.since_date,
-        )
+        ).select_related("user", "role")
         if filters.clubs_id:
             memberships = memberships.filter(club_id__in=filters.clubs_id)
 
