@@ -19,6 +19,7 @@ class TestMembershipAPI(TestCase):
         cls.user.user_permissions.add(perm)
         cls.clubs = baker.make(Club, _quantity=3, is_active=True)
         cls.roles = baker.make(ClubRole, _quantity=3, is_active=True)
+        cls.expectedNumQueries = 5
 
         # Clean existing data to avoid side effects
         Membership.objects.all().delete()
@@ -105,7 +106,7 @@ class TestNewMembershipAPI(TestMembershipAPI):
         self.client.force_login(self.user)
         since_date = localdate() - timedelta(weeks=1)
         arg = {"since_date": since_date, "clubs_id": self.clubs[0].id}
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(self.expectedNumQueries):
             response = self.client.get(self.url, query_params=arg)
         assert response.status_code == 200
         data = response.json()
@@ -121,7 +122,7 @@ class TestNewMembershipAPI(TestMembershipAPI):
             "since_date": since_date,
             "clubs_id": [self.clubs[0].id, self.clubs[1].id],
         }
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(self.expectedNumQueries):
             response = self.client.get(self.url, query_params=arg)
         assert response.status_code == 200
         data = response.json()
@@ -134,7 +135,7 @@ class TestNewMembershipAPI(TestMembershipAPI):
         self.client.force_login(self.user)
         since_date = localdate() - timedelta(weeks=1)
         arg = {"since_date": since_date}
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(self.expectedNumQueries):
             response = self.client.get(self.url, query_params=arg)
         assert response.status_code == 200
         data = response.json()
@@ -158,7 +159,7 @@ class TestFormerMembershipAPI(TestMembershipAPI):
         self.client.force_login(self.user)
         since_date = localdate() - timedelta(weeks=1)
         arg = {"since_date": since_date, "clubs_id": self.clubs[1].id}
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(self.expectedNumQueries):
             response = self.client.get(self.url, query_params=arg)
 
         assert response.status_code == 200
@@ -175,7 +176,7 @@ class TestFormerMembershipAPI(TestMembershipAPI):
             "since_date": since_date,
             "clubs_id": [self.clubs[1].id, self.clubs[0].id],
         }
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(self.expectedNumQueries):
             response = self.client.get(self.url, query_params=arg)
         assert response.status_code == 200
         data = response.json()
@@ -188,7 +189,7 @@ class TestFormerMembershipAPI(TestMembershipAPI):
         self.client.force_login(self.user)
         since_date = localdate() - timedelta(weeks=1)
         arg = {"since_date": since_date}
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(self.expectedNumQueries):
             response = self.client.get(self.url, query_params=arg)
         assert response.status_code == 200
         data = response.json()

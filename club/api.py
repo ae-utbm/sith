@@ -79,7 +79,7 @@ class ClubMembershipController(ControllerBase):
         memberships = (
             Membership.objects.ongoing()
             .filter(start_date__gte=filters.since_date, end_date__isnull=True)
-            .select_related("user", "role")
+            .select_related("user", "role", "club")
         )
         if filters.clubs_id:
             memberships = memberships.filter(club_id__in=filters.clubs_id)
@@ -98,7 +98,7 @@ class ClubMembershipController(ControllerBase):
         memberships = Membership.objects.filter(
             start_date__lt=filters.since_date,
             end_date__gte=filters.since_date,
-        ).select_related("user", "role")
+        ).select_related("user", "role", "club")
         if filters.clubs_id:
             memberships = memberships.filter(club_id__in=filters.clubs_id)
 
