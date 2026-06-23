@@ -79,10 +79,10 @@ class ClubMembershipController(ControllerBase):
         memberships = Membership.objects.ongoing().filter(
             start_date__gte=filters.since_date, end_date__isnull=True
         )
-        if filters.clubs_id is None:
-            return memberships.order_by("start_date")
+        if filters.clubs_id:
+            memberships = memberships.filter(club_id__in=filters.clubs_id)
 
-        return memberships.filter(club_id__in=filters.clubs_id)
+        return memberships.order_by("start_date")
 
     @route.get(
         "/former",
@@ -97,7 +97,7 @@ class ClubMembershipController(ControllerBase):
             start_date__lt=filters.since_date,
             end_date__gte=filters.since_date,
         )
-        if filters.clubs_id is None:
-            return memberships.order_by("start_date")
+        if filters.clubs_id:
+            memberships = memberships.filter(club_id__in=filters.clubs_id)
 
-        return memberships.filter(club_id__in=filters.clubs_id)
+        return memberships.order_by("start_date")
