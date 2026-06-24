@@ -45,3 +45,10 @@
     }
   }
 }
+
+@media screen and (max-width: 575px){
+  #club-list{
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

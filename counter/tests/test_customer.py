@@ -15,6 +15,7 @@ from core.models import User
 from counter.baker_recipes import product_recipe, refill_recipe, sale_recipe
 from counter.models import (
     Counter,
+    CounterSellers,
     Customer,
     Refilling,
     ReturnableProduct,
@@ -38,7 +39,7 @@ class TestStudentCard(TestCase):
         cls.subscriber = subscriber_user.make()
 
         cls.counter = baker.make(Counter, type="BAR")
-        cls.counter.sellers.add(cls.barmen)
+        CounterSellers.objects.create(counter=cls.counter, user=cls.barmen)
 
         cls.club_counter = baker.make(Counter)
         role = baker.make(ClubRole, club=cls.club_counter.club, is_board=True)

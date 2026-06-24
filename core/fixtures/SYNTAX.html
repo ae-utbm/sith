@@ -2,12 +2,9 @@
 <h1>Markdown-AE Documentation</h1>
 <p>Le Markdown le plus standard se trouve documenté ici:
 <a href="https://www.markdownguide.org/basic-syntax">https://www.markdownguide.org/basic-syntax</a>.<br />
-Si cette page n'est pas exhaustive vis à vis de la syntaxe du site AE,
+Si cette page n’est pas exhaustive vis à vis de la syntaxe du site AE,
 elle a au moins le mérite de bien documenter le Markdown original.</p>
-<p>Le réel parseur du site AE est une version tunée de <a href="https://github.com/lepture/mistune">mistune</a>.<br />
-Les plus aventureux pourront aller lire ses <a href="https://github.com/lepture/mistune/blob/master/tests/fixtures">tests</a>
-afin d'en connaître la syntaxe le plus finement possible.<br />
-En pratique, cette page devrait déjà résumer une bonne partie.</p>
+<p>Le réel parseur du site AE est une version tunée de <a href="https://github.com/kivikakk/comrak">comrak</a>.</p>
 <h2>Basique</h2>
 <ul>
 <li>Mettre le texte en <strong>gras</strong> : <code>**texte**</code></li>
@@ -15,8 +12,8 @@ En pratique, cette page devrait déjà résumer une bonne partie.</p>
 <li><u>Souligner</u> le texte : <code>__texte__</code></li>
 <li><del>Barrer du texte</del> : <code>~~texte~~</code></li>
 <li>On peut bien sûr tout <del><em><strong><u>combiner</u></strong></em></del> : <code>~~***__texte__***~~</code></li>
-<li>Mettre du texte^en exposant^ : <code>&lt;sup&gt;texte&lt;/sup&gt;</code></li>
-<li>Mettre du texte~en indice~ : <code>&lt;sub&gt;texte&lt;/sub&gt;</code></li>
+<li>Mettre du texte<sup>en exposant</sup> : <code>&lt;sup&gt;texte&lt;/sup&gt;</code></li>
+<li>Mettre du texte<sub>en indice</sub> : <code>&lt;sub&gt;texte&lt;/sub&gt;</code></li>
 </ul>
 <h2>Liens</h2>
 <ul>
@@ -28,10 +25,10 @@ En pratique, cette page devrait déjà résumer une bonne partie.</p>
 </ul>
 <p><a href="http://www.site.com">nom du lien</a></p>
 <ul>
-<li>Les liens peuvent être internes au site de l'AE, on peut dès lors éviter d'entrer
-l'adresse complète d'une page : <code>[nom du lien](page://nomDeLaPage)</code></li>
+<li>Les liens peuvent être internes au site de l’AE, on peut dès lors éviter d’entrer
+l’adresse complète d’une page : <code>[nom du lien](page://nomDeLaPage)</code></li>
 </ul>
-<p><a href="/page/nomDeLaPage/">nom du lien</a></p>
+<p><a href="/page/nomDeLaPage">nom du lien</a></p>
 <ul>
 <li>On peut également utiliser une image pour les liens :
 <code>[nom du lien]![images/imageDuSiteAE.png](/chemin/vers/image.png titre optionnel)(options)</code></li>
@@ -94,25 +91,25 @@ etc...
 <table>
 <thead>
 <tr>
-  <th>Titre</th>
-  <th>Titre2</th>
-  <th>Titre3</th>
+<th>Titre</th>
+<th>Titre2</th>
+<th>Titre3</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-  <td>test</td>
-  <td>test</td>
-  <td>test</td>
+<td>test</td>
+<td>test</td>
+<td>test</td>
 </tr>
 <tr>
-  <td>test</td>
-  <td>test</td>
-  <td>test</td>
+<td>test</td>
+<td>test</td>
+<td>test</td>
 </tr>
 </tbody>
 </table>
-<p>L'alignement dans les cellules est géré comme suit, avec les ':' sur la ligne en dessous du titre:</p>
+<p>L’alignement dans les cellules est géré comme suit, avec les ‘:’ sur la ligne en dessous du titre:</p>
 <pre><code>|  Titre | Titre2 | Titre3 |
 |:-------|:------:|-------:|
 | gauche | centre | droite |
@@ -120,16 +117,16 @@ etc...
 <table>
 <thead>
 <tr>
-  <th style="text-align:left">Titre</th>
-  <th style="text-align:center">Titre2</th>
-  <th style="text-align:right">Titre3</th>
+<th align="left">Titre</th>
+<th align="center">Titre2</th>
+<th align="right">Titre3</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-  <td style="text-align:left">gauche</td>
-  <td style="text-align:center">centre</td>
-  <td style="text-align:right">droite</td>
+<td align="left">gauche</td>
+<td align="center">centre</td>
+<td align="right">droite</td>
 </tr>
 </tbody>
 </table>
@@ -141,11 +138,11 @@ etc...
 ![image de 350 pixels de large](/static/core/img/logo.png?350 &quot;Image de 350 pixels&quot;)
 ![image de 350x100 pixels](/static/core/img/logo.png?350x100 &quot;Image de 350x100 pixels&quot;)
 </code></pre>
-<p><img src="/static/core/img/logo.png" alt="image à 50%" title="Image à 50%" style="width:50%;" /><br />
+<p><img src="/static/core/img/logo.png" style="width:50%" alt="image à 50%" title="Image à 50%" /><br />
 Image à 50% de la largeur de la page.</p>
-<p><img src="/static/core/img/logo.png" alt="image de 350 pixels de large" title="Image de 350 pixels" style="width:350px;" /><br />
+<p><img src="/static/core/img/logo.png" style="width:350px" alt="image de 350 pixels de large" title="Image de 350 pixels" /><br />
 Image de 350 pixels de large.</p>
-<p><img src="/static/core/img/logo.png" alt="image de 350x100 pixels" title="Image de 350x100 pixels" style="width:350px;height:100px;" /><br />
+<p><img src="/static/core/img/logo.png" style="width:350px;height:100px" alt="image de 350x100 pixels" title="Image de 350x100 pixels" /><br />
 Image de 350x100 pixels.</p>
 <p>(devrait pouvoir détecter si vidéo ou non)</p>
 <h2>Blocs de citations</h2>
@@ -159,9 +156,9 @@ Image de 350x100 pixels.</p>
 un bloc de
 citation</p>
 </blockquote>
-<p>Il est possible d'intégrer de la syntaxe Markdown-AE dans un tel bloc.</p>
+<p>Il est possible d’intégrer de la syntaxe Markdown-AE dans un tel bloc.</p>
 <h2>Note de bas de page</h2>
-<p>On les crée comme ça<sup class="footnote-ref" id="fnref-1"><a href="#fn-1">1</a></sup>:</p>
+<p>On les crée comme ça<sup class="footnote-ref"><a href="#fn-key" id="fnref-key" data-footnote-ref>1</a></sup>:</p>
 <pre><code>Je fais une note[^clef].
 
 [^clef]: je note ensuite où je veux le contenu de ma clef qui apparaîtra quand même en bas
@@ -175,13 +172,15 @@ citation</p>
 </code></pre>
 <h2>Échapper des caractères</h2>
 <ul>
-<li>Il est possible d'ignorer un caractère spécial en l'échappant à l'aide d'un \</li>
-<li>L'échappement de blocs de codes complet se fera à l'aide de balises &lt;nosyntax&gt;&lt;/nosyntax&gt;</li>
+<li>Il est possible d’ignorer un caractère spécial en l’échappant à l’aide d’un \</li>
+<li>L’échappement de blocs de codes complet se fera à l’aide de balises &lt;nosyntax&gt;&lt;/nosyntax&gt;</li>
 </ul>
-<h2>Autres (hérité de l'ancien wiki)</h2>
+<h2>Autres (hérité de l’ancien wiki)</h2>
 <p>Une ligne peut être créée avec une ligne contenant 4 tirets (<code>----</code>).</p>
-<section class="footnotes">
+<section class="footnotes" data-footnotes>
 <ol>
-<li id="fn-1"><p>ceci est le contenu de ma clef<a href="#fnref-1" class="footnote">&#8617;</a></p></li>
+<li id="fn-key">
+<p>ceci est le contenu de ma clef <a href="#fnref-key" class="footnote-backref" data-footnote-backref data-footnote-backref-idx="1" aria-label="Back to reference 1">↩</a></p>
+</li>
 </ol>
 </section>

@@ -1,4 +1,5 @@
 import pytest
+from aemark import markdown
 from bs4 import BeautifulSoup
 from django.test import Client
 from django.urls import reverse
@@ -7,7 +8,6 @@ from pytest_django.asserts import assertHTMLEqual, assertRedirects
 
 from club.models import Club, ClubRole, Membership
 from core.baker_recipes import subscriber_user
-from core.markdown import markdown
 from core.models import PageRev, User
 
 

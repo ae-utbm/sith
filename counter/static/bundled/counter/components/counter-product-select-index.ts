@@ -6,7 +6,7 @@ const productParsingRegex = /^(\d+x)?(.*)/i;
 const codeParsingRegex = / \((\w+)\)$/;
 
 function parseProduct(query: string): [number, string] {
-  const parsed = productParsingRegex.exec(query);
+  const parsed = productParsingRegex.exec(query) as RegExpExecArray;
   return [Number.parseInt(parsed[1] || "1", 10), parsed[2]];
 }
 

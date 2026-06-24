@@ -144,6 +144,8 @@ class TestRefilling(TestFullClickBase):
         assert self.updated_amount(self.customer) == 0
 
     def test_refilling_no_refer_fail(self):
+        """Check that the refill fails is the HTTP_REFERER header is missing"""
+
         def refill():
             return self.client.post(
                 reverse(
@@ -157,13 +159,13 @@ class TestRefilling(TestFullClickBase):
             )
 
         self.client.force_login(self.club_admin)
-        assert refill()
+        assert refill().status_code == 403
 
         self.client.force_login(self.root)
-        assert refill()
+        assert refill().status_code == 403
 
         self.client.force_login(self.subscriber)
-        assert refill()
+        assert refill().status_code == 403
 
         assert self.updated_amount(self.customer) == 0
 
@@ -198,6 +200,17 @@ class TestRefilling(TestFullClickBase):
             ).status_code
             == 404
         )
+
+    def test_refilling_above_limit_fails(self):
+        """Test that it's forbidden to refill a customer above the limit."""
+        self.login_in_bar()
+        limit = settings.SITH_ACCOUNT_MAX_MONEY
+        # create a refilling to check that current balance is taken into account
+        baker.make(Refilling, customer=self.customer.customer, amount=limit // 2)
+        response = self.refill_user(self.customer, self.counter, (limit // 2) + 1)
+        assert response.status_code == 200  # no redirect = failure
+        self.customer.customer.refresh_from_db()
+        assert self.updated_amount(self.customer) == limit // 2
 
     def test_refilling_counter_success(self):
         self.login_in_bar()
@@ -522,6 +535,19 @@ class TestCounterClick(TestFullClickBase):
 
         assert self.updated_amount(self.customer) == Decimal(10)
 
+    def test_unrecord_above_limit_fails(self):
+        """Test that it's forbidden to give back a recorded product
+        if it puts the account balance above the limit.
+        """
+        self.login_in_bar()
+        limit = settings.SITH_ACCOUNT_MAX_MONEY
+        # put the account balance just at the limit
+        baker.make(Refilling, customer=self.customer.customer, amount=limit)
+        response = self.submit_basket(self.customer, [BasketItem(self.dcons.id, 1)])
+        assert response.status_code == 200  # no redirect = failure
+        self.customer.customer.refresh_from_db()
+        assert self.updated_amount(self.customer) == limit
+
     def test_annotate_has_barman_queryset(self):
         """Test if the custom queryset method `annotate_has_barman` works as intended."""
         counters = Counter.objects.annotate_has_barman(self.barmen)
@@ -760,10 +786,10 @@ class TestBarmanConnection(TestCase):
         assert last_perm.counter == self.counter
         assert last_perm.user == self.barman
         assert last_perm.end is None
-        assert self.barman in response.wsgi_request.barmen
         response = self.client.get(
             self.detail_url, {"username": self.barman.username, "password": "plop"}
         )
+        assert self.barman in response.wsgi_request.barmen
         assert response.context_data.get("barmen") == [self.barman]
         soup = BeautifulSoup(response.text, "lxml")
         assert soup.find("form", id="select-user-form") is not None
@@ -803,6 +829,41 @@ class TestBarmanConnection(TestCase):
             self.login_url, {"username": self.barman.username, "password": "plop"}
         )
         self.assert_counter_login_fails(self.barman)
+
+    def test_barman_already_logged_in_another_device(self):
+        """Test when the barman is already logged in the current counter on another device."""
+        other_client = Client()
+        other_client.post(
+            self.login_url, {"username": self.barman.username, "password": "plop"}
+        )
+        self.assert_counter_login_fails(self.barman)
+
+    def test_barman_login_elsewhere(self):
+        """Test when the barman log himself out then log in on another device."""
+        self.client.post(
+            self.login_url, {"username": self.barman.username, "password": "plop"}
+        )
+        other_client = Client()
+        other_client.post(
+            reverse("counter:logout", kwargs={"counter_id": self.counter.id}),
+            data={"user_id": self.barman.id},
+        )
+        response = other_client.post(
+            self.login_url, {"username": self.barman.username, "password": "plop"}
+        )
+        assert response.status_code == 200
+        assert response.headers["HX-Redirect"] == self.detail_url
+        # the barmen should now be logged in `other_client`...
+        response = other_client.get(
+            self.detail_url, {"username": self.barman.username, "password": "plop"}
+        )
+        assert self.barman in response.wsgi_request.barmen
+
+        # ... but not in `self.client`
+        response = self.client.get(
+            self.detail_url, {"username": self.barman.username, "password": "plop"}
+        )
+        assert self.barman not in response.wsgi_request.barmen
 
     def test_barman_already_logged_elsewhere(self):
         """Test when the barman is already logged in another counter."""

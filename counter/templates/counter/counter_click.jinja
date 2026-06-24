@@ -176,13 +176,17 @@
           </form>
         </div>
       </details>
-      <details class="accordion" name="selling">
+      <details
+        class="accordion"
+        name="selling"
+        @toggle="if ($event.newState === 'open') $el.querySelector('input[type=number]')?.focus()"
+      >
         <summary>{% trans %}Refilling{% endtrans %}</summary>
         {% if object.type == "BAR" %}
           {% if refilling_fragment %}
             <div
               class="accordion-content"
-              @htmx:after-request="onRefillingSuccess"
+              @htmx:after-swap="onRefillingSuccess"
             >
               {{ refilling_fragment }}
             </div>

@@ -278,6 +278,27 @@ class TestEboutic(TestCase):
         )
         assert Basket.objects.count() == 2
 
+    def test_refill_limit(self):
+        """Test that an eboutic basket cannot refill an account above the limit."""
+        self.client.force_login(self.subscriber)
+        product = product_recipe.make(
+            product_type_id=settings.SITH_COUNTER_PRODUCTTYPE_REFILLING,
+            counters=[self.eboutic],
+        )
+        price = price_recipe.make(
+            product=product,
+            groups=[self.group_cotiz],
+            amount=settings.SITH_ACCOUNT_MAX_MONEY // 10,
+        )
+
+        response = self.submit_basket([BasketItem(price.id, 10)])
+        assert Basket.objects.count() == 1
+        assertRedirects(response, reverse("eboutic:checkout", kwargs={"basket_id": 1}))
+
+        response = self.submit_basket([BasketItem(price.id, 11)])
+        assert Basket.objects.count() == 1
+        assert response.status_code == 200  # no redirect = form validation failed
+
     def test_create_basket(self):
         self.client.force_login(self.new_customer)
         assertRedirects(
