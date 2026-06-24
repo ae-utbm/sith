@@ -55,7 +55,6 @@ declare interface NDEFRecordInit {
 // biome-ignore lint/style/useNamingConvention: this is the official API name
 declare type NDEFMessageSource = string | BufferSource | NDEFMessageInit;
 
-// biome-ignore lint/correctness/noUnusedVariables: this is the official definition
 interface Window {
   // biome-ignore lint/style/useNamingConvention: this is the official API name
   NDEFReader: NDEFReader;
