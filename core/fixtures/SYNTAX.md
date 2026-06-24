@@ -7,10 +7,7 @@ https://www.markdownguide.org/basic-syntax.
 Si cette page n'est pas exhaustive vis à vis de la syntaxe du site AE,
 elle a au moins le mérite de bien documenter le Markdown original.
 
-Le réel parseur du site AE est une version tunée de [mistune](https://github.com/lepture/mistune).  
-Les plus aventureux pourront aller lire ses [tests](https://github.com/lepture/mistune/blob/master/tests/fixtures)
-afin d'en connaître la syntaxe le plus finement possible.  
-En pratique, cette page devrait déjà résumer une bonne partie.
+Le réel parseur du site AE est une version tunée de [comrak](https://github.com/kivikakk/comrak).  
 
 ## Basique
 

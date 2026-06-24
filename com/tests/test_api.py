@@ -2,6 +2,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import pytest
+from aemark import markdown
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.http import HttpResponse
@@ -13,7 +14,6 @@ from pytest_django.asserts import assertNumQueries
 
 from com.ics_calendar import IcsCalendar
 from com.models import News, NewsDate
-from core.markdown import markdown
 from core.models import User
 
 

@@ -2,6 +2,7 @@ from datetime import timedelta
 
 import freezegun
 import pytest
+from aemark import markdown
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -13,7 +14,6 @@ from pytest_django.asserts import assertHTMLEqual, assertRedirects
 
 from club.models import Club, Membership
 from core.baker_recipes import board_user, subscriber_user
-from core.markdown import markdown
 from core.models import AnonymousUser, Page, PageRev, User
 
 

@@ -22,10 +22,9 @@
 #
 
 
+from aemark import markdown
 from django.conf import settings
 from django.core.management.base import BaseCommand
-
-from core.markdown import markdown
 
 
 class Command(BaseCommand):

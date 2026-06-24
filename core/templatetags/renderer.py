@@ -25,13 +25,12 @@
 import datetime
 
 import phonenumbers
+from aemark import markdown as md
 from django import template
 from django.forms import BoundField
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe
 from django.utils.translation import ngettext
-
-from core.markdown import markdown as md
 
 register = template.Library()
 
