@@ -63,7 +63,7 @@ class PictureWithIdentifications {
     if (this.identificationsLoading) {
       return; // The users are already being fetched.
     }
-    if (!!this.identifications && !options?.forceReload) {
+    if (this.identifications && !options?.forceReload) {
       // The users are already fetched
       // and the user does not want to force the reload
       return;
@@ -82,7 +82,7 @@ class PictureWithIdentifications {
     if (this.moderationLoading) {
       return; // The moderation requests are already being fetched.
     }
-    if (!!this.moderationRequests && !options?.forceReload) {
+    if (this.moderationRequests && !options?.forceReload) {
       // The moderation requests are already fetched
       // and the user does not want to force the reload
       return;
