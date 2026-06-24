@@ -251,8 +251,12 @@ class ApplyElectionResultForm(forms.Form):
                     user_id=c.user_id,
                     club_id=c.role.club_role.club_id,
                     role=c.role.club_role,
+                    description=(
+                        c.role.title if c.role.title != c.role.club_role.name else ""
+                    ),
                 )
                 for c in candidates
             ]
             Membership.objects.bulk_create(memberships)
             Membership._add_club_groups(memberships)
+        return memberships
