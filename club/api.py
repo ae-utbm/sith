@@ -11,6 +11,7 @@ from club.models import Club, Membership
 from club.schemas import (
     ClubSchema,
     ClubSearchFilterSchema,
+    MembershipFilterSchema,
     SimpleClubSchema,
     UserMembershipSchema,
 )
@@ -62,3 +63,43 @@ class UserClubController(ControllerBase):
             .filter(user=user)
             .select_related("club", "user", "role")
         )
+
+
+@api_controller("/clubs/members/")
+class ClubMembershipController(ControllerBase):
+    @route.get(
+        "/new",
+        response=list[UserMembershipSchema],
+        auth=[ApiKeyAuth(), SessionAuth()],
+        permissions=[HasPerm("club.view_club")],
+        url_name="get_new_clubs_members_since_date",
+    )
+    def fetch_new_club_members(self, filters: Query[MembershipFilterSchema]):
+        """give all the members of all clubs that have joined since a given date"""
+        memberships = (
+            Membership.objects.ongoing()
+            .filter(start_date__gte=filters.since_date, end_date__isnull=True)
+            .select_related("user", "role", "club")
+        )
+        if filters.clubs_id:
+            memberships = memberships.filter(club_id__in=filters.clubs_id)
+
+        return memberships.order_by("start_date")
+
+    @route.get(
+        "/former",
+        response=list[UserMembershipSchema],
+        auth=[ApiKeyAuth(), SessionAuth()],
+        permissions=[HasPerm("club.view_club")],
+        url_name="get_former_clubs_members_since_date",
+    )
+    def fetch_former_club_members(self, filters: Query[MembershipFilterSchema]):
+        """give all the former members of all clubs that have left since a given date"""
+        memberships = Membership.objects.filter(
+            start_date__lt=filters.since_date,
+            end_date__gte=filters.since_date,
+        ).select_related("user", "role", "club")
+        if filters.clubs_id:
+            memberships = memberships.filter(club_id__in=filters.clubs_id)
+
+        return memberships.order_by("start_date")
