@@ -47,14 +47,15 @@ class TestThirdPartyAuth(TestCase):
         self.callback_data["signature"] = hmac_hexdigest(
             self.api_client.hmac_key, self.callback_data["user"]
         )
+        self.url = reverse("api-link:third-party-auth", query=self.query)
 
     def test_auth_ok(self):
         self.client.force_login(self.user)
-        res = self.client.get(reverse("api-link:third-party-auth", query=self.query))
+        res = self.client.get(self.url)
         assert res.status_code == 200
         with mock.patch("requests.post", new_callable=mocked_post(ok=True)) as mocked:
             res = self.client.post(
-                reverse("api-link:third-party-auth"),
+                self.url,
                 data={"cgu_accepted": True, "is_username_valid": True, **self.query},
             )
             mocked.assert_called_once_with(
@@ -70,7 +71,7 @@ class TestThirdPartyAuth(TestCase):
         self.client.force_login(self.user)
         with mock.patch("requests.post", new_callable=mocked_post(ok=False)) as mocked:
             res = self.client.post(
-                reverse("api-link:third-party-auth"),
+                self.url,
                 data={"cgu_accepted": True, "is_username_valid": True, **self.query},
             )
             mocked.assert_called_once_with(
@@ -98,14 +99,17 @@ class TestThirdPartyAuth(TestCase):
             )
         ]
 
+        res = self.client.post(self.url, data=self.query)
+        assert res.status_code == 200
+
     def test_cgu_not_accepted(self):
         self.client.force_login(self.user)
-        res = self.client.get(reverse("api-link:third-party-auth", query=self.query))
+        res = self.client.get(self.url)
         assert res.status_code == 200
-        res = self.client.post(reverse("api-link:third-party-auth"), data=self.query)
+        res = self.client.post(self.url, data=self.query)
         assert res.status_code == 200  # no redirect means invalid form
         res = self.client.post(
-            reverse("api-link:third-party-auth"),
+            self.url,
             data={"cgu_accepted": False, "is_username_valid": False, **self.query},
         )
         assert res.status_code == 200
@@ -132,3 +136,5 @@ class TestThirdPartyAuth(TestCase):
                 message="Les données fournies pour l'authentification sont incorrectes.",
             )
         ]
+        res = self.client.post(self.url, data=self.query)
+        assert res.status_code == 200

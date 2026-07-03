@@ -39,8 +39,8 @@ class ThirdPartyAuthView(AccessMixin, FormView):
         # the given parameters and their signature are checked during both
         # POST (for obvious reasons) and GET (in order not to make
         # the user fill a form just to get an error he won't understand)
-        params = self.request.GET or self.request.POST
-        params = {key: unquote(val) for key, val in params.items()}
+        params = self.request.GET if self.request.method == "GET" else self.request.POST
+        params = {key: unquote(val) for key, val in params.dict().items()}
         try:
             params = ThirdPartyAuthParamsSchema(**params)
         except pydantic.ValidationError:
@@ -48,7 +48,7 @@ class ThirdPartyAuthView(AccessMixin, FormView):
                 self.request, _("The data provided for authentication is incorrect")
             )
             return None
-        client: ApiClient = get_object_or_none(ApiClient, id=params.client_id)
+        client: ApiClient | None = get_object_or_none(ApiClient, id=params.client_id)
         if not client:
             messages.error(
                 self.request, _("The data provided for authentication is incorrect")
@@ -71,11 +71,11 @@ class ThirdPartyAuthView(AccessMixin, FormView):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
-        self.params = self.parse_params()
-        if not self.params:
+        if (params := self.parse_params()) is None:
             # if parameters parsing failed, shortcut the operation and display
             # an empty page with just the error messages.
             return render(request, "core/base.jinja")
+        self.params = params
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, *args, **kwargs):
