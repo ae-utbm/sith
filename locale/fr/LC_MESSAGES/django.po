@@ -4466,47 +4466,6 @@ msgid "this page"
 msgstr "cette page"
 
 #: eboutic/templates/eboutic/eboutic_main.jinja
-msgid "Eurockéennes 2025 partnership"
-msgstr "Partenariat Eurockéennes 2025"
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid ""
-"Our partner uses Weezevent to sell tickets. Weezevent may collect user info "
-"according to its own privacy policy. By clicking the accept button you "
-"consent to their terms of services."
-msgstr ""
-"Notre partenaire utilises Wezevent pour vendre ses billets. Weezevent peut "
-"collecter des informations utilisateur conformément à sa propre politique de "
-"confidentialité. En cliquant sur le bouton d'acceptation vous consentez à "
-"leurs termes de service."
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid "Privacy policy"
-msgstr "Politique de confidentialité"
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-#: trombi/templates/trombi/comment_moderation.jinja
-msgid "Accept"
-msgstr "Accepter"
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-msgid ""
-"You must be subscribed to benefit from the partnership with the Eurockéennes."
-msgstr ""
-"Vous devez être cotisant pour bénéficier du partenariat avec les "
-"Eurockéennes."
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
-#, python-format
-msgid ""
-"This partnership offers a discount of up to 33%% on tickets for Friday, "
-"Saturday and Sunday, as well as the 3-day package from Friday to Sunday."
-msgstr ""
-"Ce partenariat permet de profiter d'une réduction jusqu'à 33%% sur les "
-"billets du vendredi, du samedi et du dimanche, ainsi qu'au forfait 3 jours, "
-"du vendredi au dimanche."
-
-#: eboutic/templates/eboutic/eboutic_main.jinja
 msgid "Product sold out"
 msgstr "Produit épuisé"
 
@@ -5948,6 +5907,10 @@ msgstr "fin"
 #: trombi/templates/trombi/comment_moderation.jinja
 msgid "Moderate Trombi comments"
 msgstr "Modérer les commentaires du Trombi"
+
+#: trombi/templates/trombi/comment_moderation.jinja
+msgid "Accept"
+msgstr "Accepter"
 
 #: trombi/templates/trombi/comment_moderation.jinja
 msgid "Reject"
