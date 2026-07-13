@@ -1,4 +1,9 @@
-import { Calendar, type EventClickArg, type EventContentArg } from "@fullcalendar/core";
+import {
+  Calendar,
+  type EventClickArg,
+  type EventContentArg,
+  type EventInput,
+} from "@fullcalendar/core";
 import type { EventImpl } from "@fullcalendar/core/internal";
 import enLocale from "@fullcalendar/core/locales/en-gb";
 import frLocale from "@fullcalendar/core/locales/fr";
@@ -6,8 +11,8 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import iCalendarPlugin from "@fullcalendar/icalendar";
 import listPlugin from "@fullcalendar/list";
 import { type HTMLTemplateResult, html, render } from "lit-html";
-import { makeUrl } from "#core:utils/api.ts";
-import { inheritHtmlElement, registerComponent } from "#core:utils/web-components.ts";
+import { type GenericEndpoint, makeUrl } from "#core:utils/api";
+import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
 import {
   calendarCalendarInternal,
   calendarCalendarUnpublished,
@@ -19,11 +24,11 @@ import {
 @registerComponent("ics-calendar")
 export class IcsCalendar extends inheritHtmlElement("div") {
   static observedAttributes = ["locale", "can_moderate", "can_delete", "ics-help-url"];
-  private calendar: Calendar;
-  private locale = "en";
-  private canModerate = false;
-  private canDelete = false;
-  private helpUrl = "";
+  private calendar!: Calendar;
+  private locale? = "en";
+  private canModerate? = false;
+  private canDelete? = false;
+  private helpUrl? = "";
 
   // Hack variable to detect recurring events
   // The underlying ics library doesn't include any info about rrules
@@ -35,10 +40,12 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       this.locale = newValue;
     }
     if (name === "can_moderate") {
-      this.canModerate = newValue.toLowerCase() === "true";
+      this.canModerate =
+        typeof newValue === "string" && newValue.toLowerCase() === "true";
     }
     if (name === "can_delete") {
-      this.canDelete = newValue.toLowerCase() === "true";
+      this.canDelete =
+        typeof newValue === "string" && newValue.toLowerCase() === "true";
     }
 
     if (name === "ics-help-url") {
@@ -94,7 +101,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
         .toString()
         .split("/")
         .filter((s) => s) // Remove blank characters
-        .pop(),
+        .pop() as string,
       10,
     );
   }
@@ -159,7 +166,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     this.refreshEvents();
   }
 
-  async getEventSources() {
+  async getEventSources(): Promise<EventInput[]> {
     const tagRecurringEvents = (eventData: EventImpl) => {
       // This functions tags events with a similar event url
       // We rely on the fact that the event url is always the same
@@ -173,14 +180,14 @@ export class IcsCalendar extends inheritHtmlElement("div") {
     };
     return [
       {
-        url: `${await makeUrl(calendarCalendarInternal)}`,
+        url: `${await makeUrl(calendarCalendarInternal as GenericEndpoint)}`,
         format: "ics",
         className: "internal",
         cache: false,
         eventDataTransform: tagRecurringEvents,
       },
       {
-        url: `${await makeUrl(calendarCalendarUnpublished)}`,
+        url: `${await makeUrl(calendarCalendarUnpublished as GenericEndpoint)}`,
         format: "ics",
         color: "red",
         className: "unpublished",
@@ -213,7 +220,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
             ${event.title}
           </h4>
           <span class="event-details-row-content">
-            ${this.formatDate(event.start)} - ${this.formatDate(event.end)}
+            ${this.formatDate(event.start as Date)} - ${this.formatDate(event.end as Date)}
           </span>
         </div>
       `;
@@ -251,7 +258,7 @@ export class IcsCalendar extends inheritHtmlElement("div") {
       const buttons = [] as HTMLTemplateResult[];
 
       if (this.canModerate) {
-        if (event.source.internalEventSource.ui.classNames.includes("unpublished")) {
+        if (event.source?.internalEventSource.ui.classNames.includes("unpublished")) {
           const button = html`
             <button class="btn btn-green" @click="${() => this.publishNews(newsId)}">
               <i class="fa fa-check"></i>${gettext("Publish")}
@@ -338,9 +345,9 @@ export class IcsCalendar extends inheritHtmlElement("div") {
               button.classList.remove("text-copied");
             }
             button.setAttribute("tooltip", gettext("Link copied"));
-            navigator.clipboard.writeText(
+            await navigator.clipboard.writeText(
               new URL(
-                await makeUrl(calendarCalendarInternal),
+                await makeUrl(calendarCalendarInternal as GenericEndpoint),
                 window.location.origin,
               ).toString(),
             );

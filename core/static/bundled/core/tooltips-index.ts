@@ -70,15 +70,16 @@ function createTooltip(element: HTMLElement) {
 function updateTooltip(element: HTMLElement, tooltip: HTMLElement, status: Status) {
   // Update tooltip status and set it's attributes and content
   tooltip.setAttribute("tooltip-status", status);
-  tooltip.innerText = element.getAttribute("tooltip");
+  tooltip.innerText = element.getAttribute("tooltip") as string;
 
   for (const attributes of [
     { src: "tooltip-class", dst: "class", default: ["tooltip"] },
     { src: "tooltip-id", dst: "id", default: [] },
   ]) {
     const populated = attributes.default;
-    if (element.hasAttribute(attributes.src)) {
-      populated.push(...element.getAttribute(attributes.src).split(" "));
+    const attr = element.getAttribute(attributes.src);
+    if (attr !== null) {
+      populated.push(...attr.split(" "));
     }
     tooltip.setAttribute(attributes.dst, populated.join(" "));
   }
@@ -93,7 +94,7 @@ function getTooltip(element: HTMLElement) {
   return tooltip;
 }
 
-function tooltipMouseover(event: MouseEvent) {
+function tooltipMouseover(event: Event) {
   // We get the closest tooltip to have a consistent behavior
   // when hovering over a child element of a tooltip marked element
   const target = (event.target as HTMLElement).closest("[tooltip]") as HTMLElement;
@@ -111,7 +112,7 @@ function tooltipMouseover(event: MouseEvent) {
   });
 }
 
-function tooltipMouseout(event: MouseEvent) {
+function tooltipMouseout(event: Event) {
   // We get the closest tooltip to have a consistent behavior
   // when hovering over a child element of a tooltip marked element
   const target = (event.target as HTMLElement).closest("[tooltip]") as HTMLElement;
@@ -141,7 +142,7 @@ new MutationObserver((mutations: MutationRecord[]) => {
       }
     } else if (tooltips.has(target)) {
       // Remove corresponding tooltip
-      tooltips.get(target).remove();
+      tooltips.get(target)?.remove();
       tooltips.delete(target);
     }
   }
@@ -163,7 +164,7 @@ new MutationObserver((mutations: MutationRecord[]) => {
         continue;
       }
       if (tooltips.has(target)) {
-        tooltips.get(target).remove();
+        tooltips.get(target)?.remove();
         tooltips.delete(target);
       }
     }

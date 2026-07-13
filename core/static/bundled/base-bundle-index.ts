@@ -43,13 +43,19 @@ polyfillCountryFlagEmojis();
 /**
  * HTMX
  */
-document.body.addEventListener("htmx:beforeRequest", (event: CustomEvent) => {
-  event.detail.target.ariaBusy = true;
-});
+document.body.addEventListener(
+  "htmx:beforeRequest" as keyof HTMLElementEventMap,
+  (event) => {
+    (event as CustomEvent).detail.target.ariaBusy = true;
+  },
+);
 
-document.body.addEventListener("htmx:beforeSwap", (event: CustomEvent) => {
-  event.detail.target.ariaBusy = null;
-});
+document.body.addEventListener(
+  "htmx:beforeSwap" as keyof HTMLElementEventMap,
+  (event) => {
+    (event as CustomEvent).detail.target.ariaBusy = null;
+  },
+);
 
 Object.assign(window, { htmx });
 

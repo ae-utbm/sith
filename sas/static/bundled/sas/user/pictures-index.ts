@@ -57,14 +57,16 @@ document.addEventListener("alpine:init", () => {
 
     async init() {
       const pictures = await this.fetchPictures();
-      const groupedAlbums = Object.groupBy(pictures, (i: PictureSchema) => i.album.id);
-      this.albums = Object.values(groupedAlbums).map((pictures: PictureSchema[]) => {
-        return {
-          id: pictures[0].album.id,
-          name: pictures[0].album.name,
-          pictures: pictures,
-        };
-      });
+      const groupedAlbums = Object.groupBy(pictures, (i) => i.album.id as number);
+      this.albums = Object.values(groupedAlbums as Record<number, PictureSchema[]>).map(
+        (pictures) => {
+          return {
+            id: pictures[0].album.id as number,
+            name: pictures[0].album.name,
+            pictures: pictures,
+          };
+        },
+      );
       this.albums.sort((a: Album, b: Album) => b.id - a.id);
       const hash = document.location.hash.replace("#", "");
       if (hash.startsWith("album-")) {

@@ -1,6 +1,6 @@
 import { html, render } from "lit-html";
 import { unsafeHTML } from "lit-html/directives/unsafe-html.js";
-import { registerComponent } from "#core:utils/web-components.ts";
+import { registerComponent } from "#core:utils/web-components";
 
 @registerComponent("ui-tab")
 export class Tab extends HTMLElement {
@@ -19,7 +19,7 @@ export class Tab extends HTMLElement {
     }
 
     if (name === "title") {
-      this.description = newValue;
+      this.description = newValue ?? "";
     }
     this.dispatchEvent(new CustomEvent("ui-tab-updated", { bubbles: true }));
   }
@@ -79,15 +79,15 @@ export class Tab extends HTMLElement {
 
 @registerComponent("ui-tab-group")
 export class TabGroup extends HTMLElement {
-  private node: HTMLDivElement;
+  private node!: HTMLDivElement;
 
   connectedCallback() {
     this.node = document.createElement("div");
     this.node.classList.add("tabs", "shadow");
     this.appendChild(this.node);
 
-    this.addEventListener("ui-tab-activated", (event: CustomEvent) => {
-      const target = event.detail as Tab;
+    this.addEventListener("ui-tab-activated", (event) => {
+      const target = (event as CustomEvent).detail as Tab;
       for (const tab of this.getElementsByTagName("ui-tab") as HTMLCollectionOf<Tab>) {
         if (tab !== target) {
           tab.setActive(false);

@@ -61,10 +61,10 @@ document.addEventListener("alpine:init", () => {
           // biome-ignore lint/style/useNamingConvention: api is in snake_case
           path: { basket_id: basket.id },
         });
-        if (res.response.ok) {
+        if (res.response?.ok) {
           this.data = res.data as Record<string, string>;
           this.isCbAvailable = true;
-        } else if (res.response.status === 410) {
+        } else if (res.response?.status === 410) {
           // The basket is expired, so no payment method should be available at all.
           // This shouldn't happen, because we don't send the request
           // when the timeout is passed, but we are better safe than sorry

@@ -1,11 +1,11 @@
 import { type NewsDateSchema, newsFetchNewsDates } from "#openapi";
 
-interface ParsedNewsDateSchema extends Omit<NewsDateSchema, "start_date" | "end_date"> {
+type ParsedNewsDateSchema = Omit<NewsDateSchema, "start_date" | "end_date"> & {
   // biome-ignore lint/style/useNamingConvention: api is snake_case
   start_date: Date;
   // biome-ignore lint/style/useNamingConvention: api is snake_case
   end_date: Date;
-}
+};
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("upcomingNewsLoader", (startDate: Date, locale: string) => ({
@@ -32,6 +32,11 @@ document.addEventListener("alpine:init", () => {
           page_size: this.pageSize,
         },
       });
+      if (response.response === undefined || response.data === undefined) {
+        // response may be undefined, because error may be
+        // from building the request object itself or from a network error
+        return;
+      }
       if (response.response.status === 404) {
         this.hasNext = false;
       } else if (response.data.next === null) {
@@ -44,7 +49,7 @@ document.addEventListener("alpine:init", () => {
       this.loading = false;
     },
 
-    groupedDates(): Record<string, NewsDateSchema[]> {
+    groupedDates(): Record<string, ParsedNewsDateSchema[]> {
       return this.newsDates
         .map(
           (date: NewsDateSchema): ParsedNewsDateSchema => ({

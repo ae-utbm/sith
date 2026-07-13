@@ -1,20 +1,13 @@
-import cytoscape, {
-  type ElementDefinition,
-  type NodeSingular,
-  type Singular,
-} from "cytoscape";
+import cytoscape, { type ElementDefinition, type Singular } from "cytoscape";
 import cxtmenu from "cytoscape-cxtmenu";
 import klay, { type KlayLayoutOptions } from "cytoscape-klay";
-import { History, initialUrlParams, updateQueryString } from "#core:utils/history.ts";
+import { History, initialUrlParams, updateQueryString } from "#core:utils/history";
 import { familyGetFamilyGraph, type UserProfileSchema } from "#openapi";
 
 cytoscape.use(klay);
 cytoscape.use(cxtmenu);
 
-type GraphData = (
-  | { data: UserProfileSchema }
-  | { data: { source: number; target: number } }
-)[];
+type GraphData = { data: UserProfileSchema | { source: number; target: number } }[];
 
 function isMobile() {
   return window.innerWidth < 500;
@@ -27,10 +20,8 @@ async function getGraphData(
 ): Promise<GraphData> {
   const data = (
     await familyGetFamilyGraph({
-      path: {
-        // biome-ignore lint/style/useNamingConvention: api is snake_case
-        user_id: userId,
-      },
+      // biome-ignore lint/style/useNamingConvention: api is snake_case
+      path: { user_id: userId },
       query: {
         // biome-ignore lint/style/useNamingConvention: api is snake_case
         godfathers_depth: godfathersDepth,
@@ -39,6 +30,10 @@ async function getGraphData(
       },
     })
   ).data;
+  if (data === undefined) {
+    console.error("Family graph request failed");
+    return [];
+  }
   return [
     ...data.users.map((user) => {
       return { data: user };
@@ -155,7 +150,7 @@ function createGraph(container: HTMLDivElement, data: GraphData, activeUserId: n
       {
         content: '<i class="fa fa-external-link fa-2x"></i>',
         select: (el) => {
-          window.open(el.data().profile_url, "_blank").focus();
+          window.open(el.data().profile_url, "_blank")?.focus();
         },
       },
 
@@ -195,12 +190,12 @@ document.addEventListener("alpine:init", () => {
     godfathersDepth: 0,
     godchildrenDepth: 0,
     reverse: initialUrlParams.get("reverse")?.toLowerCase?.() === "true",
-    graph: undefined as cytoscape.Core,
-    graphData: {},
+    graph: undefined as unknown as cytoscape.Core,
+    graphData: {} as GraphData,
     isZoomEnabled: !isMobile(),
 
     getInitialDepth(prop: string) {
-      const value = Number.parseInt(initialUrlParams.get(prop), 10);
+      const value = Number.parseInt(initialUrlParams.get(prop) as string, 10);
       if (Number.isNaN(value) || value < config.depthMin || value > config.depthMax) {
         return defaultDepth;
       }
@@ -223,8 +218,8 @@ document.addEventListener("alpine:init", () => {
           await delayedFetch();
         });
       }
-      this.$watch("reverse", async (value: number) => {
-        updateQueryString("reverse", value.toString(), History.Replace);
+      this.$watch("reverse", async (newValue, _oldValue) => {
+        updateQueryString("reverse", newValue.toString(), History.Replace);
         await this.reverseGraph();
       });
       this.$watch("graphData", async () => {
@@ -259,9 +254,9 @@ document.addEventListener("alpine:init", () => {
     },
 
     async reverseGraph() {
-      this.graph.elements((el: NodeSingular) => {
-        el.position({ x: -el.position().x, y: -el.position().y });
-      });
+      this.graph
+        .elements()
+        .positions((el, _) => ({ x: -el.position().x, y: -el.position().y }));
       this.graph.center(this.graph.elements());
     },
 

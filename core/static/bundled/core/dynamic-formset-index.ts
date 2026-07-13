@@ -26,19 +26,23 @@ document.addEventListener("alpine:init", () => {
    * `counter/templates/counter/product_form.jinja`
    */
   Alpine.data("dynamicFormSet", (config?: Config) => ({
+    formContainer: undefined as unknown as HTMLElement,
+    nbForms: 0,
+    template: undefined as unknown as HTMLTemplateElement,
+
     init() {
       this.formContainer = this.$refs.formContainer as HTMLElement;
       this.nbForms = this.formContainer.children.length as number;
       this.template = this.$refs.formTemplate as HTMLTemplateElement;
       const prefix = config?.prefix ?? "form";
-      this.$root
-        .querySelector(`#id_${prefix}-TOTAL_FORMS`)
-        .setAttribute(":value", "nbForms");
+      (
+        this.$root.querySelector(`#id_${prefix}-TOTAL_FORMS`) as HTMLFormElement
+      ).setAttribute(":value", "nbForms");
     },
 
     addForm() {
       this.formContainer.appendChild(document.importNode(this.template.content, true));
-      const newForm = this.formContainer.lastElementChild;
+      const newForm = this.formContainer.lastElementChild as Element;
       const inputs: NodeListOf<HTMLFormInputElement> = newForm.querySelectorAll(
         "input, select, textarea",
       );
@@ -59,7 +63,7 @@ document.addEventListener("alpine:init", () => {
       this.nbForms -= 1;
       // adjust the id of remaining forms
       for (let i = 0; i < this.nbForms; i++) {
-        const form: HTMLDivElement = this.formContainer.children[i];
+        const form = this.formContainer.children[i];
         const inputs: NodeListOf<HTMLFormInputElement> = form.querySelectorAll(
           "input, select, textarea",
         );

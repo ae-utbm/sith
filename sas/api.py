@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Literal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -20,7 +20,7 @@ from api.permissions import (
     IsRoot,
 )
 from core.models import Notification, User
-from core.schemas import UploadedImage
+from core.schemas import UploadedImage, ValidationErrorSchema
 from sas.models import Album, PeoplePictureRelation, Picture
 from sas.schemas import (
     AlbumAutocompleteSchema,
@@ -106,7 +106,7 @@ class PicturesController(ControllerBase):
         response={
             200: None,
             409: dict[Literal["detail"], dict[str, list[str]]],
-            422: dict[Literal["detail"], list[dict[str, Any]]],
+            422: ValidationErrorSchema,
         },
         url_name="upload_picture",
     )

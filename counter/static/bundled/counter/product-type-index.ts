@@ -1,5 +1,5 @@
 import Alpine from "alpinejs";
-import { AlertMessage } from "#core:utils/alert-message.ts";
+import { AlertMessage } from "#core:utils/alert-message";
 import { producttypeReorder } from "#openapi";
 
 document.addEventListener("alpine:init", () => {
@@ -22,7 +22,7 @@ document.addEventListener("alpine:init", () => {
       const productTypes = this.$refs.productTypes
         .childNodes as NodeListOf<HTMLLIElement>;
       const getId = (elem: HTMLLIElement) =>
-        Number.parseInt(elem.getAttribute("x-sort:item"), 10);
+        Number.parseInt(elem.getAttribute("x-sort:item") as string, 10);
       const query =
         newPosition === 0
           ? { above: getId(productTypes.item(1)) }
@@ -32,6 +32,10 @@ document.addEventListener("alpine:init", () => {
         path: { type_id: itemId },
         query: query,
       });
+      if (response.response === undefined) {
+        console.error("Product type reordering request failed");
+        return;
+      }
       this.openAlertMessage(response.response);
       this.loading = false;
     },

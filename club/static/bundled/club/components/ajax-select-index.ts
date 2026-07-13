@@ -1,7 +1,6 @@
-import type { TomOption } from "tom-select/dist/types/types";
-import type { escape_html } from "tom-select/dist/types/utils";
-import { AjaxSelect } from "#core:core/components/ajax-select-base.ts";
-import { registerComponent } from "#core:utils/web-components.ts";
+import type { escape_html } from "tom-select/src/utils";
+import { AjaxSelect } from "#core:core/components/ajax-select-base";
+import { registerComponent } from "#core:utils/web-components";
 import { type ClubSchema, clubSearchClub } from "#openapi";
 
 @registerComponent("club-ajax-select")
@@ -10,7 +9,7 @@ export class ClubAjaxSelect extends AjaxSelect {
   protected labelField = "name";
   protected searchField = ["code", "name"];
 
-  protected async search(query: string): Promise<TomOption[]> {
+  protected async search(query: string) {
     const resp = await clubSearchClub({ query: { search: query } });
     if (resp.data) {
       return resp.data.results;
