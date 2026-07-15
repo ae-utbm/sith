@@ -16,6 +16,12 @@ Deux informations vous sont nécessaires, en plus de votre clef d'API :
   renseignée dans le header [X-APIKey](./connect.md#x-apikey)
 - la clef HMAC du client : vous devez la demander à l'équipe info.
 
+Ces deux éléments ont une fonction différente : l'id du client permet
+de dire au serveur quelle est l'application qui s'adresse à lui,
+tandis que la [clef HMAC](https://fr.wikipedia.org/wiki/HMAC)
+servira à créer une signature unique permettant de s'assurer
+que les données transmises n'ont pas été falsifiées.
+
 Grâce à ces informations, vous allez pouvoir fournir le contexte nécessaire
 au site AE pour qu'il authentifie vos utilisateurs.
 
@@ -251,7 +257,7 @@ doit être strictement le même que celui donné plus haut.
         - `hmac` (>=0.12.1)
         - `url` (>=2.5.7, features `serde`)
         - `serde` (>=1.0.228, features `derive`)
-        - `serde_urlencoded` (>="0.7.1)
+        - `serde_urlencoded` (>=0.7.1)
         - `sha2` (>=0.10.9)
         - `dotenvy` (>= 0.15)
     
@@ -354,7 +360,7 @@ doit être strictement le même que celui donné plus haut.
         post_data = <récupération des données POST>
         print(
             "signature valide :", 
-            is_signature_valid(post_data["user"], post_data["signature"]
+            is_signature_valid(post_data["user"], post_data["signature"])
         )
     ```
 
