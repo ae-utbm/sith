@@ -147,13 +147,14 @@ Voici quelques exemples :
     env = Env()
     env.read_env()
 
+
     async def main():
         async with aiohttp.ClientSession(
-            base_url="https://ae.utbm.fr/api/",
-            headers={"X-APIKey": env.str("API_KEY")}
+            base_url="https://ae.utbm.fr/api/", headers={"X-APIKey": env.str("API_KEY")}
         ) as session:
             async with session.get("club/1") as res:
                 print(await res.json())
+
 
     asyncio.run(main())
     ```

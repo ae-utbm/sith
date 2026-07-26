@@ -27,12 +27,11 @@ SITH_SUBSCRIPTIONS = {
     "cursus-alternant": {"name": _("Alternating cursus"), "price": 30, "duration": 6},
     "membre-honoraire": {"name": _("Honorary member"), "price": 0, "duration": 666},
     "un-jour": {"name": _("One day"), "price": 0, "duration": 0.00555333},
-
     # On rajoute ici notre cotisation
     # Elle se nomme "Un mois"
     # Coûte 6€
     # Dure 1 mois (on raisonne en semestre, ici, c'est 1/6 de semestre)
-    "un-mois": {"name": _("One month"), "price": 6, "duration": 0.166}
+    "un-mois": {"name": _("One month"), "price": 6, "duration": 0.166},
 }
 ```
 
