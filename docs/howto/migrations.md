@@ -61,9 +61,8 @@ Un fichier de migration ressemble à ça :
 ```python
 from django.db import migrations
 
-    
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
         # liste des autres migrations à appliquer avant celle-ci
     ]
@@ -117,14 +116,16 @@ Par exemple :
 ```python
 from django.db import migrations
 
+
 def forwards_func(apps, schema_editor):
     print("Appplication de la migration")
 
+
 def reverse_func(apps, schema_editor):
     print("Annulation de la migration")
-    
-class Migration(migrations.Migration):
 
+
+class Migration(migrations.Migration):
     dependencies = []
 
     operations = [
@@ -164,6 +165,7 @@ On écrirait donc, dans l'application `pedagogy` :
 from django.db import models
 from core.models import User
 
+
 class UserUe(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     ue = models.CharField(max_length=10)
@@ -173,6 +175,7 @@ Et nous aurions le fichier de migration suivant :
 ```python
 from django.db import migrations, models
 from django.conf import settings
+
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -288,6 +291,7 @@ La commande vous donnera ceci :
 ```python
 from django.conf import settings
 from django.db import migrations, models
+
 
 class Migration(migrations.Migration):
     replaces = [("pedagogy", "0004_userue"), ("pedagogy", "0005_alter_userue_ue")]

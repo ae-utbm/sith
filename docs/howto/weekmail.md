@@ -26,6 +26,7 @@ from django.templatetags.static import static
 
 # Sélectionnez le fichier de bannière pour le weekmail de l'automne 2018
 
+
 def get_banner(self):
     return "http://" + settings.SITH_URL + static("com/img/weekmail_bannerA18.jpg")
 ```
