@@ -88,6 +88,7 @@
             :alt="currentPicture.name"
             id="main-picture"
             x-ref="mainPicture"
+            @click="currentPicture = (($event.offsetX > $el.offsetWidth / 2) ? nextPicture : previousPicture) ?? currentPicture"
           />
         </div>
 
@@ -95,13 +96,11 @@
           <div class="infos">
             <h5>{% trans %}Infos{% endtrans %}</h5>
             <div>
-              <div>
+              <div
+                x-data="{formatter: Intl.DateTimeFormat('{{ LANGUAGE_CODE }}', {dateStyle: 'long'})}"
+              >
                 <span>{% trans %}Date: {% endtrans %}</span>
-                <span
-                  x-text="Intl.DateTimeFormat(
-                          '{{ LANGUAGE_CODE }}', {dateStyle: 'long'}
-                          ).format(Date.parse(currentPicture.date))"
-                >
+                <span x-text="formatter.format(new Date(currentPicture.date))">
                 </span>
               </div>
               <div>
