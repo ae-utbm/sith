@@ -590,16 +590,16 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "5.2.15"
+version = "5.2.16"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref" },
     { name = "sqlparse" },
     { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2b/e3/31722f7284c9f43333daff9aee9184678e4487adcb5506af0db8cea09ce1/django-5.2.15.tar.gz", hash = "sha256:5154a9bf84ac01dde011e367f355c07dbb329532e06810dcf3ef2af269e236e7", size = 10873669, upload-time = "2026-06-03T13:03:35.892Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a9/26/889449d521ae508b26de715954faecd8bcf3f740affb81b2d146a83b42a5/django-5.2.16.tar.gz", hash = "sha256:59ea02020c3136fce14bef0bbece21a10a4febef5eed1c51c22ae468efa22200", size = 10890894, upload-time = "2026-07-07T13:52:17.005Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/92/b5/38140b1643c00d5c46ce69c78e6980fd285aee223100319631bedee4f5e7/django-5.2.15-py3-none-any.whl", hash = "sha256:0eb4a9bb1853a35b0286dbc6d916bd352c8c2687195a7f2d6f80cefd840e4970", size = 8311957, upload-time = "2026-06-03T13:03:31.329Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/13/1e5e3e4c15dcecb04281b3cb2a46a4670e1cef131068e202f6040df19224/django-5.2.16-py3-none-any.whl", hash = "sha256:04f354bf9d807a86ad1a8392fe3808d362358a8eafc322848e0e43e59b24371d", size = 8311943, upload-time = "2026-07-07T13:52:11.223Z" },
 ]
 
 [[package]]
@@ -972,9 +972,9 @@ resolution-markers = [
     "python_full_version < '3.13'",
 ]
 dependencies = [
-    { name = "pydantic", marker = "python_full_version < '3.13'" },
-    { name = "python-dateutil", marker = "python_full_version < '3.13'" },
-    { name = "tzdata", marker = "python_full_version < '3.13'" },
+    { name = "pydantic" },
+    { name = "python-dateutil" },
+    { name = "tzdata" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0c/a3/506fe8d9416472588ff30d4c97a7e477f680a098c74a9f2050bd84182a75/ical-12.0.0.tar.gz", hash = "sha256:2f1c7450bd1eff586322273360f44931eb0919dc048c7284f1647037624be7c4", size = 125412, upload-time = "2025-11-13T06:00:04.95Z" }
 wheels = [
@@ -989,9 +989,9 @@ resolution-markers = [
     "python_full_version >= '3.13'",
 ]
 dependencies = [
-    { name = "pydantic", marker = "python_full_version >= '3.13'" },
-    { name = "python-dateutil", marker = "python_full_version >= '3.13'" },
-    { name = "tzdata", marker = "python_full_version >= '3.13'" },
+    { name = "pydantic" },
+    { name = "python-dateutil" },
+    { name = "tzdata" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f5/1c/dc7378c5ba63e8b0f2987bd827a1e40bd27196d37a7082be0593551e8ed8/ical-13.2.5.tar.gz", hash = "sha256:1cc3116e6f522eeeaa694b3e20b58dbfbe4b281954a8d3d28892cfb61f03fd40", size = 131405, upload-time = "2026-05-24T16:51:56.017Z" }
 wheels = [
@@ -2187,7 +2187,7 @@ requires-dist = [
     { name = "celery", extras = ["redis"], specifier = ">=5.6.3,<8" },
     { name = "cryptography", specifier = ">=49.0.0,<50.0.0" },
     { name = "dict2xml", specifier = ">=1.7.8,<2.0.0" },
-    { name = "django", specifier = ">=5.2.15,<6.0.0" },
+    { name = "django", specifier = ">=5.2.16,<6.0.0" },
     { name = "django-celery-beat", specifier = ">=2.9.0" },
     { name = "django-celery-results", specifier = ">=2.6.0" },
     { name = "django-countries", specifier = ">=9.0.0,<10.0.0" },
