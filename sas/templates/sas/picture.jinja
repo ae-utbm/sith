@@ -82,13 +82,16 @@
 
     <div class="container" id="pict">
       <div class="main">
-        <div class="photo" :aria-busy="currentPicture.imageLoading">
+        <div
+          class="photo"
+          :aria-busy="currentPicture.imageLoading"
+          @click="currentPicture = (($event.offsetX > $event.target.getBoundingClientRect().width / 2) ? nextPicture : previousPicture) ?? currentPicture"
+        >
           <img
             :src="currentPicture.compressedUrl"
             :alt="currentPicture.name"
             id="main-picture"
             x-ref="mainPicture"
-            @click="currentPicture = (($event.offsetX > $el.offsetWidth / 2) ? nextPicture : previousPicture) ?? currentPicture"
           />
         </div>
 
