@@ -48,6 +48,9 @@
       height: 100%;
       max-width: 100%;
       object-fit: contain;
+      // Prevent ugly selection when
+      // clicking to change the image
+      user-select: none;
     }
   }
 }
