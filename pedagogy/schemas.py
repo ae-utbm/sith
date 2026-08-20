@@ -5,10 +5,20 @@ from django.urls import reverse
 from django.utils import html
 from haystack.query import SearchQuerySet
 from ninja import FilterLookup, FilterSchema, ModelSchema, Schema
-from pydantic import AliasPath, ConfigDict, Field, TypeAdapter
+from pydantic import AliasPath, BeforeValidator, ConfigDict, Field, TypeAdapter
 from pydantic.alias_generators import to_camel
 
 from pedagogy.models import UE
+
+
+class FormationSchema(Schema):
+    model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
+
+    code: str
+    label: str = Field(alias="libelle")
+
+
+FormationListSchema = TypeAdapter(list[FormationSchema])
 
 
 class UtbmShortUeSchema(Schema):
@@ -19,19 +29,17 @@ class UtbmShortUeSchema(Schema):
         The UTBM API returns more data than that.
     """
 
-    model_config = ConfigDict(alias_generator=to_camel)
+    model_config = ConfigDict(validate_by_name=True)
 
     code: str
-    code_formation: str
-    code_categorie: str | None
-    code_langue: str
-    ouvert_automne: bool
-    ouvert_printemps: bool
+    category: str = Field(alias="codeCategorie")
+    formation: FormationSchema
+    lang: str = Field(alias="codeLangue")
+    open_autumn: bool = Field(alias="ouvertAutomne")
+    open_spring: bool = Field(alias="ouvertPrintemps")
 
 
 class WorkloadSchema(Schema):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
     code: Literal["TD", "TP", "CM", "THE", "TE"]
     nbh: int
 
@@ -48,22 +56,30 @@ class SemesterUeState(Schema):
 ShortUeList = TypeAdapter(list[UtbmShortUeSchema])
 
 
+class SyllabusItemSchema(Schema):
+    model_config = ConfigDict(validate_by_name=True)
+
+    label: str = Field(alias="libelle")
+    # We want only strings, but the UTBM API can return null,
+    # so convert null values to empty strings
+    value: Annotated[str, BeforeValidator(lambda x: x or "")] = Field(alias="valeur")
+
+
 class UtbmFullUeSchema(Schema):
     """Long representation of an UE in the UTBM API."""
 
-    model_config = ConfigDict(alias_generator=to_camel)
+    model_config = ConfigDict(validate_by_name=True, alias_generator=to_camel)
 
     code: str
     departement: str = "NA"
-    libelle: str | None
-    objectifs: str | None
-    programme: str | None
-    acquisition_competences: str | None
-    acquisition_notions: str | None
-    langue: str
-    code_langue: str
+    label: str = Field(alias="libelle")
+    syllabus: list[SyllabusItemSchema] = Field(
+        default=[],
+        validation_alias=AliasPath("listeElementConstitutif", 0, "listeSaisieSyllabus"),
+    )
+    lang: str = Field(None, validation_alias=AliasPath("langueEnseignement", "code"))
     credits_ects: int
-    activites: list[WorkloadSchema]
+    activites: list[WorkloadSchema] = Field(alias="listeActivite")
     respo_automne: str | None = Field(
         None, validation_alias=AliasPath("automne", "responsable")
     )

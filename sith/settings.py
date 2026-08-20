@@ -493,7 +493,7 @@ SITH_LOG_OPERATION_TYPE = [
     ("REFILLING_DELETION", _("Refilling deletion")),
 ]
 
-SITH_PEDAGOGY_UTBM_API = "https://extranet1.utbm.fr/gpedago/api/guide"
+SITH_PEDAGOGY_UTBM_API = "https://api.utbm.fr/offre-formation/public"
 
 # Defines pagination for cash summary
 SITH_COUNTER_CASH_SUMMARY_LENGTH = 50
