@@ -103,7 +103,9 @@
                 x-data="{formatter: Intl.DateTimeFormat('{{ LANGUAGE_CODE }}', {dateStyle: 'long'})}"
               >
                 <span>{% trans %}Date: {% endtrans %}</span>
-                <span x-text="formatter.format(new Date(currentPicture.date))">
+                {# The `currentPicture.date || 0` part is to avoid having
+                a console error while the picture date is not yet fetched #}
+                <span x-text="formatter.format(new Date(currentPicture.date || 0))">
                 </span>
               </div>
               <div>
