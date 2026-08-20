@@ -18,7 +18,12 @@ class Command(BaseCommand):
                 "Fetching UEs from the UTBM API.\n"
                 "This may take a few minutes to complete."
             )
+            i = 0
             for ue in client.fetch_ues():
+                if (i := (i + 1)) % 10 == 0:
+                    self.stdout.write(f"{i} UEs processed")
+                # this is a N+1 query, but it isn't a problem,
+                # as fetching a UE from the UTBM API is taking most of the time anyway
                 db_ue = UE.objects.filter(code=ue.code).first()
                 if db_ue is None:
                     db_ue = UE(code=ue.code, author=root_user)

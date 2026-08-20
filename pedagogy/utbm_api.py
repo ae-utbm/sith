@@ -5,8 +5,16 @@ from typing import Iterator
 import requests
 from django.conf import settings
 from django.utils.functional import cached_property
+from pydantic import TypeAdapter
 
-from pedagogy.schemas import ShortUeList, UeSchema, UtbmFullUeSchema, UtbmShortUeSchema
+from pedagogy.schemas import (
+    FormationSchema,
+    UeSchema,
+    UtbmFullUeSchema,
+    UtbmShortUeSchema,
+)
+
+FormationListSchema = TypeAdapter(list[FormationSchema])
 
 
 class UtbmApiClient(requests.Session):
@@ -18,28 +26,44 @@ class UtbmApiClient(requests.Session):
     @cached_property
     def current_year(self) -> int:
         """Fetch from the API the latest existing year"""
-        url = f"{self.BASE_URL}/guides/fr"
-        response = self.get(url)
-        return response.json()[-1]["annee"]
+        url = f"{self.BASE_URL}/guide/"
+        response = self.get(url, {"langue": "fr"})
+        return max(i["annee"] for i in response.json())
 
-    def fetch_short_ues(
-        self, lang: str = "fr", year: int | None = None
-    ) -> list[UtbmShortUeSchema]:
+    @cached_property
+    def formations(self) -> list[FormationSchema]:
+        response = self.get(
+            f"{self.BASE_URL}/formation/",
+            {"langue": "fr", "annee_univ": self.current_year, "typeFormation": "ING"},
+        )
+        return FormationListSchema.validate_json(response.text, by_alias=True)
+
+    def fetch_short_ues(self, year: int | None = None) -> list[UtbmShortUeSchema]:
         """Get the list of UEs in their short format from the UTBM API"""
         if year is None:
             year = self.current_year
-        if lang not in self._cache["short_ues"]:
-            self._cache["short_ues"][lang] = {}
-        if year not in self._cache["short_ues"][lang]:
-            url = f"{self.BASE_URL}/uvs/{lang}/{year}"
-            response = self.get(url)
-            ues = ShortUeList.validate_json(response.content)
-            self._cache["short_ues"][lang][year] = ues
-        return self._cache["short_ues"][lang][year]
+        if year not in self._cache["short_ues"]:
+            ues = []
+            for formation in self.formations:
+                response = self.get(
+                    f"{self.BASE_URL}/ue/",
+                    {
+                        "langue": "fr",
+                        "annee_univ": year,
+                        "codeFormation": formation.code,
+                    },
+                )
+                ues.extend(
+                    [
+                        UtbmShortUeSchema.model_validate({**ue, "formation": formation})
+                        for ue in response.json()
+                        if ue["codeCategorie"] is not None
+                    ]
+                )
+            self._cache["short_ues"][year] = ues
+        return self._cache["short_ues"][year]
 
-    def fetch_ues(
-        self, lang: str = "fr", year: int | None = None
-    ) -> Iterator[UeSchema]:
+    def fetch_ues(self, year: int | None = None) -> Iterator[UeSchema]:
         """Fetch all UEs from the UTBM API, parsed in a format that we can use.
 
         Warning:
@@ -52,7 +76,7 @@ class UtbmApiClient(requests.Session):
         """
         if year is None:
             year = self.current_year
-        shorts_ues = self.fetch_short_ues(lang, year)
+        shorts_ues = self.fetch_short_ues(year)
         # When UEs are common to multiple branches (like most HUMA)
         # the UTBM API duplicates them for every branch.
         # We have no way in our db to link a UE to multiple formations,
@@ -65,27 +89,40 @@ class UtbmApiClient(requests.Session):
             if ue.code not in unique_short_ues:
                 unique_short_ues[ue.code] = ue
         for ue in unique_short_ues.values():
-            ue_url = f"{self.BASE_URL}/uv/{lang}/{year}/{ue.code}/{ue.code_formation}"
-            response = requests.get(ue_url)
+            if ue.lang.upper() != "FR":
+                continue
+            response = requests.get(
+                f"{self.BASE_URL}/ue/{ue.code}",
+                {
+                    "langue": ue.lang,
+                    "annee_univ": year,
+                    "codeFormation": ue.formation.code,
+                },
+            )
             full_ue = UtbmFullUeSchema.model_validate_json(response.content)
             yield make_clean_ue(ue, full_ue)
 
-    def find_uu(self, lang: str, code: str, year: int | None = None) -> UeSchema | None:
-        """Find an UE from the UTBM API."""
-        # query the UE list
+    def find_ue(self, code: str, year: int | None = None) -> UeSchema | None:
+        """Find a UE from the UTBM API."""
         if not year:
             year = self.current_year
         # the UTBM API has no way to fetch a single short ue,
         # and short ues contain infos that we need and are not
         # in the full ue schema, so we must fetch everything.
-        short_ues = self.fetch_short_ues(lang, year)
+        short_ues = self.fetch_short_ues(year)
         short_ue = next((ue for ue in short_ues if ue.code == code), None)
         if short_ue is None:
             return None
 
         # get detailed information about the UE
-        ue_url = f"{self.BASE_URL}/uv/{lang}/{year}/{code}/{short_ue.code_formation}"
-        response = requests.get(ue_url)
+        response = requests.get(
+            f"{self.BASE_URL}/ue/{code}",
+            {
+                "langue": "fr",
+                "annee_univ": year,
+                "codeFormation": short_ue.formation.code,
+            },
+        )
         full_ue = UtbmFullUeSchema.model_validate_json(response.content)
         return make_clean_ue(short_ue, full_ue)
 
@@ -112,9 +149,9 @@ def make_clean_ue(short_ue: UtbmShortUeSchema, full_ue: UtbmFullUeSchema) -> UeS
             "ED": "EDIM",
             "AI": "GI",
             "AM": "MC",
-        }.get(short_ue.code_formation, "NA")
+        }.get(short_ue.formation.code, "NA")
 
-    match short_ue.ouvert_printemps, short_ue.ouvert_automne:
+    match short_ue.open_spring, short_ue.open_autumn:
         case True, True:
             semester = "AUTUMN_AND_SPRING"
         case True, False:
@@ -125,11 +162,11 @@ def make_clean_ue(short_ue: UtbmShortUeSchema, full_ue: UtbmFullUeSchema) -> UeS
             semester = "CLOSED"
 
     return UeSchema(
-        title=full_ue.libelle or "",
+        title=full_ue.label or "",
         code=full_ue.code,
-        credit_type=short_ue.code_categorie or "FREE",
+        credit_type=short_ue.category or "FREE",
         semester=semester,
-        language=short_ue.code_langue.upper(),
+        language=short_ue.lang.upper(),
         credits=full_ue.credits_ects,
         department=department,
         hours_THE=next((i.nbh for i in full_ue.activites if i.code == "THE"), 0) // 60,
@@ -138,8 +175,16 @@ def make_clean_ue(short_ue: UtbmShortUeSchema, full_ue: UtbmFullUeSchema) -> UeS
         hours_TE=next((i.nbh for i in full_ue.activites if i.code == "TE"), 0) // 60,
         hours_CM=next((i.nbh for i in full_ue.activites if i.code == "CM"), 0) // 60,
         manager=full_ue.respo_automne or full_ue.respo_printemps or "",
-        objectives=full_ue.objectifs or "",
-        program=full_ue.programme or "",
-        skills=full_ue.acquisition_competences or "",
-        key_concepts=full_ue.acquisition_notions or "",
+        objectives=next(
+            (i.value for i in full_ue.syllabus if i.label == "Objectifs"), ""
+        ),
+        program=next((i.value for i in full_ue.syllabus if i.label == "Programme"), ""),
+        skills=next(
+            (i.value for i in full_ue.syllabus if i.label == "Acquis d'apprentissage"),
+            "",
+        ),
+        key_concepts=next(
+            (i.value for i in full_ue.syllabus if i.label == "Notions-clés"),
+            "",
+        ),
     )
