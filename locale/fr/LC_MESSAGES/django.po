@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-10 20:18+0200\n"
+"POT-Creation-Date: 2026-08-21 14:10+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4968,6 +4968,10 @@ msgstr "Ne pas voter"
 #: pedagogy/forms.py
 msgid "This user has already commented on this UE"
 msgstr "Cet utilisateur a déjà commenté cette UE"
+
+#: pedagogy/forms.py
+msgid "UE comment can't be empty."
+msgstr "Un commentaire d'UE ne peut pas être vide."
 
 #: pedagogy/forms.py
 msgid "Accepted reports"

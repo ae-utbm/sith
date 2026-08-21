@@ -521,39 +521,3 @@ details.accordion>.accordion-content {
   border-color: $pedagogy-orange;
   border-right: none;
 }
-
-fieldset.star {
-  label {
-    display: inline;
-    cursor: pointer;
-  }
-
-  .checked {
-    color: orange;
-  }
-
-  .unchecked {
-    color: gray;
-  }
-
-  .hovered {
-    color: #FFD700;
-  }
-
-  .checked.hovered {
-    color: orange;
-  }
-
-  .removed {
-    color: red;
-  }
-
-  input[type="radio"] {
-    display: none;
-  }
-
-  label:first-child {
-    margin-right: 10px;
-  }
-
-}
