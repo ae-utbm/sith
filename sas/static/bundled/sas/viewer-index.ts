@@ -1,4 +1,5 @@
 import type TomSelect from "tom-select";
+import type { TomOption } from "tom-select/src/types";
 import type { UserAjaxSelect } from "#core:core/components/ajax-select-index";
 import { paginated } from "#core:utils/api";
 import { History } from "#core:utils/history";
@@ -6,7 +7,6 @@ import {
   type IdentifiedUserSchema,
   type ModerationRequestSchema,
   type PictureSchema,
-  type PicturesFetchIdentificationsResponse,
   type PicturesFetchPicturesData,
   picturesDeletePicture,
   picturesFetchIdentifications,
@@ -15,6 +15,7 @@ import {
   picturesIdentifyUsers,
   picturesModeratePicture,
   picturesRotatePicture,
+  type SimpleAlbumSchema,
   type UserProfileSchema,
   usersidentifiedDeleteRelation,
 } from "#openapi";
@@ -23,8 +24,8 @@ import {
  * A container for a picture with the users identified on it
  * able to prefetch its data.
  */
-class PictureWithIdentifications {
-  identifications: PicturesFetchIdentificationsResponse = null;
+class PictureWithIdentifications implements PictureSchema {
+  identifications?: IdentifiedUserSchema[];
   imageLoading = false;
   identificationsLoading = false;
   moderationLoading = false;
@@ -32,10 +33,43 @@ class PictureWithIdentifications {
   compressedUrl: string = "";
   thumbUrl: string = "";
   fullSizeUrl: string = "";
-  moderationRequests: ModerationRequestSchema[] = null;
+  moderationRequests: ModerationRequestSchema[] = [];
+  owner: UserProfileSchema;
+  // biome-ignore-start lint/style/useNamingConvention: PictureSchema has CamelCase properties
+  sas_url: string;
+  full_size_url: string;
+  compressed_url: string;
+  thumb_url: string;
+  album: SimpleAlbumSchema;
+  report_url: string;
+  edit_url: string;
+  name: string;
+  date?: string | undefined;
+  updated_at: string;
+  size?: number | undefined;
+  is_moderated?: boolean | undefined;
+  asked_for_removal?: boolean | undefined;
+  // biome-ignore-end lint/style/useNamingConvention: PictureSchema has CamelCase properties
 
   constructor(picture: PictureSchema) {
-    Object.assign(this, picture);
+    if (picture.id === null || picture.id === undefined) {
+      throw new Error("picture id expected a value");
+    }
+    this.owner = picture.owner;
+    this.sas_url = picture.sas_url;
+    this.full_size_url = picture.full_size_url;
+    this.compressed_url = picture.compressed_url;
+    this.thumb_url = picture.thumb_url;
+    this.album = picture.album;
+    this.report_url = picture.report_url;
+    this.edit_url = picture.edit_url;
+    this.name = picture.name;
+    this.date = picture.date;
+    this.updated_at = picture.updated_at;
+    this.size = picture.size;
+    this.is_moderated = picture.is_moderated;
+    this.asked_for_removal = picture.asked_for_removal;
+    this.id = picture.id;
     this.compressedUrl = picture.compressed_url;
     this.thumbUrl = picture.thumb_url;
     this.fullSizeUrl = picture.full_size_url;
@@ -69,12 +103,13 @@ class PictureWithIdentifications {
       return;
     }
     this.identificationsLoading = true;
-    this.identifications = (
-      await picturesFetchIdentifications({
-        // biome-ignore lint/style/useNamingConvention: api is in snake_case
-        path: { picture_id: this.id },
-      })
-    ).data;
+    this.identifications =
+      (
+        await picturesFetchIdentifications({
+          // biome-ignore lint/style/useNamingConvention: api is in snake_case
+          path: { picture_id: this.id },
+        })
+      ).data ?? [];
     this.identificationsLoading = false;
   }
 
@@ -88,12 +123,13 @@ class PictureWithIdentifications {
       return;
     }
     this.moderationLoading = true;
-    this.moderationRequests = (
-      await picturesFetchModerationRequests({
-        // biome-ignore lint/style/useNamingConvention: api is in snake_case
-        path: { picture_id: this.id },
-      })
-    ).data;
+    this.moderationRequests =
+      (
+        await picturesFetchModerationRequests({
+          // biome-ignore lint/style/useNamingConvention: api is in snake_case
+          path: { picture_id: this.id },
+        })
+      ).data ?? [];
     this.moderationLoading = false;
   }
 
@@ -103,6 +139,10 @@ class PictureWithIdentifications {
       // biome-ignore lint/style/useNamingConvention: api is snake case
       path: { picture_id: this.id, direction: direction },
     });
+    if (!res.data) {
+      console.error("The data o the rotated were expected, but nothing was returned");
+      return;
+    }
     // urls returned by the api include a timestamp for cache busting
     this.fullSizeUrl = res.data.full_size_url;
     this.compressedUrl = res.data.compressed_url;
@@ -157,7 +197,7 @@ document.addEventListener("alpine:init", () => {
     currentPicture: {
       // biome-ignore lint/style/useNamingConvention: api is in snake_case
       is_moderated: true,
-      id: null as number,
+      id: null as number | null,
       name: "",
       // biome-ignore lint/style/useNamingConvention: api is in snake_case
       display_name: "",
@@ -171,19 +211,19 @@ document.addEventListener("alpine:init", () => {
       // biome-ignore lint/style/useNamingConvention: api is in snake_case
       created_at: new Date(),
       identifications: [] as IdentifiedUserSchema[],
-    },
+    } as unknown as PictureWithIdentifications,
     /**
      * The picture which will be displayed next if the user press the "next" button
      **/
-    nextPicture: null as PictureWithIdentifications,
+    nextPicture: null as PictureWithIdentifications | null,
     /**
      * The picture which will be displayed next if the user press the "previous" button
      **/
-    previousPicture: null as PictureWithIdentifications,
+    previousPicture: null as PictureWithIdentifications | null,
     /**
      * The select2 component used to identify users
      **/
-    selector: undefined as UserAjaxSelect,
+    selector: undefined as UserAjaxSelect | undefined,
     /**
      * Error message when a moderation operation fails
      **/
@@ -201,24 +241,18 @@ document.addEventListener("alpine:init", () => {
           query: { album_id: config.albumId },
         } as PicturesFetchPicturesData)
       ).map(PictureWithIdentifications.fromPicture);
-      this.selector = this.$refs.search;
-      this.selector.setFilter((users: UserProfileSchema[]) => {
-        const resp: UserProfileSchema[] = [];
+      this.selector = this.$refs.search as UserAjaxSelect;
+      this.selector.setFilter((users: TomOption[]) => {
         const ids = [
           ...(this.currentPicture.identifications || []).map(
             (i: IdentifiedUserSchema) => i.user.id,
           ),
         ];
-        for (const user of users) {
-          if (!ids.includes(user.id)) {
-            resp.push(user);
-          }
-        }
-        return resp;
+        return users.filter((user) => !ids.includes(user.id));
       });
       this.currentPicture = this.pictures.find(
-        (i: PictureSchema) => i.id === config.firstPictureId,
-      );
+        (i) => i.id === config.firstPictureId,
+      ) as PictureWithIdentifications;
       this.$watch(
         "currentPicture",
         (current: PictureSchema, previous: PictureSchema) => {
@@ -236,7 +270,7 @@ document.addEventListener("alpine:init", () => {
         this.pushstate = History.Replace;
         this.currentPicture = this.pictures.find(
           (i: PictureSchema) => i.id === Number.parseInt(event.state.sasPictureId, 10),
-        );
+        ) as PictureWithIdentifications;
       });
       this.pushstate = History.Replace; /* Avoid first url push */
       await this.updatePicture();
@@ -311,14 +345,15 @@ document.addEventListener("alpine:init", () => {
         // As the album is now empty, go back to the parent page
         document.location.href = config.albumUrl;
       }
-      this.currentPicture = this.nextPicture || this.previousPicture;
+      this.currentPicture = (this.nextPicture ||
+        this.previousPicture) as PictureWithIdentifications;
     },
 
     /**
      * Send the identification request and update the list of identified users.
      */
     async submitIdentification(): Promise<void> {
-      const widget: TomSelect = this.selector.widget;
+      const widget: TomSelect = (this.selector as UserAjaxSelect).widget;
       await picturesIdentifyUsers({
         // biome-ignore lint/style/useNamingConvention: api is in snake_case
         path: { picture_id: this.currentPicture.id },

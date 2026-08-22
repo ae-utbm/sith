@@ -58,7 +58,7 @@ function parseSlots(s: string): TimetableSlot[] {
     .filter((s: string) => s.length > 0)
     .map((row: string) => {
       const parsed = TIMETABLE_ROW_RE.exec(row);
-      if (!parsed) {
+      if (!parsed?.groups) {
         throw new Error(`Couldn't parse row ${row}`);
       }
       const [startHour, startMin] = parsed.groups.startHour
@@ -173,7 +173,7 @@ document.addEventListener("alpine:init", () => {
 
     async savePng() {
       const elem = document.getElementById("timetable");
-      const img = (await html2canvas(elem)).toDataURL();
+      const img = (await html2canvas(elem as HTMLElement)).toDataURL();
       const downloadLink = document.createElement("a");
       downloadLink.href = img;
       downloadLink.download = "edt.png";

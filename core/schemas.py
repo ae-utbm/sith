@@ -19,6 +19,16 @@ from core.utils import get_last_promo, is_image
 NonEmptyStr = Annotated[str, MinLen(1)]
 
 
+class ValidationErrorSchema(Schema):
+    class ValidationErrorItem(Schema):
+        loc: list[str | int]
+        msg: str
+        type: str
+        ctx: dict[str, str]
+
+    detail: list[ValidationErrorItem]
+
+
 class UploadedImage(UploadedFile):
     @classmethod
     def _validate(cls, v: Any, info: ValidationInfo) -> Any:

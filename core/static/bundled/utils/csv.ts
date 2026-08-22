@@ -7,14 +7,14 @@ interface StringifyOptions<T extends object> {
   titleRow?: readonly string[];
 }
 
-function getNested<T extends object>(obj: T, key: NestedKeyOf<T>) {
-  const path: (keyof object)[] = key.split(".") as (keyof unknown)[];
-  let res = obj[path.shift() as keyof T];
+function getNested<T extends { [key: string]: unknown }>(obj: T, key: NestedKeyOf<T>) {
+  const path = key.split(".");
+  let res = obj[path.shift() as string] as { [key: string]: unknown } | undefined;
   for (const node of path) {
-    if (res === null) {
+    if (res === undefined) {
       break;
     }
-    res = res[node];
+    res = res[node] as { [key: string]: unknown } | undefined;
   }
   return res;
 }
@@ -29,18 +29,21 @@ function sanitizeCell(content: string): string {
 }
 
 export const csv = {
-  stringify: <T extends object>(objs: T[], options?: StringifyOptions<T>) => {
-    const columns = options.columns;
+  stringify: <T extends { [key: string]: unknown }>(
+    objs: T[],
+    options?: StringifyOptions<T>,
+  ) => {
+    const columns = options?.columns;
     const content = objs
       .map((obj) => {
-        return columns
+        return (columns ?? [])
           .map((col) => {
             return sanitizeCell((getNested(obj, col) ?? "").toString());
           })
           .join(",");
       })
       .join("\n");
-    if (!options.titleRow) {
+    if (!options?.titleRow) {
       return content;
     }
     const firstRow = options.titleRow.map(sanitizeCell).join(",");

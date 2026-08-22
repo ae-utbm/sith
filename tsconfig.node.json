@@ -1,0 +1,10 @@
+{
+  "include": ["vite.config.*"],
+  "compilerOptions": {
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "emitDeclarationOnly": true,
+    "composite": true
+  }
+}

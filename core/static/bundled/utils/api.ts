@@ -37,6 +37,10 @@ export const paginated = async <T>(
   queryParams.query.page = 1;
 
   const firstPage = (await endpoint(queryParams)).data;
+  if (firstPage === undefined) {
+    console.error(`Request to "${options?.url}" failed`);
+    return [];
+  }
   const results = firstPage.results;
 
   const nbElements = firstPage.count;
@@ -45,9 +49,9 @@ export const paginated = async <T>(
   if (nbPages > 1) {
     const promises: Promise<T[]>[] = [];
     for (let i = 2; i <= nbPages; i++) {
-      const nextPage = structuredClone(queryParams);
+      const nextPage = structuredClone(queryParams) as Required<PaginatedRequest>;
       nextPage.query.page = i;
-      promises.push(endpoint(nextPage).then((res) => res.data.results));
+      promises.push(endpoint(nextPage).then((res) => res.data?.results ?? []));
     }
     results.push(...(await Promise.all(promises)).flat());
   }
@@ -61,8 +65,7 @@ interface Request extends TDataShape {
 interface InterceptorOptions {
   url: string;
 }
-
-type GenericEndpoint = <ThrowOnError extends boolean = false>(
+export type GenericEndpoint = <ThrowOnError extends boolean = false>(
   options?: Options<Request, ThrowOnError>,
 ) => RequestResult<unknown, unknown, ThrowOnError>;
 
@@ -71,7 +74,7 @@ type GenericEndpoint = <ThrowOnError extends boolean = false>(
  **/
 export const makeUrl = async (endpoint: GenericEndpoint) => {
   let url = "";
-  const interceptor = (_request: undefined, options: InterceptorOptions) => {
+  const interceptor = (_request: Request, options: InterceptorOptions) => {
     url = options.url;
     throw new Error("We don't want to send the request");
   };

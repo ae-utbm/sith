@@ -1,4 +1,4 @@
-from typing import Annotated, Any, Literal
+from typing import Annotated, Literal
 
 from annotated_types import Ge, Le, MinLen
 from django.conf import settings
@@ -26,6 +26,7 @@ from core.schemas import (
     UserFilterSchema,
     UserProfileSchema,
     UserSchema,
+    ValidationErrorSchema,
 )
 from core.templatetags.renderer import markdown
 from counter.utils import is_logged_in_counter
@@ -45,7 +46,7 @@ class UploadController(ControllerBase):
         "/image",
         response={
             200: UploadedFileSchema,
-            422: dict[Literal["detail"], list[dict[str, Any]]],
+            422: ValidationErrorSchema,
             403: dict[Literal["detail"], str],
         },
         permissions=[HasPerm("core.add_quickuploadimage")],

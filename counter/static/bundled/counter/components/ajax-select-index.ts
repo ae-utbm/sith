@@ -1,7 +1,7 @@
-import type { TomOption } from "tom-select/dist/types/types";
-import type { escape_html } from "tom-select/dist/types/utils";
-import { AjaxSelect } from "#core:core/components/ajax-select-base.ts";
-import { registerComponent } from "#core:utils/web-components.ts";
+import type { TomOption } from "tom-select/src/types";
+import type { escape_html } from "tom-select/src/utils";
+import { AjaxSelect } from "#core:core/components/ajax-select-base";
+import { registerComponent } from "#core:utils/web-components";
 import {
   type CounterSchema,
   counterSearchCounter,
@@ -28,14 +28,18 @@ export class ProductAjaxSelect extends AjaxSelect {
     return [];
   }
 
+  private getName(item: SimpleProductSchema, sanitize: typeof escape_html): string {
+    return item.code ? `${sanitize(item.code)} - ${sanitize(item.name)}` : item.name;
+  }
+
   protected renderOption(item: SimpleProductSchema, sanitize: typeof escape_html) {
     return `<div class="select-item">
-            <span class="select-item-text">${sanitize(item.code)} - ${sanitize(item.name)}</span>
+            <span class="select-item-text">${this.getName(item, sanitize)}</span>
           </div>`;
   }
 
   protected renderItem(item: SimpleProductSchema, sanitize: typeof escape_html) {
-    return `<span>${sanitize(item.code)} - ${sanitize(item.name)}</span>`;
+    return `<span>${this.getName(item, sanitize)}</span>`;
   }
 }
 
@@ -44,7 +48,7 @@ export class ProductTypeAjaxSelect extends AjaxSelect {
   protected valueField = "id";
   protected labelField = "name";
   protected searchField = ["name"];
-  private productTypes = null as ProductTypeSchema[];
+  private productTypes = null as ProductTypeSchema[] | null;
 
   protected async search(query: string): Promise<TomOption[]> {
     // The production database has a grand total of 26 product types
@@ -52,7 +56,7 @@ export class ProductTypeAjaxSelect extends AjaxSelect {
     // Thus, it's appropriate to fetch all product types during first use,
     // then to reuse the result again and again.
     if (this.productTypes === null) {
-      this.productTypes = (await producttypeFetchAll()).data || null;
+      this.productTypes = (await producttypeFetchAll()).data || [];
     }
     return this.productTypes.filter((t) =>
       t.name.toLowerCase().includes(query.toLowerCase()),

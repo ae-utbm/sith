@@ -33,6 +33,7 @@
     "@types/cytoscape-cxtmenu": "^3.4.5",
     "@types/cytoscape-klay": "^3.1.5",
     "@types/js-cookie": "^3.0.6",
+    "@types/node": "^26.1.1",
     "rollup-plugin-visualizer": "^7.0.1",
     "typescript": "^6.0.3",
     "vite": "^8.1.0"

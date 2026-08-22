@@ -1,3 +1,4 @@
+// @ts-expect-error 2307 this dependency does exist, but it's a little bit wacky
 import clip from "@arendjr/text-clipper";
 
 /*

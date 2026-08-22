@@ -17,7 +17,10 @@ function getRandomColorUniq(list: string[]) {
   }
   return color;
 }
-function hexToRgb(hex: string) {
+
+type Rgb = { r: number; g: number; b: number };
+
+function hexToRgb(hex: string): Rgb | null {
   // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
   const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
   const hexrgb = hex.replace(shorthandRegex, (_m, r, g, b) => {
@@ -37,32 +40,29 @@ function hexToRgb(hex: string) {
 document.addEventListener("DOMContentLoaded", () => {
   const ctx = (document.getElementById("statsChart") as HTMLCanvasElement).getContext(
     "2d",
-  );
+  ) as CanvasRenderingContext2D;
   const labels: string[] = [];
   const total: string[] = [];
-  const colors: string[] = [];
+  const colorStrings: string[] = [];
   const colorsDimmed: string[] = [];
   for (const element of Array.from(document.getElementsByClassName("types"))) {
-    labels.push(element.childNodes[0].textContent);
+    labels.push(element.childNodes[0].textContent as string);
   }
   for (const element of Array.from(document.getElementsByClassName("total"))) {
-    total.push(element.childNodes[0].childNodes[0].textContent);
+    total.push(element.childNodes[0].childNodes[0].textContent as string);
   }
 
   for (const _ of labels) {
-    colors.push(getRandomColorUniq(colors));
+    colorStrings.push(getRandomColorUniq(colorStrings));
+  }
+  const colors = colorStrings.map(hexToRgb) as Rgb[];
+
+  for (const color of colors) {
+    colorsDimmed.push(`rgba(${color.r}, ${color.g}, ${color.b}, 0.2)`);
   }
 
-  for (const element of colors) {
-    const rgbColor = hexToRgb(element);
-    colorsDimmed.push(`rgba(${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b}, 0.2)`);
-  }
-
-  for (const element of colors) {
-    const rgbColorDimmed = hexToRgb(element);
-    colorsDimmed.push(
-      `rgba(${rgbColorDimmed.r}, ${rgbColorDimmed.g}, ${rgbColorDimmed.b}, 0.2)`,
-    );
+  for (const color of colors) {
+    colorsDimmed.push(`rgba(${color.r}, ${color.g}, ${color.b}, 0.2)`);
   }
 
   new Chart(ctx, {
@@ -71,10 +71,11 @@ document.addEventListener("DOMContentLoaded", () => {
       labels: labels,
       datasets: [
         {
-          label: document.getElementById("graphLabel").childNodes[0].textContent,
+          label: document.getElementById("graphLabel")?.childNodes[0]
+            .textContent as string,
           data: total,
           backgroundColor: colorsDimmed,
-          borderColor: colors,
+          borderColor: colorStrings,
           borderWidth: 1,
         },
       ],

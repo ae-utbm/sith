@@ -25,7 +25,7 @@ export function limitedChoices(Alpine: AlpineType) {
   Alpine.directive(
     "limited-choices",
     (el, { expression }, { evaluateLater, effect }) => {
-      const getMaxChoices = evaluateLater(expression);
+      const getMaxChoices = evaluateLater<string>(expression);
       let maxChoices: number;
       const inputs: HTMLInputElement[] = Array.from(
         el.querySelectorAll("input[type='checkbox']"),
@@ -54,7 +54,7 @@ export function limitedChoices(Alpine: AlpineType) {
         });
       }
       effect(() => {
-        getMaxChoices((value: string) => {
+        getMaxChoices((value) => {
           const previousValue = maxChoices;
           maxChoices = Number.parseInt(value, 10);
           if (maxChoices < previousValue) {
