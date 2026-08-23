@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING
 
-from cryptography.utils import cached_property
 from django.contrib import messages
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
@@ -12,6 +11,7 @@ from django.db import transaction
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
