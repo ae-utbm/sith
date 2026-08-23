@@ -141,11 +141,8 @@ class UECommentForm(forms.ModelForm):
         if (
             all(
                 grade == -1
-                for grade in [
-                    self.cleaned_data[key]
-                    for key in self.cleaned_data
-                    if key.startswith("grade_")
-                ]
+                for key, grade in self.cleaned_data.items()
+                if key.startswith("grade_")
             )
             and not self.cleaned_data["comment"]
         ):

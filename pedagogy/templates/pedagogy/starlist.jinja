@@ -1,7 +1,7 @@
 <link-once rel="stylesheet" type="text/css" href="{{ statics.css }}" defer></link-once>
   <fieldset
     class="star"
-    x-data="{ 'value': {% if widget.value.0 %}{{ widget.value.0 }}{% else %}-1{% endif %}, 'hover': -1 }"
+    x-data="{ 'value': {{ widget.value.0 }}, 'hover': -1 }"
     @mouseover.outside="hover = -1"
     {% include "django/forms/widgets/attrs.html" %}
   >

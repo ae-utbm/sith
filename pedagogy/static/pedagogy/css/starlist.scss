@@ -14,12 +14,8 @@ fieldset.star {
     color: gray;
   }
 
-  .hovered {
+  .unchecked.hovered {
     color: #FFD700;
-  }
-
-  .checked.hovered {
-    color: orange;
   }
 
   .removed {
