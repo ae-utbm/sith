@@ -1,58 +1,52 @@
-<div>
-  <style>
-    .checked {
-      color : orange;
-    }
-    .unchecked {
-      color : gray;
-    }
-    .star input[type="radio"] {
-      display : none;
-    }
-    .star {
-      display: inline;
-    }
-
-  </style>
-
-    {# Do not vote button #}
-  <label class="star">
-    <input type="radio" name="{{ widget.name }}" value="-1" onclick='
-                                                                     var stars = document.getElementsByClassName("{{ widget.name }}");
-                                                                     for (var i = 0; i < stars.length; i++){
-                                                                     var attrs = stars[i].getAttribute("class");
-                                                                     attrs = attrs.replace("unchecked", "");
-                                                                     attrs = attrs.replace("checked", "");
-                                                                     stars[i].setAttribute("class", attrs + " unchecked");
-                                                                     }
-                                                                    ' checked>
-    <span class="fa fa-times-circle"> {{ translations.do_not_vote }}</span>
-  </label>
-
-    {# Star widget #}
-  {% for i in number_of_stars %}
-    <label class="star">
-      <input type="radio" name="{{ widget.name }}" value="{{ forloop.counter0 }}" onclick='
-                                                                                           var stars = document.getElementsByClassName("{{ widget.name }}");
-
-                                                                                           for (var i = 0; i < stars.length; i++){
-                                                                                           var attrs = stars[i].getAttribute("class");
-                                                                                           attrs = attrs.replace("unchecked", "");
-                                                                                           attrs = attrs.replace("checked", "");
-                                                                                           if (i > {{ forloop.counter0 }}){
-                                                                                           stars[i].setAttribute("class", attrs + " unchecked");
-                                                                                           } else {
-                                                                                           stars[i].setAttribute("class", attrs + " checked");
-                                                                                           }
-                                                                                           }
-                                                                                          '>
-      <i class="{{ widget.name }} fa fa-star unchecked"></i>
+<link-once rel="stylesheet" type="text/css" href="{{ statics.css }}" defer></link-once>
+  <fieldset
+    class="star"
+    x-data="{ 'value': {{ widget.value.0 }}, 'hover': -1 }"
+    @mouseover.outside="hover = -1"
+    {% include "django/forms/widgets/attrs.html" %}
+  >
+  {# Do not vote button #}
+    <label
+      @mouseover="hover = -1"
+      for="{{ widget.optgroups.0.1.0.attrs.id }}"
+    >
+      <input
+        type="radio"
+        name="{{ widget.name }}"
+        value="{{ widget.optgroups.0.1.0.value }}"
+        @click="value = -1"
+        {% with widget=widget.optgroups.0.1.0 %}
+          {% include "django/forms/widgets/attrs.html" %}
+        {% endwith %}
+      >
+      <i class="fa fa-times-circle"></i>
+      {{ widget.optgroups.0.1.0.label }}
     </label>
-  {% endfor %}
 
-    {# Restaure previous (-1 is default) #}
-  <script type="text/javascript">
-    document.querySelector("input[name='{{ widget.name }}'][value='{{ widget.value }}']").click()
-  </script>
-
-</div>
+  {# Star widget #}
+    {% for opt in widget.optgroups|slice:"1:" %}
+      <label
+        @mouseover="hover = {{ opt.1.0.value }}"
+        for="{{ opt.1.0.attrs.id }}"
+      >
+        <input
+          type="radio"
+          name="{{ widget.name }}"
+          value="{{ opt.1.0.value }}"
+          @click="value = {{ opt.1.0.value }}"
+          {% with widget=opt.1.0 %}
+            {% include "django/forms/widgets/attrs.html" %}
+          {% endwith %}
+        >
+        <i
+          class="{{ widget.name }} fa fa-star"
+          :class="{
+                  'checked': value >= {{ opt.1.0.value }},
+                  'unchecked': value < {{ opt.1.0.value }},
+                  'hovered': hover >= {{ opt.1.0.value }},
+                  'removed': hover >= 0 && value >= {{ opt.1.0.value }} && hover < {{ opt.1.0.value }},
+                  }"
+        ></i>
+      </label>
+    {% endfor %}
+  </fieldset>

@@ -89,13 +89,14 @@
           <p>{% trans %}You already posted a comment on this UE. If you want to comment again, please modify or delete your previous comment.{% endtrans %}</p>
         </div>
       {% elif user.has_perm("pedagogy.add_uecomment") %}
-        <details class="accordion" id="leave_comment">
+        <details class="accordion" id="leave_comment" {% if form.errors %}open{%endif%}>
           <summary>{% trans %}Leave comment{% endtrans %}</summary>
           <div class="accordion-content">
             <form action="{{ url('pedagogy:ue_detail', ue_id=object.id) }}" method="post" enctype="multipart/form-data">
               {% csrf_token %}
               <div class="leave-comment-grid-container">
                 <div class="form-stars">
+                  {{ form.non_field_errors() }}
                   {{ form.author.errors }}
                   {{ form.ue.errors }}
 

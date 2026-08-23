@@ -1,3 +1,4 @@
+@import "core/static/core/devices";
 @import "core/static/core/colors";
 
 
@@ -6,10 +7,6 @@ $pedagogy-orange: #ea7900;
 $pedagogy-hover-blue: #0e97ce;
 $pedagogy-light-blue: #caf0ff;
 $pedagogy-white-text: #f0f0f0;
-
-$small-devices: 576px;
-$medium-devices: 768px;
-$large-devices: 992px;
 
 .pedagogy {
   &.star-not-checked {
@@ -256,7 +253,7 @@ $large-devices: 992px;
 
     .ue-details-container {
       display: grid;
-      grid-template-columns: 150px 100px auto;
+      grid-template-columns: 150px 130px auto;
       grid-template-rows: 156px 1fr;
       grid-template-areas:
       "grade grade-stars ue-infos"
