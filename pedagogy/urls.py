@@ -24,12 +24,14 @@
 from django.urls import path
 
 from pedagogy.views import (
+    UECommentCreateView,
     UECommentDeleteView,
+    UECommentDetailView,
     UECommentReportCreateView,
     UECommentUpdateView,
     UECreateView,
     UEDeleteView,
-    UEDetailFormView,
+    UEDetailView,
     UEGuideView,
     UEModerationFormView,
     UEUpdateView,
@@ -38,7 +40,17 @@ from pedagogy.views import (
 urlpatterns = [
     # Urls displaying the actual application for visitors
     path("", UEGuideView.as_view(), name="guide"),
-    path("ue/<int:ue_id>/", UEDetailFormView.as_view(), name="ue_detail"),
+    path("ue/<int:ue_id>/", UEDetailView.as_view(), name="ue_detail"),
+    path(
+        "ue/<int:ue_id>/comment",
+        UECommentCreateView.as_view(),
+        name="comment_create",
+    ),
+    path(
+        "comment/<int:comment_id>/",
+        UECommentDetailView.as_view(),
+        name="comment_detail",
+    ),
     path(
         "comment/<int:comment_id>/edit/",
         UECommentUpdateView.as_view(),

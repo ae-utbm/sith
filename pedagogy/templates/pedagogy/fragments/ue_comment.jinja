@@ -1,0 +1,77 @@
+{% from "pedagogy/macros.jinja" import display_star %}
+{% from "core/macros.jinja" import user_profile_link %}
+
+<div id="comment-{{ comment.id }}" class="comment-container">
+
+  <div class="grade-block">
+    <div class="grade-type">
+      <p>{% trans %}Global grade{% endtrans %}</p>
+      <p>{% trans %}Utility{% endtrans %}</p>
+      <p>{% trans %}Interest{% endtrans %}</p>
+      <p>{% trans %}Teaching{% endtrans %}</p>
+      <p>{% trans %}Work load{% endtrans %}</p>
+    </div>
+    <div class="grade-stars">
+      <p>{{ display_star(comment.grade_global) }}</p>
+      <p>{{ display_star(comment.grade_utility) }}</p>
+      <p>{{ display_star(comment.grade_interest) }}</p>
+      <p>{{ display_star(comment.grade_teaching) }}</p>
+      <p>{{ display_star(comment.grade_work_load) }}</p>
+    </div>
+    <div class="grade-extension"></div>
+  </div>
+
+  <div class="comment">
+    <div class="anchor">
+      <a href="{{ url('pedagogy:ue_detail', ue_id=ue.id) }}#comment-{{ comment.id }}"><i class="fa fa-paragraph"></i></a>
+    </div>
+    {{ comment.comment|markdown }}
+  </div>
+
+  <div class="info">
+    {% if comment.is_reported %}
+      <p class="status-reported">
+        {% trans %}This comment has been reported{% endtrans %}
+      </p>
+    {% endif %}
+
+    {% if comment.author_id == user.id or user.has_perm("pedagogy.change_comment") %}
+      <button
+        class="btn btn-orange action"
+        hx-get="{{ url('pedagogy:comment_update', comment_id=comment.id) }}"
+        hx-swap="outerHTML"
+        hx-target="#comment-{{ comment.id }}"
+      >
+        <i class="fa fa-pencil"></i> {% trans %}Edit{% endtrans %}
+      </button>
+    {% endif %}
+    {% if comment.author_id == user.id or user.has_perm("pedagogy.delete_comment") %}
+      <form class="action"
+            hx-post="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}"
+            hx-confirm='{% trans obj=object %}Are you sure you want to delete "{{ obj }}"?{% endtrans %}'
+            hx-swap="outerHTML"
+            hx-target="#comment-{{ comment.id }}"
+      >
+        {% csrf_token %}
+        <button class="btn btn-red action">
+          <i class="fa fa-trash-can"></i> {% trans %}Delete{% endtrans %}
+        </button>
+      </form>
+    {% endif %}
+  </div>
+
+  <div class="comment-end-bar">
+    <div class="report">
+      <p>
+        <a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">
+          {% trans %}Report this comment{% endtrans %}
+        </a>
+      </p>
+    </div>
+
+    <div class="date"><p>{{ comment.publish_date.strftime('%d/%m/%Y') }}</p></div>
+
+    <div class="author"><p>{{ user_profile_link(comment.author) }}</p></div>
+  </div>
+
+</div>
