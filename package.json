@@ -35,7 +35,8 @@
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^26.2.0",
     "rollup-plugin-visualizer": "^7.1.1",
-    "typescript": "^7.0.2",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
     "vite": "^8.2.2"
   },
   "dependencies": {
