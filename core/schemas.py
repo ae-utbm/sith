@@ -165,6 +165,11 @@ class MarkdownSchema(Schema):
     text: str
 
 
+class LoginSchema(Schema):
+    identifier: str
+    password: str
+
+
 class FamilyGodfatherSchema(Schema):
     godfather: int
     godchild: int
