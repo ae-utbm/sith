@@ -8,9 +8,9 @@ import {
   type Rollup,
   type UserConfig,
 } from "vite";
-import { compilerOptions } from "./tsconfig.bundled.json";
+import { compilerOptions } from "./tsconfig.bundled.json" with { type: "json" };
 
-const outDir = resolve(__dirname, "./staticfiles/generated/bundled");
+const outDir = resolve(import.meta.dirname, "./staticfiles/generated/bundled");
 const collectedFiles = glob.sync(
   "./!(static)/static/bundled/**/*?(-)index.?(m)[j|t]s?(x)",
 );
@@ -21,7 +21,7 @@ const collectedFiles = glob.sync(
 function getAliases(): AliasOptions {
   const aliases: AliasOptions = {};
   for (const [key, value] of Object.entries(compilerOptions.paths)) {
-    aliases[key] = resolve(__dirname, value[0]);
+    aliases[key] = resolve(import.meta.dirname, value[0]);
   }
   return aliases;
 }
