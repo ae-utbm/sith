@@ -17,16 +17,14 @@ D'abord, il faut ajouter dans node via `package.json`:
 }
 ```
 
-Ensuite, pour faire fonctionne l'auto-complétion, il faut configurer `tsconfig.json`:
+Ensuite, pour faire fonctionne l'auto-complétion, il faut configurer `tsconfig.bundled.json`:
 
 ```json
 {
-    "compilerOptions": {
+    // ...
+    "paths": {
         // ...
-        "paths": {
-            // ...
-            "#mon_app:*": ["./mon_app/static/bundled/*"]
-        }
+        "#mon_app:*": ["./mon_app/static/bundled/*"]
     }
 }
 ```

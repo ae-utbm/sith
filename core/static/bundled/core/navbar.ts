@@ -1,5 +1,5 @@
 function showMenu() {
-  const navbar = document.getElementById("navbar-content");
+  const navbar = document.getElementById("navbar-content") as HTMLElement;
   const current = navbar.getAttribute("mobile-display");
   navbar.setAttribute("mobile-display", current === "hidden" ? "revealed" : "hidden");
 }
@@ -20,9 +20,12 @@ function navbarInit() {
         item.removeAttribute("open");
       }
     });
-    item.addEventListener("click", (event: MouseEvent) => {
+    item.addEventListener("click", (event) => {
       // Don't close when clicking on desktop mode
-      if ((event.target as HTMLElement).nodeName !== "SUMMARY" || event.detail === 0) {
+      if (
+        (event.target as HTMLElement).nodeName !== "SUMMARY" ||
+        (event as MouseEvent).detail === 0
+      ) {
         return;
       }
 

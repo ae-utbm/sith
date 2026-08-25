@@ -9,7 +9,7 @@ document.addEventListener("alpine:init", () => {
 
     async downloadZip() {
       this.isDownloading = true;
-      const bar = this.$refs.progress;
+      const bar = this.$refs.progress as HTMLProgressElement;
       bar.value = 0;
       bar.max = this.downloadPictures.length;
 
@@ -31,10 +31,11 @@ document.addEventListener("alpine:init", () => {
 
       await Promise.all(
         this.downloadPictures.map((p: PictureSchema) => {
-          const imgName = `${p.album.name}/IMG_${p.id}_${p.date.replace(/[:-]/g, "_")}${p.name.slice(p.name.lastIndexOf("."))}`;
+          const dateStr = (p.date as string).replace(/[:-]/g, "_");
+          const imgName = `${p.album.name}/IMG_${p.id}_${dateStr}${p.name.slice(p.name.lastIndexOf("."))}`;
           return zipWriter.add(imgName, new HttpReader(p.full_size_url), {
             level: 9,
-            lastModDate: new Date(p.date),
+            lastModDate: new Date(p.date as string),
             onstart: incrementProgressBar,
           });
         }),

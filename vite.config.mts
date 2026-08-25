@@ -8,9 +8,9 @@ import {
   type Rollup,
   type UserConfig,
 } from "vite";
-import tsconfig from "./tsconfig.json";
+import { compilerOptions } from "./tsconfig.bundled.json" with { type: "json" };
 
-const outDir = resolve(__dirname, "./staticfiles/generated/bundled");
+const outDir = resolve(import.meta.dirname, "./staticfiles/generated/bundled");
 const collectedFiles = glob.sync(
   "./!(static)/static/bundled/**/*?(-)index.?(m)[j|t]s?(x)",
 );
@@ -20,8 +20,8 @@ const collectedFiles = glob.sync(
  **/
 function getAliases(): AliasOptions {
   const aliases: AliasOptions = {};
-  for (const [key, value] of Object.entries(tsconfig.compilerOptions.paths)) {
-    aliases[key] = resolve(__dirname, value[0]);
+  for (const [key, value] of Object.entries(compilerOptions.paths)) {
+    aliases[key] = resolve(import.meta.dirname, value[0]);
   }
   return aliases;
 }
@@ -59,7 +59,7 @@ export default defineConfig((config: UserConfig) => {
           // Mirror architecture of static folders in generated .js and .css
           entryFileNames: (chunkInfo: Rollup.PreRenderedChunk) => {
             if (chunkInfo.facadeModuleId !== null) {
-              return `${getRelativeAssetPath(chunkInfo.facadeModuleId)}.[hash].js`;
+              return `${getRelativeAssetPath(chunkInfo.facadeModuleId as string)}.[hash].js`;
             }
             return "[name].[hash].js";
           },
@@ -80,8 +80,6 @@ export default defineConfig((config: UserConfig) => {
     resolve: {
       alias: getAliases(),
     },
-    // biome-ignore lint/style/useNamingConvention: that's how it's called
-    inject: { Alpine: "alpinejs", htmx: "htmx.org" },
     plugins: [visualizer({ filename: ".bundle-size-report.html" }) as PluginOption],
   } satisfies UserConfig;
 });

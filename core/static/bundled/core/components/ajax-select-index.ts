@@ -1,11 +1,12 @@
+// @ts-expect-error TS2882
 import "tom-select/dist/css/tom-select.default.css";
-import type { TomOption } from "tom-select/dist/types/types";
-import type { escape_html } from "tom-select/dist/types/utils";
+import type { TomOption } from "tom-select/src/types";
+import type { escape_html } from "tom-select/src/utils";
 import {
   AjaxSelect,
   AutoCompleteSelectBase,
-} from "#core:core/components/ajax-select-base.ts";
-import { registerComponent } from "#core:utils/web-components.ts";
+} from "#core:core/components/ajax-select-base";
+import { registerComponent } from "#core:utils/web-components";
 import {
   type GroupSchema,
   groupSearchGroup,

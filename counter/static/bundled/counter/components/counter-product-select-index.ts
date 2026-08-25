@@ -59,7 +59,7 @@ export class CounterProductSelect extends AutoCompleteSelectBase {
         return onOptionSelect.call(
           this.widget,
           evt,
-          this.widget.getOption(value, true),
+          this.widget.getOption(value, true) as HTMLElement,
         );
       },
     );
@@ -70,12 +70,15 @@ export class CounterProductSelect extends AutoCompleteSelectBase {
       ...super.tomSelectSettings(),
       openOnFocus: false,
       // We make searching on exact code matching a higher priority
-      // We need to manually set weights or it results on an inconsistent
+      // We need to manually set weights, or it results on an inconsistent
       // behavior between production and development environment
+      //
+      // SearchField can be an object array (according to the docs),
+      // but it is unproperly typed, so we must force-cast to trick TS
       searchField: [
         { field: "code", weight: 2 },
         { field: "text", weight: 0.5 },
-      ],
+      ] as unknown as string[],
     };
   }
 }

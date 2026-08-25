@@ -886,6 +886,28 @@ class TestBarmanConnection(TestCase):
         )
         assert response.status_code == 403
 
+    def test_logout_then_login(self):
+        """Test that the login is successful if it is after a previous logout.
+
+        This is a regression test for #1440
+        """
+        self.client.post(  # login
+            self.login_url, {"username": self.barman.username, "password": "plop"}
+        )
+        self.client.post(  # logout
+            reverse("counter:logout", kwargs={"counter_id": self.counter.id}),
+            data={"user_id": self.barman.id},
+        )
+        response = self.client.post(  # and re-login
+            self.login_url, {"username": self.barman.username, "password": "plop"}
+        )
+        assert response.status_code == 200
+        assert response.headers["HX-Redirect"] == self.detail_url
+        response = self.client.get(
+            self.detail_url, {"username": self.barman.username, "password": "plop"}
+        )
+        assert self.barman in response.wsgi_request.barmen
+
 
 @pytest.mark.django_db
 def test_barman_timeout(client: Client):

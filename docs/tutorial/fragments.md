@@ -161,8 +161,8 @@ qui seront alors injectés.
     ```python
     from django.views.generic import CreateView, UpdateView, TemplateView
     from core.views.mixins import FragmentMixin
-    
-    
+
+
     class FooCreateFragment(FragmentMixin, CreateView):
         model = Foo
         fields = ["foo", "bar"]
@@ -182,7 +182,7 @@ qui seront alors injectés.
         def get_context_data(**kwargs):
             return super().get_context_data(**kwargs) | {
                 "create_fragment": FooCreateFragment.as_fragment()(),
-                "update_fragment": FooUpdateFragment.as_fragment()(foo_id=1)
+                "update_fragment": FooUpdateFragment.as_fragment()(foo_id=1),
             }
     ```
  
@@ -288,7 +288,7 @@ class FooCreateFragment(FragmentMixin, CreateView):
 
     def render_fragment(self, request, **kwargs):
         if "foo" in kwargs:
-           kwargs["foo"] += 2
+            kwargs["foo"] += 2
         return super().render_fragment(request, **kwargs)
 ```
 
@@ -319,11 +319,9 @@ from core.views.mixins import UseFragmentsMixin
 class FooCompositeFormView(UseFragmentsMixin, TemplateView):
     fragments = {
         "create_fragment": FooCreateFragment,
-        "update_fragment": FooUpdateFragment
+        "update_fragment": FooUpdateFragment,
     }
-    fragment_data = {
-       "update_fragment": {"foo": 4}
-    }
+    fragment_data = {"update_fragment": {"foo": 4}}
     template_name = "app/foo.jinja"
 ```
 
@@ -342,9 +340,7 @@ from core.views.mixins import UseFragmentsMixin
 
 
 class FooCompositeFormView(UseFragmentsMixin, TemplateView):
-    fragments = {
-        "create_fragment": FooCreateFragment
-    }
+    fragments = {"create_fragment": FooCreateFragment}
     template_name = "app/foo.jinja"
 
     def get_fragment_context_data(self):

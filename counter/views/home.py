@@ -61,6 +61,7 @@ class CounterLoginFragment(FragmentMixin, SingleObjectMixin, FormView):
         user = form.get_user()
         perm = self.object.permanencies.create(user=user, start=timezone.now())
         self.request.session.setdefault(SESSION_PERMANENCES_KEY, []).append(perm.id)
+        self.request.session.modified = True
         self.success_url = reverse(
             "counter:details", kwargs={"counter_id": self.object.id}
         )

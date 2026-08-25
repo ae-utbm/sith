@@ -1,4 +1,4 @@
-import { inheritHtmlElement, registerComponent } from "#core:utils/web-components.ts";
+import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
 
 @registerComponent("nfc-input")
 export class NfcInput extends inheritHtmlElement("input") {
@@ -26,9 +26,11 @@ export class NfcInput extends inheritHtmlElement("input") {
         window.alert(gettext("Unsupported NFC card"));
       });
 
-      ndef.addEventListener("reading", (event: NDEFReadingEvent) => {
+      ndef.addEventListener("reading", (event) => {
         this.removeAttribute("scan");
-        this.node.value = event.serialNumber.replace(/:/g, "").toUpperCase();
+        this.node.value = (event as NDEFReadingEvent).serialNumber
+          .replace(/:/g, "")
+          .toUpperCase();
         /* Auto submit form, we need another button to not trigger our previously defined click event */
         const submit = document.createElement("button");
         this.node.appendChild(submit);

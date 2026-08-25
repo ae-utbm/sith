@@ -1,4 +1,9 @@
-import { newsDeleteNews, newsFetchNewsDates, newsPublishNews } from "#openapi";
+import {
+  newsDeleteNews,
+  newsFetchNewsDates,
+  newsPublishNews,
+  type PaginatedResponseSchemaNewsDateSchema,
+} from "#openapi";
 
 // This will be used in jinja templates,
 // so we cannot use real enums as those are purely an abstraction of Typescript
@@ -64,7 +69,8 @@ document.addEventListener("alpine:init", () => {
         // biome-ignore lint/style/useNamingConvention: api is snake-case
         query: { news_id: this.newsId, page: 1, page_size: 1 },
       });
-      return response.data.count;
+
+      return (response.data as PaginatedResponseSchemaNewsDateSchema).count;
     },
 
     weeklyEventWarningMessage(nbEvents: number): string {

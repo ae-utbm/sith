@@ -4,9 +4,9 @@ import type {
   TomLoadCallback,
   TomOption,
   TomSettings,
-} from "tom-select/dist/types/types";
-import type { escape_html } from "tom-select/dist/types/utils";
-import { inheritHtmlElement } from "#core:utils/web-components.ts";
+} from "tom-select/src/types";
+import type { escape_html } from "tom-select/src/utils";
+import { inheritHtmlElement } from "#core:utils/web-components";
 
 export class AutoCompleteSelectBase extends inheritHtmlElement("select") {
   static observedAttributes = [
@@ -15,7 +15,7 @@ export class AutoCompleteSelectBase extends inheritHtmlElement("select") {
     "max",
     "min-characters-for-search",
   ];
-  public widget: TomSelect;
+  public widget!: TomSelect;
 
   protected minCharNumberForSearch = 0;
   protected delay: number | null = null;
@@ -24,8 +24,8 @@ export class AutoCompleteSelectBase extends inheritHtmlElement("select") {
 
   protected attributeChangedCallback(
     name: string,
-    _oldValue?: string,
-    newValue?: string,
+    _oldValue: string,
+    newValue: string,
   ) {
     switch (name) {
       case "delay": {
@@ -73,7 +73,7 @@ export class AutoCompleteSelectBase extends inheritHtmlElement("select") {
       persist: false,
       maxItems: this.node.multiple ? this.max : 1,
       closeAfterSelect: true,
-      loadThrottle: this.delay,
+      loadThrottle: this.delay ?? undefined,
       placeholder: this.placeholder,
       shouldLoad: (query: string) => this.shouldLoad(query), // wraps the method to avoid shadowing `this` by the one from tom-select
       render: {
@@ -103,7 +103,7 @@ export class AutoCompleteSelectBase extends inheritHtmlElement("select") {
 }
 
 export abstract class AjaxSelect extends AutoCompleteSelectBase {
-  protected filter?: (items: TomOption[]) => TomOption[] = null;
+  protected filter?: (items: TomOption[]) => TomOption[];
   protected minCharNumberForSearch = 2;
   /**
    * A cache of researches that have been made using this input.

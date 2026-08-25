@@ -1,11 +1,13 @@
+// @ts-expect-error 2307
 // biome-ignore lint/correctness/noUndeclaredDependencies: shipped by easymde
 import "codemirror/lib/codemirror.css";
+// @ts-expect-error 2307
 import "easymde/src/css/easymde.css";
 // biome-ignore lint/correctness/noUndeclaredDependencies: Imported by EasyMDE
 import type CodeMirror from "codemirror";
 // biome-ignore lint/style/useNamingConvention: This is how they called their namespace
 import EasyMDE from "easymde";
-import { inheritHtmlElement, registerComponent } from "#core:utils/web-components.ts";
+import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
 import {
   markdownRenderMarkdown,
   type UploadUploadImageErrors,
@@ -25,11 +27,11 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
           file: file,
         },
       });
-      if (!response.response.ok) {
-        if (response.response.status === 422) {
+      if (response.response !== undefined && !response.response.ok) {
+        if (response?.response.status === 422) {
           onError(
             (response.error as UploadUploadImageErrors[422]).detail
-              .map((err: Record<"ctx", Record<"error", string>>) => err.ctx.error)
+              .map((err) => err.ctx.error)
               .join(" ; "),
           );
         } else if (response.response.status === 403) {
@@ -37,6 +39,10 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
         } else {
           onError(gettext("Could not upload image"));
         }
+        return;
+      }
+      if (response.data === undefined) {
+        // this can't happen, it's just for the type checker to know
         return;
       }
       onSuccess(response.data.href);
@@ -58,21 +64,18 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
       });
       easymde.codemirror.replaceSelection("\n");
     },
-    previewRender: (plainText: string, preview: MarkdownInput) => {
+    previewRender: (plainText, preview) => {
       /* This is wrapped this way to allow time for Alpine to be loaded on the page */
-      return Alpine.debounce((plainText: string, preview: MarkdownInput) => {
-        const func = async (
-          plainText: string,
-          preview: MarkdownInput,
-        ): Promise<null> => {
+      return Alpine.debounce(() => {
+        const func = async () => {
           preview.innerHTML = (
             await markdownRenderMarkdown({ body: { text: plainText } })
           ).data as string;
           return null;
         };
-        func(plainText, preview);
+        func().then();
         return null;
-      }, 300)(plainText, preview);
+      }, 300)();
     },
     forceSync: true, // Avoid validation error on generic create view
     imageTexts: {
@@ -222,9 +225,11 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
   });
 
   const submits: HTMLInputElement[] = Array.from(
-    textarea.closest("form").querySelectorAll('input[type="submit"]'),
+    (textarea.closest("form") as HTMLFormElement).querySelectorAll(
+      'input[type="submit"]',
+    ),
   );
-  const parentDiv = textarea.parentElement.parentElement;
+  const parentDiv = textarea.parentElement?.parentElement as HTMLElement;
 
   function checkMarkdownInput(event: Event) {
     // an attribute is null if it does not exist, else a string
@@ -249,6 +254,7 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
 };
 
 @registerComponent("markdown-input")
+// biome-ignore lint/correctness/noUnusedVariables: it is used in jinja
 class MarkdownInput extends inheritHtmlElement("textarea") {
   connectedCallback() {
     super.connectedCallback();

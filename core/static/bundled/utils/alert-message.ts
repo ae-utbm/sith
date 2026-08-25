@@ -5,9 +5,9 @@ interface AlertParams {
 
 export class AlertMessage {
   public open: boolean;
-  public success: boolean;
+  public success!: boolean;
   public content: string;
-  private timeoutId?: number;
+  private timeoutId: number | null;
   private readonly defaultDuration: number;
 
   constructor(params?: { defaultDuration: number }) {

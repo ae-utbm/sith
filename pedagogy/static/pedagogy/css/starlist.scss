@@ -1,0 +1,38 @@
+fieldset.star {
+  border: none;
+
+  label {
+    display: inline;
+    cursor: pointer;
+  }
+
+  .checked {
+    color: orange;
+  }
+
+  .unchecked {
+    color: gray;
+  }
+
+  .unchecked.hovered {
+    color: #FFD700;
+  }
+
+  .removed {
+    color: red;
+  }
+
+  input[type="radio"] {
+    display: none;
+  }
+
+  label:first-child {
+    margin-right: 10px;
+  }
+
+  &:has(input:required:invalid) {
+    border: 1px solid;
+    border-color: #c00000;
+  }
+
+}

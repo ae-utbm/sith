@@ -82,7 +82,11 @@
 
     <div class="container" id="pict">
       <div class="main">
-        <div class="photo" :aria-busy="currentPicture.imageLoading">
+        <div
+          class="photo"
+          :aria-busy="currentPicture.imageLoading"
+          @click="currentPicture = (($event.offsetX > $event.target.getBoundingClientRect().width / 2) ? nextPicture : previousPicture) ?? currentPicture"
+        >
           <img
             :src="currentPicture.compressedUrl"
             :alt="currentPicture.name"
@@ -95,13 +99,13 @@
           <div class="infos">
             <h5>{% trans %}Infos{% endtrans %}</h5>
             <div>
-              <div>
+              <div
+                x-data="{formatter: Intl.DateTimeFormat('{{ LANGUAGE_CODE }}', {dateStyle: 'long'})}"
+              >
                 <span>{% trans %}Date: {% endtrans %}</span>
-                <span
-                  x-text="Intl.DateTimeFormat(
-                          '{{ LANGUAGE_CODE }}', {dateStyle: 'long'}
-                          ).format(Date.parse(currentPicture.date))"
-                >
+                {# The `currentPicture.date || 0` part is to avoid having
+                a console error while the picture date is not yet fetched #}
+                <span x-text="formatter.format(new Date(currentPicture.date || 0))">
                 </span>
               </div>
               <div>

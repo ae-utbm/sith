@@ -15,7 +15,7 @@ Si le mot est dans le code Python :
 ```python
 from django.utils.translation import gettext as _
 
-help_text=_("Hello")
+help_text = _("Hello")
 ```
 
 Si le mot apparaît dans le template Jinja :

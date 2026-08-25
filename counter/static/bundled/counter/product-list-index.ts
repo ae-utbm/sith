@@ -1,9 +1,14 @@
 import { showSaveFilePicker } from "native-file-system-adapter";
 import type TomSelect from "tom-select";
+import type { ClubAjaxSelect } from "#club:club/components/ajax-select-index";
 import type { NestedKeyOf } from "#core:types/nested-key";
-import { paginated } from "#core:utils/api";
+import { type PaginatedRequest, paginated } from "#core:utils/api";
 import { csv } from "#core:utils/csv";
 import { getCurrentUrlParams, History, updateQueryString } from "#core:utils/history";
+import type {
+  CounterAjaxSelect,
+  ProductTypeAjaxSelect,
+} from "#counter:counter/components/ajax-select-index";
 import {
   type ProductSchema,
   type ProductSearchProductsDetailedData,
@@ -51,6 +56,8 @@ const csvColumnTitles = [
   gettext("archived"),
 ];
 
+type ProductStatus = "active" | "archived" | "both";
+
 document.addEventListener("alpine:init", () => {
   Alpine.data("productList", () => ({
     loading: false,
@@ -59,8 +66,7 @@ document.addEventListener("alpine:init", () => {
 
     /** Total number of elements corresponding to the current query. */
     nbPages: 0,
-
-    productStatus: "" as "active" | "archived" | "both",
+    productStatus: "" as ProductStatus,
     search: "",
     productTypes: [] as string[],
     clubs: [] as string[],
@@ -71,16 +77,18 @@ document.addEventListener("alpine:init", () => {
     async init() {
       const url = getCurrentUrlParams();
       this.search = url.get("search") || "";
-      this.productStatus = url.get("productStatus") ?? "active";
-      const productTypesWidget = this.$refs.productTypesInput.widget as TomSelect;
+      this.productStatus = (url.get("productStatus") ?? "active") as ProductStatus;
+      const productTypesWidget = (this.$refs.productTypesInput as ProductTypeAjaxSelect)
+        .widget as TomSelect;
       productTypesWidget.on("change", (items: string[]) => {
         this.productTypes = [...items];
       });
-      const clubsWidget = this.$refs.clubsInput.widget as TomSelect;
+      const clubsWidget = (this.$refs.clubsInput as ClubAjaxSelect).widget as TomSelect;
       clubsWidget.on("change", (items: string[]) => {
         this.clubs = [...items];
       });
-      const countersWidget = this.$refs.countersInput.widget as TomSelect;
+      const countersWidget = (this.$refs.countersInput as CounterAjaxSelect)
+        .widget as TomSelect;
       countersWidget.on("change", (items: string[]) => {
         this.counters = [...items];
       });
@@ -127,9 +135,9 @@ document.addEventListener("alpine:init", () => {
           // biome-ignore lint/style/useNamingConvention: api is in snake_case
           is_archived: isArchived,
           // biome-ignore lint/style/useNamingConvention: api is in snake_case
-          product_type: [...this.productTypes],
-          club: [...this.clubs],
-          counter: [...this.counters],
+          product_type: [...this.productTypes.map(Number.parseInt)],
+          club: [...this.clubs.map(Number.parseInt)],
+          counter: [...this.counters.map(Number.parseInt)],
         },
       };
     },
@@ -141,6 +149,10 @@ document.addEventListener("alpine:init", () => {
       this.loading = true;
       const options = this.getQueryParams();
       const resp = await productSearchProductsDetailed(options);
+      if (resp.data === undefined) {
+        console.error("Product search request failed");
+        return;
+      }
       this.nbPages = Math.ceil(resp.data.count / defaultPageSize);
       this.products = resp.data.results.reduce<GroupedProducts>(
         (acc: GroupedProducts, curr: ProductSchema) => {
@@ -172,7 +184,10 @@ document.addEventListener("alpine:init", () => {
       // If not, fetch them.
       const products: ProductSchema[] =
         this.nbPages > 1
-          ? await paginated(productSearchProductsDetailed, this.getQueryParams())
+          ? await paginated(
+              productSearchProductsDetailed,
+              this.getQueryParams() as PaginatedRequest,
+            )
           : Object.values<ProductSchema[]>(this.products).flat();
       // CSV cannot represent nested data
       // so we create a row for each price of each product.

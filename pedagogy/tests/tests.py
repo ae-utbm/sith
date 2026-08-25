@@ -339,6 +339,24 @@ class TestUVCommentCreationAndDisplay(TestCase):
         response = self.client.get(self.ue_url)
         self.assertContains(response, text="Superbe UE")
 
+    def test_create_ue_empty_comment_fail(self):
+        self.client.force_login(self.tutu)
+        response = self.client.post(
+            self.ue_url,
+            {
+                "author": self.tutu.id,
+                "ue": UE.objects.get(code="PA00").id,
+                "grade_global": -1,
+                "grade_utility": -1,
+                "grade_interest": -1,
+                "grade_teaching": -1,
+                "grade_work_load": -1,
+                "comment": "",
+            },
+        )
+        assert response.status_code == 200
+        self.assertInHTML("Un commentaire d'UE ne peut pas être vide.", response.text)
+
     def test_create_ue_comment_unauthorized_fail(self):
         nb_comments = self.ue.comments.count()
         # Test with anonymous user

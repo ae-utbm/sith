@@ -123,6 +123,7 @@ Par exemple, prenons le modèle suivant :
 ```python
 from django.db import models
 
+
 class News(models.Model):
     # ...
 
@@ -192,20 +193,21 @@ Pour les vues sous forme de fonction, il y a le décorateur
 
     ```python
     from com.models import News
-    
+
     from django.contrib.auth.mixins import PermissionRequiredMixin
     from django.shortcuts import redirect
     from django.urls import reverse
     from django.views import View
     from django.views.generic.detail import SingleObjectMixin
-    
+
+
     class NewsModerateView(PermissionRequiredMixin, SingleObjectMixin, View):
         model = News
         pk_url_kwarg = "news_id"
         permission_required = "com.moderate_news"
         # On peut aussi fournir plusieurs permissions, par exemple :
         # permission_required = ["com.moderate_news", "com.delete_news"]
-    
+
         def post(self, request, *args, **kwargs):
             # Si nous sommes ici, nous pouvons être certains que l'utilisateur
             # a la permission requise
@@ -219,12 +221,13 @@ Pour les vues sous forme de fonction, il y a le décorateur
 
     ```python
     from com.models import News
-    
+
     from django.contrib.auth.decorators import permission_required
     from django.shortcuts import get_object_or_404, redirect
     from django.urls import reverse
     from django.views.decorators.http import require_POST
-    
+
+
     @permission_required("com.moderate_news")
     @require_POST
     def moderate_news(request, news_id: int):
@@ -262,6 +265,7 @@ from com.models import News
 from core.auth.mixins import PermissionOrAuthorRequiredMixin
 
 from django.views.generic import UpdateView
+
 
 class NewsUpdateView(PermissionOrAuthorRequiredMixin, UpdateView):
     model = News
@@ -324,8 +328,8 @@ Voici un exemple d'implémentation de ce système :
 
     from core.models import User, Group
 
-    class Article(models.Model):
 
+    class Article(models.Model):
         title = models.CharField(_("title"), max_length=100)
         content = models.TextField(_("content"))
 
@@ -370,6 +374,7 @@ Voici un exemple d'implémentation de ce système :
 
     from core.models import User, Group
 
+
     class Article(models.Model):
         title = models.CharField(_("title"), max_length=100)
         content = models.TextField(_("content"))
@@ -378,7 +383,7 @@ Voici un exemple d'implémentation de ce système :
         owner_group = models.ForeignKey(  # (1)!
             Group, related_name="owned_articles", default=settings.SITH_GROUP_ROOT_ID
         )
-        
+
         # relation many-to-many
         edit_groups = models.ManyToManyField(  # (2)!
             Group,
@@ -386,7 +391,7 @@ Voici un exemple d'implémentation de ce système :
             verbose_name=_("edit groups"),
             blank=True,
         )
-    
+
         # relation many-to-many
         view_groups = models.ManyToManyField(  # (3)!
             Group,
@@ -529,10 +534,7 @@ class NewsQuerySet(models.QuerySet):  # (1)!
             return self
         # sinon, on retourne les nouvelles modérées ou dont l'utilisateur
         # est l'auteur
-        return self.filter(
-            models.Q(is_moderated=True)
-            | models.Q(author=user)
-        )
+        return self.filter(models.Q(is_moderated=True) | models.Q(author=user))
 
 
 class News(models.Model):

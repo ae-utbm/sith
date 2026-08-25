@@ -29,6 +29,7 @@ export function registerComponent(name: string, options?: ElementDefinitionOptio
 export interface InheritedHtmlElement<K extends keyof HTMLElementTagNameMap>
   extends HTMLElement {
   readonly inheritedTagName: K;
+  // readonly initializedAttribute: "component-initialized";
   node: HTMLElementTagNameMap[K];
 }
 
@@ -47,8 +48,8 @@ export function inheritHtmlElement<K extends keyof HTMLElementTagNameMap>(tagNam
     implements InheritedHtmlElement<K>
   {
     readonly inheritedTagName = tagName;
-    private readonly initializedAttribute = "component-initialized";
-    node: HTMLElementTagNameMap[K];
+    readonly initializedAttribute = "component-initialized";
+    node!: HTMLElementTagNameMap[K];
 
     connectedCallback(autoAddNode?: boolean) {
       // When nesting inherited elements, we might trigger the wrapping twice

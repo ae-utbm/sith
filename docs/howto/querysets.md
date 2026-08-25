@@ -191,7 +191,6 @@ for user in richest.annotate(amount=F("customer__amount"))[:100]:
 
 On aurait même pu réorganiser ça :
 ```python
-
 from core.models import User
 from django.db.models import F
 
@@ -239,10 +238,7 @@ nous écrivons donc instinctivement :
 from counter.models import Counter
 
 foyer = Counter.objects.get(name="Foyer")
-total_amount = sum(
-    sale.amount * sale.unit_price
-    for sale in foyer.sellings.all()
-)
+total_amount = sum(sale.amount * sale.unit_price for sale in foyer.sellings.all())
 ```
 
 On pourrait penser qu'il n'y a pas de problème.

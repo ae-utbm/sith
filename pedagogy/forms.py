@@ -22,6 +22,8 @@
 #
 
 from django import forms
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.forms.fields import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from core.models import User
@@ -30,7 +32,7 @@ from pedagogy.models import UE, UEComment, UECommentReport
 
 
 class UEForm(forms.ModelForm):
-    """Form handeling creation and edit of an UE."""
+    """Form handling creation and edit of an UE."""
 
     class Meta:
         model = UE
@@ -68,22 +70,28 @@ class UEForm(forms.ModelForm):
         self.fields["author"].initial = author_id
 
 
-class StarList(forms.NumberInput):
+class StarList(forms.RadioSelect):
     template_name = "pedagogy/starlist.jinja"
 
-    def __init__(self, nubmer_of_stars=0):
-        super().__init__(None)
-        self.number_of_stars = nubmer_of_stars
+    def __init__(self, number_of_stars=0, attrs=None):
+        super().__init__(
+            attrs=attrs,
+            choices=(
+                (choice, _("Do not vote") if choice == -1 else choice)
+                for choice in range(-1, number_of_stars)
+            ),
+        )
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        context["number_of_stars"] = range(0, self.number_of_stars)
-        context["translations"] = {"do_not_vote": _("Do not vote")}
+        context["statics"] = {
+            "css": staticfiles_storage.url("pedagogy/css/starlist.scss"),
+        }
         return context
 
 
 class UECommentForm(forms.ModelForm):
-    """Form handeling creation and edit of an UEComment."""
+    """Form handling creation and edit of an UEComment."""
 
     class Meta:
         model = UEComment
@@ -129,11 +137,22 @@ class UECommentForm(forms.ModelForm):
                 ),
             )
 
+        # Ensure that at least one value is exists
+        if (
+            all(
+                grade == -1
+                for key, grade in self.cleaned_data.items()
+                if key.startswith("grade_")
+            )
+            and not self.cleaned_data["comment"]
+        ):
+            raise ValidationError(message=_("UE comment can't be empty."))
+
         return self.cleaned_data
 
 
 class UECommentReportForm(forms.ModelForm):
-    """Form handeling creation and edit of an UEReport."""
+    """Form handling creation and edit of an UEReport."""
 
     class Meta:
         model = UECommentReport
@@ -153,7 +172,7 @@ class UECommentReportForm(forms.ModelForm):
 
 
 class UECommentModerationForm(forms.Form):
-    """Form handeling bulk comment deletion."""
+    """Form handling bulk comment deletion."""
 
     accepted_reports = forms.ModelMultipleChoiceField(
         UECommentReport.objects.all(),
