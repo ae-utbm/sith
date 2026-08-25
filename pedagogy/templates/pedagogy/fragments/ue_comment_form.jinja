@@ -6,13 +6,8 @@
   {% endif %}
   <form
     hx-post="{{ action }}"
-    {% if form.is_creation %}
-      hx-target="#comments"
-      hx-swap="afterbegin"
-    {% else %}
-      hx-target="closest .leave-comment"
-      hx-swap="outerHTML"
-    {% endif %}
+    hx-target="closest .leave-comment"
+    hx-swap="outerHTML"
     hx-disabled-elt="find input[type='submit']"
   >
     {% csrf_token %}

@@ -31,6 +31,7 @@ from pedagogy.views import (
     UECommentUpdateView,
     UECreateView,
     UEDeleteView,
+    UEDetailCommentsView,
     UEDetailView,
     UEGuideView,
     UEModerationFormView,
@@ -41,6 +42,11 @@ urlpatterns = [
     # Urls displaying the actual application for visitors
     path("", UEGuideView.as_view(), name="guide"),
     path("ue/<int:ue_id>/", UEDetailView.as_view(), name="ue_detail"),
+    path(
+        "ue/<int:ue_id>/comments",
+        UEDetailCommentsView.as_view(),
+        name="ue_comments",
+    ),
     path(
         "ue/<int:ue_id>/comment",
         UECommentCreateView.as_view(),

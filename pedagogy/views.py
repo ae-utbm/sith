@@ -79,8 +79,36 @@ class UECommentCreateView(PermissionRequiredMixin, FragmentMixin, CreateView):
             "action": reverse("pedagogy:comment_create", kwargs={"ue_id": self.ue.id})
         }
 
-    def get_success_url(self):
-        return reverse("pedagogy:comment_detail", kwargs={"comment_id": self.object.id})
+    def form_valid(self, form):
+        """If the form is valid, save the associated model."""
+        self.object = form.save()
+        response = HttpResponse(status=200)
+        response.headers["HX-Trigger"] = "NewComment, CommentUpdate"
+        return response
+
+
+class UEDetailCommentsView(
+    PermissionRequiredMixin,
+    FragmentMixin,
+    DetailView,
+):
+    """Fragment view that display all comments"""
+
+    model = UE
+    pk_url_kwarg = "ue_id"
+    template_name = "pedagogy/fragments/ue_comments.jinja"
+    permission_required = "pedagogy.view_ue"
+
+    def get_context_data(self, **kwargs):
+        self.object = self.get_object()  # Needed if loaded with .as_fragment()
+        return super().get_context_data(**kwargs) | {
+            "comments": list(
+                self.object.comments.viewable_by(self.request.user)
+                .annotate_is_reported()
+                .select_related("author")
+                .order_by("-publish_date")
+            ),
+        }
 
 
 class UEDetailView(
@@ -94,19 +122,13 @@ class UEDetailView(
     permission_required = "pedagogy.view_ue"
     fragments = {
         "add_comment_form": UECommentCreateView,
+        "comments": UEDetailCommentsView,
     }
 
     def get_fragment_data(self):
-        return {"add_comment_form": {"ue_id": self.object.id}}
-
-    def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
-            "comments": list(
-                self.object.comments.viewable_by(self.request.user)
-                .annotate_is_reported()
-                .select_related("author")
-                .order_by("-publish_date")
-            ),
+        return {
+            "add_comment_form": {"ue_id": self.object.id},
+            "comments": {"ue_id": self.object.id},
         }
 
 
@@ -116,6 +138,9 @@ class UECommentDetailView(PermissionRequiredMixin, DetailView):
     template_name = "pedagogy/fragments/ue_comment.jinja"
     permission_required = "pedagogy.view_ue"
     context_object_name = "comment"
+
+    def get_queryset(self):
+        return super().get_queryset().annotate_is_reported()
 
     def dispatch(self, *args, **kwargs):
         res: HttpResponse = super().dispatch(*args, **kwargs)

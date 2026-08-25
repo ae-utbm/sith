@@ -61,11 +61,7 @@
 
         {% include "pedagogy/fragments/ue_detail.jinja" %}
 
-        {% for comment in comments %}
-          <section id="comments">
-            {% include "pedagogy/fragments/ue_comment.jinja" %}
-          </section>
-        {% endfor %}
+        {{ comments }}
 
       </div>
     </div>
