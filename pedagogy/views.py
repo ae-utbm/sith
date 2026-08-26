@@ -140,7 +140,9 @@ class UECommentDetailView(PermissionRequiredMixin, DetailView):
     context_object_name = "comment"
 
     def get_queryset(self):
-        return super().get_queryset().annotate_is_reported()
+        return (
+            super().get_queryset().viewable_by(self.request.user).annotate_is_reported()
+        )
 
     def dispatch(self, *args, **kwargs):
         res: HttpResponse = super().dispatch(*args, **kwargs)
@@ -148,7 +150,9 @@ class UECommentDetailView(PermissionRequiredMixin, DetailView):
         return res
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {"ue": self.object.ue}
+        return super().get_context_data(**kwargs) | {
+            "ue": getattr(self.object, "ue", None)
+        }
 
 
 class UECommentUpdateView(PermissionOrAuthorRequiredMixin, AllowFragment, UpdateView):
@@ -189,10 +193,12 @@ class UECommentDeleteView(PermissionOrAuthorRequiredMixin, AllowFragment, Delete
     author_field = "author"
 
     def form_valid(self, form):
-        self.object.delete()
-        response = HttpResponse(status=200)
+        response = super().form_valid(form)
         response.headers["HX-Trigger"] = "CommentUpdate"
         return response
+
+    def get_success_url(self):
+        return reverse("pedagogy:comment_detail", kwargs={"comment_id": self.object.id})
 
 
 class UEGuideView(PermissionRequiredMixin, TemplateView):
@@ -202,12 +208,12 @@ class UEGuideView(PermissionRequiredMixin, TemplateView):
     permission_required = "pedagogy.view_ue"
 
 
-class UECommentReportCreateView(PermissionRequiredMixin, CreateView):
+class UECommentReportCreateView(PermissionRequiredMixin, AllowFragment, CreateView):
     """Create a new report for an inappropriate comment."""
 
     model = UECommentReport
     form_class = UECommentReportForm
-    template_name = "core/edit.jinja"
+    template_name = "pedagogy/fragments/comment_report.jinja"
     permission_required = "pedagogy.add_uecommentreport"
 
     def dispatch(self, request, *args, **kwargs):
@@ -219,6 +225,11 @@ class UECommentReportCreateView(PermissionRequiredMixin, CreateView):
         kwargs["reporter_id"] = self.request.user.id
         kwargs["comment_id"] = self.ue_comment.id
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data() | {
+            "comment_id": self.ue_comment.id,
+        }
 
     def form_valid(self, form):
         resp = super().form_valid(form)
@@ -235,11 +246,12 @@ class UECommentReportCreateView(PermissionRequiredMixin, CreateView):
                 url=reverse("pedagogy:moderation"),
                 type="PEDAGOGY_MODERATION",
             )
-
         return resp
 
     def get_success_url(self):
-        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.ue_comment.ue_id})
+        return reverse(
+            "pedagogy:comment_detail", kwargs={"comment_id": self.ue_comment.id}
+        )
 
 
 class UEModerationFormView(PermissionRequiredMixin, FormView):

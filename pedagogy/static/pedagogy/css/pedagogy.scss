@@ -168,12 +168,6 @@ $pedagogy-white-text: #f0f0f0;
       .input-stars {
         margin-top: 20px;
       }
-
-      .right {
-        display: flex;
-        justify-content: flex-end;
-      }
-
     }
 
     .ue-details-container {
@@ -446,4 +440,9 @@ details.accordion>.accordion-content {
   background-color: $white-color;
   border-color: $pedagogy-orange;
   border-right: none;
+}
+
+.right {
+  display: flex;
+  justify-content: flex-end;
 }

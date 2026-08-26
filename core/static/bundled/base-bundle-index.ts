@@ -18,6 +18,7 @@ import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
 import { limitedChoices } from "#core:alpine/limited-choices";
 import { expireOldStorage } from "#core:core/localstorage";
 import { default as navbar } from "#core:core/navbar";
+import { getErrorCallbacksExt } from "#core:htmx/error-callback";
 import {
   type NotificationPlugin,
   notificationsPlugin as notifications,
@@ -61,6 +62,9 @@ document.body.addEventListener(
     (event as CustomEvent).detail.ctx.target.ariaBusy = null;
   },
 );
+
+const errorCallbackExt = getErrorCallbacksExt();
+htmx.registerExtension(errorCallbackExt.name, errorCallbackExt.extension);
 
 Object.assign(window, { htmx });
 

@@ -1,0 +1,30 @@
+<form
+  hx-post="{{ request.get_full_path() }}"
+  hx-ext="error-callbacks"
+  hx-target="this"
+  hx-swap="outerHTML"
+  hx-disabled-elt="input[type='submit']"
+  hx-trigger="submit"
+  hx-callback-404="target.remove()"
+>
+  {% csrf_token %}
+  {{ form.non_field_errors() }}
+  {{ form.reason.errors }}
+  {{ form.reason }}
+
+  {# Hidden fields #}
+  {{ form.reporter }}
+  {{ form.comment }}
+
+  <button
+    hx-get="{{ url('pedagogy:comment_detail', comment_id=comment_id) }}"
+    hx-target="closest form"
+    hx-swap="outerHTML"
+  >
+    {% trans %}Cancel{% endtrans %}
+  </button>
+
+  <p class="right" id="nique">
+    <input type="submit" value="{% trans %}Report{% endtrans %}" />
+  </p>
+</form>

@@ -47,10 +47,12 @@
     {% endif %}
     {% if comment.author_id == user.id or user.has_perm("pedagogy.delete_comment") %}
       <form class="action"
+            hx-ext="error-callbacks"
             hx-post="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}"
             hx-confirm='{% trans obj=object %}Are you sure you want to delete "{{ obj }}"?{% endtrans %}'
             hx-swap="outerHTML"
             hx-target="#comment-{{ comment.id }}"
+            hx-callback-404="document.getElementsByTagName('body')[0].dispatchEvent(new CustomEvent('CommentUpdate'));target.remove()"
       >
         {% csrf_token %}
         <button class="btn btn-red action">
@@ -63,7 +65,11 @@
   <div class="comment-end-bar">
     <div class="report">
       <p>
-        <a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">
+        <a
+          hx-get="{{ url('pedagogy:comment_report', comment_id=comment.id) }}"
+          hx-swap="outerHTML"
+          hx-target="#comment-{{ comment.id }}"
+        >
           {% trans %}Report this comment{% endtrans %}
         </a>
       </p>
