@@ -28,18 +28,23 @@ export class ProductAjaxSelect extends AjaxSelect {
     return [];
   }
 
-  private getName(item: SimpleProductSchema, sanitize: typeof escape_html): string {
+  // In the context in which this method is called, `this` might be shadowed
+  // We need to call it explicitly from the class itself
+  private static getName(
+    item: SimpleProductSchema,
+    sanitize: typeof escape_html,
+  ): string {
     return item.code ? `${sanitize(item.code)} - ${sanitize(item.name)}` : item.name;
   }
 
   protected renderOption(item: SimpleProductSchema, sanitize: typeof escape_html) {
     return `<div class="select-item">
-            <span class="select-item-text">${this.getName(item, sanitize)}</span>
+            <span class="select-item-text">${ProductAjaxSelect.getName(item, sanitize)}</span>
           </div>`;
   }
 
   protected renderItem(item: SimpleProductSchema, sanitize: typeof escape_html) {
-    return `<span>${this.getName(item, sanitize)}</span>`;
+    return `<span>${ProductAjaxSelect.getName(item, sanitize)}</span>`;
   }
 }
 
