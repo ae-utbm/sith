@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block additional_js %}
-  <script type="module" src="{{ static('bundled/pedagogy/guide-index.js') }}"></script>
+  <script type="module" src="{{ static('bundled/pedagogy/guide-index.ts') }}"></script>
 {% endblock %}
 
 {% block head %}
@@ -24,30 +24,28 @@
 
 {% block content %}
   {% if user.has_perm("pedagogy.add_ue") %}
-    <div class="action-bar">
-      <p>
-        <a href="{{ url('pedagogy:ue_create') }}">{% trans %}Create UE{% endtrans %}</a>
-      </p>
-      <p>
-        <a href="{{ url('pedagogy:moderation') }}">{% trans %}Moderate comments{% endtrans %}</a>
-      </p>
+    <div class="row gap">
+      <a href="{{ url('pedagogy:ue_create') }}" class="btn btn-blue"><i class="fa fa-plus"></i>{% trans %}Create UE{% endtrans %}</a>
+      <a href="{{ url('pedagogy:moderation') }}" class="btn btn-grey">{% trans %}Moderate comments{% endtrans %}</a>
     </div>
     <br/>
   {% endif %}
   <div class="pedagogy" x-data="ue_search" x-cloak>
-    <form id="search_form">
+    <form id="search_form" class="">
       <div class="search-form-container">
-        <div class="search-bar">
+        <fieldset>
+          <label for="search_input">{% trans %}Search UE{% endtrans %}</label>
           <input
             id="search_input"
             class="search-bar-input"
-            type="text"
+            type="search"
             name="search"
+            placeholder=""
             x-model.debounce.500ms="search"
           />
-        </div>
-        <div class="radio-department">
-          <div class="radio-guide">
+        </fieldset>
+        <div class="row gap-3x margin-bottom radio-guide">
+          <fieldset>
             {% set departments = [
             ("EDIM", "EDIM"), ("ENERGIE", "EE"), ("IMSI", "IMSI"),
             ("INFO", "GI"), ("GMC", "MC"), ("HUMA", "HUMA"), ("TC", "TC")
@@ -56,16 +54,16 @@
               <input
                 type="checkbox"
                 name="department"
-                id="radio{{ real_name }}"
+                id="radio_{{ real_name }}"
                 value="{{ real_name }}"
                 x-model="department"
               />
-              <label for="radio{{ real_name }}">{% trans %}{{ display_name }}{% endtrans %}</label>
+              <label for="radio_{{ real_name }}" class="btn btn-blue">
+                {% trans %}{{ display_name }}{% endtrans %}
+              </label>
             {% endfor %}
-          </div>
-        </div>
-        <div class="radio-credit-type">
-          <div class="radio-guide">
+          </fieldset>
+          <fieldset>
             {% for credit_type in ["CS", "TM", "EC", "QC", "OM"] %}
               <input
                 type="checkbox"
@@ -74,18 +72,21 @@
                 value="{{ credit_type }}"
                 x-model="credit_type"
               />
-              <label for="radio{{ credit_type }}">{% trans %}{{ credit_type }}{% endtrans %}</label>
+              <label for="radio{{ credit_type }}" class="btn btn-blue">
+                {% trans %}{{ credit_type }}{% endtrans %}
+              </label>
             {% endfor %}
-          </div>
-        </div>
-
-        <div class="radio-semester">
-          <div class="radio-guide">
+          </fieldset>
+          <fieldset>
             <input type="checkbox" name="semester" id="radioAUTUMN" value="AUTUMN" x-model="semester"/>
-            <label for="radioAUTUMN"><i class="fa fa-leaf"></i></label>
+            <label for="radioAUTUMN" class="btn btn-no-text btn-blue">
+              <i class="fa fa-leaf"></i>
+            </label>
             <input type="checkbox" name="semester" id="radioSPRING" value="SPRING" x-model="semester"/>
-            <label for="radioSPRING"><i class="fa-regular fa-sun"></i></label>
-          </div>
+            <label for="radioSPRING" class="btn btn-no-text btn-blue">
+              <i class="fa-regular fa-sun"></i>
+            </label>
+          </fieldset>
         </div>
       </div>
     </form>
