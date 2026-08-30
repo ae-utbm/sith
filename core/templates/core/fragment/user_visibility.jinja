@@ -1,6 +1,6 @@
 <form
   hx-post="{{ url("core:user_visibility_fragment", user_id=form.instance.id) }}"
-  hx-disabled-elt="find input[type='submit']"
+  hx-disable="find input[type='submit']"
   hx-swap="outerHTML" x-data="{ isViewable: {{ form.is_viewable.value()|tojson }} }"
 >
   {% for message in messages %}
