@@ -64,100 +64,23 @@ $pedagogy-white-text: #f0f0f0;
   }
 
   #search_form {
-    .search-form-container {
-      display: grid;
-      grid-template-columns: auto auto;
-      grid-template-rows: auto auto auto;
-      grid-template-areas:
-      "action-bar action-bar"
-      "search-bar search-bar"
-      "radio-department radio-department"
-      "radio-credit-type radio-semester";
-    }
 
-    .action-bar {
-      grid-area: action-bar;
-      margin-bottom: 10px;
-    }
-
-    .search-bar {
-      grid-area: search-bar;
-      display: grid;
-      grid-template-columns: auto 200px;
-      grid-template-rows: auto;
-      grid-template-areas: "search-bar-input search-bar-button";
-
-      @media screen and (max-width: $medium-devices) {
-        grid-template-columns: auto auto;
-        grid-template-rows: auto;
-        grid-template-areas: "search-bar-input search-bar-button";
+    .radio-guide fieldset {
+      input[type="checkbox"] {
+        display: none;
       }
-
-      @media screen and (max-width: $small-devices) {
-        grid-template-columns: auto;
-        grid-template-rows: auto;
-        grid-template-areas: "search-bar-input";
-
-        .search-bar-button {
-          display: none;
-        }
-      }
-
-      .search-bar-input {
-        grid-area: search-bar-input;
-        background: $pedagogy-light-blue;
-      }
-
-      .search-bar-button {
-        grid-area: search-bar-button;
-        background: $pedagogy-orange;
-        color: white;
-        font-weight: bold;
-        margin-left: 20px;
-      }
-    }
-
-    .radio-department {
-      grid-area: radio-department;
-    }
-
-    .radio-credit-type {
-      grid-area: radio-credit-type;
-    }
-
-    .radio-semester {
-      grid-area: radio-semester;
-    }
-
-    .radio-guide input[type="radio"],
-    input[type="checkbox"] {
-      display: none;
-    }
-
-    .radio-guide {
       margin-top: 10px;
+      margin-bottom: 0;
       color: white;
-    }
 
-    .radio-guide label {
-      display: inline-block;
-      background-color: $pedagogy-blue;
-      padding: 10px 20px;
-      font-family: Arial, sans-serif;
-      font-size: 16px;
-      border-radius: 4px;
-    }
+      label {
+        padding: 10px 20px;
+      }
 
-    .radio-guide input[type="radio"]:checked+label {
-      background-color: $pedagogy-orange;
-    }
-
-    .radio-guide input[type="checkbox"]:checked+label {
-      background-color: $pedagogy-orange;
-    }
-
-    .radio-guide label:hover {
-      background-color: $pedagogy-hover-blue;
+      input[type="checkbox"]:checked+label {
+        background-color: $pedagogy-orange;
+        @include shadow;
+      }
     }
   }
 
