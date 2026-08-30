@@ -6,10 +6,15 @@
  * for more efficient tree-shaking and gzip compression.
  */
 
+// Must be loaded before Apline
+import htmx from "htmx.org";
+import "htmx.org/dist/ext/hx-alpine-compat.js";
+import "htmx.org/dist/ext/hx-prompt.js";
+import "htmx.org/dist/ext/hx-download.js";
+
 import sort from "@alpinejs/sort";
 import Alpine from "alpinejs";
 import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
-import htmx from "htmx.org";
 import { limitedChoices } from "#core:alpine/limited-choices";
 import { expireOldStorage } from "#core:core/localstorage";
 import { default as navbar } from "#core:core/navbar";
@@ -44,16 +49,16 @@ polyfillCountryFlagEmojis();
  * HTMX
  */
 document.body.addEventListener(
-  "htmx:beforeRequest" as keyof HTMLElementEventMap,
+  "htmx:before:request" as keyof HTMLElementEventMap,
   (event) => {
-    (event as CustomEvent).detail.target.ariaBusy = true;
+    (event as CustomEvent).detail.ctx.target.ariaBusy = true;
   },
 );
 
 document.body.addEventListener(
-  "htmx:beforeSwap" as keyof HTMLElementEventMap,
+  "htmx:before:swap" as keyof HTMLElementEventMap,
   (event) => {
-    (event as CustomEvent).detail.target.ariaBusy = null;
+    (event as CustomEvent).detail.ctx.target.ariaBusy = null;
   },
 );
 

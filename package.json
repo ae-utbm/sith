@@ -34,8 +34,8 @@
     "@types/cytoscape-klay": "^3.1.5",
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^26.2.0",
-    "rollup-plugin-visualizer": "^7.1.1",
     "@typescript/native": "npm:typescript@^7.0.2",
+    "rollup-plugin-visualizer": "^7.1.1",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "vite": "^8.2.2"
   },
@@ -61,7 +61,7 @@
     "easymde": "^2.21.0",
     "glob": "^13.0.6",
     "html2canvas": "^1.4.1",
-    "htmx.org": "^2.0.10",
+    "htmx.org": "^4.0.0",
     "js-cookie": "^3.0.8",
     "lit-html": "^3.3.3",
     "native-file-system-adapter": "^3.0.1",

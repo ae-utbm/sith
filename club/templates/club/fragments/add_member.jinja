@@ -7,7 +7,7 @@
 
   <form
     hx-post="{{ url('club:club_new_members', club_id=club.id) }}"
-    hx-disabled-elt="find input[type='submit']"
+    hx-disable="find input[type='submit']"
     hx-swap="outerHTML"
     hx-target="#member-fragment-container"
     id="add_club_members_form"
