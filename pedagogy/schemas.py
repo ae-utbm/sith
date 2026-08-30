@@ -153,6 +153,7 @@ class UeFilterSchema(FilterSchema):
         set[Literal["CS", "TM", "EC", "OM", "QC"]] | None,
         FilterLookup("credit_type__in"),
     ] = None
+    is_open: bool | None = None
     language: str = "FR"
     department: Annotated[set[str] | None, FilterLookup("department__in")] = None
 
@@ -187,3 +188,10 @@ class UeFilterSchema(FilterSchema):
             return Q()
         value.add("AUTUMN_AND_SPRING")
         return Q(semester__in=value)
+
+    def filter_is_open(self, value: bool | None) -> Q:  # noqa: FBT001
+        if value is None:
+            return Q()
+        if not value:
+            return Q(semester="CLOSED")
+        return ~Q(semester="CLOSED")
