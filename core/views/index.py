@@ -65,6 +65,7 @@ class SearchView(LoginRequiredMixin, TemplateView):
                 UserFilterSchema(search=query)
                 .filter(User.objects.viewable_by(self.request.user))
                 .order_by(F("last_login").desc(nulls_last=True))
+                .distinct()
             )
             clubs = list(Club.objects.filter(name__icontains=query)[:5])
         return super().get_context_data(**kwargs) | {"users": users, "clubs": clubs}

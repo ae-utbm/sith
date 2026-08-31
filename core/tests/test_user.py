@@ -141,6 +141,22 @@ class TestSearchUsersView(TestSearchUsers):
         response = self.client.get(reverse("core:search"))
         assert response.status_code == 200
 
+    def test_search_with_whitelist_unique(self):
+        """Test that when a user has a whitelist and appears in the results,
+        it appears only once.
+
+        This is a regression test (cf #1463)
+        """
+        user = subscriber_user.make(is_viewable=False)
+        user.whitelisted_users.add(
+            *subscriber_user.make(_quantity=4, _bulk_create=True)
+        )
+        self.client.force_login(user)
+        response = self.client.get(
+            reverse("core:search", query={"query": user.last_name})
+        )
+        assert response.context_data["users"] == [user]
+
 
 @pytest.mark.django_db
 def test_user_account_not_found(client: Client):
