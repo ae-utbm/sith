@@ -46,8 +46,8 @@ class ClubAdmin(admin.ModelAdmin):
 @admin.register(ClubRole)
 class ClubRoleAdmin(admin.ModelAdmin):
     list_display = ("name", "club", "is_board", "is_presidency")
-    search_fields = ("name",)
-    autocomplete_fields = ("club",)
+    search_fields = ("name", "club__name")
+    autocomplete_fields = ("club", "linked_groups")
     list_select_related = ("club",)
     list_filter = (
         "is_board",
