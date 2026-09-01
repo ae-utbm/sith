@@ -479,6 +479,13 @@ class ClubRoleCreateForm(forms.ModelForm):
 class ClubRoleBaseFormSet(forms.BaseInlineFormSet):
     ordering_widget = forms.HiddenInput()
 
+    def __init__(self, *args, queryset=None, **kwargs):
+        if queryset is None:
+            queryset = self.model._default_manager
+        super().__init__(
+            *args, queryset=queryset.prefetch_related("linked_groups"), **kwargs
+        )
+
 
 ClubRoleFormSet = forms.inlineformset_factory(
     Club,
