@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-21 14:10+0200\n"
+"POT-Creation-Date: 2026-09-01 18:32+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -5090,6 +5090,10 @@ msgid "A guide of courses available at UTBM."
 msgstr "Un guide de tous les cours disponibles à l'UTBM."
 
 #: pedagogy/templates/pedagogy/guide.jinja
+msgid "Search UE"
+msgstr "Recherche d'UE"
+
+#: pedagogy/templates/pedagogy/guide.jinja
 #, python-format
 msgid "%(display_name)s"
 msgstr "%(display_name)s"
@@ -5757,6 +5761,18 @@ msgstr "fin de la cotisation"
 #: subscription/models.py
 msgid "location"
 msgstr "lieu"
+
+#: subscription/models.py
+msgid "created_at"
+msgstr "créé le"
+
+#: subscription/models.py
+msgid ""
+"When this subscription was created. This date may differ from the start of "
+"the subscription."
+msgstr ""
+"Quand la cotisation a été créée. Cette date peut différer du début effectif de "
+"la cotisation."
 
 #: subscription/models.py
 msgid "You can not subscribe many time for the same period"
