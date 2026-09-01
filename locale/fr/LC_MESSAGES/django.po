@@ -260,6 +260,18 @@ msgstr ""
 "Si ce rôle est inactif, il ne pourra pas être attribué aux gens qui "
 "rejoignent le club."
 
+#: club/models.py
+msgid "Linked groups"
+msgstr "Groupes liés"
+
+#: club/models.py
+msgid ""
+"Groups that are automatically given or removed to user receiving or losing "
+"this club role"
+msgstr ""
+"Les groupes qui sont automatiquement donnés ou retirés quand l'utilisateur "
+"reçoit ou perd ce rôle de club"
+
 #: club/models.py election/models.py
 msgid "club role"
 msgstr "rôle de club"
@@ -484,6 +496,14 @@ msgstr "Du"
 #: core/templates/core/user_clubs.jinja
 msgid "To"
 msgstr "Au"
+
+#: club/templates/club/club_roles.jinja
+msgid "Linked groups : "
+msgstr "Groupes liés : "
+
+#: club/templates/club/club_roles.jinja
+msgid "Users receiving this role will also be assigned to those groups"
+msgstr "Les utilisateurs recevant ce rôle seront aussi assignés à ces groupes"
 
 #: club/templates/club/club_roles.jinja
 msgid ""
