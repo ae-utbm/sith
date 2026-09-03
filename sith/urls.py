@@ -34,6 +34,7 @@ urlpatterns = [
     path("", include(("core.urls", "core"), namespace="core")),
     path("sitemap.xml", cache_page(86400)(sitemap), {"sitemaps": sitemaps}),
     path("api/", api.urls),
+    path("api-link/", include(("api.urls", "api-link"), namespace="api-link")),
     path("rootplace/", include(("rootplace.urls", "rootplace"), namespace="rootplace")),
     path(
         "subscription/",
