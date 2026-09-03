@@ -3,16 +3,12 @@
 import "codemirror/lib/codemirror.css";
 // @ts-expect-error 2307
 import "easymde/src/css/easymde.css";
+import { markdown } from "@ae_utbm/aemark";
 // biome-ignore lint/correctness/noUndeclaredDependencies: Imported by EasyMDE
-import type CodeMirror from "codemirror";
-// biome-ignore lint/style/useNamingConvention: This is how they called their namespace
+import type CodeMirror from "codemirror"; // biome-ignore lint/style/useNamingConvention: This is how they called their namespace
 import EasyMDE from "easymde";
 import { inheritHtmlElement, registerComponent } from "#core:utils/web-components";
-import {
-  markdownRenderMarkdown,
-  type UploadUploadImageErrors,
-  uploadUploadImage,
-} from "#openapi";
+import { type UploadUploadImageErrors, uploadUploadImage } from "#openapi";
 
 const loadEasyMde = (textarea: HTMLTextAreaElement) => {
   const easymde = new EasyMDE({
@@ -64,19 +60,7 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
       });
       easymde.codemirror.replaceSelection("\n");
     },
-    previewRender: (plainText, preview) => {
-      /* This is wrapped this way to allow time for Alpine to be loaded on the page */
-      return Alpine.debounce(() => {
-        const func = async () => {
-          preview.innerHTML = (
-            await markdownRenderMarkdown({ body: { text: plainText } })
-          ).data as string;
-          return null;
-        };
-        func().then();
-        return null;
-      }, 300)();
-    },
+    previewRender: (plainText) => markdown(plainText),
     forceSync: true, // Avoid validation error on generic create view
     imageTexts: {
       sbInit: gettext("Attach files by drag and dropping or pasting from clipboard."),
