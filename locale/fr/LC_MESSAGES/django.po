@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-01 18:32+0200\n"
+"POT-Creation-Date: 2026-09-04 11:24+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -2048,6 +2048,10 @@ msgstr "403, Non autorisé"
 #: core/templates/core/404.jinja
 msgid "404, Not Found"
 msgstr "404. Non trouvé"
+
+#: core/templates/core/404.jinja
+msgid "Impossible, perhaps the archives are incomplete"
+msgstr "Impossible, les archives sont peut-être incomplètes"
 
 #: core/templates/core/500.jinja
 msgid "500, Server Error"
@@ -5771,8 +5775,8 @@ msgid ""
 "When this subscription was created. This date may differ from the start of "
 "the subscription."
 msgstr ""
-"Quand la cotisation a été créée. Cette date peut différer du début effectif de "
-"la cotisation."
+"Quand la cotisation a été créée. Cette date peut différer du début effectif "
+"de la cotisation."
 
 #: subscription/models.py
 msgid "You can not subscribe many time for the same period"
