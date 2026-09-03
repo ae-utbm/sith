@@ -40,6 +40,7 @@
     "vite": "^8.2.2"
   },
   "dependencies": {
+    "@ae_utbm/aemark": "^0.1.1",
     "@alpinejs/sort": "^3.16.2",
     "@arendjr/text-clipper": "npm:@jsr/arendjr__text-clipper@^3.0.0",
     "@floating-ui/dom": "^1.8.0",
