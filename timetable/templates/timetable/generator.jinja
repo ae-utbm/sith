@@ -12,15 +12,36 @@
   {% trans %}Timetable generator{% endtrans %}
 {% endblock %}
 
+{% block description -%}
+  {% trans trimmed %}
+    Get a nice schedule from the raw text in your student file
+  {% endtrans %}
+{%- endblock %}
+
+{% block metatags %}
+  <meta property="og:url" content="{{ request.build_absolute_uri() }}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Générateur d'emploi du temps" />
+  <meta property="og:image" content="{{ request.build_absolute_uri(static("core/img/logo_no_text.png")) }}" />
+  <meta
+    property="og:description"
+    content="Générateur d'emploi du temps de l'UTBM.
+             Copiez le texte de l'emploi du temps de votre dossier étudiant
+             et récupérez une image plus jolie."
+  />
+{% endblock %}
+
 {% block content %}
   <div x-data="timetableGenerator">
     <form @submit.prevent="generate()">
-      <h1>Générateur d'emploi du temps</h1>
+      <h1>{% trans %}Timetable generator{% endtrans %}</h1>
       <div class="alert alert-red" x-show="!!error" x-cloak>
         <span class="alert-main" x-text="error"></span>
       </div>
       <div class="form-group">
-        <label for="timetable-input">Colle ton emploi du temps (sans l'entête)</label>
+        <label for="timetable-input">
+          {% trans %}Paste your schedule (without the header){% endtrans %}
+        </label>
         <textarea id="timetable-input" cols="30" rows="15" x-model="content"></textarea>
       </div>
       <input type="submit" class="btn btn-blue" value="{% trans %}Generate{% endtrans %}">

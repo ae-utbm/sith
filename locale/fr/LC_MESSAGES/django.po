@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-04 11:24+0200\n"
+"POT-Creation-Date: 2026-09-04 19:39+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -5831,6 +5831,14 @@ msgstr "les groupes pouvant créer des cotisations"
 #: timetable/templates/timetable/generator.jinja
 msgid "Timetable generator"
 msgstr "Générateur d'emploi du temps"
+
+#: timetable/templates/timetable/generator.jinja
+msgid "Get a nice schedule from the raw text in your student file"
+msgstr "Générez un joli emploi du temps à partir du texte brut de votre dossier étudiant"
+
+#: timetable/templates/timetable/generator.jinja
+msgid "Paste your schedule (without the header)"
+msgstr "Colle ton emploi du temps (sans l'entête)"
 
 #: timetable/templates/timetable/generator.jinja
 msgid "Generate"
