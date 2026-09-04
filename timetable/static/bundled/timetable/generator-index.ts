@@ -1,8 +1,8 @@
 import html2canvas from "html2canvas";
 
-// see https://regex101.com/r/QHSaPM/2
+// see https://regex101.com/r/QHSaPM/3
 const TIMETABLE_ROW_RE: RegExp =
-  /^(?<ueCode>\w.+\w)\s+(?<courseType>[A-Z]{2}\d)\s+((?<weekGroup>[AB])\s+)?(?<weekday>(lundi)|(mardi)|(mercredi)|(jeudi)|(vendredi)|(samedi)|(dimanche))\s+(?<startHour>\d{2}:\d{2})\s+(?<endHour>\d{2}:\d{2})\s+[\dA-B]\s+((?<attendance>[\wé]*)\s+)?(?<room>\w+(?:, \w+)?)$/;
+  /^(?<ueCode>\w.+\w)\s+(?<courseType>[A-Z]{2}\d)\s+((?<weekGroup>[AB])\s+)?(?<weekday>(lundi)|(mardi)|(mercredi)|(jeudi)|(vendredi)|(samedi)|(dimanche))\s+(?<startHour>\d{2}:\d{2})\s+(?<endHour>\d{2}:\d{2})\s+[\dA-B]\s+((?<attendance>[\wé]*)\s+)?(?<room>\w+(?:, \w+)*)$/;
 
 const DEFAULT_TIMETABLE: string = `DS52\t\tCM1\t\tlundi\t08:00\t10:00\t1\tPrésentiel\tA113
 DS53\t\tCM1\t\tlundi\t10:15\t12:15\t1\tPrésentiel\tA101
