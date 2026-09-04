@@ -126,7 +126,11 @@ class UE(models.Model):
         Returns:
             True if the user has already posted a comment on this UE, else False.
         """
-        return self.comments.filter(author=user).exists()
+        self._has_user_commented = getattr(self, "_has_user_commented", {})
+        self._has_user_commented[user] = self._has_user_commented.get(
+            user, self.comments.filter(author=user).exists()
+        )
+        return self._has_user_commented[user]
 
     @cached_property
     def grade_global_average(self):

@@ -1,0 +1,71 @@
+<div class="leave-comment">
+  {% if form.is_creation %}
+    <details class="accordion" id="leave_comment" {% if form.errors %}open{% endif %}>
+      <summary>{% trans %}Leave comment{% endtrans %}</summary>
+      <div class="accordion-content">
+  {% endif %}
+  <form
+    hx-post="{{ action }}"
+    hx-target="closest .leave-comment"
+    hx-swap="outerHTML"
+    hx-disabled-elt="find input[type='submit']"
+  >
+    {% csrf_token %}
+    <div class="leave-comment-grid-container">
+      <div class="form-stars">
+        {{ form.non_field_errors() }}
+        {{ form.author.errors }}
+        {{ form.ue.errors }}
+
+        {{ form.author }}
+        {{ form.ue }}
+
+        <div class="input-stars">
+          <label for="{{ form.grade_global.id_for_label }}">{{ form.grade_global.label }} :</label>
+          {{ form.grade_global.errors }}
+          {{ form.grade_global }}
+        </div>
+
+        <div class="input-stars">
+          <label for="{{ form.grade_utility.id_for_label }}">{{ form.grade_utility.label }} :</label>
+          {{ form.grade_utility.errors }}
+          {{ form.grade_utility }}
+        </div>
+
+        <div class="input-stars">
+          <label for="{{ form.grade_interest.id_for_label }}">{{ form.grade_interest.label }} :</label>
+          {{ form.grade_interest.errors }}
+          {{ form.grade_interest }}
+        </div>
+
+        <div class="input-stars">
+          <label for="{{ form.grade_teaching.id_for_label }}">{{ form.grade_teaching.label }} :</label>
+          {{ form.grade_teaching.errors }}
+          {{ form.grade_teaching }}
+        </div>
+
+        <div class="input-stars">
+          <label for="{{ form.grade_work_load.id_for_label }}">{{ form.grade_work_load.label }} :</label>
+          {{ form.grade_work_load.errors }}
+          {{ form.grade_work_load }}
+        </div>
+      </div>
+      <div class="form-comment">
+        <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }} :</label>
+        {{ form.comment.errors }}
+        {{ form.comment }}
+      </div>
+    </div>
+    <p class="right">
+      <input type="submit" value="{% trans %}Comment{% endtrans %}" />
+    </p>
+  </form>
+
+  {% if form.is_creation %}
+    </div>
+    </details>
+  {% endif %}
+
+  <br>
+
+</div>

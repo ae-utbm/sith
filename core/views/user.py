@@ -473,7 +473,7 @@ class UserClubView(UserTabsMixin, CanViewMixin, DetailView):
 class UserVisibilityFormFragment(FragmentMixin, SuccessMessageMixin, UpdateView):
     model = User
     form_class = UserVisibilityForm
-    template_name = "core/fragment/user_visibility.jinja"
+    template_name = "core/fragments/user_visibility.jinja"
     pk_url_kwarg = "user_id"
 
     def get_form_kwargs(self):

@@ -128,14 +128,14 @@ $pedagogy-white-text: #f0f0f0;
       grid-area: hours-the;
     }
 
-    #leave_comment_not_allowed {
+    .leave-comment-not-allowed {
       p {
         text-align: center;
         color: red;
       }
     }
 
-    #leave_comment {
+    .leave-comment {
       .leave-comment-grid-container {
         display: grid;
         grid-template-columns: 270px auto;
@@ -167,10 +167,6 @@ $pedagogy-white-text: #f0f0f0;
 
       .input-stars {
         margin-top: 20px;
-      }
-
-      input[type="submit"] {
-        float: right;
       }
     }
 
@@ -333,8 +329,9 @@ $pedagogy-white-text: #f0f0f0;
           padding-left: 10px;
         }
 
-        .actions {
+        .action {
           float: right;
+          margin-top: 0;
         }
       }
 
@@ -443,4 +440,9 @@ details.accordion>.accordion-content {
   background-color: $white-color;
   border-color: $pedagogy-orange;
   border-right: none;
+}
+
+.right {
+  display: flex;
+  justify-content: flex-end;
 }

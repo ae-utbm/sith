@@ -1,0 +1,10 @@
+{% if comments %}
+  <h2>{% trans %}Comments{% endtrans %}</h2>
+  <br>
+{% endif %}
+
+<section>
+  {% for comment in comments %}
+    {% include "pedagogy/fragments/ue_comment.jinja" %}
+  {% endfor %}
+</section>
