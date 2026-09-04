@@ -17,6 +17,7 @@ document.addEventListener("alpine:init", () => {
     // biome-ignore lint/style/useNamingConvention: api is in snake_case
     page_size: pageSizeDefault,
     search: "",
+    hideClosedUes: true,
     department: [] as string[],
     // biome-ignore lint/style/useNamingConvention: api is in snake_case
     credit_type: [] as string[],
@@ -38,6 +39,7 @@ document.addEventListener("alpine:init", () => {
         10,
       );
       this.search = url.get("search") || "";
+      this.hideClosedUes = url.get("hideClosed") || true;
       this.department = url.getAll("department");
       this.credit_type = url.getAll("credit_type");
       /* The semester is easier to use on the backend as an enum (spring/autumn/both/none)
@@ -58,7 +60,13 @@ document.addEventListener("alpine:init", () => {
         this.to_change = [];
       }, 50);
 
-      const searchParams = ["search", "department", "credit_type", "semester"];
+      const searchParams = [
+        "search",
+        "hideClosedUes",
+        "department",
+        "credit_type",
+        "semester",
+      ];
       const paginationParams = ["page", "page_size"];
 
       for (const param of searchParams) {
@@ -87,6 +95,8 @@ document.addEventListener("alpine:init", () => {
           // biome-ignore lint/style/useNamingConvention: api is in snake_case
           credit_type: this.credit_type.length > 0 ? this.credit_type : undefined,
           semester: this.semester.length > 0 ? this.semester : undefined,
+          // biome-ignore lint/style/useNamingConvention: api is snake_case
+          is_open: this.hideClosedUes ? true : undefined,
           department: this.department.length > 0 ? this.department : undefined,
           search: this.search || undefined,
         },
