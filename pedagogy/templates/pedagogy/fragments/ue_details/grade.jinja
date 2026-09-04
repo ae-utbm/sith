@@ -1,0 +1,27 @@
+<div class="ue-details-container">
+  <div class="grade">
+    <p>{% trans %}Global grade{% endtrans %}</p>
+    <p>{% trans %}Utility{% endtrans %}</p>
+    <p>{% trans %}Interest{% endtrans %}</p>
+    <p>{% trans %}Teaching{% endtrans %}</p>
+    <p>{% trans %}Work load{% endtrans %}</p>
+  </div>
+  <div class="grade-stars">
+    <p>{{ display_star(object.grade_global_average) }}</p>
+    <p>{{ display_star(object.grade_utility_average) }}</p>
+    <p>{{ display_star(object.grade_interest_average) }}</p>
+    <p>{{ display_star(object.grade_teaching_average) }}</p>
+    <p>{{ display_star(object.grade_work_load_average) }}</p>
+  </div>
+  <div class="ue-infos">
+    <p><b>{% trans %}Objectives{% endtrans %}</b></p>
+    <p>{{ object.objectives|markdown }}</p>
+    <p><b>{% trans %}Program{% endtrans %}</b></p>
+    <p>{{ object.program|markdown }}</p>
+    <p><b>{% trans %}Earned skills{% endtrans %}</b></p>
+    <p>{{ object.skills|markdown }}</p>
+    <p><b>{% trans %}Key concepts{% endtrans %}</b></p>
+    <p>{{ object.key_concepts|markdown }}</p>
+    <p><b>{% trans %}UE manager: {% endtrans %}</b>{{ object.manager }}</p>
+  </div>
+</div>

@@ -7,7 +7,7 @@
  */
 
 // Must be loaded before Apline
-import htmx from "htmx.org";
+import htmx, { HtmxResponse } from "htmx.org";
 import "htmx.org/dist/ext/hx-alpine-compat.js";
 import "htmx.org/dist/ext/hx-prompt.js";
 import "htmx.org/dist/ext/hx-download.js";
@@ -18,7 +18,6 @@ import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
 import { limitedChoices } from "#core:alpine/limited-choices";
 import { expireOldStorage } from "#core:core/localstorage";
 import { default as navbar } from "#core:core/navbar";
-import { getErrorCallbacksExt } from "#core:htmx/error-callback";
 import {
   type NotificationPlugin,
   notificationsPlugin as notifications,
@@ -49,22 +48,13 @@ polyfillCountryFlagEmojis();
 /**
  * HTMX
  */
-document.body.addEventListener(
-  "htmx:before:request" as keyof HTMLElementEventMap,
-  (event) => {
-    (event as CustomEvent).detail.ctx.target.ariaBusy = true;
-  },
-);
+document.body.addEventListener("htmx:before:request", (event) => {
+  event.target.ariaBusy = true;
+});
 
-document.body.addEventListener(
-  "htmx:before:swap" as keyof HTMLElementEventMap,
-  (event) => {
-    (event as CustomEvent).detail.ctx.target.ariaBusy = null;
-  },
-);
-
-const errorCallbackExt = getErrorCallbacksExt();
-htmx.registerExtension(errorCallbackExt.name, errorCallbackExt.extension);
+document.body.addEventListener("htmx:before:swap", (event) => {
+  event.target.ariaBusy = null;
+});
 
 Object.assign(window, { htmx });
 

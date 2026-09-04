@@ -1,7 +1,19 @@
 {% from "pedagogy/macros.jinja" import display_star %}
 
 {% if is_fragment %}
-  {% include "pedagogy/fragments/ue_detail.jinja" %}
+
+  <hx-partial id="ue-grade">
+    {% include "pedagogy/fragments/ue_details/grade.jinja" %}
+  </hx-partial>
+
+  <hx-partial id="comment-form">
+    {% include "pedagogy/fragments/ue_details/form.jinja" %}
+  </hx-partial>
+
+  <hx-partial id="comments" hx-swap="innerMorph">
+    {% include "pedagogy/fragments/ue_details/comments.jinja" %}
+  </hx-partial>
+
 {% else %}
   {% extends "core/base.jinja" %}
 
@@ -59,12 +71,23 @@
 
         <br>
 
-        {% include "pedagogy/fragments/ue_detail.jinja" %}
+        <div id="ue-grade">
+          {% include "pedagogy/fragments/ue_details/grade.jinja" %}
+        </div>
 
-        {{ comments }}
+        <br>
+
+        <div id="comment-form">
+          {% include "pedagogy/fragments/ue_details/form.jinja" %}
+        </div>
+
+        <div id="comments">
+          {% for comment in comments %}
+            {% include "pedagogy/fragments/ue_comment.jinja" %}
+          {% endfor %}
+        </div>
 
       </div>
     </div>
-
   {% endblock %}
 {% endif %}

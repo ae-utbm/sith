@@ -16,7 +16,7 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
@@ -24,7 +24,6 @@
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Exists, OuterRef
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
@@ -76,39 +75,12 @@ class UECommentCreateView(PermissionRequiredMixin, FragmentMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
-            "action": reverse("pedagogy:comment_create", kwargs={"ue_id": self.ue.id})
+            "action": reverse("pedagogy:comment_create", kwargs={"ue_id": self.ue.id}),
+            "object": self.ue,
         }
 
-    def form_valid(self, form):
-        """If the form is valid, save the associated model."""
-        self.object = form.save()
-        response = HttpResponse(status=200)
-        response.headers["HX-Trigger"] = "NewComment, CommentUpdate"
-        return response
-
-
-class UEDetailCommentsView(
-    PermissionRequiredMixin,
-    FragmentMixin,
-    DetailView,
-):
-    """Fragment view that display all comments"""
-
-    model = UE
-    pk_url_kwarg = "ue_id"
-    template_name = "pedagogy/fragments/ue_comments.jinja"
-    permission_required = "pedagogy.view_ue"
-
-    def get_context_data(self, **kwargs):
-        self.object = self.get_object()  # Needed if loaded with .as_fragment()
-        return super().get_context_data(**kwargs) | {
-            "comments": list(
-                self.object.comments.viewable_by(self.request.user)
-                .annotate_is_reported()
-                .select_related("author")
-                .order_by("-publish_date")
-            ),
-        }
+    def get_success_url(self):
+        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.ue.id})
 
 
 class UEDetailView(
@@ -122,13 +94,21 @@ class UEDetailView(
     permission_required = "pedagogy.view_ue"
     fragments = {
         "add_comment_form": UECommentCreateView,
-        "comments": UEDetailCommentsView,
     }
 
     def get_fragment_data(self):
         return {
             "add_comment_form": {"ue_id": self.object.id},
-            "comments": {"ue_id": self.object.id},
+        }
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "comments": list(
+                self.object.comments.viewable_by(self.request.user)
+                .annotate_is_reported()
+                .select_related("author")
+                .order_by("-publish_date")
+            ),
         }
 
 
@@ -143,11 +123,6 @@ class UECommentDetailView(PermissionRequiredMixin, DetailView):
         return (
             super().get_queryset().viewable_by(self.request.user).annotate_is_reported()
         )
-
-    def dispatch(self, *args, **kwargs):
-        res: HttpResponse = super().dispatch(*args, **kwargs)
-        res.headers["HX-Trigger"] = "CommentUpdate"
-        return res
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
