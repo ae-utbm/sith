@@ -1,9 +1,5 @@
-import {
-  getCurrentUrlParams,
-  History,
-  updateQueryString,
-} from "#core:utils/history.ts";
-import { ueFetchUeList } from "#openapi";
+import { getCurrentUrlParams, updateQueryString } from "#core:utils/history";
+import { type SimpleUeSchema, ueFetchUeList } from "#openapi";
 
 const pageDefault = 1;
 const pageSizeDefault = 100;
@@ -12,38 +8,42 @@ document.addEventListener("alpine:init", () => {
   Alpine.data("ue_search", () => ({
     ues: {
       count: 0,
-      next: null,
-      previous: null,
-      results: [],
+      next: null as string | null,
+      previous: null as string | null,
+      results: [] as SimpleUeSchema[],
     },
     loading: false,
     page: pageDefault,
     // biome-ignore lint/style/useNamingConvention: api is in snake_case
     page_size: pageSizeDefault,
     search: "",
-    department: [],
+    department: [] as string[],
     // biome-ignore lint/style/useNamingConvention: api is in snake_case
-    credit_type: [],
-    semester: [],
+    credit_type: [] as string[],
+    semester: [] as string[],
     // biome-ignore lint/style/useNamingConvention: api is in snake_case
-    to_change: [],
-    pushstate: History.Push,
+    to_change: [] as { param: string; value: string }[],
 
-    update: undefined,
+    // dummy implementation to make TS happy.
+    // The real function is initialized in init
+    update: () => {
+      console.warn("Update not yet initialized");
+    },
 
     initializeArgs() {
       const url = getCurrentUrlParams();
-      this.pushstate = History.Replace;
-
-      this.page = Number.parseInt(url.get("page"), 10) || pageDefault;
-      this.page_size = Number.parseInt(url.get("page_size"), 10) || pageSizeDefault;
+      this.page = Number.parseInt(url.get("page") || pageDefault.toString(), 10);
+      this.page_size = Number.parseInt(
+        url.get("page_size") || pageSizeDefault.toString(),
+        10,
+      );
       this.search = url.get("search") || "";
       this.department = url.getAll("department");
       this.credit_type = url.getAll("credit_type");
       /* The semester is easier to use on the backend as an enum (spring/autumn/both/none)
           and easier to use on the frontend as an array ([spring, autumn]).
           Thus there is some conversion involved when both communicate together */
-      this.semester = url.has("semester") ? url.get("semester").split("_AND_") : [];
+      this.semester = url.get("semester")?.split("_AND_") || [];
 
       this.update();
     },
@@ -51,15 +51,11 @@ document.addEventListener("alpine:init", () => {
     async init() {
       this.update = Alpine.debounce(async () => {
         /* Create the whole url before changing everything all at once */
-        const first = this.to_change.shift();
-        let url = updateQueryString(first.param, first.value, History.None);
-        for (const value of this.to_change) {
-          url = updateQueryString(value.param, value.value, History.None, url);
+        for (const val of this.to_change) {
+          updateQueryString(val.param, val.value);
         }
-        updateQueryString(first.param, first.value, this.pushstate, url);
         await this.fetchData(); /* reload data on form change */
         this.to_change = [];
-        this.pushstate = History.Push;
       }, 50);
 
       const searchParams = ["search", "department", "credit_type", "semester"];
@@ -67,47 +63,37 @@ document.addEventListener("alpine:init", () => {
 
       for (const param of searchParams) {
         this.$watch(param, () => {
-          if (this.pushstate !== History.Push) {
-            /* This means that we are doing a mass param edit */
-            return;
-          }
           /* Reset pagination on search */
           this.page = pageDefault;
           this.page_size = pageSizeDefault;
         });
       }
       for (const param of searchParams.concat(paginationParams)) {
-        this.$watch(param, (value) => {
+        this.$watch(param, (value: string) => {
           this.to_change.push({ param: param, value: value });
           this.update();
         });
       }
-      window.addEventListener("popstate", () => {
-        this.initializeArgs();
-      });
       this.initializeArgs();
     },
 
     async fetchData() {
       this.loading = true;
-      const args = {
-        // biome-ignore lint/style/useNamingConvention: api is in snake_case
-        page_size: this.page_size,
-      };
-      for (const [param, value] of new URL(
-        window.location.href,
-      ).searchParams.entries()) {
-        // Deal with array type params
-        if (["credit_type", "department", "semester"].includes(param)) {
-          if (args[param] === undefined) {
-            args[param] = [];
-          }
-          args[param].push(value);
-        } else {
-          args[param] = value;
-        }
+
+      const res = await ueFetchUeList({
+        query: {
+          // biome-ignore lint/style/useNamingConvention: api is in snake_case
+          page_size: this.page_size,
+          // biome-ignore lint/style/useNamingConvention: api is in snake_case
+          credit_type: this.credit_type.length > 0 ? this.credit_type : undefined,
+          semester: this.semester.length > 0 ? this.semester : undefined,
+          department: this.department.length > 0 ? this.department : undefined,
+          search: this.search || undefined,
+        },
+      });
+      if (res.data !== undefined) {
+        this.ues = res.data;
       }
-      this.ues = (await ueFetchUeList({ query: args })).data;
       this.loading = false;
     },
 
