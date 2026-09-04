@@ -49,6 +49,20 @@
             {{ subform.is_active.help_text }}
           </span>
         </div>
+        {% set groups = subform.instance.linked_groups.all()|list %}
+        {% if groups %}
+          <div>
+            <p>
+              <strong>{% trans %}Linked groups : {% endtrans %}</strong>
+              {{ groups|map(attribute="name")|join(", ") }}
+            </p>
+            <p class="helptext">
+              {% trans trimmed %}
+                Users receiving this role will also be assigned to those groups
+              {% endtrans %}
+            </p>
+          </div>
+        {% endif %}
       </div>
     </details>
   </div>

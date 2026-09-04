@@ -17,7 +17,7 @@ from club.forms import ClubAddMemberForm, JoinClubForm
 from club.models import Club, ClubRole, Membership
 from club.tests.base import TestClub
 from core.baker_recipes import subscriber_user
-from core.models import AnonymousUser, User
+from core.models import AnonymousUser, Group, User
 
 
 class TestMembershipQuerySet(TestClub):
@@ -499,6 +499,29 @@ class TestMembership(TestClub):
         )
         assert self.subscriber.groups.contains(self.club.members_group)
         assert self.subscriber.groups.contains(self.club.board_group)
+
+    def test_add_to_club_role_group(self):
+        groups = baker.make(Group, _quantity=4)
+        self.subscriber.groups.set(groups[:1])
+        self.board_role.linked_groups.set(groups[1:3])
+        baker.make(
+            Membership, club=self.club, user=self.subscriber, role=self.board_role
+        )
+        assert set(self.subscriber.groups.all()) == {
+            *groups[:3],
+            self.club.board_group,
+            self.club.members_group,
+        }
+
+    def test_remove_from_club_role_group(self):
+        groups = baker.make(Group, _quantity=3)
+        baker.make(
+            Membership, club=self.club, user=self.subscriber, role=self.board_role
+        )
+        self.subscriber.groups.set(groups[:1])
+        self.board_role.linked_groups.set(groups[1:])
+        self.subscriber.memberships.update(end_date=localdate())
+        assert set(self.subscriber.groups.all()) == {groups[0]}
 
     def test_change_position_in_club(self):
         """Test that when moving from board to members, club group change"""
