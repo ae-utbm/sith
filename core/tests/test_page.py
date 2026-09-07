@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
@@ -6,7 +7,6 @@ from aemark import markdown
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.test import Client
 from django.urls import reverse
 from django.utils.timezone import now
 from model_bakery import baker
@@ -15,6 +15,9 @@ from pytest_django.asserts import assertHTMLEqual, assertRedirects
 from club.models import Club, Membership
 from core.baker_recipes import board_user, subscriber_user
 from core.models import AnonymousUser, Page, PageRev, User
+
+if TYPE_CHECKING:
+    from django.test import Client
 
 
 @pytest.mark.django_db

@@ -1,5 +1,5 @@
-from collections.abc import Iterable
 from operator import attrgetter
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.core.mail import send_mass_mail
@@ -12,6 +12,9 @@ from django.utils.translation import gettext as _
 
 from core.models import User, UserQuerySet
 from counter.models import AccountDump, Counter, Customer, Product, Selling
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class Command(BaseCommand):

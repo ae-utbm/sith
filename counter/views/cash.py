@@ -13,6 +13,8 @@
 #
 #
 
+from typing import TYPE_CHECKING
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -22,7 +24,6 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import BaseFormView, UpdateView
 
-from core.models import User
 from counter.forms import CashSummaryFormBase
 from counter.models import (
     CashRegisterSummary,
@@ -34,6 +35,9 @@ from counter.views.mixins import (
     CounterAdminTabsMixin,
     CounterTabsMixin,
 )
+
+if TYPE_CHECKING:
+    from core.models import User
 
 
 class CashRegisterSummaryForm(forms.Form):

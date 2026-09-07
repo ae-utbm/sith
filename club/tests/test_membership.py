@@ -1,6 +1,6 @@
 import itertools
-from collections.abc import Callable
 from datetime import timedelta
+from typing import TYPE_CHECKING
 
 import pytest
 from bs4 import BeautifulSoup
@@ -18,6 +18,9 @@ from club.models import Club, ClubRole, Membership
 from club.tests.base import TestClub
 from core.baker_recipes import subscriber_user
 from core.models import AnonymousUser, User
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class TestMembershipQuerySet(TestClub):

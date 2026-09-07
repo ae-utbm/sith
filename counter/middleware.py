@@ -1,13 +1,14 @@
 from typing import TYPE_CHECKING, Callable
 
-from django.http import HttpRequest, HttpResponse
 from django.utils.functional import SimpleLazyObject
 
-from core.models import User
 from counter.models import Permanency
 
 if TYPE_CHECKING:
     from django.contrib.sessions.backends.base import SessionBase
+    from django.http import HttpRequest, HttpResponse
+
+    from core.models import User
 
 
 SESSION_PERMANENCES_KEY = "permanence_ids"

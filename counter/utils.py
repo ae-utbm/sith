@@ -1,7 +1,10 @@
+from typing import TYPE_CHECKING
 from urllib.parse import urlparse
 
-from django.http import HttpRequest
 from django.urls import resolve
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 def is_logged_in_counter(request: HttpRequest) -> bool:

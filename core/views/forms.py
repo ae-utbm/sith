@@ -22,8 +22,8 @@
 #
 import re
 from copy import copy
-from datetime import date, datetime
 from io import BytesIO
+from typing import TYPE_CHECKING
 
 from captcha.fields import CaptchaField
 from django import forms
@@ -58,6 +58,9 @@ from core.views.widgets.ajax_select import (
     AutoCompleteSelectUser,
 )
 from core.views.widgets.markdown import MarkdownInput
+
+if TYPE_CHECKING:
+    from datetime import date, datetime
 
 # Widgets
 

@@ -1,13 +1,12 @@
 """Tests focused on testing subscription creation"""
 
 from datetime import date, timedelta
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.test import Client
 from django.urls import reverse
 from django.utils.timezone import localdate
 from model_bakery import baker
@@ -18,6 +17,9 @@ from core.models import Group, User
 from counter.models import Customer
 from subscription.forms import SubscriptionExistingUserForm, SubscriptionNewUserForm
 from subscription.models import Subscription
+
+if TYPE_CHECKING:
+    from django.test import Client
 
 
 @pytest.mark.django_db

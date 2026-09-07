@@ -14,6 +14,7 @@
 #
 import random
 from collections import defaultdict
+from typing import TYPE_CHECKING
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
@@ -22,14 +23,11 @@ from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, resolve_url
 from django.urls import reverse
-from django.utils.safestring import SafeString
 from django.utils.translation import gettext as _
 from django.views.generic import CreateView, FormView
 from django.views.generic.detail import SingleObjectMixin
-from ninja.main import HttpRequest
 
 from core.auth.mixins import CanViewMixin
-from core.models import User
 from core.views.mixins import FragmentMixin, UseFragmentsMixin
 from counter.forms import BasketForm, RefillForm
 from counter.models import (
@@ -43,6 +41,12 @@ from counter.models import (
 from counter.utils import is_logged_in_counter
 from counter.views.mixins import CounterTabsMixin
 from counter.views.student_card import StudentCardFormFragment
+
+if TYPE_CHECKING:
+    from django.utils.safestring import SafeString
+    from ninja.main import HttpRequest
+
+    from core.models import User
 
 
 def get_operator(request: HttpRequest, counter: Counter, customer: Customer) -> User:

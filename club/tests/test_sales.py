@@ -1,8 +1,8 @@
 import csv
 import itertools
+from typing import TYPE_CHECKING
 
 import pytest
-from django.test import Client
 from django.urls import reverse
 from model_bakery import baker
 
@@ -11,6 +11,9 @@ from club.models import Club
 from core.models import User
 from counter.baker_recipes import product_recipe, sale_recipe
 from counter.models import Counter, Customer, Product, Selling
+
+if TYPE_CHECKING:
+    from django.test import Client
 
 
 @pytest.mark.django_db

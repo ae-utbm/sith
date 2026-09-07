@@ -2,11 +2,14 @@ import logging
 import signal
 import subprocess
 import sys
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import psutil
 
 from sith import settings
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def get_pid_file(procfile: Path) -> Path:

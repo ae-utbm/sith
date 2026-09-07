@@ -1,5 +1,5 @@
-from collections.abc import Iterable
 from datetime import timedelta
+from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
@@ -16,6 +16,9 @@ from counter.management.commands.dump_accounts import Command as DumpCommand
 from counter.management.commands.dump_warning_mail import Command as WarningCommand
 from counter.models import AccountDump, Customer, Refilling, Selling
 from subscription.models import Subscription
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class TestAccountDump(TestCase):

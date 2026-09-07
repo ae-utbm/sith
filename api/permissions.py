@@ -39,14 +39,16 @@ Example:
 
 import operator
 from functools import reduce
-from typing import Any, Callable
+from typing import TYPE_CHECKING, Any, Callable
 
-from django.contrib.auth.models import Permission
-from django.http import HttpRequest
-from ninja_extra import ControllerBase
 from ninja_extra.permissions import BasePermission
 
 from counter.utils import is_logged_in_counter
+
+if TYPE_CHECKING:
+    from django.contrib.auth.models import Permission
+    from django.http import HttpRequest
+    from ninja_extra import ControllerBase
 
 
 class IsInGroup(BasePermission):

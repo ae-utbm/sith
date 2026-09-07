@@ -12,11 +12,15 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
-from django.forms.models import ModelForm
-from django.http import HttpRequest
 
 from club.models import Club, ClubLink, ClubRole, LinkType, Membership
+
+if TYPE_CHECKING:
+    from django.forms.models import ModelForm
+    from django.http import HttpRequest
 
 
 @admin.register(Club)
