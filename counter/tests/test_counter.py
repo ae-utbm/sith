@@ -15,6 +15,7 @@
 from dataclasses import asdict, dataclass
 from datetime import timedelta
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from bs4 import BeautifulSoup
@@ -22,7 +23,6 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import Permission, make_password
 from django.contrib.messages import DEFAULT_LEVELS, get_messages
-from django.http import HttpResponse
 from django.shortcuts import resolve_url
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -47,6 +47,9 @@ from counter.models import (
     ReturnableProduct,
     Selling,
 )
+
+if TYPE_CHECKING:
+    from django.http import HttpResponse
 
 
 def set_age(user: User, age: int):

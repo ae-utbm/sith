@@ -91,7 +91,6 @@ class UE(models.Model):
 
     # All texts about the UE
     title = models.CharField(_("title"), max_length=300)
-    manager = models.CharField(_("ue manager"), max_length=300)
     objectives = models.TextField(_("objectives"))
     program = models.TextField(_("program"))
     skills = models.TextField(_("skills"))

@@ -1,12 +1,16 @@
+from typing import TYPE_CHECKING
+
 import pytest
 from django.conf import settings
-from django.test import Client
 from django.urls import reverse
 from model_bakery import baker, seq
 
 from core.baker_recipes import board_user, subscriber_user
 from core.models import Group, User
 from counter.models import ProductType
+
+if TYPE_CHECKING:
+    from django.test import Client
 
 
 @pytest.fixture

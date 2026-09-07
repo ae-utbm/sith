@@ -20,13 +20,15 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
 import honeypot.templatetags.honeypot as honeypot_filters
 from django.template.loader import render_to_string
 from jinja2 import Environment, nodes
 from jinja2.ext import Extension
-from jinja2.parser import Parser
+
+if TYPE_CHECKING:
+    from jinja2.parser import Parser
 
 
 class HoneypotExtension(Extension):

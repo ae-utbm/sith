@@ -12,7 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.conf import settings
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -21,7 +21,6 @@ from django.db.models import Count, OuterRef, Subquery
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from django.utils.safestring import SafeString
 from django.views.generic import CreateView, DetailView, TemplateView
 from django.views.generic.edit import FormView, UpdateView
 
@@ -39,6 +38,9 @@ from sas.forms import (
     PictureUploadForm,
 )
 from sas.models import Album, PeoplePictureRelation, Picture
+
+if TYPE_CHECKING:
+    from django.utils.safestring import SafeString
 
 
 class AlbumCreateFragment(FragmentMixin, CreateView):

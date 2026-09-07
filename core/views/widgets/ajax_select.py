@@ -1,14 +1,17 @@
-from collections.abc import Collection
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.db.models import Model, QuerySet
 from django.forms import Select, SelectMultiple
-from ninja import ModelSchema
 from pydantic import TypeAdapter
 
 from core.models import Group, SithFile, User
 from core.schemas import GroupSchema, SithFileSchema, UserProfileSchema
+
+if TYPE_CHECKING:
+    from collections.abc import Collection
+
+    from django.db.models import Model, QuerySet
+    from ninja import ModelSchema
 
 
 class AutoCompleteSelectMixin:

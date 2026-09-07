@@ -132,6 +132,13 @@ ignore = [
     "RUF012"  # mutable class attributes. This rule doesn't integrate well with django
 ]
 
+[tool.ruff.lint.per-file-ignores]
+# schemas and API routes are built upon ninja and pydantic,
+# which heavily rely on type annotations at runtime.
+# Systematically using TYPE_CHECKING blocks in those files is NOT safe
+"schemas.py" = ["TCH"]
+"api.py" = ["TCH"]
+
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 

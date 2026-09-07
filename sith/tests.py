@@ -1,10 +1,13 @@
 from contextlib import nullcontext as does_not_raise
+from typing import TYPE_CHECKING
 
 import pytest
-from _pytest.raises import RaisesExc
-from django.test import Client
 from django.test.utils import override_settings
 from django.urls import reverse
+
+if TYPE_CHECKING:
+    from _pytest.raises import RaisesExc
+    from django.test import Client
 
 
 @pytest.mark.django_db

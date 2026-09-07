@@ -1,13 +1,16 @@
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.contrib.staticfiles.finders import find
 from django.contrib.staticfiles.storage import (
     ManifestStaticFilesStorage,
 )
-from django.core.files.storage import Storage
 
 from staticfiles.processors import JS, JSBundler, Scss
+
+if TYPE_CHECKING:
+    from django.core.files.storage import Storage
 
 
 class ManifestPostProcessingStorage(ManifestStaticFilesStorage):

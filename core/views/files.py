@@ -13,7 +13,7 @@
 #
 #
 import mimetypes
-from pathlib import Path
+from typing import TYPE_CHECKING
 from urllib.parse import quote, urljoin
 
 # This file contains all the views that concern the page model
@@ -47,6 +47,9 @@ from core.views.widgets.ajax_select import (
     AutoCompleteSelectUser,
 )
 from counter.utils import is_logged_in_counter
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def send_raw_file(path: Path) -> HttpResponse:

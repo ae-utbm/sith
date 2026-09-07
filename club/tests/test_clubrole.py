@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 import pytest
 from django.contrib.auth.models import Permission
@@ -13,6 +13,9 @@ from club.forms import ClubRoleFormSet
 from club.models import Club, ClubRole, Membership
 from core.baker_recipes import subscriber_user
 from core.models import AnonymousUser, User
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 def make_club():
