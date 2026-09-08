@@ -15,9 +15,6 @@
   {% endblock %}
 {% else %}
   {% extends "core/base.jinja" %}
-  {% block additional_css %}
-    <link rel="stylesheet" href="{{ static("club/list.scss") }}">
-  {% endblock %}
   {% block description -%}
     {% trans %}The list of all clubs existing at UTBM.{% endtrans %}
   {%- endblock %}
@@ -26,6 +23,12 @@
   {%- endblock %}
 {% endif %}
 
+{% block additional_css %}
+  {% if not is_fragment %}
+    <link rel="stylesheet" href="{{ static("club/list.scss") }}">
+  {% endif %}
+{% endblock %}
+
 {% from "core/macros.jinja" import paginate_htmx %}
 
 {% block content %}
@@ -33,15 +36,17 @@
     <h3>{% trans %}Filters{% endtrans %}</h3>
     <form
       id="club-list-filters"
-      hx-get="{{ url("club:club_list") }}"
+      method="GET"
+      hx-action="{{ url("club:club_list") }}"
       hx-target="#content"
       hx-swap="innerHTML"
       hx-push-url="true"
+      hx-disable="find input, find button"
     >
       <div class="row gap-4x">
         {{ form }}
       </div>
-      <button type="submit" class="btn btn-blue margin-bottom">
+      <button class="btn btn-blue margin-bottom">
         <i class="fa fa-magnifying-glass"></i>{% trans %}Search{% endtrans %}
       </button>
     </form>

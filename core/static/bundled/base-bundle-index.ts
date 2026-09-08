@@ -62,6 +62,7 @@ document.body.addEventListener(
   },
 );
 
+htmx.config.transitions = true;
 Object.assign(window, { htmx });
 
 /**
