@@ -92,11 +92,11 @@ docs = [
 default-groups = ["dev", "tests", "docs"]
 
 [tool.xapian]
-version = "2.0.0"
+version = "2.1.0"
 # Those hashes are here to protect against supply chains attacks
 # See `https://ae-utbm.github.io/sith/howto/xapian/` for more information
-core-sha256 = "6cea3f49952a47224439a40bdb3608f928d121ad8721b9921cc42802d548ecf8"
-bindings-sha256 = "9a544b69c31355a92edbcd4102cf0f1ec4407fd0a4645f4870fb52300b736910"
+core-sha256 = "8e1259586d342e3d12b5e1f772e9185a10f2ba16e541566b5c3c239f71b8aacc"
+bindings-sha256 = "f52ec189f13b4fa66ea625a6eb94bb32dd651b9ec806be6a911dda54cbe3875c"
 
 [tool.ruff]
 output-format = "concise" # makes ruff error logs easier to read
