@@ -16,7 +16,7 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Sofware Foundation, Inc., 59 Temple
+# this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
@@ -26,9 +26,11 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Exists, OuterRef
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
+from django.utils.functional import cached_property
 from django.views.generic import (
     CreateView,
     DeleteView,
+    DetailView,
     FormView,
     TemplateView,
     UpdateView,
@@ -36,7 +38,7 @@ from django.views.generic import (
 
 from core.auth.mixins import PermissionOrAuthorRequiredMixin
 from core.models import Notification, User
-from core.views import DetailFormView
+from core.views.mixins import AllowFragment, FragmentMixin, UseFragmentsMixin
 from pedagogy.forms import (
     UECommentForm,
     UECommentModerationForm,
@@ -46,37 +48,56 @@ from pedagogy.forms import (
 from pedagogy.models import UE, UEComment, UECommentReport
 
 
-class UEDetailFormView(PermissionRequiredMixin, DetailFormView):
-    """Display every comment of an UE and detailed infos about it.
-
-    Allow to comment the UE.
-    """
-
-    model = UE
-    pk_url_kwarg = "ue_id"
-    template_name = "pedagogy/ue_detail.jinja"
+class UECommentCreateView(PermissionRequiredMixin, FragmentMixin, CreateView):
+    model = UEComment
+    template_name = "pedagogy/fragments/ue_comment_form.jinja"
     form_class = UECommentForm
-    permission_required = "pedagogy.view_ue"
+    permission_required = "pedagogy.add_uecomment"
+    object = None  # Avoid initialisation bug with FragmentMixin
+
+    @cached_property
+    def ue(self):
+        return get_object_or_404(UE, id=self.kwargs.get("ue_id"))
 
     def has_permission(self):
-        if self.request.method == "POST" and not self.request.user.has_perm(
-            "pedagogy.add_uecomment"
-        ):
-            # if it's a POST request, the user is trying to add a new UEComment
-            # thus he also needs the "add_uecomment" permission
+        if self.ue.has_user_already_commented(self.request.user):
             return False
         return super().has_permission()
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["author_id"] = self.request.user.id
-        kwargs["ue_id"] = self.object.id
+        kwargs["ue_id"] = self.ue.id
         kwargs["is_creation"] = True
         return kwargs
 
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "action": reverse("pedagogy:comment_create", kwargs={"ue_id": self.ue.id}),
+            "object": self.ue,
+        }
+
+    def get_success_url(self):
+        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.ue.id})
+
+
+class UEDetailView(
+    PermissionRequiredMixin, UseFragmentsMixin, AllowFragment, DetailView
+):
+    """Display every comment of an UE and detailed infos about it."""
+
+    model = UE
+    pk_url_kwarg = "ue_id"
+    template_name = "pedagogy/ue_detail.jinja"
+    permission_required = "pedagogy.view_ue"
+    fragments = {
+        "add_comment_form": UECommentCreateView,
+    }
+
+    def get_fragment_data(self):
+        return {
+            "add_comment_form": {"ue_id": self.object.id},
+        }
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -85,22 +106,17 @@ class UEDetailFormView(PermissionRequiredMixin, DetailFormView):
                 .annotate_is_reported()
                 .select_related("author")
                 .order_by("-publish_date")
-            )
+            ),
         }
 
-    def get_success_url(self):
-        # once the new ue comment has been saved
-        # redirect to the same page we are currently
-        return self.request.path
 
-
-class UECommentUpdateView(PermissionOrAuthorRequiredMixin, UpdateView):
+class UECommentUpdateView(PermissionOrAuthorRequiredMixin, AllowFragment, UpdateView):
     """Allow edit of a given comment."""
 
     model = UEComment
     form_class = UECommentForm
     pk_url_kwarg = "comment_id"
-    template_name = "core/edit.jinja"
+    template_name = "pedagogy/fragments/ue_comment_form.jinja"
     permission_required = "pedagogy.change_uecomment"
     author_field = "author"
 
@@ -111,11 +127,18 @@ class UECommentUpdateView(PermissionOrAuthorRequiredMixin, UpdateView):
         kwargs["is_creation"] = False
         return kwargs
 
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "action": reverse(
+                "pedagogy:comment_update", kwargs={"comment_id": self.object.id}
+            )
+        }
+
     def get_success_url(self):
-        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.object.ue_id})
+        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.object.ue.id})
 
 
-class UECommentDeleteView(PermissionOrAuthorRequiredMixin, DeleteView):
+class UECommentDeleteView(PermissionOrAuthorRequiredMixin, AllowFragment, DeleteView):
     """Allow to delete a given comment."""
 
     model = UEComment
@@ -124,8 +147,13 @@ class UECommentDeleteView(PermissionOrAuthorRequiredMixin, DeleteView):
     permission_required = "pedagogy.delete_uecomment"
     author_field = "author"
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        response.headers["HX-Trigger"] = "CommentUpdate"
+        return response
+
     def get_success_url(self):
-        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.object.ue_id})
+        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.object.ue.id})
 
 
 class UEGuideView(PermissionRequiredMixin, TemplateView):
@@ -135,23 +163,33 @@ class UEGuideView(PermissionRequiredMixin, TemplateView):
     permission_required = "pedagogy.view_ue"
 
 
-class UECommentReportCreateView(PermissionRequiredMixin, CreateView):
+class UECommentReportCreateView(PermissionRequiredMixin, AllowFragment, CreateView):
     """Create a new report for an inappropriate comment."""
 
     model = UECommentReport
     form_class = UECommentReportForm
-    template_name = "core/edit.jinja"
+    template_name = "pedagogy/fragments/comment_report.jinja"
     permission_required = "pedagogy.add_uecommentreport"
 
     def dispatch(self, request, *args, **kwargs):
         self.ue_comment = get_object_or_404(UEComment, pk=kwargs["comment_id"])
         return super().dispatch(request, *args, **kwargs)
 
+    @cached_property
+    def ue_detail_url(self):
+        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.ue_comment.ue.id})
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["reporter_id"] = self.request.user.id
         kwargs["comment_id"] = self.ue_comment.id
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data() | {
+            "comment_id": self.ue_comment.id,
+            "ue_detail_url": self.ue_detail_url,
+        }
 
     def form_valid(self, form):
         resp = super().form_valid(form)
@@ -168,11 +206,10 @@ class UECommentReportCreateView(PermissionRequiredMixin, CreateView):
                 url=reverse("pedagogy:moderation"),
                 type="PEDAGOGY_MODERATION",
             )
-
         return resp
 
     def get_success_url(self):
-        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.ue_comment.ue_id})
+        return self.ue_detail_url
 
 
 class UEModerationFormView(PermissionRequiredMixin, FormView):
