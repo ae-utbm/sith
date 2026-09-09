@@ -26,6 +26,7 @@ from django.conf import settings
 from django.core import validators
 from django.db import models
 from django.db.models import Exists, OuterRef
+from django.db.models.query_utils import Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -159,7 +160,14 @@ class UECommentQuerySet(models.QuerySet):
             # so he can view non-moderated comments
             return self
         if user.has_perm("pedagogy.view_uecomment"):
-            return self.filter(reports=None)
+            return self.filter(
+                Q(author=user)
+                | ~Exists(
+                    UECommentReport.objects.filter(
+                        ~Q(reporter=user), comment=OuterRef("pk")
+                    )
+                )
+            ).distinct()
         return self.filter(author=user)
 
     def annotate_is_reported(self) -> Self:
@@ -261,7 +269,7 @@ class UEResult(models.Model):
 
 
 class UECommentReport(models.Model):
-    """Report an inapropriate comment."""
+    """Report an inappropriate comment."""
 
     comment = models.ForeignKey(
         UEComment,
