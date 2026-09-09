@@ -16,9 +16,23 @@
   <div x-data="timetableGenerator">
     <form @submit.prevent="generate()">
       <h1>Générateur d'emploi du temps</h1>
-      <div class="alert alert-red" x-show="!!error" x-cloak>
-        <span class="alert-main" x-text="error"></span>
-      </div>
+      <template x-if="error !== null" x-cloak>
+        <div class="alert alert-red">
+          <div class="alert-main">
+            <p>
+              {% trans trimmed %}
+                Wrong timetable format. Make sure you copied if from your student folder.
+              {% endtrans %}
+            </p>
+            <template x-if="!!error.incorrectRow">
+              <p>
+                {% trans %}Incorrect row{% endtrans %} :
+                <code x-text="error.incorrectRow"></code>
+              </p>
+            </template>
+          </div>
+        </div>
+      </template>
       <div class="form-group">
         <label for="timetable-input">Colle ton emploi du temps (sans l'entête)</label>
         <textarea id="timetable-input" cols="30" rows="15" x-model="content"></textarea>
