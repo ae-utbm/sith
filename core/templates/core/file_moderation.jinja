@@ -39,13 +39,13 @@
         <p><button
           hx-get="{{ url('core:file_moderate', file_id=f.id) }}"
           hx-target="#content"
-          hx-swap="outerHtml"
+          hx-swap="innerHTML"
         >{% trans %}Moderate{% endtrans %}</button> -
           {% set current_page = url('core:file_moderation') + "?page=" + page_obj.number | string %}
           <button
             hx-get="{{ url('core:file_delete', file_id=f.id) }}?next={{ current_page | urlencode }}&previous={{ current_page | urlencode }}"
             hx-target="#file-{{ loop.index }}"
-            hx-swap="outerHtml"
+            hx-swap="innerHTML"
           >{% trans %}Delete{% endtrans %}</button></p>
       </div>
     {% endfor %}

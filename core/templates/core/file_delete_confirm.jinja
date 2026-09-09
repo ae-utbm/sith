@@ -31,7 +31,7 @@
       {% if is_fragment %}
         hx-post="{{ action }}"
         hx-target="#content"
-        hx-swap="outerHtml"
+        hx-swap="innerHTML"
       {% endif %}
     >{% trans %}Confirm{% endtrans %}</button>
 
@@ -39,7 +39,7 @@
       {% if is_fragment %}
         hx-get="{{ previous }}"
         hx-target="#content"
-        hx-swap="outerHtml"
+        hx-swap="innerHTML"
       {% else %}
         action="window.history.back()"
       {% endif %}

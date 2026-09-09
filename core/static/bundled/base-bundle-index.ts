@@ -69,6 +69,7 @@ htmx.registerExtension("aria-busy", {
   },
 });
 
+htmx.config.transitions = true;
 Object.assign(window, { htmx });
 
 /**
