@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-08 23:36+0200\n"
+"POT-Creation-Date: 2026-09-09 07:21+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -5853,8 +5853,14 @@ msgid "Timetable generator"
 msgstr "Générateur d'emploi du temps"
 
 #: timetable/templates/timetable/generator.jinja
+msgid "Get a nice schedule from the raw text in your student file"
+msgstr ""
+"Générez un joli emploi du temps à partir du texte brut de votre dossier "
+"étudiant"
+
+#: timetable/templates/timetable/generator.jinja
 msgid ""
-"Wrong timetable format. Make sure you copied if from your student folder."
+"Wrong timetable format. Make sure you copied it from your student folder."
 msgstr ""
 "Mauvais format d'emploi du temps. Assurez-vous que vous l'avez copié depuis "
 "votre dossier étudiant."
@@ -5862,6 +5868,10 @@ msgstr ""
 #: timetable/templates/timetable/generator.jinja
 msgid "Incorrect row"
 msgstr "Ligne incorrecte"
+
+#: timetable/templates/timetable/generator.jinja
+msgid "Paste your schedule (without the header)"
+msgstr "Colle ton emploi du temps (sans l'entête)"
 
 #: timetable/templates/timetable/generator.jinja
 msgid "Generate"
