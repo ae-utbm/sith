@@ -48,19 +48,26 @@ polyfillCountryFlagEmojis();
 /**
  * HTMX
  */
-document.body.addEventListener(
-  "htmx:before:request" as keyof HTMLElementEventMap,
-  (event) => {
-    (event as CustomEvent).detail.ctx.target.ariaBusy = true;
+htmx.registerExtension("aria-busy", {
+  // biome-ignore lint/style/useNamingConvention: api's name
+  htmx_before_request: (
+    _: HTMLElement,
+    detail: { ctx: { target: HTMLElement | undefined } },
+  ) => {
+    if (detail.ctx.target !== undefined) {
+      (detail.ctx.target as HTMLElement).ariaBusy = "true";
+    }
   },
-);
-
-document.body.addEventListener(
-  "htmx:before:swap" as keyof HTMLElementEventMap,
-  (event) => {
-    (event as CustomEvent).detail.ctx.target.ariaBusy = null;
+  // biome-ignore lint/style/useNamingConvention: api's name
+  htmx_after_swap: (
+    _: HTMLElement,
+    detail: { ctx: { target: HTMLElement | undefined } },
+  ) => {
+    if (detail.ctx.target !== undefined) {
+      (detail.ctx.target as HTMLElement).ariaBusy = null;
+    }
   },
-);
+});
 
 Object.assign(window, { htmx });
 
