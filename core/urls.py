@@ -21,7 +21,7 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-from django.urls import path, re_path, register_converter
+from django.urls import path, register_converter
 from django.views.generic import RedirectView
 
 from com.views import NewsListView
@@ -193,27 +193,11 @@ urlpatterns = [
         name="user_gift_delete",
     ),
     # File views
-    re_path(r"^file/$", FileListView.as_view(), name="file_list"),
-    re_path(
-        r"^file/(?P<file_id>[0-9]+)/$",
-        FileView.as_view(),
-        name="file_detail",
-    ),
-    re_path(
-        r"^file/(?P<file_id>[0-9]+)/edit/$",
-        FileEditView.as_view(),
-        name="file_edit",
-    ),
-    re_path(
-        r"^file/(?P<file_id>[0-9]+)/prop/$",
-        FileEditPropView.as_view(),
-        name="file_prop",
-    ),
-    re_path(
-        r"^file/(?P<file_id>[0-9]+)/delete/$",
-        FileDeleteView.as_view(),
-        name="file_delete",
-    ),
+    path("file/", FileListView.as_view(), name="file_list"),
+    path("file/<int:file_id>/", FileView.as_view(), name="file_detail"),
+    path("file/<int:file_id>/edit/", FileEditView.as_view(), name="file_edit"),
+    path("file/<int:file_id>/prop/", FileEditPropView.as_view(), name="file_prop"),
+    path("file/<int:file_id>/delete/", FileDeleteView.as_view(), name="file_delete"),
     path("file/moderation/", FileModerationView.as_view(), name="file_moderation"),
     path(
         "file/<int:file_id>/moderate/", FileModerateView.as_view(), name="file_moderate"

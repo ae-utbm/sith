@@ -356,15 +356,8 @@ class FileDeleteView(AllowFragment, CanEditPropMixin, DeleteView):
         if "next" in self.request.GET:
             return self.request.GET["next"]
         if self.object.parent is None:
-            return reverse(
-                "core:file_list",
-            )
-        return reverse(
-            "core:file_detail",
-            kwargs={
-                "file_id": self.object.parent.id,
-            },
-        )
+            return reverse("core:file_list")
+        return reverse("core:file_detail", kwargs={"file_id": self.object.parent.id})
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
