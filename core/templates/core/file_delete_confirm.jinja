@@ -20,31 +20,35 @@
   {% endif %}
 
   <p>{% trans obj=object %}Are you sure you want to delete "{{ obj }}"?{% endtrans %}</p>
-  <form
-    method="post"
-    {% if is_fragment %}
-      hx-action="{{ action }}"
-      hx-target="#content"
-      hx-swap="innerHTML"
-    {% else %}
-      action="{{ action }}"
-    {% endif %}
-  >
-    {% csrf_token %}
-    <input type="submit" value="{% trans %}Confirm{% endtrans %}" />
-  </form>
-  <form
-    method="get"
-    {% if is_fragment %}
-      hx-action="{{ previous }}"
-      hx-target="#content"
-      hx-swap="innerHTML"
-    {% else %}
-      action="javascript:history.back();"
-    {% endif %}
-  >
-    <input type="submit" name="cancel" value="{% trans %}Cancel{% endtrans %}" />
-  </form>
+  <div class="row gap">
+    <form
+      style="margin-right: 0"
+      method="post"
+      {% if is_fragment %}
+        hx-action="{{ action }}"
+        hx-target="#content"
+        hx-swap="innerHTML"
+      {% else %}
+        action="{{ action }}"
+      {% endif %}
+    >
+      {% csrf_token %}
+      <input type="submit" value="{% trans %}Confirm{% endtrans %}" />
+    </form>
+    <form
+      style="margin-left: 0"
+      method="get"
+      {% if is_fragment %}
+        hx-action="{{ previous }}"
+        hx-target="#content"
+        hx-swap="innerHTML"
+      {% else %}
+        action="javascript:history.back();"
+      {% endif %}
+    >
+      <input type="submit" name="cancel" value="{% trans %}Cancel{% endtrans %}" />
+    </form>
+  </div>
 {% endblock %}
 
 
