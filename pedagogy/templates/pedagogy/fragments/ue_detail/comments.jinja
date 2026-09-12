@@ -7,8 +7,7 @@
 {% endif %}
 
 <section>
-  {% for comment in comments %}
-
+  {%- for comment in comments -%}
     <div id="comment-{{ comment.id }}" class="comment-container">
 
       <div class="grade-block">
@@ -54,11 +53,12 @@
           </button>
         {% endif %}
         {% if comment.author_id == user.id or user.has_perm("pedagogy.delete_comment") %}
-          <form class="action"
-                hx-post="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}"
-                hx-confirm='{% trans obj=object %}Are you sure you want to delete "{{ obj }}"?{% endtrans %}'
-                hx-swap="outerHTML"
-                hx-target="#comment-{{ comment.id }}"
+          <form
+            class="action"
+            hx-post="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}"
+            hx-confirm='{% trans obj=object %}Are you sure you want to delete "{{ obj }}"?{% endtrans %}'
+            hx-swap="outerHTML"
+            hx-target="#comment-{{ comment.id }}"
           >
             {% csrf_token %}
             <button class="btn btn-red action">
@@ -82,10 +82,9 @@
         </div>
 
         <div class="date"><p>{{ comment.publish_date.strftime('%d/%m/%Y') }}</p></div>
-
         <div class="author"><p>{{ user_profile_link(comment.author) }}</p></div>
       </div>
 
     </div>
-  {% endfor %}
+  {%- endfor -%}
 </section>
