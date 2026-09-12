@@ -107,57 +107,55 @@
     {% elif user.has_perm("pedagogy.add_uecomment") %}
       <details class="accordion" id="leave_comment" {% if form.errors %}open{%endif%}>
         <summary>{% trans %}Leave comment{% endtrans %}</summary>
-        <div class="accordion-content">
-          <form action="{{ url('pedagogy:ue_detail', ue_id=object.id) }}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="leave-comment-grid-container">
-              <div class="form-stars">
-                {{ form.non_field_errors() }}
-                {{ form.author.errors }}
-                {{ form.ue.errors }}
+        <form
+          class="accordion-content"
+          action="{{ url('pedagogy:ue_detail', ue_id=object.id) }}"
+          method="post"
+          enctype="multipart/form-data"
+        >
+          {% csrf_token %}
+          {{ form.non_field_errors() }}
+          {{ form.author.errors }}
+          {{ form.ue.errors }}
 
-                {{ form.author }}
-                {{ form.ue }}
-
-                <div class="input-stars">
-                  <label for="{{ form.grade_global.id_for_label }}">{{ form.grade_global.label }} :</label>
-                  {{ form.grade_global.errors }}
-                  {{ form.grade_global }}
-                </div>
-
-                <div class="input-stars">
-                  <label for="{{ form.grade_utility.id_for_label }}">{{ form.grade_utility.label }} :</label>
-                  {{ form.grade_utility.errors }}
-                  {{ form.grade_utility }}
-                </div>
-
-                <div class="input-stars">
-                  <label for="{{ form.grade_interest.id_for_label }}">{{ form.grade_interest.label }} :</label>
-                  {{ form.grade_interest.errors }}
-                  {{ form.grade_interest }}
-                </div>
-
-                <div class="input-stars">
-                  <label for="{{ form.grade_teaching.id_for_label }}">{{ form.grade_teaching.label }} :</label>
-                  {{ form.grade_teaching.errors }}
-                  {{ form.grade_teaching }}
-                </div>
-
-                <div class="input-stars">
-                  <label for="{{ form.grade_work_load.id_for_label }}">{{ form.grade_work_load.label }} :</label>
-                  {{ form.grade_work_load.errors }}
-                  {{ form.grade_work_load }}
-                </div>
+          {{ form.author }}
+          {{ form.ue }}
+          <div class="comment-form-content">
+            <div class="form-stars">
+              <div>
+                <label for="{{ form.grade_global.id_for_label }}">{{ form.grade_global.label }} :</label>
+                {{ form.grade_global.errors }}
+                {{ form.grade_global }}
               </div>
-              <div class="form-comment">
-                <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }} :</label>
-                {{ form.comment.errors }}
-                {{ form.comment }}
+              <div>
+                <label for="{{ form.grade_utility.id_for_label }}">{{ form.grade_utility.label }} :</label>
+                {{ form.grade_utility.errors }}
+                {{ form.grade_utility }}
+              </div>
+              <div>
+                <label for="{{ form.grade_interest.id_for_label }}">{{ form.grade_interest.label }} :</label>
+                {{ form.grade_interest.errors }}
+                {{ form.grade_interest }}
+              </div>
+              <div>
+                <label for="{{ form.grade_teaching.id_for_label }}">{{ form.grade_teaching.label }} :</label>
+                {{ form.grade_teaching.errors }}
+                {{ form.grade_teaching }}
+              </div>
+              <div>
+                <label for="{{ form.grade_work_load.id_for_label }}">{{ form.grade_work_load.label }} :</label>
+                {{ form.grade_work_load.errors }}
+                {{ form.grade_work_load }}
               </div>
             </div>
-            <p><input type="submit" value="{% trans %}Comment{% endtrans %}" /></p>
-          </form>
-        </div>
+            <div class="form-comment">
+              <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }} :</label>
+              {{ form.comment.errors }}
+              {{ form.comment }}
+            </div>
+          </div>
+          <p><input type="submit" class="btn btn-blue"/></p>
+        </form>
       </details>
     {% endif %}
     <br>

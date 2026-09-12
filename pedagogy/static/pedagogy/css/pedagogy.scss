@@ -116,28 +116,27 @@ $pedagogy-white-text: #f0f0f0;
     }
 
     #leave_comment {
-      .leave-comment-grid-container {
-        display: grid;
-        grid-template-columns: 270px auto;
-        grid-template-rows: 100%;
-        grid-template-areas: "stars comment";
+      .comment-form-content {
+        display: flex;
+        gap: 2em;
 
         @media screen and (max-width: $large-devices) {
-          grid-template-columns: 100%;
-          grid-template-rows: auto auto;
-          grid-template-areas:
-          "stars"
-          "comment";
+          gap: 1em;
+          flex-direction: column;
         }
-
       }
-
       .form-stars {
-        grid-area: stars;
+        flex: 1;
+        min-width: 250px;
+        display: flex;
+        align-content: flex-start;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem 2em;
+        height: unset;
       }
-
       .form-comment {
-        grid-area: comment;
+        flex: 2;
       }
 
       .ui-accordion-header-icon {
@@ -145,12 +144,17 @@ $pedagogy-white-text: #f0f0f0;
         margin-right: 10px;
       }
 
-      .input-stars {
-        margin-top: 20px;
+      input[type="submit"] {
+        display: block;
+        margin-left: auto;
       }
 
-      input[type="submit"] {
-        float: right;
+      summary {
+        background: $pedagogy-orange;
+        color: $pedagogy-white-text;
+        @media screen and (min-width: $large-devices) {
+          clip-path: polygon(0 0%, 0 100%, 30% 100%, 33% 0);
+        }
       }
     }
 
@@ -370,21 +374,4 @@ $pedagogy-white-text: #f0f0f0;
       }
     }
   }
-}
-
-details.accordion summary {
-
-  background: $pedagogy-orange !important;
-  color: $pedagogy-white-text !important;
-  clip-path: polygon(0 0%, 0 100%, 30% 100%, 33% 0);
-
-  @media screen and (max-width: $large-devices) {
-    clip-path: none;
-  }
-}
-
-details.accordion>.accordion-content {
-  background-color: $white-color;
-  border-color: $pedagogy-orange;
-  border-right: none;
 }
