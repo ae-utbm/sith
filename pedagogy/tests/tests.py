@@ -306,18 +306,31 @@ class TestUVCommentDisplay(TestCase):
         cls.admin = baker.make(User, is_superuser=True)
         cls.ue = baker.make(UE)
         cls.ue_url = reverse("pedagogy:ue_detail", kwargs={"ue_id": cls.ue.id})
+        cls.pedagogy_admin = baker.make(
+            User,
+            user_permissions=[
+                Permission.objects.get(codename="view_ue"),
+                Permission.objects.get(codename="view_uecomment"),
+                Permission.objects.get(codename="view_uecommentreport"),
+            ],
+        )
+        cls.subscriber = subscriber_user.make()
+        comments = baker.make(UEComment, ue=cls.ue, _quantity=10)
+        baker.make(
+            UECommentReport,
+            comment=iter(comments[5:]),
+            _quantity=len(comments[5:]),
+            _bulk_create=True,
+        )
 
     def test_access_succses(self):
         self.client.force_login(self.admin)
         assert self.client.get(self.ue_url).status_code == 200
 
-        pedagogy_admin = baker.make(
-            User, user_permissions=[Permission.objects.get(codename="view_ue")]
-        )
-        self.client.force_login(pedagogy_admin)
+        self.client.force_login(self.pedagogy_admin)
         assert self.client.get(self.ue_url).status_code == 200
 
-        self.client.force_login(subscriber_user.make())
+        self.client.force_login(self.subscriber)
         assert self.client.get(self.ue_url).status_code == 200
 
     def test_access_fail(self):
@@ -337,6 +350,52 @@ class TestUVCommentDisplay(TestCase):
             reverse("pedagogy:ue_detail", kwargs={"ue_id": UE.objects.last().id + 1})
         )
         assert res.status_code == 404
+
+    def test_comments_normal_user(self):
+        # Normal user only see
+        # * Unreported comments
+        # * Comments that he wrote but were reported
+        # * Comments that he himself reported
+
+        self.client.force_login(self.subscriber)
+        comments = self.client.get(self.ue_url).context_data.get("comments", [])
+        assert len(comments) == 5
+        assert all(not comment.reports.exists() for comment in comments)
+
+        # Make user comment
+        user_comment = baker.make(UEComment, ue=self.ue, author=self.subscriber)
+        comments = self.client.get(self.ue_url).context_data.get("comments", [])
+        assert len(comments) == 6
+        assert all(not comment.reports.exists() for comment in comments)
+        assert user_comment in comments
+
+        # Report user comment
+        baker.make(UECommentReport, comment=user_comment)
+        comments = self.client.get(self.ue_url).context_data.get("comments", [])
+        assert len(comments) == 6
+        assert not all(not comment.reports.exists() for comment in comments)
+        assert user_comment in comments
+
+        # Report someone's else comment
+        comment_reported_by_user = baker.make(UEComment, ue=self.ue)
+        baker.make(
+            UECommentReport, comment=comment_reported_by_user, reporter=self.subscriber
+        )
+        comments = self.client.get(self.ue_url).context_data.get("comments", [])
+        assert len(comments) == 7
+        assert comment_reported_by_user in comments
+
+    def test_comments_pedagogy_admin(self):
+        # Pedagogy admin sees everything
+        self.client.force_login(self.pedagogy_admin)
+        comments = self.client.get(self.ue_url).context_data.get("comments", [])
+        assert len(comments) == 10
+
+    def test_comments_admin(self):
+        # Admin sees everything
+        self.client.force_login(self.admin)
+        comments = self.client.get(self.ue_url).context_data.get("comments", [])
+        assert len(comments) == 10
 
 
 class TestUECommentCreation(TestCase):
