@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-09 07:21+0200\n"
+"POT-Creation-Date: 2026-09-12 19:50+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1188,8 +1188,9 @@ msgstr "Actions"
 
 #: com/templates/com/mailing_admin.jinja com/templates/com/poster_list.jinja
 #: core/templates/core/file_detail.jinja
-#: core/templates/core/file_moderation.jinja sas/templates/sas/moderation.jinja
-#: sas/templates/sas/picture.jinja
+#: core/templates/core/file_moderation.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+#: sas/templates/sas/moderation.jinja sas/templates/sas/picture.jinja
 msgid "Moderate"
 msgstr "Modérer"
 
@@ -1491,7 +1492,6 @@ msgstr "Descendre"
 
 #: com/templates/com/weekmail_preview.jinja
 #: core/templates/core/user_account_detail.jinja
-#: pedagogy/templates/pedagogy/ue_detail.jinja
 #: trombi/templates/trombi/comment_moderation.jinja
 #: trombi/templates/trombi/export.jinja
 msgid "Back"
@@ -1842,7 +1842,9 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 #: core/models.py core/templates/core/macros.jinja
 #: core/templates/core/user_detail.jinja core/templates/core/user_edit.jinja
 #: election/templates/election/election_detail.jinja
-#: forum/templates/forum/macros.jinja trombi/templates/trombi/user_tools.jinja
+#: forum/templates/forum/macros.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+#: trombi/templates/trombi/user_tools.jinja
 msgid "Profile"
 msgstr "Profil"
 
@@ -3779,7 +3781,6 @@ msgstr "Coffre vidé"
 
 #: counter/templates/counter/cash_summary_list.jinja counter/views/cash.py
 #: pedagogy/templates/pedagogy/moderation.jinja
-#: pedagogy/templates/pedagogy/ue_detail.jinja
 #: trombi/templates/trombi/comment.jinja
 #: trombi/templates/trombi/user_tools.jinja
 msgid "Comment"
@@ -5118,6 +5119,10 @@ msgid "Search UE"
 msgstr "Recherche d'UE"
 
 #: pedagogy/templates/pedagogy/guide.jinja
+msgid "Hide closed UEs"
+msgstr "Cacher les UEs fermées"
+
+#: pedagogy/templates/pedagogy/guide.jinja
 #, python-format
 msgid "%(display_name)s"
 msgstr "%(display_name)s"
@@ -5170,24 +5175,20 @@ msgid "UE Details"
 msgstr "Détails d'UE"
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja
-msgid "CM: "
-msgstr "CM : "
+msgid "Category"
+msgstr "Catégorie"
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja
-msgid "TD: "
-msgstr "TD : "
+msgid "Credits"
+msgstr "Crédits"
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja
-msgid "TP: "
-msgstr "TP : "
+msgid "Availability"
+msgstr "Disponibilité"
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja
-msgid "TE: "
-msgstr "TE : "
-
-#: pedagogy/templates/pedagogy/ue_detail.jinja
-msgid "THE: "
-msgstr "THE : "
+msgid "Manager"
+msgstr "Responsable"
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Global grade"
@@ -5206,7 +5207,7 @@ msgid "Teaching"
 msgstr "Enseignement"
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja
-msgid "Work load"
+msgid "Workload"
 msgstr "Charge de travail"
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja
@@ -5224,10 +5225,6 @@ msgstr "Compétences acquises"
 #: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Key concepts"
 msgstr "Concepts clefs"
-
-#: pedagogy/templates/pedagogy/ue_detail.jinja
-msgid "UE manager: "
-msgstr "Gestionnaire d'UE : "
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja pedagogy/tests/tests.py
 msgid ""
@@ -5251,8 +5248,12 @@ msgid "This comment has been reported"
 msgstr "Ce commentaire a été signalé"
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja
-msgid "Report this comment"
-msgstr "Signaler ce commentaire"
+msgid "It will be hidden until moderated."
+msgstr "Il sera caché tant qu'il ne sera pas modéré."
+
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+msgid "Report"
+msgstr "Signaler"
 
 #: pedagogy/templates/pedagogy/ue_edit.jinja
 msgid "Edit UE"
