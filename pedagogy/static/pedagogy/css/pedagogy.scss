@@ -2,10 +2,7 @@
 @import "core/static/core/colors";
 
 
-$pedagogy-blue: #1bb9ea;
 $pedagogy-orange: #ea7900;
-$pedagogy-hover-blue: #0e97ce;
-$pedagogy-light-blue: #caf0ff;
 $pedagogy-white-text: #f0f0f0;
 
 .pedagogy {
@@ -108,13 +105,6 @@ $pedagogy-white-text: #f0f0f0;
       }
     }
 
-    #leave_comment_not_allowed {
-      p {
-        text-align: center;
-        color: red;
-      }
-    }
-
     #leave_comment {
       .comment-form-content {
         display: flex;
@@ -163,214 +153,56 @@ $pedagogy-white-text: #f0f0f0;
       padding-left: 10px;
     }
 
-    .comment-container {
-      display: grid;
-      grid-template-columns: 300px auto;
-      grid-template-rows: auto auto auto;
-      grid-template-areas:
-      "grade-block comment"
-      "grade-block info"
-      "comment-end-bar comment-end-bar";
-      margin-bottom: 30px;
-      margin-top: 10px;
+    .comment {
+      padding: 15px;
+      margin: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: $primary-neutral-light-color;
+      border-radius: 5px;
+      border: 1px darken($secondary-neutral-light-color, 10%) solid;
 
-      @media screen and (max-width: $large-devices) {
-        grid-template-columns: auto;
-        grid-template-rows: auto auto auto auto;
-        grid-template-areas:
-        "grade-block"
-        "comment"
-        "info"
-        "comment-end-bar";
+      &.reported {
+        border: #fc8181 1px solid;
       }
 
-      .grade-block {
-        grid-area: grade-block;
-        width: 300px;
+      .comment-header {
+        display: flex;
+        gap: 20px;
 
-        display: grid;
-        grid-template-columns: 150px 150px;
-        grid-template-rows: 156px auto;
-        grid-template-areas:
-        "grade-type grade-stars"
-        "grade-extension grade-extension";
-        grid-gap: 15px;
-
-        clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 30px, 270px 0);
-        align-items: start;
-
-        background-color: $pedagogy-blue;
-
-        @media screen and (max-width: $large-devices) {
-          grid-template-columns: 50% auto;
-          grid-template-rows: auto;
-          grid-template-areas: "grade-type grade-stars";
-          width: auto;
-          clip-path: none;
-          align-content: space-evenly;
-          align-items: end;
+        img {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
         }
 
-        .grade-extension {
-          grid-area: grade-extension;
-          background-color: $pedagogy-blue;
+        .comment-metadata {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
         }
 
-        .grade-type {
-          grid-area: grade-type;
-
-          >p {
-            color: $pedagogy-white-text;
-            font-weight: bold;
-            text-align: right;
-          }
-        }
-
-        .grade-stars {
-          grid-area: grade-stars;
+        .comment-options {
+          flex: 2;
+          display: flex;
+          justify-content: right;
+          gap: 15px;
         }
       }
 
-      .comment {
-        grid-area: comment;
-
-        display: grid;
-        grid-template-columns: auto;
-        grid-template-rows: auto auto;
-        grid-template-areas:
-        "anchor"
-        "markdown";
-
-        @media screen and (max-width: $large-devices) {
-          border-left: solid;
-          border-right: solid;
-          border-color: $pedagogy-blue;
-        }
-
-        .anchor {
-          grid-area: anchor;
-          text-align: right;
-          margin-right: 15px;
-        }
-
-        .markdown {
-          grid-area: markdown;
-
-          min-height: 139px;
-          margin-top: 0;
-          margin-right: 0;
-          padding: 10px;
-          text-align: justify;
-          overflow: auto;
-        }
+      .comment-stars {
+        display: flex;
+        justify-content: space-evenly;
+        flex-wrap: wrap;
+        gap: 1em 2em;
+        padding: 2em;
+        border-top: 0.0625rem grey dotted;
+        border-bottom: 0.0625rem grey dotted;
       }
 
-      .info {
-        grid-area: info;
-        padding-bottom: 10px;
-
-        @media screen and (max-width: $large-devices) {
-          border-left: solid;
-          border-right: solid;
-          border-color: $pedagogy-blue;
-        }
-
-        .status-reported {
-          color: red;
-          float: left;
-          padding-left: 10px;
-        }
-
-        .actions {
-          float: right;
-        }
-      }
-
-      .comment-end-bar {
-        grid-area: comment-end-bar;
-
-        display: grid;
-        grid-template-columns: 33% auto auto;
-        grid-template-rows: 2.5em;
-        grid-template-areas: "author date report";
-
-        background-color: $pedagogy-blue;
-        margin-top: -1px;
-
-        @media screen and (max-width: $large-devices) {
-          grid-template-columns: auto;
-          grid-template-rows: auto auto auto;
-          grid-template-areas:
-          "report"
-          "date"
-          "author";
-          margin-top: 0;
-          text-align: center;
-        }
-
-        .author {
-          grid-area: author;
-
-          padding-top: 6px;
-          padding-left: 20px;
-
-          background-color: $pedagogy-orange;
-          clip-path: polygon(0 10px, 0 100%, 350px 200%, 300px 10px);
-
-          @media screen and (max-width: $large-devices) {
-            clip-path: none;
-            padding: 0;
-            padding-bottom: 7px;
-          }
-
-          a {
-            color: $pedagogy-white-text;
-            font-weight: bold;
-          }
-
-          a:hover {
-            color: $pedagogy-hover-blue;
-          }
-        }
-
-        .date {
-          grid-area: date;
-          color: $pedagogy-white-text;
-
-          @media screen and (max-width: $large-devices) {
-            padding-bottom: 7px;
-          }
-        }
-
-        .report {
-          grid-area: report;
-          justify-self: right;
-          padding-right: 30px;
-          padding-left: 30px;
-
-          a {
-            color: $pedagogy-white-text;
-          }
-
-          a:hover {
-            color: $pedagogy-hover-blue;
-          }
-
-          @media screen and (max-width: $large-devices) {
-            text-align: center;
-            justify-self: inherit;
-            padding-bottom: 7px;
-            background-color: $white-color;
-
-            border-left: solid;
-            border-right: solid;
-            border-color: $pedagogy-blue;
-
-            a {
-              color: $black-color;
-            }
-          }
-        }
+      .comment-content {
+        padding: 0 20px;
       }
     }
   }
