@@ -124,13 +124,11 @@ class UE(models.Model):
         This function checks that no other comment has been posted by a specified user.
 
         Returns:
-            True if the user has already posted a comment on this UE, else False.
+            True if the user has already posted a comment on this UE or is anonymous, else False.
         """
-        self._has_user_commented = getattr(self, "_has_user_commented", {})
-        self._has_user_commented[user] = self._has_user_commented.get(
-            user, self.comments.filter(author=user).exists()
-        )
-        return self._has_user_commented[user]
+        if user.is_anonymous:
+            return True
+        return self.comments.filter(author=user).exists()
 
     @cached_property
     def grade_global_average(self):
