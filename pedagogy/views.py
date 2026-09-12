@@ -88,16 +88,19 @@ class UEDetailView(
 
     model = UE
     pk_url_kwarg = "ue_id"
-    template_name = "pedagogy/ue_detail.jinja"
     permission_required = "pedagogy.view_ue"
-    fragments = {
-        "add_comment_form": UECommentCreateView,
-    }
+    fragments = {"add_comment_form": UECommentCreateView}
+
+    def get_template_names(self) -> list[str]:
+        is_fragment = self.request.headers.get("HX-Request", False)
+        return (
+            ["pedagogy/fragments/ue_detail/ue_detail.jinja"]
+            if is_fragment
+            else ["pedagogy/ue_detail.jinja"]
+        )
 
     def get_fragment_data(self):
-        return {
-            "add_comment_form": {"ue_id": self.object.id},
-        }
+        return {"add_comment_form": {"ue_id": self.object.id}}
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {

@@ -1,0 +1,20 @@
+<div class="info-container-item">
+  <span>{% trans %}Global grade{% endtrans %}</span>
+  <span>{{ display_star(object.grade_global_average) }}</span>
+</div>
+<div class="info-container-item">
+  <span>{% trans %}Utility{% endtrans %}</span>
+  <span>{{ display_star(object.grade_utility_average) }}</span>
+</div>
+<div class="info-container-item">
+  <span>{% trans %}Interest{% endtrans %}</span>
+  <span>{{ display_star(object.grade_interest_average) }}</span>
+</div>
+<div class="info-container-item">
+  <span>{% trans %}Teaching{% endtrans %}</span>
+  <span>{{ display_star(object.grade_teaching_average) }}</span>
+</div>
+<div class="info-container-item">
+  <span>{% trans %}Workload{% endtrans %}</span>
+  <span>{{ display_star(object.grade_work_load_average) }}</span>
+</div>
