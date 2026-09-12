@@ -11,210 +11,269 @@
 {% endblock %}
 
 {% block content %}
-  <div class="pedagogy">
-    <div id="ue_detail">
-      <button onclick='(function(){
-                       // If comes from the guide page, go back with history
-                       if (document.referrer.replace(/\?(.+)/gm,"").endsWith(`{{ url("pedagogy:guide") }}`)){
-                       window.history.back();
-                       return;
-                       }
-                       // Simply goes to the guide page
-                       window.location.href = `{{ url("pedagogy:guide") }}`;
-                       })()' hidden>{% trans %}Back{% endtrans %}</button>
+  <div class="pedagogy" id="ue_detail">
+    <h1>{{ object.code }}</h1>
+    <h2 class="margin-bottom">{{ object.title }}</h2>
+    <div class="ue-infos">
 
-      <h1>{{ object.code }} - {{ object.title }}</h1>
-      <br>
-      <div class="ue-quick-info-container">
-        <div class="hours-cm">
-          <b>{% trans %}CM: {% endtrans %}</b>{{ object.hours_CM }}
-        </div>
-        <div class="hours-td">
-          <b>{% trans %}TD: {% endtrans %}</b>{{ object.hours_TD }}
-        </div>
-        <div class="hours-tp">
-          <b>{% trans %}TP: {% endtrans %}</b>{{ object.hours_TP }}
-        </div>
-        <div class="hours-te">
-          <b>{% trans %}TE: {% endtrans %}</b>{{ object.hours_TE }}
-        </div>
-        <div class="hours-the">
-          <b>{% trans %}THE: {% endtrans %}</b>{{ object.hours_THE }}
-        </div>
-
-        <div class="department">
-          {{ object.department }}
-        </div>
-        <div class="credit-type">
-          {{ object.credit_type }}
-        </div>
-        <div class="semester">
-          {{ object.get_semester_display() }}
-        </div>
-      </div>
-
-      <br>
-
-      <div class="ue-details-container">
-        <div class="grade">
-          <p>{% trans %}Global grade{% endtrans %}</p>
-          <p>{% trans %}Utility{% endtrans %}</p>
-          <p>{% trans %}Interest{% endtrans %}</p>
-          <p>{% trans %}Teaching{% endtrans %}</p>
-          <p>{% trans %}Work load{% endtrans %}</p>
-        </div>
-        <div class="grade-stars">
-          <p>{{ display_star(object.grade_global_average) }}</p>
-          <p>{{ display_star(object.grade_utility_average) }}</p>
-          <p>{{ display_star(object.grade_interest_average) }}</p>
-          <p>{{ display_star(object.grade_teaching_average) }}</p>
-          <p>{{ display_star(object.grade_work_load_average) }}</p>
-        </div>
-        <div class="ue-infos">
-          <p><b>{% trans %}Objectives{% endtrans %}</b></p>
-          <p>{{ object.objectives|markdown }}</p>
-          <p><b>{% trans %}Program{% endtrans %}</b></p>
-          <p>{{ object.program|markdown }}</p>
-          <p><b>{% trans %}Earned skills{% endtrans %}</b></p>
-          <p>{{ object.skills|markdown }}</p>
-          <p><b>{% trans %}Key concepts{% endtrans %}</b></p>
-          <p>{{ object.key_concepts|markdown }}</p>
-          <p><b>{% trans %}UE manager: {% endtrans %}</b>{{ object.manager }}</p>
-        </div>
-      </div>
-
-      <br>
-      {% if object.has_user_already_commented(user) %}
-        <div id="leave_comment_not_allowed">
-          <p>{% trans %}You already posted a comment on this UE. If you want to comment again, please modify or delete your previous comment.{% endtrans %}</p>
-        </div>
-      {% elif user.has_perm("pedagogy.add_uecomment") %}
-        <details class="accordion" id="leave_comment" {% if form.errors %}open{%endif%}>
-          <summary>{% trans %}Leave comment{% endtrans %}</summary>
-          <div class="accordion-content">
-            <form action="{{ url('pedagogy:ue_detail', ue_id=object.id) }}" method="post" enctype="multipart/form-data">
-              {% csrf_token %}
-              <div class="leave-comment-grid-container">
-                <div class="form-stars">
-                  {{ form.non_field_errors() }}
-                  {{ form.author.errors }}
-                  {{ form.ue.errors }}
-
-                  {{ form.author }}
-                  {{ form.ue }}
-
-                  <div class="input-stars">
-                    <label for="{{ form.grade_global.id_for_label }}">{{ form.grade_global.label }} :</label>
-                    {{ form.grade_global.errors }}
-                    {{ form.grade_global }}
-                  </div>
-
-                  <div class="input-stars">
-                    <label for="{{ form.grade_utility.id_for_label }}">{{ form.grade_utility.label }} :</label>
-                    {{ form.grade_utility.errors }}
-                    {{ form.grade_utility }}
-                  </div>
-
-                  <div class="input-stars">
-                    <label for="{{ form.grade_interest.id_for_label }}">{{ form.grade_interest.label }} :</label>
-                    {{ form.grade_interest.errors }}
-                    {{ form.grade_interest }}
-                  </div>
-
-                  <div class="input-stars">
-                    <label for="{{ form.grade_teaching.id_for_label }}">{{ form.grade_teaching.label }} :</label>
-                    {{ form.grade_teaching.errors }}
-                    {{ form.grade_teaching }}
-                  </div>
-
-                  <div class="input-stars">
-                    <label for="{{ form.grade_work_load.id_for_label }}">{{ form.grade_work_load.label }} :</label>
-                    {{ form.grade_work_load.errors }}
-                    {{ form.grade_work_load }}
-                  </div>
-                </div>
-                <div class="form-comment">
-                  <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }} :</label>
-                  {{ form.comment.errors }}
-                  {{ form.comment }}
-                </div>
-              </div>
-              <p><input type="submit" value="{% trans %}Comment{% endtrans %}" /></p>
-            </form>
+      <div class="infos-column">
+        <aside class="info-container">
+          <div class="info-container-item">
+            <div>{% trans %}Category{% endtrans %}</div>
+            <div>{{ object.credit_type }}</div>
           </div>
-        </details>
-      {% endif %}
-      <br>
-
-      {% if comments %}
-        <h2>{% trans %}Comments{% endtrans %}</h2>
-        {% for comment in comments %}
-          <div id="{{ comment.id }}" class="comment-container">
-
-            <div class="grade-block">
-              <div class="grade-type">
-                <p>{% trans %}Global grade{% endtrans %}</p>
-                <p>{% trans %}Utility{% endtrans %}</p>
-                <p>{% trans %}Interest{% endtrans %}</p>
-                <p>{% trans %}Teaching{% endtrans %}</p>
-                <p>{% trans %}Work load{% endtrans %}</p>
-              </div>
-              <div class="grade-stars">
-                <p>{{ display_star(comment.grade_global) }}</p>
-                <p>{{ display_star(comment.grade_utility) }}</p>
-                <p>{{ display_star(comment.grade_interest) }}</p>
-                <p>{{ display_star(comment.grade_teaching) }}</p>
-                <p>{{ display_star(comment.grade_work_load) }}</p>
-              </div>
-              <div class="grade-extension"></div>
-            </div>
-
-            <div class="comment">
-              <div class="anchor">
-                <a href="{{ url('pedagogy:ue_detail', ue_id=ue.id) }}#{{ comment.id }}"><i class="fa fa-paragraph"></i></a>
-              </div>
-              {{ comment.comment|markdown }}
-            </div>
-
-            <div class="info">
-              {% if comment.is_reported %}
-                <p class="status-reported">
-                  {% trans %}This comment has been reported{% endtrans %}
-                </p>
-              {% endif %}
-
-              {% if comment.author_id == user.id or user.has_perm("pedagogy.change_comment") %}
-                <p class="actions">
-                  <a href="{{ url('pedagogy:comment_update', comment_id=comment.id) }}">
-                    {% trans %}Edit{% endtrans %}
-                  </a>
-              {% endif %}
-              {% if comment.author_id == user.id or user.has_perm("pedagogy.delete_comment") %}
-                <a href="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}">
-                  {% trans %}Delete{% endtrans %}
-                </a>
-                </p>
-              {% endif %}
-            </div>
-
-            <div class="comment-end-bar">
-              <div class="report">
-                <p>
-                  <a href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}">
-                    {% trans %}Report this comment{% endtrans %}
-                  </a>
-                </p>
-              </div>
-
-              <div class="date"><p>{{ comment.publish_date.strftime('%d/%m/%Y') }}</p></div>
-
-              <div class="author"><p>{{ user_profile_link(comment.author) }}</p></div>
-            </div>
-
+          <div class="info-container-item">
+            <div>{% trans %}Credits{% endtrans %}</div>
+            <div>{{ object.credits }}</div>
           </div>
-        {% endfor %}
-      {% endif %}
-
+          <hr>
+          <div class="info-container-item">
+            <div>Cours magistraux</div>
+            <div>{{ object.hours_CM }}h</div>
+          </div>
+          <div class="info-container-item">
+            <div>Travaux dirigés</div>
+            <div>{{ object.hours_TD }}h</div>
+          </div>
+          <div class="info-container-item">
+            <div>Travaux pratiques</div>
+            <div>{{ object.hours_TP }}h</div>
+          </div>
+          <div class="info-container-item">
+            <div>Travail hors encadrement</div>
+            <div>{{ object.hours_THE }}h</div>
+          </div>
+          <div class="info-container-item">
+            <div>Cours magistraux</div>
+            <div>{{ object.hours_TE }}h</div>
+          </div>
+          <hr>
+          <div class="info-container-item">
+            <div>{% trans %}Availability{% endtrans %}</div>
+            <div>{{ object.get_semester_display() }}</div>
+          </div>
+          <hr>
+          <div class="info-container-item">
+            <div>{% trans %}Manager{% endtrans %}</div>
+            <div>{{ object.manager }}</div>
+          </div>
+        </aside>
+        <aside class="info-container">
+          <div class="info-container-item">
+            <span>{% trans %}Global grade{% endtrans %}</span>
+            <span>{{ display_star(object.grade_global_average) }}</span>
+          </div>
+          <div class="info-container-item">
+            <span>{% trans %}Utility{% endtrans %}</span>
+            <span>{{ display_star(object.grade_utility_average) }}</span>
+          </div>
+          <div class="info-container-item">
+            <span>{% trans %}Interest{% endtrans %}</span>
+            <span>{{ display_star(object.grade_interest_average) }}</span>
+          </div>
+          <div class="info-container-item">
+            <span>{% trans %}Teaching{% endtrans %}</span>
+            <span>{{ display_star(object.grade_teaching_average) }}</span>
+          </div>
+          <div class="info-container-item">
+            <span>{% trans %}Workload{% endtrans %}</span>
+            <span>{{ display_star(object.grade_work_load_average) }}</span>
+          </div>
+        </aside>
+      </div>
+      <main class="ue-main-infos">
+        <h3>{% trans %}Objectives{% endtrans %}</h3>
+        <p>{{ object.objectives|markdown }}</p>
+        <h3>{% trans %}Program{% endtrans %}</h3>
+        <p>{{ object.program|markdown }}</p>
+        <h3>{% trans %}Earned skills{% endtrans %}</h3>
+        <p>{{ object.skills|markdown }}</p>
+        <h3>{% trans %}Key concepts{% endtrans %}</h3>
+        <p>{{ object.key_concepts|markdown }}</p>
+      </main>
     </div>
+
+    <br>
+    {% if object.has_user_already_commented(user) %}
+      <div id="leave_comment_not_allowed">
+        <em>
+          {% trans trimmed %}
+            You already posted a comment on this UE.
+            If you want to comment again, please modify or delete your previous comment.
+          {% endtrans %}
+        </em>
+      </div>
+    {% elif user.has_perm("pedagogy.add_uecomment") %}
+      <details class="accordion" id="leave_comment" {% if form.errors %}open{%endif%}>
+        <summary>{% trans %}Leave comment{% endtrans %}</summary>
+        <form
+          class="accordion-content"
+          action="{{ url('pedagogy:ue_detail', ue_id=object.id) }}"
+          method="post"
+          enctype="multipart/form-data"
+        >
+          {% csrf_token %}
+          {{ form.non_field_errors() }}
+          {{ form.author.errors }}
+          {{ form.ue.errors }}
+
+          {{ form.author }}
+          {{ form.ue }}
+          <div class="comment-form-content">
+            <div class="form-stars">
+              <div>
+                <label for="{{ form.grade_global.id_for_label }}">{{ form.grade_global.label }} :</label>
+                {{ form.grade_global.errors }}
+                {{ form.grade_global }}
+              </div>
+              <div>
+                <label for="{{ form.grade_utility.id_for_label }}">{{ form.grade_utility.label }} :</label>
+                {{ form.grade_utility.errors }}
+                {{ form.grade_utility }}
+              </div>
+              <div>
+                <label for="{{ form.grade_interest.id_for_label }}">{{ form.grade_interest.label }} :</label>
+                {{ form.grade_interest.errors }}
+                {{ form.grade_interest }}
+              </div>
+              <div>
+                <label for="{{ form.grade_teaching.id_for_label }}">{{ form.grade_teaching.label }} :</label>
+                {{ form.grade_teaching.errors }}
+                {{ form.grade_teaching }}
+              </div>
+              <div>
+                <label for="{{ form.grade_work_load.id_for_label }}">{{ form.grade_work_load.label }} :</label>
+                {{ form.grade_work_load.errors }}
+                {{ form.grade_work_load }}
+              </div>
+            </div>
+            <div class="form-comment">
+              <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }} :</label>
+              {{ form.comment.errors }}
+              {{ form.comment }}
+            </div>
+          </div>
+          <p><input type="submit" class="btn btn-blue"/></p>
+        </form>
+      </details>
+    {% endif %}
+    <br>
+
+    {% if comments %}
+      <h2>{% trans %}Comments{% endtrans %}</h2>
+      {% for comment in comments %}
+        <article
+          id="comment_{{ comment.id }}"
+          class="comment {% if comment.is_reported %}reported{% endif %}"
+        >
+          {% if comment.is_reported %}
+            <div class="alert alert-red">
+              <div class="alert-main">
+                <h5 class="alert-title margin-bottom">
+                  {% trans %}This comment has been reported{% endtrans %}
+                </h5>
+                <p>{% trans %}It will be hidden until moderated.{% endtrans %}</p>
+                {% if user.has_perm("pedagogy.view_uecommentreport") %}
+                  {% for report in comment.reports.all() %}
+                    <div class="markdown margin-bottom">
+                      <blockquote>
+                        <em>{{ report.reporter.get_display_name() }}</em>
+                        {{ report.reason|markdown }}
+                      </blockquote>
+                    </div>
+                  {% endfor %}
+                {% endif %}
+              </div>
+              {% if user.has_perm("pedagogy.delete_uecomment") %}
+                <div class="alert-aside">
+                  <a
+                    href="{{ url("pedagogy:comment_delete", comment_id=comment.id) }}"
+                    class="btn btn-red"
+                  >
+                    <i class="fa fa-trash"></i>{% trans %}Delete{% endtrans %}
+                  </a>
+                  <a href="{{ url("pedagogy:moderation") }}" class="btn btn-green">
+                    <i class="fa fa-check"></i>{% trans %}Moderate{% endtrans %}
+                  </a>
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+          <div class="comment-header">
+            <img
+              {% if comment.author.avatar_pict %}
+                src="{{ comment.author.avatar_pict.get_download_url() }}"
+              {% elif comment.author.profile_pict %}
+                src="{{ comment.author.profile_pict.get_download_url() }}"
+              {% else %}
+                src="{{ static("core/img/unknown.jpg") }}"
+              {% endif %}
+              alt="{% trans %}Profile{% endtrans %}"
+            />
+            <div class="comment-metadata">
+              <a href="{{ comment.author.get_absolute_url() }}">
+                <strong>{{ comment.author.get_display_name() }}</strong>
+              </a>
+              <span>
+                {{ comment.publish_date|localtime|date(DATETIME_FORMAT) }}
+                {{ comment.publish_date|localtime|time(DATETIME_FORMAT) }}
+              </span>
+            </div>
+            <div class="comment-options">
+              {% if user.can_edit(comment) %}
+                <a
+                  href="{{ url("pedagogy:comment_update", comment_id=comment.id) }}"
+                  tooltip="{% trans %}Edit{% endtrans %}"
+                >
+                  <i class="fa fa-pencil edit-action"></i>
+                </a>
+              {% endif %}
+              {% if not comment.is_reported %}
+                <a
+                  href="{{ url('pedagogy:comment_report', comment_id=comment.id) }}"
+                  tooltip="{% trans %}Report{% endtrans %}"
+                >
+                  <i class="fa fa-exclamation delete-action"></i>
+                </a>
+              {% endif %}
+              {% if user.has_perm("pedagogy.delete_uecomment") %}
+                <a
+                  href="{{ url("pedagogy:comment_delete", comment_id=comment.id) }}"
+                  tooltip="{% trans %}Delete{% endtrans %}"
+                >
+                  <i class="fa fa-trash-can delete-action"></i>
+                </a>
+              {% endif %}
+            </div>
+          </div>
+          <div class="comment-stars">
+            <div>
+              <span>{% trans %}Global grade{% endtrans %}</span>
+              <span>{{ display_star(comment.grade_global) }}</span>
+            </div>
+            <div>
+              <span>{% trans %}Utility{% endtrans %}</span>
+              <span>{{ display_star(comment.grade_utility) }}</span>
+            </div>
+            <div>
+              <span>{% trans %}Interest{% endtrans %}</span>
+              <span>{{ display_star(comment.grade_interest) }}</span>
+            </div>
+            <div>
+              <span>{% trans %}Teaching{% endtrans %}</span>
+              <span>{{ display_star(comment.grade_teaching) }}</span>
+            </div>
+            <div>
+              <span>{% trans %}Workload{% endtrans %}</span>
+              <span>{{ display_star(comment.grade_work_load) }}</span>
+            </div>
+          </div>
+
+          <div class="comment-content">
+            {{ comment.comment|markdown }}
+          </div>
+        </article>
+      {% endfor %}
+    {% endif %}
   </div>
 {% endblock %}
