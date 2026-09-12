@@ -1,0 +1,31 @@
+<form
+  class="report-form"
+  hx-post="{{ request.get_full_path() }}"
+  hx-target="this"
+  hx-swap="outerHTML"
+  hx-disable="button input[type='submit']"
+  hx-trigger="submit"
+>
+  {% csrf_token %}
+  {{ form.non_field_errors() }}
+  {{ form.reason.errors }}
+  {{ form.reason }}
+
+  {# Hidden fields #}
+  {{ form.reporter }}
+  {{ form.comment }}
+
+  <div class="buttons">
+    <button
+      class="btn btn-red left"
+      hx-get="{{ ue_detail_url }}"
+      hx-target="closest form"
+      hx-swap="outerHTML"
+    >
+      {% trans %}Cancel{% endtrans %}
+    </button>
+
+    <input class="btn btn-green" type="submit" value="{% trans %}Report{% endtrans %}" />
+
+  </div>
+</form>

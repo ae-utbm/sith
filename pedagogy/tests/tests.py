@@ -27,7 +27,6 @@ from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.test import Client, TestCase
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
@@ -278,13 +277,17 @@ class TestUEUpdate(TestCase):
 # UEComment class tests
 
 
-def create_ue_comment_template(user_id, ue_code="PA00", exclude_list=None):
+def create_ue_comment_template(
+    user_id: int,
+    ue: int | str = "PA00",
+    exclude_list: list[str] | None = None,
+):
     """Factory to help UEComment creation/update in post requests."""
     if exclude_list is None:
         exclude_list = []
     comment = {
         "author": user_id,
-        "ue": UE.objects.get(code=ue_code).id,
+        "ue": UE.objects.get(code=ue).id if isinstance(ue, str) else ue,
         "grade_global": 4,
         "grade_utility": 4,
         "grade_interest": 4,
@@ -297,12 +300,105 @@ def create_ue_comment_template(user_id, ue_code="PA00", exclude_list=None):
     return comment
 
 
-class TestUVCommentCreationAndDisplay(TestCase):
-    """Test UEComment creation and its display.
+class TestUVCommentDisplay(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.admin = baker.make(User, is_superuser=True)
+        cls.ue = baker.make(UE)
+        cls.ue_url = reverse("pedagogy:ue_detail", kwargs={"ue_id": cls.ue.id})
+        cls.pedagogy_admin = baker.make(
+            User,
+            user_permissions=[
+                Permission.objects.get(codename="view_ue"),
+                Permission.objects.get(codename="view_uecomment"),
+                Permission.objects.get(codename="view_uecommentreport"),
+            ],
+        )
+        cls.subscriber = subscriber_user.make()
+        comments = baker.make(UEComment, ue=cls.ue, _quantity=10)
+        baker.make(
+            UECommentReport,
+            comment=iter(comments[5:]),
+            _quantity=len(comments[5:]),
+            _bulk_create=True,
+        )
 
-    Display and creation are the same view.
-    """
+    def test_access_succses(self):
+        self.client.force_login(self.admin)
+        assert self.client.get(self.ue_url).status_code == 200
 
+        self.client.force_login(self.pedagogy_admin)
+        assert self.client.get(self.ue_url).status_code == 200
+
+        self.client.force_login(self.subscriber)
+        assert self.client.get(self.ue_url).status_code == 200
+
+    def test_access_fail(self):
+        # Anonymous user
+        assertRedirects(
+            self.client.get(self.ue_url),
+            reverse("core:login", query={"next": self.ue_url}),
+        )
+
+        # Unauthorized user
+        self.client.force_login(baker.make(User))
+        assert self.client.get(self.ue_url).status_code == 403
+
+    def test_access_not_found(self):
+        self.client.force_login(self.admin)
+        res = self.client.get(
+            reverse("pedagogy:ue_detail", kwargs={"ue_id": UE.objects.last().id + 1})
+        )
+        assert res.status_code == 404
+
+    def test_comments_normal_user(self):
+        # Normal user only see
+        # * Unreported comments
+        # * Comments that he wrote but were reported
+        # * Comments that he himself reported
+
+        self.client.force_login(self.subscriber)
+        comments = self.client.get(self.ue_url).context_data.get("comments", [])
+        assert len(comments) == 5
+        assert all(not comment.reports.exists() for comment in comments)
+
+        # Make user comment
+        user_comment = baker.make(UEComment, ue=self.ue, author=self.subscriber)
+        comments = self.client.get(self.ue_url).context_data.get("comments", [])
+        assert len(comments) == 6
+        assert all(not comment.reports.exists() for comment in comments)
+        assert user_comment in comments
+
+        # Report user comment
+        baker.make(UECommentReport, comment=user_comment)
+        comments = self.client.get(self.ue_url).context_data.get("comments", [])
+        assert len(comments) == 6
+        assert not all(not comment.reports.exists() for comment in comments)
+        assert user_comment in comments
+
+        # Report someone's else comment
+        comment_reported_by_user = baker.make(UEComment, ue=self.ue)
+        baker.make(
+            UECommentReport, comment=comment_reported_by_user, reporter=self.subscriber
+        )
+        comments = self.client.get(self.ue_url).context_data.get("comments", [])
+        assert len(comments) == 7
+        assert comment_reported_by_user in comments
+
+    def test_comments_pedagogy_admin(self):
+        # Pedagogy admin sees everything
+        self.client.force_login(self.pedagogy_admin)
+        comments = self.client.get(self.ue_url).context_data.get("comments", [])
+        assert len(comments) == 10
+
+    def test_comments_admin(self):
+        # Admin sees everything
+        self.client.force_login(self.admin)
+        comments = self.client.get(self.ue_url).context_data.get("comments", [])
+        assert len(comments) == 10
+
+
+class TestUECommentCreation(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.bibou = User.objects.get(username="root")
@@ -311,11 +407,14 @@ class TestUVCommentCreationAndDisplay(TestCase):
         cls.guy = User.objects.get(username="guy")
         cls.ue = UE.objects.get(code="PA00")
         cls.ue_url = reverse("pedagogy:ue_detail", kwargs={"ue_id": cls.ue.id})
+        cls.comment_create_url = reverse(
+            "pedagogy:comment_create", kwargs={"ue_id": cls.ue.id}
+        )
 
     def test_create_ue_comment_admin_success(self):
         self.client.force_login(self.bibou)
         response = self.client.post(
-            self.ue_url, create_ue_comment_template(self.bibou.id)
+            self.comment_create_url, create_ue_comment_template(self.bibou.id)
         )
         assertRedirects(response, self.ue_url)
         response = self.client.get(self.ue_url)
@@ -324,7 +423,7 @@ class TestUVCommentCreationAndDisplay(TestCase):
     def test_create_ue_comment_pedagogy_admin_success(self):
         self.client.force_login(self.tutu)
         response = self.client.post(
-            self.ue_url, create_ue_comment_template(self.tutu.id)
+            self.comment_create_url, create_ue_comment_template(self.tutu.id)
         )
         self.assertRedirects(response, self.ue_url)
         response = self.client.get(self.ue_url)
@@ -333,7 +432,7 @@ class TestUVCommentCreationAndDisplay(TestCase):
     def test_create_ue_comment_subscriber_success(self):
         self.client.force_login(self.sli)
         response = self.client.post(
-            self.ue_url, create_ue_comment_template(self.sli.id)
+            self.comment_create_url, create_ue_comment_template(self.sli.id)
         )
         self.assertRedirects(response, self.ue_url)
         response = self.client.get(self.ue_url)
@@ -342,7 +441,7 @@ class TestUVCommentCreationAndDisplay(TestCase):
     def test_create_ue_empty_comment_fail(self):
         self.client.force_login(self.tutu)
         response = self.client.post(
-            self.ue_url,
+            self.comment_create_url,
             {
                 "author": self.tutu.id,
                 "ue": UE.objects.get(code="PA00").id,
@@ -360,24 +459,40 @@ class TestUVCommentCreationAndDisplay(TestCase):
     def test_create_ue_comment_unauthorized_fail(self):
         nb_comments = self.ue.comments.count()
         # Test with anonymous user
-        response = self.client.post(self.ue_url, create_ue_comment_template(0))
-        assertRedirects(response, reverse("core:login", query={"next": self.ue_url}))
+        response = self.client.post(
+            self.comment_create_url, create_ue_comment_template(0)
+        )
+        assertRedirects(
+            response, reverse("core:login", query={"next": self.comment_create_url})
+        )
 
         # Test with non subscribed user
         self.client.force_login(self.guy)
         response = self.client.post(
-            self.ue_url, create_ue_comment_template(self.guy.id)
+            self.comment_create_url, create_ue_comment_template(self.guy.id)
         )
         assert response.status_code == 403
 
         # Check that no comment has been created
         assert self.ue.comments.count() == nb_comments
 
+    def test_create_ue_comment_ue_not_exist_fails(self):
+        self.client.force_login(self.bibou)
+        not_existing_id = UE.objects.all().last().id + 1
+        response = self.client.post(
+            reverse("pedagogy:comment_create", kwargs={"ue_id": not_existing_id}),
+            create_ue_comment_template(
+                self.bibou.id,
+                ue=not_existing_id,
+            ),
+        )
+        assert response.status_code == 404
+
     def test_create_ue_comment_bad_form_fail(self):
         nb_comments = self.ue.comments.count()
         self.client.force_login(self.bibou)
         response = self.client.post(
-            self.ue_url,
+            self.comment_create_url,
             create_ue_comment_template(self.bibou.id, exclude_list=["grade_global"]),
         )
 
@@ -385,45 +500,55 @@ class TestUVCommentCreationAndDisplay(TestCase):
         assert self.ue.comments.count() == nb_comments
 
     def test_create_ue_comment_twice_fail(self):
-        # Checks that the has_user_already_commented method works proprely
+        # Checks that the has_user_already_commented method works properly
         assert not self.ue.has_user_already_commented(self.bibou)
 
         # Create a first comment
         self.client.force_login(self.bibou)
-        self.client.post(self.ue_url, create_ue_comment_template(self.bibou.id))
+        self.client.post(
+            self.comment_create_url, create_ue_comment_template(self.bibou.id)
+        )
 
-        # Checks that the has_user_already_commented method works proprely
+        # Checks that the has_user_already_commented method works properly
         assert self.ue.has_user_already_commented(self.bibou)
 
         # Create the second comment
         comment = create_ue_comment_template(self.bibou.id)
         comment["comment"] = "Twice"
-        response = self.client.post(self.ue_url, comment)
-        assert response.status_code == 200
+        response = self.client.post(self.comment_create_url, comment)
+        assert response.status_code == 403
         assert UEComment.objects.filter(comment__contains="Superbe UE").exists()
         assert not UEComment.objects.filter(comment__contains="Twice").exists()
-        self.assertContains(
-            response,
-            _(
-                "You already posted a comment on this UE. "
-                "If you want to comment again, "
-                "please modify or delete your previous comment."
-            ),
-        )
+
+    def test_create_ue_comment_wrong_args(self):
+        self.client.force_login(self.bibou)
 
         # Ensure that there is no crash when no ue or no author is given
-        self.client.post(
-            self.ue_url, create_ue_comment_template(self.bibou.id, exclude_list=["ue"])
+        response = self.client.post(
+            self.comment_create_url,
+            create_ue_comment_template(self.bibou.id, exclude_list=["ue"]),
         )
         assert response.status_code == 200
-        self.client.post(
-            self.ue_url,
+        assert not self.ue.has_user_already_commented(self.bibou)
+
+        response = self.client.post(
+            self.comment_create_url,
             create_ue_comment_template(self.bibou.id, exclude_list=["author"]),
         )
         assert response.status_code == 200
+        assert not self.ue.has_user_already_commented(self.bibou)
+
+        # Ensure that we can't push the wrong UE id
+        other_ue = baker.make(UE)
+        response = self.client.post(
+            self.comment_create_url,
+            create_ue_comment_template(self.bibou.id, ue=other_ue.id),
+        )
+        assert response.status_code == 200
+        assert not self.ue.has_user_already_commented(self.bibou)
 
 
-class TestUVCommentDelete(TestCase):
+class TestUECommentDelete(TestCase):
     """Test UEComment deletion rights."""
 
     @classmethod
@@ -462,7 +587,7 @@ class TestUVCommentDelete(TestCase):
         assert UEComment.objects.filter(id=self.comment.id).exists()
 
 
-class TestUVCommentUpdate(TestCase):
+class TestUECommentUpdate(TestCase):
     """Test UEComment update rights."""
 
     @classmethod
@@ -536,7 +661,7 @@ class TestUVCommentUpdate(TestCase):
         self.assertEqual(self.comment.author, self.krophil)
 
 
-class TestUVModerationForm(TestCase):
+class TestUEModerationForm(TestCase):
     """Assert access rights and if the form works well."""
 
     @classmethod
@@ -750,7 +875,7 @@ class TestUVModerationForm(TestCase):
         assert UEComment.objects.filter(id=self.comment_2.id).exists()
 
 
-class TestUVCommentReportCreate(TestCase):
+class TestUECommentReportCreate(TestCase):
     """Test report creation view.
 
     Assert access rights and if you can create with it.
