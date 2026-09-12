@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 13:16+0200\n"
+"POT-Creation-Date: 2026-10-02 12:56+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -832,7 +832,7 @@ msgstr "Méthode de paiement"
 #: counter/templates/counter/last_ops.jinja
 #: election/templates/election/election_detail.jinja
 #: forum/templates/forum/macros.jinja
-#: pedagogy/templates/pedagogy/fragments/ue_details/comments.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
 #: pedagogy/templates/pedagogy/guide.jinja sas/templates/sas/album.jinja
 #: sas/templates/sas/moderation.jinja sas/templates/sas/picture.jinja
 #: trombi/templates/trombi/detail.jinja
@@ -1028,7 +1028,7 @@ msgstr "Outils"
 #: counter/templates/counter/counter_list.jinja
 #: election/templates/election/election_detail.jinja
 #: forum/templates/forum/macros.jinja
-#: pedagogy/templates/pedagogy/fragments/ue_details/comments.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
 #: pedagogy/templates/pedagogy/guide.jinja sas/templates/sas/album.jinja
 #: trombi/templates/trombi/detail.jinja
 #: trombi/templates/trombi/edit_profile.jinja
@@ -1285,8 +1285,9 @@ msgstr "Actions"
 
 #: com/templates/com/mailing_admin.jinja com/templates/com/poster_list.jinja
 #: core/templates/core/file_detail.jinja
-#: core/templates/core/file_moderation.jinja sas/templates/sas/moderation.jinja
-#: sas/templates/sas/picture.jinja
+#: core/templates/core/file_moderation.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
+#: sas/templates/sas/moderation.jinja sas/templates/sas/picture.jinja
 msgid "Moderate"
 msgstr "Modérer"
 
@@ -1588,7 +1589,6 @@ msgstr "Descendre"
 
 #: com/templates/com/weekmail_preview.jinja
 #: core/templates/core/user_account_detail.jinja
-#: pedagogy/templates/pedagogy/ue_detail.jinja
 #: trombi/templates/trombi/comment_moderation.jinja
 #: trombi/templates/trombi/export.jinja
 msgid "Back"
@@ -1933,8 +1933,8 @@ msgstr ""
 "toujours le voir."
 
 #: core/models.py
-msgid "ToS approved"
-msgstr "CGU approuvées"
+msgid "ToS approved at"
+msgstr "CGU approuvées le"
 
 #: core/models.py
 msgid "A user with that username already exists"
@@ -1943,7 +1943,9 @@ msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 #: core/models.py core/templates/core/macros.jinja
 #: core/templates/core/user_detail.jinja core/templates/core/user_edit.jinja
 #: election/templates/election/election_detail.jinja
-#: forum/templates/forum/macros.jinja trombi/templates/trombi/user_tools.jinja
+#: forum/templates/forum/macros.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
+#: trombi/templates/trombi/user_tools.jinja
 msgid "Profile"
 msgstr "Profil"
 
@@ -2374,7 +2376,6 @@ msgstr "Propriétés"
 
 #: core/templates/core/file_delete_confirm.jinja
 #: counter/templates/counter/fragments/delete_student_card.jinja
-#: pedagogy/templates/pedagogy/fragments/ue_details/comments.jinja
 #, python-format
 msgid "Are you sure you want to delete \"%(obj)s\"?"
 msgstr "Êtes-vous sûr de vouloir supprimer \"%(obj)s\" ?"
@@ -3907,7 +3908,6 @@ msgid "Emptied"
 msgstr "Coffre vidé"
 
 #: counter/templates/counter/cash_summary_list.jinja counter/views/cash.py
-#: pedagogy/templates/pedagogy/fragments/ue_comment_form.jinja
 #: pedagogy/templates/pedagogy/moderation.jinja
 #: trombi/templates/trombi/comment.jinja
 #: trombi/templates/trombi/user_tools.jinja
@@ -5239,6 +5239,7 @@ msgid "reporter"
 msgstr "signalant"
 
 #: pedagogy/templates/pedagogy/fragments/comment_report.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
 msgid "Report"
 msgstr "Signaler"
 
@@ -5246,71 +5247,52 @@ msgstr "Signaler"
 msgid "Leave comment"
 msgstr "Laisser un commentaire"
 
-#: pedagogy/templates/pedagogy/fragments/ue_details/comments.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
 #: trombi/templates/trombi/export.jinja
 msgid "Comments"
 msgstr "Commentaires"
 
-#: pedagogy/templates/pedagogy/fragments/ue_details/comments.jinja
-#: pedagogy/templates/pedagogy/fragments/ue_details/grade.jinja
-msgid "Global grade"
-msgstr "Note globale"
-
-#: pedagogy/templates/pedagogy/fragments/ue_details/comments.jinja
-#: pedagogy/templates/pedagogy/fragments/ue_details/grade.jinja
-msgid "Utility"
-msgstr "Utilité"
-
-#: pedagogy/templates/pedagogy/fragments/ue_details/comments.jinja
-#: pedagogy/templates/pedagogy/fragments/ue_details/grade.jinja
-msgid "Interest"
-msgstr "Intérêt"
-
-#: pedagogy/templates/pedagogy/fragments/ue_details/comments.jinja
-#: pedagogy/templates/pedagogy/fragments/ue_details/grade.jinja
-msgid "Teaching"
-msgstr "Enseignement"
-
-#: pedagogy/templates/pedagogy/fragments/ue_details/comments.jinja
-#: pedagogy/templates/pedagogy/fragments/ue_details/grade.jinja
-msgid "Work load"
-msgstr "Charge de travail"
-
-#: pedagogy/templates/pedagogy/fragments/ue_details/comments.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
 msgid "This comment has been reported"
 msgstr "Ce commentaire a été signalé"
 
-#: pedagogy/templates/pedagogy/fragments/ue_details/comments.jinja
-msgid "Report this comment"
-msgstr "Signaler ce commentaire"
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
+msgid "It will be hidden until moderated."
+msgstr "Il sera caché tant qu'il ne sera pas modéré."
 
-#: pedagogy/templates/pedagogy/fragments/ue_details/form.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/grade.jinja
+msgid "Global grade"
+msgstr "Note globale"
+
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/grade.jinja
+msgid "Utility"
+msgstr "Utilité"
+
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/grade.jinja
+msgid "Interest"
+msgstr "Intérêt"
+
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/grade.jinja
+msgid "Teaching"
+msgstr "Enseignement"
+
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/grade.jinja
+msgid "Workload"
+msgstr "Charge de travail"
+
+#: pedagogy/templates/pedagogy/fragments/ue_detail/ue_detail.jinja
+#: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid ""
 "You already posted a comment on this UE. If you want to comment again, "
 "please modify or delete your previous comment."
 msgstr ""
 "Vous avez déjà commenté cette UE. Si vous voulez de nouveau commenter, "
 "veuillez modifier ou supprimer votre commentaire précédent."
-
-#: pedagogy/templates/pedagogy/fragments/ue_details/grade.jinja
-msgid "Objectives"
-msgstr "Objectifs"
-
-#: pedagogy/templates/pedagogy/fragments/ue_details/grade.jinja
-msgid "Program"
-msgstr "Programme"
-
-#: pedagogy/templates/pedagogy/fragments/ue_details/grade.jinja
-msgid "Earned skills"
-msgstr "Compétences acquises"
-
-#: pedagogy/templates/pedagogy/fragments/ue_details/grade.jinja
-msgid "Key concepts"
-msgstr "Concepts clefs"
-
-#: pedagogy/templates/pedagogy/fragments/ue_details/grade.jinja
-msgid "UE manager: "
-msgstr "Gestionnaire d'UE : "
 
 #: pedagogy/templates/pedagogy/guide.jinja
 msgid "A guide of courses available at UTBM."
@@ -5377,24 +5359,52 @@ msgid "UE Details"
 msgstr "Détails d'UE"
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja
-msgid "CM: "
-msgstr "CM : "
+msgid "Category"
+msgstr "Catégorie"
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja
-msgid "TD: "
-msgstr "TD : "
+msgid "Credits"
+msgstr "Crédits"
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja
-msgid "TP: "
-msgstr "TP : "
+msgid "Lectures"
+msgstr "Cours magistraux"
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja
-msgid "TE: "
-msgstr "TE : "
+msgid "Tutorials"
+msgstr "Travaux dirigés"
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja
-msgid "THE: "
-msgstr "THE : "
+msgid "Practicals"
+msgstr "Travaux pratiques"
+
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+msgid "Work without supervision"
+msgstr "Travail hors encadrement"
+
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+msgid "Availability"
+msgstr "Disponibilité"
+
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+msgid "Manager"
+msgstr "Responsable"
+
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+msgid "Objectives"
+msgstr "Objectifs"
+
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+msgid "Program"
+msgstr "Programme"
+
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+msgid "Earned skills"
+msgstr "Compétences acquises"
+
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+msgid "Key concepts"
+msgstr "Concepts clefs"
 
 #: pedagogy/templates/pedagogy/ue_edit.jinja
 msgid "Edit UE"
