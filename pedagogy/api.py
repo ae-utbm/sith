@@ -29,14 +29,11 @@ class UeController(ControllerBase):
         response=UeSchema,
     )
     def fetch_from_utbm_api(
-        self,
-        code: str,
-        lang: Query[str] = "fr",
-        year: Query[Annotated[int, Ge(2010)] | None] = None,
+        self, code: str, year: Query[Annotated[int, Ge(2010)] | None] = None
     ):
         """Fetch UE data from the UTBM API and returns it after some parsing."""
         with UtbmApiClient() as client:
-            res = client.find_ue(lang, code, year)
+            res = client.find_ue(code, year)
         if res is None:
             raise NotFound
         return res

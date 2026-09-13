@@ -44,6 +44,10 @@
             x-model.debounce.500ms="search"
           />
         </fieldset>
+        <fieldset>
+          <input type="checkbox" class="switch" x-model="hideClosedUes" id="hide-closed-ues" name="hide-closed-ues">
+          <label for="hide-closed-ues">{% trans %}Hide closed UEs{% endtrans %}</label>
+        </fieldset>
         <div class="row gap-3x margin-bottom radio-guide">
           <fieldset>
             {% set departments = [
