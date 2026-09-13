@@ -106,7 +106,7 @@ class UEDetailView(
                 .annotate_is_reported()
                 .select_related("author")
                 .order_by("-publish_date")
-            ),
+            )
         }
 
 
@@ -135,7 +135,7 @@ class UECommentUpdateView(PermissionOrAuthorRequiredMixin, AllowFragment, Update
         }
 
     def get_success_url(self):
-        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.object.ue.id})
+        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.object.ue_id})
 
 
 class UECommentDeleteView(PermissionOrAuthorRequiredMixin, AllowFragment, DeleteView):
@@ -147,13 +147,8 @@ class UECommentDeleteView(PermissionOrAuthorRequiredMixin, AllowFragment, Delete
     permission_required = "pedagogy.delete_uecomment"
     author_field = "author"
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        response.headers["HX-Trigger"] = "CommentUpdate"
-        return response
-
     def get_success_url(self):
-        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.object.ue.id})
+        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.object.ue_id})
 
 
 class UEGuideView(PermissionRequiredMixin, TemplateView):
@@ -177,7 +172,7 @@ class UECommentReportCreateView(PermissionRequiredMixin, AllowFragment, CreateVi
 
     @cached_property
     def ue_detail_url(self):
-        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.ue_comment.ue.id})
+        return reverse("pedagogy:ue_detail", kwargs={"ue_id": self.ue_comment.ue_id})
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

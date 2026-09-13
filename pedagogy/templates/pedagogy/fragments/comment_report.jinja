@@ -15,9 +15,9 @@
   {{ form.reporter }}
   {{ form.comment }}
 
-  <div class="buttons">
+  <div class="buttons row gap">
     <button
-      class="btn btn-red left"
+      class="btn btn-grey"
       hx-get="{{ ue_detail_url }}"
       hx-target="closest form"
       hx-swap="outerHTML"
@@ -25,7 +25,7 @@
       {% trans %}Cancel{% endtrans %}
     </button>
 
-    <input class="btn btn-green" type="submit" value="{% trans %}Report{% endtrans %}" />
+    <input class="btn btn-blue" type="submit" value="{% trans %}Report{% endtrans %}" />
 
   </div>
 </form>

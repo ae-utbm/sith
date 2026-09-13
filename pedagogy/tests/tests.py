@@ -25,6 +25,7 @@ from typing import Callable
 import pytest
 from django.conf import settings
 from django.contrib.auth.models import Permission
+from django.db.models import Max
 from django.test import Client, TestCase
 from django.urls import reverse
 from model_bakery import baker
@@ -316,10 +317,11 @@ class TestUVCommentDisplay(TestCase):
         )
         cls.subscriber = subscriber_user.make()
         comments = baker.make(UEComment, ue=cls.ue, _quantity=10)
+        cls.unreported, cls.reported = comments[:5], comments[5:]
         baker.make(
             UECommentReport,
-            comment=iter(comments[5:]),
-            _quantity=len(comments[5:]),
+            comment=iter(cls.reported),
+            _quantity=len(cls.reported),
             _bulk_create=True,
         )
 
@@ -347,7 +349,10 @@ class TestUVCommentDisplay(TestCase):
     def test_access_not_found(self):
         self.client.force_login(self.admin)
         res = self.client.get(
-            reverse("pedagogy:ue_detail", kwargs={"ue_id": UE.objects.last().id + 1})
+            reverse(
+                "pedagogy:ue_detail",
+                kwargs={"ue_id": UE.objects.aggregate(id=Max("id"))["id"] + 1},
+            )
         )
         assert res.status_code == 404
 
@@ -359,22 +364,20 @@ class TestUVCommentDisplay(TestCase):
 
         self.client.force_login(self.subscriber)
         comments = self.client.get(self.ue_url).context_data.get("comments", [])
-        assert len(comments) == 5
-        assert all(not comment.reports.exists() for comment in comments)
+        assert len(comments) == len(self.unreported)
+        assert set(comments) == set(self.unreported)
 
         # Make user comment
         user_comment = baker.make(UEComment, ue=self.ue, author=self.subscriber)
         comments = self.client.get(self.ue_url).context_data.get("comments", [])
-        assert len(comments) == 6
-        assert all(not comment.reports.exists() for comment in comments)
-        assert user_comment in comments
+        assert len(comments) == len(self.unreported) + 1
+        assert set(comments) == {*self.unreported, user_comment}
 
         # Report user comment
         baker.make(UECommentReport, comment=user_comment)
         comments = self.client.get(self.ue_url).context_data.get("comments", [])
-        assert len(comments) == 6
-        assert not all(not comment.reports.exists() for comment in comments)
-        assert user_comment in comments
+        assert len(comments) == len(self.unreported) + 1
+        assert set(comments) == {*self.unreported, user_comment}
 
         # Report someone's else comment
         comment_reported_by_user = baker.make(UEComment, ue=self.ue)
@@ -382,8 +385,12 @@ class TestUVCommentDisplay(TestCase):
             UECommentReport, comment=comment_reported_by_user, reporter=self.subscriber
         )
         comments = self.client.get(self.ue_url).context_data.get("comments", [])
-        assert len(comments) == 7
-        assert comment_reported_by_user in comments
+        assert len(comments) == len(self.unreported) + 2
+        assert set(comments) == {
+            *self.unreported,
+            user_comment,
+            comment_reported_by_user,
+        }
 
     def test_comments_pedagogy_admin(self):
         # Pedagogy admin sees everything
@@ -478,7 +485,7 @@ class TestUECommentCreation(TestCase):
 
     def test_create_ue_comment_ue_not_exist_fails(self):
         self.client.force_login(self.bibou)
-        not_existing_id = UE.objects.all().last().id + 1
+        not_existing_id = UE.objects.aggregate(id=Max("id"))["id"] + 1
         response = self.client.post(
             reverse("pedagogy:comment_create", kwargs={"ue_id": not_existing_id}),
             create_ue_comment_template(
