@@ -69,6 +69,7 @@ $pedagogy-white-text: #f0f0f0;
       input[type="checkbox"] {
         display: none;
       }
+
       margin-top: 10px;
       margin-bottom: 0;
       color: white;
@@ -128,14 +129,14 @@ $pedagogy-white-text: #f0f0f0;
       grid-area: hours-the;
     }
 
-    #leave_comment_not_allowed {
+    .leave-comment-not-allowed {
       p {
         text-align: center;
         color: red;
       }
     }
 
-    #leave_comment {
+    .leave-comment {
       .leave-comment-grid-container {
         display: grid;
         grid-template-columns: 270px auto;
@@ -167,10 +168,6 @@ $pedagogy-white-text: #f0f0f0;
 
       .input-stars {
         margin-top: 20px;
-      }
-
-      input[type="submit"] {
-        float: right;
       }
     }
 
@@ -333,8 +330,9 @@ $pedagogy-white-text: #f0f0f0;
           padding-left: 10px;
         }
 
-        .actions {
+        .action {
           float: right;
+          margin-top: 0;
         }
       }
 
@@ -402,6 +400,7 @@ $pedagogy-white-text: #f0f0f0;
 
           a {
             color: $pedagogy-white-text;
+            cursor: pointer;
           }
 
           a:hover {
@@ -443,4 +442,10 @@ details.accordion>.accordion-content {
   background-color: $white-color;
   border-color: $pedagogy-orange;
   border-right: none;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
