@@ -190,6 +190,7 @@ class UeFilterSchema(FilterSchema):
         return Q(semester__in=value)
 
     def filter_is_open(self, value: bool | None) -> Q:  # noqa: FBT001
+        """Filter by open/closed status."""
         if value is None:
             return Q()
         if not value:
