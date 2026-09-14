@@ -11,44 +11,39 @@
     hx-disabled-elt="find input[type='submit']"
   >
     {% csrf_token %}
-    <div class="leave-comment-grid-container">
+    {{ form.non_field_errors() }}
+    {{ form.author.errors }}
+    {{ form.ue.errors }}
+
+    {{ form.author }}
+    {{ form.ue }}
+    <div class="comment-form-content">
       <div class="form-stars">
-        {{ form.non_field_errors() }}
-        {{ form.author.errors }}
-        {{ form.ue.errors }}
-
-        {{ form.author }}
-        {{ form.ue }}
-
-        <div class="input-stars">
-          <label for="{{ form.grade_global.id_for_label }}">{{ form.grade_global.label }} :</label>
+        <fieldset>
+          <legend>{{ form.grade_global.label }} :</legend>
           {{ form.grade_global.errors }}
           {{ form.grade_global }}
-        </div>
-
-        <div class="input-stars">
-          <label for="{{ form.grade_utility.id_for_label }}">{{ form.grade_utility.label }} :</label>
+        </fieldset>
+        <fieldset>
+          <legend>{{ form.grade_utility.label }} :</legend>
           {{ form.grade_utility.errors }}
           {{ form.grade_utility }}
-        </div>
-
-        <div class="input-stars">
-          <label for="{{ form.grade_interest.id_for_label }}">{{ form.grade_interest.label }} :</label>
+        </fieldset>
+        <fieldset>
+          <legend>{{ form.grade_interest.label }} :</legend>
           {{ form.grade_interest.errors }}
           {{ form.grade_interest }}
-        </div>
-
-        <div class="input-stars">
-          <label for="{{ form.grade_teaching.id_for_label }}">{{ form.grade_teaching.label }} :</label>
+        </fieldset>
+        <fieldset>
+          <legend>{{ form.grade_teaching.label }} :</legend>
           {{ form.grade_teaching.errors }}
           {{ form.grade_teaching }}
-        </div>
-
-        <div class="input-stars">
-          <label for="{{ form.grade_work_load.id_for_label }}">{{ form.grade_work_load.label }} :</label>
+        </fieldset>
+        <fieldset>
+          <legend>{{ form.grade_work_load.label }} :</legend>
           {{ form.grade_work_load.errors }}
           {{ form.grade_work_load }}
-        </div>
+        </fieldset>
       </div>
       <div class="form-comment">
         <label for="{{ form.comment.id_for_label }}">{{ form.comment.label }} :</label>
@@ -56,9 +51,7 @@
         {{ form.comment }}
       </div>
     </div>
-    <div class="buttons">
-      <input type="submit" value="{% trans %}Comment{% endtrans %}" />
-    </div>
+    <p><input type="submit" class="btn btn-blue"/></p>
   </form>
 
   {% if form.is_creation %}
