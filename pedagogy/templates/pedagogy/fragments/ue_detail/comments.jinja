@@ -8,83 +8,122 @@
 
 <section>
   {%- for comment in comments -%}
-    <div id="comment-{{ comment.id }}" class="comment-container">
-
-      <div class="grade-block">
-        <div class="grade-type">
-          <p>{% trans %}Global grade{% endtrans %}</p>
-          <p>{% trans %}Utility{% endtrans %}</p>
-          <p>{% trans %}Interest{% endtrans %}</p>
-          <p>{% trans %}Teaching{% endtrans %}</p>
-          <p>{% trans %}Work load{% endtrans %}</p>
+    <article
+      id="comment-{{ comment.id }}"
+      class="comment {% if comment.is_reported %}reported{% endif %}"
+    >
+      {% if comment.is_reported %}
+        <div class="alert alert-red">
+          <div class="alert-main">
+            <h5 class="alert-title margin-bottom">
+              {% trans %}This comment has been reported{% endtrans %}
+            </h5>
+            <p>{% trans %}It will be hidden until moderated.{% endtrans %}</p>
+            {% if user.has_perm("pedagogy.view_uecommentreport") %}
+              {% for report in comment.reports.all() %}
+                <div class="markdown margin-bottom">
+                  <blockquote>
+                    <em>{{ report.reporter.get_display_name() }}</em>
+                    {{ report.reason|markdown }}
+                  </blockquote>
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+          {% if user.has_perm("pedagogy.delete_uecomment") %}
+            <div class="alert-aside">
+              <a
+                href="{{ url("pedagogy:comment_delete", comment_id=comment.id) }}"
+                class="btn btn-red"
+              >
+                <i class="fa fa-trash"></i>{% trans %}Delete{% endtrans %}
+              </a>
+              <a href="{{ url("pedagogy:moderation") }}" class="btn btn-green">
+                <i class="fa fa-check"></i>{% trans %}Moderate{% endtrans %}
+              </a>
+            </div>
+          {% endif %}
         </div>
-        <div class="grade-stars">
-          <p>{{ display_star(comment.grade_global) }}</p>
-          <p>{{ display_star(comment.grade_utility) }}</p>
-          <p>{{ display_star(comment.grade_interest) }}</p>
-          <p>{{ display_star(comment.grade_teaching) }}</p>
-          <p>{{ display_star(comment.grade_work_load) }}</p>
+      {% endif %}
+      <div class="comment-header">
+        <img
+          {% if comment.author.avatar_pict %}
+            src="{{ comment.author.avatar_pict.get_download_url() }}"
+          {% elif comment.author.profile_pict %}
+            src="{{ comment.author.profile_pict.get_download_url() }}"
+          {% else %}
+            src="{{ static("core/img/unknown.jpg") }}"
+          {% endif %}
+          alt="{% trans %}Profile{% endtrans %}"
+        />
+        <div class="comment-metadata">
+          <a href="{{ comment.author.get_absolute_url() }}">
+            <strong>{{ comment.author.get_display_name() }}</strong>
+          </a>
+          <time datetime="{{ comment.publish_date.isoformat(timespec="seconds") }}">
+            {{ comment.publish_date|localtime|date(DATETIME_FORMAT) }}
+            {{ comment.publish_date|localtime|time(DATETIME_FORMAT) }}
+          </time>
         </div>
-        <div class="grade-extension"></div>
-      </div>
-
-      <div class="comment">
-        <div class="anchor">
-          <a href="{{ url('pedagogy:ue_detail', ue_id=ue.id) }}#comment-{{ comment.id }}"><i class="fa fa-paragraph"></i></a>
-        </div>
-        {{ comment.comment|markdown }}
-      </div>
-
-      <div class="info">
-        {% if comment.is_reported %}
-          <p class="status-reported">
-            {% trans %}This comment has been reported{% endtrans %}
-          </p>
-        {% endif %}
-
-        {% if comment.author_id == user.id or user.has_perm("pedagogy.change_comment") %}
-          <button
-            class="btn btn-orange action"
-            hx-get="{{ url('pedagogy:comment_update', comment_id=comment.id) }}"
-            hx-swap="outerHTML"
-            hx-target="#comment-{{ comment.id }}"
-          >
-            <i class="fa fa-pencil"></i> {% trans %}Edit{% endtrans %}
-          </button>
-        {% endif %}
-        {% if comment.author_id == user.id or user.has_perm("pedagogy.delete_comment") %}
-          <form
-            class="action"
-            hx-post="{{ url('pedagogy:comment_delete', comment_id=comment.id) }}"
-            hx-confirm='{% trans obj=object %}Are you sure you want to delete "{{ obj }}"?{% endtrans %}'
-            hx-swap="outerHTML"
-            hx-target="#comment-{{ comment.id }}"
-          >
-            {% csrf_token %}
-            <button class="btn btn-red action">
-              <i class="fa fa-trash-can"></i> {% trans %}Delete{% endtrans %}
-            </button>
-          </form>
-        {% endif %}
-      </div>
-
-      <div class="comment-end-bar">
-        <div class="report">
-          <p>
+        <div class="comment-options">
+          {% if user.can_edit(comment) %}
             <a
+              class="clickable"
+              hx-get="{{ url('pedagogy:comment_update', comment_id=comment.id) }}"
+              hx-swap="outerHTML"
+              hx-target="#comment-{{ comment.id }}"
+              tooltip="{% trans %}Edit{% endtrans %}"
+            >
+              <i class="fa fa-pencil edit-action"></i>
+            </a>
+          {% endif %}
+          {% if not comment.is_reported %}
+            <a
+              class="clickable"
               hx-get="{{ url('pedagogy:comment_report', comment_id=comment.id) }}"
               hx-swap="outerHTML"
               hx-target="#comment-{{ comment.id }}"
+              tooltip="{% trans %}Report{% endtrans %}"
             >
-              {% trans %}Report this comment{% endtrans %}
+              <i class="fa fa-exclamation delete-action"></i>
             </a>
-          </p>
+          {% endif %}
+          {% if user.has_perm("pedagogy.delete_uecomment") %}
+            <a
+              href="{{ url("pedagogy:comment_delete", comment_id=comment.id) }}"
+              tooltip="{% trans %}Delete{% endtrans %}"
+            >
+              <i class="fa fa-trash-can delete-action"></i>
+            </a>
+          {% endif %}
         </div>
-
-        <div class="date"><p>{{ comment.publish_date.strftime('%d/%m/%Y') }}</p></div>
-        <div class="author"><p>{{ user_profile_link(comment.author) }}</p></div>
+      </div>
+      <div class="comment-stars">
+        <div>
+          <span>{% trans %}Global grade{% endtrans %}</span>
+          <span>{{ display_star(comment.grade_global) }}</span>
+        </div>
+        <div>
+          <span>{% trans %}Utility{% endtrans %}</span>
+          <span>{{ display_star(comment.grade_utility) }}</span>
+        </div>
+        <div>
+          <span>{% trans %}Interest{% endtrans %}</span>
+          <span>{{ display_star(comment.grade_interest) }}</span>
+        </div>
+        <div>
+          <span>{% trans %}Teaching{% endtrans %}</span>
+          <span>{{ display_star(comment.grade_teaching) }}</span>
+        </div>
+        <div>
+          <span>{% trans %}Workload{% endtrans %}</span>
+          <span>{{ display_star(comment.grade_work_load) }}</span>
+        </div>
       </div>
 
-    </div>
+      <div class="comment-content">
+        {{ comment.comment|markdown }}
+      </div>
+    </article>
   {%- endfor -%}
 </section>
