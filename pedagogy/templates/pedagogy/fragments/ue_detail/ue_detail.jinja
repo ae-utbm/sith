@@ -1,14 +1,19 @@
 {# A few hx-partials for swapping a few parts of the main ue_detail.jinja #}
 
+{% from "pedagogy/macros.jinja" import display_star %}
+
 <hx-partial id="ue-grade">
   {% include "pedagogy/fragments/ue_detail/grade.jinja" %}
 </hx-partial>
 
 <hx-partial id="comment-form">
   {% if object.has_user_already_commented(user) %}
-    <div class="leave-comment-not-allowed">
-      <p>{% trans %}You already posted a comment on this UE. If you want to comment again, please modify or delete your previous comment.{% endtrans %}</p>
-    </div>
+    <em>
+      {% trans trimmed %}
+        You already posted a comment on this UE.
+        If you want to comment again, please modify or delete your previous comment.
+      {% endtrans %}
+    </em>
     <br>
   {% elif user.has_perm("pedagogy.add_uecomment") %}
     {{ add_comment_form }}
