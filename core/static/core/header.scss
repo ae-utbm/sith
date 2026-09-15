@@ -241,6 +241,8 @@ $background-color-hovered: #283747;
           >.links {
             width: 100%;
             display: flex;
+            flex-direction: row;
+            align-items: center;
             justify-content: flex-end;
             gap: 15px;
 
@@ -266,7 +268,17 @@ $background-color-hovered: #283747;
 
             form#logout-form {
               margin: 0;
-              display: inline;
+              display: inline-flex;
+              align-items: center;
+              
+              button.link-like {
+                padding: 0;
+                margin: 0;
+                background: none;
+                border: none;
+                cursor: pointer;
+                line-height: inherit;
+              }
             }
           }
         }
