@@ -55,6 +55,7 @@ class TestUserRegistration:
             "password2": "plop",
             "captcha_0": "dummy-value",
             "captcha_1": "PASSED",
+            "eula_approved": True,
         }
 
     @pytest.fixture()
@@ -92,6 +93,7 @@ class TestUserRegistration:
             ({"first_name": ""}, "Ce champ est obligatoire."),
             ({"last_name": ""}, "Ce champ est obligatoire."),
             ({"captcha_1": "WRONG_CAPTCHA"}, "CAPTCHA invalide"),
+            ({"eula_approved": "False"}, "Ce champ est obligatoire."),
         ],
     )
     def test_register_user_form_fail(
