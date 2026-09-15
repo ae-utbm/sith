@@ -291,6 +291,7 @@ class User(AbstractUser):
         ),
         blank=True,
     )
+    eula_approved = models.BooleanField(_("EULA approved"), default=False)
     godfathers = models.ManyToManyField("User", related_name="godchildren", blank=True)
 
     objects = CustomUserManager()

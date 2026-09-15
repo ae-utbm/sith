@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                     "Groups that are automatically given or removed "
                     "to user receiving or losing this club role"
                 ),
-                related_name="club_roles",
+                related_name="linked_roles",
                 to="core.group",
                 verbose_name="Linked groups",
             ),

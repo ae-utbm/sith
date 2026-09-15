@@ -6,9 +6,7 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("counter", "0018_producttype_priority"),
-    ]
+    dependencies = [("counter", "0018_producttype_priority")]
 
     operations = [
         migrations.AlterModelOptions(
