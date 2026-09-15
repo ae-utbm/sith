@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-09 07:21+0200\n"
+"POT-Creation-Date: 2026-09-15 23:49+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -1836,6 +1836,10 @@ msgstr ""
 "toujours le voir."
 
 #: core/models.py
+msgid "EULA approved"
+msgstr "CGU approuvées"
+
+#: core/models.py
 msgid "A user with that username already exists"
 msgstr "Un utilisateur de ce nom d'utilisateur existe déjà"
 
@@ -3138,6 +3142,15 @@ msgid "Username, email, or account number"
 msgstr "Nom d'utilisateur, email, ou numéro de compte AE"
 
 #: core/views/forms.py
+#, python-format
+msgid ""
+"I have read and I approve the <a href=\"%(url)s\" target=\"_blank\">End User "
+"License Agreement</a>"
+msgstr ""
+"J'ai lu et j'approuve les <a href=\"%(url)s\" target=\"_blank\">Conditions "
+"Générales d'utilisation</a>"
+
+#: core/views/forms.py
 msgid ""
 "Profile: you need to be visible on the picture, in order to be recognized "
 "(e.g. by the barmen)"
@@ -3778,8 +3791,8 @@ msgid "Emptied"
 msgstr "Coffre vidé"
 
 #: counter/templates/counter/cash_summary_list.jinja counter/views/cash.py
+#: pedagogy/templates/pedagogy/fragments/ue_comment_form.jinja
 #: pedagogy/templates/pedagogy/moderation.jinja
-#: pedagogy/templates/pedagogy/ue_detail.jinja
 #: trombi/templates/trombi/comment.jinja
 #: trombi/templates/trombi/user_tools.jinja
 msgid "Comment"
