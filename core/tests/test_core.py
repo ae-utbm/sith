@@ -55,6 +55,7 @@ class TestUserRegistration:
             "password2": "plop",
             "captcha_0": "dummy-value",
             "captcha_1": "PASSED",
+            "cgu_approved": True,
         }
 
     @pytest.fixture()
@@ -92,6 +93,7 @@ class TestUserRegistration:
             ({"first_name": ""}, "Ce champ est obligatoire."),
             ({"last_name": ""}, "Ce champ est obligatoire."),
             ({"captcha_1": "WRONG_CAPTCHA"}, "CAPTCHA invalide"),
+            ({"cgu_approved": ""}, "Vous devez approuver les conditions générales d'utilisation"),
         ],
     )
     def test_register_user_form_fail(

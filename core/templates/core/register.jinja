@@ -18,7 +18,17 @@
   <form action="{{ url('core:register') }}" method="post">
     {% csrf_token %}
     {% render_honeypot_field %}
-    {{ form.as_p() }}
-    <input type="submit" value="{% trans %}Register{% endtrans %}" />
+    {% for field in form %}
+      {% if field.name not in ["cgu_approved", "captcha"] %}
+        <div>{{ field.as_field_group() }}</div>
+      {% endif %}
+    {% endfor %}
+    <div class="captcha">{{ form.captcha.as_field_group() }}</div>
+    <fieldset>
+      {{ form.cgu_approved.errors }}
+      {{ form.cgu_approved }}
+      {{ form.cgu_approved.label_tag() }}
+    </fieldset>
+    <input type="submit" class="btn btn-blue" value="{% trans %}Register{% endtrans %}" />
   </form>
 {% endblock %}
