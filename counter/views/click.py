@@ -204,7 +204,7 @@ class CounterClick(
             res["student_card_fragment"] = StudentCardFormFragment.as_fragment()(
                 self.request, customer=self.customer
             )
-        if self.object.can_refill():
+        if self.object.can_refill:
             res["refilling_fragment"] = RefillingCreateView.as_fragment()(
                 self.request, customer=self.customer, counter=self.object
             )
@@ -250,7 +250,7 @@ class RefillingCreateView(FragmentMixin, CreateView):
         if not (
             request.barmen
             and request.barmen.issubset(self.counter.barmen_list)
-            and self.counter.can_refill()
+            and self.counter.can_refill
         ):
             raise PermissionDenied
 

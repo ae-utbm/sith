@@ -669,13 +669,18 @@ class Counter(models.Model):
         """Update the barman activity to prevent timeout."""
         self.permanencies.filter(end=None).update(activity=timezone.now())
 
+    @cached_property
     def can_refill(self) -> bool:
-        """Show if the counter authorize the refilling with physic money."""
-        if self.type != "BAR":
-            return False
-        # at least one of the barmen is in the AE board
-        ae = Club.objects.get(id=settings.SITH_MAIN_CLUB_ID)
-        return any(ae.get_membership_for(barman) for barman in self.barmen_list)
+        """Show if the counter authorize the refilling with physic money.
+
+        Refills are authorized if a user having the required permission
+        is currently logged in.
+        """
+        return self.type == "BAR" and (
+            User.objects.with_perm("counter.add_refilling")
+            .filter(id__in=[u.id for u in self.barmen_list])
+            .exists()
+        )
 
     def get_top_barmen(self) -> QuerySet:
         """Return a QuerySet querying the office hours stats of all the barmen of all time
