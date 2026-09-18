@@ -1,11 +1,10 @@
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.contrib.syndication.views import add_domain
 from django.db.models import Count, OuterRef, QuerySet, Subquery
-from django.http import HttpRequest
 from django.urls import reverse
 from django.utils import timezone
 from ical.calendar import Calendar
@@ -14,7 +13,13 @@ from ical.event import Event
 from ical.types import Frequency, Recur
 
 from com.models import News, NewsDate
-from core.models import User
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from django.http import HttpRequest
+
+    from core.models import User
 
 
 def as_absolute_url(url: str, request: HttpRequest | None = None) -> str:

@@ -41,7 +41,7 @@
       hx-post="{{ url("election:apply_result", election_id=form.election.id) }}"
       hx-swap="outerHTML"
       hx-target="#apply-election-result-fragment"
-      hx-disabled-elt="find input[type='submit']"
+      hx-disable="find input[type='submit']"
     >
       {% csrf_token %}
       {{ form }}

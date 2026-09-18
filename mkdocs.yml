@@ -71,6 +71,7 @@ nav:
     - API:
       - Développement: tutorial/api/dev.md
       - Connexion à l'API: tutorial/api/connect.md
+    - Markdown AE: tutorial/markdown.md
     - Etransactions: tutorial/etransaction.md
   - How-to:
     - L'ORM de Django: howto/querysets.md

@@ -3,7 +3,6 @@ from typing import Annotated, Literal
 from annotated_types import Ge, Le, MinLen
 from django.conf import settings
 from django.db.models import F
-from django.http import HttpResponse
 from ninja import File, Query
 from ninja.security import SessionAuth
 from ninja_extra import ControllerBase, api_controller, paginate, route
@@ -18,7 +17,6 @@ from core.models import Group, QuickUploadImage, SithFile, User
 from core.schemas import (
     FamilyGodfatherSchema,
     GroupSchema,
-    MarkdownSchema,
     SithFileSchema,
     UploadedFileSchema,
     UploadedImage,
@@ -28,16 +26,7 @@ from core.schemas import (
     UserSchema,
     ValidationErrorSchema,
 )
-from core.templatetags.renderer import markdown
 from counter.utils import is_logged_in_counter
-
-
-@api_controller("/markdown")
-class MarkdownController(ControllerBase):
-    @route.post("", url_name="markdown")
-    def render_markdown(self, body: MarkdownSchema):
-        """Convert the markdown text into html."""
-        return HttpResponse(markdown(body.text), content_type="text/html")
 
 
 @api_controller("/upload")

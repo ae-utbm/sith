@@ -1,8 +1,12 @@
-from django.http import HttpRequest
+from typing import TYPE_CHECKING
+
 from ninja.security import APIKeyHeader
 
 from api.hashers import get_hasher
 from api.models import ApiClient, ApiKey
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 class ApiKeyAuth(APIKeyHeader):

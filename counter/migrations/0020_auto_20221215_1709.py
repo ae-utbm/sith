@@ -6,9 +6,7 @@ import counter.fields
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("counter", "0019_billinginfo"),
-    ]
+    dependencies = [("counter", "0019_billinginfo")]
 
     operations = [
         migrations.AlterField(

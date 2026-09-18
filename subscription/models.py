@@ -64,6 +64,14 @@ class Subscription(models.Model):
         max_length=20,
         verbose_name=_("location"),
     )
+    created_at = models.DateTimeField(
+        _("created_at"),
+        help_text=_(
+            "When this subscription was created. "
+            "This date may differ from the start of the subscription."
+        ),
+        auto_now_add=True,
+    )
 
     class Meta:
         ordering = ["subscription_start"]

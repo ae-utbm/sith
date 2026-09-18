@@ -17,15 +17,17 @@ from datetime import date, timedelta
 
 # Image utils
 from io import BytesIO
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 import PIL
 from django.conf import settings
 from django.core.files.base import ContentFile
-from django.core.files.uploadedfile import UploadedFile
-from django.http import HttpRequest
 from django.utils.timezone import localdate
 from PIL.Image import Image, Resampling
+
+if TYPE_CHECKING:
+    from django.core.files.uploadedfile import UploadedFile
+    from django.http import HttpRequest
 
 RED_PIXEL_PNG: Final[bytes] = (
     b"\x89\x50\x4e\x47\x0d\x0a\x1a\x0a\x00\x00\x00\x0d\x49\x48\x44\x52"

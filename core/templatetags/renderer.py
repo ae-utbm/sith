@@ -23,14 +23,17 @@
 #
 
 import datetime
+from typing import TYPE_CHECKING
 
 import phonenumbers
 from aemark import markdown as md
 from django import template
-from django.forms import BoundField
 from django.template.defaultfilters import stringfilter
 from django.utils.safestring import mark_safe
 from django.utils.translation import ngettext
+
+if TYPE_CHECKING:
+    from django.forms import BoundField
 
 register = template.Library()
 

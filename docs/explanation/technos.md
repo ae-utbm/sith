@@ -217,7 +217,7 @@ C'est une technologie simple et puissante qui se veut comme le jQuery du web mod
 
 ### Htmx
 
-[Site officiel](https://htmx.org/)
+[Site officiel](https://four.htmx.org/)
 
 En plus de AlpineJS, l’interactivité sur le site est augmentée via Htmx.
 C'est une librairie js qui s'utilise également au moyen d'attributs HTML à

@@ -747,6 +747,7 @@ class Command(BaseCommand):
                     "add_subscription",
                     "add_membership",
                     "view_hidden_user",
+                    "add_refilling",
                 ]
             )
         )

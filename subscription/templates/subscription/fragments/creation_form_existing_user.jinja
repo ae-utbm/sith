@@ -1,7 +1,7 @@
 <form
   hx-post="{{ url("subscription:fragment-existing-user") }}"
   hx-target="this"
-  hx-disabled-elt="find input[type='submit']"
+  hx-disable="find input[type='submit']"
   hx-swap="outerHTML"
 >
   {% csrf_token %}

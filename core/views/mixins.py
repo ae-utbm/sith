@@ -1,13 +1,15 @@
 import copy
 import inspect
-from typing import Any, ClassVar, LiteralString, Protocol, Unpack
+from typing import TYPE_CHECKING, Any, ClassVar, LiteralString, Protocol, Unpack
 
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpRequest, HttpResponse
 from django.template.loader import render_to_string
-from django.utils.safestring import SafeString
 from django.views import View
 from django.views.generic.base import ContextMixin, TemplateResponseMixin
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest, HttpResponse
+    from django.utils.safestring import SafeString
 
 
 class TabedViewMixin(View):

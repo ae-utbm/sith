@@ -1,9 +1,9 @@
 import json
 from datetime import timedelta
+from typing import TYPE_CHECKING
 
 import pytest
 from django.conf import settings
-from django.test import Client
 from django.urls import reverse
 from django.utils.timezone import now
 from django_celery_beat.models import ClockedSchedule
@@ -17,6 +17,9 @@ from counter.forms import (
     ScheduledProductActionFormSet,
 )
 from counter.models import Product, ProductType, ScheduledProductAction
+
+if TYPE_CHECKING:
+    from django.test import Client
 
 
 @pytest.mark.django_db

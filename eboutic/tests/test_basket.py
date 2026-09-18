@@ -1,13 +1,12 @@
 import re
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 
 import freezegun
 import pytest
 from bs4 import BeautifulSoup
 from django.conf import settings
-from django.http import HttpResponse
 from django.test import TestCase
-from django.test.client import Client
 from django.urls import reverse
 from django.utils.timezone import localdate, now
 from model_bakery import baker
@@ -30,6 +29,10 @@ from counter.models import (
 )
 from counter.tests.test_counter import BasketItem
 from eboutic.models import Basket
+
+if TYPE_CHECKING:
+    from django.http import HttpResponse
+    from django.test.client import Client
 
 
 @pytest.mark.django_db

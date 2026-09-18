@@ -3,7 +3,7 @@ import math
 import uuid
 from collections import defaultdict
 from datetime import date, datetime, timezone
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from dateutil.relativedelta import relativedelta
 from django import forms
@@ -11,7 +11,6 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Q
 from django.forms import BaseModelFormSet
-from django.http import HttpRequest
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
@@ -58,6 +57,9 @@ from counter.widgets.ajax_select import (
     AutoCompleteSelectMultipleProduct,
     AutoCompleteSelectProduct,
 )
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 class BillingInfoForm(forms.ModelForm):

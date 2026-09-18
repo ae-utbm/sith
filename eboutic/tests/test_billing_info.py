@@ -1,7 +1,6 @@
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 
 import pytest
-from django.test import Client
 from django.urls import reverse
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
@@ -9,6 +8,9 @@ from pytest_django.asserts import assertRedirects
 from core.baker_recipes import subscriber_user
 from core.models import User
 from counter.models import BillingInfo
+
+if TYPE_CHECKING:
+    from django.test import Client
 
 
 @pytest.mark.django_db

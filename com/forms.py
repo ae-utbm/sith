@@ -1,4 +1,5 @@
 from datetime import date
+from typing import TYPE_CHECKING
 
 from dateutil.relativedelta import relativedelta
 from django import forms
@@ -9,10 +10,12 @@ from django.utils.translation import gettext_lazy as _
 from club.models import Club
 from club.widgets.ajax_select import AutoCompleteSelectClub
 from com.models import News, NewsDate, Poster
-from core.models import User
 from core.utils import get_end_of_semester
 from core.views.forms import SelectDateTime
 from core.views.widgets.markdown import MarkdownInput
+
+if TYPE_CHECKING:
+    from core.models import User
 
 
 class PosterForm(forms.ModelForm):

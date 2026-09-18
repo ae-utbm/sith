@@ -1,9 +1,9 @@
 from datetime import timedelta
+from typing import TYPE_CHECKING
 
 import pytest
 from django.conf import settings
 from django.db import ProgrammingError
-from django.test import Client
 from django.urls import reverse
 from django.utils.timezone import localdate
 from model_bakery import baker
@@ -13,6 +13,9 @@ from pytest_django.asserts import assertRedirects
 from club.models import Club, ClubRole, Membership
 from core.baker_recipes import subscriber_user
 from core.models import User
+
+if TYPE_CHECKING:
+    from django.test import Client
 
 
 @pytest.mark.django_db

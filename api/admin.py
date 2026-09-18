@@ -1,10 +1,14 @@
+from typing import TYPE_CHECKING
+
 from django.contrib import admin, messages
-from django.db.models import QuerySet
-from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
 from api.hashers import generate_key
 from api.models import ApiClient, ApiKey
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+    from django.http import HttpRequest
 
 
 @admin.register(ApiClient)

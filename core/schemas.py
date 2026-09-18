@@ -161,10 +161,6 @@ class UserFilterSchema(FilterSchema):
         return value
 
 
-class MarkdownSchema(Schema):
-    text: str
-
-
 class FamilyGodfatherSchema(Schema):
     godfather: int
     godchild: int

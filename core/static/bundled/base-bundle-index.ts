@@ -6,10 +6,15 @@
  * for more efficient tree-shaking and gzip compression.
  */
 
+// Must be loaded before Apline
+import htmx from "htmx.org";
+import "htmx.org/dist/ext/hx-alpine-compat.js";
+import "htmx.org/dist/ext/hx-prompt.js";
+import "htmx.org/dist/ext/hx-download.js";
+
 import sort from "@alpinejs/sort";
 import Alpine from "alpinejs";
 import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
-import htmx from "htmx.org";
 import { limitedChoices } from "#core:alpine/limited-choices";
 import { expireOldStorage } from "#core:core/localstorage";
 import { default as navbar } from "#core:core/navbar";
@@ -43,19 +48,28 @@ polyfillCountryFlagEmojis();
 /**
  * HTMX
  */
-document.body.addEventListener(
-  "htmx:beforeRequest" as keyof HTMLElementEventMap,
-  (event) => {
-    (event as CustomEvent).detail.target.ariaBusy = true;
+htmx.registerExtension("aria-busy", {
+  // biome-ignore lint/style/useNamingConvention: api's name
+  htmx_before_request: (
+    _: HTMLElement,
+    detail: { ctx: { target: HTMLElement | undefined } },
+  ) => {
+    if (detail.ctx.target !== undefined) {
+      (detail.ctx.target as HTMLElement).ariaBusy = "true";
+    }
   },
-);
+  // biome-ignore lint/style/useNamingConvention: api's name
+  htmx_after_swap: (
+    _: HTMLElement,
+    detail: { ctx: { target: HTMLElement | undefined } },
+  ) => {
+    if (detail.ctx.target !== undefined) {
+      (detail.ctx.target as HTMLElement).ariaBusy = null;
+    }
+  },
+});
 
-document.body.addEventListener(
-  "htmx:beforeSwap" as keyof HTMLElementEventMap,
-  (event) => {
-    (event as CustomEvent).detail.target.ariaBusy = null;
-  },
-);
+htmx.config.transitions = true;
 
 Object.assign(window, { htmx });
 

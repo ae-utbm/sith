@@ -1,6 +1,7 @@
 from datetime import timedelta
 from itertools import groupby, islice
 from operator import attrgetter
+from typing import TYPE_CHECKING
 
 from django import forms
 from django.conf import settings
@@ -13,7 +14,6 @@ from django.utils.translation import gettext_lazy as _
 from club.forms import ClubRoleChoiceField
 from club.models import ClubRole, Membership
 from club.widgets.ajax_select import AutoCompleteSelectMultipleClub
-from core.models import User
 from core.views.forms import SelectDateTime
 from core.views.widgets.ajax_select import (
     AutoCompleteSelect,
@@ -22,6 +22,9 @@ from core.views.widgets.ajax_select import (
 )
 from core.views.widgets.markdown import MarkdownInput
 from election.models import Candidature, Election, ElectionList, Role
+
+if TYPE_CHECKING:
+    from core.models import User
 
 
 class LimitedCheckboxField(forms.ModelMultipleChoiceField):

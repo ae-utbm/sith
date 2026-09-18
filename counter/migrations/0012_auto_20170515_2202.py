@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
             model_name="permanency",
             name="end",
             field=models.DateTimeField(
-                db_index=True, verbose_name="end date", null=True
+                db_index=True, verbose_name="end date", null=True, blank=True
             ),
         )
     ]

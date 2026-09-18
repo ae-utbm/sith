@@ -9,7 +9,6 @@ from django.utils.timezone import get_current_timezone
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
 
-from core.models import User
 from core.utils import resize_image
 from core.views import MultipleImageField
 from core.views.forms import SelectDate
@@ -19,6 +18,8 @@ from sas.widgets.ajax_select import AutoCompleteSelectAlbum
 
 if TYPE_CHECKING:
     from django.db.models.fields.files import FieldFile
+
+    from core.models import User
 
 
 class AlbumCreateForm(forms.ModelForm):

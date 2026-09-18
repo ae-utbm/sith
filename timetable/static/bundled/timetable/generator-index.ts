@@ -1,8 +1,8 @@
 import html2canvas from "html2canvas";
 
-// see https://regex101.com/r/QHSaPM/2
+// see https://regex101.com/r/QHSaPM/3
 const TIMETABLE_ROW_RE: RegExp =
-  /^(?<ueCode>\w.+\w)\s+(?<courseType>[A-Z]{2}\d)\s+((?<weekGroup>[AB])\s+)?(?<weekday>(lundi)|(mardi)|(mercredi)|(jeudi)|(vendredi)|(samedi)|(dimanche))\s+(?<startHour>\d{2}:\d{2})\s+(?<endHour>\d{2}:\d{2})\s+[\dA-B]\s+((?<attendance>[\wé]*)\s+)?(?<room>\w+(?:, \w+)?)$/;
+  /^(?<ueCode>\w.+\w)\s+(?<courseType>[A-Z]{2}\d)\s+((?<weekGroup>[AB])\s+)?(?<weekday>(lundi)|(mardi)|(mercredi)|(jeudi)|(vendredi)|(samedi)|(dimanche))\s+(?<startHour>\d{2}:\d{2})\s+(?<endHour>\d{2}:\d{2})\s+[\dA-B]\s+((?<attendance>[\wé]*)\s+)?(?<room>\w+(?:, \w+)*)$/;
 
 const DEFAULT_TIMETABLE: string = `DS52\t\tCM1\t\tlundi\t08:00\t10:00\t1\tPrésentiel\tA113
 DS53\t\tCM1\t\tlundi\t10:15\t12:15\t1\tPrésentiel\tA101
@@ -59,7 +59,7 @@ function parseSlots(s: string): TimetableSlot[] {
     .map((row: string) => {
       const parsed = TIMETABLE_ROW_RE.exec(row);
       if (!parsed?.groups) {
-        throw new Error(`Couldn't parse row ${row}`);
+        throw new Error(`Couldn't parse row ${row}`, { cause: { row: row } });
       }
       const [startHour, startMin] = parsed.groups.startHour
         .split(":")
@@ -78,7 +78,7 @@ function parseSlots(s: string): TimetableSlot[] {
 document.addEventListener("alpine:init", () => {
   Alpine.data("timetableGenerator", () => ({
     content: DEFAULT_TIMETABLE,
-    error: "",
+    error: null as { incorrectRow?: string },
     displayedWeekdays: [] as WeekDay[],
     courses: [] as TimetableSlot[],
     startSlot: 0,
@@ -106,10 +106,9 @@ document.addEventListener("alpine:init", () => {
     generate() {
       try {
         this.courses = parseSlots(this.content);
-      } catch {
-        this.error = gettext(
-          "Wrong timetable format. Make sure you copied if from your student folder.",
-        );
+        this.error = null;
+      } catch (err) {
+        this.error = { incorrectRow: err?.cause?.row };
         return;
       }
 

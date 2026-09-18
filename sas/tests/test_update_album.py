@@ -1,14 +1,13 @@
 import random
 import string
 from pathlib import Path
-from typing import Callable
+from typing import TYPE_CHECKING, Callable
 from unittest.mock import patch
 
 import pytest
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import Client
 from django.urls import reverse
 from django.utils.datastructures import MultiValueDict
 from django.utils.timezone import localdate
@@ -22,6 +21,9 @@ from core.utils import RED_PIXEL_PNG
 from sas.baker_recipes import picture_recipe
 from sas.forms import AlbumEditForm
 from sas.models import Album
+
+if TYPE_CHECKING:
+    from django.test import Client
 
 
 @pytest.fixture

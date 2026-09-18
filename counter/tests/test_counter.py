@@ -15,6 +15,7 @@
 from dataclasses import asdict, dataclass
 from datetime import timedelta
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 import pytest
 from bs4 import BeautifulSoup
@@ -22,7 +23,6 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import Permission, make_password
 from django.contrib.messages import DEFAULT_LEVELS, get_messages
-from django.http import HttpResponse
 from django.shortcuts import resolve_url
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -47,6 +47,9 @@ from counter.models import (
     ReturnableProduct,
     Selling,
 )
+
+if TYPE_CHECKING:
+    from django.http import HttpResponse
 
 
 def set_age(user: User, age: int):
@@ -105,6 +108,13 @@ class TestFullClickBase(TestCase):
 
 
 class TestRefilling(TestFullClickBase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.board_admin.user_permissions.add(
+            Permission.objects.get(codename="add_refilling")
+        )
+
     def login_in_bar(self, barmen: User | None = None):
         used_barman = barmen if barmen is not None else self.board_admin
         self.client.post(
@@ -144,7 +154,7 @@ class TestRefilling(TestFullClickBase):
         assert self.updated_amount(self.customer) == 0
 
     def test_refilling_no_refer_fail(self):
-        """Check that the refill fails is the HTTP_REFERER header is missing"""
+        """Check that the refill fails if the HTTP_REFERER header is missing"""
 
         def refill():
             return self.client.post(

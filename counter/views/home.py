@@ -13,6 +13,7 @@
 #
 #
 from datetime import timedelta
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
@@ -21,7 +22,6 @@ from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.safestring import SafeString
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 from django.views.generic.detail import SingleObjectMixin
@@ -34,6 +34,9 @@ from counter.middleware import SESSION_PERMANENCES_KEY
 from counter.models import Counter, Permanency
 from counter.utils import is_logged_in_counter
 from counter.views.mixins import CounterTabsMixin
+
+if TYPE_CHECKING:
+    from django.utils.safestring import SafeString
 
 
 class CounterLoginFragment(FragmentMixin, SingleObjectMixin, FormView):

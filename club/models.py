@@ -23,6 +23,8 @@
 #
 from __future__ import annotations
 
+import operator
+from functools import reduce
 from typing import Iterable, Self
 
 from django.conf import settings
@@ -282,6 +284,15 @@ class ClubRole(OrderedModel):
             "If the role is inactive, people joining the club won't be able to get it."
         ),
     )
+    linked_groups = models.ManyToManyField(
+        Group,
+        verbose_name=_("Linked groups"),
+        help_text=_(
+            "Groups that are automatically given or removed "
+            "to user receiving or losing this club role"
+        ),
+        related_name="linked_roles",
+    )
 
     order_with_respect_to = "club"
 
@@ -534,7 +545,7 @@ class Membership(models.Model):
     def _remove_club_groups(
         memberships: Iterable[Membership],
     ) -> tuple[int, dict[str, int]]:
-        """Remove users of those memberships from the club groups.
+        """Remove users of those memberships from the club  and club role groups.
 
         For example, if a user is in the Troll club board,
         he is in the board group and the members group of the Troll.
@@ -553,15 +564,19 @@ class Membership(models.Model):
         clubs = {m.club_id for m in memberships}
         users = {m.user_id for m in memberships}
         groups = Group.objects.filter(Q(club__in=clubs) | Q(club_board__in=clubs))
+        role_groups = [
+            Q(user_id=m.user_id, group__linked_roles=m.role_id) for m in memberships
+        ]
         return User.groups.through.objects.filter(
-            Q(group__in=groups) & Q(user__in=users)
+            (Q(group__in=groups) & Q(user__in=users))
+            | reduce(operator.or_, role_groups)
         ).delete()
 
     @staticmethod
     def _add_club_groups(
         memberships: Iterable[Membership],
     ) -> list[User.groups.through]:
-        """Add users of those memberships to the club groups.
+        """Add users of those memberships to the club and club role groups.
 
         For example, if a user just joined the Troll club board,
         he will be added in both the members group and the board group
@@ -582,34 +597,40 @@ class Membership(models.Model):
         memberships = [m for m in memberships if m.end_date is None]
         if not memberships:
             return []
-
-        if sum(1 for m in memberships if not hasattr(m, "club")) > 1:
+        nb_prefetched = sum(
+            1 for m in memberships if not hasattr(m, "club") or not hasattr(m, "role")
+        )
+        if nb_prefetched > 1:
             # if more than one membership hasn't its `club` attribute set
             # it's less expensive to reload the whole query with
             # a select_related than perform a distinct query
             # to fetch each club.
             ids = {m.id for m in memberships}
             memberships = list(
-                Membership.objects.filter(id__in=ids).select_related("club")
+                Membership.objects.filter(id__in=ids)
+                .select_related("club", "role")
+                .prefetch_related("role__linked_groups")
             )
-        club_groups = []
+        groups = []
         for membership in memberships:
-            club_groups.append(
+            groups.append(
                 User.groups.through(
                     user_id=membership.user_id,
                     group_id=membership.club.members_group_id,
                 )
             )
             if membership.role.is_board:
-                club_groups.append(
+                groups.append(
                     User.groups.through(
                         user_id=membership.user_id,
                         group_id=membership.club.board_group_id,
                     )
                 )
-        return User.groups.through.objects.bulk_create(
-            club_groups, ignore_conflicts=True
-        )
+            groups.extend(
+                User.groups.through(user_id=membership.user_id, group_id=g.id)
+                for g in membership.role.linked_groups.all()
+            )
+        return User.groups.through.objects.bulk_create(groups, ignore_conflicts=True)
 
 
 class Mailing(models.Model):

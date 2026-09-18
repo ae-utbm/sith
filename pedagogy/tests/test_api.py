@@ -1,8 +1,6 @@
-import json
-
 from django.conf import settings
+from django.core.management import call_command
 from django.test import TestCase
-from django.test.testcases import call_command
 from django.urls import reverse
 from model_bakery import baker
 from model_bakery.recipe import Recipe
@@ -17,7 +15,7 @@ class TestUESearch(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.root = User.objects.get(username="root")
+        cls.root = baker.make(User, is_superuser=True)
         cls.url = reverse("api:fetch_ues")
         ue_recipe = Recipe(UE, author=cls.root)
         ues = [
@@ -92,10 +90,10 @@ class TestUESearch(TestCase):
     def test_format(self):
         """Test that the return data format is correct"""
         self.client.force_login(self.root)
-        res = self.client.get(self.url + "?search=PA00")
+        res = self.client.get(self.url, query_params={"search": "PA00"})
         ue = UE.objects.get(code="PA00")
         assert res.status_code == 200
-        assert json.loads(res.content) == {
+        assert res.json() == {
             "count": 1,
             "next": None,
             "previous": None,
@@ -121,79 +119,77 @@ class TestUESearch(TestCase):
     def test_search_by_text(self):
         self.client.force_login(self.root)
         for query, expected in (
-            # UE code search case insensitive
+            # UE code search case-insensitive
             ("m", {"MT01", "MT10"}),
             ("M", {"MT01", "MT10"}),
             ("mt", {"MT01", "MT10"}),
             ("MT", {"MT01", "MT10"}),
-            ("algèbre", {"MT01"}),  # Title search case insensitive
+            ("algèbre", {"MT01"}),  # Title search case-insensitive
             # Manager search
             ("moss", {"TNEV"}),
             ("francky", {"DA50", "AP4A"}),
         ):
-            res = self.client.get(self.url + f"?search={query}")
+            res = self.client.get(self.url, query_params={"search": query})
             assert res.status_code == 200
-            assert {ue["code"] for ue in json.loads(res.content)["results"]} == expected
+            assert {ue["code"] for ue in res.json()["results"]} == expected
 
     def test_search_by_credit_type(self):
         self.client.force_login(self.root)
-        res = self.client.get(self.url + "?credit_type=CS")
+        res = self.client.get(self.url, query_params={"credit_type": "CS"})
         assert res.status_code == 200
-        codes = [ue["code"] for ue in json.loads(res.content)["results"]]
+        codes = [ue["code"] for ue in res.json()["results"]]
         assert codes == ["AP4A", "MT01", "PHYS11"]
-        res = self.client.get(self.url + "?credit_type=CS&credit_type=OM")
+        res = self.client.get(self.url, query_params={"credit_type": ["CS", "OM"]})
         assert res.status_code == 200
-        codes = {ue["code"] for ue in json.loads(res.content)["results"]}
+        codes = {ue["code"] for ue in res.json()["results"]}
         assert codes == {"AP4A", "MT01", "PHYS11", "PA00"}
 
     def test_search_by_semester(self):
         self.client.force_login(self.root)
-        res = self.client.get(self.url + "?semester=SPRING")
+        res = self.client.get(self.url, query_params={"semester": "SPRING"})
         assert res.status_code == 200
-        codes = {ue["code"] for ue in json.loads(res.content)["results"]}
+        codes = {ue["code"] for ue in res.json()["results"]}
         assert codes == {"DA50", "TNEV", "PA00"}
 
     def test_search_multiple_filters(self):
         self.client.force_login(self.root)
         res = self.client.get(
-            self.url + "?semester=AUTUMN&credit_type=CS&department=TC"
+            self.url,
+            query_params={
+                "semester": "AUTUMN",
+                "credit_type": "CS",
+                "department": "TC",
+            },
         )
         assert res.status_code == 200
-        codes = {ue["code"] for ue in json.loads(res.content)["results"]}
+        codes = {ue["code"] for ue in res.json()["results"]}
         assert codes == {"MT01", "PHYS11"}
 
     def test_search_fails(self):
         self.client.force_login(self.root)
-        res = self.client.get(self.url + "?credit_type=CS&search=DA")
+        res = self.client.get(
+            self.url, query_params={"search": "DA", "credit_type": "CS"}
+        )
         assert res.status_code == 200
-        assert json.loads(res.content)["results"] == []
+        assert res.json()["results"] == []
 
-    def test_search_pa00_fail(self):
+    def test_search_closed_status(self):
+        # Simple heuristic : take a UE, and mark everything before it as closed
+        closed_ue = UE.objects.order_by("id")[2]
+        UE.objects.filter(id__lte=closed_ue.id).update(semester="CLOSED")
+
         self.client.force_login(self.root)
-        # Search with UE code
-        response = self.client.get(reverse("pedagogy:guide"), {"search": "IFC"})
-        self.assertNotContains(response, text="PA00")
 
-        # Search with first letter of UE code
-        response = self.client.get(reverse("pedagogy:guide"), {"search": "I"})
-        self.assertNotContains(response, text="PA00")
+        res = self.client.get(self.url, query_params={"is_open": False})
+        assert res.status_code == 200
+        ids = {ue["id"] for ue in res.json()["results"]}
+        assert ids == set(
+            UE.objects.filter(semester="CLOSED").values_list("id", flat=True)
+        )
 
-        # Search with UE manager
-        response = self.client.get(reverse("pedagogy:guide"), {"search": "GILLES"})
-        self.assertNotContains(response, text="PA00")
-
-        # Search with department
-        response = self.client.get(reverse("pedagogy:guide"), {"department": "TC"})
-        self.assertNotContains(response, text="PA00")
-
-        # Search with semester
-        response = self.client.get(reverse("pedagogy:guide"), {"semester": "CLOSED"})
-        self.assertNotContains(response, text="PA00")
-
-        # Search with language
-        response = self.client.get(reverse("pedagogy:guide"), {"language": "EN"})
-        self.assertNotContains(response, text="PA00")
-
-        # Search with credit type
-        response = self.client.get(reverse("pedagogy:guide"), {"credit_type": "TM"})
-        self.assertNotContains(response, text="PA00")
+        res = self.client.get(self.url, query_params={"is_open": True})
+        assert res.status_code == 200
+        ids = {ue["id"] for ue in res.json()["results"]}
+        assert ids == set(
+            UE.objects.exclude(semester="CLOSED").values_list("id", flat=True)
+        )

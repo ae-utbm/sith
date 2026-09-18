@@ -12,11 +12,15 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
-from django.forms.models import ModelForm
-from django.http import HttpRequest
 
 from club.models import Club, ClubLink, ClubRole, LinkType, Membership
+
+if TYPE_CHECKING:
+    from django.forms.models import ModelForm
+    from django.http import HttpRequest
 
 
 @admin.register(Club)
@@ -46,8 +50,8 @@ class ClubAdmin(admin.ModelAdmin):
 @admin.register(ClubRole)
 class ClubRoleAdmin(admin.ModelAdmin):
     list_display = ("name", "club", "is_board", "is_presidency")
-    search_fields = ("name",)
-    autocomplete_fields = ("club",)
+    search_fields = ("name", "club__name")
+    autocomplete_fields = ("club", "linked_groups")
     list_select_related = ("club",)
     list_filter = (
         "is_board",

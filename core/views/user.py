@@ -27,6 +27,7 @@ from datetime import timedelta
 # This file contains all the views that concern the user model
 from operator import itemgetter
 from smtplib import SMTPException
+from typing import TYPE_CHECKING
 
 from django.contrib import messages
 from django.contrib.auth import login, views
@@ -43,7 +44,6 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
-from django.utils.safestring import SafeString
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 from django.views.generic import (
@@ -72,6 +72,9 @@ from core.views.mixins import FragmentMixin, TabedViewMixin, UseFragmentsMixin
 from counter.models import Refilling, Selling
 from eboutic.models import Invoice
 from trombi.views import UserTrombiForm
+
+if TYPE_CHECKING:
+    from django.utils.safestring import SafeString
 
 
 class SithLoginView(views.LoginView):

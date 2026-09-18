@@ -22,17 +22,21 @@
 #
 #
 
+from typing import TYPE_CHECKING
+
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import F
-from django.db.models.query import QuerySet
-from django.http import HttpRequest
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, TemplateView
 
 from club.models import Club
 from core.models import Notification, User
 from core.schemas import UserFilterSchema
+
+if TYPE_CHECKING:
+    from django.db.models.query import QuerySet
+    from django.http import HttpRequest
 
 
 class NotificationList(LoginRequiredMixin, ListView):
@@ -65,6 +69,7 @@ class SearchView(LoginRequiredMixin, TemplateView):
                 UserFilterSchema(search=query)
                 .filter(User.objects.viewable_by(self.request.user))
                 .order_by(F("last_login").desc(nulls_last=True))
+                .distinct()
             )
             clubs = list(Club.objects.filter(name__icontains=query)[:5])
         return super().get_context_data(**kwargs) | {"users": users, "clubs": clubs}

@@ -1,14 +1,17 @@
 from datetime import datetime, timedelta
+from typing import TYPE_CHECKING
 
 import pytest
 from django.contrib.auth.models import Permission
-from django.test import Client
 from django.urls import reverse
 from django.utils.timezone import localtime
 from model_bakery import baker
 from pytest_django.asserts import assertRedirects
 
 from core.models import BanGroup, User, UserBan
+
+if TYPE_CHECKING:
+    from django.test import Client
 
 
 @pytest.fixture

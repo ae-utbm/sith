@@ -13,14 +13,18 @@
 #
 #
 
+from typing import TYPE_CHECKING
+
 import pytest
 from django.conf import settings
-from django.test import Client
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
 from core.models import User
 from forum.models import Forum, ForumMessage, ForumTopic
+
+if TYPE_CHECKING:
+    from django.test import Client
 
 
 @pytest.mark.django_db

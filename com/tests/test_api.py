@@ -1,11 +1,11 @@
 from datetime import timedelta
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 from aemark import markdown
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.http import HttpResponse
 from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils.timezone import now
@@ -15,6 +15,9 @@ from pytest_django.asserts import assertNumQueries
 from com.ics_calendar import IcsCalendar
 from com.models import News, NewsDate
 from core.models import User
+
+if TYPE_CHECKING:
+    from django.http import HttpResponse
 
 
 def accel_redirect_to_file(response: HttpResponse) -> Path | None:

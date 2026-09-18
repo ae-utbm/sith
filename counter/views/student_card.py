@@ -13,11 +13,12 @@
 #
 #
 
+from typing import TYPE_CHECKING
+
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
-from django.utils.safestring import SafeString
 from django.utils.translation import gettext as _
 from django.views.generic.edit import DeleteView, FormView
 
@@ -26,6 +27,9 @@ from core.views.mixins import FragmentMixin
 from counter.forms import StudentCardForm
 from counter.models import Customer, StudentCard
 from counter.utils import is_logged_in_counter
+
+if TYPE_CHECKING:
+    from django.utils.safestring import SafeString
 
 
 class StudentCardDeleteView(DeleteView):

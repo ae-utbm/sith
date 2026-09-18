@@ -1,10 +1,10 @@
 from datetime import date, datetime
+from typing import TYPE_CHECKING
 
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import Permission
 from django.core.exceptions import ValidationError
-from django.test import Client
 from django.urls import reverse
 from django.utils.timezone import now
 from model_bakery import baker
@@ -15,6 +15,9 @@ from core.models import User
 from counter.baker_recipes import sale_recipe
 from counter.forms import InvoiceCallForm
 from counter.models import Customer, InvoiceCall, Selling
+
+if TYPE_CHECKING:
+    from django.test import Client
 
 
 @pytest.mark.django_db
