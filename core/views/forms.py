@@ -42,6 +42,8 @@ from django.forms import (
     TextInput,
     Widget,
 )
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
@@ -146,8 +148,24 @@ class RegisteringForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email")
+        fields = ("first_name", "last_name", "email", "cgu_approved")
         field_classes = {"email": AntiSpamEmailField}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["cgu_approved"].required = True
+        self.fields["cgu_approved"].label_suffix = ""
+        self.fields["cgu_approved"].label = mark_safe(
+            _(
+                "I have read and I approve the "
+                '<a href="%(url)s" target="_blank">End User License Agreement</a>'
+            )
+            % {
+                "url": reverse(
+                    "core:download", kwargs={"file_id": settings.SITH_CGU_FILE_ID}
+                )
+            }
+        )
 
 
 class UserProfileForm(forms.ModelForm):

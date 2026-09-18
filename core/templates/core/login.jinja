@@ -50,13 +50,12 @@
     <input type="hidden" name="next" value="{{ next }}">
     <input type="submit" value="{% trans %}Login{% endtrans %}">
 
-
-        {# Assumes you setup the password_reset view in your URLconf #}
-    <p>
+    <div>
       <a href="{{ url('core:password_reset') }}">{% trans %}Lost password?{% endtrans %}</a>
-      &nbsp;&nbsp;
+    </div>
+    <div>
       <a href="{{ url('core:register') }}">{% trans %}Create account{% endtrans %}</a>
-    </p>
+    </div>
   </form>
 {% endblock %}
 
