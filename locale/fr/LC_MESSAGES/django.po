@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-14 11:48+0200\n"
+"POT-Creation-Date: 2026-09-18 11:01+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -5240,6 +5240,22 @@ msgstr "Catégorie"
 #: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Credits"
 msgstr "Crédits"
+
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+msgid "Lectures"
+msgstr "Cours magistraux"
+
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+msgid "Tutorials"
+msgstr "Travaux dirigés"
+
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+msgid "Practicals"
+msgstr "Travaux pratiques"
+
+#: pedagogy/templates/pedagogy/ue_detail.jinja
+msgid "Work without supervision"
+msgstr "Travail hors encadrement"
 
 #: pedagogy/templates/pedagogy/ue_detail.jinja
 msgid "Availability"

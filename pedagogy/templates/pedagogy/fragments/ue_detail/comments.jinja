@@ -30,7 +30,7 @@
               {% endfor %}
             {% endif %}
           </div>
-          {% if user.has_perm("pedagogy.delete_uecomment") %}
+          {% if comment.author_id == user.id or user.has_perm("pedagogy.delete_uecomment") %}
             <div class="alert-aside">
               <a
                 href="{{ url("pedagogy:comment_delete", comment_id=comment.id) }}"
@@ -66,7 +66,7 @@
           </time>
         </div>
         <div class="comment-options">
-          {% if user.can_edit(comment) %}
+          {% if comment.author_id == user.id or user.has_perm("pedagogy.change_uecomment") %}
             <a
               class="clickable"
               hx-get="{{ url('pedagogy:comment_update', comment_id=comment.id) }}"
@@ -88,7 +88,7 @@
               <i class="fa fa-exclamation delete-action"></i>
             </a>
           {% endif %}
-          {% if user.has_perm("pedagogy.delete_uecomment") %}
+          {% if comment.author_id == user.id or user.has_perm("pedagogy.delete_uecomment") %}
             <a
               href="{{ url("pedagogy:comment_delete", comment_id=comment.id) }}"
               tooltip="{% trans %}Delete{% endtrans %}"
