@@ -186,7 +186,7 @@
           {% if refilling_fragment %}
             <div
               class="accordion-content"
-              @htmx:after-swap="onRefillingSuccess"
+              @htmx:after:swap="onRefillingSuccess"
             >
               {{ refilling_fragment }}
             </div>
