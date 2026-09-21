@@ -60,7 +60,7 @@
     </p>
     <br>
     {% if settings.SITH_EBOUTIC_CB_ENABLED %}
-      <div @htmx:after-request="fill">
+      <div @htmx:after:request="fill">
         {{ billing_infos_form }}
       </div>
     {% endif %}
