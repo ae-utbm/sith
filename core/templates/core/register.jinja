@@ -24,11 +24,11 @@
       {% endif %}
     {% endfor %}
     <div class="captcha">{{ form.captcha.as_field_group() }}</div>
-    <fieldset>
+    <div class="form-group">
       {{ form.cgu_approved.errors }}
       {{ form.cgu_approved }}
       {{ form.cgu_approved.label_tag() }}
-    </fieldset>
+    </div>
     <input type="submit" class="btn btn-blue" value="{% trans %}Register{% endtrans %}" />
   </form>
 {% endblock %}
