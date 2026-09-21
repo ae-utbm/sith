@@ -31,6 +31,7 @@ from core.converters import (
     TwoDigitMonthConverter,
 )
 from core.views import (
+    CGUApprovalView,
     FileDeleteView,
     FileEditPropView,
     FileEditView,
@@ -125,6 +126,7 @@ urlpatterns = [
         name="password_reset_complete",
     ),
     path("register/", UserCreationView.as_view(), name="register"),
+    path("cgu/", CGUApprovalView.as_view(), name="approve_cgu"),
     # Group handling
     path("group/", GroupListView.as_view(), name="group_list"),
     path("group/new/", GroupCreateView.as_view(), name="group_new"),
