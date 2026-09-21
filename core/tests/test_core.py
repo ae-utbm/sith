@@ -93,7 +93,10 @@ class TestUserRegistration:
             ({"first_name": ""}, "Ce champ est obligatoire."),
             ({"last_name": ""}, "Ce champ est obligatoire."),
             ({"captcha_1": "WRONG_CAPTCHA"}, "CAPTCHA invalide"),
-            ({"cgu_approved": ""}, "Vous devez approuver les conditions générales d'utilisation"),
+            (
+                {"cgu_approved": ""},
+                "Vous devez approuver les conditions générales d'utilisation",
+            ),
         ],
     )
     def test_register_user_form_fail(
@@ -152,7 +155,7 @@ class TestUserRegistration:
 class TestUserLogin:
     @pytest.fixture()
     def user(self) -> User:
-        return baker.make(User, password=make_password("plop"))
+        return baker.make(User, password=make_password("plop"), cgu_approved=True)
 
     @pytest.mark.parametrize(
         "identifier_getter",
@@ -193,8 +196,38 @@ class TestUserLogin:
             reverse("core:login"),
             {"username": identifier_getter(user), "password": "plop"},
         )
-        assertRedirects(response, reverse("core:index"))
+        assertRedirects(response, settings.LOGIN_REDIRECT_URL)
         assert response.wsgi_request.user == user
+
+
+@pytest.mark.django_db
+class TestCGU:
+    def test_cgu_approval(self, client: Client):
+        user = baker.make(User, password=make_password("plop"), cgu_approved=False)
+        user_url = user.get_absolute_url()
+        res = client.post(
+            reverse("core:login"),
+            {"username": user.username, "password": "plop", "next": user_url},
+        )
+        assertRedirects(res, reverse("core:approve_cgu", query={"next": user_url}))
+        res = client.post(
+            reverse("core:approve_cgu"), {"cgu_approved": True, "next": user_url}
+        )
+        assertRedirects(res, user_url)
+        user.refresh_from_db()
+        assert user.cgu_approved
+
+    def test_access_cgu_when_already_approved(self, client: Client):
+        url = reverse("core:approve_cgu")
+
+        res = client.get(url)
+        assertRedirects(res, reverse("core:login"))
+
+        client.force_login(baker.make(User, cgu_approved=True))
+        res = client.get(url)
+        assertRedirects(res, settings.LOGIN_REDIRECT_URL)
+        res = client.post(url, {"cgu_approved": True})
+        assertRedirects(res, settings.LOGIN_REDIRECT_URL)
 
 
 @pytest.mark.parametrize(
