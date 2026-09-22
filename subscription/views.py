@@ -17,16 +17,14 @@ from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils.timezone import localdate
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DetailView, TemplateView
-from django.views.generic.edit import FormView
 
 from core.views import FragmentMixin, UseFragmentsMixin
 from core.views.group import PermissionGroupsUpdateView
 from subscription.forms import (
-    SelectionDateForm,
     SubscriptionExistingUserForm,
     SubscriptionNewUserForm,
 )
@@ -93,34 +91,19 @@ class SubscriptionPermissionView(PermissionGroupsUpdateView):
     extra_context = {"object_name": _("the groups that can create subscriptions")}
 
 
-class SubscriptionsStatsView(FormView):
+class SubscriptionsStatsView(TemplateView):
     template_name = "subscription/stats.jinja"
-    form_class = SelectionDateForm
-    success_url = reverse_lazy("subscriptions:stats")
 
     def dispatch(self, request, *arg, **kwargs):
-        self.start_date = localdate()
-        self.end_date = self.start_date
         if request.user.is_root or request.user.is_board_member:
             return super().dispatch(request, *arg, **kwargs)
         raise PermissionDenied
 
-    def post(self, request, *args, **kwargs):
-        self.form = self.get_form()
-        self.start_date = self.form["start_date"]
-        self.end_date = self.form["end_date"]
-        return super().post(request, *args, **kwargs)
-
-    def get_initial(self):
-        return {
-            "start_date": self.start_date.strftime("%Y-%m-%d %H:%M:%S"),
-            "end_date": self.end_date.strftime("%Y-%m-%d %H:%M:%S"),
-        }
-
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
+        today = localdate()
         kwargs["subscriptions_total"] = Subscription.objects.filter(
-            subscription_end__gte=self.end_date, subscription_start__lte=self.start_date
+            subscription_end__gte=today, subscription_start__lte=today
         )
         kwargs["subscriptions_types"] = settings.SITH_SUBSCRIPTIONS
         kwargs["payment_types"] = settings.SITH_SUBSCRIPTION_PAYMENT_METHOD
