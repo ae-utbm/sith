@@ -138,10 +138,22 @@ class Command(BaseCommand):
         )
 
     def create_subscriptions(self, users: list[User]):
+        subscription_types = [
+            "un-semestre",
+            "deux-semestres",
+            "cursus-tronc-commun",
+            "cursus-branche",
+        ]
+
         def prepare_subscription(_user: User, start_date: date) -> Subscription:
             payment_method = random.choice(settings.SITH_SUBSCRIPTION_PAYMENT_METHOD)[0]
-            duration = random.randint(1, 4)
-            s = Subscription(member=_user, payment_method=payment_method)
+            subscription_type = random.choice(subscription_types)
+            s = Subscription(
+                member=_user,
+                payment_method=payment_method,
+                subscription_type=subscription_type,
+            )
+            duration = settings.SITH_SUBSCRIPTIONS[subscription_type]["duration"]
             s.subscription_start = s.compute_start(d=start_date, duration=duration)
             s.subscription_end = s.compute_end(duration)
             return s
