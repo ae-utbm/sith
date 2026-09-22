@@ -11,51 +11,38 @@
 
 {% block content %}
 
-  <p>
-    <form>
-      {{ form.start_date.label }}<br>
-      {{ form.start_date }}<br><br>
-      {{ form.end_date.label }}<br>
-      {{ form.end_date }}<br>
-      <p><input type="submit" value="{% trans %}Go{% endtrans %}" /></p>
-    </form>
-  </p>
-
   <canvas id="statsChart" width="400" height="200"></canvas>
 
-  <p>
-    {% trans %}Total subscriptions{% endtrans %} : {{ subscriptions_total.count() }}<br><br>
-    {% trans %}Subscriptions by type{% endtrans %}<br><br>
-    {% for location in locations %}
-      {{ location[1] }} : <i class="nb">{{ subscriptions_total.filter(location=location[0]).count() }}</i><br>
+  {% trans %}Total subscriptions{% endtrans %} : {{ subscriptions_total.count() }}<br><br>
+  {% trans %}Subscriptions by type{% endtrans %}<br><br>
+  {% for location in locations %}
+    {{ location[1] }} : <i class="nb">{{ subscriptions_total.filter(location=location[0]).count() }}</i><br>
+  {% endfor %}
+
+  <br>
+  <table>
+    <thead>
+      <th>{% trans %}Subscription type{% endtrans %}</th>
+      {% for location in locations %}
+        <th>{{ location[1] }}</th>
+      {% endfor %}
+      <th id="graphLabel">{% trans %}Total{% endtrans %}</th>
+    </thead>
+    {% for type in subscriptions_types %}
+      <tr>
+        <td><i class="types" >{{ subscriptions_types[type]['name'] }}</i></td>
+        {% set subscriptions_total_type = subscriptions_total.filter(subscription_type=type) %}
+        {% for location in locations %}
+          <td>
+            {% set subscriptions_total_type_location = subscriptions_total_type.filter(location=location[0]) %}
+            {% trans %}Total{% endtrans %} : {{ subscriptions_total_type_location.count()}}<br>
+            {% for p_type in payment_types %}
+              {{ p_type[1] }} : <i class="nb">{{ subscriptions_total_type_location.filter(payment_method=p_type[0]).count()}}</i><br>
+            {% endfor %}
+          </td>
+        {% endfor %}
+        <td class="total"><i class="nb">{{subscriptions_total_type.count()}}</i></td>
+      </tr>
     {% endfor %}
-    <p>
-
-      <br>
-
-      <table>
-        <tr>
-          <th>{% trans %}Subscription type{% endtrans %}</th>
-          {% for location in locations %}
-            <th>{{ location[1] }}</th>
-          {% endfor %}
-          <th id="graphLabel">{% trans %}Total{% endtrans %}</th>
-          {% for type in subscriptions_types %}
-            <tr>
-              <td><i class="types" >{{ subscriptions_types[type]['name'] }}</i></td>
-              {% set subscriptions_total_type = subscriptions_total.filter(subscription_type=type) %}
-              {% for location in locations %}
-                <td>
-                  {% set subscriptions_total_type_location = subscriptions_total_type.filter(location=location[0]) %}
-                  {% trans %}Total{% endtrans %} : {{ subscriptions_total_type_location.count()}}<br>
-                  {% for p_type in payment_types %}
-                    {{ p_type[1] }} : <i class="nb">{{ subscriptions_total_type_location.filter(payment_method=p_type[0]).count()}}</i><br>
-                  {% endfor %}
-                </td>
-              {% endfor %}
-              <td class="total"><i class="nb">{{subscriptions_total_type.count()}}</i>
-              </tr>
-          {% endfor %}
-        </table>
-
+  </table>
 {% endblock %}
