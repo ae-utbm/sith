@@ -1,6 +1,13 @@
-import { BarController, BarElement, CategoryScale, Chart, LinearScale } from "chart.js";
+import {
+  BarController,
+  BarElement,
+  CategoryScale,
+  Chart,
+  LinearScale,
+  Tooltip,
+} from "chart.js";
 
-Chart.register(BarController, BarElement, CategoryScale, LinearScale);
+Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
 
 function getRandomColor() {
   const letters = "0123456789ABCDEF";
