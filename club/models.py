@@ -98,6 +98,9 @@ class Club(models.Model):
     board_group = models.OneToOneField(
         Group, related_name="club_board", on_delete=models.PROTECT, editable=False
     )
+    stock_group = models.OneToOneField(
+        Group, related_name="club_stock", on_delete=models.PROTECT, editable=False
+    )
 
     objects = ClubQuerySet.as_manager()
 
@@ -128,6 +131,9 @@ class Club(models.Model):
             )
             self.members_group = Group.objects.create(
                 name=f"{self.name} - Membres", is_manually_manageable=False
+            )
+            self.stock_group = Group.objects.create(
+                name=f"{self.name} - Stock", is_manually_manageable=False
             )
             self.make_home()
         self.make_page()

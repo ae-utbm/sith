@@ -1,0 +1,33 @@
+{% extends "core/base.jinja" %}
+
+{% block additional_js %}
+  <script type="module" src="{{ static("bundled/core/dynamic-formset-index.ts") }}"></script>
+{% endblock %}
+
+{% block title %}{% trans %}Create stock item{% endtrans %}{% endblock %}
+
+{% block content %}
+  <h2>{% trans %}Create stock item{% endtrans %}</h2>
+  <form method="post" x-data="dynamicFormSet({ prefix: '{{ formset.prefix }}' })">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    <div x-ref="formContainer">
+      {% for item_form in formset.forms %}
+        <fieldset>
+          <legend>{% trans %}Item{% endtrans %}</legend>
+          {{ item_form.as_p() }}
+        </fieldset>
+      {% endfor %}
+    </div>
+    <template x-ref="formTemplate">
+      <fieldset>
+        <legend>{% trans %}Item{% endtrans %}</legend>
+        {{ formset.empty_form.as_p() }}
+      </fieldset>
+    </template>
+    <button type="button" class="btn btn-grey" @click.prevent="addForm()">
+      <i class="fa fa-plus"></i> {% trans %}Add an item{% endtrans %}
+    </button>
+    <button type="submit">{% trans %}Save{% endtrans %}</button>
+  </form>
+{% endblock %}

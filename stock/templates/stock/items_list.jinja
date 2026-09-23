@@ -1,0 +1,34 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}{% trans %}Stock items{% endtrans %}{% endblock %}
+
+{% block content %}
+  <h3>{% trans %}Items in {% endtrans %}{{ stock.name }}</h3>
+  {% if is_editor %}
+    <a href="{{ url('stock:items_create', club_id=club.id, stock_id=stock.id) }}">
+      {% trans %}Create items{% endtrans %}
+    </a>
+    <a href="{{ url('stock:action_create', club_id=club.id, stock_id=stock.id) }}">
+      {% trans %}Create action{% endtrans %}
+    </a>
+  {% endif %}
+  {% if items %}
+    {% for item in items %}
+      <div>
+        <div>
+          <p>{{ item.name }}</p>
+          <p>{% trans %}Last known quantity: {% endtrans %}{{ item.last_known_quantity }}</p>
+        </div>
+        <div>
+          {% if is_editor %}
+            <a href="{{ url('stock:item_edit', club_id=club.id, stock_id=stock.id, item_id=item.id) }}">
+              {% trans %}Edit{% endtrans %}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>{% trans %}No item has been created yet.{% endtrans %}</p>
+  {% endif %}
+{% endblock %}

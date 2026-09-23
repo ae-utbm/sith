@@ -510,6 +510,12 @@ class ClubRoleBoardCreateView(ClubRoleBaseCreateView):
 
 class ClubRoleMemberCreateView(ClubRoleBaseCreateView):
     is_presidency = False
+    is_board = True
+    role_description = _("club role \u2013 stock manager")
+
+
+class ClubRoleMemberCreateView(ClubRoleBaseCreateView):
+    is_presidency = False
     is_board = False
     role_description = _("club role \u2013 member")
 
