@@ -8,20 +8,9 @@ from django.utils.translation import gettext_lazy as _
 
 from core.models import User
 from core.utils import get_last_promo
-from core.views.forms import SelectDate, SelectDateTime
+from core.views.forms import SelectDate
 from core.views.widgets.ajax_select import AutoCompleteSelectUser
 from subscription.models import Subscription
-
-
-class SelectionDateForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["start_date"] = forms.DateTimeField(
-            label=_("Start date"), widget=SelectDateTime, required=True
-        )
-        self.fields["end_date"] = forms.DateTimeField(
-            label=_("End date"), widget=SelectDateTime, required=True
-        )
 
 
 class SubscriptionForm(forms.ModelForm):
