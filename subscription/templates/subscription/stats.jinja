@@ -13,12 +13,6 @@
 
   <canvas id="statsChart" width="400" height="200"></canvas>
 
-  {% trans %}Total subscriptions{% endtrans %} : {{ subscriptions_total.count() }}<br><br>
-  {% trans %}Subscriptions by type{% endtrans %}<br><br>
-  {% for location in locations %}
-    {{ location[1] }} : <i class="nb">{{ subscriptions_total.filter(location=location[0]).count() }}</i><br>
-  {% endfor %}
-
   <br>
   <table>
     <thead>
@@ -28,20 +22,27 @@
       {% endfor %}
       <th id="graphLabel">{% trans %}Total{% endtrans %}</th>
     </thead>
+    <tr>
+      <td>{% trans %}All subscriptions{% endtrans %}</td>
+      {% for location in locations %}
+        <td><i class="nb">{{ total_location[location[0]] }}</i><br></td>
+      {% endfor %}
+      <td><i class="nb">{{ total_location.values()|sum }}</i></td>
+    </tr>
     {% for type in subscriptions_types %}
       <tr>
-        <td><i class="types" >{{ subscriptions_types[type]['name'] }}</i></td>
-        {% set subscriptions_total_type = subscriptions_total.filter(subscription_type=type) %}
+        <td><i class="types">{{ subscriptions_types[type]['name'] }}</i></td>
         {% for location in locations %}
           <td>
-            {% set subscriptions_total_type_location = subscriptions_total_type.filter(location=location[0]) %}
-            {% trans %}Total{% endtrans %} : {{ subscriptions_total_type_location.count()}}<br>
             {% for p_type in payment_types %}
-              {{ p_type[1] }} : <i class="nb">{{ subscriptions_total_type_location.filter(payment_method=p_type[0]).count()}}</i><br>
+              {% set subtotal = subscriptions[type][location[0]][p_type[0]] %}
+              {% if subtotal > 0 %}
+                {{ p_type[1] }} : <i class="nb">{{ subtotal }}</i><br>
+              {% endif %}
             {% endfor %}
           </td>
         {% endfor %}
-        <td class="total"><i class="nb">{{subscriptions_total_type.count()}}</i></td>
+        <td class="total"><i class="nb">{{ total_type[type] }}</i></td>
       </tr>
     {% endfor %}
   </table>

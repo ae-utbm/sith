@@ -12,11 +12,13 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count
 from django.urls import reverse
 from django.utils.timezone import localdate
 from django.utils.translation import gettext_lazy as _
@@ -102,9 +104,28 @@ class SubscriptionsStatsView(TemplateView):
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
         today = localdate()
-        kwargs["subscriptions_total"] = Subscription.objects.filter(
+        qs = Subscription.objects.filter(
             subscription_end__gte=today, subscription_start__lte=today
         )
+        grouped = qs.values("subscription_type", "location", "payment_method").annotate(
+            count=Count("*")
+        )
+        by_location = qs.values("location").annotate(count=Count("*"))
+        by_type = qs.values("subscription_type").annotate(count=Count("*"))
+        kwargs["subscriptions"] = defaultdict(
+            lambda: defaultdict(lambda: defaultdict(int))
+        )
+        for sub in grouped:
+            kwargs["subscriptions"][sub["subscription_type"]][sub["location"]][
+                sub["payment_method"]
+            ] = sub["count"]
+        kwargs["total_location"] = defaultdict(
+            int, {i["location"]: i["count"] for i in by_location}
+        )
+        kwargs["total_type"] = defaultdict(
+            int, {i["subscription_type"]: i["count"] for i in by_type}
+        )
+
         kwargs["subscriptions_types"] = settings.SITH_SUBSCRIPTIONS
         kwargs["payment_types"] = settings.SITH_SUBSCRIPTION_PAYMENT_METHOD
         kwargs["locations"] = settings.SITH_SUBSCRIPTION_LOCATIONS
