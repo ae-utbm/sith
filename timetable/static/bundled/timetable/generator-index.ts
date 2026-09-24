@@ -1,4 +1,6 @@
 import html2canvas from "html2canvas";
+import { AlertMessage } from "#core:utils/alert-message";
+import { type WeekDay as ApiWeekDay, timetableSaveTimetable } from "#openapi";
 
 // see https://regex101.com/r/QHSaPM/3
 const TIMETABLE_ROW_RE: RegExp =
@@ -78,7 +80,76 @@ function parseSlots(s: string): TimetableSlot[] {
 document.addEventListener("alpine:init", () => {
   Alpine.data("timetableGenerator", () => ({
     content: DEFAULT_TIMETABLE,
-    error: null as { incorrectRow?: string },
+    error: null as { incorrectRow?: string } | null,
+    courses: [] as TimetableSlot[],
+    edtPublic: false,
+    saving: false,
+    timetableSavedMessage: new AlertMessage(),
+
+    generate() {
+      try {
+        this.courses = parseSlots(this.content);
+        this.error = null;
+      } catch (err) {
+        type ParseRowError = { cause: { row: string } };
+        this.error = { incorrectRow: (err as ParseRowError)?.cause?.row };
+        return;
+      }
+    },
+
+    async savePng() {
+      const elem = document.getElementById("timetable");
+      const img = (await html2canvas(elem as HTMLElement)).toDataURL();
+      const downloadLink = document.createElement("a");
+      downloadLink.href = img;
+      downloadLink.download = "edt.png";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+    },
+
+    async saveSith() {
+      this.saving = true;
+      const res = await timetableSaveTimetable({
+        body: {
+          // biome-ignore lint/style/useNamingConvention: api is snake case
+          is_viewable: this.edtPublic,
+          slots: this.courses.map((c) => ({
+            // biome-ignore lint/style/useNamingConvention: api is snake case
+            start_at: c.startSlot,
+            // biome-ignore lint/style/useNamingConvention: api is snake case
+            end_at: c.endSlot,
+            weekday: (WEEKDAYS.indexOf(c.weekday) + 1) as ApiWeekDay,
+            // biome-ignore lint/style/useNamingConvention: api is snake case
+            week_group: c.weekGroup,
+            // biome-ignore lint/style/useNamingConvention: api is snake case
+            course_type: c.courseType,
+            room: c.room,
+            ue: c.ueCode,
+          })),
+        },
+      });
+      if (res.response?.ok) {
+        this.timetableSavedMessage.display(
+          gettext("This timetable has been saved in your profile"),
+          { success: true },
+        );
+      } else {
+        this.timetableSavedMessage.display(
+          interpolate(gettext("Error %d: timetable save failed"), res.response?.status),
+          { success: false },
+        );
+      }
+      this.saving = false;
+    },
+  }));
+
+  /**
+   * Alpine data dedicated to timetable display only.
+   * It can interact with the `timetableGenerator` data with x-model and x-modelable
+   * (for example of this, see timetable/generator.jinja)
+   */
+  Alpine.data("timetableDisplay", (slots: TimetableSlot[]) => ({
     displayedWeekdays: [] as WeekDay[],
     courses: [] as TimetableSlot[],
     startSlot: 0,
@@ -108,7 +179,8 @@ document.addEventListener("alpine:init", () => {
         this.courses = parseSlots(this.content);
         this.error = null;
       } catch (err) {
-        this.error = { incorrectRow: err?.cause?.row };
+        type ParseRowError = { cause: { row: string } };
+        this.error = { incorrectRow: (err as ParseRowError)?.cause?.row };
         return;
       }
 
@@ -138,7 +210,7 @@ document.addEventListener("alpine:init", () => {
     },
 
     getStyle(slot: TimetableSlot) {
-      const hasWeekGroup = slot.weekGroup !== undefined;
+      const hasWeekGroup = !!slot.weekGroup;
       const width = hasWeekGroup ? SLOT_WIDTH / 2 : SLOT_WIDTH;
       const leftOffset = slot.weekGroup === "B" ? SLOT_WIDTH / 2 : 0;
       return {
