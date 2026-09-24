@@ -78,7 +78,7 @@ function parseSlots(s: string): TimetableSlot[] {
 document.addEventListener("alpine:init", () => {
   Alpine.data("timetableGenerator", () => ({
     content: DEFAULT_TIMETABLE,
-    error: null as { incorrectRow?: string },
+    error: null as { incorrectRow?: string } | null,
     displayedWeekdays: [] as WeekDay[],
     courses: [] as TimetableSlot[],
     startSlot: 0,
@@ -108,7 +108,8 @@ document.addEventListener("alpine:init", () => {
         this.courses = parseSlots(this.content);
         this.error = null;
       } catch (err) {
-        this.error = { incorrectRow: err?.cause?.row };
+        type ParseRowError = { cause: { row: string } };
+        this.error = { incorrectRow: (err as ParseRowError)?.cause?.row };
         return;
       }
 
