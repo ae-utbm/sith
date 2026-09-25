@@ -112,7 +112,7 @@ cf. [HTTP persistant connection (wikipedia)](https://en.wikipedia.org/wiki/HTTP_
 
 Voici quelques exemples : 
 
-=== "Python (requests)"
+=== ":simple-python: Python (requests)"
 
     Dépendances :
 
@@ -132,7 +132,7 @@ Voici quelques exemples :
         print(response.json())
     ```
 
-=== "Python (aiohttp)"
+=== ":simple-python: Python (aiohttp)"
 
     Dépendances :
 
@@ -159,7 +159,7 @@ Voici quelques exemples :
     asyncio.run(main())
     ```
 
-=== "Javascript (axios)"
+=== ":simple-javascript: Javascript (axios)"
 
     Dépendances :
 
@@ -179,7 +179,7 @@ Voici quelques exemples :
     console.log(await instance.get("club/1").json());
     ```
 
-=== "Rust (reqwest)"
+=== ":simple-rust: Rust (reqwest)"
 
     Dépendances :
     
