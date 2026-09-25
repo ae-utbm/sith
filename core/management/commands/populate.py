@@ -252,7 +252,7 @@ class Command(BaseCommand):
             date_of_birth="1942-06-12",
             password="plop",
         )
-        User.objects.all().update(cgu_approved=True)
+        User.objects.all().update(cgu_approved_at=now())
         User.groups.through.objects.bulk_create(
             [
                 User.groups.through(group=groups.counter_admin, user=counter),

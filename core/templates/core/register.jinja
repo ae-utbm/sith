@@ -19,15 +19,15 @@
     {% csrf_token %}
     {% render_honeypot_field %}
     {% for field in form %}
-      {% if field.name not in ["cgu_approved", "captcha"] %}
+      {% if field.name not in ["cgu_approved_at", "captcha"] %}
         <div>{{ field.as_field_group() }}</div>
       {% endif %}
     {% endfor %}
     <div class="captcha">{{ form.captcha.as_field_group() }}</div>
     <div class="form-group">
-      {{ form.cgu_approved.errors }}
-      {{ form.cgu_approved }}
-      {{ form.cgu_approved.label_tag() }}
+      {{ form.cgu_approved_at.errors }}
+      {{ form.cgu_approved_at }}
+      {{ form.cgu_approved_at.label_tag() }}
     </div>
     <input type="submit" class="btn btn-blue" value="{% trans %}Register{% endtrans %}" />
   </form>

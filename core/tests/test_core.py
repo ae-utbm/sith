@@ -27,6 +27,7 @@ from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
+from django.utils.timezone import now
 from django.views.generic import View
 from django.views.generic.base import ContextMixin
 from model_bakery import baker
@@ -55,7 +56,7 @@ class TestUserRegistration:
             "password2": "plop",
             "captcha_0": "dummy-value",
             "captcha_1": "PASSED",
-            "cgu_approved": True,
+            "cgu_approved_at": now(),
         }
 
     @pytest.fixture()
@@ -94,7 +95,7 @@ class TestUserRegistration:
             ({"last_name": ""}, "Ce champ est obligatoire."),
             ({"captcha_1": "WRONG_CAPTCHA"}, "CAPTCHA invalide"),
             (
-                {"cgu_approved": ""},
+                {"cgu_approved_at": False},
                 "Vous devez approuver les conditions générales d'utilisation",
             ),
         ],
@@ -155,7 +156,7 @@ class TestUserRegistration:
 class TestUserLogin:
     @pytest.fixture()
     def user(self) -> User:
-        return baker.make(User, password=make_password("plop"), cgu_approved=True)
+        return baker.make(User, password=make_password("plop"), cgu_approved_at=now())
 
     @pytest.mark.parametrize(
         "identifier_getter",
@@ -203,7 +204,7 @@ class TestUserLogin:
 @pytest.mark.django_db
 class TestCGU:
     def test_cgu_approval(self, client: Client):
-        user = baker.make(User, password=make_password("plop"), cgu_approved=False)
+        user = baker.make(User, password=make_password("plop"), cgu_approved_at=None)
         user_url = user.get_absolute_url()
         res = client.post(
             reverse("core:login"),
@@ -211,11 +212,11 @@ class TestCGU:
         )
         assertRedirects(res, reverse("core:approve_cgu", query={"next": user_url}))
         res = client.post(
-            reverse("core:approve_cgu"), {"cgu_approved": True, "next": user_url}
+            reverse("core:approve_cgu"), {"cgu_approved_at": now(), "next": user_url}
         )
         assertRedirects(res, user_url)
         user.refresh_from_db()
-        assert user.cgu_approved
+        assert user.cgu_approved_at is not None
 
     def test_access_cgu_when_already_approved(self, client: Client):
         url = reverse("core:approve_cgu")
@@ -223,10 +224,10 @@ class TestCGU:
         res = client.get(url)
         assertRedirects(res, reverse("core:login"))
 
-        client.force_login(baker.make(User, cgu_approved=True))
+        client.force_login(baker.make(User, cgu_approved_at=now()))
         res = client.get(url)
         assertRedirects(res, settings.LOGIN_REDIRECT_URL)
-        res = client.post(url, {"cgu_approved": True})
+        res = client.post(url, {"cgu_approved_at": now()})
         assertRedirects(res, settings.LOGIN_REDIRECT_URL)
 
 

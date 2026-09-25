@@ -44,6 +44,7 @@ from django.core.files.base import ContentFile
 from django.core.mail import send_mail
 from django.db import models, transaction
 from django.db.models import Exists, F, OuterRef, Q
+from django.db.models.aggregates import Max
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -291,7 +292,7 @@ class User(AbstractUser):
         ),
         blank=True,
     )
-    cgu_approved = models.BooleanField(_("ToS approved"), default=False)
+    cgu_approved_at = models.DateTimeField(_("ToS approved at"), null=True, blank=False)
     godfathers = models.ManyToManyField("User", related_name="godchildren", blank=True)
 
     objects = CustomUserManager()
@@ -418,6 +419,14 @@ class User(AbstractUser):
             self.date_of_birth.day,
         )
         return age
+
+    @cached_property
+    def approved_current_cgu(self) -> bool:
+        qs = PageRev.objects.filter(page___full_name=settings.SITH_CGU_PAGE)
+        return (
+            self.cgu_approved_at is not None
+            and self.cgu_approved_at > qs.aggregate(date=Max("date"))["date"]
+        )
 
     def make_home(self):
         if self.home is None:

@@ -89,7 +89,7 @@ class SithLoginView(views.LoginView):
     def get_success_url(self) -> str:
         redirect_to = self.get_redirect_url()
         default_url = self.get_default_redirect_url()
-        if not self.request.user.cgu_approved:
+        if not self.request.user.approved_current_cgu:
             query = {"next": redirect_to} if redirect_to else {}
             return reverse("core:approve_cgu", query=query)
         return redirect_to or default_url
@@ -205,7 +205,7 @@ class CGUApprovalView(views.RedirectURLMixin, UpdateView):
     def dispatch(self, request, *args, **kwargs):
         if self.request.user.is_anonymous:
             return redirect("core:login")
-        if self.request.user.cgu_approved:
+        if self.request.user.approved_current_cgu:
             return redirect(self.get_success_url())
         return super().dispatch(request, *args, **kwargs)
 

@@ -110,6 +110,12 @@ class FutureDateTimeField(forms.DateTimeField):
 
 
 class CGUApprovalField(forms.BooleanField):
+    """Form field with a checkbox to approve the CGUs.
+
+    The checkbox must be checked to be valid.
+    If valid, then the value of the field is the current timestamp.
+    """
+
     default_error_messages = {"required": _("You must approve the terms of service.")}
     __label = None
 
@@ -123,6 +129,9 @@ class CGUApprovalField(forms.BooleanField):
         kwargs["label"] = lazy(self.get_label, str)
         kwargs["required"] = True
         super().__init__(label_suffix=label_suffix, **kwargs)
+
+    def to_python(self, value):
+        return now() if super().to_python(value) else None
 
     def get_label(self):
         if not self.__label:
@@ -175,15 +184,28 @@ class RegisteringForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email", "cgu_approved")
-        field_classes = {"email": AntiSpamEmailField, "cgu_approved": CGUApprovalField}
+        fields = ("first_name", "last_name", "email", "cgu_approved_at")
+        field_classes = {
+            "email": AntiSpamEmailField,
+            "cgu_approved_at": CGUApprovalField,
+        }
 
 
 class CGUApprovalForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["cgu_approved"]
-        field_classes = {"cgu_approved": CGUApprovalField}
+        fields = ["cgu_approved_at"]
+        field_classes = {"cgu_approved_at": CGUApprovalField}
+
+    def __init__(self, *args, instance: User | None = None, **kwargs):
+        if instance:
+            # If this form is displayed,
+            # then we want the user to explicitly check the button.
+            # So we pretend cgu were never approved (even if they were).
+            # If we didn't do that, the button would be initially checked,
+            # even if the approval was done before the last CGU version.
+            instance.cgu_approved_at = False
+        super().__init__(*args, instance=instance, **kwargs)
 
 
 class UserProfileForm(forms.ModelForm):
