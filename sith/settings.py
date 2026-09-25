@@ -372,6 +372,9 @@ SITH_PDF_CLUB_ID = env.int("SITH_PDF_CLUB_ID", default=2)
 # Main root for club pages
 SITH_CLUB_ROOT_PAGE = "clubs"
 
+SITH_CGU_PAGE = env.str("SITH_CGU_PAGE", default="legals/ri")
+
+
 # Define the date in the year serving as
 # reference for the subscriptions calendar (month, day)
 SITH_SEMESTER_START_AUTUMN = (8, 15)  # 15 August
@@ -416,8 +419,6 @@ SITH_FORUM_PAGE_LENGTH = 30
 # SAS variables
 SITH_SAS_ROOT_DIR_ID = env.int("SITH_SAS_ROOT_DIR_ID", default=4)
 SITH_SAS_IMAGES_PER_PAGE = 60
-
-SITH_CGU_FILE_ID = env.int("SITH_CGU_FILE_ID", default=5)
 
 SITH_PROFILE_DEPARTMENTS = [
     ("TC", _("TC")),

@@ -1234,9 +1234,8 @@ class Page(models.Model):
             raise NotLocked("The page is not locked and thus can not be saved")
         self.full_clean()
         if not self.id:
-            super().save(
-                *args, **kwargs
-            )  # Save a first time to correctly set _full_name
+            # Save a first time to correctly set _full_name
+            super().save(*args, **kwargs)
         # This reset the _full_name just before saving to maintain a coherent field quicker for queries than the
         # recursive method
         # It also update all the children to maintain correct names
@@ -1255,7 +1254,6 @@ class Page(models.Model):
         return Page.objects.filter(_full_name=name).first()
 
     def clean(self):
-        """Cleans up only the name for the moment, but this can be used to make any treatment before saving the object."""
         if "/" in self.name:
             self.name = self.name.split("/")[-1]
         if (

@@ -25,6 +25,7 @@ from io import StringIO
 from pathlib import Path
 from typing import ClassVar, NamedTuple
 
+import itertools
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
@@ -125,18 +126,6 @@ class Command(BaseCommand):
         sas = SithFile.objects.create(
             name="SAS", owner=root, id=settings.SITH_SAS_ROOT_DIR_ID
         )
-        s = SithFile.objects.create(
-            name="CGU",
-            is_folder=False,
-            file=ContentFile(
-                content="Conditions générales d'utilisation", name="cgu.txt"
-            ),
-            owner=root,
-        )
-        s.view_groups.add(settings.SITH_GROUP_PUBLIC_ID)
-        # Page needed for club creation
-        p = Page(name=settings.SITH_CLUB_ROOT_PAGE)
-        p.save(force_lock=True)
         clubs = self._create_clubs()
 
         self.reset_index("club")
@@ -287,34 +276,7 @@ class Command(BaseCommand):
             ]
         )
 
-        # Adding syntax help page
-        syntax_page = Page(name="Aide_sur_la_syntaxe")
-        syntax_page.save(force_lock=True)
-        PageRev.objects.create(
-            page=syntax_page,
-            title="Aide sur la syntaxe",
-            author=skia,
-            content=(self.ROOT_PATH / "core" / "fixtures" / "SYNTAX.md").read_text(),
-        )
-        services_page = Page(name="Services")
-        services_page.save(force_lock=True)
-        PageRev.objects.create(
-            page=services_page,
-            title="Services",
-            author=skia,
-            content="- [Eboutic](/eboutic)\n- Matmat\n- SAS\n- Weekmail\n- Forum",
-        )
-
-        index_page = Page(name="Index")
-        index_page.save(force_lock=True)
-        PageRev.objects.create(
-            page=index_page,
-            title="Wiki index",
-            author=root,
-            content="Welcome to the wiki page!",
-        )
-
-        groups.public.viewable_page.set([syntax_page, services_page, index_page])
+        self._create_pages(groups)
 
         self._create_subscription(root)
         self._create_subscription(skia)
@@ -585,6 +547,48 @@ class Command(BaseCommand):
             ]
         )
 
+    def _create_pages(self, groups: PopulatedGroups):
+        pages = Page.objects.bulk_create(
+            [Page(name=s, _full_name=s) for s in settings.SITH_CGU_PAGE.split("/")]
+        )
+        for parent, son in itertools.pairwise(pages):
+            son.parent = parent
+            son.save(force_lock=True)
+        cgu_page = pages[-1]
+
+        syntax_page = Page(name="Aide_sur_la_syntaxe")
+        syntax_page.save(force_lock=True)
+        services_page = Page(name="Services")
+        services_page.save(force_lock=True)
+        index_page = Page(name="Index")
+        index_page.save(force_lock=True)
+
+        page_revs = [
+            PageRev(page=cgu_page, title="Règlement informatique", content=""),
+            PageRev(
+                page=syntax_page,
+                title="Aide sur la syntaxe",
+                content=(
+                    self.ROOT_PATH / "core" / "fixtures" / "SYNTAX.md"
+                ).read_text(),
+            ),
+            PageRev(
+                page=services_page,
+                title="Services",
+                content="- [Eboutic](/eboutic)\n- Matmat\n- SAS\n- Weekmail\n- Forum",
+            ),
+            PageRev(
+                page=index_page, title="Wiki index", content="Welcome to the wiki page!"
+            ),
+        ]
+        for rev in page_revs:
+            rev.author_id = settings.SITH_ROOT_USER_ID
+            rev.revision = 1
+        PageRev.objects.bulk_create(page_revs)
+        groups.public.viewable_page.set(
+            [syntax_page, services_page, index_page, cgu_page]
+        )
+
     def _create_products(self, groups: PopulatedGroups, clubs: PopulatedClubs):
         beers_type, cotis_type, refill_type, verre_type = (
             ProductType.objects.bulk_create(
@@ -745,6 +749,10 @@ class Command(BaseCommand):
         s.save()
 
     def _create_clubs(self) -> PopulatedClubs:
+        # Page needed for club creation
+        p = Page(name=settings.SITH_CLUB_ROOT_PAGE)
+        p.save(force_lock=True)
+
         ae = Club.objects.create(
             id=1, name="AE", address="6 Boulevard Anatole France, 90000 Belfort"
         )

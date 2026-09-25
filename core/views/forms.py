@@ -110,7 +110,6 @@ class FutureDateTimeField(forms.DateTimeField):
 
 
 class CGUApprovalField(forms.BooleanField):
-    cgu_file_id = settings.SITH_CGU_FILE_ID
     default_error_messages = {"required": _("You must approve the terms of service.")}
     __label = None
 
@@ -127,12 +126,13 @@ class CGUApprovalField(forms.BooleanField):
 
     def get_label(self):
         if not self.__label:
+            url = reverse("core:page", kwargs={"page_name": settings.SITH_CGU_PAGE})
             self.__label = mark_safe(
                 _(
                     "I have read and I approve the "
                     '<a href="%(url)s" target="_blank">Terms of Service</a>'
                 )
-                % {"url": reverse("core:page", kwargs={"page_name": self.cgu_file_id})}
+                % {"url": url}
             )
         return self.__label
 
