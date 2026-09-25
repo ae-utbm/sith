@@ -27,12 +27,12 @@ from datetime import timedelta
 # This file contains all the views that concern the user model
 from operator import itemgetter
 from smtplib import SMTPException
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from django.contrib import messages
 from django.contrib.auth import login, views
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
+from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
@@ -60,6 +60,7 @@ from honeypot.decorators import check_honeypot
 from core.auth.mixins import CanEditMixin, CanEditPropMixin, CanViewMixin
 from core.models import Gift, Preferences, User
 from core.views.forms import (
+    CGUApprovalForm,
     GiftForm,
     LoginForm,
     RegisteringForm,
@@ -71,6 +72,7 @@ from core.views.forms import (
 from core.views.mixins import FragmentMixin, TabedViewMixin, UseFragmentsMixin
 from counter.models import Refilling, Selling
 from eboutic.models import Invoice
+from sith import settings
 from trombi.views import UserTrombiForm
 
 if TYPE_CHECKING:
@@ -82,8 +84,15 @@ class SithLoginView(views.LoginView):
 
     template_name = "core/login.jinja"
     authentication_form = LoginForm
-    form_class = PasswordChangeForm
     redirect_authenticated_user = True
+
+    def get_success_url(self) -> str:
+        redirect_to = self.get_redirect_url()
+        default_url = self.get_default_redirect_url()
+        if not self.request.user.approved_current_cgu:
+            query = {"next": redirect_to} if redirect_to else {}
+            return reverse("core:approve_cgu", query=query)
+        return redirect_to or default_url
 
 
 class SithPasswordChangeView(views.PasswordChangeView):
@@ -186,6 +195,27 @@ class UserCreationView(FormView):
         user = form.save()
         login(self.request, user)
         return super().form_valid(form)
+
+
+class CGUApprovalView(views.RedirectURLMixin, UpdateView):
+    form_class = CGUApprovalForm
+    next_page = settings.LOGIN_REDIRECT_URL
+    template_name = "core/cgu_approve.jinja"
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user.is_anonymous:
+            return redirect("core:login")
+        if self.request.user.approved_current_cgu:
+            return redirect(self.get_success_url())
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self, *args, **kwargs):
+        return self.request.user
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        return super().get_context_data(**kwargs) | {
+            self.redirect_field_name: self.get_redirect_url()
+        }
 
 
 class UserMeRedirect(LoginRequiredMixin, RedirectView):

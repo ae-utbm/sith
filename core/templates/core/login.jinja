@@ -35,28 +35,17 @@
 
     {% csrf_token %}
 
-    <div>
-      <label for="{{ form.username.name }}">{{ form.username.label }}</label>
-      {{ form.username }}
-      {{ form.username.errors }}
-    </div>
-
-    <div>
-      <label for="{{ form.password.name }}">{{ form.password.label }}</label>
-      {{ form.password }}
-      {{ form.password.errors }}
-    </div>
+    {{ form }}
 
     <input type="hidden" name="next" value="{{ next }}">
-    <input type="submit" value="{% trans %}Login{% endtrans %}">
+    <input type="submit" class="btn btn-blue" value="{% trans %}Login{% endtrans %}">
 
-
-        {# Assumes you setup the password_reset view in your URLconf #}
-    <p>
-      <a href="{{ url('core:password_reset') }}">{% trans %}Lost password?{% endtrans %}</a>
-      &nbsp;&nbsp;
-      <a href="{{ url('core:register') }}">{% trans %}Create account{% endtrans %}</a>
-    </p>
+    <div>
+      <a href="{{ url("core:password_reset") }}">{% trans %}Lost password?{% endtrans %}</a>
+    </div>
+    <div>
+      <a href="{{ url("core:register") }}">{% trans %}Create account{% endtrans %}</a>
+    </div>
   </form>
 {% endblock %}
 

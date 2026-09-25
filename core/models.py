@@ -44,6 +44,7 @@ from django.core.files.base import ContentFile
 from django.core.mail import send_mail
 from django.db import models, transaction
 from django.db.models import Exists, F, OuterRef, Q
+from django.db.models.aggregates import Max
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -291,6 +292,7 @@ class User(AbstractUser):
         ),
         blank=True,
     )
+    cgu_approved_at = models.DateTimeField(_("ToS approved at"), null=True, blank=False)
     godfathers = models.ManyToManyField("User", related_name="godchildren", blank=True)
 
     objects = CustomUserManager()
@@ -417,6 +419,14 @@ class User(AbstractUser):
             self.date_of_birth.day,
         )
         return age
+
+    @cached_property
+    def approved_current_cgu(self) -> bool:
+        qs = PageRev.objects.filter(page___full_name=settings.SITH_CGU_PAGE)
+        return (
+            self.cgu_approved_at is not None
+            and self.cgu_approved_at > qs.aggregate(date=Max("date"))["date"]
+        )
 
     def make_home(self):
         if self.home is None:
@@ -1233,9 +1243,8 @@ class Page(models.Model):
             raise NotLocked("The page is not locked and thus can not be saved")
         self.full_clean()
         if not self.id:
-            super().save(
-                *args, **kwargs
-            )  # Save a first time to correctly set _full_name
+            # Save a first time to correctly set _full_name
+            super().save(*args, **kwargs)
         # This reset the _full_name just before saving to maintain a coherent field quicker for queries than the
         # recursive method
         # It also update all the children to maintain correct names
@@ -1254,7 +1263,6 @@ class Page(models.Model):
         return Page.objects.filter(_full_name=name).first()
 
     def clean(self):
-        """Cleans up only the name for the moment, but this can be used to make any treatment before saving the object."""
         if "/" in self.name:
             self.name = self.name.split("/")[-1]
         if (
