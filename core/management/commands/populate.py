@@ -20,16 +20,15 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
+import itertools
 from datetime import date, datetime, timedelta
 from io import StringIO
 from pathlib import Path
 from typing import ClassVar, NamedTuple
 
-import itertools
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
-from django.core.files.base import ContentFile
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db import connection
@@ -253,6 +252,7 @@ class Command(BaseCommand):
             date_of_birth="1942-06-12",
             password="plop",
         )
+        User.objects.all().update(cgu_approved=True)
         User.groups.through.objects.bulk_create(
             [
                 User.groups.through(group=groups.counter_admin, user=counter),
