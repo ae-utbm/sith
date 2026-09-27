@@ -87,14 +87,14 @@
             >
               <i class="fa fa-exclamation delete-action"></i>
             </a>
-          {% endif %}
-          {% if comment.author_id == user.id or user.has_perm("pedagogy.delete_uecomment") %}
-            <a
-              href="{{ url("pedagogy:comment_delete", comment_id=comment.id) }}"
-              tooltip="{% trans %}Delete{% endtrans %}"
-            >
-              <i class="fa fa-trash-can delete-action"></i>
-            </a>
+            {% if comment.author_id == user.id or user.has_perm("pedagogy.delete_uecomment") %}
+              <a
+                href="{{ url("pedagogy:comment_delete", comment_id=comment.id) }}"
+                tooltip="{% trans %}Delete{% endtrans %}"
+              >
+                <i class="fa fa-trash-can delete-action"></i>
+              </a>
+            {% endif %}
           {% endif %}
         </div>
       </div>
