@@ -2,6 +2,7 @@ import type TomSelect from "tom-select";
 import type { TomOption } from "tom-select/src/types";
 import type { UserAjaxSelect } from "#core:core/components/ajax-select-index";
 import { paginated } from "#core:utils/api";
+import { History } from "#core:utils/history";
 import {
   type IdentifiedUserSchema,
   type ModerationRequestSchema,
@@ -227,6 +228,11 @@ document.addEventListener("alpine:init", () => {
      * Error message when a moderation operation fails
      **/
     moderationError: "",
+    /**
+     * Method of pushing new url to the browser history
+     * Used by popstate event and always reset to it's default value when used
+     **/
+    pushstate: History.Push,
 
     async init() {
       this.pictures = (
@@ -261,10 +267,12 @@ document.addEventListener("alpine:init", () => {
         if (!event.state || event.state.sasPictureId === undefined) {
           return;
         }
+        this.pushstate = History.Replace;
         this.currentPicture = this.pictures.find(
           (i: PictureSchema) => i.id === Number.parseInt(event.state.sasPictureId, 10),
         ) as PictureWithIdentifications;
       });
+      this.pushstate = History.Replace; /* Avoid first url push */
       await this.updatePicture();
     },
 
@@ -277,11 +285,17 @@ document.addEventListener("alpine:init", () => {
      * the list of identified users are updated.
      */
     async updatePicture(): Promise<void> {
-      window.history.replaceState(
-        { sasPictureId: this.currentPicture.id },
-        "",
-        this.currentPicture.sas_url,
-      );
+      const updateArgs = {
+        data: { sasPictureId: this.currentPicture.id },
+        unused: "",
+        url: this.currentPicture.sas_url,
+      };
+      if (this.pushstate === History.Replace) {
+        window.history.replaceState(updateArgs.data, updateArgs.unused, updateArgs.url);
+        this.pushstate = History.Push;
+      } else {
+        window.history.pushState(updateArgs.data, updateArgs.unused, updateArgs.url);
+      }
 
       this.moderationError = "";
       const index: number = this.pictures.indexOf(this.currentPicture);
