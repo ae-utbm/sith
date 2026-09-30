@@ -154,10 +154,10 @@ document.addEventListener("alpine:init", () => {
     courses: [] as TimetableSlot[],
     startSlot: 0,
     endSlot: 0,
-    table: {
-      height: 0,
-      width: 0,
-    },
+    table: { height: 0, width: 0 },
+    edtPublic: false,
+    saving: false,
+    timetableSavedMessage: new AlertMessage(),
 
     colors: {} as Record<string, string>,
     colorPalette: [
@@ -251,6 +251,37 @@ document.addEventListener("alpine:init", () => {
       document.body.appendChild(downloadLink);
       downloadLink.click();
       downloadLink.remove();
+    },
+
+    async saveSith() {
+      this.saving = true;
+      const res = await timetableSaveTimetable({
+        body: {
+          // biome-ignore lint/style/useNamingConvention: api is snake case
+          is_viewable: this.edtPublic,
+          slots: this.courses.map((c) =>
+            Object.assign({}, c, {
+              // biome-ignore lint/style/useNamingConvention: api is snake case
+              start_at: c.startSlot,
+              // biome-ignore lint/style/useNamingConvention: api is snake case
+              end_at: c.endSlot,
+              weekday: WEEKDAYS.indexOf(c.weekday) + 1,
+            }),
+          ),
+        },
+      });
+      if (res.response?.ok) {
+        this.timetableSavedMessage.display(
+          gettext("This timetable has been saved in your profile"),
+          { success: true },
+        );
+      } else {
+        this.timetableSavedMessage.display(
+          interpolate(gettext("Error %d: timetable save failed"), res.response?.status),
+          { success: false },
+        );
+      }
+      this.saving = false;
     },
   }));
 });
