@@ -339,7 +339,7 @@ class UserVisibilityForm(forms.ModelForm):
         ["show_my_stats", "show_my_timetable"],
         widgets={
             "show_my_stats": forms.CheckboxInput(attrs={"class": "switch"}),
-            "show_my_timetable": forms.CheckboxInput(attrs={"class": "switch"})
+            "show_my_timetable": forms.CheckboxInput(attrs={"class": "switch"}),
         },
     )
     show_my_stats = __preferences_fields["show_my_stats"]
@@ -358,7 +358,9 @@ class UserVisibilityForm(forms.ModelForm):
         instance = super().save(commit=commit)
         if commit:
             instance.preferences.show_my_stats = self.cleaned_data["show_my_stats"]
-            instance.preferences.show_my_timetable = self.cleaned_data["show_my_timetable"]
+            instance.preferences.show_my_timetable = self.cleaned_data[
+                "show_my_timetable"
+            ]
             instance.preferences.save()
         return instance
 
