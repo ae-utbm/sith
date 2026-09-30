@@ -92,12 +92,39 @@
         </div>
       </div>
     </div>
-    <button
-      class="margin-bottom btn btn-blue"
-      @click="savePng"
-      x-show="table.height > 0 && table.width > 0"
-    >
-      {% trans %}Save to PNG{% endtrans %}
-    </button>
+    <template x-if="table.height > 0 && table.width > 0">
+      <section>
+        {% if user.has_perm("timetable.add_self_timetable") %}
+          <div id="timetable-save" class="margin-bottom">
+            <h3>{% trans %}Save on your profile{% endtrans %}</h3>
+            <form>
+              <fieldset>
+                <input type="checkbox" class="switch" id="edt-public-switch-id" x-model="edtPublic">
+                <label for="edt-public-switch-id">{% trans %}Make this timetable public{% endtrans %}</label>
+                <span class="helptext">
+                  {% trans trimmed url=url("core:user_prefs", user_id=user.id) %}
+                    You can change this at any time in <a href="{{ url }}">your preferences</a>
+                  {% endtrans %}
+                </span>
+              </fieldset>
+              <button class="btn btn-blue" :disabled="saving" @click.prevent="saveSith">
+                {% trans %}Save timetable{% endtrans %}
+              </button>
+              <p
+                class="alert"
+                :class="timetableSavedMessage.success ? 'alert-green' : 'alert-red'"
+                x-show="timetableSavedMessage.open"
+                x-transition.duration.500ms
+                x-text="timetableSavedMessage.content"
+              ></p>
+            </form>
+          </div>
+        {% endif %}
+        <h3 class="margin-bottom">{% trans %}Export{% endtrans %}</h3>
+        <button class="margin-bottom btn btn-blue" @click="savePng">
+          {% trans %}Export to PNG{% endtrans %}
+        </button>
+      </section>
+    </template>
   </div>
 {% endblock content %}
