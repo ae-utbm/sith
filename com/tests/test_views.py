@@ -26,6 +26,7 @@ from django.utils import html
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
 from model_bakery import baker
+from model_bakery.recipe import Recipe
 from pytest_django.asserts import assertNumQueries, assertRedirects
 
 from club.models import Club, ClubRole, Membership
@@ -362,3 +363,37 @@ def test_moderate_poster(client: Client, referer: str | None):
     poster.refresh_from_db()
     assert poster.is_moderated
     assert poster.moderator == user
+
+
+class TestNewsDetail(TestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.news = baker.make(News, is_published=True)
+        cls.user = subscriber_user.make()
+        cls.url = reverse("com:news_detail", kwargs={"news_id": cls.news.id})
+
+    def test_page_ok(self):
+        self.client.force_login(self.user)
+        res = self.client.get(self.url)
+        assert res.status_code == 200
+
+    def test_displayed_date(self):
+        self.client.force_login(self.user)
+        n = now()
+        date_recipe = Recipe(NewsDate, news=self.news)
+        date_recipe.make(
+            start_date=n - timedelta(days=1, hours=6), end_date=n - timedelta(days=1)
+        )
+        date_recipe.make(
+            start_date=n - timedelta(hours=6), end_date=n + timedelta(hours=1)
+        )
+        expected = date_recipe.make(  # we expect the next happening date.
+            start_date=n + timedelta(days=1), end_date=n + timedelta(days=1, hours=1)
+        )
+        date_recipe.make(
+            start_date=n + timedelta(days=2), end_date=n + timedelta(days=2, hours=1)
+        )
+        self.client.force_login(self.user)
+        res = self.client.get(self.url)
+        assert res.status_code == 200
+        assert res.context_data["date"] == expected
