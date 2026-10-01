@@ -37,8 +37,7 @@ body {
       margin: 0;
     }
 
-    >div,
-    >form {
+    form {
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
@@ -49,66 +48,32 @@ body {
       max-width: 500px;
       margin-top: 20px;
 
-      >p,
-      >div {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+      input[type="submit"] {
         width: 100%;
-        margin: 0;
-
-        >label {
-          width: 100%;
-
-          @media (min-width: 500px) {
-            width: 300px;
-          }
-        }
+        max-width: 300px;
+        margin-top: 1em;
       }
 
-      >input,
-      >p>input,
-      >div>input {
-        box-sizing: border-box;
-        width: 100%;
-        max-width: 500px;
-
-        @media (min-width: 500px) {
-          max-width: 300px;
-        }
-      }
-
-      >.errorlist {
+      .errorlist {
         color: red;
         text-align: center;
         margin: 10px 0 0 0;
         list-style-type: none;
       }
 
-      >.required>.helptext {
-        text-align: center;
-        font-style: italic;
-      }
-
-      >.required:last-of-type {
-        box-sizing: border-box;
+      div, fieldset {
         max-width: 300px;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-between;
+      }
+      .captcha {
+        box-sizing: border-box;
 
-        >label {
-          width: 100%;
+        fieldset {
+          margin-bottom: unset
         }
 
         >img {
           width: 70px;
           object-fit: contain;
-        }
-
-        >input {
-          width: 200px;
         }
       }
     }

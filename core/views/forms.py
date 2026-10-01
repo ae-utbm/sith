@@ -30,9 +30,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import Permission
-from django.contrib.staticfiles.management.commands.collectstatic import (
-    staticfiles_storage,
-)
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import (
@@ -42,6 +40,9 @@ from django.forms import (
     TextInput,
     Widget,
 )
+from django.urls import reverse
+from django.utils.functional import lazy
+from django.utils.safestring import mark_safe
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
@@ -108,6 +109,43 @@ class FutureDateTimeField(forms.DateTimeField):
         return {"min": widget.format_value(now())}
 
 
+class CGUApprovalField(forms.BooleanField):
+    """Form field with a checkbox to approve the CGUs.
+
+    The checkbox must be checked to be valid.
+    If valid, then the value of the field is the current timestamp.
+    """
+
+    default_error_messages = {"required": _("You must approve the terms of service.")}
+    __label = None
+
+    def __init__(self, *, label_suffix: str | None = "", **kwargs):
+        # Because the core app of the sith is so huge,
+        # and because we require a url from the latter,
+        # putting the reverse into the __init__ will result in it
+        # being evaluated at server startup time (even with reverse_lazy).
+        # This will result in a circular import.
+        # Thus, we must keep the label in its own property and force it to be lazy.
+        kwargs["label"] = lazy(self.get_label, str)
+        kwargs["required"] = True
+        super().__init__(label_suffix=label_suffix, **kwargs)
+
+    def to_python(self, value):
+        return now() if super().to_python(value) else None
+
+    def get_label(self):
+        if not self.__label:
+            url = reverse("core:page", kwargs={"page_name": settings.SITH_CGU_PAGE})
+            self.__label = mark_safe(
+                _(
+                    "I have read and I approve the "
+                    '<a href="%(url)s" target="_blank">Terms of Service</a>'
+                )
+                % {"url": url}
+            )
+        return self.__label
+
+
 # Forms
 
 
@@ -146,8 +184,28 @@ class RegisteringForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email")
-        field_classes = {"email": AntiSpamEmailField}
+        fields = ("first_name", "last_name", "email", "cgu_approved_at")
+        field_classes = {
+            "email": AntiSpamEmailField,
+            "cgu_approved_at": CGUApprovalField,
+        }
+
+
+class CGUApprovalForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["cgu_approved_at"]
+        field_classes = {"cgu_approved_at": CGUApprovalField}
+
+    def __init__(self, *args, instance: User | None = None, **kwargs):
+        if instance:
+            # If this form is displayed,
+            # then we want the user to explicitly check the button.
+            # So we pretend cgu were never approved (even if they were).
+            # If we didn't do that, the button would be initially checked,
+            # even if the approval was done before the last CGU version.
+            instance.cgu_approved_at = False
+        super().__init__(*args, instance=instance, **kwargs)
 
 
 class UserProfileForm(forms.ModelForm):
