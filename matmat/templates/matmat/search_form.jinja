@@ -25,7 +25,7 @@
       {% endfor %}
     </div>
     {% if page_obj.has_other_pages() %}
-      {{ paginate_htmx(page_obj, paginator) }}
+      {{ paginate_htmx(request, page_obj, paginator) }}
     {% endif %}
     <hr>
   {% endif %}

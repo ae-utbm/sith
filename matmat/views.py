@@ -20,7 +20,6 @@
 # Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #
-
 from django.db.models import F
 from django.views.generic import ListView
 from django.views.generic.edit import FormMixin

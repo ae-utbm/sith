@@ -123,14 +123,14 @@ document.addEventListener("alpine:init", () => {
 
     onRefillingSuccess(event: CustomEvent) {
       if (
-        event.type !== "htmx:after-swap" ||
-        event.detail.failed ||
-        event.detail.elt.querySelector(".errorlist")
+        event.type !== "htmx:after:swap" ||
+        event.detail.ctx.response.status !== 200 ||
+        event.detail.ctx.target.querySelector(".errorlist")
       ) {
         return;
       }
       this.customerBalance += Number.parseFloat(
-        (event.detail.target.querySelector("#id_amount") as HTMLInputElement).value,
+        (event.detail.ctx.target.querySelector("#id_amount") as HTMLInputElement).value,
       );
       document.getElementById("selling-accordion")?.setAttribute("open", "");
       this.codeField?.widget.focus();

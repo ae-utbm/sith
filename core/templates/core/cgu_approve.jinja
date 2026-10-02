@@ -1,0 +1,39 @@
+{% extends "core/base.jinja" %}
+
+{%- block additional_css -%}
+  <link rel="stylesheet" href="{{ static('user/login.scss') }}">
+{%- endblock -%}
+
+{% block title %}
+  {% trans %}Login{% endtrans %}
+{% endblock %}
+
+{% block info_boxes %}
+{% endblock %}
+
+{% block nav %}
+{% endblock %}
+
+{% block content %}
+  <h1 class="title">{% trans %}Terms of Service{% endtrans %}</h1>
+
+  <form method="post" id="login-form">
+    {% csrf_token %}
+
+    <div class="alert alert-yellow">
+      {% trans trimmed %}
+        To continue using our services,
+        please read and approve the AE website's terms of service
+      {% endtrans %}
+    </div>
+    <div class="form-group">
+      {{ form.cgu_approved_at.errors }}
+      {{ form.cgu_approved_at }}
+      {{ form.cgu_approved_at.label_tag() }}
+    </div>
+
+    <input type="hidden" name="next" value="{{ next }}">
+    <input type="submit" class="btn btn-blue">
+  </form>
+{% endblock %}
+

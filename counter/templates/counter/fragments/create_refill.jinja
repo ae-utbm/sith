@@ -4,6 +4,8 @@
   hx-swap="outerHTML"
 >
   {% csrf_token %}
-  {{  form.as_p() }}
-  <input type="submit" value="{% trans %}Go{% endtrans %}"/>
+  <div class="margin-bottom">
+    {{ form.as_p() }}
+  </div>
+  <input type="submit" class="btn btn-blue" value="{% trans %}Go{% endtrans %}"/>
 </form>

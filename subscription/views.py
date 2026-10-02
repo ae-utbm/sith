@@ -12,21 +12,21 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
+from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse, reverse_lazy
+from django.db.models import Count
+from django.urls import reverse
 from django.utils.timezone import localdate
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DetailView, TemplateView
-from django.views.generic.edit import FormView
 
 from core.views import FragmentMixin, UseFragmentsMixin
 from core.views.group import PermissionGroupsUpdateView
 from subscription.forms import (
-    SelectionDateForm,
     SubscriptionExistingUserForm,
     SubscriptionNewUserForm,
 )
@@ -93,35 +93,39 @@ class SubscriptionPermissionView(PermissionGroupsUpdateView):
     extra_context = {"object_name": _("the groups that can create subscriptions")}
 
 
-class SubscriptionsStatsView(FormView):
+class SubscriptionsStatsView(TemplateView):
     template_name = "subscription/stats.jinja"
-    form_class = SelectionDateForm
-    success_url = reverse_lazy("subscriptions:stats")
 
     def dispatch(self, request, *arg, **kwargs):
-        self.start_date = localdate()
-        self.end_date = self.start_date
         if request.user.is_root or request.user.is_board_member:
             return super().dispatch(request, *arg, **kwargs)
         raise PermissionDenied
 
-    def post(self, request, *args, **kwargs):
-        self.form = self.get_form()
-        self.start_date = self.form["start_date"]
-        self.end_date = self.form["end_date"]
-        return super().post(request, *args, **kwargs)
-
-    def get_initial(self):
-        return {
-            "start_date": self.start_date.strftime("%Y-%m-%d %H:%M:%S"),
-            "end_date": self.end_date.strftime("%Y-%m-%d %H:%M:%S"),
-        }
-
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["subscriptions_total"] = Subscription.objects.filter(
-            subscription_end__gte=self.end_date, subscription_start__lte=self.start_date
+        today = localdate()
+        qs = Subscription.objects.filter(
+            subscription_end__gte=today, subscription_start__lte=today
         )
+        grouped = qs.values("subscription_type", "location", "payment_method").annotate(
+            count=Count("*")
+        )
+        by_location = qs.values("location").annotate(count=Count("*"))
+        by_type = qs.values("subscription_type").annotate(count=Count("*"))
+        kwargs["subscriptions"] = defaultdict(
+            lambda: defaultdict(lambda: defaultdict(int))
+        )
+        for sub in grouped:
+            kwargs["subscriptions"][sub["subscription_type"]][sub["location"]][
+                sub["payment_method"]
+            ] = sub["count"]
+        kwargs["total_location"] = defaultdict(
+            int, {i["location"]: i["count"] for i in by_location}
+        )
+        kwargs["total_type"] = defaultdict(
+            int, {i["subscription_type"]: i["count"] for i in by_type}
+        )
+
         kwargs["subscriptions_types"] = settings.SITH_SUBSCRIPTIONS
         kwargs["payment_types"] = settings.SITH_SUBSCRIPTION_PAYMENT_METHOD
         kwargs["locations"] = settings.SITH_SUBSCRIPTION_LOCATIONS

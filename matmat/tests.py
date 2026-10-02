@@ -58,3 +58,13 @@ class TestMatmatronch(TestCase):
         assert list(response.context_data["object_list"]) == []
         assert not response.context_data["form"].is_valid()
         assert "Recherche vide" in response.context_data["form"].non_field_errors()
+
+    def test_search_many_users(self):
+        """Test that the pagination works when a lot of users are returned."""
+
+        baker.make(User, promo=17, _quantity=40, _bulk_create=True)
+        self.client.force_login(subscriber_user.make())
+        response = self.client.get(reverse("matmat:search", query={"promo": 17}))
+        assert response.status_code == 200
+        assert response.context_data["paginator"].count == 43
+        assert response.context_data["paginator"].num_pages == 3

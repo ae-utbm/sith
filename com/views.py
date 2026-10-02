@@ -301,7 +301,9 @@ class NewsDetailView(CanViewMixin, DetailView):
     queryset = News.objects.select_related("club", "author", "moderator")
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {"date": self.object.dates.first()}
+        return super().get_context_data(**kwargs) | {
+            "date": self.object.dates.filter(start_date__gt=now()).first()
+        }
 
 
 class NewsFeed(Feed):
