@@ -1,4 +1,6 @@
 import html2canvas from "html2canvas";
+import { AlertMessage } from "#core:utils/alert-message";
+import { timetableSaveTimetable } from "#openapi";
 
 // see https://regex101.com/r/QHSaPM/3
 const TIMETABLE_ROW_RE: RegExp =
@@ -78,15 +80,15 @@ function parseSlots(s: string): TimetableSlot[] {
 document.addEventListener("alpine:init", () => {
   Alpine.data("timetableGenerator", () => ({
     content: DEFAULT_TIMETABLE,
-    error: null as { incorrectRow?: string },
+    error: null as { incorrectRow?: string } | null,
     displayedWeekdays: [] as WeekDay[],
     courses: [] as TimetableSlot[],
     startSlot: 0,
     endSlot: 0,
-    table: {
-      height: 0,
-      width: 0,
-    },
+    table: { height: 0, width: 0 },
+    edtPublic: false,
+    saving: false,
+    timetableSavedMessage: new AlertMessage(),
 
     colors: {} as Record<string, string>,
     colorPalette: [
@@ -108,7 +110,8 @@ document.addEventListener("alpine:init", () => {
         this.courses = parseSlots(this.content);
         this.error = null;
       } catch (err) {
-        this.error = { incorrectRow: err?.cause?.row };
+        type ParseRowError = { cause: { row: string } };
+        this.error = { incorrectRow: (err as ParseRowError)?.cause?.row };
         return;
       }
 
@@ -179,6 +182,37 @@ document.addEventListener("alpine:init", () => {
       document.body.appendChild(downloadLink);
       downloadLink.click();
       downloadLink.remove();
+    },
+
+    async saveSith() {
+      this.saving = true;
+      const res = await timetableSaveTimetable({
+        body: {
+          // biome-ignore lint/style/useNamingConvention: api is snake case
+          is_viewable: this.edtPublic,
+          slots: this.courses.map((c) =>
+            Object.assign({}, c, {
+              // biome-ignore lint/style/useNamingConvention: api is snake case
+              start_at: c.startSlot,
+              // biome-ignore lint/style/useNamingConvention: api is snake case
+              end_at: c.endSlot,
+              weekday: WEEKDAYS.indexOf(c.weekday) + 1,
+            }),
+          ),
+        },
+      });
+      if (res.response?.ok) {
+        this.timetableSavedMessage.display(
+          gettext("This timetable has been saved in your profile"),
+          { success: true },
+        );
+      } else {
+        this.timetableSavedMessage.display(
+          interpolate(gettext("Error %d: timetable save failed"), res.response?.status),
+          { success: false },
+        );
+      }
+      this.saving = false;
     },
   }));
 });
