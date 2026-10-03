@@ -78,6 +78,9 @@ function parseSlots(s: string): TimetableSlot[] {
 }
 
 document.addEventListener("alpine:init", () => {
+  /**
+   * Alpine data that can parse a timetable, save it and export it to png.
+   */
   Alpine.data("timetableGenerator", () => ({
     content: DEFAULT_TIMETABLE,
     error: null as { incorrectRow?: string } | null,
@@ -95,151 +98,6 @@ document.addEventListener("alpine:init", () => {
         this.error = { incorrectRow: (err as ParseRowError)?.cause?.row };
         return;
       }
-    },
-
-    async savePng() {
-      const elem = document.getElementById("timetable");
-      const img = (await html2canvas(elem as HTMLElement)).toDataURL();
-      const downloadLink = document.createElement("a");
-      downloadLink.href = img;
-      downloadLink.download = "edt.png";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      downloadLink.remove();
-    },
-
-    async saveSith() {
-      this.saving = true;
-      const res = await timetableSaveTimetable({
-        body: {
-          // biome-ignore lint/style/useNamingConvention: api is snake case
-          is_viewable: this.edtPublic,
-          slots: this.courses.map((c) => ({
-            // biome-ignore lint/style/useNamingConvention: api is snake case
-            start_at: c.startSlot,
-            // biome-ignore lint/style/useNamingConvention: api is snake case
-            end_at: c.endSlot,
-            weekday: (WEEKDAYS.indexOf(c.weekday) + 1) as ApiWeekDay,
-            // biome-ignore lint/style/useNamingConvention: api is snake case
-            week_group: c.weekGroup,
-            // biome-ignore lint/style/useNamingConvention: api is snake case
-            course_type: c.courseType,
-            room: c.room,
-            ue: c.ueCode,
-          })),
-        },
-      });
-      if (res.response?.ok) {
-        this.timetableSavedMessage.display(
-          gettext("This timetable has been saved in your profile"),
-          { success: true },
-        );
-      } else {
-        this.timetableSavedMessage.display(
-          interpolate(gettext("Error %d: timetable save failed"), res.response?.status),
-          { success: false },
-        );
-      }
-      this.saving = false;
-    },
-  }));
-
-  /**
-   * Alpine data dedicated to timetable display only.
-   * It can interact with the `timetableGenerator` data with x-model and x-modelable
-   * (for example of this, see timetable/generator.jinja)
-   */
-  Alpine.data("timetableDisplay", (slots: TimetableSlot[]) => ({
-    displayedWeekdays: [] as WeekDay[],
-    courses: [] as TimetableSlot[],
-    startSlot: 0,
-    endSlot: 0,
-    table: { height: 0, width: 0 },
-    edtPublic: false,
-    saving: false,
-    timetableSavedMessage: new AlertMessage(),
-
-    colors: {} as Record<string, string>,
-    colorPalette: [
-      "#27ae60",
-      "#2980b9",
-      "#c0392b",
-      "#7f8c8d",
-      "#f1c40f",
-      "#1abc9c",
-      "#95a5a6",
-      "#26C6DA",
-      "#c2185b",
-      "#e64a19",
-      "#1b5e20",
-    ],
-
-    generate() {
-      try {
-        this.courses = parseSlots(this.content);
-        this.error = null;
-      } catch (err) {
-        type ParseRowError = { cause: { row: string } };
-        this.error = { incorrectRow: (err as ParseRowError)?.cause?.row };
-        return;
-      }
-
-      // color each UE
-      let colorIndex = 0;
-      for (const slot of this.courses) {
-        if (!this.colors[slot.ueCode]) {
-          this.colors[slot.ueCode] =
-            this.colorPalette[colorIndex % this.colorPalette.length];
-          colorIndex++;
-        }
-      }
-
-      this.displayedWeekdays = WEEKDAYS.filter((day) =>
-        this.courses.some((slot: TimetableSlot) => slot.weekday === day),
-      );
-      this.startSlot = this.courses.reduce(
-        (acc: number, curr: TimetableSlot) => Math.min(acc, curr.startSlot),
-        25 * 4,
-      );
-      this.endSlot = this.courses.reduce(
-        (acc: number, curr: TimetableSlot) => Math.max(acc, curr.endSlot),
-        1,
-      );
-      this.table.height = SLOT_HEIGHT * (this.endSlot - this.startSlot);
-      this.table.width = SLOT_WIDTH * this.displayedWeekdays.length;
-    },
-
-    getStyle(slot: TimetableSlot) {
-      const hasWeekGroup = !!slot.weekGroup;
-      const width = hasWeekGroup ? SLOT_WIDTH / 2 : SLOT_WIDTH;
-      const leftOffset = slot.weekGroup === "B" ? SLOT_WIDTH / 2 : 0;
-      return {
-        height: `${(slot.endSlot - slot.startSlot) * SLOT_HEIGHT}px`,
-        width: `${width}px`,
-        top: `${(slot.startSlot - this.startSlot) * SLOT_HEIGHT}px`,
-        left: `${this.displayedWeekdays.indexOf(slot.weekday) * SLOT_WIDTH + leftOffset}px`,
-        backgroundColor: this.colors[slot.ueCode],
-      };
-    },
-
-    getHours(): [string, object][] {
-      let hour: number = Number.parseInt(
-        this.courses
-          .map((c: TimetableSlot) => c.startHour)
-          .reduce((res: string, hour: string) => (hour < res ? hour : res), "24:00")
-          .split(":")[0],
-        10,
-      );
-      const res: [string, object][] = [];
-      for (let i = 0; i <= this.endSlot - this.startSlot; i += 60 / MINUTES_PER_SLOT) {
-        res.push([`${hour}:00`, { top: `${i * SLOT_HEIGHT}px` }]);
-        hour += 1;
-      }
-      return res;
-    },
-
-    getWidth() {
-      return this.displayedWeekdays.length * SLOT_WIDTH + 20;
     },
 
     async savePng() {
@@ -282,6 +140,101 @@ document.addEventListener("alpine:init", () => {
         );
       }
       this.saving = false;
+    },
+  }));
+
+  /**
+   * Alpine data dedicated to timetable display only.
+   * It can interact with the `timetableGenerator` data with x-model and x-modelable
+   * (for example of this, see timetable/generator.jinja)
+   */
+  Alpine.data("timetableDisplay", (slots: TimetableSlot[]) => ({
+    displayedWeekdays: [] as WeekDay[],
+    startSlot: 0,
+    endSlot: 0,
+    table: { height: 0, width: 0 },
+    slots: slots,
+
+    colors: {} as Record<string, string>,
+    colorPalette: [
+      "#27ae60",
+      "#2980b9",
+      "#c0392b",
+      "#7f8c8d",
+      "#f1c40f",
+      "#1abc9c",
+      "#95a5a6",
+      "#26C6DA",
+      "#c2185b",
+      "#e64a19",
+      "#1b5e20",
+    ],
+
+    init() {
+      this.$watch("slots", () => this.display());
+    },
+
+    display() {
+      // color each UE
+      let colorIndex = 0;
+      for (const slot of this.slots) {
+        if (!this.colors[slot.ueCode]) {
+          this.colors[slot.ueCode] =
+            this.colorPalette[colorIndex % this.colorPalette.length];
+          colorIndex++;
+        }
+      }
+
+      this.displayedWeekdays = WEEKDAYS.filter((day) =>
+        this.slots.some((slot: TimetableSlot) => slot.weekday === day),
+      );
+      this.startSlot = this.slots.reduce(
+        (acc: number, curr: TimetableSlot) => Math.min(acc, curr.startSlot),
+        25 * 4,
+      );
+      this.endSlot = this.slots.reduce(
+        (acc: number, curr: TimetableSlot) => Math.max(acc, curr.endSlot),
+        1,
+      );
+      this.table.height = SLOT_HEIGHT * (this.endSlot - this.startSlot);
+      this.table.width = SLOT_WIDTH * this.displayedWeekdays.length;
+    },
+
+    getStyle(slot: TimetableSlot) {
+      const hasWeekGroup = !!slot.weekGroup;
+      const width = hasWeekGroup ? SLOT_WIDTH / 2 : SLOT_WIDTH;
+      const leftOffset = slot.weekGroup === "B" ? SLOT_WIDTH / 2 : 0;
+      return {
+        height: `${(slot.endSlot - slot.startSlot) * SLOT_HEIGHT}px`,
+        width: `${width}px`,
+        top: `${(slot.startSlot - this.startSlot) * SLOT_HEIGHT}px`,
+        left: `${this.displayedWeekdays.indexOf(slot.weekday) * SLOT_WIDTH + leftOffset}px`,
+        backgroundColor: this.colors[slot.ueCode],
+      };
+    },
+
+    /**
+     * Return the hours that should be displayed on this timetable,
+     * with their `top` placing
+     */
+    getHours(): [string, { top: `${number}px` }][] {
+      let hour: number = Number.parseInt(
+        this.slots
+          .map((c: TimetableSlot) => c.startHour)
+          .reduce((res: string, hour: string) => (hour < res ? hour : res), "24:00")
+          .split(":")[0],
+        10,
+      );
+      const res: [string, { top: `${number}px` }][] = [];
+      for (let i = 0; i <= this.endSlot - this.startSlot; i += 60 / MINUTES_PER_SLOT) {
+        res.push([`${hour}:00`, { top: `${i * SLOT_HEIGHT}px` }]);
+        hour += 1;
+      }
+      return res;
+    },
+
+    getWidth() {
+      return this.displayedWeekdays.length * SLOT_WIDTH + 20;
     },
   }));
 });
