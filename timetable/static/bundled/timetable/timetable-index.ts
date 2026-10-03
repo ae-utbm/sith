@@ -78,7 +78,10 @@ function parseSlots(s: string): TimetableSlot[] {
 }
 
 document.addEventListener("alpine:init", () => {
-  Alpine.data("timetableGenerator", () => ({
+  /**
+   * Alpine data that can parse a timetable, save it and export it to png.
+   */
+  Alpine.data("timetableGenerator", (userId: number) => ({
     content: DEFAULT_TIMETABLE,
     error: null as { incorrectRow?: string } | null,
     courses: [] as TimetableSlot[],
@@ -111,6 +114,8 @@ document.addEventListener("alpine:init", () => {
     async saveSith() {
       this.saving = true;
       const res = await timetableSaveTimetable({
+        // biome-ignore lint/style/useNamingConvention: api is snake case
+        path: { user_id: userId },
         body: {
           // biome-ignore lint/style/useNamingConvention: api is snake case
           is_viewable: this.edtPublic,
@@ -151,13 +156,10 @@ document.addEventListener("alpine:init", () => {
    */
   Alpine.data("timetableDisplay", (slots: TimetableSlot[]) => ({
     displayedWeekdays: [] as WeekDay[],
-    courses: [] as TimetableSlot[],
     startSlot: 0,
     endSlot: 0,
     table: { height: 0, width: 0 },
-    edtPublic: false,
-    saving: false,
-    timetableSavedMessage: new AlertMessage(),
+    slots: slots,
 
     colors: {} as Record<string, string>,
     colorPalette: [
@@ -174,19 +176,14 @@ document.addEventListener("alpine:init", () => {
       "#1b5e20",
     ],
 
-    generate() {
-      try {
-        this.courses = parseSlots(this.content);
-        this.error = null;
-      } catch (err) {
-        type ParseRowError = { cause: { row: string } };
-        this.error = { incorrectRow: (err as ParseRowError)?.cause?.row };
-        return;
-      }
+    init() {
+      this.$watch("slots", () => this.display());
+    },
 
+    display() {
       // color each UE
       let colorIndex = 0;
-      for (const slot of this.courses) {
+      for (const slot of this.slots) {
         if (!this.colors[slot.ueCode]) {
           this.colors[slot.ueCode] =
             this.colorPalette[colorIndex % this.colorPalette.length];
@@ -195,13 +192,13 @@ document.addEventListener("alpine:init", () => {
       }
 
       this.displayedWeekdays = WEEKDAYS.filter((day) =>
-        this.courses.some((slot: TimetableSlot) => slot.weekday === day),
+        this.slots.some((slot: TimetableSlot) => slot.weekday === day),
       );
-      this.startSlot = this.courses.reduce(
+      this.startSlot = this.slots.reduce(
         (acc: number, curr: TimetableSlot) => Math.min(acc, curr.startSlot),
         25 * 4,
       );
-      this.endSlot = this.courses.reduce(
+      this.endSlot = this.slots.reduce(
         (acc: number, curr: TimetableSlot) => Math.max(acc, curr.endSlot),
         1,
       );
@@ -222,15 +219,19 @@ document.addEventListener("alpine:init", () => {
       };
     },
 
-    getHours(): [string, object][] {
+    /**
+     * Return the hours that should be displayed on this timetable,
+     * with their `top` placing
+     */
+    getHours(): [string, { top: `${number}px` }][] {
       let hour: number = Number.parseInt(
-        this.courses
+        this.slots
           .map((c: TimetableSlot) => c.startHour)
           .reduce((res: string, hour: string) => (hour < res ? hour : res), "24:00")
           .split(":")[0],
         10,
       );
-      const res: [string, object][] = [];
+      const res: [string, { top: `${number}px` }][] = [];
       for (let i = 0; i <= this.endSlot - this.startSlot; i += 60 / MINUTES_PER_SLOT) {
         res.push([`${hour}:00`, { top: `${i * SLOT_HEIGHT}px` }]);
         hour += 1;
@@ -240,48 +241,6 @@ document.addEventListener("alpine:init", () => {
 
     getWidth() {
       return this.displayedWeekdays.length * SLOT_WIDTH + 20;
-    },
-
-    async savePng() {
-      const elem = document.getElementById("timetable");
-      const img = (await html2canvas(elem as HTMLElement)).toDataURL();
-      const downloadLink = document.createElement("a");
-      downloadLink.href = img;
-      downloadLink.download = "edt.png";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      downloadLink.remove();
-    },
-
-    async saveSith() {
-      this.saving = true;
-      const res = await timetableSaveTimetable({
-        body: {
-          // biome-ignore lint/style/useNamingConvention: api is snake case
-          is_viewable: this.edtPublic,
-          slots: this.courses.map((c) =>
-            Object.assign({}, c, {
-              // biome-ignore lint/style/useNamingConvention: api is snake case
-              start_at: c.startSlot,
-              // biome-ignore lint/style/useNamingConvention: api is snake case
-              end_at: c.endSlot,
-              weekday: WEEKDAYS.indexOf(c.weekday) + 1,
-            }),
-          ),
-        },
-      });
-      if (res.response?.ok) {
-        this.timetableSavedMessage.display(
-          gettext("This timetable has been saved in your profile"),
-          { success: true },
-        );
-      } else {
-        this.timetableSavedMessage.display(
-          interpolate(gettext("Error %d: timetable save failed"), res.response?.status),
-          { success: false },
-        );
-      }
-      this.saving = false;
     },
   }));
 });
