@@ -13,12 +13,12 @@
 {% endblock %}
 
 {% block content %}
-  <p>
-    <a href="{{ url('counter:new_product_type') }}" class="btn btn-blue">
+  {% if user.has_perm("counter.add_producttype") %}
+    <a href="{{ url('counter:new_product_type') }}" class="btn btn-blue margin-bottom">
       {% trans %}New product type{% endtrans %}
       <i class="fa fa-plus"></i>
     </a>
-  </p>
+  {% endif %}
   {% if product_types %}
     <aside>
       <p>

@@ -13,36 +13,11 @@
 #
 #
 
-from django.conf import settings
-from django.core.exceptions import PermissionDenied
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic.base import View
 
 from core.views.mixins import TabedViewMixin
 from counter.utils import is_logged_in_counter
-
-
-class CounterAdminMixin(View):
-    """Protect counter admin section."""
-
-    edit_group = [settings.SITH_GROUP_COUNTER_ADMIN_ID]
-    edit_club = []
-
-    def _test_group(self, user):
-        return any(user.is_in_group(pk=grp_id) for grp_id in self.edit_group)
-
-    def _test_club(self, user):
-        return any(c.can_be_edited_by(user) for c in self.edit_club)
-
-    def dispatch(self, request, *args, **kwargs):
-        if not (
-            request.user.is_root
-            or self._test_group(request.user)
-            or self._test_club(request.user)
-        ):
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
 
 
 class CounterTabsMixin(TabedViewMixin):
@@ -89,45 +64,70 @@ class CounterTabsMixin(TabedViewMixin):
 
 class CounterAdminTabsMixin(TabedViewMixin):
     tabs_title = _("Counter administration")
-    list_of_tabs = [
-        {
-            "url": reverse_lazy("counter:admin_list"),
-            "slug": "counters",
-            "name": _("Counters"),
-        },
-        {
-            "url": reverse_lazy("counter:product_list"),
-            "slug": "products",
-            "name": _("Products"),
-        },
-        {
-            "url": reverse_lazy("counter:product_formula_list"),
-            "slug": "formulas",
-            "name": _("Formulas"),
-        },
-        {
-            "url": reverse_lazy("counter:product_type_list"),
-            "slug": "product_types",
-            "name": _("Product types"),
-        },
-        {
-            "url": reverse_lazy("counter:returnable_list"),
-            "slug": "returnable_products",
-            "name": _("Returnable products"),
-        },
-        {
-            "url": reverse_lazy("counter:cash_summary_list"),
-            "slug": "cash_summary",
-            "name": _("Cash register summaries"),
-        },
-        {
-            "url": reverse_lazy("counter:invoices_call"),
-            "slug": "invoices_call",
-            "name": _("Invoices call"),
-        },
-        {
-            "url": reverse_lazy("counter:eticket_list"),
-            "slug": "etickets",
-            "name": _("Etickets"),
-        },
-    ]
+
+    def get_list_of_tabs(self):
+        user = self.request.user
+        res = [
+            {
+                "url": reverse_lazy("counter:admin_list"),
+                "slug": "counters",
+                "name": _("Counters"),
+            }
+        ]
+        if user.has_perm("counter.view_product"):
+            res.append(
+                {
+                    "url": reverse_lazy("counter:product_list"),
+                    "slug": "products",
+                    "name": _("Products"),
+                }
+            )
+        if user.has_perm("counter.view_productformula"):
+            res.append(
+                {
+                    "url": reverse_lazy("counter:product_formula_list"),
+                    "slug": "formulas",
+                    "name": _("Formulas"),
+                }
+            )
+        if user.has_perm("counter.view_producttype"):
+            res.append(
+                {
+                    "url": reverse_lazy("counter:product_type_list"),
+                    "slug": "product_types",
+                    "name": _("Product types"),
+                }
+            )
+        if user.has_perm("counter.view_returnableproduct"):
+            res.append(
+                {
+                    "url": reverse_lazy("counter:returnable_list"),
+                    "slug": "returnable_products",
+                    "name": _("Returnable products"),
+                }
+            )
+        if user.has_perm("counter.view_cashregistersummary"):
+            res.append(
+                {
+                    "url": reverse_lazy("counter:cash_summary_list"),
+                    "slug": "cash_summary",
+                    "name": _("Cash register summaries"),
+                }
+            )
+        if user.has_perm("counter.view_invoicecall"):
+            res.append(
+                {
+                    "url": reverse_lazy("counter:invoices_call"),
+                    "slug": "invoices_call",
+                    "name": _("Invoices call"),
+                }
+            )
+        if user.has_perm("counter.view_eticket"):
+            res.append(
+                {
+                    "url": reverse_lazy("counter:eticket_list"),
+                    "slug": "etickets",
+                    "name": _("Etickets"),
+                }
+            )
+        return res
