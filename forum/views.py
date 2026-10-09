@@ -346,13 +346,16 @@ class ForumTopicDetailView(CanViewMixin, DetailView):
         return kwargs
 
 
-class ForumMessageView(SingleObjectMixin, RedirectView):
+class ForumMessageView(SingleObjectMixin, UserPassesTestMixin, RedirectView):
     model = ForumMessage
     pk_url_kwarg = "message_id"
     permanent = False
 
-    def get_redirect_url(self, *args, **kwargs):
+    def test_func(self) -> bool:
         self.object = self.get_object()
+        return self.request.user.can_view(self.object)
+
+    def get_redirect_url(self, *args, **kwargs):
         return self.object.get_url()
 
 
