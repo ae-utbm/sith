@@ -84,6 +84,7 @@ from core.views import (
     notification,
     send_file,
 )
+from timetable.views import UserTimetableView
 
 register_converter(FourDigitYearConverter, "yyyy")
 register_converter(TwoDigitMonthConverter, "mm")
@@ -184,6 +185,11 @@ urlpatterns = [
         name="user_account_detail",
     ),
     path("user/<int:user_id>/stats/", UserStatsView.as_view(), name="user_stats"),
+    path(
+        "user/<int:user_id>/edt/",
+        UserTimetableView.as_view(),
+        name="user_timetable",
+    ),
     path(
         "user/<int:user_id>/gift/create/",
         GiftCreateView.as_view(),
