@@ -29,5 +29,13 @@
     </span>
     {{ form.show_my_stats.errors }}
   </fieldset>
+  <fieldset class="form-group">
+    {{ form.show_my_timetable }}
+    {{ form.show_my_timetable.label_tag() }}
+    <span class="helptext">
+      {{ form.show_my_timetable.help_text }}
+    </span>
+    {{ form.show_my_timetable.errors }}
+  </fieldset>
   <input type="submit" class="btn btn-blue" value="{% trans %}Save{% endtrans %}">
 </form>
