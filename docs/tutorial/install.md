@@ -18,7 +18,8 @@ il n'est pas possible de développer le site sur ce système d'exploitation.
 Heureusement, il existe une alternative qui ne requiert pas de désinstaller votre
 OS ni de mettre un dual boot sur votre ordinateur : `WSL`.
 
-- **Prérequis:** vous devez être sur Windows 10 version 2004 ou ultérieure (build 19041 & versions ultérieures) ou Windows 11.
+- **Prérequis:** vous devez être sur Windows 10 version 2004 ou ultérieure (build 19041 & versions ultérieures) ou
+  Windows 11.
 - **Plus d'info:** [docs.microsoft.com](https://docs.microsoft.com/fr-fr/windows/wsl/install)
 
 ```shell
@@ -43,7 +44,7 @@ il suffit d'utiliser la commande suivante :
 cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
 ```
 
-!!!note
+!!!success
 
     À ce stade, si vous avez réussi votre installation de `WSL` ou bien qu'il
     était déjà installé, vous pouvez effectuer la mise en place du projet en suivant
@@ -101,10 +102,10 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
         ln -s /usr/bin/valkey-server /usr/bin/redis-server
         ```
 
-
 === "macOS"
 
-    Pour installer les dépendances, il est fortement recommandé d'installer le gestionnaire de paquets `homebrew <https://brew.sh/index_fr>`_.  
+    Pour installer les dépendances, il est fortement recommandé 
+    d'installer le gestionnaire de paquets `homebrew <https://brew.sh/index_fr>`_.  
     Il est également nécessaire d'avoir installé xcode
     
     ```bash    
@@ -116,12 +117,15 @@ cd /mnt/<la_lettre_du_disque>/vos/fichiers/comme/dhab
     
     !!!note
     
-        Si vous rencontrez des erreurs lors de votre configuration, n'hésitez pas à vérifier l'état de votre installation homebrew avec :code:`brew doctor`
+        Si vous rencontrez des erreurs lors de votre configuration, 
+        n'hésitez pas à vérifier l'état de votre installation homebrew 
+        avec :code:`brew doctor`
 
 !!!note
 
     Python ne fait pas parti des dépendances puisqu'il est automatiquement
-    installé par uv. Il est cependant parfois nécessaire d'installer les headers Python nécessaire à la compilation de certains paquets.
+    installé par uv. Il est cependant parfois nécessaire d'installer 
+    les headers Python nécessaire à la compilation de certains paquets.
 
 ## Finaliser l'installation
 
@@ -144,7 +148,6 @@ uv run ./manage.py install_xapian
     La commande `install_xapian` est longue et affiche beaucoup
     de texte à l'écran.
     C'est normal, il ne faut pas avoir peur.
-
 
 La modification de la configuration passe par la modification de variables
 d'environnement.
@@ -174,8 +177,8 @@ uv run ./manage.py compilemessages
 
 ## Démarrer le serveur de développement
 
-Il faut toujours avoir préalablement activé 
-l'environnement virtuel comme fait plus haut 
+Il faut toujours avoir préalablement activé
+l'environnement virtuel comme fait plus haut
 et se placer à la racine du projet.
 Il suffit ensuite d'utiliser cette commande :
 
@@ -183,11 +186,32 @@ Il suffit ensuite d'utiliser cette commande :
 uv run ./manage.py runserver
 ```
 
-!!!note
+Le serveur est alors accessible à l'adresse
+[http://localhost:8000](http://localhost:8000) 
+ou bien [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
 
-    Le serveur est alors accessible à l'adresse
-    [http://localhost:8000](http://localhost:8000) 
-    ou bien [http://127.0.0.1:8000/](http://127.0.0.1:8000/).
+Pour vous connecter, vous pouvez utiliser un des comptes utilisateur
+créés durant l'installation :
+
+| username         | description                                                                |
+|------------------|----------------------------------------------------------------------------|
+| `root`           | super-utilisateur<br/>il peut tout faire et tout voir                      |
+| `subscriber`     | simple cotisant                                                            |
+| `old_subscriber` | ancien cotisant                                                            |
+| `public`         | non-cotisant                                                               |
+| `krophil`        | cotisant<br/>barman Foyer<br/>président du Troll Penché                    |
+| `sli`            | cotisant<br/>VP Troll                                                      |
+| `skia`           | cotisant<br/>barman MDE<br/>membre du bureau AE<br/>ancien membre du Troll |
+| `comunity`       | cotisant<br/>membre du bureau PdF<br/>admin communication                  |
+| `counter`        | cotisant<br/>admin comptoirs                                               |
+| `comptable`      | cotisant<br/>admin comptabilité                                            |
+| `rbatsbak`       | cotisant<br/>membre du Troll                                               |
+
+En plus de ces dernier, quelques centaines d'utilisateurs
+supplémentaires sont générés procéduralement,
+afin de rajouter un peu de volume de données.
+
+Tous les utilisateurs ont le mot de passe `plop`.
 
 !!!note
 
@@ -228,10 +252,10 @@ uv run ./manage.py runserver
 
 La documentation est automatiquement mise en ligne à chaque envoi de code sur GitHub.
 Pour l'utiliser en local ou globalement pour la modifier,
-il existe une commande du site qui génère 
+il existe une commande du site qui génère
 la documentation et lance un serveur la rendant
 accessible à l'adresse [http://localhost:8080](http://localhost:8000).
-Cette commande génère la documentation à 
+Cette commande génère la documentation à
 chacune de ses modifications,
 inutile de relancer le serveur à chaque fois.
 
@@ -241,7 +265,7 @@ uv run mkdocs serve
 
 ## Lancer les tests
 
-Pour lancer les tests, il suffit d'utiliser 
+Pour lancer les tests, il suffit d'utiliser
 la commande suivante :
 
 ```bash
