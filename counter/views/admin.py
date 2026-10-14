@@ -48,7 +48,7 @@ from counter.models import (
     Selling,
 )
 from counter.utils import is_logged_in_counter
-from counter.views.mixins import CounterAdminMixin, CounterAdminTabsMixin
+from counter.views.mixins import CounterAdminTabsMixin
 
 
 class CounterListView(CounterAdminTabsMixin, CanViewMixin, ListView):
@@ -84,17 +84,18 @@ class CounterEditView(
         return reverse_lazy("counter:admin", kwargs={"counter_id": self.object.id})
 
 
-class CounterEditPropView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
-    """Edit a counter's main informations (for the counter's admin)."""
+class CounterEditPropView(CounterAdminTabsMixin, PermissionRequiredMixin, UpdateView):
+    """Edit a counter's main infos."""
 
     model = Counter
     form_class = modelform_factory(Counter, fields=["name", "club", "type"])
     pk_url_kwarg = "counter_id"
     template_name = "core/edit.jinja"
     current_tab = "counters"
+    permission_required = "counter.change_counter"
 
 
-class CounterCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
+class CounterCreateView(CounterAdminTabsMixin, PermissionRequiredMixin, CreateView):
     """Create a counter (for the admins)."""
 
     model = Counter
@@ -105,9 +106,10 @@ class CounterCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
     )
     template_name = "core/create.jinja"
     current_tab = "counters"
+    permission_required = "counter.add_counter"
 
 
-class CounterDeleteView(CounterAdminTabsMixin, CounterAdminMixin, DeleteView):
+class CounterDeleteView(CounterAdminTabsMixin, PermissionRequiredMixin, DeleteView):
     """Delete a counter (for the admins)."""
 
     model = Counter
@@ -115,30 +117,33 @@ class CounterDeleteView(CounterAdminTabsMixin, CounterAdminMixin, DeleteView):
     template_name = "core/delete_confirm.jinja"
     success_url = reverse_lazy("counter:admin_list")
     current_tab = "counters"
+    permission_required = "counter.delete_counter"
 
 
 # Product management
 
 
-class ProductTypeListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
+class ProductTypeListView(CounterAdminTabsMixin, PermissionRequiredMixin, ListView):
     """A list view for the admins."""
 
     model = ProductType
     template_name = "counter/product_type_list.jinja"
     current_tab = "product_types"
     context_object_name = "product_types"
+    permission_required = "counter.view_producttype"
 
 
-class ProductTypeCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
+class ProductTypeCreateView(CounterAdminTabsMixin, PermissionRequiredMixin, CreateView):
     """A create view for the admins."""
 
     model = ProductType
     fields = ["name", "description", "comment", "icon"]
     template_name = "core/create.jinja"
     current_tab = "products"
+    permission_required = "counter.add_producttype"
 
 
-class ProductTypeEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
+class ProductTypeEditView(CounterAdminTabsMixin, PermissionRequiredMixin, UpdateView):
     """An edit view for the admins."""
 
     model = ProductType
@@ -146,23 +151,26 @@ class ProductTypeEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     fields = ["name", "description", "comment", "icon"]
     pk_url_kwarg = "type_id"
     current_tab = "products"
+    permission_required = "counter.change_producttype"
 
 
-class ProductListView(CounterAdminTabsMixin, CounterAdminMixin, TemplateView):
+class ProductListView(CounterAdminTabsMixin, PermissionRequiredMixin, TemplateView):
     current_tab = "products"
     template_name = "counter/product_list.jinja"
+    permission_required = "counter.view_product"
 
 
-class ProductCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
+class ProductCreateView(CounterAdminTabsMixin, PermissionRequiredMixin, CreateView):
     """A create view for the admins."""
 
     model = Product
     form_class = ProductForm
     template_name = "counter/product_form.jinja"
     current_tab = "products"
+    permission_required = "counter.add_product"
 
 
-class ProductEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
+class ProductEditView(CounterAdminTabsMixin, PermissionRequiredMixin, UpdateView):
     """An edit view for the admins."""
 
     model = Product
@@ -170,6 +178,13 @@ class ProductEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     pk_url_kwarg = "product_id"
     template_name = "counter/product_form.jinja"
     current_tab = "products"
+    permission_required = "counter.change_product"
+
+    def has_permission(self):
+        return self.request.user.has_perm("counter.change_product") or (
+            self.request.method == "GET"
+            and self.request.user.has_perm("counter.view_product")
+        )
 
 
 class ProductFormulaListView(CounterAdminTabsMixin, PermissionRequiredMixin, ListView):
@@ -299,7 +314,6 @@ class RefillingDeleteView(DeleteView):
     template_name = "core/delete_confirm.jinja"
 
     def dispatch(self, request, *args, **kwargs):
-        """We have here a very particular right handling, we can't inherit from CanEditPropMixin."""
         self.object = self.get_object()
         if timezone.now() - self.object.date <= timedelta(
             minutes=settings.SITH_LAST_OPERATIONS_LIMIT
@@ -324,7 +338,6 @@ class SellingDeleteView(DeleteView):
     template_name = "core/delete_confirm.jinja"
 
     def dispatch(self, request, *args, **kwargs):
-        """We have here a very particular right handling, we can't inherit from CanEditPropMixin."""
         self.object = self.get_object()
         if timezone.now() - self.object.date <= timedelta(
             minutes=settings.SITH_LAST_OPERATIONS_LIMIT
@@ -376,23 +389,23 @@ class CounterStatView(PermissionRequiredMixin, DetailView):
         return kwargs
 
 
-class CounterRefillingListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
+class CounterRefillingListView(
+    CounterAdminTabsMixin, PermissionRequiredMixin, ListView
+):
     """List of refillings on a counter."""
 
     model = Refilling
     template_name = "counter/refilling_list.jinja"
     current_tab = "counters"
     paginate_by = 30
+    permission_required = "counter.view_refilling"
 
-    def dispatch(self, request, *args, **kwargs):
-        self.counter = get_object_or_404(Counter, pk=kwargs["counter_id"])
-        self.queryset = Refilling.objects.filter(counter__id=self.counter.id)
-        return super().dispatch(request, *args, **kwargs)
+    def get_queryset(self):
+        self.counter = get_object_or_404(Counter, pk=self.kwargs["counter_id"])
+        return Refilling.objects.filter(counter=self.counter).order_by("-date")
 
     def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["counter"] = self.counter
-        return kwargs
+        return super().get_context_data(**kwargs) | {"counter": self.counter}
 
 
 class RefoundAccountView(UserPassesTestMixin, FormView):

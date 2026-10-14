@@ -12,7 +12,7 @@
 # OR WITHIN THE LOCAL FILE "LICENSE"
 #
 #
-
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import Http404, HttpResponse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView
@@ -21,28 +21,30 @@ from django.views.generic.edit import CreateView, UpdateView
 from core.auth.mixins import CanViewMixin
 from counter.forms import EticketForm
 from counter.models import Eticket, Selling
-from counter.views.mixins import CounterAdminMixin, CounterAdminTabsMixin
+from counter.views.mixins import CounterAdminTabsMixin
 
 
-class EticketListView(CounterAdminTabsMixin, CounterAdminMixin, ListView):
+class EticketListView(CounterAdminTabsMixin, PermissionRequiredMixin, ListView):
     """A list view for the admins."""
 
     model = Eticket
     template_name = "counter/eticket_list.jinja"
     ordering = ["id"]
     current_tab = "etickets"
+    permission_required = "counter.view_eticket"
 
 
-class EticketCreateView(CounterAdminTabsMixin, CounterAdminMixin, CreateView):
+class EticketCreateView(CounterAdminTabsMixin, PermissionRequiredMixin, CreateView):
     """Create an eticket."""
 
     model = Eticket
     template_name = "core/create.jinja"
     form_class = EticketForm
     current_tab = "etickets"
+    permission_required = "counter.add_eticket"
 
 
-class EticketEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
+class EticketEditView(CounterAdminTabsMixin, PermissionRequiredMixin, UpdateView):
     """Edit an eticket."""
 
     model = Eticket
@@ -50,6 +52,7 @@ class EticketEditView(CounterAdminTabsMixin, CounterAdminMixin, UpdateView):
     form_class = EticketForm
     pk_url_kwarg = "eticket_id"
     current_tab = "etickets"
+    permission_required = "counter.change_eticket"
 
 
 class EticketPDFView(CanViewMixin, DetailView):

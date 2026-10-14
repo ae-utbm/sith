@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-02 12:56+0200\n"
+"POT-Creation-Date: 2026-10-09 21:44+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -236,7 +236,7 @@ msgstr "vous devez spécifier au moins un utilisateur ou une adresse email"
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/forms.py com/forms.py counter/forms.py subscription/forms.py
+#: club/forms.py com/forms.py counter/forms.py
 msgid "End date"
 msgstr "Date de fin"
 
@@ -1093,7 +1093,7 @@ msgstr "Prix d'achat"
 msgid "Format: 16:9 | Resolution: 1920x1080"
 msgstr "Format : 16:9 | Résolution : 1920x1080"
 
-#: com/forms.py subscription/forms.py
+#: com/forms.py
 msgid "Start date"
 msgstr "Date de début"
 
@@ -4102,7 +4102,6 @@ msgstr "Nouvelle formule"
 #: counter/templates/counter/fragments/create_student_card.jinja
 #: counter/templates/counter/invoices_call.jinja
 #: sas/templates/sas/picture.jinja
-#: subscription/templates/subscription/stats.jinja
 msgid "Go"
 msgstr "Valider"
 
@@ -4237,9 +4236,12 @@ msgid "Remove price"
 msgstr "Retirer le prix"
 
 #: counter/templates/counter/product_form.jinja
-#, python-format
-msgid "Edit product %(name)s"
-msgstr "Édition du produit %(name)s"
+msgid ""
+"You can see product details. However, you cannot edit it, thus you won't be "
+"able to submit this form."
+msgstr ""
+"Vous pouvez voir ce produit. Cependant, vous ne pouvez pas l'éditer ; vous "
+"ne serez donc pas en mesure de soumettre le formulaire."
 
 #: counter/templates/counter/product_form.jinja
 msgid "Creation date"
@@ -5985,12 +5987,8 @@ msgid "Create another subscription"
 msgstr "Créer une nouvelle cotisation"
 
 #: subscription/templates/subscription/stats.jinja
-msgid "Total subscriptions"
-msgstr "Cotisations totales"
-
-#: subscription/templates/subscription/stats.jinja
-msgid "Subscriptions by type"
-msgstr "Cotisations par type"
+msgid "All subscriptions"
+msgstr "Toutes les cotisations"
 
 #: subscription/templates/subscription/subscription.jinja
 msgid "Existing member"
