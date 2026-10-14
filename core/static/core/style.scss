@@ -57,7 +57,7 @@ body {
 
   .collapse-header {
     color: white;
-    background-color: $deepblue;
+    background-color: var(--deepblue);
     padding: 5px 10px;
     display: flex;
     align-items: center;
@@ -141,7 +141,7 @@ body {
   }
 
   #info_box {
-    background: $primary-neutral-light-color;
+    background: var(--bg-off-white);
 
     &:before {
       content: "\f05a";
@@ -150,11 +150,11 @@ body {
   }
 
   #alert_box {
-    background: $second-color;
+    background: var(--bg-yellow);
 
     &:before {
       content: "\f06a";
-      color: $white-color;
+      color: var(--text-white);
     }
   }
 }
@@ -189,10 +189,10 @@ body {
     border-radius: 5px;
 
     &.btn-blue {
-      background-color: $deepblue;
+      background-color: var(--deepblue);
 
       &:not(:disabled):hover {
-        background-color: darken($deepblue, 10%);
+        background-color: var(--darkened-deepblue);
       }
 
       &:disabled {
@@ -215,7 +215,7 @@ body {
     &.btn-green {
       $bg-color: rgba(0, 210, 83, 0.4);
       background-color: $bg-color;
-      color: $black-color;
+      color: var(--text-black);
 
       &:not(:disabled):hover {
         background-color: darken($bg-color, 15%);
@@ -272,8 +272,8 @@ body {
   /*--------------------------------CONTENT------------------------------*/
   #content {
     padding: 1.5em 3%;
-    box-shadow: $shadow-color 0 5px 10px;
-    background: $white-color;
+    box-shadow: var(--bg-darkened-off-white) 0 5px 10px;
+    background: var(--bg-white);
     overflow: auto;
   }
 
@@ -343,7 +343,7 @@ body {
       display: flex;
       flex-wrap: wrap;
       float: right;
-      background: $primary-neutral-light-color;
+      background: var(--bg-off-white);
       padding: 5px;
       border-radius: 6px;
       text-align: center;
@@ -351,7 +351,7 @@ body {
       a {
         padding: 7px;
         display: inline-block;
-        color: $black-color;
+        color: var(--text-black);
         font-weight: bold;
         margin: 2px;
         flex: 1;
@@ -359,14 +359,14 @@ body {
         white-space: nowrap;
 
         &.selected_tab {
-          background: $primary-color;
-          color: $white-color;
+          background: var(--blue);
+          color: var(--text-white);
           border-radius: 6px;
         }
 
         &:hover {
-          background: $primary-color;
-          color: $white-color;
+          background: var(--blue);
+          color: var(--text-white);
           border-radius: 6px;
         }
       }
@@ -556,23 +556,23 @@ thead td {
 }
 
 thead {
-  background-color: $deepblue;
+  background-color: var(--deepblue);
   color: white;
 }
 
 tbody>tr {
   &:nth-child(even):not(.highlight) {
-    background: $primary-neutral-light-color;
+    background: var(--bg-off-white);
   }
 
   &.clickable:hover {
     cursor: pointer;
-    background: $secondary-neutral-light-color;
+    background: var(--bg-lightgrey);
     width: 100%;
   }
 
   &.highlight {
-    color: $primary-dark-color;
+    color: var(--lightblue);
     font-style: italic;
   }
 }
@@ -598,7 +598,7 @@ em {
 }
 
 .highlight {
-  background: $second-color;
+  background: var(--bg-yellow);
   font-weight: bold;
 }
 
@@ -700,15 +700,15 @@ u,
     height: 18em;
     overflow: hidden;
     border: 1px solid black;
-    box-shadow: $shadow-color 1px 1px 1px;
+    box-shadow: var(--bg-darkened-off-white) 1px 1px 1px;
 
     &:hover {
-      box-shadow: 1px 1px 5px $second-color;
+      box-shadow: 1px 1px 5px var(--bg-yellow);
     }
   }
 
   .matmat_user a {
-    color: $primary-neutral-dark-color;
+    color: var(--deepblue);
     height: 100%;
     width: 100%;
     margin: 0;
@@ -723,7 +723,6 @@ u,
   display: block;
   margin: 10px;
   padding: 10px;
-  background: $white-color;
 }
 
 textarea {

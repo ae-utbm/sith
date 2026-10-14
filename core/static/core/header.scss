@@ -7,7 +7,7 @@ $background-color-hovered: #283747;
 
 .header {
   box-sizing: border-box;
-  background-color: $deepblue;
+  background-color: var(--deepblue);
   box-shadow: 3px 3px 3px 0 #dfdfdf;
   border-radius: 0;
   width: 100%;
@@ -96,7 +96,7 @@ $background-color-hovered: #283747;
         border-radius: 0;
         margin: 0;
         box-sizing: border-box;
-        background-color: $deepblue;
+        background-color: var(--deepblue);
         width: 45px;
         height: 25px;
         padding: 0;
@@ -212,7 +212,7 @@ $background-color-hovered: #283747;
           background-position: center center;
           background-size: cover;
           background-repeat: no-repeat;
-          background-color: $deepblue;
+          background-color: var(--deepblue);
         }
 
         >.options {
@@ -298,7 +298,7 @@ $background-color-hovered: #283747;
             width: 10px;
             height: 10px;
             padding: 5px;
-            background-color: $red-text-color;
+            background-color: var(--text-red);
             border-radius: 50%;
             position: absolute;
             top: -50%;
