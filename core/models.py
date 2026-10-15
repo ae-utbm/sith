@@ -799,6 +799,14 @@ class Preferences(models.Model):
         ),
         default=False,
     )
+    show_my_timetable = models.BooleanField(
+        _("show your timetable to others"),
+        help_text=_(
+            "Allow subscribers to see your timetable and "
+            "to compare it to theirs (if you have filled it)"
+        ),
+        default=True,
+    )
     notify_on_click = models.BooleanField(
         _("get a notification for every click"), default=False
     )

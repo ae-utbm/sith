@@ -1,0 +1,52 @@
+{% extends "core/base.jinja" %}
+
+{% from "timetable/macros.jinja" import display_timetable %}
+
+
+{%- block additional_css -%}
+  <link rel="stylesheet" href="{{ static('timetable/css/generator.scss') }}">
+{%- endblock -%}
+
+{%- block additional_js -%}
+  <script type="module" src="{{ static('bundled/timetable/timetable-index.ts') }}"></script>
+{%- endblock -%}
+
+{% block content %}
+  {% for timetable in timetables %}
+    <details
+      class="accordion"
+      name="{{ timetable.semester }}"
+      {% if loop.first %}open{% endif %}
+    >
+      <summary>{{ timetable.semester }}</summary>
+      <div class="accordion-content">
+        {{ display_timetable(timetable.semester) }}
+      </div>
+    </details>
+  {% endfor %}
+{% endblock %}
+
+{%- block script -%}
+  {% set weekdays = ["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"] %}
+  <script>
+    {%- for timetable in timetables  -%}
+      const {{ timetable.semester }} = [
+        {%- for slot in timetable.slots.all() -%}
+          {
+            courseType: "{{ slot.course_type }}",
+            room: "{{ slot.room }}",
+            startHour: "{{ "%02d:%02d" % (slot.start_hour.seconds // 3600, (slot.start_hour.seconds % 3600 ) // 60) }}",
+            endHour: "{{ "%02d:%02d" % (slot.end_hour.seconds // 3600, (slot.end_hour.seconds % 3600 ) // 60) }}",
+            startSlot: {{ slot.start_at }},
+            endSlot: {{ slot.end_at }},
+            ueCode: "{{ slot.ue }}",
+            {%- if slot.week_group -%}
+              weekGroup: "{{ slot.week_group }}",
+            {%- endif -%}
+            weekday: "{{ weekdays[slot.weekday] }}"
+          },
+        {%- endfor -%}
+      ];
+    {%- endfor -%}
+  </script>
+{%- endblock -%}

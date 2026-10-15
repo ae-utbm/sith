@@ -1,0 +1,46 @@
+{# HTML+AlpineJS to display a timetable
+
+Args:
+    ues: either a JS variable name or an array of object
+         satisfying the TimetableSlot interface
+    reactive: if True and `ues` is a variable used in an Alpine context,
+         then this timetable will react to modifications and
+         change its own display
+#}
+{% macro display_timetable(ues) %}
+  <div
+    x-data="timetableDisplay({{ ues }})"
+    x-model="{{ ues }}"
+    x-modelable="slots"
+    class="timetable"
+    x-show="slots.length > 0"
+    :style="{width: `${table.width+80}px`, height: `${table.height+40}px`}"
+  >
+    <div class="header">
+      <template x-for="weekday in displayedWeekdays">
+        <span x-text="weekday"></span>
+      </template>
+    </div>
+    <div class="content">
+      <div class="hours" :height="(endSlot - endSlot%4) - (startSlot - startSlot%4)">
+        <template x-for="[hour, style] in getHours()">
+          <div class="hour" :style="style">
+            <div x-text="hour"></div>
+            <div class="hour-bar" :style="{width: `${getWidth()}px`}"></div>
+          </div>
+        </template>
+      </div>
+      <div class="courses">
+        <template x-for="course in slots">
+          <div class="slot" :style="getStyle(course)">
+            <span class="course-type" x-text="course.courseType"></span>
+            <span x-text="course.ueCode"></span>
+            <span x-text="`${course.startHour} - ${course.endHour}`"></span>
+            <span x-text="(course.weekGroup ? `\nGroupe ${course.weekGroup}` : '')"></span>
+            <span x-text="course.room"></span>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
