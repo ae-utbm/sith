@@ -6,27 +6,21 @@
   margin: 30px;
 
   button {
-    background-color: $secondary-neutral-light-color;
+    background-color: var(--bg-off-white);
     min-width: 37px;
 
     &:hover {
-      background-color: darken($secondary-neutral-light-color, 10%);
-    }
-
-    &:disabled {
-      color: #fff;
-      background-color: darken($secondary-neutral-light-color, 5%);
+      background-color: var(--bg-lightgrey);
     }
 
     &.active,
     &.active:hover {
-      background-color: $primary-neutral-color;
+      background-color: var(--deepblue);
       color: white;
       border-radius: 50%;
     }
 
-    &:first-of-type,
-    &:last-of-type {
+    .pagination-arrow {
       // previous and next buttons
       &:disabled {
         // Hide the arrows when they are disabled, without

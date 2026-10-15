@@ -27,7 +27,7 @@ main {
     font-size: 1.2em;
     line-height: 1.2em;
     color: black;
-    background-color: $primary-neutral-light-color;
+    background-color: var(--bg-white);
     border-radius: 5px;
     font-weight: bold;
 
@@ -36,7 +36,7 @@ main {
     }
 
     &:disabled {
-      background-color: $primary-neutral-light-color;
+      background-color: var(--bg-white);
       color: #d4d4d4;
     }
   }

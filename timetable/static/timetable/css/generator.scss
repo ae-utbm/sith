@@ -6,7 +6,7 @@
   display: block;
   margin: 2em auto;
   .header {
-    background-color: $white-color;
+    background-color: var(--bg-white);
     font-weight: bold;
     box-shadow: none;
     width: calc(100% - var(--hour-side-width) - 10px);

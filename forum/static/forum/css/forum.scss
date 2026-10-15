@@ -13,7 +13,8 @@
   }
 
   .topic {
-    border: solid $primary-neutral-color 1px;
+    border: solid var(--darkened-deepblue) 1px;
+    border-radius: 5px;
     padding: 1px;
     margin: 1px;
 
@@ -23,7 +24,7 @@
     }
 
     a {
-      color: $black-color;
+      color: var(--text-black);
     }
 
     a:hover {
@@ -56,7 +57,7 @@
   }
 
   .forum {
-    background: $primary-neutral-light-color;
+    background: var(--bg-white);
     padding: 1px;
     margin: 1px;
 
@@ -66,7 +67,7 @@
     }
 
     a {
-      color: $black-color;
+      color: var(--text-black);
     }
     a:hover {
       text-decoration: underline;
@@ -91,7 +92,7 @@
 
   .category {
     margin-top: 5px;
-    background: $secondary-color;
+    background: var(--deepblue);
     color: white;
     border-radius: 10px 10px 0 0;
     .title {
@@ -105,12 +106,12 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    background: $secondary-neutral-light-color;
+    background: var(--bg-off-white);
     border-radius: 5px;
-    border: 1px darken($secondary-neutral-light-color, 10%) solid;
+    border: 1px var(--bg-lightgrey) solid;
 
     &:nth-child(odd) {
-      background: $primary-neutral-light-color;
+      background: var(--bg-white);
     }
 
     .message-header {

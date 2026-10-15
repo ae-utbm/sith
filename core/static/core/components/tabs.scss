@@ -11,7 +11,7 @@ ui-tab-group {
     .tab-headers {
       display: flex;
       flex-flow: row wrap;
-      background-color: $primary-neutral-light-color;
+      background-color: var(--bg-off-white);
       padding: 3px 12px 12px;
       column-gap: 20px;
       border-top-left-radius: 5px;
@@ -25,23 +25,27 @@ ui-tab-group {
         background-color: unset;
         position: relative;
 
+        &:hover {
+          background-color: var(--bg-lightgrey);
+        }
+
         &:after {
           content: '';
           position: absolute;
           bottom: 0;
           left: 0;
           width: 100%;
-          border-bottom: 4px solid darken($primary-neutral-light-color, 10%);
+          border-bottom: 4px solid var(--bg-lightgrey);
           border-radius: 2px;
           transition: all 0.2s ease-in-out;
         }
 
         &:hover:after {
-          border-bottom-color: darken($primary-neutral-light-color, 20%);
+          filter: brightness(85%);
         }
 
         &.active:after {
-          border-bottom-color: $primary-dark-color;
+          border-bottom-color: var(--lightblue);
         }
       }
     }
