@@ -26,6 +26,15 @@
 {% endblock %}
 
 {% block content %}
+  {% if user.is_authenticated and user.can_edit(club) %}
+    <a
+      href="{{ url("core:page_edit", page_name=club.page.get_full_name()) }}"
+      class="btn btn-blue margin-bottom"
+    >
+      <i class="fa fa-pen-to-square"></i> {% trans %}Edit{% endtrans %}
+    </a>
+  {% endif %}
+
   <h3>{{ club.name }}</h3>
   <div id="club-detail" {% if links %}class="has-links"{% endif %}>
     <div id="club-attributes">
