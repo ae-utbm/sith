@@ -1,18 +1,15 @@
 from typing import Annotated, Literal
 
 from annotated_types import Ge, Le, MinLen
-from django.conf import settings
 from django.db.models import F
 from ninja import File, Query
 from ninja.security import SessionAuth
 from ninja_extra import ControllerBase, api_controller, paginate, route
-from ninja_extra.exceptions import PermissionDenied
 from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
 from api.auth import ApiKeyAuth
 from api.permissions import CanAccessLookup, CanView, HasPerm
-from club.models import Mailing
 from core.models import Group, QuickUploadImage, SithFile, User
 from core.schemas import (
     FamilyGodfatherSchema,
@@ -46,19 +43,6 @@ class UploadController(ControllerBase):
             file, uploader=self.context.request.user
         )
         return image
-
-
-@api_controller("/mailings")
-class MailingListController(ControllerBase):
-    @route.get("", response=str)
-    def fetch_mailing_lists(self, key: str):
-        if key != settings.SITH_MAILING_FETCH_KEY:
-            raise PermissionDenied
-        mailings = Mailing.objects.filter(
-            is_moderated=True, club__is_active=True
-        ).prefetch_related("subscriptions")
-        data = "\n".join(m.fetch_format() for m in mailings)
-        return data
 
 
 @api_controller("/user")

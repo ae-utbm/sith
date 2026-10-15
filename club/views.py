@@ -34,7 +34,6 @@ from django.contrib.auth.mixins import (
     UserPassesTestMixin,
 )
 from django.contrib.messages.views import SuccessMessageMixin
-from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
 from django.db.models import F, Prefetch, Q, Sum
 from django.db.models.functions import Length
@@ -59,7 +58,6 @@ from club.forms import (
     ClubRoleFormSet,
     ClubSearchForm,
     JoinClubForm,
-    MailingForm,
     SellingsForm,
 )
 from club.models import (
@@ -67,8 +65,6 @@ from club.models import (
     ClubLink,
     ClubRole,
     LinkType,
-    Mailing,
-    MailingSubscription,
     Membership,
 )
 from com.models import Poster
@@ -180,13 +176,6 @@ class ClubTabsMixin(TabedViewMixin):
                         ),
                         "slug": "sellings",
                         "name": _("Sellings"),
-                    },
-                    {
-                        "url": reverse(
-                            "club:mailing", kwargs={"club_id": self.object.id}
-                        ),
-                        "slug": "mailing",
-                        "name": _("Mailing list"),
                     },
                     {
                         "url": reverse(
@@ -740,166 +729,6 @@ class MembershipDeleteView(PermissionRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return reverse_lazy("core:user_clubs", kwargs={"user_id": self.object.user_id})
-
-
-class ClubMailingView(ClubTabsMixin, CanEditMixin, DetailFormView):
-    """A list of mailing for a given club."""
-
-    model = Club
-    form_class = MailingForm
-    pk_url_kwarg = "club_id"
-    template_name = "club/mailing.jinja"
-    current_tab = "mailing"
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["club_id"] = self.object.id
-        kwargs["user_id"] = self.request.user.id
-        kwargs["mailings"] = self.object.mailings.all()
-        return kwargs
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        mailings = list(self.object.mailings.all())
-        kwargs["club"] = self.object
-        kwargs["user"] = self.request.user
-        kwargs["mailings"] = mailings
-        kwargs["mailings_moderated"] = [m for m in mailings if m.is_moderated]
-        kwargs["mailings_not_moderated"] = [m for m in mailings if not m.is_moderated]
-        kwargs["form_actions"] = {
-            "NEW_MALING": self.form_class.ACTION_NEW_MAILING,
-            "NEW_SUBSCRIPTION": self.form_class.ACTION_NEW_SUBSCRIPTION,
-            "REMOVE_SUBSCRIPTION": self.form_class.ACTION_REMOVE_SUBSCRIPTION,
-        }
-        return kwargs
-
-    def add_new_mailing(self, cleaned_data) -> ValidationError | None:
-        """Create a new mailing list from the form."""
-        mailing = Mailing(
-            club=self.object,
-            email=cleaned_data["mailing_email"],
-            moderator=self.request.user,
-            is_moderated=False,
-        )
-        try:
-            mailing.clean()
-        except ValidationError as validation_error:
-            return validation_error
-        mailing.save()
-        return None
-
-    def add_new_subscription(self, cleaned_data) -> ValidationError | None:
-        """Add mailing subscriptions for each user given and/or for the specified email in form."""
-        users_to_save = []
-
-        for user in cleaned_data["subscription_users"]:
-            sub = MailingSubscription(
-                mailing=cleaned_data["subscription_mailing"], user=user
-            )
-            try:
-                sub.clean()
-            except ValidationError as validation_error:
-                return validation_error
-
-            sub.save()
-            users_to_save.append(sub)
-
-        if cleaned_data["subscription_email"]:
-            sub = MailingSubscription(
-                mailing=cleaned_data["subscription_mailing"],
-                email=cleaned_data["subscription_email"],
-            )
-
-        try:
-            sub.clean()
-        except ValidationError as validation_error:
-            return validation_error
-        sub.save()
-
-        # Save users after we are sure there is no error
-        for user in users_to_save:
-            user.save()
-
-        return None
-
-    def remove_subscription(self, cleaned_data):
-        """Remove specified users from a mailing list."""
-        fields = [
-            val for key, val in cleaned_data.items() if key.startswith("removal_")
-        ]
-        for field in fields:
-            for sub in field:
-                sub.delete()
-
-    def form_valid(self, form):
-        resp = super().form_valid(form)
-
-        cleaned_data = form.clean()
-        error = None
-
-        if cleaned_data["action"] == self.form_class.ACTION_NEW_MAILING:
-            error = self.add_new_mailing(cleaned_data)
-
-        if cleaned_data["action"] == self.form_class.ACTION_NEW_SUBSCRIPTION:
-            error = self.add_new_subscription(cleaned_data)
-
-        if cleaned_data["action"] == self.form_class.ACTION_REMOVE_SUBSCRIPTION:
-            self.remove_subscription(cleaned_data)
-
-        if error:
-            form.add_error(NON_FIELD_ERRORS, error)
-            return self.form_invalid(form)
-
-        return resp
-
-    def get_success_url(self, **kwargs):
-        return reverse("club:mailing", kwargs={"club_id": self.object.id})
-
-
-class MailingDeleteView(CanEditMixin, DeleteView):
-    model = Mailing
-    template_name = "core/delete_confirm.jinja"
-    pk_url_kwarg = "mailing_id"
-    redirect_page = None
-
-    def dispatch(self, request, *args, **kwargs):
-        self.club_id = self.get_object().club.id
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_success_url(self, **kwargs):
-        if self.redirect_page:
-            return reverse_lazy(self.redirect_page)
-        else:
-            return reverse_lazy("club:mailing", kwargs={"club_id": self.club_id})
-
-
-class MailingSubscriptionDeleteView(CanEditMixin, DeleteView):
-    model = MailingSubscription
-    template_name = "core/delete_confirm.jinja"
-    pk_url_kwarg = "mailing_subscription_id"
-
-    def dispatch(self, request, *args, **kwargs):
-        self.club_id = self.get_object().mailing.club.id
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_success_url(self, **kwargs):
-        return reverse_lazy("club:mailing", kwargs={"club_id": self.club_id})
-
-
-class MailingAutoGenerationView(View):
-    def dispatch(self, request, *args, **kwargs):
-        self.mailing = get_object_or_404(Mailing, pk=kwargs["mailing_id"])
-        if not request.user.can_edit(self.mailing):
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        club = self.mailing.club
-        self.mailing.subscriptions.all().delete()
-        members = club.members.ongoing().filter(role__is_board=True)
-        for member in members.all():
-            MailingSubscription(user=member.user, mailing=self.mailing).save()
-        return redirect("club:mailing", club_id=club.id)
 
 
 class PosterListView(
