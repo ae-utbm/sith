@@ -259,10 +259,7 @@ class Weekmail(models.Model):
         return f"Weekmail {self.id} (sent: {self.sent}) - {self.title}"
 
     def send(self):
-        """Send the weekmail to all users with the receive weekmail option opt-in.
-
-        Also send the weekmail to the mailing list in settings.SITH_COM_EMAIL.
-        """
+        """Send the weekmail to all users with the receive weekmail option opt-in."""
         dest = [
             i[0]
             for i in Preferences.objects.filter(receive_weekmail=True).values_list(
