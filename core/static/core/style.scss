@@ -2,12 +2,21 @@
 @import "forms";
 @import "devices";
 
+/*----- RESET -----*/
+* {
+  margin: 0;
+  padding: 0;
+}
+
+
 /*--------------------------------GENERAL------------------------------*/
 
 body {
   position: relative;
   width: 100%;
   font-family: sans-serif;
+  background-color: var(--bg-white);
+  line-height: 1;
 }
 
 [aria-busy] {
