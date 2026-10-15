@@ -407,28 +407,33 @@ body {
     }
   }
 
-  /* Fontawesome icons */
-  .fa-brands, .fa-link {
-    color: black;
-  }
+}
 
-  .fa-facebook {
-    color: $faceblue;
-  }
+/* Fontawesome icons */
+.fa-brands, .fa-link {
+  color: black;
+}
 
-  .fa-discord {
-    color: $discordblurple;
-  }
+.fa-facebook {
+  color: $faceblue;
+}
 
-  .fa-square-instagram::before, .fa-instagram::before {
-    background: $instagradient;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+.fa-discord {
+  color: $discordblurple;
+}
 
-  .fa-bluesky, .fa-square-bluesky {
-    color: #0f73ff;
-  }
+.fa-square-instagram::before, .fa-instagram::before {
+  background: $instagradient;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.fa-bluesky, .fa-square-bluesky {
+  color: #0f73ff;
+}
+
+.fa-github {
+  color: $githubblack;
 }
 
 @media screen and (max-width: $small-devices) {
@@ -519,15 +524,15 @@ th {
   text-align: center;
   padding: 5px 10px;
 
-  >input[type="checkbox"] {
+  > input[type="checkbox"] {
     padding: unset;
   }
 
-  >ul {
+  > ul {
     margin-top: 0;
   }
 
-  >input[type="checkbox"] {
+  > input[type="checkbox"] {
     padding: unset;
   }
 }
@@ -550,7 +555,7 @@ thead {
   color: white;
 }
 
-tbody>tr {
+tbody > tr {
   &:nth-child(even):not(.highlight) {
     background: var(--bg-off-white);
   }
