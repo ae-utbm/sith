@@ -621,7 +621,6 @@ with open(
 
 SITH_NOTIFICATIONS = [
     ("POSTER_MODERATION", _("A new poster needs to be moderated")),
-    ("MAILING_MODERATION", _("A new mailing list needs to be moderated")),
     (
         "PEDAGOGY_MODERATION",
         _("A new pedagogy comment has been signaled for moderation"),
