@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 21:44+0200\n"
+"POT-Creation-Date: 2026-10-15 14:50+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -517,6 +517,22 @@ msgstr "Url dupliquée"
 msgid "This link doesn't match with the url base of its type."
 msgstr "Ce lien ne correspond pas à l'url de base de son type."
 
+#: club/templates/club/club_detail.jinja club/views.py
+#: com/templates/com/news_admin_list.jinja com/templates/com/poster_list.jinja
+#: com/templates/com/screen_list.jinja com/templates/com/weekmail.jinja
+#: core/templates/core/file.jinja core/templates/core/group_list.jinja
+#: core/templates/core/page/base.jinja core/templates/core/user_tools.jinja
+#: core/views/user.py counter/templates/counter/cash_summary_list.jinja
+#: counter/templates/counter/counter_list.jinja
+#: election/templates/election/election_detail.jinja
+#: forum/templates/forum/macros.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
+#: pedagogy/templates/pedagogy/guide.jinja sas/templates/sas/album.jinja
+#: trombi/templates/trombi/detail.jinja
+#: trombi/templates/trombi/edit_profile.jinja
+msgid "Edit"
+msgstr "Éditer"
+
 #: club/templates/club/club_detail.jinja com/templates/com/news_list.jinja
 msgid "Links"
 msgstr "Liens"
@@ -1018,26 +1034,6 @@ msgstr "Historique"
 #: sas/templates/sas/picture.jinja trombi/views.py
 msgid "Tools"
 msgstr "Outils"
-
-#: club/views.py com/templates/com/news_admin_list.jinja
-#: com/templates/com/poster_list.jinja com/templates/com/screen_list.jinja
-#: com/templates/com/weekmail.jinja core/templates/core/file.jinja
-#: core/templates/core/group_list.jinja core/templates/core/page/base.jinja
-#: core/templates/core/user_tools.jinja core/views/user.py
-#: counter/templates/counter/cash_summary_list.jinja
-#: counter/templates/counter/counter_list.jinja
-#: election/templates/election/election_detail.jinja
-#: forum/templates/forum/macros.jinja
-#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
-#: pedagogy/templates/pedagogy/guide.jinja sas/templates/sas/album.jinja
-#: trombi/templates/trombi/detail.jinja
-#: trombi/templates/trombi/edit_profile.jinja
-msgid "Edit"
-msgstr "Éditer"
-
-#: club/views.py
-msgid "Edit club page"
-msgstr "Éditer la page de club"
 
 #: club/views.py
 msgid "Sellings"
