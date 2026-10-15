@@ -490,16 +490,6 @@ dt {
   margin-top: 25px;
 }
 
-.edit-bar {
-  display: block;
-  margin: 4px;
-
-  a {
-    display: inline-block;
-    margin: 4px;
-  }
-}
-
 .important {
   font-size: 1.2em;
   font-weight: bold;
@@ -512,7 +502,6 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
   border-radius: 5px;
-  -moz-border-radius: 5px;
   overflow: hidden;
   box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0,
               rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
@@ -522,10 +511,6 @@ table {
   table {
     width: 100%;
   }
-}
-
-th {
-  padding: 4px;
 }
 
 td,
@@ -552,10 +537,6 @@ td {
   border-collapse: collapse;
   overflow: hidden;
   text-overflow: ellipsis;
-
-  >ul {
-    margin-top: 0;
-  }
 }
 
 th,
@@ -739,43 +720,7 @@ textarea {
   margin-top: 10px;
 }
 
-
-
-.ui-dialog .ui-dialog-buttonpane {
-  bottom: 0;
-  position: absolute;
-  width: 97%;
-}
-
 #cash_summary_form label,
 .inline {
   display: inline;
-}
-
-.form_button {
-  width: 150px;
-  height: 120px;
-  padding: 2px;
-  display: inline-block;
-  font-size: 0.8em;
-
-  span {
-    width: 70px;
-    float: right;
-  }
-
-  img {
-    max-width: 50px;
-    max-height: 50px;
-    float: left;
-  }
-
-  strong {
-    font-weight: bold;
-    font-size: 1.2em;
-  }
-
-  button {
-    vertical-align: middle;
-  }
 }
