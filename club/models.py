@@ -28,8 +28,7 @@ from functools import reduce
 from typing import Iterable, Self
 
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.core.validators import RegexValidator, validate_email
+from django.core.exceptions import ValidationError
 from django.db import ProgrammingError, models, transaction
 from django.db.models import Exists, F, OuterRef, Q
 from django.urls import reverse
@@ -41,7 +40,7 @@ from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 
 from core.fields import ResizedImageField
-from core.models import Group, Notification, Page, SithFile, User
+from core.models import Group, Page, SithFile, User
 
 
 class ClubQuerySet(models.QuerySet):
@@ -631,169 +630,6 @@ class Membership(models.Model):
                 for g in membership.role.linked_groups.all()
             )
         return User.groups.through.objects.bulk_create(groups, ignore_conflicts=True)
-
-
-class Mailing(models.Model):
-    """A Mailing list for a club.
-
-    Warning:
-        Remember that mailing lists should be validated by UTBM.
-    """
-
-    club = models.ForeignKey(
-        Club,
-        verbose_name=_("Club"),
-        related_name="mailings",
-        null=False,
-        blank=False,
-        on_delete=models.CASCADE,
-    )
-    email = models.CharField(
-        _("Email address"),
-        unique=True,
-        null=False,
-        blank=False,
-        max_length=256,
-        validators=[
-            RegexValidator(
-                validate_email.user_regex,
-                _("Enter a valid address. Only the root of the address is needed."),
-            )
-        ],
-    )
-    is_moderated = models.BooleanField(_("is moderated"), default=False)
-    moderator = models.ForeignKey(
-        User,
-        related_name="moderated_mailings",
-        verbose_name=_("moderator"),
-        null=True,
-        on_delete=models.CASCADE,
-    )
-
-    def __str__(self):
-        return "%s - %s" % (self.club, self.email_full)
-
-    def save(self, *args, **kwargs):
-        if not self.is_moderated:
-            unread_notif_subquery = Notification.objects.filter(
-                user=OuterRef("pk"), type="MAILING_MODERATION", viewed=False
-            )
-            for user in User.objects.filter(
-                ~Exists(unread_notif_subquery),
-                groups__id__in=[settings.SITH_GROUP_COM_ADMIN_ID],
-            ):
-                Notification(
-                    user=user,
-                    url=reverse("com:mailing_admin"),
-                    type="MAILING_MODERATION",
-                ).save(*args, **kwargs)
-        super().save(*args, **kwargs)
-
-    def clean(self):
-        if Mailing.objects.filter(email=self.email).exists():
-            raise ValidationError(_("This mailing list already exists."))
-        if self.can_moderate(self.moderator):
-            self.is_moderated = True
-        else:
-            self.moderator = None
-        super().clean()
-
-    @property
-    def email_full(self):
-        return self.email + "@" + settings.SITH_MAILING_DOMAIN
-
-    def can_moderate(self, user):
-        return user.is_root or user.is_com_admin
-
-    def is_owned_by(self, user):
-        if user.is_anonymous:
-            return False
-        return user.is_root or user.is_com_admin
-
-    def can_view(self, user):
-        return self.club.has_rights_in_club(user)
-
-    def can_be_edited_by(self, user):
-        return self.club.has_rights_in_club(user)
-
-    def delete(self, *args, **kwargs):
-        self.subscriptions.all().delete()
-        super().delete()
-
-    def fetch_format(self):
-        destination = "".join(s.fetch_format() for s in self.subscriptions.all())
-        return f"{self.email}: {destination}"
-
-
-class MailingSubscription(models.Model):
-    """Link between user and mailing list."""
-
-    mailing = models.ForeignKey(
-        Mailing,
-        verbose_name=_("Mailing"),
-        related_name="subscriptions",
-        null=False,
-        blank=False,
-        on_delete=models.CASCADE,
-    )
-    user = models.ForeignKey(
-        User,
-        verbose_name=_("User"),
-        related_name="mailing_subscriptions",
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-    )
-    email = models.EmailField(_("Email address"), blank=False, null=False)
-
-    class Meta:
-        unique_together = (("user", "email", "mailing"),)
-
-    def __str__(self):
-        return "(%s) - %s : %s" % (self.mailing, self.get_username, self.email)
-
-    def clean(self):
-        if not self.user and not self.email:
-            raise ValidationError(_("At least user or email is required"))
-        try:
-            if self.user and not self.email:
-                self.email = self.user.email
-                if MailingSubscription.objects.filter(
-                    mailing=self.mailing, email=self.email
-                ).exists():
-                    raise ValidationError(
-                        _("This email is already suscribed in this mailing")
-                    )
-        except ObjectDoesNotExist:
-            pass
-        super().clean()
-
-    def is_owned_by(self, user):
-        if user.is_anonymous:
-            return False
-        return (
-            self.mailing.club.has_rights_in_club(user)
-            or user.is_root
-            or self.user.is_com_admin
-        )
-
-    def can_be_edited_by(self, user):
-        return self.user is not None and user.id == self.user.id
-
-    @cached_property
-    def get_email(self):
-        if self.user and not self.email:
-            return self.user.email
-        return self.email
-
-    @cached_property
-    def get_username(self):
-        if self.user:
-            return str(self.user)
-        return _("Unregistered user")
-
-    def fetch_format(self):
-        return self.get_email + " "
 
 
 class LinkType(models.Model):
