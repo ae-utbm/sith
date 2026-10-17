@@ -1,0 +1,79 @@
+{% extends "core/base.jinja" %}
+
+{% block content %}
+  {% if club.has_rights_in_club(user) %}
+    <a class="btn btn-blue" href="{{ url("com:news_new") }}">
+      <i class="fa fa-plus"></i> {% trans %}Create news{% endtrans %}
+    </a>
+  {% endif %}
+
+  {% for semester_code, semester_events in events %}
+    <h3>{{ semester_code }}</h3>
+    {% for event in semester_events %}
+      <details class="accordion">
+        <summary>{{ event.title }}</summary>
+        <div class="accordion-content">
+
+          {# Events that occur weekly from the start to the end of the semester
+             would take a lot of space if shown by default.
+             Thus, if the event has more than one date, those are
+             hidden by a details element.
+             If there is only one date, it is directly displayed. #}
+          {% set dates = event.dates.all()|list %}
+          {% if dates|length == 1 %}
+            <em>
+              <time datetime="{{ dates[0].start_date.isoformat(timespec="seconds") }}">
+                {{ dates[0].start_date|localtime|date(DATETIME_FORMAT) }},
+                {{ dates[0].start_date|localtime|time(DATETIME_FORMAT) }}
+              </time> -
+              <time datetime="{{ dates[0].end_date.isoformat(timespec="seconds") }}">
+                {{ dates[0].end_date|localtime|date(DATETIME_FORMAT) }},
+                {{ dates[0].end_date|localtime|time(DATETIME_FORMAT) }}
+              </time>
+            </em>
+          {% else %}
+            <details>
+              <summary>
+                {% trans trimmed nb_occurrences=dates|length %}
+                  Dates ({{ nb_occurrences }} occurrences)
+                {% endtrans %}
+              </summary>
+              <ul>
+                {% for d in dates %}
+                  <li>
+                    <time datetime="{{ d.start_date.isoformat(timespec="seconds") }}">
+                      {{ d.start_date|localtime|date(DATETIME_FORMAT) }},
+                      {{ d.start_date|localtime|time(DATETIME_FORMAT) }}
+                    </time> -
+                    <time datetime="{{ d.end_date.isoformat(timespec="seconds") }}">
+                      {{ d.end_date|localtime|date(DATETIME_FORMAT) }},
+                      {{ d.end_date|localtime|time(DATETIME_FORMAT) }}
+                    </time>
+                  </li>
+                {% endfor %}
+              </ul>
+            </details>
+          {% endif %}
+
+          <h4>{% trans %}Permalink{% endtrans %}</h4>
+          <p>{{ request.build_absolute_uri(event.get_absolute_url())|urlize }}</p>
+
+          <h4>{% trans %}Summary{% endtrans %}</h4>
+          {% if event.summary %}
+            {{ event.summary|markdown }}
+          {% else %}
+            <p><em>{% trans %}No summary{% endtrans %}</em></p>
+          {% endif %}
+
+          <h4>{% trans %}Description{% endtrans %}</h4>
+          {% if event.content %}
+            {{ event.content|markdown }}
+          {% else %}
+            <p><em>{% trans %}No detailed description{% endtrans %}</em></p>
+          {% endif %}
+        </div>
+      </details>
+    {% endfor %}
+    <br />
+  {% endfor %}
+{% endblock %}

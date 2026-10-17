@@ -31,6 +31,7 @@ from club.views import (
     ClubListView,
     ClubMailingView,
     ClubMembersView,
+    ClubNewsView,
     ClubOldMembersView,
     ClubPageEditView,
     ClubPageHistView,
@@ -136,4 +137,5 @@ urlpatterns = [
         PosterDeleteView.as_view(),
         name="poster_delete",
     ),
+    path("<int:club_id>/news/", ClubNewsView.as_view(), name="news_list"),
 ]
