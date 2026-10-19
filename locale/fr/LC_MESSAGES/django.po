@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-09 21:44+0200\n"
+"POT-Creation-Date: 2026-10-19 19:45+0200\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4412,6 +4412,11 @@ msgstr ""
 #, python-format
 msgid "returnable product : %(returnable)s -> %(returned)s"
 msgstr "produit consigné : %(returnable)s -> %(returned)s"
+
+#: counter/views/admin.py
+#, python-format
+msgid "%(user)s's AE account has been emptied"
+msgstr "Le compte de %(user)s a été vidé"
 
 #: counter/views/cash.py
 msgid "10 cents"
