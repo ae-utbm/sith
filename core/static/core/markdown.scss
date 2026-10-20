@@ -33,6 +33,15 @@
     padding: 1px 2px;
   }
 
+  /**
+   * Some restyling rules for the cases where our own md css
+   * conflicts with the easymde editor preview css
+   */
+  &.editor-preview {
+    pre {
+      background: unset;
+    }
+  }
   pre code {
     // code that is not inlined
     margin: 15px;
