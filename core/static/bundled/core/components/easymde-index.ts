@@ -60,6 +60,7 @@ const loadEasyMde = (textarea: HTMLTextAreaElement) => {
       });
       easymde.codemirror.replaceSelection("\n");
     },
+    previewClass: ["editor-preview", "markdown"], // default class + our own markdown class
     previewRender: (plainText) => markdown(plainText),
     forceSync: true, // Avoid validation error on generic create view
     imageTexts: {
