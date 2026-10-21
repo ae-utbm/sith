@@ -408,11 +408,12 @@ class CounterRefillingListView(
         return super().get_context_data(**kwargs) | {"counter": self.counter}
 
 
-class RefoundAccountView(UserPassesTestMixin, FormView):
+class RefoundAccountView(UserPassesTestMixin, SuccessMessageMixin, FormView):
     """Create a selling with the same amount as the current user money."""
 
     template_name = "counter/refound_account.jinja"
     form_class = CloseCustomerAccountForm
+    success_message = _("%(user)s's AE account has been emptied")
 
     def test_func(self):
         return self.request.user.is_root or self.request.user.is_in_group(
