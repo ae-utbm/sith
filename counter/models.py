@@ -647,23 +647,12 @@ class Counter(models.Model):
             or user in self.sellers.all()
         )
 
-    def gen_token(self) -> None:
-        """Generate a new token for this counter."""
-        self.token = "".join(
-            random.choice(string.ascii_letters + string.digits) for _ in range(30)
-        )
-        self.save()
-
     @cached_property
     def barmen_list(self) -> list[User]:
         """Returns the barman list as list of User."""
         return [
             p.user for p in self.permanencies.filter(end=None).select_related("user")
         ]
-
-    def get_random_barman(self) -> User:
-        """Return a random user being currently a barman."""
-        return random.choice(self.barmen_list)
 
     def update_activity(self) -> None:
         """Update the barman activity to prevent timeout."""
