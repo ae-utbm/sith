@@ -238,7 +238,7 @@ class Club(models.Model):
 
     def can_be_edited_by(self, user: User) -> bool:
         """Method to see if that object can be edited by the given user."""
-        return self.has_rights_in_club(user)
+        return user.has_perm("club.change_club") or self.has_rights_in_club(user)
 
     def can_roles_be_edited_by(self, user: User) -> bool:
         """Return True if the given user can edit the roles of this club"""
