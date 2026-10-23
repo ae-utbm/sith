@@ -413,7 +413,7 @@ class UserStatsView(UserTabsMixin, UserPassesTestMixin, DetailView):
         kwargs = super().get_context_data(**kwargs)
 
         kwargs["perm_time"] = list(
-            self.object.permanencies.filter(end__isnull=False, counter__type="BAR")
+            self.object.permanencies.filter(end__isnull=False)
             .values("counter", "counter__name")
             .annotate(total=Sum(F("end") - F("start"), default=timedelta(seconds=0)))
             .order_by("-total")
@@ -422,8 +422,7 @@ class UserStatsView(UserTabsMixin, UserPassesTestMixin, DetailView):
             [perm["total"] for perm in kwargs["perm_time"]], start=timedelta(seconds=0)
         )
         kwargs["purchase_sums"] = list(
-            self.object.customer.buyings.filter(counter__type="BAR")
-            .values("counter", "counter__name")
+            self.object.customer.buyings.values("counter", "counter__name")
             .annotate(total=Sum(F("unit_price") * F("quantity")))
             .order_by("-total")
         )
