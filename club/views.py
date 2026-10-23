@@ -106,42 +106,35 @@ class ClubTabsMixin(TabedViewMixin):
         return self.object.get_display_name()
 
     def get_list_of_tabs(self):
+        if not self.request.user.has_perm("club.view_club"):
+            # The user will still be able to see the club main page,
+            # but nothing else.
+            # It's useless to display a tab with only one item, so return nothing.
+            return []
         tab_list = [
             {
                 "url": reverse("club:club_view", kwargs={"club_id": self.object.id}),
                 "slug": "infos",
                 "name": _("Infos"),
-            }
+            },
+            {
+                "url": reverse("club:club_members", kwargs={"club_id": self.object.id}),
+                "slug": "members",
+                "name": _("Members"),
+            },
+            {
+                "url": reverse(
+                    "club:club_old_members", kwargs={"club_id": self.object.id}
+                ),
+                "slug": "elderlies",
+                "name": _("Old members"),
+            },
+            {
+                "url": reverse("club:club_hist", kwargs={"club_id": self.object.id}),
+                "slug": "history",
+                "name": _("History"),
+            },
         ]
-        if self.request.user.has_perm("club.view_club"):
-            tab_list.extend(
-                [
-                    {
-                        "url": reverse(
-                            "club:club_members", kwargs={"club_id": self.object.id}
-                        ),
-                        "slug": "members",
-                        "name": _("Members"),
-                    },
-                    {
-                        "url": reverse(
-                            "club:club_old_members", kwargs={"club_id": self.object.id}
-                        ),
-                        "slug": "elderlies",
-                        "name": _("Old members"),
-                    },
-                ]
-            )
-            if self.object.page:
-                tab_list.append(
-                    {
-                        "url": reverse(
-                            "club:club_hist", kwargs={"club_id": self.object.id}
-                        ),
-                        "slug": "history",
-                        "name": _("History"),
-                    }
-                )
         if self.request.user.can_edit(self.object):
             tab_list.extend(
                 [
@@ -159,21 +152,6 @@ class ClubTabsMixin(TabedViewMixin):
                         "slug": "edit",
                         "name": _("Edit"),
                     },
-                ]
-            )
-            if self.object.page and self.request.user.can_edit(self.object.page):
-                tab_list.append(
-                    {
-                        "url": reverse(
-                            "core:page_edit",
-                            kwargs={"page_name": self.object.page.get_full_name()},
-                        ),
-                        "slug": "page_edit",
-                        "name": _("Edit club page"),
-                    }
-                )
-            tab_list.extend(
-                [
                     {
                         "url": reverse(
                             "club:club_sellings", kwargs={"club_id": self.object.id}

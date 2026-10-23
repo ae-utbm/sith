@@ -1,8 +1,9 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 import pytest
 from aemark import markdown
 from bs4 import BeautifulSoup
+from django.contrib.auth.models import Permission
 from django.urls import reverse
 from model_bakery import baker
 from pytest_django.asserts import assertHTMLEqual, assertRedirects
@@ -16,13 +17,20 @@ if TYPE_CHECKING:
 
 
 @pytest.mark.django_db
-def test_page_display_on_club_main_page(client: Client):
+@pytest.mark.parametrize("user_factory", [lambda: None, subscriber_user.make])
+def test_page_display_on_club_main_page(
+    client: Client, user_factory: Callable[[], User | None]
+):
     """Test the club Page is properly displayed on the club main view"""
     club = baker.make(Club)
+    # create another previous revision, to test that we display the most recent one
+    baker.make(PageRev, page=club.page, revision=1)
     content = "# foo\nLorem ipsum dolor sit amet"
-    baker.make(PageRev, page=club.page, revision=1, content=content)
-    res = client.get(reverse("club:club_view", kwargs={"club_id": club.id}))
+    baker.make(PageRev, page=club.page, revision=2, content=content)
 
+    if user := user_factory():
+        client.force_login(user)
+    res = client.get(reverse("club:club_view", kwargs={"club_id": club.id}))
     assert res.status_code == 200
     soup = BeautifulSoup(res.text, "lxml")
     detail_html = soup.find(id="club-page").find(class_="markdown")
@@ -30,20 +38,60 @@ def test_page_display_on_club_main_page(client: Client):
 
 
 @pytest.mark.django_db
-def test_club_main_page_without_content(client: Client):
-    """Test the club view works, even if the club page is empty"""
+@pytest.mark.parametrize(
+    ("user_factory", "can_view_tabs", "can_view_edit_button"),
+    [
+        (lambda _: None, False, False),
+        (lambda _: baker.make(User), False, False),
+        (lambda _: subscriber_user.make(), True, False),
+        (
+            # admin user
+            lambda _: subscriber_user.make(
+                user_permissions=[Permission.objects.get(codename="change_club")]
+            ),
+            True,
+            True,
+        ),
+        (
+            # club board member
+            lambda club: (
+                baker.make(
+                    Membership,
+                    club=club,
+                    role=baker.make(ClubRole, is_board=True),
+                    user=subscriber_user.make(),
+                ).user
+            ),
+            True,
+            True,
+        ),
+    ],
+    ids=["anonymous", "public", "subscriber", "admin", "club board"],
+)
+@pytest.mark.django_db
+def test_club_main_page_displayed_elements(
+    client: Client, user_factory, can_view_tabs, can_view_edit_button
+):
+    """Test that the appropriate elements are displayed depending on user status."""
     club = baker.make(Club)
-    club.page.revisions.all().delete()
+    if user := user_factory(club):
+        client.force_login(user)
     res = client.get(reverse("club:club_view", kwargs={"club_id": club.id}))
 
     assert res.status_code == 200
     soup = BeautifulSoup(res.text, "lxml")
-    detail_html = soup.find(id="club-page")
-    assert detail_html.find_all("markdown") == []
+    tabs = soup.find(class_="tool_bar")
+    assert tabs is not None if can_view_tabs else tabs is None
+    edit_btn = soup.find(
+        "a",
+        href=reverse("core:page_edit", kwargs={"page_name": club.page.get_full_name()}),
+    )
+    assert edit_btn is not None if can_view_edit_button else edit_btn is None
 
 
 @pytest.mark.django_db
 def test_page_revision(client: Client):
+    """Test that accessing a previous revision of the club page works."""
     club = baker.make(Club)
     revisions = baker.make(
         PageRev, page=club.page, _quantity=3, content=iter(["foo", "bar", "baz"])
