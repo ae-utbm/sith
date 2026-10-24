@@ -30,11 +30,9 @@ from urllib.parse import urlparse
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.mixins import (
-    PermissionRequiredMixin,
-)
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.syndication.views import Feed
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import ValidationError
 from django.db.models import Exists, Max, OuterRef, Value
 from django.forms.models import modelform_factory
 from django.http import HttpResponseRedirect
@@ -46,7 +44,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, TemplateView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from club.models import Club, Mailing, Membership
+from club.models import Club, Membership
 from com.forms import NewsDateForm, NewsForm, PosterForm
 from com.ics_calendar import IcsCalendar
 from com.models import News, NewsDate, Poster, Screen, Sith, Weekmail, WeekmailArticle
@@ -85,11 +83,6 @@ class ComTabsMixin(TabedViewMixin):
                 "url": reverse("com:alert_edit"),
                 "slug": "alert",
                 "name": _("Alert message"),
-            },
-            {
-                "url": reverse("com:mailing_admin"),
-                "slug": "mailings",
-                "name": _("Mailing lists administration"),
             },
             {
                 "url": reverse("com:poster_list"),
@@ -531,37 +524,6 @@ class WeekmailArticleDeleteView(CanEditPropMixin, DeleteView):
     template_name = "core/delete_confirm.jinja"
     success_url = reverse_lazy("com:weekmail")
     pk_url_kwarg = "article_id"
-
-
-class MailingListAdminView(ComTabsMixin, ListView):
-    template_name = "com/mailing_admin.jinja"
-    model = Mailing
-    current_tab = "mailings"
-
-    def dispatch(self, request, *args, **kwargs):
-        if not (request.user.is_com_admin or request.user.is_root):
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        kwargs = super().get_context_data(**kwargs)
-        kwargs["moderated"] = self.get_queryset().filter(is_moderated=True).all()
-        kwargs["unmoderated"] = self.get_queryset().filter(is_moderated=False).all()
-        kwargs["has_moderated"] = len(kwargs["moderated"]) > 0
-        kwargs["has_unmoderated"] = len(kwargs["unmoderated"]) > 0
-        return kwargs
-
-
-class MailingModerateView(View):
-    def get(self, request, *args, **kwargs):
-        mailing = get_object_or_404(Mailing, pk=kwargs["mailing_id"])
-        if mailing.can_moderate(request.user):
-            mailing.is_moderated = True
-            mailing.moderator = request.user
-            mailing.save()
-            return redirect("com:mailing_admin")
-
-        raise PermissionDenied
 
 
 class PosterListBaseView(ListView):
