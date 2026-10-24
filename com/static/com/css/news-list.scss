@@ -32,7 +32,7 @@
 
   h3 {
     --box-shadow: rgb(60 64 67 / 30%) 0 1px 3px 0, rgb(60 64 67 / 15%) 0 3px 7px 2px;
-    background: lighten($second-color, 5%);
+    background: var(--bg-yellow);
     box-shadow: var(--box-shadow);
     padding: .75rem;
     margin: 0 0 0.5em 0;
@@ -85,7 +85,7 @@
 
     #links_content {
       overflow: auto;
-      box-shadow: $shadow-color 1px 1px 1px;
+      box-shadow: var(--bg-darkened-off-white) 1px 1px 1px;
       min-height: 20em;
       padding: 1em;
 
@@ -111,7 +111,7 @@
     }
 
     #birthdays_content {
-      box-shadow: $shadow-color 1px 1px 1px;
+      box-shadow: var(--bg-darkened-off-white) 1px 1px 1px;
       padding: 1em;
 
       ul.birthdays_year {
@@ -123,7 +123,7 @@
           padding: 0.5em;
 
           &:nth-child(even) {
-            background: $secondary-neutral-light-color;
+            background: var(--bg-off-white);
           }
         }
 
@@ -141,7 +141,7 @@
 
   /* EVENTS TODAY AND NEXT FEW DAYS */
   .news_events_group {
-    box-shadow: $shadow-color 1px 1px 1px;
+    box-shadow: var(--bg-darkened-off-white) 1px 1px 1px;
     margin-left: 0;
     margin-bottom: 0.5em;
 
@@ -153,8 +153,8 @@
       display: table-cell;
       padding: 0.6em;
       vertical-align: middle;
-      background: $primary-neutral-dark-color;
-      color: $white-color;
+      background: var(--deepblue);
+      color: var(--text-white);
       text-transform: uppercase;
       text-align: center;
       font-weight: bold;
@@ -180,7 +180,7 @@
       }
 
       .news_event:nth-of-type(even) {
-        background: $primary-neutral-light-color;
+        background: var(--bg-white);
       }
 
       .news_event {

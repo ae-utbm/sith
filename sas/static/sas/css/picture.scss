@@ -239,7 +239,7 @@
   >.tools {
     flex: 1;
     .btn {
-      background-color: $primary-neutral-light-color;
+      background-color: var(--bg-white);
       display: flex;
       justify-content: center;
       align-items: center;

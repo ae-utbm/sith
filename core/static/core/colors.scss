@@ -1,40 +1,36 @@
-$first-color: hsl(220, 100%, 50%);
-$second-color: hsl(48, 100%, 67%);
-$primary-color: hsl(219.9, 53.7%, 50%);
-$secondary-color: hsl(204, 64%, 44%);
-$primary-color-text: hsl(0, 0%, 100%);
-$secondary-color-text: hsla(0, 0%, 0%, 0.87);
+/**
+ * Sith theme variables
+ */
+:root {
+  --bg-yellow: #ffe270;
+  --bg-white: #f9fafb;
+  --bg-off-white: #f0f0f0;
+  --bg-darkened-off-white: #e3e3e3;
+  --bg-lightgrey: #d4d4d4;
 
-$primary-light-color: hsl(219.8, 46.4%, 64.9%);
-$primary-dark-color: hsl(203, 75%, 40%);
+  --text-white: #f9fafb;
+  --text-black: #2b2b2b;
+  --text-red: #eb2f06;
 
-$secondary-light-color: hsl(40, 68%, 65%);
-$secondary-dark-color: hsl(40, 68%, 35%);
+  --blue: #3b69c4;
+  --lightblue: #1a78b3;
+  // darkened-deepblue is 10% darker than deepblue
+  // This is explicitely declared, because the `darken` scss function
+  // isn't called at compile-time somehow.
+  --deepblue: #354a5f;
+  --darkened-deepblue: #23313e;
+}
 
-$primary-neutral-color: hsl(219.6, 20.8%, 50%);
-$primary-neutral-light-color: hsl(0, 0%, 94%);
-$primary-neutral-dark-color: hsl(210, 29%, 29%);
-
-$secondary-neutral-color: hsl(204, 64%, 44%);
-$secondary-neutral-light-color: hsl(0, 0%, 91%);
-$secondary-neutral-dark-color: hsl(40, 57.6%, 17%);
-
-$white-color: hsl(219.6, 20.8%, 98%);
-$black-color: hsl(0, 0%, 17%);
-$red-text-color: #eb2f06;
-$hovered-red-text-color: #ff4d4d;
-
+/**
+ * Brand colours.
+ * Those are officially defined by their respective companies,
+ * and so are more appropriate as scss variables.
+ */
 $faceblue: hsl(221, 44%, 41%);
 $twitblue: hsl(206, 82%, 63%);
 $discordblurple: #7289da;
 $instagradient: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
 $githubblack: rgb(22, 22, 20);
-
-$shadow-color: rgb(223, 223, 223);
-
-$background-button-color: hsl(0, 0%, 95%);
-
-$deepblue: #354a5f;
 
 @mixin shadow {
   box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0,

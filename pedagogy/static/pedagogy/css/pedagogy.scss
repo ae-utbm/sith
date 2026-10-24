@@ -23,7 +23,6 @@ $pedagogy-white-text: #f0f0f0;
     overflow-wrap: break-word;
 
     .closed td.title {
-      color: lighten($black-color, 10%);
       font-style: italic;
     }
 
@@ -69,9 +68,6 @@ $pedagogy-white-text: #f0f0f0;
       min-width: 300px;
     }
     .info-container {
-      // Darken the background color just enough to make this part
-      // stand out a little, while not being too perceptible
-      background: darken($white-color, 1%);
       display: grid;
       grid-template-columns: 1fr 1fr;
       border-radius: 5px;
@@ -158,9 +154,9 @@ $pedagogy-white-text: #f0f0f0;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      background: $primary-neutral-light-color;
+      background: var(--bg-off-white);
       border-radius: 5px;
-      border: 1px darken($secondary-neutral-light-color, 10%) solid;
+      border: 1px var(--bg-lightgrey) solid;
 
       &.reported {
         border: #fc8181 1px solid;
