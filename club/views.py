@@ -136,6 +136,11 @@ class ClubTabsMixin(TabedViewMixin):
                 "slug": "history",
                 "name": _("History"),
             },
+            {
+                "url": reverse("club:news_list", kwargs={"club_id": self.object.id}),
+                "slug": "events",
+                "name": _("Events"),
+            },
         ]
         if self.request.user.can_edit(self.object):
             tab_list.extend(
@@ -939,11 +944,12 @@ class PosterDeleteView(ClubTabsMixin, PosterDeleteBaseView):
         return reverse_lazy("club:poster_list", kwargs={"club_id": self.club.id})
 
 
-class ClubNewsView(PermissionRequiredMixin, DetailView):
+class ClubNewsView(PermissionRequiredMixin, ClubTabsMixin, DetailView):
     pk_url_kwarg = "club_id"
     model = Club
     permission_required = "club.view_club"
     template_name = "club/club_news_list.jinja"
+    current_tab = "events"
 
     def get_context_data(self, **kwargs: Any):
         events = list(
@@ -961,5 +967,5 @@ class ClubNewsView(PermissionRequiredMixin, DetailView):
         return super().get_context_data(**kwargs) | {
             "events": itertools.groupby(
                 events, key=lambda event: get_semester_code(event.first_date.date())
-            )
+            ),
         }
