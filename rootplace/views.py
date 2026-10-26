@@ -184,10 +184,9 @@ class DeleteAllForumUserMessagesView(FormView):
     form_class = SelectUserForm
 
     def dispatch(self, request, *args, **kwargs):
-        res = super().dispatch(request, *args, **kwargs)
-        if request.user.is_root:
-            return res
-        raise PermissionDenied
+        if not request.user.is_root:
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         self.user = form.cleaned_data["user"]
