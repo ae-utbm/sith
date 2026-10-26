@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.14, <4.0"
 
 [[package]]
@@ -2048,6 +2048,7 @@ wheels = [
 name = "sith"
 version = "3"
 source = { editable = "." }
+default-groups = ["dev", "docs", "tests"]
 dependencies = [
     { name = "aemark" },
     { name = "celery", extra = ["redis"] },
