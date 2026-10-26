@@ -269,7 +269,7 @@ class FileView(CanViewMixin, DetailView, FormMixin):
     form_class = AddFilesForm
 
     @staticmethod
-    def handle_clipboard(request, obj):
+    def handle_clipboard(request, obj: SithFile):
         """Handle the clipboard in the view.
 
         This method can fail, since it does not catch the exceptions coming from
@@ -283,10 +283,9 @@ class FileView(CanViewMixin, DetailView, FormMixin):
                  where you want to paste the clipboard
         """
         if "delete" in request.POST:
-            for f_id in request.POST.getlist("file_list"):
-                file = SithFile.objects.filter(id=f_id).first()
-                if file:
-                    file.delete()
+            file_ids = request.POST.getlist("file_list")
+            for file in obj.children.filter(id__in=file_ids):
+                file.delete()
         if "clear" in request.POST:
             request.session["clipboard"] = []
         if "cut" in request.POST:
