@@ -37,6 +37,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import NON_FIELD_ERRORS, PermissionDenied, ValidationError
 from django.core.paginator import InvalidPage, Paginator
 from django.db.models import F, Prefetch, Q, Sum
+from django.db.models.expressions import OuterRef, Subquery
 from django.db.models.functions import Length
 from django.http import Http404, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -71,7 +72,7 @@ from club.models import (
     MailingSubscription,
     Membership,
 )
-from com.models import Poster
+from com.models import NewsDate, Poster
 from com.views import (
     PosterCreateBaseView,
     PosterDeleteBaseView,
@@ -80,6 +81,7 @@ from com.views import (
 )
 from core.auth.mixins import CanEditMixin, PermissionOrClubBoardRequiredMixin
 from core.models import Page, PageRev
+from core.utils import get_semester_code
 from core.views import BasePageEditView, DetailFormView, UseFragmentsMixin
 from core.views.mixins import (
     AllowFragment,
@@ -106,42 +108,40 @@ class ClubTabsMixin(TabedViewMixin):
         return self.object.get_display_name()
 
     def get_list_of_tabs(self):
+        if not self.request.user.has_perm("club.view_club"):
+            # The user will still be able to see the club main page,
+            # but nothing else.
+            # It's useless to display a tab with only one item, so return nothing.
+            return []
         tab_list = [
             {
                 "url": reverse("club:club_view", kwargs={"club_id": self.object.id}),
                 "slug": "infos",
                 "name": _("Infos"),
-            }
+            },
+            {
+                "url": reverse("club:club_members", kwargs={"club_id": self.object.id}),
+                "slug": "members",
+                "name": _("Members"),
+            },
+            {
+                "url": reverse(
+                    "club:club_old_members", kwargs={"club_id": self.object.id}
+                ),
+                "slug": "elderlies",
+                "name": _("Old members"),
+            },
+            {
+                "url": reverse("club:club_hist", kwargs={"club_id": self.object.id}),
+                "slug": "history",
+                "name": _("History"),
+            },
+            {
+                "url": reverse("club:news_list", kwargs={"club_id": self.object.id}),
+                "slug": "events",
+                "name": _("Events"),
+            },
         ]
-        if self.request.user.has_perm("club.view_club"):
-            tab_list.extend(
-                [
-                    {
-                        "url": reverse(
-                            "club:club_members", kwargs={"club_id": self.object.id}
-                        ),
-                        "slug": "members",
-                        "name": _("Members"),
-                    },
-                    {
-                        "url": reverse(
-                            "club:club_old_members", kwargs={"club_id": self.object.id}
-                        ),
-                        "slug": "elderlies",
-                        "name": _("Old members"),
-                    },
-                ]
-            )
-            if self.object.page:
-                tab_list.append(
-                    {
-                        "url": reverse(
-                            "club:club_hist", kwargs={"club_id": self.object.id}
-                        ),
-                        "slug": "history",
-                        "name": _("History"),
-                    }
-                )
         if self.request.user.can_edit(self.object):
             tab_list.extend(
                 [
@@ -159,21 +159,6 @@ class ClubTabsMixin(TabedViewMixin):
                         "slug": "edit",
                         "name": _("Edit"),
                     },
-                ]
-            )
-            if self.object.page and self.request.user.can_edit(self.object.page):
-                tab_list.append(
-                    {
-                        "url": reverse(
-                            "core:page_edit",
-                            kwargs={"page_name": self.object.page.get_full_name()},
-                        ),
-                        "slug": "page_edit",
-                        "name": _("Edit club page"),
-                    }
-                )
-            tab_list.extend(
-                [
                     {
                         "url": reverse(
                             "club:club_sellings", kwargs={"club_id": self.object.id}
@@ -957,3 +942,30 @@ class PosterDeleteView(ClubTabsMixin, PosterDeleteBaseView):
 
     def get_success_url(self):
         return reverse_lazy("club:poster_list", kwargs={"club_id": self.club.id})
+
+
+class ClubNewsView(PermissionRequiredMixin, ClubTabsMixin, DetailView):
+    pk_url_kwarg = "club_id"
+    model = Club
+    permission_required = "club.view_club"
+    template_name = "club/club_news_list.jinja"
+    current_tab = "events"
+
+    def get_context_data(self, **kwargs: Any):
+        events = list(
+            self.object.news.viewable_by(self.request.user)
+            .annotate(
+                first_date=Subquery(
+                    NewsDate.objects.filter(news_id=OuterRef("pk"))
+                    .order_by("start_date")
+                    .values("start_date")[:1]
+                ),
+            )
+            .prefetch_related("dates")
+            .order_by("-first_date")
+        )
+        return super().get_context_data(**kwargs) | {
+            "events": itertools.groupby(
+                events, key=lambda event: get_semester_code(event.first_date.date())
+            ),
+        }

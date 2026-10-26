@@ -1,6 +1,14 @@
 import copy
 import inspect
-from typing import TYPE_CHECKING, Any, ClassVar, LiteralString, Protocol, Unpack
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    ClassVar,
+    LiteralString,
+    Protocol,
+    TypedDict,
+    Unpack,
+)
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template.loader import render_to_string
@@ -12,11 +20,17 @@ if TYPE_CHECKING:
     from django.utils.safestring import SafeString
 
 
+class TabItem(TypedDict):
+    url: str
+    slug: str
+    name: str
+
+
 class TabedViewMixin(View):
     """Basic functions for displaying tabs in the template."""
 
     current_tab: ClassVar[str | None] = None
-    list_of_tabs: ClassVar[list | None] = None
+    list_of_tabs: ClassVar[list[TabItem] | None] = None
     tabs_title: ClassVar[str | None] = None
 
     def get_tabs_title(self):

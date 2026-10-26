@@ -48,7 +48,7 @@ des scripts complets mais qui restent lisibles,
     ```
     Ok, c'est de la triche, on installe un package externe.
     Mais bon, ça marche, et l'équivalent pur bash
-    serait carrément plus moche.
+    serait un pur enfer.
 
 === "nu"
 
@@ -59,20 +59,18 @@ des scripts complets mais qui restent lisibles,
 
     Nombre de lignes total :
     ```nu
-    ls **/*.py | insert linecount { get name | open | lines | length } | math sum
+    ls **/*.py | par-each { open $in.name | lines | length } | math sum
     ```
 
     Vous pouvez aussi exlure les lignes vides
     et les les lignes de commentaire :
     ```nu
     ls **/*.py |
-    insert linecount {
-        get name |
-        open |
+    par-each {
+        open $in.name |
         lines |
         each { str trim } |
-        filter { |l| not ($l | str starts-with "#") } |  # commentaires
-        filter { |l| ($l | str length) > 0 } |  # lignes vides
+        where { |l| ($l | str length) > 0 and not ($l | str starts-with "#") } |
         length
     } |
     math sum

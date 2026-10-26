@@ -336,10 +336,14 @@ class UserVisibilityForm(forms.ModelForm):
 
     __preferences_fields = forms.fields_for_model(
         Preferences,
-        ["show_my_stats"],
-        widgets={"show_my_stats": forms.CheckboxInput(attrs={"class": "switch"})},
+        ["show_my_stats", "show_my_timetable"],
+        widgets={
+            "show_my_stats": forms.CheckboxInput(attrs={"class": "switch"}),
+            "show_my_timetable": forms.CheckboxInput(attrs={"class": "switch"}),
+        },
     )
     show_my_stats = __preferences_fields["show_my_stats"]
+    show_my_timetable = __preferences_fields["show_my_timetable"]
 
     def __init__(
         self, *args, initial: dict | None = None, instance: User | None = None, **kwargs
@@ -347,12 +351,16 @@ class UserVisibilityForm(forms.ModelForm):
         if instance:
             initial = initial or {}
             initial["show_my_stats"] = instance.preferences.show_my_stats
+            initial["show_my_timetable"] = instance.preferences.show_my_timetable
         super().__init__(*args, initial=initial, instance=instance, **kwargs)
 
     def save(self, commit=True) -> User:  # noqa: FBT002
         instance = super().save(commit=commit)
         if commit:
             instance.preferences.show_my_stats = self.cleaned_data["show_my_stats"]
+            instance.preferences.show_my_timetable = self.cleaned_data[
+                "show_my_timetable"
+            ]
             instance.preferences.save()
         return instance
 

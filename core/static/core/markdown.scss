@@ -1,7 +1,4 @@
 .markdown {
-  --bg-lightgrey: rgb(240, 241, 245);
-  --border-lightgrey: rgb(215, 216, 220);
-
   h1,
   h2,
   h3,
@@ -28,11 +25,20 @@
     font-size: 14px;
     tab-size: 4;
     border-radius: 4px;
-    border: 1px solid var(--border-lightgrey);
-    background-color: var(--bg-lightgrey);
+    border: 1px solid var(--bg-lightgrey);
+    background-color: var(--bg-off-white);
     padding: 1px 2px;
   }
 
+  /**
+   * Some restyling rules for the cases where our own md css
+   * conflicts with the easymde editor preview css
+   */
+  &.editor-preview {
+    pre {
+      background: unset;
+    }
+  }
   pre code {
     // code that is not inlined
     margin: 15px;

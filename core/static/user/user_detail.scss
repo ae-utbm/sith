@@ -71,7 +71,7 @@ main {
         border-radius: 50%;
         justify-content: center;
         align-items: center;
-        background-color: $primary-neutral-light-color;
+        background-color: var(--bg-white);
 
         > span {
           font-size: small;

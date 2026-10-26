@@ -864,7 +864,11 @@ class Command(BaseCommand):
 
         subscribers = Group.objects.create(name="Cotisants")
         subscribers.permissions.add(
-            *list(perms.filter(codename__in=["add_news", "add_uecomment"]))
+            *list(
+                perms.filter(
+                    codename__in=["add_news", "add_uecomment", "add_self_timetable"]
+                )
+            )
         )
         old_subscribers = Group.objects.create(name="Anciens cotisants")
         old_subscribers.permissions.add(
@@ -893,18 +897,16 @@ class Command(BaseCommand):
         accounting_admin.permissions.add(
             *list(
                 perms.filter(
-                    Q(
-                        codename__in=[
-                            "view_customer",
-                            "view_product",
-                            "change_product",
-                            "add_product",
-                            "view_producttype",
-                            "change_producttype",
-                            "add_producttype",
-                            "delete_selling",
-                        ]
-                    )
+                    codename__in=[
+                        "view_customer",
+                        "view_product",
+                        "change_product",
+                        "add_product",
+                        "view_producttype",
+                        "change_producttype",
+                        "add_producttype",
+                        "delete_selling",
+                    ]
                 ).values_list("pk", flat=True)
             )
         )

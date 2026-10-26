@@ -31,10 +31,10 @@
           {% for sum in purchase_sums %}
             <div>
               <span>{{ sum["counter__name"] }}</span>
-              <span>{{ sum["total"] }} €</span>
+              <span>{{ "%.2f"|format(sum["total"]) }} €</span>
             </div>
           {% endfor %}
-          <div><b>Total : </b><b>{{ total_purchases }} €</b></div>
+          <div><b>Total : </b><b>{{ "%.2f"|format(total_purchases) }} €</b></div>
         </div>
       </div>
     </div>

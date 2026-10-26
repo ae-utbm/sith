@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-02 12:56+0200\n"
+"POT-Creation-Date: 2026-10-25 12:04+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -236,7 +236,7 @@ msgstr "vous devez spécifier au moins un utilisateur ou une adresse email"
 msgid "Begin date"
 msgstr "Date de début"
 
-#: club/forms.py com/forms.py counter/forms.py subscription/forms.py
+#: club/forms.py com/forms.py counter/forms.py
 msgid "End date"
 msgstr "Date de fin"
 
@@ -394,7 +394,8 @@ msgstr ""
 "de la présidence."
 
 #: club/models.py core/models.py counter/models.py eboutic/models.py
-#: election/models.py pedagogy/models.py sas/models.py trombi/models.py
+#: election/models.py pedagogy/models.py sas/models.py timetable/models.py
+#: trombi/models.py
 msgid "user"
 msgstr "utilisateur"
 
@@ -517,6 +518,22 @@ msgstr "Url dupliquée"
 msgid "This link doesn't match with the url base of its type."
 msgstr "Ce lien ne correspond pas à l'url de base de son type."
 
+#: club/templates/club/club_detail.jinja club/views.py
+#: com/templates/com/news_admin_list.jinja com/templates/com/poster_list.jinja
+#: com/templates/com/screen_list.jinja com/templates/com/weekmail.jinja
+#: core/templates/core/file.jinja core/templates/core/group_list.jinja
+#: core/templates/core/page/base.jinja core/templates/core/user_tools.jinja
+#: core/views/user.py counter/templates/counter/cash_summary_list.jinja
+#: counter/templates/counter/counter_list.jinja
+#: election/templates/election/election_detail.jinja
+#: forum/templates/forum/macros.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
+#: pedagogy/templates/pedagogy/guide.jinja sas/templates/sas/album.jinja
+#: trombi/templates/trombi/detail.jinja
+#: trombi/templates/trombi/edit_profile.jinja
+msgid "Edit"
+msgstr "Éditer"
+
 #: club/templates/club/club_detail.jinja com/templates/com/news_list.jinja
 msgid "Links"
 msgstr "Liens"
@@ -564,6 +581,7 @@ msgid "Role"
 msgstr "Rôle"
 
 #: club/templates/club/club_members.jinja
+#: club/templates/club/club_news_list.jinja
 #: club/templates/club/club_old_members.jinja
 #: core/templates/core/group_list.jinja core/templates/core/user_clubs.jinja
 msgid "Description"
@@ -577,6 +595,34 @@ msgstr "Depuis"
 #: club/templates/club/club_members.jinja
 msgid "There are no members in this club."
 msgstr "Il n'y a pas de membres dans ce club."
+
+#: club/templates/club/club_news_list.jinja
+#: com/templates/com/news_admin_list.jinja com/templates/com/news_edit.jinja
+#: com/templates/com/news_list.jinja core/templates/core/user_tools.jinja
+msgid "Create news"
+msgstr "Créer une nouvelle"
+
+#: club/templates/club/club_news_list.jinja
+#, python-format
+msgid "Dates (%(nb_occurrences)s occurrences)"
+msgstr "Dates (%(nb_occurrences)s occurrences)"
+
+#: club/templates/club/club_news_list.jinja
+msgid "Permalink"
+msgstr "Permalien"
+
+#: club/templates/club/club_news_list.jinja
+#: com/templates/com/news_admin_list.jinja
+msgid "Summary"
+msgstr "Résumé"
+
+#: club/templates/club/club_news_list.jinja
+msgid "No summary"
+msgstr "Pas de Résumé"
+
+#: club/templates/club/club_news_list.jinja
+msgid "No detailed description"
+msgstr "Pas de description détaillée"
 
 #: club/templates/club/club_old_members.jinja
 msgid "Club old members"
@@ -1014,30 +1060,15 @@ msgstr "Anciens membres"
 msgid "History"
 msgstr "Historique"
 
+#: club/views.py com/templates/com/news_admin_list.jinja
+#: core/templates/core/base/navbar.jinja
+msgid "Events"
+msgstr "Événements"
+
 #: club/views.py core/templates/core/base/header.jinja core/views/user.py
 #: sas/templates/sas/picture.jinja trombi/views.py
 msgid "Tools"
 msgstr "Outils"
-
-#: club/views.py com/templates/com/news_admin_list.jinja
-#: com/templates/com/poster_list.jinja com/templates/com/screen_list.jinja
-#: com/templates/com/weekmail.jinja core/templates/core/file.jinja
-#: core/templates/core/group_list.jinja core/templates/core/page/base.jinja
-#: core/templates/core/user_tools.jinja core/views/user.py
-#: counter/templates/counter/cash_summary_list.jinja
-#: counter/templates/counter/counter_list.jinja
-#: election/templates/election/election_detail.jinja
-#: forum/templates/forum/macros.jinja
-#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
-#: pedagogy/templates/pedagogy/guide.jinja sas/templates/sas/album.jinja
-#: trombi/templates/trombi/detail.jinja
-#: trombi/templates/trombi/edit_profile.jinja
-msgid "Edit"
-msgstr "Éditer"
-
-#: club/views.py
-msgid "Edit club page"
-msgstr "Éditer la page de club"
 
 #: club/views.py
 msgid "Sellings"
@@ -1093,7 +1124,7 @@ msgstr "Prix d'achat"
 msgid "Format: 16:9 | Resolution: 1920x1080"
 msgstr "Format : 16:9 | Résolution : 1920x1080"
 
-#: com/forms.py subscription/forms.py
+#: com/forms.py
 msgid "Start date"
 msgstr "Date de début"
 
@@ -1321,11 +1352,6 @@ msgstr "Administration des nouvelles"
 msgid "News"
 msgstr "Nouvelles"
 
-#: com/templates/com/news_admin_list.jinja com/templates/com/news_edit.jinja
-#: com/templates/com/news_list.jinja core/templates/core/user_tools.jinja
-msgid "Create news"
-msgstr "Créer une nouvelle"
-
 #: com/templates/com/news_admin_list.jinja
 msgid "Weeklies"
 msgstr "Événements hebdomadaires"
@@ -1339,10 +1365,6 @@ msgstr "Événements hebdomadaires affichées"
 #: forum/views.py pedagogy/templates/pedagogy/guide.jinja
 msgid "Title"
 msgstr "Titre"
-
-#: com/templates/com/news_admin_list.jinja
-msgid "Summary"
-msgstr "Résumé"
 
 #: com/templates/com/news_admin_list.jinja com/templates/com/weekmail.jinja
 #: forum/templates/forum/forum.jinja sas/models.py
@@ -1370,11 +1392,6 @@ msgstr "Dépublier"
 #: com/templates/com/news_admin_list.jinja
 msgid "Weeklies to moderate"
 msgstr "Nouvelles hebdomadaires à modérer"
-
-#: com/templates/com/news_admin_list.jinja
-#: core/templates/core/base/navbar.jinja
-msgid "Events"
-msgstr "Événements"
 
 #: com/templates/com/news_admin_list.jinja
 msgid "Displayed events"
@@ -1873,7 +1890,7 @@ msgstr "département"
 msgid "dpt option"
 msgstr "Filière"
 
-#: core/models.py pedagogy/models.py
+#: core/models.py pedagogy/models.py timetable/models.py
 msgid "semester"
 msgstr "semestre"
 
@@ -1997,6 +2014,18 @@ msgid ""
 msgstr ""
 "Autorise les cotisants (ou les personnes whitelistées, si votre profil est "
 "caché) à accéder aux statistiques de votre compte AE"
+
+#: core/models.py
+msgid "show your timetable to others"
+msgstr "montrez votre emploi du temps aux autres"
+
+#: core/models.py
+msgid ""
+"Allow subscribers to see your timetable and to compare it to theirs (if you "
+"have filled it)"
+msgstr ""
+"Permet aux cotisants de voir votre emploi du temps et de le comparer au leur "
+"(si vous l'avez enregistré)"
 
 #: core/models.py
 msgid "get a notification for every click"
@@ -4102,7 +4131,6 @@ msgstr "Nouvelle formule"
 #: counter/templates/counter/fragments/create_student_card.jinja
 #: counter/templates/counter/invoices_call.jinja
 #: sas/templates/sas/picture.jinja
-#: subscription/templates/subscription/stats.jinja
 msgid "Go"
 msgstr "Valider"
 
@@ -4237,9 +4265,12 @@ msgid "Remove price"
 msgstr "Retirer le prix"
 
 #: counter/templates/counter/product_form.jinja
-#, python-format
-msgid "Edit product %(name)s"
-msgstr "Édition du produit %(name)s"
+msgid ""
+"You can see product details. However, you cannot edit it, thus you won't be "
+"able to submit this form."
+msgstr ""
+"Vous pouvez voir ce produit. Cependant, vous ne pouvez pas l'éditer ; vous "
+"ne serez donc pas en mesure de soumettre le formulaire."
 
 #: counter/templates/counter/product_form.jinja
 msgid "Creation date"
@@ -4410,6 +4441,11 @@ msgstr ""
 #, python-format
 msgid "returnable product : %(returnable)s -> %(returned)s"
 msgstr "produit consigné : %(returnable)s -> %(returned)s"
+
+#: counter/views/admin.py
+#, python-format
+msgid "%(user)s's AE account has been emptied"
+msgstr "Le compte de %(user)s a été vidé"
 
 #: counter/views/cash.py
 msgid "10 cents"
@@ -5198,7 +5234,7 @@ msgstr "heures THE"
 msgid "hours TE"
 msgstr "heures TE"
 
-#: pedagogy/models.py
+#: pedagogy/models.py timetable/models.py
 msgid "ue"
 msgstr "UE"
 
@@ -5985,12 +6021,8 @@ msgid "Create another subscription"
 msgstr "Créer une nouvelle cotisation"
 
 #: subscription/templates/subscription/stats.jinja
-msgid "Total subscriptions"
-msgstr "Cotisations totales"
-
-#: subscription/templates/subscription/stats.jinja
-msgid "Subscriptions by type"
-msgstr "Cotisations par type"
+msgid "All subscriptions"
+msgstr "Toutes les cotisations"
 
 #: subscription/templates/subscription/subscription.jinja
 msgid "Existing member"
@@ -5999,6 +6031,46 @@ msgstr "Membre existant"
 #: subscription/views.py
 msgid "the groups that can create subscriptions"
 msgstr "les groupes pouvant créer des cotisations"
+
+#: timetable/models.py
+msgid "timetable"
+msgstr "emploi du temps"
+
+#: timetable/models.py
+msgid "timetables"
+msgstr "emplois du temps"
+
+#: timetable/models.py
+msgid "weekday"
+msgstr "jour de la semaine"
+
+#: timetable/models.py
+msgid "start at"
+msgstr "début"
+
+#: timetable/models.py
+msgid "end at"
+msgstr "fin"
+
+#: timetable/models.py
+msgid "course type"
+msgstr "type de cours"
+
+#: timetable/models.py
+msgid "room"
+msgstr "salle"
+
+#: timetable/models.py
+msgid "week group"
+msgstr "groupe de semaine"
+
+#: timetable/models.py
+msgid "timetable slot"
+msgstr "créneau d'emploi du temps"
+
+#: timetable/models.py
+msgid "timetable slots"
+msgstr "créneaux d'emploi du temps"
 
 #: timetable/templates/timetable/generator.jinja
 msgid "Timetable generator"
@@ -6030,8 +6102,44 @@ msgid "Generate"
 msgstr "Générer"
 
 #: timetable/templates/timetable/generator.jinja
-msgid "Save to PNG"
-msgstr "Sauver en PNG"
+msgid "Save on your profile"
+msgstr "Enregistrer sur votre profil"
+
+#: timetable/templates/timetable/generator.jinja
+msgid "Make this timetable public"
+msgstr "Rendre cet emploi du temps publique"
+
+#: timetable/templates/timetable/generator.jinja
+#, python-format
+msgid ""
+"You can change this at any time in <a href=\"%(url)s\">your preferences</a>"
+msgstr ""
+"Vous pouvez changer ceci n'importe quand dans <a href=\"%(url)s\">vos préférences</a>"
+
+#: timetable/templates/timetable/generator.jinja
+msgid "Save timetable"
+msgstr "Enregistrer l'emploi du temps"
+
+#: timetable/templates/timetable/generator.jinja
+#: trombi/templates/trombi/detail.jinja
+msgid "Export"
+msgstr "Export"
+
+#: timetable/templates/timetable/generator.jinja
+msgid "Export to PNG"
+msgstr "Exporter en PNG"
+
+#: timetable/views.py
+msgid "Timetables"
+msgstr "Emplois du temps"
+
+#: timetable/views.py
+msgid "Generator"
+msgstr "Générateur"
+
+#: timetable/views.py
+msgid "My timetables"
+msgstr "Mes emplois du temps"
 
 #: trombi/models.py
 msgid "subscription deadline"
@@ -6145,10 +6253,6 @@ msgstr "Fin des inscriptions : "
 #: trombi/templates/trombi/detail.jinja
 msgid "Comment deadline: "
 msgstr "Fin des commentaires : "
-
-#: trombi/templates/trombi/detail.jinja
-msgid "Export"
-msgstr "Exporter"
 
 #: trombi/templates/trombi/detail.jinja
 msgid "Add user"

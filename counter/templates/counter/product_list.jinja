@@ -80,9 +80,11 @@
     <h3 class="margin-bottom">{% trans %}Product list{% endtrans %}</h3>
 
     <div class="row margin-bottom">
-      <a href="{{ url('counter:new_product') }}" class="btn btn-blue">
-        {% trans %}New product{% endtrans %} <i class="fa fa-plus"></i>
-      </a>
+      {% if user.has_perm("counter.add_product") %}
+        <a href="{{ url('counter:new_product') }}" class="btn btn-blue">
+          {% trans %}New product{% endtrans %} <i class="fa fa-plus"></i>
+        </a>
+      {% endif %}
       <button
         class="btn btn-blue"
         @click="downloadCsv()"
