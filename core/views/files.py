@@ -21,7 +21,7 @@ from wsgiref.util import FileWrapper
 
 from django import forms
 from django.conf import settings
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Exists, OuterRef
 from django.forms.models import modelform_factory
 from django.http import Http404, HttpRequest, HttpResponse
@@ -233,6 +233,12 @@ class FileEditPropForm(forms.ModelForm):
 
     recursive = forms.BooleanField(label=_("Apply rights recursively"), required=False)
 
+    def clean_parent(self):
+        parent = self.cleaned_data["parent"]
+        if not self.instance.owner.can_edit(parent):
+            raise ValidationError(_("You cannot move this file there"))
+        return parent
+
 
 class FileEditPropView(CanEditPropMixin, UpdateView):
     model = SithFile
@@ -253,10 +259,7 @@ class FileEditPropView(CanEditPropMixin, UpdateView):
         return ret
 
     def get_success_url(self):
-        return reverse(
-            "core:file_detail",
-            kwargs={"file_id": self.object.id},
-        )
+        return reverse("core:file_detail", kwargs={"file_id": self.object.id})
 
 
 class FileView(CanViewMixin, DetailView, FormMixin):
