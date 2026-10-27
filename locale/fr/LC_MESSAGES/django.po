@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-25 12:04+0100\n"
+"POT-Creation-Date: 2026-10-27 23:26+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3275,6 +3275,10 @@ msgstr "Erreur d'envoi du fichier %(file_name)s : %(msg)s"
 msgid "Apply rights recursively"
 msgstr "Appliquer les droits récursivement"
 
+#: core/views/files.py
+msgid "You cannot move this file there"
+msgstr "Vous ne pouvez pas déplacer ce fichier là"
+
 #: core/views/forms.py
 msgid "Ensure this timestamp is set in the future"
 msgstr "Assurez-vous que cet horodatage est dans le futur"
@@ -3387,6 +3391,14 @@ msgstr "Cet UID est invalide"
 #: counter/forms.py
 msgid "User not found"
 msgstr "Utilisateur non trouvé"
+
+#: counter/forms.py
+msgid "This user cannot buy items on counters."
+msgstr "Cet utilisateur ne peut pas faire d'achats sur les comptoirs."
+
+#: counter/forms.py
+msgid "This user is banned from AE places. Take him/her out if you can."
+msgstr "Cette personne est ban comptoir. Faites-la sortir si vous le pouvez."
 
 #: counter/forms.py
 msgid "You are not a barman of this counter."
@@ -6114,7 +6126,8 @@ msgstr "Rendre cet emploi du temps publique"
 msgid ""
 "You can change this at any time in <a href=\"%(url)s\">your preferences</a>"
 msgstr ""
-"Vous pouvez changer ceci n'importe quand dans <a href=\"%(url)s\">vos préférences</a>"
+"Vous pouvez changer ceci n'importe quand dans <a href=\"%(url)s\">vos "
+"préférences</a>"
 
 #: timetable/templates/timetable/generator.jinja
 msgid "Save timetable"

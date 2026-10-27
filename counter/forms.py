@@ -130,8 +130,14 @@ class GetUserForm(forms.Form):
         elif cleaned_data["id"]:
             customer = Customer.objects.filter(user=cleaned_data["id"]).first()
 
-        if customer is None or not customer.can_buy:
+        if customer is None:
             raise forms.ValidationError(_("User not found"))
+        if not customer.can_buy:
+            raise forms.ValidationError(_("This user cannot buy items on counters."))
+        if customer.user.is_banned_counter:
+            raise forms.ValidationError(
+                _("This user is banned from AE places. Take him/her out if you can.")
+            )
         cleaned_data["user_id"] = customer.user_id
         cleaned_data["user"] = customer.user
         return cleaned_data
