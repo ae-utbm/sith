@@ -16,9 +16,9 @@ from datetime import timedelta
 from typing import TYPE_CHECKING
 
 from django.conf import settings
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import F
-from django.http import HttpRequest, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -36,6 +36,7 @@ from counter.utils import is_logged_in_counter
 from counter.views.mixins import CounterTabsMixin
 
 if TYPE_CHECKING:
+    from django.http import HttpRequest, HttpResponseRedirect
     from django.utils.safestring import SafeString
 
 
@@ -155,7 +156,7 @@ class CounterMain(
         return super().form_valid(form)
 
 
-class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
+class CounterLastOperationsView(CounterTabsMixin, UserPassesTestMixin, DetailView):
     """Provide the last operations to allow barmen to delete them."""
 
     model = Counter
@@ -163,14 +164,12 @@ class CounterLastOperationsView(CounterTabsMixin, CanViewMixin, DetailView):
     template_name = "counter/last_ops.jinja"
     current_tab = "last_ops"
 
-    def dispatch(self, request, *args, **kwargs):
-        """We have here again a very particular right handling."""
+    def test_func(self):
         self.object = self.get_object()
-        if is_logged_in_counter(request) and self.object.barmen_list:
-            return super().dispatch(request, *args, **kwargs)
-        return HttpResponseRedirect(
-            reverse("counter:details", kwargs={"counter_id": self.object.id})
-            + "?bad_location"
+        return is_logged_in_counter(
+            self.request, counter=self.object
+        ) or self.request.user.has_perms(
+            ["counter.view_selling", "counter.view_refilling"]
         )
 
     def get_context_data(self, **kwargs):

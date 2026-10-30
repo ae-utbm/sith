@@ -21,7 +21,8 @@ import pytest
 from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.contrib.auth.models import Permission, make_password
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import Permission
 from django.contrib.messages import DEFAULT_LEVELS, get_messages
 from django.shortcuts import resolve_url
 from django.test import Client, TestCase
@@ -65,8 +66,9 @@ class TestFullClickBase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.customer = subscriber_user.make()
-        cls.barmen = subscriber_user.make(password=make_password("plop"))
-        cls.board_admin = board_user.make(password=make_password("plop"))
+        password = make_password("plop")
+        cls.barmen = subscriber_user.make(password=password)
+        cls.board_admin = board_user.make(password=password)
         cls.club_admin = subscriber_user.make()
         cls.root = baker.make(User, is_superuser=True)
         cls.subscriber = subscriber_user.make()

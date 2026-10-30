@@ -22,7 +22,7 @@ from counter.utils import is_logged_in_counter
 
 class CounterTabsMixin(TabedViewMixin):
     def get_tabs_title(self):
-        return self.object
+        return self.object.name
 
     def get_list_of_tabs(self):
         if self.object.type != "BAR":
@@ -46,7 +46,11 @@ class CounterTabsMixin(TabedViewMixin):
                     "name": _("Cash summary"),
                 }
             )
-        if is_logged_in_counter(self.request):
+        if is_logged_in_counter(
+            self.request, counter=self.object
+        ) or self.request.user.has_perms(
+            ["counter.view_selling", "counter.view_refilling"]
+        ):
             tab_list.append(
                 {
                     "url": reverse(
