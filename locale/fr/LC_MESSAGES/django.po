@@ -192,46 +192,6 @@ msgstr ""
 "arrivée durant l'interaction avec l'application tierce. Veuillez contacter "
 "les responsables de cette dernière."
 
-#: club/forms.py
-msgid "Users to add"
-msgstr "Utilisateurs à ajouter"
-
-#: club/forms.py core/views/group.py
-msgid "Search users to add (one or more)."
-msgstr "Recherche les utilisateurs à ajouter (un ou plus)."
-
-#: club/forms.py
-msgid "New Mailing"
-msgstr "Nouvelle mailing liste"
-
-#: club/forms.py
-msgid "Subscribe"
-msgstr "S'abonner"
-
-#: club/forms.py
-msgid "Remove"
-msgstr "Retirer"
-
-#: club/forms.py counter/forms.py pedagogy/templates/pedagogy/moderation.jinja
-msgid "Action"
-msgstr "Action"
-
-#: club/forms.py club/tests/test_mailing.py
-msgid "This field is required"
-msgstr "Ce champ est obligatoire"
-
-#: club/forms.py club/tests/test_mailing.py
-msgid "One of the selected users doesn't have an email address"
-msgstr "Un des utilisateurs sélectionnés n'a pas d'adresse email"
-
-#: club/forms.py
-msgid "An action is required"
-msgstr "Une action est requise"
-
-#: club/forms.py club/tests/test_mailing.py
-msgid "You must specify at least an user or an email address"
-msgstr "vous devez spécifier au moins un utilisateur ou une adresse email"
-
 #: club/forms.py counter/forms.py
 msgid "Begin date"
 msgstr "Date de début"
@@ -415,60 +375,6 @@ msgstr "rôle"
 msgid "past member"
 msgstr "ancien membre"
 
-#: club/models.py com/templates/com/mailing_admin.jinja
-#: com/templates/com/news_admin_list.jinja com/templates/com/weekmail.jinja
-#: core/templates/core/user_clubs.jinja
-#: counter/templates/counter/invoices_call.jinja
-#: trombi/templates/trombi/edit_profile.jinja
-#: trombi/templates/trombi/export.jinja
-#: trombi/templates/trombi/user_profile.jinja
-msgid "Club"
-msgstr "Club"
-
-#: club/models.py
-msgid "Email address"
-msgstr "Adresse email"
-
-#: club/models.py
-msgid "Enter a valid address. Only the root of the address is needed."
-msgstr ""
-"Entrez une adresse valide. Seule la racine de l'adresse est nécessaire."
-
-#: club/models.py com/models.py core/models.py
-msgid "is moderated"
-msgstr "est modéré"
-
-#: club/models.py com/models.py
-msgid "moderator"
-msgstr "modérateur"
-
-#: club/models.py
-msgid "This mailing list already exists."
-msgstr "Cette liste de diffusion existe déjà."
-
-#: club/models.py club/templates/club/mailing.jinja
-msgid "Mailing"
-msgstr "Liste de diffusion"
-
-#: club/models.py club/templates/club/club_members.jinja
-#: club/templates/club/club_old_members.jinja club/templates/club/mailing.jinja
-#: counter/templates/counter/cash_summary_list.jinja
-#: counter/templates/counter/stats.jinja
-msgid "User"
-msgstr "Utilisateur"
-
-#: club/models.py
-msgid "At least user or email is required"
-msgstr "Au moins un utilisateur ou un email est nécessaire"
-
-#: club/models.py club/tests/test_mailing.py
-msgid "This email is already suscribed in this mailing"
-msgstr "Cet email est déjà abonné à cette mailing"
-
-#: club/models.py
-msgid "Unregistered user"
-msgstr "Utilisateur non enregistré"
-
 #: club/models.py
 msgid "The base url that links with this type must respect"
 msgstr "L'url de base que tous les liens de ce type doivent respecter"
@@ -570,6 +476,13 @@ msgstr "Membres du club"
 #: club/templates/club/club_members.jinja
 msgid "Manage roles"
 msgstr "Gérer les rôles"
+
+#: club/templates/club/club_members.jinja
+#: club/templates/club/club_old_members.jinja
+#: counter/templates/counter/cash_summary_list.jinja
+#: counter/templates/counter/stats.jinja
+msgid "User"
+msgstr "Utilisateur"
 
 #: club/templates/club/club_members.jinja
 #: club/templates/club/club_old_members.jinja
@@ -863,8 +776,7 @@ msgstr "Total"
 msgid "Payment method"
 msgstr "Méthode de paiement"
 
-#: club/templates/club/club_sellings.jinja club/templates/club/mailing.jinja
-#: com/templates/com/macros.jinja com/templates/com/mailing_admin.jinja
+#: club/templates/club/club_sellings.jinja com/templates/com/macros.jinja
 #: com/templates/com/news_admin_list.jinja com/templates/com/poster_edit.jinja
 #: com/templates/com/screen_edit.jinja com/templates/com/weekmail.jinja
 #: core/templates/core/file_detail.jinja
@@ -990,60 +902,6 @@ msgstr "Ajouter"
 msgid "Join"
 msgstr "Rejoindre"
 
-#: club/templates/club/mailing.jinja
-msgid "Mailing lists"
-msgstr "Mailing listes"
-
-#: club/templates/club/mailing.jinja
-msgid ""
-"Remember : mailing lists need to be moderated, if your new created list is "
-"not shown wait until moderation takes action"
-msgstr ""
-"Rappelez vous : les mailing listes doivent être modérées, si votre liste "
-"nouvellement créée n'est pas affichée, attendez jusqu'à ce qu'un modérateur "
-"prenne une décision"
-
-#: club/templates/club/mailing.jinja
-msgid "Mailing lists waiting for moderation"
-msgstr "Listes de diffusions en attente de modération"
-
-#: club/templates/club/mailing.jinja
-msgid "Generate mailing list"
-msgstr "Générer la liste de diffusion"
-
-#: club/templates/club/mailing.jinja com/templates/com/mailing_admin.jinja
-msgid "Email"
-msgstr "Email"
-
-#: club/templates/club/mailing.jinja
-msgid "Remove from mailing list"
-msgstr "Supprimer de la liste de diffusion"
-
-#: club/templates/club/mailing.jinja
-msgid "There is no subscriber for this mailing list"
-msgstr "Il n'y a pas d'abonnés dans cette liste de diffusion"
-
-#: club/templates/club/mailing.jinja
-msgid "No mailing list existing for this club"
-msgstr "Aucune mailing liste n'existe pour ce club"
-
-#: club/templates/club/mailing.jinja
-#: subscription/templates/subscription/subscription.jinja
-msgid "New member"
-msgstr "Nouveau membre"
-
-#: club/templates/club/mailing.jinja
-msgid "Add to mailing list"
-msgstr "Ajouter à la mailing liste"
-
-#: club/templates/club/mailing.jinja
-msgid "New mailing"
-msgstr "Nouvelle liste de diffusion"
-
-#: club/templates/club/mailing.jinja
-msgid "Create mailing list"
-msgstr "Créer une liste de diffusion"
-
 #: club/templates/club/pagerev_edit.jinja core/templates/core/page/edit.jinja
 msgid "Edit page"
 msgstr "Éditer la page"
@@ -1073,10 +931,6 @@ msgstr "Outils"
 #: club/views.py
 msgid "Sellings"
 msgstr "Vente"
-
-#: club/views.py
-msgid "Mailing list"
-msgstr "Listes de diffusion"
 
 #: club/views.py
 msgid "You are now a member of this club."
@@ -1209,6 +1063,10 @@ msgid "is published"
 msgstr "est publié"
 
 #: com/models.py
+msgid "moderator"
+msgstr "modérateur"
+
+#: com/models.py
 msgid "news"
 msgstr "nouvelle"
 
@@ -1268,6 +1126,10 @@ msgstr "fichier"
 msgid "display time"
 msgstr "temps d'affichage"
 
+#: com/models.py core/models.py
+msgid "is moderated"
+msgstr "est modéré"
+
 #: com/models.py
 msgid "Begin date should be before end date"
 msgstr "La date de début doit être avant celle de fin"
@@ -1303,46 +1165,6 @@ msgstr "Nouvelle publiée"
 msgid "News deleted"
 msgstr "Nouvelle supprimée"
 
-#: com/templates/com/mailing_admin.jinja com/views.py
-#: core/templates/core/user_tools.jinja
-msgid "Mailing lists administration"
-msgstr "Administration des mailing listes"
-
-#: com/templates/com/mailing_admin.jinja
-#: com/templates/com/news_admin_list.jinja com/templates/com/weekmail.jinja
-#: counter/templates/counter/refilling_list.jinja
-msgid "Actions"
-msgstr "Actions"
-
-#: com/templates/com/mailing_admin.jinja com/templates/com/poster_list.jinja
-#: core/templates/core/file_detail.jinja
-#: core/templates/core/file_moderation.jinja
-#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
-#: sas/templates/sas/moderation.jinja sas/templates/sas/picture.jinja
-msgid "Moderate"
-msgstr "Modérer"
-
-#: com/templates/com/mailing_admin.jinja
-#, python-format
-msgid "Moderated by %(user)s"
-msgstr "Modéré par %(user)s"
-
-#: com/templates/com/mailing_admin.jinja
-msgid "This page lists all mailing lists"
-msgstr "Cette page liste toutes les listes de diffusion"
-
-#: com/templates/com/mailing_admin.jinja
-msgid "Not moderated mailing lists"
-msgstr "Listes de diffusion non modérées"
-
-#: com/templates/com/mailing_admin.jinja
-msgid "Moderated mailing lists"
-msgstr "Modérer les listes de diffusion"
-
-#: com/templates/com/mailing_admin.jinja
-msgid "No mailing list existing"
-msgstr "Aucune liste de diffusion existante"
-
 #: com/templates/com/news_admin_list.jinja
 msgid "News admin"
 msgstr "Administration des nouvelles"
@@ -1367,6 +1189,15 @@ msgid "Title"
 msgstr "Titre"
 
 #: com/templates/com/news_admin_list.jinja com/templates/com/weekmail.jinja
+#: core/templates/core/user_clubs.jinja
+#: counter/templates/counter/invoices_call.jinja
+#: trombi/templates/trombi/edit_profile.jinja
+#: trombi/templates/trombi/export.jinja
+#: trombi/templates/trombi/user_profile.jinja
+msgid "Club"
+msgstr "Club"
+
+#: com/templates/com/news_admin_list.jinja com/templates/com/weekmail.jinja
 #: forum/templates/forum/forum.jinja sas/models.py
 msgid "Author"
 msgstr "Auteur"
@@ -1379,6 +1210,11 @@ msgstr "Modérateur"
 #: trombi/templates/trombi/edit_profile.jinja
 msgid "Dates"
 msgstr "Dates"
+
+#: com/templates/com/news_admin_list.jinja com/templates/com/weekmail.jinja
+#: counter/templates/counter/refilling_list.jinja
+msgid "Actions"
+msgstr "Actions"
 
 #: com/templates/com/news_admin_list.jinja core/templates/core/file.jinja
 #: core/templates/core/page/base.jinja
@@ -1534,6 +1370,13 @@ msgstr "Créer"
 #: com/templates/com/poster_list.jinja com/templates/com/screen_slideshow.jinja
 msgid "Click to expand"
 msgstr "Cliquez pour agrandir"
+
+#: com/templates/com/poster_list.jinja core/templates/core/file_detail.jinja
+#: core/templates/core/file_moderation.jinja
+#: pedagogy/templates/pedagogy/fragments/ue_detail/comments.jinja
+#: sas/templates/sas/moderation.jinja sas/templates/sas/picture.jinja
+msgid "Moderate"
+msgstr "Modérer"
 
 #: com/templates/com/poster_list.jinja
 msgid "No posters"
@@ -2857,14 +2700,6 @@ msgstr "Clubs actuels : "
 msgid "Old club(s) :"
 msgstr "Anciens clubs :"
 
-#: core/templates/core/user_clubs.jinja
-msgid "Subscribed mailing lists"
-msgstr "Mailing listes abonnées"
-
-#: core/templates/core/user_clubs.jinja
-msgid "Unsubscribe"
-msgstr "Se désabonner"
-
 #: core/templates/core/user_detail.jinja
 #, python-format
 msgid "%(user_name)s's profile"
@@ -3351,6 +3186,10 @@ msgid "Users to add to group"
 msgstr "Utilisateurs à ajouter au groupe"
 
 #: core/views/group.py
+msgid "Search users to add (one or more)."
+msgstr "Recherche les utilisateurs à ajouter (un ou plus)."
+
+#: core/views/group.py
 msgid "Users to remove from group"
 msgstr "Utilisateurs à retirer du groupe"
 
@@ -3456,6 +3295,10 @@ msgstr ""
 "Un utilisateur ne peut pas être un barman régulier et temporaire en même "
 "temps, mais les utilisateurs suivants ont été définis comme les deux : "
 "%(users)s"
+
+#: counter/forms.py pedagogy/templates/pedagogy/moderation.jinja
+msgid "Action"
+msgstr "Action"
 
 #: counter/forms.py
 msgid "Date and time of action"
@@ -5909,10 +5752,6 @@ msgid "A new poster needs to be moderated"
 msgstr "Une nouvelle affiche a besoin d'être modérée"
 
 #: sith/settings.py
-msgid "A new mailing list needs to be moderated"
-msgstr "Une nouvelle mailing list a besoin d'être modérée"
-
-#: sith/settings.py
 msgid "A new pedagogy comment has been signaled for moderation"
 msgstr ""
 "Un nouveau commentaire de la pédagogie a été signalé pour la modération"
@@ -6039,6 +5878,10 @@ msgstr "Toutes les cotisations"
 #: subscription/templates/subscription/subscription.jinja
 msgid "Existing member"
 msgstr "Membre existant"
+
+#: subscription/templates/subscription/subscription.jinja
+msgid "New member"
+msgstr "Nouveau membre"
 
 #: subscription/views.py
 msgid "the groups that can create subscriptions"

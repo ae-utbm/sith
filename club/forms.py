@@ -31,20 +31,10 @@ from django.forms.models import ModelChoiceField, ModelChoiceIterator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from club.models import (
-    Club,
-    ClubLink,
-    ClubRole,
-    Mailing,
-    MailingSubscription,
-    Membership,
-)
+from club.models import Club, ClubLink, ClubRole, Membership
 from core.models import User
 from core.views.forms import SelectDateTime
-from core.views.widgets.ajax_select import (
-    AutoCompleteSelectMultipleUser,
-    AutoCompleteSelectUser,
-)
+from core.views.widgets.ajax_select import AutoCompleteSelectUser
 from counter.models import Counter, Selling
 from counter.schemas import SaleFilterSchema
 
@@ -129,107 +119,6 @@ class ClubAdminEditForm(ClubEditForm):
 
     class Meta(ClubEditForm.Meta):
         fields = ["name", "parent", "is_active", *ClubEditForm.Meta.fields]
-
-
-class MailingForm(forms.Form):
-    """Form handling mailing lists right."""
-
-    ACTION_NEW_MAILING = 1
-    ACTION_NEW_SUBSCRIPTION = 2
-    ACTION_REMOVE_SUBSCRIPTION = 3
-
-    subscription_users = forms.ModelMultipleChoiceField(
-        label=_("Users to add"),
-        help_text=_("Search users to add (one or more)."),
-        required=False,
-        widget=AutoCompleteSelectMultipleUser,
-        queryset=User.objects.all(),
-    )
-
-    def __init__(self, club_id, user_id, mailings, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.fields["action"] = forms.TypedChoiceField(
-            choices=(
-                (self.ACTION_NEW_MAILING, _("New Mailing")),
-                (self.ACTION_NEW_SUBSCRIPTION, _("Subscribe")),
-                (self.ACTION_REMOVE_SUBSCRIPTION, _("Remove")),
-            ),
-            coerce=int,
-            label=_("Action"),
-            initial=1,
-            required=True,
-            widget=forms.HiddenInput(),
-        )
-
-        # Generate bulk removal forms, they are never required
-        for mailing in mailings:
-            self.fields["removal_" + str(mailing.id)] = forms.ModelMultipleChoiceField(
-                mailing.subscriptions.all(),
-                label=_("Remove"),
-                required=False,
-                widget=forms.CheckboxSelectMultiple,
-            )
-
-        # Include fields for handling mailing creation
-        mailing_fields = ("email",)
-        self.fields.update(forms.fields_for_model(Mailing, fields=mailing_fields))
-        for field in mailing_fields:
-            self.fields["mailing_" + field] = self.fields.pop(field)
-            self.fields["mailing_" + field].required = False
-
-        # Include fields for handling subscription creation
-        subscription_fields = ("mailing", "email")
-        self.fields.update(
-            forms.fields_for_model(MailingSubscription, fields=subscription_fields)
-        )
-        for field in subscription_fields:
-            self.fields["subscription_" + field] = self.fields.pop(field)
-            self.fields["subscription_" + field].required = False
-
-        self.fields["subscription_mailing"].queryset = Mailing.objects.filter(
-            club__id=club_id, is_moderated=True
-        )
-
-    def check_required(self, cleaned_data, field):
-        """If the given field doesn't exist or has no value, add a required error on it."""
-        if not cleaned_data.get(field, None):
-            self.add_error(field, _("This field is required"))
-
-    def clean_subscription_users(self):
-        """Convert given users into real users and check their validity."""
-        cleaned_data = super().clean()
-        users = []
-        for user in cleaned_data["subscription_users"]:
-            if not user.email:
-                raise forms.ValidationError(
-                    _("One of the selected users doesn't have an email address"),
-                    code="invalid",
-                )
-            users.append(user)
-        return users
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        if "action" not in cleaned_data:
-            # If there is no action provided, we can stop here
-            raise forms.ValidationError(_("An action is required"), code="invalid")
-
-        if cleaned_data["action"] == self.ACTION_NEW_MAILING:
-            self.check_required(cleaned_data, "mailing_email")
-
-        if cleaned_data["action"] == self.ACTION_NEW_SUBSCRIPTION:
-            self.check_required(cleaned_data, "subscription_mailing")
-            if not cleaned_data.get(
-                "subscription_users", None
-            ) and not cleaned_data.get("subscription_email", None):
-                raise forms.ValidationError(
-                    _("You must specify at least an user or an email address"),
-                    code="invalid",
-                )
-
-        return cleaned_data
 
 
 class SellingsForm(forms.Form):
