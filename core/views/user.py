@@ -502,7 +502,9 @@ class UserClubView(UserTabsMixin, CanViewMixin, DetailView):
     current_tab = "clubs"
 
 
-class UserVisibilityFormFragment(FragmentMixin, SuccessMessageMixin, UpdateView):
+class UserVisibilityFormFragment(
+    FragmentMixin, SuccessMessageMixin, CanEditMixin, UpdateView
+):
     model = User
     form_class = UserVisibilityForm
     template_name = "core/fragment/user_visibility.jinja"
