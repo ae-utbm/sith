@@ -94,8 +94,8 @@ class FragmentMixin(TemplateResponseMixin, AllowFragment, ContextMixin):
             return render(
                 request,
                 "app/template.jinja",
-                context={"fragment": fragment(request)
-            }
+                context={"fragment": fragment(request)}
+            )
 
         # in urls.py
         urlpatterns = [
