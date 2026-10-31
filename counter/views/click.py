@@ -242,15 +242,11 @@ class RefillingCreateView(FragmentMixin, CreateView):
         if not self.customer.can_buy:
             raise Http404
 
-        if not is_logged_in_counter(request):
-            raise PermissionDenied
-
         self.counter: Counter = get_object_or_404(Counter, id=self.kwargs["counter_id"])
 
-        if not (
-            request.barmen
-            and request.barmen.issubset(self.counter.barmen_list)
-            and self.counter.can_refill
+        if (
+            not is_logged_in_counter(request, counter=self.counter)
+            or not self.counter.can_refill
         ):
             raise PermissionDenied
 

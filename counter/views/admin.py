@@ -306,52 +306,41 @@ class ReturnableProductDeleteView(
         }
 
 
-class RefillingDeleteView(DeleteView):
+class CounterTransactionDeletionView(DeleteView):
+    template_name = "core/delete_confirm.jinja"
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("counter", "customer")
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object: Selling | Refilling = self.get_object()
+        if timezone.now() - self.object.date <= timedelta(
+            minutes=settings.SITH_LAST_OPERATIONS_LIMIT
+        ) and is_logged_in_counter(request, counter=self.object.counter):
+            self.success_url = reverse(
+                "counter:details", kwargs={"counter_id": self.object.counter_id}
+            )
+            return super().dispatch(request, *args, **kwargs)
+        elif self.object.is_owned_by(request.user):
+            self.success_url = reverse(
+                "core:user_account", kwargs={"user_id": self.object.customer.user_id}
+            )
+            return super().dispatch(request, *args, **kwargs)
+        raise PermissionDenied
+
+
+class RefillingDeleteView(CounterTransactionDeletionView):
     """Delete a refilling (for the admins)."""
 
     model = Refilling
     pk_url_kwarg = "refilling_id"
-    template_name = "core/delete_confirm.jinja"
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if timezone.now() - self.object.date <= timedelta(
-            minutes=settings.SITH_LAST_OPERATIONS_LIMIT
-        ) and is_logged_in_counter(request):
-            self.success_url = reverse(
-                "counter:details", kwargs={"counter_id": self.object.counter.id}
-            )
-            return super().dispatch(request, *args, **kwargs)
-        elif self.object.is_owned_by(request.user):
-            self.success_url = reverse(
-                "core:user_account", kwargs={"user_id": self.object.customer.user.id}
-            )
-            return super().dispatch(request, *args, **kwargs)
-        raise PermissionDenied
 
 
-class SellingDeleteView(DeleteView):
+class SellingDeleteView(CounterTransactionDeletionView):
     """Delete a selling (for the admins)."""
 
     model = Selling
     pk_url_kwarg = "selling_id"
-    template_name = "core/delete_confirm.jinja"
-
-    def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        if timezone.now() - self.object.date <= timedelta(
-            minutes=settings.SITH_LAST_OPERATIONS_LIMIT
-        ) and is_logged_in_counter(request):
-            self.success_url = reverse(
-                "counter:details", kwargs={"counter_id": self.object.counter.id}
-            )
-            return super().dispatch(request, *args, **kwargs)
-        elif self.object.is_owned_by(request.user):
-            self.success_url = reverse(
-                "core:user_account", kwargs={"user_id": self.object.customer.user.id}
-            )
-            return super().dispatch(request, *args, **kwargs)
-        raise PermissionDenied
 
 
 class CounterStatView(PermissionRequiredMixin, DetailView):
