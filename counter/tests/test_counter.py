@@ -25,8 +25,8 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Permission
 from django.contrib.messages import DEFAULT_LEVELS, get_messages
 from django.shortcuts import resolve_url
-from django.test import Client, TestCase
-from django.urls import reverse
+from django.test import Client, RequestFactory, TestCase
+from django.urls import resolve, reverse
 from django.utils import timezone
 from django.utils.timezone import localdate, now
 from freezegun import freeze_time
@@ -48,6 +48,7 @@ from counter.models import (
     ReturnableProduct,
     Selling,
 )
+from counter.utils import is_logged_in_counter
 
 if TYPE_CHECKING:
     from django.http import HttpResponse
@@ -919,6 +920,48 @@ class TestBarmanConnection(TestCase):
             self.detail_url, {"username": self.barman.username, "password": "plop"}
         )
         assert self.barman in response.wsgi_request.barmen
+
+
+class TestIsLoggedInCounter(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.counter = baker.make(Counter, type="BAR")
+        cls.other_counter = baker.make(Counter, type="BAR")
+        cls.barman = subscriber_user.make()
+        cls.other_barman = subscriber_user.make()
+        cls.url = reverse("counter:details", kwargs={"counter_id": cls.counter.id})
+
+    def make_request(self, barmen):
+        """Requête émise depuis une vue du namespace `counter`."""
+        request = RequestFactory().get(self.url)
+        request.resolver_match = resolve(self.url)
+        request.barmen = set(barmen)
+        return request
+
+    def test_denied(self):
+        # nobody is logged
+        request = self.make_request([])
+        assert not is_logged_in_counter(request)
+
+        # somebody is logged, but on another counter
+        self.other_counter.permanencies.create(user=self.barman, start=now())
+        assert not is_logged_in_counter(request, counter=self.counter)
+
+    def test_ok(self):
+        request = self.make_request([self.barman])
+        assert is_logged_in_counter(request)
+
+        self.counter.permanencies.create(user=self.barman, start=now())
+        assert is_logged_in_counter(request, counter=self.counter)
+
+    def test_request_outside_counter_app(self):
+        """A request coming from outside the counter app is denied."""
+        request = self.make_request([self.barman])
+        request.resolver_match = resolve(reverse("core:index"))
+        assert not is_logged_in_counter(request)
+
+        self.counter.permanencies.create(user=self.barman, start=now())
+        assert not is_logged_in_counter(request, counter=self.counter)
 
 
 @pytest.mark.django_db
