@@ -240,13 +240,6 @@ $background-color-hovered: #283747;
 
           >.links {
             width: 100%;
-            display: flex;
-            justify-content: flex-end;
-            gap: 15px;
-
-            @media (max-width: 1200px) {
-              justify-content: flex-start;
-            }
 
             a {
               color: $text-color;
