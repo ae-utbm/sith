@@ -38,22 +38,31 @@ class Command(BaseCommand):
         return domains
 
     def _update_domains(self, domains: set[str]):
-        # Cleanup database
-        ToxicDomain.objects.filter(is_externally_managed=True).delete()
-
-        # Create database
-        ToxicDomain.objects.bulk_create(
-            [
-                ToxicDomain(domain=domain, is_externally_managed=True)
-                for domain in domains
-            ],
-            ignore_conflicts=True,
-        )
+        existing = set(ToxicDomain.objects.values_list("domain", flat=True))
+        if existing == domains:
+            self.stdout.write("Domain database was up to date")
+            return
+        if to_remove := (existing - domains):
+            # Cleanup database
+            ToxicDomain.objects.filter(
+                domain__in=to_remove, is_externally_managed=True
+            ).delete()
+        if to_create := (domains - existing):
+            # Create database
+            ToxicDomain.objects.bulk_create(
+                [
+                    ToxicDomain(domain=domain, is_externally_managed=True)
+                    for domain in to_create
+                ],
+                ignore_conflicts=True,
+            )
         self.stdout.write("Domain database updated")
 
     def handle(self, *args, **options):
         if not self._should_update(force=options["force"]):
-            self.stdout.write("Domain database is up to date")
+            self.stdout.write(
+                "No update required. Use --force if you want to do it anyway."
+            )
             return
         self.stdout.write("Updating domain database")
 
