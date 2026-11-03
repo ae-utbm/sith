@@ -61,6 +61,7 @@ documentation = "https://sith-ae.readthedocs.io/"
 [dependency-groups]
 prod = [
     "psycopg[c]>=3.3.6,<4.0.0",
+    "uwsgi>=2.0.31,<3",
 ]
 dev = [
     "django-debug-toolbar>=8.0.0,<9",
