@@ -6,8 +6,10 @@ from django.urls import resolve
 if TYPE_CHECKING:
     from django.http import HttpRequest
 
+    from counter.models import Counter
 
-def is_logged_in_counter(request: HttpRequest) -> bool:
+
+def is_logged_in_counter(request: HttpRequest, counter: Counter | None = None) -> bool:
     """Check if the request is sent from a device logged to a counter.
 
     The request must also be sent within the frame of a counter's activity.
@@ -30,4 +32,6 @@ def is_logged_in_counter(request: HttpRequest) -> bool:
     if not referer_ok and request.resolver_match.app_name != "counter":
         return False
 
-    return bool(request.barmen)
+    if counter is None:
+        return bool(request.barmen)
+    return bool(request.barmen) and request.barmen.issubset(set(counter.barmen_list))
