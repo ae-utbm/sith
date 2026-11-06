@@ -35,7 +35,7 @@ from pytest_django.asserts import assertInHTML, assertRedirects
 
 from antispam.models import ToxicDomain
 from club.models import Club
-from core.baker_recipes import subscriber_user
+from core.baker_recipes import board_user, subscriber_user
 from core.models import AnonymousUser, Group, Page, User, validate_promo
 from core.utils import get_last_promo, get_semester_code, get_start_of_semester
 from core.views import AllowFragment
@@ -398,11 +398,24 @@ class TestUserTools:
             response, expected_url=reverse("core:login", query={"next": url})
         )
 
-    @pytest.mark.parametrize("username", ["guy", "root", "skia", "comunity"])
-    def test_page_is_working(self, client, username):
+    @pytest.mark.parametrize(
+        "user_factory",
+        [
+            lambda: baker.make(User),
+            lambda: baker.make(User, is_superuser=True),
+            board_user.make,
+            lambda: baker.make(
+                User, groups=[Group.objects.get(id=settings.SITH_GROUP_COM_ADMIN_ID)]
+            ),
+            lambda: baker.make(
+                User,
+                groups=[Group.objects.get(id=settings.SITH_GROUP_COUNTER_ADMIN_ID)],
+            ),
+        ],
+    )
+    def test_page_is_working(self, client, user_factory):
         """All existing users should be able to see the test page."""
-        # Test for simple user
-        client.force_login(User.objects.get(username=username))
+        client.force_login(user_factory())
         response = client.get(reverse("core:user_tools"))
         assert response.status_code == 200
 
