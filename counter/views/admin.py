@@ -181,6 +181,9 @@ class ProductEditView(CounterAdminTabsMixin, PermissionRequiredMixin, UpdateView
     permission_required = "counter.change_product"
 
     def has_permission(self):
+        # If users can see products but not edit them,
+        # still show them this form, as it is the place where all infos are,
+        # but forbid to save it.
         return self.request.user.has_perm("counter.change_product") or (
             self.request.method == "GET"
             and self.request.user.has_perm("counter.view_product")
