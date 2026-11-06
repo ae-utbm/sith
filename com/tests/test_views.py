@@ -31,8 +31,9 @@ from pytest_django.asserts import assertNumQueries, assertRedirects
 
 from club.models import Club, ClubRole, Membership
 from com.models import News, NewsDate, Poster, Sith, Weekmail, WeekmailArticle
-from core.baker_recipes import subscriber_user
+from core.baker_recipes import old_subscriber_user, subscriber_user
 from core.models import AnonymousUser, Group, User
+from core.templatetags.renderer import markdown
 from core.utils import RED_PIXEL_PNG
 
 
@@ -42,68 +43,32 @@ def user_community():
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize(
-    "url",
-    [
-        reverse("com:alert_edit"),
-        reverse("com:info_edit"),
-    ],
-)
-def test_com_page_is_working(client, url, user_community):
+def test_com_page_is_working(client, user_community):
     client.force_login(user_community)
-    response = client.get(url)
+    response = client.get(reverse("com:banner_edit"))
     assert response.status_code == 200
 
 
 class TestCom(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.skia = User.objects.get(username="skia")
         cls.com_group = Group.objects.get(id=settings.SITH_GROUP_COM_ADMIN_ID)
-        cls.skia.groups.set([cls.com_group])
+        cls.com_admin = subscriber_user.make(groups=[cls.com_group])
 
-    def setUp(self):
-        self.client.force_login(self.skia)
-
-    def test_alert_msg(self):
+    def test_banner_messages(self):
+        self.client.force_login(self.com_admin)
+        alert_msg = "### ALERTE!\n\n**Caaaataaaapuuuulte!!!!**\n"
+        info_msg = "### INFO:\n\n**Caaaataaaapuuuulte!!!!**\n"
         self.client.post(
-            reverse("com:alert_edit"),
-            {
-                "alert_msg": """
-### ALERTE!
-
-**Caaaataaaapuuuulte!!!!**
-"""
-            },
+            reverse("com:banner_edit"), {"alert_msg": alert_msg, "info_msg": info_msg}
         )
         r = self.client.get(reverse("core:index"))
         assert r.status_code == 200
-        self.assertInHTML(
-            """<div id="alert_box"><div class="markdown"><h3>ALERTE!</h3>
-            <p><strong>Caaaataaaapuuuulte!!!!</strong></p>""",
-            r.content.decode(),
-        )
-
-    def test_info_msg(self):
-        self.client.post(
-            reverse("com:info_edit"),
-            {
-                "info_msg": """
-### INFO: **Caaaataaaapuuuulte!!!!**
-"""
-            },
-        )
-        r = self.client.get(reverse("core:index"))
-
-        assert r.status_code == 200
-        self.assertInHTML(
-            """<div id="info_box"><div class="markdown">
-            <h3>INFO: <strong>Caaaataaaapuuuulte!!!!</strong></h3>""",
-            r.content.decode(),
-        )
+        self.assertInHTML(f'<div id="alert_box">{markdown(alert_msg)}</div>', r.text)
+        self.assertInHTML(f'<div id="info_box">{markdown(info_msg)}</div>', r.text)
 
     def test_birthday_non_subscribed_user(self):
-        self.client.force_login(User.objects.get(username="guy"))
+        self.client.force_login(baker.make(User))
         response = self.client.get(reverse("core:index"))
         self.assertContains(
             response,
@@ -111,6 +76,7 @@ class TestCom(TestCase):
         )
 
     def test_birthday_subscibed_user(self):
+        self.client.force_login(subscriber_user.make())
         response = self.client.get(reverse("core:index"))
 
         self.assertNotContains(
@@ -119,7 +85,7 @@ class TestCom(TestCase):
         )
 
     def test_birthday_old_subscibed_user(self):
-        self.client.force_login(User.objects.get(username="old_subscriber"))
+        self.client.force_login(old_subscriber_user.make())
         response = self.client.get(reverse("core:index"))
 
         self.assertNotContains(
