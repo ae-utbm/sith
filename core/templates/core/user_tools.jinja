@@ -13,7 +13,7 @@
     <h3>{% trans %}User Tools{% endtrans %}</h3>
 
     <div class="container">
-      {% if user.has_perm("subscription.view_userban") or user.is_root or user.is_board_member %}
+      {% if user.has_perm("subscription.view_userban") or user.has_perm("club.add_club") or user.is_root or user.is_board_member %}
         <div>
           <h4>{% trans %}Sith management{% endtrans %}</h4>
           <ul>
@@ -30,7 +30,7 @@
             {% if user.has_perm("core.view_userban") %}
               <li><a href="{{ url("rootplace:ban_list") }}">{% trans %}Bans{% endtrans %}</a></li>
             {% endif %}
-            {% if user.is_board_member or user.is_root %}
+            {% if user.has_perm("club.add_club") %}
               <li><a href="{{ url('club:club_new') }}">{% trans %}New club{% endtrans %}</a></li>
             {% endif %}
           </ul>
@@ -41,8 +41,7 @@
       {% for b in settings.SITH_COUNTER_BARS if user.is_in_group(name=b[1] + " admin") %}
         {% set is_admin_on_a_counter = true %}
       {% endfor %}
-
-      {% if is_admin_on_a_counter or user.is_root or user.is_in_group(pk=settings.SITH_GROUP_COUNTER_ADMIN_ID) %}
+      {% if is_admin_on_a_counter or user.has_perm("counter.view_product") or user.has_perm("counter.view_eticket") %}
         <div>
           <h4>{% trans %}Counters{% endtrans %}</h4>
           <ul>
@@ -52,31 +51,15 @@
                   {% trans %}General counters management{% endtrans %}
                 </a>
               </li>
+            {% endif %}
+            {% if user.has_perm("counter.view_product") %}
               <li>
                 <a href="{{ url('counter:product_list') }}">
                   {% trans %}Products management{% endtrans %}
                 </a>
               </li>
-              <li>
-                <a href="{{ url('counter:product_type_list') }}">
-                  {% trans %}Product types management{% endtrans %}
-                </a>
-              </li>
-              <li>
-                <a href="{{ url("counter:returnable_list") }}">
-                  {% trans %}Returnable products management{% endtrans %}
-                </a>
-              </li>
-              <li>
-                <a href="{{ url('counter:cash_summary_list') }}">
-                  {% trans %}Cash register summaries{% endtrans %}
-                </a>
-              </li>
-              <li>
-                <a href="{{ url('counter:invoices_call') }}">
-                  {% trans %}Invoices call{% endtrans %}
-                </a>
-              </li>
+            {% endif %}
+            {% if user.has_perm("counter.view_eticket") %}
               <li>
                 <a href="{{ url('counter:eticket_list') }}">
                   {% trans %}Etickets{% endtrans %}
@@ -109,10 +92,17 @@
         </div>
       {% endif %}
 
-      {% if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
+      {% if user.has_perms(["counter.view_invoicecall", "counter.change_invoicecall"]) or user.is_root or user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
         <div>
           <h4>{% trans %}Accounting{% endtrans %}</h4>
           <ul>
+            {% if user.has_perms(["counter.view_invoicecall", "counter.change_invoicecall"]) %}
+              <li>
+                <a href="{{ url('counter:invoices_call') }}">
+                  {% trans %}Invoices call{% endtrans %}
+                </a>
+              </li>
+            {% endif %}
             {% if user.is_root or user.is_in_group(pk=settings.SITH_GROUP_ACCOUNTING_ADMIN_ID) %}
               <li><a href="{{ url("counter:account_refound") }}">{% trans %}Refound Account{% endtrans %}</a></li>
             {% endif %}
@@ -120,21 +110,19 @@
         </div>
       {% endif %}
 
-      {% if user.is_root or user.is_com_admin or user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
+      {% if user.is_root or user.is_com_admin or user.has_perm("sas.moderate_sasfile") %}
         <div>
           <h4>{% trans %}Communication{% endtrans %}</h4>
           <ul>
             {% if user.is_com_admin or user.is_root %}
-              <li><a href="{{ url('com:weekmail_article') }}">{% trans %}Create weekmail article{% endtrans %}</a></li>
               <li><a href="{{ url('com:weekmail') }}">{% trans %}Weekmail{% endtrans %}</a></li>
-              <li><a href="{{ url('com:weekmail_destinations') }}">{% trans %}Weekmail destinations{% endtrans %}</a></li>
               <li><a href="{{ url('com:news_new') }}">{% trans %}Create news{% endtrans %}</a></li>
               <li><a href="{{ url('com:news_admin_list') }}">{% trans %}Moderate news{% endtrans %}</a></li>
               <li><a href="{{ url('com:banner_edit') }}">{% trans %}Edit banner messages{% endtrans %}</a></li>
               <li><a href="{{ url('com:poster_list') }}">{% trans %}Posters{% endtrans %}</a></li>
               <li><a href="{{ url('com:screen_list') }}">{% trans %}Screens{% endtrans %}</a></li>
             {% endif %}
-            {% if user.is_in_group(pk=settings.SITH_GROUP_SAS_ADMIN_ID) %}
+            {% if user.has_perm("sas.moderate_sasfile") %}
               <li><a href="{{ url('sas:moderation') }}">{% trans %}Moderate pictures{% endtrans %}</a></li>
             {% endif %}
           </ul>
@@ -170,12 +158,17 @@
         </div>
       {% endif %}
 
-      {% if user.memberships.filter(end_date=None).all().count() > 0 %}
+      {% set memberships = user.memberships.ongoing().select_related("club")|list %}
+      {% if memberships|length > 0 %}
         <div>
           <h4>{% trans %}Club tools{% endtrans %}</h4>
           <ul>
-            {% for m in user.memberships.filter(end_date=None).all() %}
-              <li><a href="{{ url('club:tools', club_id=m.club.id) }}">{{ m.club }}</a></li>
+            {% for m in memberships %}
+              {% if m.is_board %}
+                <li><a href="{{ url('club:tools', club_id=m.club_id) }}">{{ m.club }}</a></li>
+              {% else %}
+                <li><a href="{{ url('club:club_view', club_id=m.club_id) }}">{{ m.club }}</a></li>
+              {% endif %}
             {% endfor %}
           </ul>
         </div>
@@ -208,7 +201,7 @@
         <ul>
           <li><a href="{{ url('election:list') }}">{% trans %}See available elections{% endtrans %}</a></li>
           <li><a href="{{ url('election:list_archived') }}">{% trans %}See archived elections{% endtrans %}</a></li>
-          {%- if user.is_subscribed -%}
+          {%- if user.has_perm("election.add_election") -%}
             <li><a href="{{ url('election:create') }}">{% trans %}Create a new election{% endtrans %}</a></li>
           {%- endif -%}
         </ul>
