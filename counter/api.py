@@ -22,7 +22,7 @@ from ninja_extra.pagination import PageNumberPaginationExtra
 from ninja_extra.schemas import PaginatedResponseSchema
 
 from api.auth import ApiKeyAuth
-from api.permissions import CanAccessLookup, CanView, IsInGroup, IsRoot
+from api.permissions import CanAccessLookup, CanView, HasPerm, IsInGroup, IsRoot
 from counter.models import Counter, Product, ProductType
 from counter.schemas import (
     CounterFilterSchema,
@@ -93,7 +93,7 @@ class ProductController(ControllerBase):
     @route.get(
         "/search/detailed",
         response=PaginatedResponseSchema[ProductSchema],
-        permissions=[IsCounterAdmin],
+        permissions=[HasPerm("counter.view_product")],
         url_name="search_products_detailed",
     )
     @paginate(PageNumberPaginationExtra, page_size=50)
