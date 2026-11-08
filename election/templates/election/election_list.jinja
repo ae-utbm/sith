@@ -5,24 +5,13 @@
   {%- trans %}Election list{% endtrans %}
 {%- endblock %}
 
-{% block head %}
-  {{ super() -}}
-  <style>
-    small {
-      font-size: smaller;
-    }
-
-    time {
-      font-weight: bolder;
-    }
-  </style>
-{%- endblock %}
-
 {% block content %}
   <h3>{% trans %}Current elections{% endtrans %}</h3>
-  <a class="btn btn-blue" href="{{ url("election:create") }}">
-    <i class="fa fa-plus"></i>{% trans %}New election{% endtrans %}
-  </a>
+  {% if user.has_perm("election.add_election") %}
+    <a class="btn btn-blue" href="{{ url("election:create") }}">
+      <i class="fa fa-plus"></i>{% trans %}New election{% endtrans %}
+    </a>
+  {% endif %}
   {%- for election in object_list %}
     <hr>
     <section>

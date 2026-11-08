@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-27 23:26+0100\n"
+"POT-Creation-Date: 2026-11-06 17:22+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -20,15 +20,15 @@ msgstr ""
 msgid "Email domain is not allowed."
 msgstr "Le domaine de l'addresse e-mail n'est pas autorisé."
 
-#: antispam/models.py
+#: antispam/models/models.py
 msgid "domain"
 msgstr "domaine"
 
-#: antispam/models.py
+#: antispam/models/models.py
 msgid "is externally managed"
 msgstr "est géré de manière externe"
 
-#: antispam/models.py
+#: antispam/models/models.py
 msgid ""
 "True if kept up-to-date using external toxic domain providers, else False"
 msgstr ""
@@ -1503,17 +1503,13 @@ msgstr "Le mot de la fin"
 msgid "Communication administration"
 msgstr "Administration de la communication"
 
-#: com/views.py core/templates/core/user_tools.jinja
+#: com/views.py
 msgid "Weekmail destinations"
 msgstr "Destinataires du Weekmail"
 
 #: com/views.py
-msgid "Info message"
-msgstr "Message d'info"
-
-#: com/views.py
-msgid "Alert message"
-msgstr "Message d'alerte"
+msgid "Banner messages"
+msgstr "Messages de bannière"
 
 #: com/views.py
 msgid "Posters list"
@@ -2984,24 +2980,6 @@ msgstr "Gestion générale des comptoirs"
 msgid "Products management"
 msgstr "Gestion des produits"
 
-#: core/templates/core/user_tools.jinja
-msgid "Product types management"
-msgstr "Gestion des types de produit"
-
-#: core/templates/core/user_tools.jinja
-msgid "Returnable products management"
-msgstr "Gestion des consignes"
-
-#: core/templates/core/user_tools.jinja
-#: counter/templates/counter/cash_summary_list.jinja counter/views/mixins.py
-msgid "Cash register summaries"
-msgstr "Relevés de caisse"
-
-#: core/templates/core/user_tools.jinja
-#: counter/templates/counter/invoices_call.jinja counter/views/mixins.py
-msgid "Invoices call"
-msgstr "Appels à facture"
-
 #: core/templates/core/user_tools.jinja core/views/user.py
 #: counter/templates/counter/counter_list.jinja
 msgid "Stats"
@@ -3012,6 +2990,11 @@ msgid "Accounting"
 msgstr "Comptabilité"
 
 #: core/templates/core/user_tools.jinja
+#: counter/templates/counter/invoices_call.jinja counter/views/mixins.py
+msgid "Invoices call"
+msgstr "Appels à facture"
+
+#: core/templates/core/user_tools.jinja
 msgid "Refound Account"
 msgstr "Rembourser un compte"
 
@@ -3020,24 +3003,12 @@ msgid "Communication"
 msgstr "Communication"
 
 #: core/templates/core/user_tools.jinja
-msgid "Create weekmail article"
-msgstr "Rédiger un nouvel article dans le Weekmail"
-
-#: core/templates/core/user_tools.jinja
 msgid "Moderate news"
 msgstr "Modérer les nouvelles"
 
 #: core/templates/core/user_tools.jinja
-msgid "Edit alert message"
-msgstr "Éditer le message d'alerte"
-
-#: core/templates/core/user_tools.jinja
-msgid "Edit information message"
-msgstr "Éditer le message d'informations"
-
-#: core/templates/core/user_tools.jinja
-msgid "Moderate files"
-msgstr "Modérer les fichiers"
+msgid "Edit banner messages"
+msgstr "Éditer les messages de bannière"
 
 #: core/templates/core/user_tools.jinja
 msgid "Moderate pictures"
@@ -3786,6 +3757,10 @@ msgstr "Liste des relevés de caisse"
 #: counter/templates/counter/cash_summary_list.jinja
 msgid "Theoric sums"
 msgstr "Sommes théoriques"
+
+#: counter/templates/counter/cash_summary_list.jinja counter/views/mixins.py
+msgid "Cash register summaries"
+msgstr "Relevés de caisse"
 
 #: counter/templates/counter/cash_summary_list.jinja counter/views/cash.py
 msgid "Emptied"

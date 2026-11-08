@@ -75,14 +75,9 @@ class ComTabsMixin(TabedViewMixin):
                 "name": _("Weekmail destinations"),
             },
             {
-                "url": reverse("com:info_edit"),
-                "slug": "info",
-                "name": _("Info message"),
-            },
-            {
-                "url": reverse("com:alert_edit"),
-                "slug": "alert",
-                "name": _("Alert message"),
+                "url": reverse("com:banner_edit"),
+                "slug": "banner",
+                "name": _("Banner messages"),
             },
             {
                 "url": reverse("com:poster_list"),
@@ -105,20 +100,14 @@ class ComEditView(ComTabsMixin, CanEditPropMixin, UpdateView):
         return Sith.objects.first()
 
 
-class AlertMsgEditView(ComEditView):
+class BannerMessagesEditView(ComEditView):
     form_class = modelform_factory(
-        Sith, fields=["alert_msg"], widgets={"alert_msg": MarkdownInput}
+        Sith,
+        fields=["alert_msg", "info_msg"],
+        widgets={"alert_msg": MarkdownInput, "info_msg": MarkdownInput},
     )
-    current_tab = "alert"
-    success_url = reverse_lazy("com:alert_edit")
-
-
-class InfoMsgEditView(ComEditView):
-    form_class = modelform_factory(
-        Sith, fields=["info_msg"], widgets={"info_msg": MarkdownInput}
-    )
-    current_tab = "info"
-    success_url = reverse_lazy("com:info_edit")
+    current_tab = "banner"
+    success_url = reverse_lazy("com:banner_edit")
 
 
 class WeekmailDestinationEditView(ComEditView):

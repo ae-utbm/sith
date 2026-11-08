@@ -16,8 +16,7 @@
 from django.urls import path
 
 from com.views import (
-    AlertMsgEditView,
-    InfoMsgEditView,
+    BannerMessagesEditView,
     NewsAdminListView,
     NewsCreateView,
     NewsDeleteView,
@@ -45,8 +44,7 @@ from com.views import (
 )
 
 urlpatterns = [
-    path("sith/edit/alert/", AlertMsgEditView.as_view(), name="alert_edit"),
-    path("sith/edit/info/", InfoMsgEditView.as_view(), name="info_edit"),
+    path("sith/edit/banner/", BannerMessagesEditView.as_view(), name="banner_edit"),
     path(
         "sith/edit/weekmail_destinations/",
         WeekmailDestinationEditView.as_view(),
