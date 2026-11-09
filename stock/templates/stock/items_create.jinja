@@ -1,5 +1,9 @@
 {% extends "core/base.jinja" %}
 
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("stock/css/forms.scss") }}">
+{% endblock %}
+
 {% block additional_js %}
   <script type="module" src="{{ static("bundled/core/dynamic-formset-index.ts") }}"></script>
 {% endblock %}
@@ -8,7 +12,8 @@
 
 {% block content %}
   <h2>{% trans %}Create stock items in{% endtrans %}{{ stock.name }}</h2>
-  <form method="post" x-data="dynamicFormSet({ prefix: '{{ formset.prefix }}' })">
+  <form method="post" class="stock-form"
+        x-data="dynamicFormSet({ prefix: '{{ formset.prefix }}' })">
     {% csrf_token %}
     {{ formset.management_form }}
     <div x-ref="formContainer" class="margin-bottom">
@@ -18,7 +23,7 @@
             {{ item_form.as_p() }}
             {% if not loop.first %}
               <button type="button" class="btn btn-grey"
-                @click.prevent="removeForm($event.target.closest('div'))">
+                      @click.prevent="removeForm($event.target.closest('div'))">
                 <i class="fa fa-minus"></i> {% trans %}Remove{% endtrans %}
               </button>
             {% endif %}
@@ -34,16 +39,18 @@
             {{ formset.empty_form.as_p() }}
           </div>
           <button type="button" class="btn btn-grey"
-            @click.prevent="removeForm($event.target.closest('div'))">
+                  @click.prevent="removeForm($event.target.closest('div'))">
             <i class="fa fa-minus"></i> {% trans %}Remove{% endtrans %}
           </button>
         </fieldset>
         <hr>
       </div>
     </template>
-    <button type="button" class="btn btn-grey" @click.prevent="addForm()">
-      <i class="fa fa-plus"></i> {% trans %}Add an item{% endtrans %}
-    </button>
-    <button type="submit" class="btn btn-blue">{% trans %}Save{% endtrans %}</button>
+    <div class="row gap margin-bottom">
+      <button type="button" class="btn btn-grey" @click.prevent="addForm()">
+        <i class="fa fa-plus"></i> {% trans %}Add an item{% endtrans %}
+      </button>
+      <button type="submit" class="btn btn-blue">{% trans %}Save{% endtrans %}</button>
+    </div>
   </form>
 {% endblock %}

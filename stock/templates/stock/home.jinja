@@ -5,12 +5,13 @@
 {% endblock %}
 
 {% block content %}
-  <h2>{% trans %}Stock{% endtrans %}</h2>
+  <h2 class="margin-bottom">{% trans %}Stock{% endtrans %}</h2>
 
   {% if is_editor %}
-    <p>
-      <a href="{{ url('stock:create', club_id=club.id) }}">
+    <p class="margin-bottom">
+      <a class="btn btn-blue" href="{{ url('stock:create', club_id=club.id) }}">
         {% trans %}Create a stock{% endtrans %}
+        <i class="fa fa-plus"></i>
       </a>
     </p>
   {% endif %}
@@ -24,12 +25,13 @@
               {{ stock.name }}
             </a>
             {% if is_editor %}
+              -
               <a href="{{ url('stock:edit', club_id=club.id, stock_id=stock.id) }}">
                 {% trans %}Edit{% endtrans %}
               </a>
             {% endif %}
+          </li>
         {% endif %}
-        </li>
       {% endfor %}
     </ul>
   {% else %}

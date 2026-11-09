@@ -1,12 +1,16 @@
 {% extends "core/base.jinja" %}
 
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("stock/css/forms.scss") }}">
+{% endblock %}
+
 {% block title %}{% trans %}Edit stock item{% endtrans %}{% endblock %}
 
 {% block content %}
   <h2>{% trans %}Edit stock item{% endtrans %}</h2>
-  <form method="post">
+  <form method="post" class="stock-form">
     {% csrf_token %}
     {{ form.as_p() }}
-    <button type="submit">{% trans %}Save{% endtrans %}</button>
+    <p><button class="btn btn-blue" type="submit">{% trans %}Save{% endtrans %}</button></p>
   </form>
 {% endblock %}

@@ -1,18 +1,22 @@
 {% extends "core/base.jinja" %}
 
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("stock/css/forms.scss") }}">
+{% endblock %}
+
 {% macro field_row(field) %}
-  <div
-    {% if field.name == "item" %}
-      x-data="{ existingQuantity: null }"
-      x-init="existingQuantity = $el.querySelector('select')?.selectedOptions[0]?.dataset.quantity ?? null"
-      @change="existingQuantity = $event.target.selectedOptions[0]?.dataset.quantity ?? null"
-    {% endif %}
-    {% if field.field.widget.attrs.get("x-show") %} x-show="{{ field.field.widget.attrs.get("x-show") }}"{% endif %}
+  <div class="form-group"
+       {% if field.name == "item" %}
+         x-data="{ existingQuantity: null }"
+         x-init="existingQuantity = $el.querySelector('select')?.selectedOptions[0]?.dataset.quantity ?? null"
+         @change="existingQuantity = $event.target.selectedOptions[0]?.dataset.quantity ?? null"
+       {% endif %}
+       {% if field.field.widget.attrs.get("x-show") %} x-show="{{ field.field.widget.attrs.get("x-show") }}"{% endif %}
   >
     {{ field.label_tag() }} {{ field }} {{ field.errors }}
     {% if field.name == "item" %}
       <div x-show="existingQuantity !== null">
-        Quantité actuelle :
+        {% trans %}Current quantity:{% endtrans %}
         <span x-text="existingQuantity"></span>
       </div>
     {% endif %}
@@ -79,7 +83,7 @@
 
   {% set action_value = form["action"].value() %}
 
-  <form method="post" enctype="multipart/form-data"
+  <form method="post" class="stock-form" enctype="multipart/form-data"
         x-data="{ action: '{{ action_value if action_value is not none else '' }}' }">
     {% csrf_token %}
     {{ form.non_field_errors() }}
@@ -113,7 +117,7 @@
         {{ action_row(empty_form) }}
       </template>
 
-      <div>
+      <div class="row gap margin-bottom">
         <button class="btn btn-grey" type="button" @click="add()">
           <i class="fa fa-plus"></i>
           {% trans %}Add{% endtrans %}

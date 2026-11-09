@@ -1,5 +1,3 @@
-from csv import Error
-
 from django import forms
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -148,9 +146,7 @@ def update_quantities(stock_items, item_actions, metadata_entries, operation_typ
 
 def apply_transfer(stock_items, item_actions, metadata_entries, user, source_stock):
     destinations = {}
-    for item_action, metadata_entry in zip(
-        item_actions, metadata_entries, strict=True
-    ):
+    for item_action, metadata_entry in zip(item_actions, metadata_entries, strict=True):
         key = (item_action.item.item_id, metadata_entry.new_stock_id)
         if key not in destinations:
             destinations[key], _created = (
@@ -168,9 +164,7 @@ def apply_transfer(stock_items, item_actions, metadata_entries, user, source_sto
     )
     destination_item_actions = []
 
-    for item_action, metadata_entry in zip(
-        item_actions, metadata_entries, strict=True
-    ):
+    for item_action, metadata_entry in zip(item_actions, metadata_entries, strict=True):
         source_item = stock_items[item_action.item_id]
         destination = destinations[(source_item.item_id, metadata_entry.new_stock_id)]
         quantity = metadata_entry.remove_quantity
@@ -195,7 +189,11 @@ def apply_transfer(stock_items, item_actions, metadata_entries, user, source_sto
         destination.quantity += quantity
         metadata_entry.other_item_action = destination_item_actions[-1]
 
-    return destination_stock_action, list(destinations.values()), destination_item_actions
+    return (
+        destination_stock_action,
+        list(destinations.values()),
+        destination_item_actions,
+    )
 
 
 class ItemActionCreateView(UserPassesTestMixin, SuccessMessageMixin, CreateView):
@@ -211,7 +209,7 @@ class ItemActionCreateView(UserPassesTestMixin, SuccessMessageMixin, CreateView)
     def posted_operation_type(self):
         try:
             return int(self.request.POST.get("action"))
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             return None
 
     def attach_metadata_forms(self, form, active_operation_type=None):
