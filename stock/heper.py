@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def can_be_edited_by(user: User, club: Club):
-    return user.groups.contains(club.stock_group) or user.is_root
+    return user.is_in_group(pk=club.stock_group) or user.is_root
 
 
 def can_be_view_by(user: User, club: Club, stock: Stock):

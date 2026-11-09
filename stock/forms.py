@@ -16,6 +16,8 @@ if TYPE_CHECKING:
 
 
 class StockForm(forms.ModelForm):
+    required_css_class = "required"
+
     class Meta:
         model = models.Stock
         fields = ["name", "club"]
@@ -34,6 +36,8 @@ class StockForm(forms.ModelForm):
 
 
 class StockItemStockForm(forms.ModelForm):
+    required_css_class = "required"
+
     name = forms.CharField(max_length=64, label=_("name"))
     description = forms.CharField(
         required=False, label=_("description"), widget=forms.Textarea
@@ -107,6 +111,8 @@ HIDDEN_QUANTITY_ACTIONS = (
 
 
 class StockActionForm(forms.ModelForm):
+    required_css_class = "required"
+
     class Meta:
         model = models.StockAction
         fields = ["comment", "action"]
@@ -127,7 +133,7 @@ class StockActionForm(forms.ModelForm):
 StockItemActionFormSet = forms.inlineformset_factory(
     models.StockAction,
     models.StockItemAction,
-    fields=["quantity_after", "item"],
+    fields=["item", "quantity_after"],
     can_delete_extra=False,
     can_delete=False,
     min_num=1,
@@ -147,6 +153,8 @@ StockItemActionFormSet = forms.inlineformset_factory(
 
 
 class RefuelMetadataForm(forms.ModelForm):
+    required_css_class = "required"
+
     added_quantity = forms.DecimalField(
         required=True,
         min_value=0,
@@ -171,6 +179,8 @@ class RefuelMetadataForm(forms.ModelForm):
 
 
 class TransferMetadataForm(forms.ModelForm):
+    required_css_class = "required"
+
     transfer_quantity = forms.DecimalField(
         required=True,
         min_value=0,

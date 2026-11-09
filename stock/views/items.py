@@ -282,6 +282,7 @@ class ItemActionCreateView(UserPassesTestMixin, SuccessMessageMixin, CreateView)
         if "formset" not in ctx:
             ctx["formset"] = self.build_formset()
             ctx["empty_form"] = self.attach_metadata_forms(ctx["formset"].empty_form)
+        ctx["stock"] = self.stock
         return ctx
 
     def form_valid(self, form):

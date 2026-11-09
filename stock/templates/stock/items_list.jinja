@@ -5,16 +5,18 @@
 {% block content %}
   <h3>{% trans %}Items in {% endtrans %}{{ stock.name }}</h3>
   {% if is_editor %}
-    <a href="{{ url('stock:items_create', club_id=club.id, stock_id=stock.id) }}">
-      {% trans %}Create items{% endtrans %}
-    </a>
-    <a href="{{ url('stock:action_create', club_id=club.id, stock_id=stock.id) }}">
-      {% trans %}Create action{% endtrans %}
-    </a>
+    <div>
+      <a href="{{ url('stock:items_create', club_id=club.id, stock_id=stock.id) }}" class="btn btn-blue">
+        {% trans %}Create items{% endtrans %}
+      </a>
+      <a href="{{ url('stock:action_create', club_id=club.id, stock_id=stock.id) }}" class="btn btn-blue">
+        {% trans %}Create action{% endtrans %}
+      </a>
+    </div>
   {% endif %}
   {% if items %}
     {% for item in items %}
-      <div>
+      <div class="card card-row shadow">
         <div>
           <p>{{ item.name }}</p>
           <p>{% trans %}Last known quantity: {% endtrans %}{{ item.last_known_quantity }}</p>
