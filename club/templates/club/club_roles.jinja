@@ -49,7 +49,18 @@
             {{ subform.is_active.help_text }}
           </span>
         </div>
-        {% set groups = subform.instance.linked_groups.all()|list %}
+        <div class="form-group">
+          <div>
+            {{ subform.is_stock_group }}
+            {{ subform.is_stock_group.label_tag() }}
+          </div>
+          <span class="helptext">
+            {{ subform.is_stock_group.help_text }}
+          </span>
+        </div>
+
+        {# I don't know why it has no id in my case.... Maybe I'm big dum #}
+        {% set groups = subform.instance.linked_groups.all()|list if subform.instance.pk else [] %}
         {% if groups %}
           <div>
             <p>

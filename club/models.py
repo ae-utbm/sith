@@ -301,6 +301,19 @@ class ClubRole(OrderedModel):
 
     order_with_respect_to = "club"
 
+    @property
+    def is_stock_group(self):
+        if not self.pk:
+            return False
+        return self.linked_groups.contains(self.club.stock_group)
+
+    @is_stock_group.setter
+    def is_stock_group(self, value):
+        if value is True:
+            self.linked_groups.add(self.club.stock_group)
+        else:
+            self.linked_groups.remove(self.club.stock_group)
+
     class Meta(OrderedModel.Meta):
         verbose_name = _("club role")
         verbose_name_plural = _("club roles")

@@ -15,10 +15,10 @@ def add_stock_groups(apps, schema_editor):
         club.stock_group = new_group
         club.save()
 
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
-        ('club', '0019_remove_mailingsubscription_mailing_and_more'),
+        ("club", "0019_remove_mailingsubscription_mailing_and_more"),
     ]
 
     operations = [
