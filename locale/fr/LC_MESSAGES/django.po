@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-10 13:16+0100\n"
+"POT-Creation-Date: 2026-11-12 15:32+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4338,6 +4338,13 @@ msgstr "Nombre de chèque"
 #: counter/views/click.py
 msgid "You cannot click users on this counter"
 msgstr "Vous ne pouvez pas cliquer des gens sur ce comptoir"
+
+#: counter/views/click.py
+msgid ""
+"A minor is barman on this on this device, so you cannot currently sell "
+"alcohol."
+msgstr ""
+"Un mineur est barman sur cet appareil, vous ne pouvez donc pas vendre d'alcool actuellement."
 
 #: counter/views/eticket.py
 msgid "people(s)"

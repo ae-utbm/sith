@@ -111,6 +111,17 @@ class CounterClick(
             return redirect(obj)  # Redirect to counter
 
         self.prices = list(obj.get_prices_for(self.customer))
+        if any(user.age < 18 for user in request.barmen):
+            filtered = [p for p in self.prices if p.product.limit_age < 18]
+            if len(filtered) != len(self.prices):
+                self.prices = filtered
+                messages.warning(
+                    request,
+                    _(
+                        "A minor is barman on this on this device, "
+                        "so you cannot currently sell alcohol."
+                    ),
+                )
 
         return super().dispatch(request, *args, **kwargs)
 
