@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-06 17:22+0100\n"
+"POT-Creation-Date: 2026-11-10 13:16+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -3256,6 +3256,16 @@ msgid ""
 msgstr ""
 "Si vous souhaitez ajouter sur ce comptoir un produit qui n'appartient pas à "
 "votre club, vous devriez demander à un admin."
+
+#: counter/forms.py
+#, python-format
+msgid "%(user)s is banned."
+msgstr "%(user)s est banni."
+
+#: counter/forms.py
+#, python-format
+msgid "%(user)s has not filled its birthdate."
+msgstr "%(user)s n'a pas renseigné sa date de naissance."
 
 #: counter/forms.py
 #, python-format

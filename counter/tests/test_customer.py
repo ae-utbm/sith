@@ -145,7 +145,7 @@ class TestStudentCard(TestCase):
 
         self.login_in_counter()
         barman = subscriber_user.make()
-        self.counter.sellers.add(barman)
+        self.counter.sellers.add(barman, through_defaults={"is_regular": True})
         # We want to test sending requests from another counter while
         # we are currently registered to another counter
         # so we connect to a counter and

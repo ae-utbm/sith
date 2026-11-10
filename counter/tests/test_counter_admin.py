@@ -1,3 +1,6 @@
+from datetime import timedelta
+
+from dateutil.utils import today
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.test import TestCase
@@ -6,7 +9,7 @@ from model_bakery import baker
 
 from club.models import Membership
 from core.baker_recipes import subscriber_user
-from core.models import Group, User
+from core.models import Group, User, UserBan
 from counter.baker_recipes import product_recipe
 from counter.forms import CounterEditForm
 from counter.models import Counter, CounterSellers
@@ -18,7 +21,11 @@ class TestEditCounterSellers(TestCase):
         cls.counter = baker.make(Counter, type="BAR")
         cls.products = product_recipe.make(_quantity=2, _bulk_create=True)
         cls.counter.products.add(*cls.products)
-        users = subscriber_user.make(_quantity=6, _bulk_create=True)
+        users = subscriber_user.make(
+            date_of_birth=today() - timedelta(days=365 * 20),
+            _quantity=6,
+            _bulk_create=True,
+        )
         cls.regular_barmen = users[:2]
         cls.tmp_barmen = users[2:4]
         cls.not_barmen = users[4:]
@@ -127,6 +134,54 @@ class TestEditCounterSellers(TestCase):
         assert set(
             self.counter.sellers.filter(countersellers__is_regular=False)
         ) == set(self.tmp_barmen)
+
+    def test_barman_without_birthdate(self):
+        """Test that users without a birthdate cannot be sellers."""
+        user = subscriber_user.make()
+        form = CounterEditForm(
+            data={
+                "sellers_regular": [*self.regular_barmen, user],
+                "sellers_temporary": self.tmp_barmen,
+                "products": self.products,
+            },
+            instance=self.counter,
+            user=self.operator,
+        )
+        assert not form.is_valid()
+        assert form.errors == {
+            "sellers_regular": [
+                f"{user.get_full_name()} n'a pas renseigné sa date de naissance."
+            ]
+        }
+
+    def test_banned_barman_forbidden(self):
+        """Test that users with a counter ban cannot be sellers."""
+        UserBan.objects.create(
+            user=self.not_barmen[0],
+            ban_group_id=settings.SITH_GROUP_BANNED_COUNTER_ID,
+            reason="ban comptoir",
+        )
+        UserBan.objects.create(
+            user=self.not_barmen[1],
+            ban_group_id=settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID,
+            reason="ban comptoir",
+        )
+        form = CounterEditForm(
+            data={
+                "sellers_regular": [*self.regular_barmen, *self.not_barmen[0:2]],
+                "sellers_temporary": self.tmp_barmen,
+                "products": self.products,
+            },
+            instance=self.counter,
+            user=self.operator,
+        )
+        assert not form.is_valid()
+        assert form.errors == {
+            "sellers_regular": [
+                f"{self.not_barmen[0].get_full_name()} est banni.",
+                f"{self.not_barmen[1].get_full_name()} est banni.",
+            ]
+        }
 
 
 class TestEditCounterProducts(TestCase):
