@@ -769,6 +769,14 @@ class UserBan(models.Model):
     def __str__(self):
         return f"Ban of user {self.user.id}"
 
+    def save(self, *args, **kwargs):
+        if self.ban_group_id in [
+            settings.SITH_GROUP_BANNED_COUNTER_ID,
+            settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID,
+        ]:
+            self.user.counters.clear()
+        return super().save(*args, **kwargs)
+
 
 class GlobalPermissionRights(models.Model):
     """Little hack to have permissions not linked to a specific db table."""
