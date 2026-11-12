@@ -43,8 +43,8 @@ from counter.views.mixins import CounterTabsMixin
 from counter.views.student_card import StudentCardFormFragment
 
 if TYPE_CHECKING:
+    from django.http import HttpRequest
     from django.utils.safestring import SafeString
-    from ninja.main import HttpRequest
 
     from core.models import User
 
@@ -60,9 +60,70 @@ def get_operator(request: HttpRequest, counter: Counter, customer: Customer) -> 
 class CounterClick(
     CounterTabsMixin, UseFragmentsMixin, CanViewMixin, SingleObjectMixin, FormView
 ):
-    """The click view
-    This is a detail view not to have to worry about loading the counter
-    Everything is made by hand in the post method.
+    """The click view.
+
+    This page is reached from the counter main page, after selecting
+    the user who is purchasing stuff.
+
+    # Counter access
+
+    Who can perform barman actions depends on the type of the counter :
+
+    - for eboutic counters, no barman access at all is granted ;
+      it's just a 404, as there should be only one eboutic,
+      accessible only at `/eboutic/`
+    - office counters are accessible to the board members of the
+      club owning the counter and to users that have been
+      explicitly added to the sellers of this counter.
+    - bar counters are accessible to users that have been added to
+      the counter sellers and that are currently logged as barmen
+      on the current device.
+
+    The bar case is really tricky,
+    as it doesn't use the usual django auth backend.
+    Barmen must not be logged in as regular users,
+    but as barmen, granting the session some special privileges,
+    even in the case where no regular user is logged in.
+
+    This is because of two reasons :
+
+    - we track the barmen connection, for logging,
+      statistics and dick contest purposes.
+      We want to know who was barman, where and when,
+      as barmen are accountable of what happens during their duty.
+    - multiple users must be able to log on the same device,
+      while keeping the session anonymous.
+      The bar PC must be a reliable way for any barman to click users,
+      but without requiring a user session.
+      Just imagine if someone who is superuser had to log in with
+      all its privileges on a device everyone can access.
+
+    # Available items
+
+    A counter can have multiple products.
+    A product can have multiple prices.
+    To select what the user can buy, we select
+    all the prices that can be applied to the current
+    customer, among the products of the counter.
+    The price selection logic is described in
+    [PriceQuerySet][counter.models.PriceQuerySet].
+
+    On top of that, some additional rules are applied,
+    because alcohol can be sold on counters :
+
+    - if the customer is minor (or has not filled its birthdate)
+      age restricted products are removed
+      ([L.3342-1, Code de la santé publique](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000031927682))
+    - if any barman on the current device is minor,
+      age restricted products are also removed
+      ([L.3336-4, Code de la santé publique](https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000048654800))
+
+    The minor barman case is a little bit unclear, legally speaking,
+    as barmen are volunteers, but the law speaks only of employees and interns.
+    As such, we don't apply the law to its full extent.
+    It would be harsh for young students not to be able to
+    be barmen at the MDE, where no alcohol at all is sold during daytime.
+    However, we restrict items that can be sold as a token of good will.
     """
 
     model = Counter
@@ -112,6 +173,8 @@ class CounterClick(
 
         self.prices = list(obj.get_prices_for(self.customer))
         if any(user.age < 18 for user in request.barmen):
+            # users without a birthdate cannot be sellers on counters,
+            # so the `user.age == 0` case shouldn't happen
             filtered = [p for p in self.prices if p.product.limit_age < 18]
             if len(filtered) != len(self.prices):
                 self.prices = filtered
