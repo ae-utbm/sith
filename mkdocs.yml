@@ -113,7 +113,11 @@ nav:
       - reference/core/auth.md
     - counter:
       - reference/counter/models.md
-      - reference/counter/views.md
+      - Views:
+          - reference/counter/views/home.md
+          - reference/counter/views/click.md
+          - reference/counter/views/mixins.md
+          - reference/counter/views/others.md
       - reference/counter/schemas.md
     - eboutic:
       - reference/eboutic/models.md

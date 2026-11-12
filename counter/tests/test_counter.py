@@ -405,7 +405,7 @@ class TestCounterClick(TestFullClickBase):
         self.assertRedirects(res, self.counter.get_absolute_url())
         assert self.updated_amount(self.customer) == Decimal(8)
 
-    def test_click_alcool_unauthorized(self):
+    def test_click_alcohol_unauthorized(self):
         self.login_in_bar()
 
         for user in [self.underage_customer, self.banned_alcohol_customer]:
@@ -422,6 +422,31 @@ class TestCounterClick(TestFullClickBase):
             assert res.status_code == 200
 
             assert self.updated_amount(user) == Decimal(7)
+
+    def test_click_no_alcohol_if_minor_barman(self):
+        """Test that no age restricted product can be sold if the barman is minor."""
+        set_age(self.barmen, 17)
+        self.login_in_bar(self.barmen)
+        res = self.client.get(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": self.customer.id},
+            )
+        )
+        assert res.status_code == 200
+        messages = list(get_messages(res.wsgi_request))
+        assert len(messages) == 1
+        assert messages[0].level == DEFAULT_LEVELS["WARNING"]
+        assert messages[0].message == (
+            "Un mineur est barman sur cet appareil, "
+            "vous ne pouvez donc pas vendre d'alcool actuellement."
+        )
+        assert res.context_data["prices"] == [
+            self.gift,
+            self.snack,
+            self.cons,
+            self.dcons,
+        ]
 
     def test_click_unauthorized_customer(self):
         self.login_in_bar()
