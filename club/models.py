@@ -98,6 +98,9 @@ class Club(models.Model):
     board_group = models.OneToOneField(
         Group, related_name="club_board", on_delete=models.PROTECT, editable=False
     )
+    stock_group = models.OneToOneField(
+        Group, related_name="club_stock", on_delete=models.PROTECT, editable=False
+    )
 
     objects = ClubQuerySet.as_manager()
 
@@ -128,6 +131,9 @@ class Club(models.Model):
             )
             self.members_group = Group.objects.create(
                 name=f"{self.name} - Membres", is_manually_manageable=False
+            )
+            self.stock_group = Group.objects.create(
+                name=f"{self.name} - Stock", is_manually_manageable=False
             )
             self.make_home()
         self.make_page()
@@ -294,6 +300,19 @@ class ClubRole(OrderedModel):
     )
 
     order_with_respect_to = "club"
+
+    @property
+    def is_stock_group(self):
+        if not self.pk:
+            return False
+        return self.linked_groups.contains(self.club.stock_group)
+
+    @is_stock_group.setter
+    def is_stock_group(self, value):
+        if value is True:
+            self.linked_groups.add(self.club.stock_group)
+        else:
+            self.linked_groups.remove(self.club.stock_group)
 
     class Meta(OrderedModel.Meta):
         verbose_name = _("club role")

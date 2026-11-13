@@ -299,6 +299,12 @@ class ClubSearchForm(forms.ModelForm):
 class ClubRoleForm(forms.ModelForm):
     error_css_class = "error"
     required_css_class = "required"
+    is_stock_group = forms.BooleanField(
+        required=False,
+        label=_("Can edit stock"),
+        widget=forms.CheckboxInput(attrs={"class": "switch"}),
+        help_text=_("Tell if the user can edit all stocks belongings to the club"),
+    )
 
     class Meta:
         model = ClubRole
@@ -309,11 +315,19 @@ class ClubRoleForm(forms.ModelForm):
             "is_active": forms.CheckboxInput(attrs={"class": "switch"}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["is_stock_group"].initial = self.instance.is_stock_group
+
     def clean(self):
         cleaned_data = super().clean()
         if "ORDER" in cleaned_data:
             self.instance.order = cleaned_data["ORDER"] - 1
         return cleaned_data
+
+    def _save_m2m(self):
+        super()._save_m2m()
+        self.instance.is_stock_group = self.cleaned_data["is_stock_group"]
 
     def save(self, commit=True):  # noqa: FBT002
         instance: ClubRole = super().save(commit=commit)
