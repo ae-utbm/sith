@@ -302,11 +302,21 @@ class ClubRoleForm(forms.ModelForm):
 
     class Meta:
         model = ClubRole
-        fields = ["name", "description", "is_presidency", "is_board", "is_active"]
+        fields = [
+            "name",
+            "name_en",
+            "description",
+            "is_presidency",
+            "is_board",
+            "is_active",
+        ]
         widgets = {
             "is_presidency": forms.HiddenInput(),
             "is_board": forms.HiddenInput(),
             "is_active": forms.CheckboxInput(attrs={"class": "switch"}),
+        }
+        help_texts = {
+            "name_en": _("Provide an english name for non-french speaking users.")
         }
 
     def clean(self):
@@ -354,7 +364,10 @@ class ClubRoleCreateForm(forms.ModelForm):
 
     class Meta:
         model = ClubRole
-        fields = ["name", "description"]
+        fields = ["name", "name_en", "description"]
+        help_texts = {
+            "name_en": _("Provide an english name for non-french speaking users.")
+        }
 
     def __init__(
         self, *args, club: Club, is_presidency: bool, is_board: bool, **kwargs

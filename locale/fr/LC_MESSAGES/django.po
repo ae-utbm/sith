@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-12 15:32+0100\n"
+"POT-Creation-Date: 2026-11-14 13:59+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -251,6 +251,10 @@ msgstr "Inactif"
 msgid "All clubs"
 msgstr "Tous les clubs"
 
+#: club/forms.py
+msgid "Provide an english name for non-french speaking users."
+msgstr "Fournissez un nom anglais pour les utilisateurs non-francophones."
+
 #: club/models.py
 msgid "slug name"
 msgstr "nom slug"
@@ -339,6 +343,10 @@ msgstr "rôles de club"
 msgid "A role cannot be in the presidency while not being in the board"
 msgstr ""
 "Un rôle ne peut pas appartenir à la présidence sans être dans le bureau"
+
+#: club/models.py
+msgid "There is already a role with that name"
+msgstr "Il existe déjà un rôle avec ce nom"
 
 #: club/models.py
 #, python-format
@@ -4344,7 +4352,8 @@ msgid ""
 "A minor is barman on this on this device, so you cannot currently sell "
 "alcohol."
 msgstr ""
-"Un mineur est barman sur cet appareil, vous ne pouvez donc pas vendre d'alcool actuellement."
+"Un mineur est barman sur cet appareil, vous ne pouvez donc pas vendre "
+"d'alcool actuellement."
 
 #: counter/views/eticket.py
 msgid "people(s)"
@@ -5500,12 +5509,12 @@ msgid "Download all my pictures"
 msgstr "Télécharger toutes mes photos"
 
 #: sith/settings.py
-msgid "English"
-msgstr "Anglais"
-
-#: sith/settings.py
 msgid "French"
 msgstr "Français"
+
+#: sith/settings.py
+msgid "English"
+msgstr "Anglais"
 
 #: sith/settings.py
 msgid "TC"
