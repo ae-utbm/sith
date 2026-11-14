@@ -307,7 +307,12 @@ class ClubRole(OrderedModel):
                 violation_error_message=_(
                     "A role cannot be in the presidency while not being in the board"
                 ),
-            )
+            ),
+            models.UniqueConstraint(
+                fields=("club", "name"),
+                name="clubrole_club_name_unique",
+                violation_error_message=_("There is already a role with that name"),
+            ),
         ]
 
     def __str__(self):
