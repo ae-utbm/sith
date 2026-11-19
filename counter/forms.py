@@ -507,8 +507,6 @@ class ProductForm(forms.ModelForm):
         self.fields["name"].widget.attrs["autofocus"] = "autofocus"
         if self.instance.id:
             self.fields["counters"].initial = self.instance.counters.all()
-            if hasattr(self.instance, "formula"):
-                self.formula_init(self.instance.formula)
         self.price_formset = ProductPriceFormSet(
             *args, instance=self.instance, prefix="price", **kwargs
         )
