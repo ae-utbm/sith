@@ -1,0 +1,40 @@
+{% extends "core/base.jinja" %}
+
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("core/components/card.scss") }}">
+{% endblock %}
+
+{% block title %}{% trans %}Stock items{% endtrans %}{% endblock %}
+
+{% block content %}
+  <h2 class="margin-bottom">{% trans %}Items in {% endtrans %}{{ stock.name }}</h2>
+  {% if is_editor %}
+    <div class="row gap margin-bottom">
+      <a href="{{ url('stock:items_create', club_id=club.id, stock_id=stock.id) }}" class="btn btn-blue">
+        {% trans %}Create items{% endtrans %} <i class="fa fa-plus"></i>
+      </a>
+      <a href="{{ url('stock:action_create', club_id=club.id, stock_id=stock.id) }}" class="btn btn-blue">
+        {% trans %}Create action{% endtrans %} <i class="fa fa-plus"></i>
+      </a>
+    </div>
+  {% endif %}
+  {% if items %}
+    <div>
+      {% for item in items %}
+        <div class="card card-row shadow margin-bottom">
+          <div class="card-content">
+            <strong class="card-title">{{ item.item.name }}</strong>
+            <p>{% trans %}Last known quantity:{% endtrans %} {{ item.last_known_quantity }}</p>
+          </div>
+          {% if is_editor %}
+            <a class="btn btn-grey" href="{{ url('stock:item_edit', club_id=club.id, stock_id=stock.id, item_id=item.id) }}">
+              <i class="fa fa-pen"></i> {% trans %}Edit{% endtrans %}
+            </a>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>{% trans %}No item has been created yet.{% endtrans %}</p>
+  {% endif %}
+{% endblock %}

@@ -137,6 +137,7 @@ INSTALLED_APPS = (
     "antispam",
     "timetable",
     "api",
+    "stock",
 )
 
 MIDDLEWARE = (

@@ -1,0 +1,40 @@
+{% extends "core/base.jinja" %}
+
+{% block title %}
+  {% trans %}Stock{% endtrans %}
+{% endblock %}
+
+{% block content %}
+  <h2 class="margin-bottom">{% trans %}Stock{% endtrans %}</h2>
+
+  {% if is_editor %}
+    <p class="margin-bottom">
+      <a class="btn btn-blue" href="{{ url('stock:create', club_id=club.id) }}">
+        {% trans %}Create a stock{% endtrans %}
+        <i class="fa fa-plus"></i>
+      </a>
+    </p>
+  {% endif %}
+
+  {% if stocks %}
+    <ul>
+      {% for stock in stocks %}
+        {% if stock.can_be_view_by_board or is_editor %}
+          <li>
+            <a href="{{ url('stock:items_list', club_id=club.id, stock_id=stock.id) }}">
+              {{ stock.name }}
+            </a>
+            {% if is_editor %}
+              -
+              <a href="{{ url('stock:edit', club_id=club.id, stock_id=stock.id) }}">
+                {% trans %}Edit{% endtrans %}
+              </a>
+            {% endif %}
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>{% trans %}No stock has been created yet.{% endtrans %}</p>
+  {% endif %}
+{% endblock %}

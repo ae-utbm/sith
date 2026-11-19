@@ -55,6 +55,7 @@ urlpatterns = [
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
     path("captcha/", include("captcha.urls")),
     path("edt/", include(("timetable.urls", "timetable"), namespace="timetable")),
+    path("stock/", include(("stock.urls", "stock"), namespace="stock")),
 ]
 
 if settings.DEBUG:

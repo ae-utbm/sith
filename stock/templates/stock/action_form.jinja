@@ -1,0 +1,129 @@
+{% extends "core/base.jinja" %}
+
+{% block additional_css %}
+  <link rel="stylesheet" href="{{ static("stock/css/forms.scss") }}">
+{% endblock %}
+
+{% macro field_row(field) %}
+  <div class="form-group"
+       {% if field.name == "item" %}
+         x-data="{ existingQuantity: null }"
+         x-init="existingQuantity = $el.querySelector('select')?.selectedOptions[0]?.dataset.quantity ?? null"
+         @change="existingQuantity = $event.target.selectedOptions[0]?.dataset.quantity ?? null"
+       {% endif %}
+       {% if field.field.widget.attrs.get("x-show") %} x-show="{{ field.field.widget.attrs.get("x-show") }}"{% endif %}
+  >
+    {{ field.label_tag() }} {{ field }} {{ field.errors }}
+    {% if field.name == "item" %}
+      <div x-show="existingQuantity !== null">
+        {% trans %}Current quantity:{% endtrans %}
+        <span x-text="existingQuantity"></span>
+      </div>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+
+{% macro action_row(f, removable=true) %}
+  <div>
+    <div class="action-row">
+      {% for h in f.hidden_fields() %}{{ h }}{% endfor %}
+      {{ f.non_field_errors() }}
+      {% for field in f.visible_fields() %}
+        {{ field_row(field) }}
+      {% endfor %}
+
+      {% for b in f.blocks %}
+        <fieldset x-cloak
+                  x-show="action === '{{ b.action }}'"
+                  :disabled="action !== '{{ b.action }}'">
+          {{ b.form.non_field_errors() }}
+          {% for h in b.form.hidden_fields() %}{{ h }}{% endfor %}
+          {% for field in b.form.visible_fields() %}
+            {{ field_row(field) }}
+          {% endfor %}
+        </fieldset>
+      {% endfor %}
+      {% if removable %}
+        <button class="btn btn-grey" type="button"
+                @click.prevent="$el.closest('.action-row').parentElement.remove()">
+          <i class="fa fa-minus"></i>
+          {% trans %}Remove{% endtrans %}
+        </button>
+      {% endif %}
+    </div>
+    <hr class="margin-bottom">
+  </div>
+{% endmacro %}
+
+{% block script %}
+  <script>
+    document.addEventListener("alpine:init", () => {
+      Alpine.data("rows", (prefix, base) => ({
+        prefix, base, added: [],
+        get total() { return this.base + this.added.length },
+        add() { this.added.push(this.base + this.added.length) },
+        html(i) {
+          return this.$refs.tpl.innerHTML.replaceAll(
+            `${this.prefix}-__prefix__`, `${this.prefix}-${i}`)
+        },
+      }))
+    })
+  </script>
+{% endblock %}
+
+{% block title %}
+  {% trans %}New stock action{% endtrans %}
+{% endblock %}
+
+
+{% block content %}
+
+  <h2>{% trans %}New stock action in {% endtrans %}{{ stock.name }}</h2>
+
+  {% set action_value = form["action"].value() %}
+
+  <form method="post" class="stock-form" enctype="multipart/form-data"
+        x-data="{ action: '{{ action_value if action_value is not none else '' }}' }">
+    {% csrf_token %}
+    {{ form.non_field_errors() }}
+
+    <div class="margin-bottom">
+      {% for field in form.visible_fields() %}
+        {{ field_row(field) }}
+      {% endfor %}
+      <hr>
+    </div>
+
+    <div x-data="rows('{{ formset.prefix }}', {{ formset.total_form_count() }})">
+      <input type="hidden" name="{{ formset.prefix }}-TOTAL_FORMS" :value="total">
+      {{ formset.management_form["INITIAL_FORMS"] }}
+      {{ formset.management_form["MIN_NUM_FORMS"] }}
+      {{ formset.management_form["MAX_NUM_FORMS"] }}
+
+      {{ formset.non_form_errors() }}
+
+      <h3 class="margin-bottom">{% trans %}Items{% endtrans %}</h3>
+
+      {% for f in formset %}
+        {{ action_row(f, not loop.first) }}
+      {% endfor %}
+
+      <template x-for="i in added" :key="i">
+        <div x-html="html(i)"></div>
+      </template>
+
+      <template x-ref="tpl">
+        {{ action_row(empty_form) }}
+      </template>
+
+      <div class="row gap margin-bottom">
+        <button class="btn btn-grey" type="button" @click="add()">
+          <i class="fa fa-plus"></i>
+          {% trans %}Add{% endtrans %}
+        </button>
+        <button class="btn btn-blue" type="submit">{% trans %}Save{% endtrans %}</button>
+      </div>
+    </div>
+  </form>
+{% endblock %}
