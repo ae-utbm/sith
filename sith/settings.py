@@ -103,6 +103,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 SITE_ID = 4000
 
 INSTALLED_APPS = (
+    "modeltranslation",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -285,7 +286,7 @@ LOGGING = {
 
 LANGUAGE_CODE = "fr-FR"
 
-LANGUAGES = [("en", _("English")), ("fr", _("French"))]
+LANGUAGES = [("fr", _("French")), ("en", _("English"))]
 
 TIME_ZONE = "Europe/Paris"
 

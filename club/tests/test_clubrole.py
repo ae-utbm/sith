@@ -4,6 +4,7 @@ import pytest
 from django.contrib.auth.models import Permission
 from django.test import Client, TestCase
 from django.urls import reverse
+from django.utils import translation
 from django.utils.timezone import now
 from model_bakery import baker, seq
 from model_bakery.recipe import Recipe
@@ -281,3 +282,14 @@ class TestClubRoleUpdate(TestCase):
         # the second membership is finished, so its user shouldn't get the role
         assert members[0].user.groups.contains(self.club.board_group)
         assert not members[1].user.groups.contains(self.club.board_group)
+
+    def test_name_translation(self):
+        """Test that setting the english name works."""
+        name_en = "something something"
+        self.payload["roles-0-name_en"] = name_en
+        formset = ClubRoleFormSet(data=self.payload, instance=self.club)
+        assert formset.is_valid()
+        formset.save()
+        self.roles[0].refresh_from_db()
+        with translation.override("en"):
+            assert self.roles[0].name == name_en
