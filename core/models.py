@@ -55,6 +55,7 @@ from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 from PIL import Image, ImageOps
 
+from antispam.models import AntiSpamEmailField
 from core.utils import get_last_promo
 
 if TYPE_CHECKING:
@@ -158,7 +159,7 @@ class User(AbstractUser):
 
     first_name = models.CharField(_("first name"), max_length=64)
     last_name = models.CharField(_("last name"), max_length=64)
-    email = models.EmailField(_("email address"), unique=True)
+    email = AntiSpamEmailField(_("email address"), unique=True)
     date_of_birth = models.DateField(_("date of birth"), blank=True, null=True)
     nick_name = models.CharField(_("nick name"), max_length=64, null=True, blank=True)
     last_update = models.DateTimeField(_("last update"), auto_now=True)
@@ -267,7 +268,7 @@ class User(AbstractUser):
     forum_signature = models.TextField(
         _("forum signature"), max_length=256, blank=True, default=""
     )
-    second_email = models.EmailField(_("second email address"), null=True, blank=True)
+    second_email = AntiSpamEmailField(_("second email address"), null=True, blank=True)
     phone = PhoneNumberField(_("phone"), null=True, blank=True)
     parent_phone = PhoneNumberField(_("parent phone"), null=True, blank=True)
     address = models.CharField(_("address"), max_length=128, blank=True, default="")
@@ -767,6 +768,14 @@ class UserBan(models.Model):
 
     def __str__(self):
         return f"Ban of user {self.user.id}"
+
+    def save(self, *args, **kwargs):
+        if self.ban_group_id in [
+            settings.SITH_GROUP_BANNED_COUNTER_ID,
+            settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID,
+        ]:
+            self.user.counters.clear()
+        return super().save(*args, **kwargs)
 
 
 class GlobalPermissionRights(models.Model):

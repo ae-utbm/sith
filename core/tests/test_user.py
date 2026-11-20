@@ -321,6 +321,7 @@ class UserTabTestView(UserTabsMixin, DetailView): ...
                 "edit",
                 "prefs",
                 "clubs",
+                "timetable",
                 "stats",
                 "account",
             ],
@@ -337,6 +338,7 @@ class UserTabTestView(UserTabsMixin, DetailView): ...
                 "edit",
                 "prefs",
                 "clubs",
+                "timetable",
                 "groups",
             ],
         ),
@@ -370,6 +372,7 @@ def test_displayed_user_self_tabs(user_factory, expected_tabs: list[str]):
                 "edit",
                 "prefs",
                 "clubs",
+                "timetable",
                 "groups",
                 "stats",
                 "account",
@@ -470,6 +473,36 @@ def test_user_preferences(client: Client):
     assertRedirects(response, url)
     user.preferences.refresh_from_db()
     assert user.preferences.notify_on_click is True
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("can_edit", [True, False])
+def test_user_visibility(client: Client, monkeypatch, can_edit):
+    # The view is a CanView, so just patch User.can_be_edited_by for the test
+    monkeypatch.setattr("core.models.User.can_be_edited_by", lambda *args: can_edit)
+    client.force_login(subscriber_user.make())
+
+    user, other_user = subscriber_user.make(_quantity=2)
+    url = reverse("core:user_visibility_fragment", kwargs={"user_id": user.id})
+    response = client.get(url)
+    assert response.status_code == 200 if can_edit else 403
+    response = client.post(
+        url,
+        {
+            "show_my_stats": False,
+            "is_viewable": False,
+            "whitelisted_users": [other_user.id],
+        },
+    )
+    if not can_edit:
+        assert response.status_code == 403
+        return
+    assertRedirects(response, url)
+    user.refresh_from_db()
+    user.preferences.refresh_from_db()
+    assert user.is_viewable is False
+    assert list(user.whitelisted_users.all()) == [other_user]
+    assert user.preferences.show_my_stats is False
 
 
 @pytest.mark.django_db

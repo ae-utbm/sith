@@ -21,11 +21,12 @@ import pytest
 from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.contrib.auth.models import Permission, make_password
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import Permission
 from django.contrib.messages import DEFAULT_LEVELS, get_messages
 from django.shortcuts import resolve_url
-from django.test import Client, TestCase
-from django.urls import reverse
+from django.test import Client, RequestFactory, TestCase
+from django.urls import resolve, reverse
 from django.utils import timezone
 from django.utils.timezone import localdate, now
 from freezegun import freeze_time
@@ -47,6 +48,7 @@ from counter.models import (
     ReturnableProduct,
     Selling,
 )
+from counter.utils import is_logged_in_counter
 
 if TYPE_CHECKING:
     from django.http import HttpResponse
@@ -65,8 +67,9 @@ class TestFullClickBase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.customer = subscriber_user.make()
-        cls.barmen = subscriber_user.make(password=make_password("plop"))
-        cls.board_admin = board_user.make(password=make_password("plop"))
+        password = make_password("plop")
+        cls.barmen = subscriber_user.make(password=password)
+        cls.board_admin = board_user.make(password=password)
         cls.club_admin = subscriber_user.make()
         cls.root = baker.make(User, is_superuser=True)
         cls.subscriber = subscriber_user.make()
@@ -402,7 +405,7 @@ class TestCounterClick(TestFullClickBase):
         self.assertRedirects(res, self.counter.get_absolute_url())
         assert self.updated_amount(self.customer) == Decimal(8)
 
-    def test_click_alcool_unauthorized(self):
+    def test_click_alcohol_unauthorized(self):
         self.login_in_bar()
 
         for user in [self.underage_customer, self.banned_alcohol_customer]:
@@ -419,6 +422,31 @@ class TestCounterClick(TestFullClickBase):
             assert res.status_code == 200
 
             assert self.updated_amount(user) == Decimal(7)
+
+    def test_click_no_alcohol_if_minor_barman(self):
+        """Test that no age restricted product can be sold if the barman is minor."""
+        set_age(self.barmen, 17)
+        self.login_in_bar(self.barmen)
+        res = self.client.get(
+            reverse(
+                "counter:click",
+                kwargs={"counter_id": self.counter.id, "user_id": self.customer.id},
+            )
+        )
+        assert res.status_code == 200
+        messages = list(get_messages(res.wsgi_request))
+        assert len(messages) == 1
+        assert messages[0].level == DEFAULT_LEVELS["WARNING"]
+        assert messages[0].message == (
+            "Un mineur est barman sur cet appareil, "
+            "vous ne pouvez donc pas vendre d'alcool actuellement."
+        )
+        assert res.context_data["prices"] == [
+            self.gift,
+            self.snack,
+            self.cons,
+            self.dcons,
+        ]
 
     def test_click_unauthorized_customer(self):
         self.login_in_bar()
@@ -917,6 +945,48 @@ class TestBarmanConnection(TestCase):
             self.detail_url, {"username": self.barman.username, "password": "plop"}
         )
         assert self.barman in response.wsgi_request.barmen
+
+
+class TestIsLoggedInCounter(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.counter = baker.make(Counter, type="BAR")
+        cls.other_counter = baker.make(Counter, type="BAR")
+        cls.barman = subscriber_user.make()
+        cls.other_barman = subscriber_user.make()
+        cls.url = reverse("counter:details", kwargs={"counter_id": cls.counter.id})
+
+    def make_request(self, barmen):
+        """Requête émise depuis une vue du namespace `counter`."""
+        request = RequestFactory().get(self.url)
+        request.resolver_match = resolve(self.url)
+        request.barmen = set(barmen)
+        return request
+
+    def test_denied(self):
+        # nobody is logged
+        request = self.make_request([])
+        assert not is_logged_in_counter(request)
+
+        # somebody is logged, but on another counter
+        self.other_counter.permanencies.create(user=self.barman, start=now())
+        assert not is_logged_in_counter(request, counter=self.counter)
+
+    def test_ok(self):
+        request = self.make_request([self.barman])
+        assert is_logged_in_counter(request)
+
+        self.counter.permanencies.create(user=self.barman, start=now())
+        assert is_logged_in_counter(request, counter=self.counter)
+
+    def test_request_outside_counter_app(self):
+        """A request coming from outside the counter app is denied."""
+        request = self.make_request([self.barman])
+        request.resolver_match = resolve(reverse("core:index"))
+        assert not is_logged_in_counter(request)
+
+        self.counter.permanencies.create(user=self.barman, start=now())
+        assert not is_logged_in_counter(request, counter=self.counter)
 
 
 @pytest.mark.django_db

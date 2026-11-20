@@ -48,7 +48,6 @@ from django.utils.translation import gettext_lazy as _
 from phonenumber_field.widgets import RegionalPhoneNumberWidget
 from PIL import Image
 
-from antispam.forms import AntiSpamEmailField
 from core.models import Gift, Group, Page, PageRev, Preferences, SithFile, User
 from core.utils import resize_image
 from core.views.widgets.ajax_select import (
@@ -185,10 +184,7 @@ class RegisteringForm(UserCreationForm):
     class Meta:
         model = User
         fields = ("first_name", "last_name", "email", "cgu_approved_at")
-        field_classes = {
-            "email": AntiSpamEmailField,
-            "cgu_approved_at": CGUApprovalField,
-        }
+        field_classes = {"cgu_approved_at": CGUApprovalField}
 
 
 class CGUApprovalForm(forms.ModelForm):

@@ -275,6 +275,27 @@ class UserTabsMixin(TabedViewMixin):
                     "name": _("Clubs"),
                 }
             )
+            if user == self.request.user and not user.timetables.exists():
+                tab_list.append(
+                    {
+                        "url": reverse("timetable:generator"),
+                        "slug": "timetable",
+                        "name": _("Timetable"),
+                    }
+                )
+            elif user == self.request.user or (
+                self.request.user.has_perm("timetable.view_timetable")
+                and user.preferences.show_my_timetable
+            ):
+                tab_list.append(
+                    {
+                        "url": reverse(
+                            "core:user_timetable", kwargs={"user_id": user.id}
+                        ),
+                        "slug": "timetable",
+                        "name": _("Timetable"),
+                    }
+                )
         if self.request.user.is_owner(user):
             tab_list.append(
                 {
@@ -502,7 +523,9 @@ class UserClubView(UserTabsMixin, CanViewMixin, DetailView):
     current_tab = "clubs"
 
 
-class UserVisibilityFormFragment(FragmentMixin, SuccessMessageMixin, UpdateView):
+class UserVisibilityFormFragment(
+    FragmentMixin, SuccessMessageMixin, CanEditMixin, UpdateView
+):
     model = User
     form_class = UserVisibilityForm
     template_name = "core/fragment/user_visibility.jinja"

@@ -252,7 +252,6 @@ class Command(BaseCommand):
             date_of_birth="1942-06-12",
             password="plop",
         )
-        User.objects.all().update(cgu_approved_at=now())
         User.groups.through.objects.bulk_create(
             [
                 User.groups.through(group=groups.counter_admin, user=counter),
@@ -277,6 +276,10 @@ class Command(BaseCommand):
         )
 
         self._create_pages(groups)
+        # the "approve cgu" button is shown if the cgu were approved
+        # before the last version of the CGU page.
+        # Hence, it's better for this update to be after page creation.
+        User.objects.all().update(cgu_approved_at=now())
 
         self._create_subscription(root)
         self._create_subscription(skia)
@@ -779,28 +782,47 @@ class Command(BaseCommand):
             name="Carte AE", address="Jamais imprimée", parent=ae
         )
         roles = []
-        presidency_roles = ["Président⸱e", "Vice-Président⸱e"]
-        board_roles = [
-            "Trésorier⸱e",
-            "Secrétaire",
-            "Respo Info",
-            "Respo Com",
-            "Membre du bureau",
+        presidency_roles = [
+            ("Président⸱e", "President"),
+            ("Vice-Président⸱e", "Vice-president"),
         ]
-        simple_roles = ["Membre actif⸱ve", "Curieux⸱euse"]
+        board_roles = [
+            ("Trésorier⸱e", "Treasurer"),
+            ("Secrétaire", "Secretary"),
+            ("Respo Info", "IT manager"),
+            ("Respo Com", "Communication manager"),
+            ("Membre du bureau", "Board member"),
+        ]
+        simple_roles = [
+            ("Membre actif⸱ve", "Active member"),
+            ("Curieux⸱euse", "Curious"),
+        ]
         for club in ae, pdf, troll, refound:
-            for i, role in enumerate(presidency_roles):
+            for i, (role_fr, role_en) in enumerate(presidency_roles):
                 roles.append(
                     ClubRole(
-                        club=club, order=i, name=role, is_presidency=True, is_board=True
+                        club=club,
+                        order=i,
+                        name=role_fr,
+                        name_en=role_en,
+                        is_presidency=True,
+                        is_board=True,
                     )
                 )
-            for i, role in enumerate(board_roles, start=len(presidency_roles)):
-                roles.append(ClubRole(club=club, order=i, name=role, is_board=True))
-            for i, role in enumerate(
+            for i, (role_fr, role_en) in enumerate(
+                board_roles, start=len(presidency_roles)
+            ):
+                roles.append(
+                    ClubRole(
+                        club=club, order=i, name=role_fr, name_en=role_en, is_board=True
+                    )
+                )
+            for i, (role_fr, role_en) in enumerate(
                 simple_roles, start=len(presidency_roles) + len(board_roles)
             ):
-                roles.append(ClubRole(club=club, order=i, name=role))
+                roles.append(
+                    ClubRole(club=club, order=i, name=role_fr, name_en=role_en)
+                )
         ClubRole.objects.bulk_create(roles)
         insta, fb, discord, _ = LinkType.objects.bulk_create(
             [

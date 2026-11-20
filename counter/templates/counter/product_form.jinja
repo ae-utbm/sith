@@ -83,15 +83,17 @@
 {% endmacro %}
 
 {% block content %}
-  <div class="alert alert-yellow">
-    <div class="alert-main">
-      {%- trans trimmed -%}
-        You can see product details.
-        However, you cannot edit it, thus you won't be able
-        to submit this form.
-      {%- endtrans -%}
+  {% if not user.has_perm("counter.change_product") %}
+    <div class="alert alert-yellow">
+      <div class="alert-main">
+        {%- trans trimmed -%}
+          You can see product details.
+          However, you cannot edit it, thus you won't be able
+          to submit this form.
+        {%- endtrans -%}
+      </div>
     </div>
-  </div>
+  {% endif %}
   {% if object %}
     <h2>{{ object }}</h2>
     <p><i>{% trans %}Creation date{% endtrans %} : {{ object.created_at|date }}</i></p>

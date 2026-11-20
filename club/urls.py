@@ -29,7 +29,6 @@ from club.views import (
     ClubCreateView,
     ClubEditView,
     ClubListView,
-    ClubMailingView,
     ClubMembersView,
     ClubNewsView,
     ClubOldMembersView,
@@ -44,9 +43,6 @@ from club.views import (
     ClubSellingView,
     ClubToolsView,
     ClubView,
-    MailingAutoGenerationView,
-    MailingDeleteView,
-    MailingSubscriptionDeleteView,
     MembershipDeleteView,
     MembershipSetOldView,
     PosterCreateView,
@@ -97,22 +93,6 @@ urlpatterns = [
         "<int:club_id>/sellings/csv/", ClubSellingCSVView.as_view(), name="sellings_csv"
     ),
     path("<int:club_id>/tools/", ClubToolsView.as_view(), name="tools"),
-    path("<int:club_id>/mailing/", ClubMailingView.as_view(), name="mailing"),
-    path(
-        "<int:mailing_id>/mailing/generate/",
-        MailingAutoGenerationView.as_view(),
-        name="mailing_generate",
-    ),
-    path(
-        "<int:mailing_id>/mailing/delete/",
-        MailingDeleteView.as_view(),
-        name="mailing_delete",
-    ),
-    path(
-        "<int:mailing_subscription_id>/mailing/delete/subscription/",
-        MailingSubscriptionDeleteView.as_view(),
-        name="mailing_subscription_delete",
-    ),
     path(
         "membership/<int:membership_id>/set_old/",
         MembershipSetOldView.as_view(),

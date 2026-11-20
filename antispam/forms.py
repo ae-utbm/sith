@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import EmailValidator
 from django.utils.translation import gettext_lazy as _
 
-from antispam.models import ToxicDomain
+from antispam.models.models import ToxicDomain
 
 
 class AntiSpamEmailValidator(EmailValidator):
@@ -17,6 +17,6 @@ validate_antispam_email = AntiSpamEmailValidator()
 
 
 class AntiSpamEmailField(forms.EmailField):
-    """An email field that email addresses with a known toxic domain."""
+    """An email field that forbids email addresses with a known toxic domain."""
 
     default_validators = [validate_antispam_email]

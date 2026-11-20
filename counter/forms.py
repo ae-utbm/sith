@@ -3,7 +3,7 @@ import math
 import uuid
 from collections import defaultdict
 from datetime import date, datetime, timezone
-from typing import TYPE_CHECKING, ClassVar
+from typing import TYPE_CHECKING, ClassVar, LiteralString
 
 from dateutil.relativedelta import relativedelta
 from django import forms
@@ -19,7 +19,7 @@ from phonenumber_field.widgets import RegionalPhoneNumberWidget
 
 from club.models import Club
 from club.widgets.ajax_select import AutoCompleteSelectClub
-from core.models import User, UserQuerySet
+from core.models import User, UserBan, UserQuerySet
 from core.views import LoginForm
 from core.views.forms import (
     FutureDateTimeField,
@@ -130,8 +130,14 @@ class GetUserForm(forms.Form):
         elif cleaned_data["id"]:
             customer = Customer.objects.filter(user=cleaned_data["id"]).first()
 
-        if customer is None or not customer.can_buy:
+        if customer is None:
             raise forms.ValidationError(_("User not found"))
+        if not customer.can_buy:
+            raise forms.ValidationError(_("This user cannot buy items on counters."))
+        if customer.user.is_banned_counter:
+            raise forms.ValidationError(
+                _("This user is banned from AE places. Take him/her out if you can.")
+            )
         cleaned_data["user_id"] = customer.user_id
         cleaned_data["user"] = customer.user
         return cleaned_data
@@ -250,6 +256,41 @@ class CounterEditForm(forms.ModelForm):
         self.fields["sellers_temporary"].initial = self.instance.sellers.filter(
             countersellers__is_regular=False
         ).all()
+
+    def clean_sellers(self, field: LiteralString):
+        sellers = self.cleaned_data[field]
+        bans = [
+            settings.SITH_GROUP_BANNED_COUNTER_ID,
+            settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID,
+        ]
+        invalid_sellers = sellers.annotate(
+            is_banned=Exists(
+                UserBan.objects.filter(user=OuterRef("pk"), ban_group__in=bans)
+            )
+        ).filter(Q(is_banned=True) | Q(date_of_birth=None))
+        for seller in invalid_sellers:
+            if seller.is_banned:
+                self.add_error(
+                    field,
+                    ValidationError(
+                        _("%(user)s is banned.") % {"user": seller.get_full_name()}
+                    ),
+                )
+            if not seller.date_of_birth:
+                self.add_error(
+                    field,
+                    ValidationError(
+                        _("%(user)s has not filled its birthdate.")
+                        % {"user": seller.get_full_name()}
+                    ),
+                )
+        return sellers
+
+    def clean_sellers_regular(self):
+        return self.clean_sellers("sellers_regular")
+
+    def clean_sellers_temporary(self):
+        return self.clean_sellers("sellers_temporary")
 
     def clean(self):
         regular: UserQuerySet = self.cleaned_data["sellers_regular"]
@@ -466,8 +507,6 @@ class ProductForm(forms.ModelForm):
         self.fields["name"].widget.attrs["autofocus"] = "autofocus"
         if self.instance.id:
             self.fields["counters"].initial = self.instance.counters.all()
-            if hasattr(self.instance, "formula"):
-                self.formula_init(self.instance.formula)
         self.price_formset = ProductPriceFormSet(
             *args, instance=self.instance, prefix="price", **kwargs
         )

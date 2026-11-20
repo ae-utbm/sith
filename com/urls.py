@@ -15,12 +15,8 @@
 
 from django.urls import path
 
-from club.views import MailingDeleteView
 from com.views import (
-    AlertMsgEditView,
-    InfoMsgEditView,
-    MailingListAdminView,
-    MailingModerateView,
+    BannerMessagesEditView,
     NewsAdminListView,
     NewsCreateView,
     NewsDeleteView,
@@ -48,8 +44,7 @@ from com.views import (
 )
 
 urlpatterns = [
-    path("sith/edit/alert/", AlertMsgEditView.as_view(), name="alert_edit"),
-    path("sith/edit/info/", InfoMsgEditView.as_view(), name="info_edit"),
+    path("sith/edit/banner/", BannerMessagesEditView.as_view(), name="banner_edit"),
     path(
         "sith/edit/weekmail_destinations/",
         WeekmailDestinationEditView.as_view(),
@@ -82,17 +77,6 @@ urlpatterns = [
         "news/<int:news_id>/moderate/", NewsModerateView.as_view(), name="news_moderate"
     ),
     path("news/<int:news_id>/", NewsDetailView.as_view(), name="news_detail"),
-    path("mailings/", MailingListAdminView.as_view(), name="mailing_admin"),
-    path(
-        "mailings/<int:mailing_id>/moderate/",
-        MailingModerateView.as_view(),
-        name="mailing_moderate",
-    ),
-    path(
-        "mailings/<int:mailing_id>/delete/",
-        MailingDeleteView.as_view(redirect_page="com:mailing_admin"),
-        name="mailing_delete",
-    ),
     path("poster/", PosterListView.as_view(), name="poster_list"),
     path("poster/create/", PosterCreateView.as_view(), name="poster_create"),
     path("poster/<int:poster_id>/edit/", PosterEditView.as_view(), name="poster_edit"),

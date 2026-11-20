@@ -104,7 +104,7 @@ class Migration(migrations.Migration):
                     "week_group",
                     models.CharField(
                         blank=True,
-                        choices=[("A", "A"), ("B", "B")],
+                        choices=[("A", "A"), ("B", "B"), ("", "Both")],
                         default="",
                         max_length=1,
                         verbose_name="week group",
