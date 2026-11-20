@@ -85,7 +85,7 @@ tests = [
 docs = [
     "mkdocs>=1.6.1,<2.0.0",
     "mkdocs-material>=9.8.2,<10.0.0",
-    "mkdocstrings>=1.0.6,<2.0.0",
+    "mkdocstrings>=1.0.8,<2.0.0",
     "mkdocstrings-python>=2.0.11,<3.0.0",
     "mkdocs-include-markdown-plugin>=7.3.0,<8.0.0",
 ]
