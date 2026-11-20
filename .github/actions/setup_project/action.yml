@@ -18,10 +18,7 @@ runs:
         version: 1.0  # increment to reset cache
 
     - name: Install Redis
-      if: ${{ inputs.full == 'true' }}
       uses: shogo82148/actions-setup-redis@v1
-      with:
-        redis-version: "7.x"
 
     - name: "Set up Python"
       uses: actions/setup-python@v6

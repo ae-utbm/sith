@@ -26,6 +26,17 @@ jobs:
       with:
         extra_args: --all-files
 
+  migration-check:
+    name: Check missing migrations
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - uses: ./.github/actions/setup_project
+      with:
+        full: false
+    - name: check migrations
+      run: uv run ./manage.py makemigrations --check
+
   tests:
     name: Run tests and generate coverage report
     runs-on: ubuntu-latest
