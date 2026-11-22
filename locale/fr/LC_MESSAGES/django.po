@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-14 13:59+0100\n"
+"POT-Creation-Date: 2026-11-22 22:06+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -226,6 +226,10 @@ msgstr "L'utilisateur doit être cotisant pour faire partie d'un club"
 #: club/forms.py
 msgid "You can not add the same user twice"
 msgstr "Vous ne pouvez pas ajouter deux fois le même utilisateur"
+
+#: club/forms.py
+msgid "This user is banned from being in the board of a club"
+msgstr "Cette personne a l'interdiction de rejoindre le bureau d'un club."
 
 #: club/forms.py
 msgid "You must be subscribed to join a club"
@@ -1316,7 +1320,7 @@ msgstr "Nos services"
 msgid "UE Guide"
 msgstr "Guide des UEs"
 
-#: com/templates/com/news_list.jinja
+#: com/templates/com/news_list.jinja core/views/user.py
 msgid "Timetable"
 msgstr "Emploi du temps"
 
