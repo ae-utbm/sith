@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-22 22:06+0100\n"
+"POT-Creation-Date: 2026-11-27 11:02+0100\n"
 "PO-Revision-Date: 2016-07-18\n"
 "Last-Translator: Maréchal <thomas.girod@utbm.fr\n"
 "Language-Team: AE info <ae.info@utbm.fr>\n"
@@ -4569,6 +4569,11 @@ msgstr "Vous avez sélectionné trop de candidats."
 #: election/forms.py
 msgid "User to candidate"
 msgstr "Utilisateur se présentant"
+
+#: election/forms.py
+#, python-format
+msgid "%(user)s is forbidden to run in a election."
+msgstr "%(user)s n'a pas le droit de se présenter à une élection."
 
 #: election/forms.py election/templates/election/election_detail.jinja
 msgid "Blank vote"
