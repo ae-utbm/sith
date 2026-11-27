@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 from bs4 import BeautifulSoup
+from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.core.cache import cache
 from django.db.models import Max
@@ -17,7 +18,7 @@ from club.forms import ClubAddMemberForm, JoinClubForm
 from club.models import Club, ClubRole, Membership
 from club.tests.base import TestClub
 from core.baker_recipes import subscriber_user
-from core.models import AnonymousUser, Group, User
+from core.models import AnonymousUser, Group, User, UserBan
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -384,6 +385,25 @@ class TestMembership(TestClub):
         assert not form.is_valid()
         assert form.errors == {
             "user": ["Vous ne pouvez pas ajouter deux fois le même utilisateur"]
+        }
+
+    def test_add_banned_user(self):
+        user = subscriber_user.make()
+        baker.make(
+            UserBan,
+            ban_group_id=settings.SITH_GROUP_BANNED_RESPONSIBILITY_ID,
+            user=user,
+        )
+        form = ClubAddMemberForm(
+            data={"user": user, "role": self.board_role},
+            request_user=self.root,
+            club=self.club,
+        )
+        assert not form.is_valid()
+        assert form.errors == {
+            "__all__": [
+                "Cette personne a l'interdiction de rejoindre le bureau d'un club."
+            ]
         }
 
     def test_add_other_member_forbidden(self):

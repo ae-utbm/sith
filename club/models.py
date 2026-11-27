@@ -421,18 +421,24 @@ class MembershipQuerySet(models.QuerySet):
         """Remove users from club groups they are no more in
         and add them in the club groups they should be in.
 
-        Be aware that this adds three db queries :
+        Be aware that this adds four db queries (on top of the UPDATE query) :
 
-        - one to retrieve the updated memberships
+        - two to retrieve the updated memberships
         - one to perform group removal
         - and one to perform group attribution.
         """
-        nb_rows = super().update(**kwargs)
-        if nb_rows == 0:
-            # if no row was affected, no need to edit club groups
+        memberships = set(self.values_list("id", flat=True))
+        if not memberships:
+            # if there is no selected membership,there is nothing to do
             return 0
+        nb_rows = super().update(**kwargs)
 
-        memberships = set(self.select_related("club"))
+        # re-fetch the updated objects, with their new state.
+        memberships = set(
+            Membership.objects.filter(id__in=memberships)
+            .select_related("club", "role")
+            .prefetch_related("role__linked_groups")
+        )
         # delete all User-Group relations and recreate the necessary ones
         Membership._remove_club_groups(memberships)
         Membership._add_club_groups(memberships)

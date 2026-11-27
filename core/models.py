@@ -775,6 +775,8 @@ class UserBan(models.Model):
             settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID,
         ]:
             self.user.counters.clear()
+        if self.ban_group_id == settings.SITH_GROUP_BANNED_RESPONSIBILITY_ID:
+            self.user.memberships.ongoing().board().update(end_date=localdate())
         return super().save(*args, **kwargs)
 
 

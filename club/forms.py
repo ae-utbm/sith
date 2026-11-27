@@ -25,6 +25,7 @@ import itertools
 from operator import attrgetter
 
 from django import forms
+from django.conf import settings
 from django.db.models import Exists, OuterRef, Q, QuerySet
 from django.db.models.functions import Lower
 from django.forms.models import ModelChoiceField, ModelChoiceIterator
@@ -182,7 +183,12 @@ class ClubOldMemberForm(forms.Form):
 
 
 class ClubMemberForm(forms.ModelForm):
-    """Form to add a member to the club, as a board member."""
+    """Base form to create a Membership.
+
+    Two subclasses exist :
+    - one for adding any user to a club, that is shown to board members
+    - the other for users without privileges to join the club as simple members.
+    """
 
     error_css_class = "error"
     required_css_class = "required"
@@ -247,9 +253,29 @@ class ClubAddMemberForm(ClubMemberForm):
             )
         return user
 
+    def clean(self):
+        res = super().clean()
+        if self.errors:
+            return res
+        user, role = self.cleaned_data["user"], self.cleaned_data["role"]
+        if (
+            role.is_board
+            and user.ban_groups.filter(
+                id=settings.SITH_GROUP_BANNED_RESPONSIBILITY_ID
+            ).exists()
+        ):
+            raise forms.ValidationError(
+                _("This user is banned from being in the board of a club"),
+                code="banned",
+            )
+        return res
+
 
 class JoinClubForm(ClubMemberForm):
-    """Form to join a club."""
+    """Form to join a club.
+
+    Only member roles can be obtained through this form.
+    """
 
     def __init__(self, *args, club: Club, request_user: User, **kwargs):
         super().__init__(*args, club=club, request_user=request_user, **kwargs)
@@ -261,6 +287,8 @@ class JoinClubForm(ClubMemberForm):
 
     def clean(self):
         """Check that the user is subscribed and isn't already in the club."""
+        # note: we don't check here if users are ban from joining a club board,
+        # because this form manages only member roles.
         if not self.request_user.is_subscribed:
             raise forms.ValidationError(
                 _("You must be subscribed to join a club"), code="invalid"

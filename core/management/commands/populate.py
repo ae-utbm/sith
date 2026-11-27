@@ -1006,6 +1006,7 @@ class Command(BaseCommand):
         BanGroup.objects.create(name="Banned from buying alcohol", description="")
         BanGroup.objects.create(name="Banned from counters", description="")
         BanGroup.objects.create(name="Banned to subscribe", description="")
+        BanGroup.objects.create(name="Responsibility ban", description="")
 
     def _create_elections(
         self,

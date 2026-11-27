@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from django import forms
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Count
 from django.forms.models import ModelChoiceIterator, ModelChoiceIteratorValue
@@ -54,9 +55,7 @@ class CandidateForm(forms.ModelForm):
     class Meta:
         model = Candidature
         fields = ["user", "role", "program", "election_list"]
-        labels = {
-            "user": _("User to candidate"),
-        }
+        labels = {"user": _("User to candidate")}
         widgets = {
             "program": MarkdownInput,
             "user": AutoCompleteSelectUser,
@@ -70,6 +69,23 @@ class CandidateForm(forms.ModelForm):
         self.fields["election_list"].queryset = election.election_lists.all()
         if not can_edit:
             self.fields["user"].widget = forms.HiddenInput()
+
+    def clean_user(self):
+        user = self.cleaned_data.get("user")
+        if (
+            user
+            and user.ban_groups.filter(
+                id__in=[
+                    settings.SITH_GROUP_BANNED_RESPONSIBILITY_ID,
+                    settings.SITH_GROUP_BANNED_SUBSCRIPTION_ID,
+                ]
+            ).exists()
+        ):
+            raise ValidationError(
+                _("%(user)s is forbidden to run in a election.")
+                % {"user": user.get_full_name()}
+            )
+        return user
 
 
 class VoteForm(forms.Form):
